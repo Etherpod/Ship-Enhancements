@@ -31,6 +31,36 @@
       "type": "toggle",
       "value": false,
       "tooltip": "Turns off both the interior and exterior lighting fixtures."
+    },
+    "disableShipOxygen": {
+      "title": "Disable Ship Oxygen",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Removes all of the oxygen from your ship. Don't stay out in space for too long!"
+    },
+    "oxygenDrainMultiplier": {
+      "title": "Ship Oxygen Drain Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "A multipler that influences how quickly the ship oxygen drains."
+    },
+    "fuelDrainMultiplier": {
+      "title": "Ship Fuel Drain Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "A multiplier that influences how quickly the ship fuel drains."
+    },
+    "shipDamageMultiplier": {
+      "title": "Ship Damage Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "A multiplier that influences how much damage the ship takes when it crashes."
+    },
+    "shipDamageSpeedMultiplier": {
+      "title": "Ship Damage Speed Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "A multiplier that influences the speed at which the ship starts taking damage. Higher numbers result in higher speeds before taking damage."
     }
   }
 }

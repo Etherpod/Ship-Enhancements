@@ -7,13 +7,27 @@ namespace ShipEnhancements;
 public class ShipEnhancements : ModBehaviour
 {
     public static ShipEnhancements Instance;
+    public bool oxygenDepleted;
+
     public bool HeadlightsDisabled { get; private set; }
+    public bool LandingCameraDisabled { get; private set; }
+    public float OxygenDrainMultiplier { get; private set; }
+    public float FuelDrainMultiplier { get; private set; }
+    public float DamageMultiplier { get; private set; }
+    public float DamageSpeedMultiplier { get; private set; }
 
     private bool _gravityCrystalDisabled;
     private bool _ejectButtonDisabled;
     private bool _headlightsDisabled;
     private bool _landingCameraDisabled;
     private bool _shipLightsDisabled;
+    private bool _oxygenDisabled;
+    private float _oxygenDrainMultiplier;
+    private float _fuelDrainMultiplier;
+    private float _damageMultiplier;
+    private float _damageSpeedMultiplier;
+
+    private float _lastSuitOxygen;
 
     private void Awake()
     {
@@ -28,23 +42,59 @@ public class ShipEnhancements : ModBehaviour
         _headlightsDisabled = ModHelper.Config.GetSettingsValue<bool>("disableHeadlights");
         _landingCameraDisabled = ModHelper.Config.GetSettingsValue<bool>("disableLandingCamera");
         _shipLightsDisabled = ModHelper.Config.GetSettingsValue<bool>("disableShipLights");
+        _oxygenDrainMultiplier = ModHelper.Config.GetSettingsValue<float>("oxygenDrainMultiplier");
+        _fuelDrainMultiplier = ModHelper.Config.GetSettingsValue<float>("fuelDrainMultiplier");
+        _damageMultiplier = ModHelper.Config.GetSettingsValue<float>("shipDamageMultiplier");
+        _damageSpeedMultiplier = ModHelper.Config.GetSettingsValue<float>("shipDamageSpeedMultiplier");
+
 
         LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
         {
             if (loadScene != OWScene.SolarSystem) return;
+
+            GlobalMessenger.AddListener("SuitUp", OnPlayerSuitUp);
+            GlobalMessenger.AddListener("RemoveSuit", OnPlayerRemoveSuit);
+            oxygenDepleted = false;
             HeadlightsDisabled = _headlightsDisabled;
-            StartCoroutine(WaitForShip());
+            LandingCameraDisabled = _landingCameraDisabled;
+            OxygenDrainMultiplier = _oxygenDrainMultiplier;
+            FuelDrainMultiplier = _fuelDrainMultiplier;
+            DamageMultiplier = _damageMultiplier;
+            DamageSpeedMultiplier = _damageSpeedMultiplier;
+            StartCoroutine(InitializeShip());
         };
 
         LoadManager.OnStartSceneLoad += (scene, loadScene) =>
         {
             if (scene != OWScene.SolarSystem) return;
+
+            GlobalMessenger.RemoveListener("SuitUp", OnPlayerSuitUp);
+            GlobalMessenger.RemoveListener("RemoveSuit", OnPlayerRemoveSuit);
+            _lastSuitOxygen = 0f;
         };
     }
 
-    private IEnumerator WaitForShip()
+    private void Update()
+    {
+        if (LoadManager.GetCurrentScene() != OWScene.SolarSystem) return;
+
+        if (!oxygenDepleted && Locator.GetShipBody().GetComponent<ShipResources>().GetOxygen() <= 0)
+        {
+            oxygenDepleted = true;
+            if (PlayerState.AtFlightConsole() && PlayerState.IsWearingSuit())
+            {
+                Locator.GetPlayerSuit().PutOnHelmet();
+            }
+            Locator.GetShipBody().GetComponentInChildren<OxygenVolume>().OnEffectVolumeExit(Locator.GetPlayerDetector());
+        }
+    }
+
+    private IEnumerator InitializeShip()
     {
         yield return new WaitUntil(() => Locator._shipBody != null);
+
+        _lastSuitOxygen = Locator.GetPlayerBody().GetComponent<PlayerResources>()._currentOxygen;
+
         if (_gravityCrystalDisabled)
         {
             DisableGravityCrystal();
@@ -55,11 +105,7 @@ public class ShipEnhancements : ModBehaviour
         }
         if (_headlightsDisabled)
         {
-            ElectricalComponent[] lightComponents = Locator.GetShipBody().GetComponentInChildren<ShipHeadlightComponent>()._electricalSystem._connectedComponents;
-            foreach (ElectricalComponent light in lightComponents)
-            {
-                light.GetComponent<ShipLight>().SetDamaged(true);
-            }
+            DisableHeadlights();
         }
         if (_landingCameraDisabled)
         {
@@ -85,6 +131,21 @@ public class ShipEnhancements : ModBehaviour
                 beacon.gameObject.SetActive(false);
             }
         }
+        if (_oxygenDisabled)
+        {
+            Locator.GetShipBody().GetComponent<ShipResources>().SetOxygen(0f);
+            oxygenDepleted = true;
+        }
+    }
+
+    private static void DisableHeadlights()
+    {
+        ShipHeadlightComponent headlightComponent = Locator.GetShipBody().GetComponentInChildren<ShipHeadlightComponent>();
+        headlightComponent._persistentCollider = true;
+        headlightComponent._repairReceiver.DisableCollider();
+        headlightComponent._damaged = true;
+        headlightComponent._repairFraction = 0f;
+        headlightComponent.OnComponentDamaged();
     }
 
     private void DisableGravityCrystal()
@@ -110,6 +171,19 @@ public class ShipEnhancements : ModBehaviour
         cameraComponent._landingCamera.SetPowered(false);
     }
 
+    private void OnPlayerSuitUp()
+    {
+        if (Locator.GetPlayerBody().GetComponent<PlayerResources>()._currentOxygen < _lastSuitOxygen)
+        {
+            Locator.GetPlayerBody().GetComponent<PlayerResources>()._currentOxygen = _lastSuitOxygen;
+        }
+    }
+
+    private void OnPlayerRemoveSuit()
+    {
+        _lastSuitOxygen = Locator.GetPlayerBody().GetComponent<PlayerResources>()._currentOxygen;
+    }
+
     public static void WriteDebugMessage(object msg)
     {
         Instance.ModHelper.Console.WriteLine(msg.ToString());
@@ -122,5 +196,10 @@ public class ShipEnhancements : ModBehaviour
         _headlightsDisabled = ModHelper.Config.GetSettingsValue<bool>("disableHeadlights");
         _landingCameraDisabled = ModHelper.Config.GetSettingsValue<bool>("disableLandingCamera");
         _shipLightsDisabled = ModHelper.Config.GetSettingsValue<bool>("disableShipLights");
+        _oxygenDisabled = ModHelper.Config.GetSettingsValue<bool>("disableShipOxygen");
+        _oxygenDrainMultiplier = ModHelper.Config.GetSettingsValue<float>("oxygenDrainMultiplier");
+        _fuelDrainMultiplier = ModHelper.Config.GetSettingsValue<float>("fuelDrainMultiplier");
+        _damageMultiplier = ModHelper.Config.GetSettingsValue<float>("shipDamageMultiplier");
+        _damageSpeedMultiplier = ModHelper.Config.GetSettingsValue<float>("shipDamageSpeedMultiplier");
     }
 }
