@@ -8,15 +8,18 @@ namespace ShipEnhancements;
 [HarmonyPatch]
 public class PatchClass
 {
-	[HarmonyPrefix]
+    #region DisableHeadlights
+    [HarmonyPrefix]
 	[HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.UpdateShipLightInput))]
 	public static bool DisableHeadlights(ShipCockpitController __instance)
 	{
         if (ShipEnhancements.Instance.HeadlightsDisabled) return false;
         return true;
     }
+    #endregion
 
-	[HarmonyPrefix]
+    #region DisableOxygen
+    [HarmonyPrefix]
 	[HarmonyPatch(typeof(OxygenVolume), nameof(OxygenVolume.OnEffectVolumeEnter))]
 	public static bool DisableShipOxygen(OxygenVolume __instance)
 	{
@@ -88,7 +91,9 @@ public class PatchClass
         }
         return false;
     }
+    #endregion
 
+    #region DisableGravity
     [HarmonyPrefix]
     [HarmonyPatch(typeof(PlayerCameraController), nameof(PlayerCameraController.UpdateInput))]
     public static bool AllowZeroGCockpitFreeLook(PlayerCameraController __instance, float deltaTime)
@@ -126,7 +131,9 @@ public class PatchClass
         __instance._degreesY += OWInput.GetAxisValue(InputLibrary.look, InputMode.All).y * num2 * vector.y * num;
         return false;
     }
+    #endregion
 
+    #region ResourceDrainMultiplier
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ShipResources), nameof(ShipResources.DrainOxygen))]
     public static bool ApplyOxygenDrainMultiplier(ShipResources __instance, float amount)
@@ -142,7 +149,9 @@ public class PatchClass
         __instance._currentFuel = Mathf.Max(__instance._currentFuel - (amount * ShipEnhancements.Instance.FuelDrainMultiplier), 0f);
         return false;
     }
+    #endregion
 
+    #region DamageMultiplier
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ShipHull), nameof(ShipHull.FixedUpdate))]
     public static bool ApplyHullDamageMultiplier(ShipHull __instance)
@@ -255,4 +264,92 @@ public class PatchClass
         }
         __result = flag;
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.OnImpact))]
+    public static bool ApplyExplosionDamageMultiplier(ShipDamageController __instance, ImpactData impact)
+    {
+        if (impact.otherCollider.attachedRigidbody != null && impact.otherCollider.attachedRigidbody.CompareTag("Player") && PlayerState.IsInsideShip())
+        {
+            return false;
+        }
+        if (impact.speed >= 300f * ShipEnhancements.Instance.DamageSpeedMultiplier && !__instance._exploded)
+        {
+            __instance.Explode(false);
+            return false;
+        }
+        if (!__instance._invincible)
+        {
+            for (int i = 0; i < __instance._shipModules.Length; i++)
+            {
+                __instance._shipModules[i].ApplyImpact(impact);
+            }
+        }
+        return false;
+    }
+    #endregion
+
+    #region OxygenRefill
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(OxygenVolume), nameof(OxygenVolume.OnEffectVolumeEnter))]
+    public static void AddShipToVolume(GameObject hitObj)
+    {
+        if (hitObj.CompareTag("ShipDetector"))
+        {
+            ShipEnhancements.Instance.AddShipOxygenVolume();
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(OxygenVolume), nameof(OxygenVolume.OnEffectVolumeExit))]
+    public static void RemoveShipFromVolume(GameObject hitObj)
+    {
+        if (hitObj.CompareTag("ShipDetector"))
+        {
+            ShipEnhancements.Instance.RemoveShipOxygenVolume();
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipResources), nameof(ShipResources.Update))]
+    public static bool RefillShipOxygen(ShipResources __instance)
+    {
+        if (!ShipEnhancements.Instance.TreesRefillShipOxygen) return true;
+
+        if (__instance._killingResources)
+        {
+            __instance.DebugKillResources();
+            return false;
+        }
+        float magnitude = __instance._shipThruster.GetLocalAcceleration().magnitude;
+        if (magnitude > 0f)
+        {
+            __instance.DrainFuel(magnitude * 0.1f * Time.deltaTime);
+        }
+        if (__instance._currentFuel <= 0f && !NotificationManager.SharedInstance.IsPinnedNotification(__instance._fuelDepletedNotification))
+        {
+            NotificationManager.SharedInstance.PostNotification(__instance._fuelDepletedNotification, true);
+        }
+        else if (__instance._currentFuel > 0f && NotificationManager.SharedInstance.IsPinnedNotification(__instance._fuelDepletedNotification))
+        {
+            NotificationManager.SharedInstance.UnpinNotification(__instance._fuelDepletedNotification);
+        }
+        if (__instance._hullBreach)
+        {
+            __instance.DrainOxygen(1000f * Time.deltaTime);
+        }
+        else
+        {
+            if (ShipEnhancements.Instance.IsShipInOxygen())
+            {
+                __instance.AddOxygen(100f * Time.deltaTime);
+            }
+            else if (PlayerState.IsInsideShip())
+            {
+                __instance.DrainOxygen(0.13f * Time.deltaTime);
+            }
+        }
+        return false;
+    }
+    #endregion
 }

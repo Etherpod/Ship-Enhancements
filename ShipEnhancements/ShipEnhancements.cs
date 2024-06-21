@@ -1,4 +1,5 @@
-﻿using OWML.Common;
+﻿using JetBrains.Annotations;
+using OWML.Common;
 using OWML.ModHelper;
 using System.Collections;
 using UnityEngine;
@@ -15,6 +16,7 @@ public class ShipEnhancements : ModBehaviour
     public float FuelDrainMultiplier { get; private set; }
     public float DamageMultiplier { get; private set; }
     public float DamageSpeedMultiplier { get; private set; }
+    public bool TreesRefillShipOxygen { get; private set; }
 
     private bool _gravityCrystalDisabled;
     private bool _ejectButtonDisabled;
@@ -26,8 +28,12 @@ public class ShipEnhancements : ModBehaviour
     private float _fuelDrainMultiplier;
     private float _damageMultiplier;
     private float _damageSpeedMultiplier;
+    private bool _treesRefillShipOxygen = true;
 
     private float _lastSuitOxygen;
+    private bool _shipLoaded = false;
+    private int _activeShipOxygenVolumes;
+    
 
     private void Awake()
     {
@@ -61,6 +67,7 @@ public class ShipEnhancements : ModBehaviour
             FuelDrainMultiplier = _fuelDrainMultiplier;
             DamageMultiplier = _damageMultiplier;
             DamageSpeedMultiplier = _damageSpeedMultiplier;
+            TreesRefillShipOxygen = _treesRefillShipOxygen;
             StartCoroutine(InitializeShip());
         };
 
@@ -71,12 +78,14 @@ public class ShipEnhancements : ModBehaviour
             GlobalMessenger.RemoveListener("SuitUp", OnPlayerSuitUp);
             GlobalMessenger.RemoveListener("RemoveSuit", OnPlayerRemoveSuit);
             _lastSuitOxygen = 0f;
+            _activeShipOxygenVolumes = 0;
+            _shipLoaded = false;
         };
     }
 
     private void Update()
     {
-        if (LoadManager.GetCurrentScene() != OWScene.SolarSystem) return;
+        if (!_shipLoaded || LoadManager.GetCurrentScene() != OWScene.SolarSystem) return;
 
         if (!oxygenDepleted && Locator.GetShipBody().GetComponent<ShipResources>().GetOxygen() <= 0)
         {
@@ -87,13 +96,18 @@ public class ShipEnhancements : ModBehaviour
             }
             Locator.GetShipBody().GetComponentInChildren<OxygenVolume>().OnEffectVolumeExit(Locator.GetPlayerDetector());
         }
+        else if (oxygenDepleted && Locator.GetShipBody().GetComponent<ShipResources>().GetOxygen() > 0)
+        {
+            oxygenDepleted = false;
+        }
     }
 
     private IEnumerator InitializeShip()
     {
         yield return new WaitUntil(() => Locator._shipBody != null);
 
-        _lastSuitOxygen = Locator.GetPlayerBody().GetComponent<PlayerResources>()._currentOxygen;
+        _shipLoaded = true;
+        UpdateSuitOxygen();
 
         if (_gravityCrystalDisabled)
         {
@@ -181,7 +195,28 @@ public class ShipEnhancements : ModBehaviour
 
     private void OnPlayerRemoveSuit()
     {
+        UpdateSuitOxygen();
+    }
+
+    public void UpdateSuitOxygen()
+    {
         _lastSuitOxygen = Locator.GetPlayerBody().GetComponent<PlayerResources>()._currentOxygen;
+    }
+
+    public void AddShipOxygenVolume()
+    {
+        _activeShipOxygenVolumes++;
+    }
+
+    public void RemoveShipOxygenVolume()
+    {
+        _activeShipOxygenVolumes = Mathf.Max(_activeShipOxygenVolumes - 1, 0);
+    }
+
+    public bool IsShipInOxygen()
+    {
+        WriteDebugMessage("Checking oxygen");
+        return _activeShipOxygenVolumes > 0;
     }
 
     public static void WriteDebugMessage(object msg)
