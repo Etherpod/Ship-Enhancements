@@ -1,0 +1,36 @@
+{
+  "$schema": "https://raw.githubusercontent.com/ow-mods/owml/master/schemas/config_schema.json",
+  "enabled": true,
+  "settings": {
+    "disableGravityCrystal": {
+      "title": "Disable Ship Gravity",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Disables the gravity crystal inside the ship."
+    },
+    "disableEjectButton": {
+      "title": "Disable Eject Button",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Disables the eject button in the cockpit."
+    },
+    "disableHeadlights": {
+      "title": "Disable Headlights",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Disables the ship headlights and the landing camera light."
+    },
+    "disableLandingCamera": {
+      "title": "Disable Landing Camera",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Disables the landing camera. Good luck making a proper landing!"
+    },
+    "disableShipLights": {
+      "title": "Disable Ship Lights",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Turns off both the interior and exterior lighting fixtures."
+    }
+  }
+}
