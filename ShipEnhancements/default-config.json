@@ -61,6 +61,18 @@
       "type": "number",
       "value": 1,
       "tooltip": "A multiplier that influences the speed at which the ship starts taking damage. Higher numbers result in higher speeds before taking damage."
+    },
+    "shipOxygenRefill": {
+      "title": "Enable Ship Oxygen Refill",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Refills the ship's oxygen tank when near oxygen sources. Doesn't work when oxygen is disabled."
+    },
+    "disableShipRepair": {
+      "title": "Disable Ship Repairing",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Removes your ability to repair your ship. Be careful out there!"
     }
   }
 }

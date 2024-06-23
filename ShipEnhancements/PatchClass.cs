@@ -10,9 +10,9 @@ public class PatchClass
 {
     #region DisableHeadlights
     [HarmonyPrefix]
-	[HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.UpdateShipLightInput))]
-	public static bool DisableHeadlights(ShipCockpitController __instance)
-	{
+    [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.UpdateShipLightInput))]
+    public static bool DisableHeadlights(ShipCockpitController __instance)
+    {
         if (ShipEnhancements.Instance.HeadlightsDisabled) return false;
         return true;
     }
@@ -20,20 +20,20 @@ public class PatchClass
 
     #region DisableOxygen
     [HarmonyPrefix]
-	[HarmonyPatch(typeof(OxygenVolume), nameof(OxygenVolume.OnEffectVolumeEnter))]
-	public static bool DisableShipOxygen(OxygenVolume __instance)
-	{
-		if (ShipEnhancements.Instance.oxygenDepleted && __instance.GetComponentInParent<ShipBody>())
-		{
-			return false;
-		}
-		return true;
-	}
+    [HarmonyPatch(typeof(OxygenVolume), nameof(OxygenVolume.OnEffectVolumeEnter))]
+    public static bool DisableShipOxygen(OxygenVolume __instance)
+    {
+        if (ShipEnhancements.Instance.oxygenDepleted && __instance.GetComponentInParent<ShipBody>())
+        {
+            return false;
+        }
+        return true;
+    }
 
-	[HarmonyPrefix]
-	[HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.OnPressInteract))]
-	public static bool KeepHelmetOnAtCockpit(ShipCockpitController __instance)
-	{
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.OnPressInteract))]
+    public static bool KeepHelmetOnAtCockpit(ShipCockpitController __instance)
+    {
         if (!ShipEnhancements.Instance.oxygenDepleted) return true;
 
         if (!__instance._playerAtFlightConsole)
@@ -100,7 +100,7 @@ public class PatchClass
     {
         bool flag = __instance._shipController != null && __instance._shipController.AllowFreeLook() && OWInput.IsPressed(InputLibrary.freeLook, 0f);
         bool flag2 = OWInput.IsInputMode(InputMode.Character | InputMode.ScopeZoom | InputMode.NomaiRemoteCam | InputMode.PatchingSuit);
-        if (__instance._isSnapping || __instance._isLockedOn 
+        if (__instance._isSnapping || __instance._isLockedOn
             || (PlayerState.InZeroG() && PlayerState.IsWearingSuit() && !PlayerState.AtFlightConsole()) || (!flag2 && !flag))
         {
             return false;
@@ -114,8 +114,8 @@ public class PatchClass
             vector /= Time.timeScale;
         }
         float num = deltaTime;
-        if (InputLibrary.look.AxisID == AxisIdentifier.KEYBD_MOUSE 
-            || InputLibrary.look.AxisID == AxisIdentifier.KEYBD_MOUSEX 
+        if (InputLibrary.look.AxisID == AxisIdentifier.KEYBD_MOUSE
+            || InputLibrary.look.AxisID == AxisIdentifier.KEYBD_MOUSEX
             || InputLibrary.look.AxisID == AxisIdentifier.KEYBD_MOUSEY)
         {
             num = 0.01666667f;
@@ -179,7 +179,7 @@ public class PatchClass
         }
         if (__instance._dominantImpact != null)
         {
-            float num = Mathf.InverseLerp(30f * ShipEnhancements.Instance.DamageSpeedMultiplier, 
+            float num = Mathf.InverseLerp(30f * ShipEnhancements.Instance.DamageSpeedMultiplier,
                 200f * ShipEnhancements.Instance.DamageSpeedMultiplier, __instance._dominantImpact.speed);
             if (num > 0f)
             {
@@ -238,7 +238,7 @@ public class PatchClass
         {
             return false;
         }
-        if (UnityEngine.Random.value / ShipEnhancements.Instance.DamageMultiplier 
+        if (UnityEngine.Random.value / ShipEnhancements.Instance.DamageMultiplier
             < __instance._damageProbabilityCurve.Evaluate(impact.speed / ShipEnhancements.Instance.DamageSpeedMultiplier))
         {
             __instance.SetDamaged(true);
@@ -291,22 +291,12 @@ public class PatchClass
 
     #region OxygenRefill
     [HarmonyPostfix]
-    [HarmonyPatch(typeof(OxygenVolume), nameof(OxygenVolume.OnEffectVolumeEnter))]
-    public static void AddShipToVolume(GameObject hitObj)
+    [HarmonyPatch(typeof(OxygenVolume), nameof(OxygenVolume.PlaysRefillAudio))]
+    public static void PlayRefillAudio(OxygenVolume __instance, ref bool __result)
     {
-        if (hitObj.CompareTag("ShipDetector"))
+        if (__instance.GetComponentInParent<ShipBody>() && ShipEnhancements.Instance.refillingOxygen)
         {
-            ShipEnhancements.Instance.AddShipOxygenVolume();
-        }
-    }
-
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(OxygenVolume), nameof(OxygenVolume.OnEffectVolumeExit))]
-    public static void RemoveShipFromVolume(GameObject hitObj)
-    {
-        if (hitObj.CompareTag("ShipDetector"))
-        {
-            ShipEnhancements.Instance.RemoveShipOxygenVolume();
+            __result = true;
         }
     }
 
@@ -314,7 +304,7 @@ public class PatchClass
     [HarmonyPatch(typeof(ShipResources), nameof(ShipResources.Update))]
     public static bool RefillShipOxygen(ShipResources __instance)
     {
-        if (!ShipEnhancements.Instance.TreesRefillShipOxygen) return true;
+        if (ShipEnhancements.Instance.OxygenDisabled || !ShipEnhancements.Instance.ShipOxygenRefill) return true;
 
         if (__instance._killingResources)
         {
@@ -350,6 +340,55 @@ public class PatchClass
             }
         }
         return false;
+    }
+    #endregion
+
+    #region DisableShipRepair
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipComponent), nameof(ShipComponent.Awake))]
+    public static void DisableShipComponentRepair(ShipComponent __instance)
+    {
+        if (!ShipEnhancements.Instance.ShipRepairDisabled) return;
+
+        __instance._repairReceiver._repairDistance = 0f;
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipHull), nameof(ShipHull.Start))]
+    public static void DisableShipHullRepair(ShipHull __instance)
+    {
+        if (!ShipEnhancements.Instance.ShipRepairDisabled) return;
+
+        for (int i = 0; i < __instance._colliders.Length; i++)
+        {
+            if (__instance._colliders[i].TryGetComponent(out RepairReceiver repairReceiver))
+            {
+                repairReceiver._repairDistance = 0f;
+            }
+        }
+    }
+    #endregion
+
+    #region GravityLandingGear
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(LandingPadSensor), nameof(LandingPadSensor.Awake))]
+    public static void AddGravityComponent(LandingPadSensor __instance)
+    {
+        __instance.gameObject.AddComponent<GravityLandingGear>();
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(LandingPadSensor), nameof(LandingPadSensor.OnTriggerEnter))]
+    public static void EnableGravity(LandingPadSensor __instance)
+    {
+        //__instance.transform.GetChild(0).gameObject.SetActive(true);
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(LandingPadSensor), nameof(LandingPadSensor.OnTriggerExit))]
+    public static void DisableGravity(LandingPadSensor __instance)
+    {
+        //__instance.transform.GetChild(0).gameObject.SetActive(false);
     }
     #endregion
 }
