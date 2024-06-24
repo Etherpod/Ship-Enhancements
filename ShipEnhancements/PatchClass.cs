@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using HarmonyLib;
+using NAudio.MediaFoundation;
 using UnityEngine;
 
 namespace ShipEnhancements;
@@ -374,21 +375,185 @@ public class PatchClass
     [HarmonyPatch(typeof(LandingPadSensor), nameof(LandingPadSensor.Awake))]
     public static void AddGravityComponent(LandingPadSensor __instance)
     {
+        if (!ShipEnhancements.Instance.GravityLandingGearEnabled) return;
         __instance.gameObject.AddComponent<GravityLandingGear>();
     }
+    #endregion
 
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(LandingPadSensor), nameof(LandingPadSensor.OnTriggerEnter))]
-    public static void EnableGravity(LandingPadSensor __instance)
+    #region DisableAutoRoll
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(FluidVolume), nameof(FluidVolume.Start))]
+    public static void Attempt3(FluidVolume __instance)
     {
-        //__instance.transform.GetChild(0).gameObject.SetActive(true);
+        if (ShipEnhancements.Instance.AirAutoRollDisabled && __instance._fluidType == FluidVolume.Type.AIR)
+        {
+            __instance._allowShipAutoroll = false;
+        }
+        else if (ShipEnhancements.Instance.WaterAutoRollDisabled && __instance._fluidType == FluidVolume.Type.WATER)
+        {
+            __instance._allowShipAutoroll = false;
+        }
+    }
+    #endregion
+
+    #region ThrustModulator
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipThrusterController), nameof(ShipThrusterController.ReadTranslationalInput))]
+    public static void LimitTranslationalInput(ShipThrusterController __instance, ref Vector3 __result)
+    {
+        if (!ShipEnhancements.Instance.ThrustModulatorEnabled) return;
+        __result *= ShipEnhancements.Instance.ThrustModulatorLevel / 5f;
     }
 
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(LandingPadSensor), nameof(LandingPadSensor.OnTriggerExit))]
-    public static void DisableGravity(LandingPadSensor __instance)
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Autopilot), nameof(Autopilot.ReadTranslationalInput))]
+    public static bool LimitAutopilotTranslationalInput(Autopilot __instance, ref Vector3 __result)
     {
-        //__instance.transform.GetChild(0).gameObject.SetActive(false);
+        if (!ShipEnhancements.Instance.ThrustModulatorEnabled) return true;
+
+        if (__instance._isShipAutopilot && !__instance._shipResources.AreThrustersUsable())
+        {
+            if (__instance._isMatchingVelocity)
+            {
+                __instance.StopMatchVelocity();
+            }
+            else if (__instance._isFlyingToDestination)
+            {
+                __instance.Abort();
+            }
+            __result = Vector3.zero;
+            return false;
+        }
+
+        float multiplier = ShipEnhancements.Instance.ThrustModulatorLevel / 5f;
+
+        if (__instance._isMatchingVelocity && __instance._referenceFrame != null)
+        {
+            float num = Vector3.Distance(__instance._owRigidbody.GetWorldCenterOfMass(), __instance._referenceFrame.GetPosition());
+            Vector3 vector;
+            if (__instance._referenceFrame.GetAllowMatchAngularVelocity(num))
+            {
+                vector = __instance._referenceFrame.GetPointVelocity(__instance._owRigidbody.GetCenterOfMass()) - __instance._owRigidbody.GetVelocity();
+            }
+            else
+            {
+                vector = __instance._owRigidbody.GetRelativeVelocity(__instance._referenceFrame);
+            }
+            float magnitude = vector.magnitude;
+            float num2 = (__instance._ignoreThrustLimits ? __instance._thrusterModel.GetMaxTranslationalThrust() * multiplier
+                : Mathf.Min(__instance._rulesetDetector.GetThrustLimit(), __instance._thrusterModel.GetMaxTranslationalThrust() * multiplier));
+            float num3 = num2 * Time.fixedDeltaTime;
+            float num4 = num2 / (__instance._thrusterModel.GetMaxTranslationalThrust() * multiplier);
+            if (magnitude < num3)
+            {
+                num4 *= magnitude / num3;
+            }
+            if (__instance._stopMatchingNextFrame)
+            {
+                __instance._stopMatchingNextFrame = false;
+
+                var eventDelegate1 = (MulticastDelegate)typeof(Autopilot).GetField("OnArriveAtDestination", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).GetValue(__instance);
+                var eventDelegate2 = (MulticastDelegate)typeof(Autopilot).GetField("OnMatchedVelocity", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).GetValue(__instance);
+                if (eventDelegate1 != null && __instance._isFlyingToDestination)
+                {
+                    float num5 = num - __instance._referenceFrame.GetAutopilotArrivalDistance();
+                    foreach (var handler in eventDelegate1.GetInvocationList())
+                    {
+                        handler.Method.Invoke(handler.Target, [num5]);
+                    }
+                    __instance._isFlyingToDestination = false;
+                }
+                else if (eventDelegate2 != null)
+                {
+                    foreach (var handler in eventDelegate2.GetInvocationList())
+                    {
+                        handler.Method.Invoke(handler.Target, null);
+                    }
+                }
+
+                __instance.StopMatchVelocity();
+            }
+            else
+            {
+                float num6 = magnitude - num3 * num4;
+                float num7 = 0.01f;
+                ForceDetector attachedForceDetector = __instance._referenceFrame.GetOWRigidBody().GetAttachedForceDetector();
+                if (attachedForceDetector != null)
+                {
+                    num7 = (Vector3.Project(attachedForceDetector.GetForceAcceleration() - __instance._forceDetector.GetForceAcceleration(), vector.normalized) * Time.deltaTime).magnitude;
+                }
+                if (num6 <= num7)
+                {
+                    __instance._stopMatchingNextFrame = true;
+                    __result = Vector3.zero;
+                    return false;
+                }
+            }
+            __result = __instance.transform.InverseTransformDirection(vector.normalized * num4) * multiplier;
+            return false;
+        }
+        if (!__instance._isFlyingToDestination || __instance._referenceFrame == null)
+        {
+            __result = Vector3.zero;
+            return false;
+        }
+        __instance._isLiningUpDestination = false;
+        __instance._isApproachingDestination = false;
+        Vector3 vector2 = __instance._referenceFrame.GetPosition() - __instance._owRigidbody.GetWorldCenterOfMass();
+        float magnitude2 = vector2.magnitude;
+        Vector3 relativeVelocity = __instance._owRigidbody.GetRelativeVelocity(__instance._referenceFrame);
+        Vector3 vector3 = Vector3.Project(relativeVelocity, vector2);
+        float num8 = vector3.magnitude * -Mathf.Sign(Vector3.Dot(vector2, vector3));
+        if (num8 < -1f)
+        {
+            __instance._isLiningUpDestination = true;
+            __result = __instance.transform.InverseTransformDirection(relativeVelocity.normalized) * multiplier;
+            return false;
+        }
+        Vector3 vector4 = Vector3.Project(__instance._forceDetector.GetForceAcceleration(), vector2);
+        float num9 = vector4.magnitude * -Mathf.Sign(Vector3.Dot(vector2, vector4));
+        Vector3 vector5 = Vector3.Project(__instance._referenceFrame.GetAcceleration(), vector2);
+        float num10 = vector5.magnitude * Mathf.Sign(Vector3.Dot(vector2, vector5)) + num9 + (__instance._thrusterModel.GetMaxTranslationalThrust() * multiplier);
+        if (Mathf.Pow(Mathf.Abs(num8), 2f) / (2f * num10) > magnitude2 - __instance._referenceFrame.GetAutopilotArrivalDistance())
+        {
+            var eventDelegate3 = (MulticastDelegate)typeof(Autopilot).GetField("OnFireRetroRockets", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).GetValue(__instance);
+
+            if (eventDelegate3 != null)
+            {
+                foreach (var handler in eventDelegate3.GetInvocationList())
+                {
+                    handler.Method.Invoke(handler.Target, null);
+                }
+            }
+            __instance.StartMatchVelocity(__instance._referenceFrame, true);
+            __result = Vector3.zero;
+            return false;
+        }
+        Vector3 vector6 = relativeVelocity - vector3;
+        if (vector6.magnitude > (__instance._thrusterModel.GetMaxTranslationalThrust() * multiplier) / 10f)
+        {
+            __instance._isLiningUpDestination = true;
+            if (num8 > 10f)
+            {
+                vector3 = Vector3.zero;
+            }
+        }
+        else
+        {
+            __instance._isApproachingDestination = true;
+            vector6 *= vector3.magnitude / 2f;
+            if (num8 > 0f)
+            {
+                vector3 *= -1f;
+            }
+            else if (num8 <= 0f)
+            {
+                vector6 = Vector3.zero;
+                vector3 = vector2;
+            }
+        }
+        __result = __instance.transform.InverseTransformDirection((vector6 + vector3).normalized) * multiplier;
+        return false;
     }
     #endregion
 }

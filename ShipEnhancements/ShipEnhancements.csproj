@@ -12,6 +12,15 @@
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugType>none</DebugType>
   </PropertyGroup>
+  <Target Name="CopyDLLs" AfterTargets="Build" Condition=" '$(Configuration)' == 'Debug' And '$(UnityProjectDir)' != '' ">
+    <Message Text="Copying DLL to Unity project" Importance="High" />
+
+    <Copy SourceFiles="$(TargetDir)$(ProjectName).dll" DestinationFolder="$(UnityProjectModDir)" />
+    <Copy SourceFiles="@(CopyItems)" DestinationFolder="$(UnityProjectModDir)" />
+
+    <Message Text="Copy complete" Importance="High" />
+  </Target>
+  
   <ItemGroup>
     <PackageReference Include="OWML" Version="2.9.8" />
     <PackageReference Include="OuterWildsGameLibs" Version="1.1.14.768" />

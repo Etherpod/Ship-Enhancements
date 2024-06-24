@@ -1,5 +1,7 @@
 ﻿<Project>
   <PropertyGroup>
     <OutputPath>$(AppData)\OuterWildsModManager\OWML\Mods\Etherpod.ShipEnhancements</OutputPath>
+    <UnityProjectDir>$(SolutionDir)\..\ShipEnhancementsAssets</UnityProjectDir>
+    <UnityProjectModDir>$(UnityProjectDir)\Assets\Dlls</UnityProjectModDir>
   </PropertyGroup>
 </Project>

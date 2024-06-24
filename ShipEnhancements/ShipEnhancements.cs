@@ -4,10 +4,14 @@ using OWML.ModHelper;
 using System.Collections;
 using UnityEngine;
 using System.IO;
+using System.Security.Policy;
 
 namespace ShipEnhancements;
 public class ShipEnhancements : ModBehaviour
 {
+    public delegate void SwitchEvent(bool enabled);
+    public event SwitchEvent OnGravityLandingGearSwitch;
+
     public static ShipEnhancements Instance;
     public bool oxygenDepleted;
     public bool refillingOxygen;
@@ -21,6 +25,12 @@ public class ShipEnhancements : ModBehaviour
     public bool ShipOxygenRefill { get; private set; }
     public bool OxygenDisabled { get; private set; }
     public bool ShipRepairDisabled { get; private set; }
+    public bool GravityLandingGearEnabled { get; private set; }
+    public bool AirAutoRollDisabled { get; private set; }
+    public bool WaterAutoRollDisabled { get; private set; }
+    public bool ThrustModulatorEnabled { get; private set; }
+    public int ThrustModulatorLevel { get; private set; }
+    
 
     private bool _gravityCrystalDisabled;
     private bool _ejectButtonDisabled;
@@ -35,6 +45,9 @@ public class ShipEnhancements : ModBehaviour
     private bool _shipOxygenRefill;
     private bool _shipRepairDisabled;
     private bool _gravityLandingGearEnabled;
+    private bool _airAutoRollDisabled;
+    private bool _waterAutoRollDisabled;
+    private bool _thrustModulatorEnabled;
 
     private AssetBundle _shipEnhancementsBundle;
     private float _lastSuitOxygen;
@@ -50,7 +63,7 @@ public class ShipEnhancements : ModBehaviour
 
     private void Start()
     {
-        _shipEnhancementsBundle = AssetBundle.LoadFromFile(Path.Combine(ModHelper.Manifest.ModFolderPath, "ShipEnhancements/assets/shipenhancements"));
+        _shipEnhancementsBundle = AssetBundle.LoadFromFile(Path.Combine(ModHelper.Manifest.ModFolderPath, "assets/shipenhancements"));
 
         _gravityCrystalDisabled = ModHelper.Config.GetSettingsValue<bool>("disableGravityCrystal");
         _ejectButtonDisabled = ModHelper.Config.GetSettingsValue<bool>("disableEjectButton");
@@ -63,6 +76,10 @@ public class ShipEnhancements : ModBehaviour
         _damageSpeedMultiplier = ModHelper.Config.GetSettingsValue<float>("shipDamageSpeedMultiplier");
         _shipOxygenRefill = ModHelper.Config.GetSettingsValue<bool>("shipOxygenRefill");
         _shipRepairDisabled = ModHelper.Config.GetSettingsValue<bool>("disableShipRepair");
+        _gravityLandingGearEnabled = ModHelper.Config.GetSettingsValue<bool>("enableGravityLandingGear");
+        _airAutoRollDisabled = ModHelper.Config.GetSettingsValue<bool>("disableAirAutoRoll");
+        _waterAutoRollDisabled = ModHelper.Config.GetSettingsValue<bool>("disableWaterAutoRoll");
+        _thrustModulatorEnabled = ModHelper.Config.GetSettingsValue<bool>("enableThrustModulator");
 
         LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
         {
@@ -71,22 +88,16 @@ public class ShipEnhancements : ModBehaviour
             GlobalMessenger.AddListener("SuitUp", OnPlayerSuitUp);
             GlobalMessenger.AddListener("RemoveSuit", OnPlayerRemoveSuit);
             oxygenDepleted = false;
-            HeadlightsDisabled = _headlightsDisabled;
-            LandingCameraDisabled = _landingCameraDisabled;
-            OxygenDrainMultiplier = _oxygenDrainMultiplier;
-            FuelDrainMultiplier = _fuelDrainMultiplier;
-            DamageMultiplier = _damageMultiplier;
-            DamageSpeedMultiplier = _damageSpeedMultiplier;
-            ShipOxygenRefill = _shipOxygenRefill;
-            OxygenDisabled = _oxygenDisabled;
-            ShipRepairDisabled = _shipRepairDisabled;
+
             StartCoroutine(InitializeShip());
         };
 
         LoadManager.OnStartSceneLoad += (scene, loadScene) =>
         {
+            if (scene == OWScene.TitleScreen) UpdateProperties();
             if (scene != OWScene.SolarSystem) return;
 
+            UpdateProperties();
             GlobalMessenger.RemoveListener("SuitUp", OnPlayerSuitUp);
             GlobalMessenger.RemoveListener("RemoveSuit", OnPlayerRemoveSuit);
             _lastSuitOxygen = 0f;
@@ -142,13 +153,36 @@ public class ShipEnhancements : ModBehaviour
         }
     }
 
+    private void UpdateProperties()
+    {
+        HeadlightsDisabled = _headlightsDisabled;
+        LandingCameraDisabled = _landingCameraDisabled;
+        OxygenDrainMultiplier = _oxygenDrainMultiplier;
+        FuelDrainMultiplier = _fuelDrainMultiplier;
+        DamageMultiplier = _damageMultiplier;
+        DamageSpeedMultiplier = _damageSpeedMultiplier;
+        ShipOxygenRefill = _shipOxygenRefill;
+        OxygenDisabled = _oxygenDisabled;
+        ShipRepairDisabled = _shipRepairDisabled;
+        GravityLandingGearEnabled = _gravityLandingGearEnabled;
+        AirAutoRollDisabled = _airAutoRollDisabled;
+        WaterAutoRollDisabled = _waterAutoRollDisabled;
+        ThrustModulatorEnabled = _thrustModulatorEnabled;
+        ThrustModulatorLevel = 5;
+    }
+
     private IEnumerator InitializeShip()
     {
         yield return new WaitUntil(() => Locator._shipBody != null);
 
         GameObject buttonConsole = (GameObject)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ButtonConsole.prefab");
         AssetBundleUtilities.ReplaceShaders(buttonConsole);
-        buttonConsole.transform.parent = Locator.GetShipTransform().Find("");
+        Vector3 cockpitPosition = new Vector3(0, -3.762f, 0.1989994f);
+        GameObject buttonConsoleObj = Instantiate(buttonConsole, cockpitPosition, 
+            Quaternion.identity, Locator.GetShipBody().transform);
+        buttonConsoleObj.transform.localPosition = cockpitPosition;
+        buttonConsoleObj.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
+        buttonConsoleObj.transform.localScale = Vector3.one;
 
         _shipLoaded = true;
         UpdateSuitOxygen();
@@ -253,6 +287,19 @@ public class ShipEnhancements : ModBehaviour
         return _shipOxygenDetector != null && _shipOxygenDetector.GetDetectOxygen();
     }
 
+    public void SetGravityLandingGearEnabled(bool enabled)
+    {
+        if (OnGravityLandingGearSwitch != null)
+        {
+            OnGravityLandingGearSwitch(enabled);
+        }
+    }
+
+    public void SetThrustModulatorLevel(int level)
+    {
+        ThrustModulatorLevel = level;
+    }
+
     public static void WriteDebugMessage(object msg)
     {
         Instance.ModHelper.Console.WriteLine(msg.ToString());
@@ -272,5 +319,9 @@ public class ShipEnhancements : ModBehaviour
         _damageSpeedMultiplier = ModHelper.Config.GetSettingsValue<float>("shipDamageSpeedMultiplier");
         _shipOxygenRefill = ModHelper.Config.GetSettingsValue<bool>("shipOxygenRefill");
         _shipRepairDisabled = ModHelper.Config.GetSettingsValue<bool>("disableShipRepair");
+        _gravityLandingGearEnabled = ModHelper.Config.GetSettingsValue<bool>("enableGravityLandingGear");
+        _airAutoRollDisabled = ModHelper.Config.GetSettingsValue<bool>("disableAirAutoRoll");
+        _waterAutoRollDisabled = ModHelper.Config.GetSettingsValue<bool>("disableWaterAutoRoll");
+        _thrustModulatorEnabled = ModHelper.Config.GetSettingsValue<bool>("enableThrustModulator");
     }
 }
