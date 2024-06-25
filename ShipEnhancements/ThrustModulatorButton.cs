@@ -66,4 +66,9 @@ public class ThrustModulatorButton : MonoBehaviour
         _lastEmissiveScale = _emissiveRenderer.GetEmissiveScale();
         _fading = true;
     }
+
+    public void SetInteractable(bool interactable)
+    {
+        _interactReceiver.SetInteractionEnabled(interactable);
+    }
 }

@@ -20,4 +20,10 @@ public class GravityLandingGearSwitch : CockpitSwitch
     {
         ShipEnhancements.Instance.SetGravityLandingGearEnabled(state);
     }
+
+    public override void SetPowered(bool powered)
+    {
+        base.SetPowered(powered);
+        ShipEnhancements.Instance.SetGravityLandingGearEnabled(_on && !Locator.GetShipBody().GetComponent<ShipDamageController>().IsElectricalFailed());
+    }
 }

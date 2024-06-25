@@ -266,7 +266,7 @@ public class ShipEnhancements : ModBehaviour
         cameraComponent._repairReceiver.repairDistance = 0f;
         cameraComponent._damaged = true;
         cameraComponent._repairFraction = 0f;
-        cameraComponent._landingCamera.SetPowered(false);
+        cameraComponent._landingCamera.SetDamaged(true);
     }
 
     private void OnPlayerSuitUp()

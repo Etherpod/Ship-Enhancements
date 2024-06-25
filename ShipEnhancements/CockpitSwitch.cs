@@ -7,16 +7,15 @@ namespace ShipEnhancements;
 public abstract class CockpitSwitch : ElectricalComponent
 {
     [SerializeField]
-    private float _rotationOffset;
+    protected float _rotationOffset;
     [SerializeField]
-    private InteractReceiver _interactReceiver;
+    protected InteractReceiver _interactReceiver;
     [SerializeField]
-    private string _label;
+    protected string _label;
 
-    private Quaternion _initialRotation;
-    OWRenderer _renderer;
-    private bool _on = false;
-    private bool _wasOn = false;
+    protected Quaternion _initialRotation;
+    protected OWRenderer _renderer;
+    protected bool _on = false;
 
     private void Start()
     {
@@ -65,7 +64,7 @@ public abstract class CockpitSwitch : ElectricalComponent
         if (powered)
         {
             _interactReceiver.EnableInteraction();
-            if (_wasOn)
+            if (_on)
             {
                 _renderer.SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 1f);
             }
@@ -74,7 +73,6 @@ public abstract class CockpitSwitch : ElectricalComponent
         {
             if (_on)
             {
-                _wasOn = true;
                 _renderer.SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 0f);
             }
             _interactReceiver.DisableInteraction();

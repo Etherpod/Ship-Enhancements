@@ -48,10 +48,18 @@ public class ThrustModulatorController : ElectricalComponent
         if (powered)
         {
             UpdateModulatorDisplay(_lastLevel);
+            foreach (ThrustModulatorButton button in _modulatorButtons)
+            {
+                button.SetInteractable(true);
+            }
         }
         else
         {
             UpdateModulatorDisplay(0);
+            foreach (ThrustModulatorButton button in _modulatorButtons)
+            {
+                button.SetInteractable(false);
+            }
         }
     }
 }
