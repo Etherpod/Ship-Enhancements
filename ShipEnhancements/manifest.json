@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/ow-mods/owml/master/schemas/manifest_schema.json",
   "filename": "ShipEnhancements.dll",
   "author": "Etherpod",
-  "name": "ShipEnhancements",
+  "name": "Ship Enhancements",
   "uniqueName": "Etherpod.ShipEnhancements",
   "version": "0.1.0",
   "owmlVersion": "2.9.8",

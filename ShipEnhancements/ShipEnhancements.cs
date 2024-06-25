@@ -30,6 +30,7 @@ public class ShipEnhancements : ModBehaviour
     public bool WaterAutoRollDisabled { get; private set; }
     public bool ThrustModulatorEnabled { get; private set; }
     public int ThrustModulatorLevel { get; private set; }
+    public int TemperatureDamageEnabled { get; private set; }
     
     private bool _gravityCrystalDisabled;
     private bool _ejectButtonDisabled;
@@ -47,7 +48,7 @@ public class ShipEnhancements : ModBehaviour
     private bool _airAutoRollDisabled;
     private bool _waterAutoRollDisabled;
     private bool _thrustModulatorEnabled;
-    private bool _temperatureDamageEnabled = true;
+    private bool _temperatureDamageEnabled;
 
     private AssetBundle _shipEnhancementsBundle;
     private float _lastSuitOxygen;
@@ -80,6 +81,7 @@ public class ShipEnhancements : ModBehaviour
         _airAutoRollDisabled = ModHelper.Config.GetSettingsValue<bool>("disableAirAutoRoll");
         _waterAutoRollDisabled = ModHelper.Config.GetSettingsValue<bool>("disableWaterAutoRoll");
         _thrustModulatorEnabled = ModHelper.Config.GetSettingsValue<bool>("enableThrustModulator");
+        _temperatureDamageEnabled = ModHelper.Config.GetSettingsValue<bool>("enableTemperatureDamage");
 
         LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
         {
@@ -184,6 +186,18 @@ public class ShipEnhancements : ModBehaviour
         buttonConsoleObj.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
         buttonConsoleObj.transform.localScale = Vector3.one;
 
+        GameObject sunTempZone = (GameObject)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/TemperatureZone_Sun.prefab");
+        Transform sunTransform = Locator.GetAstroObject(AstroObject.Name.Sun).transform;
+        GameObject sunTempZoneObj = Instantiate(sunTempZone, Vector3.zero, Quaternion.identity, sunTransform);
+        sunTempZoneObj.transform.localPosition = Vector3.zero;
+        sunTempZoneObj.transform.localScale = Vector3.one;
+
+        GameObject vmTempZone = (GameObject)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/TemperatureZone_VolcanicMoon.prefab");
+        Transform vmTransform = GameObject.Find("VolcanicMoon_Body").transform;
+        GameObject vmTempZoneObj = Instantiate(sunTempZone, Vector3.zero, Quaternion.identity, vmTransform);
+        vmTempZoneObj.transform.localPosition = Vector3.zero;
+        vmTempZoneObj.transform.localScale = Vector3.one;
+
         _shipLoaded = true;
         UpdateSuitOxygen();
 
@@ -234,7 +248,7 @@ public class ShipEnhancements : ModBehaviour
         }
         if (_temperatureDamageEnabled)
         {
-            Locator.GetShipBody().gameObject.AddComponent<ShipTemperatureDamage>();
+            Locator.GetShipDetector().gameObject.AddComponent<ShipTemperatureDetector>();
             Locator.GetShipBody().GetComponentInChildren<ShipFuelGauge>().gameObject.AddComponent<ShipTemperatureGauge>();
         }
     }
@@ -328,5 +342,6 @@ public class ShipEnhancements : ModBehaviour
         _airAutoRollDisabled = ModHelper.Config.GetSettingsValue<bool>("disableAirAutoRoll");
         _waterAutoRollDisabled = ModHelper.Config.GetSettingsValue<bool>("disableWaterAutoRoll");
         _thrustModulatorEnabled = ModHelper.Config.GetSettingsValue<bool>("enableThrustModulator");
+        _temperatureDamageEnabled = ModHelper.Config.GetSettingsValue<bool>("enableTemperatureDamage");
     }
 }

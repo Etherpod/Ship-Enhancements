@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 97676341
+CRC: 3974752192
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 0e849843c071090f41109739095b9296
+    Hash: c605963fa87fbf8c8e6f616a6fb779b6
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 4abda9e7c54b9847c6003ba53eb97eee
+    Hash: dbdb07e4097ced0d740187fcd45726ee
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -26,6 +26,8 @@ ClassTypes:
 - Class: 48
   Script: {instanceID: 0}
 - Class: 114
+  Script: {fileID: 11500000, guid: fbb2498122f7e23a2e87544333cb528f, type: 3}
+- Class: 114
   Script: {fileID: 11500000, guid: 0053d129d589d30957bcc3b1958fc878, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 4d37ab8d4d1e425918e8172c84cb8288, type: 3}
@@ -39,6 +41,8 @@ ClassTypes:
   Script: {fileID: 700171697, guid: 56e5cf1f6ac64bc4d8feff9ed2c6da44, type: 3}
 - Class: 114
   Script: {fileID: 724769104, guid: 56e5cf1f6ac64bc4d8feff9ed2c6da44, type: 3}
+- Class: 114
+  Script: {fileID: -1479741793, guid: 56e5cf1f6ac64bc4d8feff9ed2c6da44, type: 3}
 - Class: 115
   Script: {instanceID: 0}
 - Class: 135
@@ -54,7 +58,9 @@ Assets:
 - Assets/ShipEnhancements/Switch.prefab
 - Assets/ShipEnhancements/ShipInterior_HEA_VillagePlanks_Recolored_mat.mat
 - Assets/ShipEnhancements/ButtonConsole.prefab
+- Assets/ShipEnhancements/TemperatureZone_VolcanicMoon.prefab
 - Assets/ShipEnhancements/ShipInterior_HEA_VillageCabin_Recolored_mat.mat
+- Assets/ShipEnhancements/TemperatureZone_Sun.prefab
 - Assets/ShipEnhancements/ButtonConsole.fbx
 - Assets/ShipEnhancements/Switch.fbx
 Dependencies: []
