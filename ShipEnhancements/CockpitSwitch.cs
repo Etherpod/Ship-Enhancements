@@ -1,9 +1,10 @@
-﻿using System;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace ShipEnhancements;
 
-public class CockpitSwitch : MonoBehaviour
+public abstract class CockpitSwitch : ElectricalComponent
 {
     [SerializeField]
     private float _rotationOffset;
@@ -13,9 +14,9 @@ public class CockpitSwitch : MonoBehaviour
     private string _label;
 
     private Quaternion _initialRotation;
+    OWRenderer _renderer;
     private bool _on = false;
-
-    protected virtual void Awake() { }
+    private bool _wasOn = false;
 
     private void Start()
     {
@@ -24,7 +25,15 @@ public class CockpitSwitch : MonoBehaviour
         _interactReceiver._screenPrompt._text = "Turn on " + _label;
         transform.localRotation = Quaternion.Euler(_initialRotation.eulerAngles.x + _rotationOffset,
             _initialRotation.eulerAngles.y, _initialRotation.eulerAngles.z);
-        GetComponent<OWRenderer>().SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 0f);
+        _renderer = GetComponent<OWRenderer>();
+        _renderer.SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 0f);
+
+        ElectricalSystem cockpitElectricalSystem = Locator.GetShipBody().transform
+            .Find("Module_Cockpit/Systems_Cockpit/FlightControlsElectricalSystem")
+            .GetComponent<ElectricalSystem>();
+        List<ElectricalComponent> componentList = cockpitElectricalSystem._connectedComponents.ToList();
+        componentList.Add(this);
+        cockpitElectricalSystem._connectedComponents = componentList.ToArray();
     }
 
     private void FlipSwitch()
@@ -35,19 +44,41 @@ public class CockpitSwitch : MonoBehaviour
             transform.localRotation = Quaternion.Euler(_initialRotation.eulerAngles.x - _rotationOffset,
                 _initialRotation.eulerAngles.y, _initialRotation.eulerAngles.z);
             _interactReceiver._screenPrompt._text = "Turn off " + _label;
-            GetComponent<OWRenderer>().SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 1f);
+            _renderer.SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 1f);
         }
         else
         {
             transform.localRotation = Quaternion.Euler(_initialRotation.eulerAngles.x + _rotationOffset,
                 _initialRotation.eulerAngles.y, _initialRotation.eulerAngles.z);
             _interactReceiver._screenPrompt._text = "Turn on " + _label;
-            GetComponent<OWRenderer>().SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 0f);
+            _renderer.SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 0f);
         }
 
         OnFlipSwitch(_on);
         Locator.GetPromptManager().UpdateText(_interactReceiver._screenPrompt, _interactReceiver._screenPrompt._text);
         _interactReceiver.ResetInteraction();
+    }
+
+    public override void SetPowered(bool powered)
+    {
+        base.SetPowered(powered);
+        if (powered)
+        {
+            _interactReceiver.EnableInteraction();
+            if (_wasOn)
+            {
+                _renderer.SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 1f);
+            }
+        }
+        else
+        {
+            if (_on)
+            {
+                _wasOn = true;
+                _renderer.SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 0f);
+            }
+            _interactReceiver.DisableInteraction();
+        }
     }
 
     protected virtual void OnFlipSwitch(bool state) { }

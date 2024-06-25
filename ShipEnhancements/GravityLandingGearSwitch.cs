@@ -4,8 +4,9 @@ namespace ShipEnhancements;
 
 public class GravityLandingGearSwitch : CockpitSwitch
 {
-    protected override void Awake()
+    public override void Awake()
     {
+        base.Awake();
         if (!ShipEnhancements.Instance.GravityLandingGearEnabled)
         {
             transform.parent.gameObject.SetActive(false);

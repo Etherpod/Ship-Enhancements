@@ -31,7 +31,6 @@ public class ShipEnhancements : ModBehaviour
     public bool ThrustModulatorEnabled { get; private set; }
     public int ThrustModulatorLevel { get; private set; }
     
-
     private bool _gravityCrystalDisabled;
     private bool _ejectButtonDisabled;
     private bool _headlightsDisabled;
@@ -48,6 +47,7 @@ public class ShipEnhancements : ModBehaviour
     private bool _airAutoRollDisabled;
     private bool _waterAutoRollDisabled;
     private bool _thrustModulatorEnabled;
+    private bool _temperatureDamageEnabled = true;
 
     private AssetBundle _shipEnhancementsBundle;
     private float _lastSuitOxygen;
@@ -179,7 +179,7 @@ public class ShipEnhancements : ModBehaviour
         AssetBundleUtilities.ReplaceShaders(buttonConsole);
         Vector3 cockpitPosition = new Vector3(0, -3.762f, 0.1989994f);
         GameObject buttonConsoleObj = Instantiate(buttonConsole, cockpitPosition, 
-            Quaternion.identity, Locator.GetShipBody().transform);
+            Quaternion.identity, Locator.GetShipBody().transform.Find("Module_Cockpit"));
         buttonConsoleObj.transform.localPosition = cockpitPosition;
         buttonConsoleObj.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
         buttonConsoleObj.transform.localScale = Vector3.one;
@@ -232,12 +232,17 @@ public class ShipEnhancements : ModBehaviour
         {
             _shipOxygenDetector = Locator.GetShipDetector().gameObject.AddComponent<OxygenDetector>();
         }
+        if (_temperatureDamageEnabled)
+        {
+            Locator.GetShipBody().gameObject.AddComponent<ShipTemperatureDamage>();
+            Locator.GetShipBody().GetComponentInChildren<ShipFuelGauge>().gameObject.AddComponent<ShipTemperatureGauge>();
+        }
     }
 
     private static void DisableHeadlights()
     {
         ShipHeadlightComponent headlightComponent = Locator.GetShipBody().GetComponentInChildren<ShipHeadlightComponent>();
-        headlightComponent._repairReceiver._repairDistance = 0f;
+        headlightComponent._repairReceiver.repairDistance = 0f;
         headlightComponent._damaged = true;
         headlightComponent._repairFraction = 0f;
         headlightComponent.OnComponentDamaged();
@@ -246,7 +251,7 @@ public class ShipEnhancements : ModBehaviour
     private void DisableGravityCrystal()
     {
         ShipGravityComponent gravityComponent = Locator.GetShipBody().GetComponentInChildren<ShipGravityComponent>();
-        gravityComponent._repairReceiver._repairDistance = 0f;
+        gravityComponent._repairReceiver.repairDistance = 0f;
         gravityComponent._damaged = true;
         gravityComponent._repairFraction = 0f;
         gravityComponent.OnComponentDamaged();
@@ -258,7 +263,7 @@ public class ShipEnhancements : ModBehaviour
     private void DisableLandingCamera()
     {
         ShipCameraComponent cameraComponent = Locator.GetShipBody().GetComponentInChildren<ShipCameraComponent>();
-        cameraComponent._repairReceiver._repairDistance = 0f;
+        cameraComponent._repairReceiver.repairDistance = 0f;
         cameraComponent._damaged = true;
         cameraComponent._repairFraction = 0f;
         cameraComponent._landingCamera.SetPowered(false);
