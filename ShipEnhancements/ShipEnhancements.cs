@@ -49,6 +49,7 @@ public class ShipEnhancements : ModBehaviour
     private bool _waterAutoRollDisabled;
     private bool _thrustModulatorEnabled;
     private bool _temperatureDamageEnabled;
+    private bool _extraTemperatureZonesEnabled;
 
     private AssetBundle _shipEnhancementsBundle;
     private float _lastSuitOxygen;
@@ -82,6 +83,7 @@ public class ShipEnhancements : ModBehaviour
         _waterAutoRollDisabled = ModHelper.Config.GetSettingsValue<bool>("disableWaterAutoRoll");
         _thrustModulatorEnabled = ModHelper.Config.GetSettingsValue<bool>("enableThrustModulator");
         _temperatureDamageEnabled = ModHelper.Config.GetSettingsValue<bool>("enableTemperatureDamage");
+        _extraTemperatureZonesEnabled = ModHelper.Config.GetSettingsValue<bool>("enableExtraTemperatureZones");
 
         LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
         {
@@ -177,26 +179,9 @@ public class ShipEnhancements : ModBehaviour
     {
         yield return new WaitUntil(() => Locator._shipBody != null);
 
-        GameObject buttonConsole = (GameObject)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ButtonConsole.prefab");
+        GameObject buttonConsole = LoadPrefab("Assets/ShipEnhancements/ButtonConsole.prefab");
         AssetBundleUtilities.ReplaceShaders(buttonConsole);
-        Vector3 cockpitPosition = new Vector3(0, -3.762f, 0.1989994f);
-        GameObject buttonConsoleObj = Instantiate(buttonConsole, cockpitPosition, 
-            Quaternion.identity, Locator.GetShipBody().transform.Find("Module_Cockpit"));
-        buttonConsoleObj.transform.localPosition = cockpitPosition;
-        buttonConsoleObj.transform.localRotation = Quaternion.Euler(0f, 180f, 0f);
-        buttonConsoleObj.transform.localScale = Vector3.one;
-
-        GameObject sunTempZone = (GameObject)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/TemperatureZone_Sun.prefab");
-        Transform sunTransform = Locator.GetAstroObject(AstroObject.Name.Sun).transform;
-        GameObject sunTempZoneObj = Instantiate(sunTempZone, Vector3.zero, Quaternion.identity, sunTransform);
-        sunTempZoneObj.transform.localPosition = Vector3.zero;
-        sunTempZoneObj.transform.localScale = Vector3.one;
-
-        GameObject vmTempZone = (GameObject)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/TemperatureZone_VolcanicMoon.prefab");
-        Transform vmTransform = GameObject.Find("VolcanicMoon_Body").transform;
-        GameObject vmTempZoneObj = Instantiate(sunTempZone, Vector3.zero, Quaternion.identity, vmTransform);
-        vmTempZoneObj.transform.localPosition = Vector3.zero;
-        vmTempZoneObj.transform.localScale = Vector3.one;
+        GameObject buttonConsoleObj = Instantiate(buttonConsole, Locator.GetShipBody().transform.Find("Module_Cockpit"));
 
         _shipLoaded = true;
         UpdateSuitOxygen();
@@ -250,6 +235,79 @@ public class ShipEnhancements : ModBehaviour
         {
             Locator.GetShipDetector().gameObject.AddComponent<ShipTemperatureDetector>();
             Locator.GetShipBody().GetComponentInChildren<ShipFuelGauge>().gameObject.AddComponent<ShipTemperatureGauge>();
+
+            GameObject sun = GameObject.Find("Sun_Body");
+            if (sun != null)
+            {
+                GameObject sunTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Sun.prefab");
+                GameObject sunTempZoneObj = Instantiate(sunTempZone, sun.transform.Find("Sector_SUN"));
+            }
+
+            if (_extraTemperatureZonesEnabled)
+            {
+                AddTemperatureZones();
+            }
+        }
+    }
+
+    private static void AddTemperatureZones()
+    {
+        GameObject vm = GameObject.Find("VolcanicMoon_Body");
+        if (vm != null)
+        {
+            GameObject vmTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_VolcanicMoon.prefab");
+            GameObject vmTempZoneObj = Instantiate(vmTempZone, vm.transform.Find("Sector_VM"));
+        }
+
+        GameObject db = GameObject.Find("DarkBramble_Body");
+        if (db != null)
+        {
+            GameObject dbTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_DarkBramble.prefab");
+            GameObject dbTempZoneObj = Instantiate(dbTempZone, db.transform.Find("Sector_DB"));
+        }
+
+        GameObject comet = GameObject.Find("Comet_Body");
+        if (comet != null)
+        {
+            GameObject cometTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Interloper.prefab");
+            cometTempZone.transform.rotation = comet.transform.rotation;
+            GameObject cometTempZoneObj = Instantiate(cometTempZone, comet.transform.Find("Sector_CO"));
+        }
+
+        GameObject gd = GameObject.Find("GiantsDeep_Body");
+        if (gd != null)
+        {
+            GameObject gdTempZone1 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_GiantsDeepOcean.prefab");
+            GameObject gdTempZoneObj1 = Instantiate(gdTempZone1, gd.transform.Find("Sector_GD/Sector_GDInterior"));
+            GameObject gdTempZone2 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_GiantsDeepCore.prefab");
+            GameObject gdTempZoneObj2 = Instantiate(gdTempZone2, gd.transform.Find("Sector_GD/Sector_GDInterior"));
+        }
+
+        GameObject bh = GameObject.Find("BrittleHollow_Body");
+        if (bh != null)
+        {
+            GameObject bhTempZone1 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_BrittleHollowNorth.prefab");
+            GameObject bhTempZoneObj1 = Instantiate(bhTempZone1, bh.transform.Find("Sector_BH"));
+            GameObject bhTempZone2 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_BrittleHollowSouth.prefab");
+            GameObject bhTempZoneObj2 = Instantiate(bhTempZone2, bh.transform.Find("Sector_BH"));
+        }
+
+        GameObject th = GameObject.Find("TimberHearth_Body");
+        if (th != null)
+        {
+            GameObject thTempZone1 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_TimberHearthGeyser.prefab");
+            GameObject thTempZoneObj1 = Instantiate(thTempZone1, th.transform.Find("Sector_TH"));
+            GameObject thTempZone2 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_TimberHearthCore.prefab");
+            GameObject thTempZoneObj2 = Instantiate(thTempZone2, th.transform.Find("Sector_TH"));
+        }
+
+        GameObject ct = GameObject.Find("CaveTwin_Body");
+        if (ct != null)
+        {
+            GameObject ctTempZone1 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_CaveTwinHot.prefab");
+            GameObject ctTempZoneObj1 = Instantiate(ctTempZone1, ct.transform.Find("Sector_CaveTwin"));
+            GameObject ctTempZone2 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_CaveTwinCold.prefab");
+            GameObject ctTempZoneObj2 = Instantiate(ctTempZone2, ct.transform.Find("Sector_CaveTwin"));
         }
     }
 
@@ -324,6 +382,11 @@ public class ShipEnhancements : ModBehaviour
         Instance.ModHelper.Console.WriteLine(msg.ToString());
     }
 
+    public static GameObject LoadPrefab(string path)
+    {
+        return (GameObject)Instance._shipEnhancementsBundle.LoadAsset(path);
+    }
+
     public override void Configure(IModConfig config)
     {
         _gravityCrystalDisabled = ModHelper.Config.GetSettingsValue<bool>("disableGravityCrystal");
@@ -343,5 +406,6 @@ public class ShipEnhancements : ModBehaviour
         _waterAutoRollDisabled = ModHelper.Config.GetSettingsValue<bool>("disableWaterAutoRoll");
         _thrustModulatorEnabled = ModHelper.Config.GetSettingsValue<bool>("enableThrustModulator");
         _temperatureDamageEnabled = ModHelper.Config.GetSettingsValue<bool>("enableTemperatureDamage");
+        _extraTemperatureZonesEnabled = ModHelper.Config.GetSettingsValue<bool>("enableExtraTemperatureZones");
     }
 }

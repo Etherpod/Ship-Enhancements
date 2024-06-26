@@ -13,12 +13,15 @@ public class ShipTemperatureDetector : MonoBehaviour
     private ShipComponent[] _shipComponents;
     private HazardVolume[] _heatVolumes;
     private float _currentTemperature;
+    private float _highTempCutoff = 50f;
     private bool _highTemperature = false;
     private float _damageDelay = 1.5f;
     private float _randDamageDelay;
     private float _delayStartTime;
     private float _tempMeterChargeLength = 360f;
     private float _tempMeterStartTime;
+    private float _cooldownStartTime;
+    private float _cooldownTime;
 
     private void Start()
     {
@@ -36,50 +39,69 @@ public class ShipTemperatureDetector : MonoBehaviour
     {
         if (_activeZones.Count > 0)
         {
-            if (!_highTemperature)
-            {
-                _highTemperature = true;
-                _tempMeterStartTime = Time.time;
-            }
-
             float totalTemperature = 0f;
             foreach (TemperatureZone zone in _activeZones)
             {
                 totalTemperature += zone.GetTemperature();
             }
-            _currentTemperature = totalTemperature /= _activeZones.Count;
+            _currentTemperature = totalTemperature / _activeZones.Count;
 
-            if (Time.time > _delayStartTime + _randDamageDelay)
+            if (!_highTemperature)
             {
-                _delayStartTime = Time.time;
-
-                float timeMultiplier = Mathf.InverseLerp(_tempMeterStartTime, _tempMeterStartTime + _tempMeterChargeLength, Time.time) * Mathf.Abs(GetTemperatureRatio());
-
-                float damageChance = 0f;
-                damageChance = 0.05f * Mathf.Lerp(1f, 5f, timeMultiplier);
-                if (UnityEngine.Random.value < damageChance / 2)
+                if (Mathf.Abs(_currentTemperature) > _highTempCutoff)
                 {
-                    ComponentTemperatureDamage();
+                    _highTemperature = true;
+                    float ratio = Mathf.InverseLerp(_cooldownStartTime, _cooldownStartTime + _cooldownTime, Time.time);
+                    _tempMeterStartTime = Time.time - (_cooldownTime * (1 - ratio));
                 }
-                else if (UnityEngine.Random.value < damageChance)
+            }
+            else
+            {
+                if (Time.time > _delayStartTime + _randDamageDelay)
                 {
-                    HullTemperatureDamage();
+                    _delayStartTime = Time.time;
+
+                    float timeMultiplier = Mathf.InverseLerp(_tempMeterStartTime, _tempMeterStartTime + _tempMeterChargeLength, Time.time)
+                        * Mathf.Abs(GetTemperatureRatio());
+
+                    float damageChance = 0.05f * Mathf.LerpUnclamped(0f, 3f, timeMultiplier);
+                    if (UnityEngine.Random.value < damageChance)
+                    {
+                        HullTemperatureDamage();
+                    }
                 }
             }
         }
-        else if (_highTemperature)
+
+        if (_highTemperature && (_activeZones.Count == 0 || Mathf.Abs(_currentTemperature) < 30f))
         {
             _highTemperature = false;
-            _tempMeterStartTime = Time.time;
+            _cooldownStartTime = Time.time;
+            _cooldownTime = Mathf.Max(_tempMeterChargeLength - ((_tempMeterStartTime + _tempMeterChargeLength) - Time.time), 0f);
         }
     }
 
     private void HullTemperatureDamage()
     {
         ShipHull targetHull = _shipHulls[UnityEngine.Random.Range(0, _shipHulls.Length)];
+        if (targetHull.isDamaged)
+        {
+            if (UnityEngine.Random.value < 0.05f)
+            {
+                ShipElectricalComponent electricalComponent = Locator.GetShipBody().GetComponentInChildren<ShipElectricalComponent>();
+                if (!electricalComponent.isDamaged)
+                {
+                    electricalComponent.SetDamaged(true);
+                }
+            }
+        }
+        else
+        {
+            targetHull._damaged = true;
+        }
+
         float damage = UnityEngine.Random.Range(0.03f, 0.15f) * ShipEnhancements.Instance.DamageMultiplier;
         targetHull._integrity = Mathf.Max(targetHull._integrity - damage, 0f);
-        targetHull._damaged = true;
         var eventDelegate1 = (MulticastDelegate)typeof(ShipHull).GetField("OnDamaged", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).GetValue(targetHull);
         if (eventDelegate1 != null)
         {
@@ -94,14 +116,14 @@ public class ShipTemperatureDetector : MonoBehaviour
         }
     }
 
-    private void ComponentTemperatureDamage()
+    /*private void ComponentTemperatureDamage()
     {
         ShipComponent[] enabledComponents = _shipComponents.Where(component => {
             return component.repairFraction == 1f && !component.isDamaged;
         }).ToArray();
         ShipComponent targetComponent = enabledComponents[UnityEngine.Random.Range(0, enabledComponents.Length)];
         targetComponent.SetDamaged(true);
-    }
+    }*/
 
     public float GetTemperatureRatio()
     {

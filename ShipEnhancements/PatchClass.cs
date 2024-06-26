@@ -556,4 +556,16 @@ public class PatchClass
         return false;
     }
     #endregion
+
+    #region TemperatureZone
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(SunController), nameof(SunController.UpdateScale))]
+    public static void UpdateSunTempZone(SunController __instance, float scale)
+    {
+        if (__instance.TryGetComponent(out TemperatureZone tempZone)) 
+        {
+            tempZone.SetScale(scale);
+        }
+    }
+    #endregion
 }

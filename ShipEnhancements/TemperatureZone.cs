@@ -10,14 +10,22 @@ public class TemperatureZone : MonoBehaviour
     private float _temperature;
     [SerializeField]
     private float _innerRadius;
+    [SerializeField]
+    private bool _isShell;
+    [SerializeField]
+    private float _shellCenterRadius;
+    [SerializeField]
+    private float _shellCenterThickness;
 
     private OWTriggerVolume _triggerVolume;
-    private bool _zoneOccupied;
+    private SphereShape _shape;
     private float _outerRadius;
+    private float _scale = 1f;
 
     private void Start()
     {
-        _outerRadius = GetComponent<SphereCollider>().radius;
+        _shape = GetComponent<SphereShape>();
+        _outerRadius = _shape.radius;
         _triggerVolume = GetComponent<OWTriggerVolume>();
         _triggerVolume.OnEntry += OnEffectVolumeEnter;
         _triggerVolume.OnExit += OnEffectVolumeExit;
@@ -28,7 +36,6 @@ public class TemperatureZone : MonoBehaviour
         if (hitObj.TryGetComponent(out ShipTemperatureDetector detector))
         {
             detector.AddZone(this);
-            _zoneOccupied = true;
         }
     }
 
@@ -37,14 +44,29 @@ public class TemperatureZone : MonoBehaviour
         if (hitObj.TryGetComponent(out ShipTemperatureDetector detector))
         {
             detector.RemoveZone(this);
-            _zoneOccupied = false;
         }
     }
 
     public float GetTemperature()
     {
-        float distSqr = (Locator.GetShipDetector().transform.position - transform.position).sqrMagnitude;
-        float falloffMultiplier = Mathf.InverseLerp(_outerRadius * _outerRadius, _innerRadius * _innerRadius, distSqr);
-        return _temperature * falloffMultiplier;
+        float distSqr = (Locator.GetShipDetector().transform.position - (transform.position + _shape.center)).sqrMagnitude;
+        float multiplier;
+        if (_isShell)
+        {
+            float a = Mathf.InverseLerp(Mathf.Pow(_outerRadius, 2), Mathf.Pow(_shellCenterRadius + _shellCenterThickness, 2), distSqr);
+            float b = Mathf.InverseLerp(Mathf.Pow(_shellCenterRadius - _shellCenterThickness, 2), Mathf.Pow(_innerRadius, 2), distSqr);
+            multiplier = a - b;
+        }
+        else
+        {
+            multiplier = Mathf.InverseLerp(Mathf.Pow(_outerRadius * _scale, 2), Mathf.Pow(_innerRadius * _scale, 2), distSqr);
+        }
+        return _temperature * multiplier;
+    }
+
+    public void SetScale(float scale)
+    {
+        _scale = scale;
+        _shape.transform.localScale = Vector3.one * scale;
     }
 }
