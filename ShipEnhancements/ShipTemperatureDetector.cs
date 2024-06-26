@@ -23,6 +23,8 @@ public class ShipTemperatureDetector : MonoBehaviour
     private float _cooldownStartTime;
     private float _cooldownTime;
 
+    private int _frameDelay = 5;
+
     private void Start()
     {
         ShipDamageController damageController = Locator.GetShipBody().GetComponent<ShipDamageController>();
@@ -42,8 +44,12 @@ public class ShipTemperatureDetector : MonoBehaviour
             float totalTemperature = 0f;
             foreach (TemperatureZone zone in _activeZones)
             {
-                totalTemperature += zone.GetTemperature();
+                float temp = zone.GetTemperature();
+                if (_frameDelay == 5) ShipEnhancements.WriteDebugMessage(temp);
+                totalTemperature += temp;
             }
+            _frameDelay--;
+            if (_frameDelay == 0) _frameDelay = 5;
             _currentTemperature = Mathf.Clamp(totalTemperature, -100f, 100f);
 
             if (!_highTemperature)
@@ -73,7 +79,7 @@ public class ShipTemperatureDetector : MonoBehaviour
             }
         }
 
-        if (_highTemperature && (_activeZones.Count == 0 || Mathf.Abs(_currentTemperature) < 30f))
+        if (_highTemperature && (_activeZones.Count == 0 || Mathf.Abs(_currentTemperature) < _highTempCutoff))
         {
             _highTemperature = false;
             _cooldownStartTime = Time.time;

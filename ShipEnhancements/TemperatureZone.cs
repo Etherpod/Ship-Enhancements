@@ -53,8 +53,8 @@ public class TemperatureZone : MonoBehaviour
         float multiplier;
         if (_isShell)
         {
-            float a = Mathf.InverseLerp(Mathf.Pow(_outerRadius, 2), Mathf.Pow(_shellCenterRadius + _shellCenterThickness, 2), distSqr);
-            float b = Mathf.InverseLerp(Mathf.Pow(_shellCenterRadius - _shellCenterThickness, 2), Mathf.Pow(_innerRadius, 2), distSqr);
+            float a = Mathf.InverseLerp(Mathf.Pow(_outerRadius * _scale, 2), Mathf.Pow((_shellCenterRadius + _shellCenterThickness) * _scale, 2), distSqr);
+            float b = Mathf.InverseLerp(Mathf.Pow((_shellCenterRadius - _shellCenterThickness) * _scale, 2), Mathf.Pow(_innerRadius * _scale, 2), distSqr);
             multiplier = a - b;
         }
         else

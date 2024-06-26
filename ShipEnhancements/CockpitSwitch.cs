@@ -21,7 +21,7 @@ public abstract class CockpitSwitch : ElectricalComponent
     {
         _interactReceiver.OnPressInteract += FlipSwitch;
 
-        _interactReceiver._screenPrompt._text = "Turn on " + _label;
+        _interactReceiver.ChangePrompt("Turn on " + _label);
         transform.localRotation = Quaternion.Euler(_initialRotation.eulerAngles.x + _rotationOffset,
             _initialRotation.eulerAngles.y, _initialRotation.eulerAngles.z);
         _renderer = GetComponent<OWRenderer>();
@@ -42,20 +42,18 @@ public abstract class CockpitSwitch : ElectricalComponent
         {
             transform.localRotation = Quaternion.Euler(_initialRotation.eulerAngles.x - _rotationOffset,
                 _initialRotation.eulerAngles.y, _initialRotation.eulerAngles.z);
-            _interactReceiver._screenPrompt._text = "Turn off " + _label;
+            _interactReceiver.ChangePrompt("Turn off " + _label);
             _renderer.SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 1f);
         }
         else
         {
             transform.localRotation = Quaternion.Euler(_initialRotation.eulerAngles.x + _rotationOffset,
                 _initialRotation.eulerAngles.y, _initialRotation.eulerAngles.z);
-            _interactReceiver._screenPrompt._text = "Turn on " + _label;
+            _interactReceiver.ChangePrompt("Turn on " + _label);
             _renderer.SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 0f);
         }
 
         OnFlipSwitch(_on);
-        Locator.GetPromptManager().UpdateText(_interactReceiver._screenPrompt, _interactReceiver._screenPrompt._text);
-        _interactReceiver.ResetInteraction();
     }
 
     public override void SetPowered(bool powered)

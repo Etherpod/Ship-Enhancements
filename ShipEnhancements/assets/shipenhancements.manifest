@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 3160672606
+CRC: 711372168
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 3d2ea0d6e6a4b6083234b69b389c96ed
+    Hash: dd2535973c15f6ab720c83d8e1efe89e
   TypeTreeHash:
     serializedVersion: 2
-    Hash: db72786431ad8ec5e63a238a338ab76c
+    Hash: 9b449d54a4c7f82ad79afcaf9e75c263
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -45,6 +45,8 @@ ClassTypes:
   Script: {fileID: 724769104, guid: 56e5cf1f6ac64bc4d8feff9ed2c6da44, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 5b69738f164a5a2451d76a672bae5943, type: 3}
+- Class: 114
+  Script: {fileID: -1524060901, guid: 56e5cf1f6ac64bc4d8feff9ed2c6da44, type: 3}
 - Class: 115
   Script: {instanceID: 0}
 - Class: 135
@@ -65,8 +67,9 @@ Assets:
 - Assets/ShipEnhancements/TemperatureZone_CaveTwinCold.prefab
 - Assets/ShipEnhancements/TemperatureZone_BrittleHollowSouth.prefab
 - Assets/ShipEnhancements/Switch.prefab
-- Assets/ShipEnhancements/TemperatureZone_Interloper.prefab
+- Assets/ShipEnhancements/TemperatureZone_InterloperDarkSide.prefab
 - Assets/ShipEnhancements/TemperatureZone_TimberHearthGeyser.prefab
+- Assets/ShipEnhancements/TemperatureZone_InterloperAtmosphere.prefab
 - Assets/ShipEnhancements/ShipInterior_HEA_VillagePlanks_Recolored_mat.mat
 - Assets/ShipEnhancements/ButtonConsole.prefab
 - Assets/ShipEnhancements/TemperatureZone_VolcanicMoon.prefab
@@ -74,6 +77,7 @@ Assets:
 - Assets/ShipEnhancements/TemperatureZone_Sun.prefab
 - Assets/ShipEnhancements/TemperatureZone_GiantsDeepCore.prefab
 - Assets/ShipEnhancements/TemperatureZone_BrittleHollowNorth.prefab
+- Assets/ShipEnhancements/FuelTransferVolume.prefab
 - Assets/ShipEnhancements/ButtonConsole.fbx
 - Assets/ShipEnhancements/Switch.fbx
 Dependencies: []

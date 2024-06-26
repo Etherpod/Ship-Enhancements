@@ -98,17 +98,22 @@
       "value": false,
       "tooltip": "Adds an interface to the cockpit for decreasing your ship's maximum thrust."
     },
+    "temperatureZonesAmount": {
+      "title": "Temperature Zones",
+      "type": "selector",
+      "value": "None",
+      "options": [
+        "None",
+        "Sun",
+        "All"
+      ],
+      "tooltip": "Determines whether to add temperature zones around the entire solar system, just around the sun, or to add none at all."
+    },
     "enableTemperatureDamage": {
       "title": "Enable Temperature Damage",
       "type": "toggle",
       "value": false,
       "tooltip": "Damages the ship over time in extremely high or low temperatures."
-    },
-    "enableExtraTemperatureZones": {
-      "title": "Enable Extra Temperature Zones",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Adds extra temperature zones around the solar system that damage the ship, like on the dark side of the Interloper."
     }
   }
 }
