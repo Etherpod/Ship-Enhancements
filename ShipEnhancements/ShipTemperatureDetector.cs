@@ -44,7 +44,7 @@ public class ShipTemperatureDetector : MonoBehaviour
             {
                 totalTemperature += zone.GetTemperature();
             }
-            _currentTemperature = totalTemperature / _activeZones.Count;
+            _currentTemperature = Mathf.Clamp(totalTemperature, -100f, 100f);
 
             if (!_highTemperature)
             {
