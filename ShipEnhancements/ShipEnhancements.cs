@@ -5,6 +5,7 @@ using System.Collections;
 using UnityEngine;
 using System.IO;
 using System.Security.Policy;
+using UnityEngine.PostProcessing;
 
 namespace ShipEnhancements;
 public class ShipEnhancements : ModBehaviour
@@ -49,7 +50,8 @@ public class ShipEnhancements : ModBehaviour
     private bool _thrustModulatorEnabled;
     private string _temperatureZonesAmount;
     private bool _temperatureDamageEnabled;
-    private bool _shipRefuelEnabled = true;
+    private bool _shipFuelTransferEnabled;
+    private bool _refuelDrainsShip;
 
     private AssetBundle _shipEnhancementsBundle;
     private float _lastSuitOxygen;
@@ -84,6 +86,8 @@ public class ShipEnhancements : ModBehaviour
         _thrustModulatorEnabled = ModHelper.Config.GetSettingsValue<bool>("enableThrustModulator");
         _temperatureZonesAmount = ModHelper.Config.GetSettingsValue<string>("temperatureZonesAmount");
         _temperatureDamageEnabled = ModHelper.Config.GetSettingsValue<bool>("enableTemperatureDamage");
+        _shipFuelTransferEnabled = ModHelper.Config.GetSettingsValue<bool>("enableShipFuelTransfer");
+        _refuelDrainsShip = ModHelper.Config.GetSettingsValue<bool>("enableJetpackRefuelDrain");
 
         LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
         {
@@ -249,10 +253,14 @@ public class ShipEnhancements : ModBehaviour
             Locator.GetShipDetector().gameObject.AddComponent<ShipTemperatureDetector>();
             Locator.GetShipBody().GetComponentInChildren<ShipFuelGauge>().gameObject.AddComponent<ShipTemperatureGauge>();
         }
-        if (_shipRefuelEnabled)
+        if (_shipFuelTransferEnabled)
         {
             GameObject transferVolume = LoadPrefab("Assets/ShipEnhancements/FuelTransferVolume.prefab");
             Instantiate(transferVolume, Locator.GetShipBody().GetComponentInChildren<ShipFuelTankComponent>().transform);
+        }
+        if (_refuelDrainsShip)
+        {
+            Locator.GetShipBody().GetComponentInChildren<PlayerRecoveryPoint>().gameObject.AddComponent<ShipRecoveryPoint>();
         }
     }
 
@@ -421,5 +429,7 @@ public class ShipEnhancements : ModBehaviour
         _thrustModulatorEnabled = ModHelper.Config.GetSettingsValue<bool>("enableThrustModulator");
         _temperatureZonesAmount = ModHelper.Config.GetSettingsValue<string>("temperatureZonesAmount");
         _temperatureDamageEnabled = ModHelper.Config.GetSettingsValue<bool>("enableTemperatureDamage");
+        _shipFuelTransferEnabled = ModHelper.Config.GetSettingsValue<bool>("enableShipFuelTransfer");
+        _refuelDrainsShip = ModHelper.Config.GetSettingsValue<bool>("enableJetpackRefuelDrain");
     }
 }

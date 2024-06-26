@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ShipEnhancements;
 
@@ -10,21 +9,24 @@ public class ShipFuelTransfer : MonoBehaviour
 
     private PlayerResources _playerResources;
     private ShipResources _shipResources;
+    private ShipFuelTankComponent _fuelTankComponent;
     private bool _transferring = false;
     private bool _fuelDepleted = false;
 
     private void Start()
     {
-        ShipFuelTankComponent fuelTankComponent = GetComponentInParent<ShipFuelTankComponent>();
+        _fuelTankComponent = GetComponentInParent<ShipFuelTankComponent>();
         _playerResources = Locator.GetPlayerBody().GetComponent<PlayerResources>();
         _shipResources = Locator.GetShipBody().GetComponent<ShipResources>();
 
-        fuelTankComponent.OnRepaired += ctx => OnComponentRepaired();
-        fuelTankComponent.OnDamaged += ctx => OnComponentDamaged();
+        _fuelTankComponent.OnRepaired += ctx => OnComponentRepaired();
+        _fuelTankComponent.OnDamaged += ctx => OnComponentDamaged();
         _interactReceiver.OnPressInteract += OnPressInteract;
         _interactReceiver.OnReleaseInteract += OnReleaseInteract;
+        GlobalMessenger.AddListener("SuitUp", OnSuitUp);
+        GlobalMessenger.AddListener("RemoveSuit", OnRemoveSuit);
 
-        _interactReceiver.ChangePrompt("Transfer jetpack fuel (Hold)");
+        _interactReceiver.SetPromptText(UITextType.HoldPrompt, "Transfer jetpack fuel");
     }
 
     private void Update()
@@ -34,27 +36,45 @@ public class ShipFuelTransfer : MonoBehaviour
             if (_playerResources._currentFuel > 0)
             {
                 _fuelDepleted = false;
+                _interactReceiver.EnableInteraction();
             }
         }
         else if (_transferring)
         {
-            _playerResources._currentFuel -= PlayerResources._maxFuel * Time.deltaTime * 0.5f;
-            _shipResources.AddFuel(PlayerResources._maxFuel * Time.deltaTime * 10f);
-            if (_playerResources._currentFuel <= 0)
+            if (!_interactReceiver.IsFocused())
             {
-                _fuelDepleted = true;
+                OnReleaseInteract();
+            }
+            else
+            {
+                _playerResources._currentFuel -= (PlayerResources._maxFuel * Time.deltaTime) / 3f;
+                _shipResources.AddFuel(PlayerResources._maxFuel * Time.deltaTime * 10f);
+                if (_playerResources._currentFuel <= 0)
+                {
+                    OnReleaseInteract();
+                    _fuelDepleted = true;
+                    _interactReceiver.DisableInteraction();
+                }
             }
         }
     }
 
     private void OnPressInteract()
     {
+        if (_fuelDepleted || !PlayerState.IsWearingSuit()) return;
+
+        _fuelTankComponent._damageEffect._particleAudioSource.Play();
         _transferring = true;
     }
 
     private void OnReleaseInteract()
     {
+        if (_fuelDepleted || !PlayerState.IsWearingSuit()) return;
+
+        _playerResources._playerAudioController.PlayRefuel();
+        _fuelTankComponent._damageEffect._particleAudioSource.Stop();
         _transferring = false;
+        _interactReceiver.ResetInteraction();
     }
 
     private void OnComponentRepaired()
@@ -65,5 +85,25 @@ public class ShipFuelTransfer : MonoBehaviour
     private void OnComponentDamaged()
     {
         _interactReceiver.DisableInteraction();
+    }
+
+    private void OnSuitUp()
+    {
+        _interactReceiver.EnableInteraction();
+    }
+
+    private void OnRemoveSuit()
+    {
+        _interactReceiver.DisableInteraction();
+    }
+
+    private void OnDestroy()
+    {
+        _fuelTankComponent.OnRepaired -= ctx => OnComponentRepaired();
+        _fuelTankComponent.OnDamaged -= ctx => OnComponentDamaged();
+        _interactReceiver.OnPressInteract -= OnPressInteract;
+        _interactReceiver.OnReleaseInteract -= OnReleaseInteract;
+        GlobalMessenger.RemoveListener("SuitUp", OnSuitUp);
+        GlobalMessenger.RemoveListener("RemoveSuit", OnRemoveSuit);
     }
 }

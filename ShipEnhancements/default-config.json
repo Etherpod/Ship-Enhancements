@@ -114,6 +114,18 @@
       "type": "toggle",
       "value": false,
       "tooltip": "Damages the ship over time in extremely high or low temperatures."
+    },
+    "enableShipFuelTransfer": {
+      "title": "Enable Ship Fuel Transfer",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Lets you transfer your jetpack fuel to the ship through the fuel tank to refill it."
+    },
+    "enableJetpackRefuelDrain" {
+      "title": "Enable Jetpack Refuel Drain",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Drains the ship's fuel when you refill your jetpack in the ship."
     }
   }
 }
