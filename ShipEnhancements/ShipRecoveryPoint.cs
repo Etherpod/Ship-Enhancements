@@ -11,10 +11,8 @@ public class ShipRecoveryPoint : MonoBehaviour
     {
         _recoveryPoint = GetComponent<PlayerRecoveryPoint>();
         _shipResources = Locator.GetShipBody().GetComponent<ShipResources>();
-        ShipEnhancements.WriteDebugMessage("started thing");
         if (!_recoveryPoint._refuelsPlayer)
         {
-            ShipEnhancements.WriteDebugMessage("bad thing");
             enabled = false;
         }
     }
@@ -33,7 +31,6 @@ public class ShipRecoveryPoint : MonoBehaviour
 
         if (_recoveryPoint._recovering && PlayerState.IsWearingSuit())
         {
-            ShipEnhancements.WriteDebugMessage("doing thing");
             _shipResources._currentFuel = Mathf.Max(_shipResources._currentFuel - (PlayerResources._maxFuel * 10f * Time.deltaTime * 3f), 0f);
         }
     }

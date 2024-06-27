@@ -11,13 +11,15 @@ public class ShipFuelTransfer : MonoBehaviour
     private ShipResources _shipResources;
     private ShipFuelTankComponent _fuelTankComponent;
     private bool _transferring = false;
-    private bool _fuelDepleted = false;
+    private bool _jetpackFuelDepleted = false;
+    private bool _shipFuelFull = false;
 
     private void Start()
     {
         _fuelTankComponent = GetComponentInParent<ShipFuelTankComponent>();
         _playerResources = Locator.GetPlayerBody().GetComponent<PlayerResources>();
         _shipResources = Locator.GetShipBody().GetComponent<ShipResources>();
+        _shipFuelFull = IsShipFuelFull();
 
         _fuelTankComponent.OnRepaired += ctx => OnComponentRepaired();
         _fuelTankComponent.OnDamaged += ctx => OnComponentDamaged();
@@ -27,15 +29,28 @@ public class ShipFuelTransfer : MonoBehaviour
         GlobalMessenger.AddListener("RemoveSuit", OnRemoveSuit);
 
         _interactReceiver.SetPromptText(UITextType.HoldPrompt, "Transfer jetpack fuel");
+        if (_shipFuelFull)
+        {
+            _interactReceiver.DisableInteraction();
+        }
     }
 
     private void Update()
     {
-        if (_fuelDepleted)
+        if (_shipFuelFull && !IsShipFuelFull())
+        {
+            _shipFuelFull = false;
+            if (!_jetpackFuelDepleted)
+            {
+                _interactReceiver.EnableInteraction();
+            }
+        }
+
+        if (_jetpackFuelDepleted)
         {
             if (_playerResources._currentFuel > 0)
             {
-                _fuelDepleted = false;
+                _jetpackFuelDepleted = false;
                 _interactReceiver.EnableInteraction();
             }
         }
@@ -52,16 +67,27 @@ public class ShipFuelTransfer : MonoBehaviour
                 if (_playerResources._currentFuel <= 0)
                 {
                     OnReleaseInteract();
-                    _fuelDepleted = true;
+                    _jetpackFuelDepleted = true;
+                    _interactReceiver.DisableInteraction();
+                }
+                else if (IsShipFuelFull())
+                {
+                    OnReleaseInteract();
+                    _shipFuelFull = true;
                     _interactReceiver.DisableInteraction();
                 }
             }
         }
     }
 
+    private bool IsShipFuelFull()
+    {
+        return _shipResources._currentFuel >= _shipResources._maxFuel;
+    }
+
     private void OnPressInteract()
     {
-        if (_fuelDepleted || !PlayerState.IsWearingSuit()) return;
+        if (_shipFuelFull || _jetpackFuelDepleted || !PlayerState.IsWearingSuit()) return;
 
         _fuelTankComponent._damageEffect._particleAudioSource.Play();
         _transferring = true;
@@ -69,7 +95,7 @@ public class ShipFuelTransfer : MonoBehaviour
 
     private void OnReleaseInteract()
     {
-        if (_fuelDepleted || !PlayerState.IsWearingSuit()) return;
+        if (_shipFuelFull || _jetpackFuelDepleted || !PlayerState.IsWearingSuit()) return;
 
         _playerResources._playerAudioController.PlayRefuel();
         _fuelTankComponent._damageEffect._particleAudioSource.Stop();
@@ -89,7 +115,10 @@ public class ShipFuelTransfer : MonoBehaviour
 
     private void OnSuitUp()
     {
-        _interactReceiver.EnableInteraction();
+        if (!_shipFuelFull && !_jetpackFuelDepleted)
+        {
+            _interactReceiver.EnableInteraction();
+        }
     }
 
     private void OnRemoveSuit()

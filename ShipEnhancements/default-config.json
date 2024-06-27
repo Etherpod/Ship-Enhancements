@@ -121,7 +121,7 @@
       "value": false,
       "tooltip": "Lets you transfer your jetpack fuel to the ship through the fuel tank to refill it."
     },
-    "enableJetpackRefuelDrain" {
+    "enableJetpackRefuelDrain": {
       "title": "Enable Jetpack Refuel Drain",
       "type": "toggle",
       "value": false,
