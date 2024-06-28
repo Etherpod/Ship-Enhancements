@@ -53,7 +53,7 @@ public abstract class CockpitSwitch : ElectricalComponent
             _renderer.SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 1f);
             if (_onAudio)
             {
-                _audioSource.PlayOneShot(_onAudio);
+                PlaySwitchAudio(_onAudio);
             }
         }
         else
@@ -64,11 +64,17 @@ public abstract class CockpitSwitch : ElectricalComponent
             _renderer.SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 0f);
             if (_offAudio)
             {
-                _audioSource.PlayOneShot(_offAudio);
+                PlaySwitchAudio(_offAudio);
             }
         }
 
         OnFlipSwitch(_on);
+    }
+
+    private void PlaySwitchAudio(AudioClip clip)
+    {
+        _audioSource.pitch = Random.Range(0.9f, 1.1f);
+        _audioSource.PlayOneShot(clip);
     }
 
     public override void SetPowered(bool powered)

@@ -7,7 +7,7 @@ public class GravityLandingGear : MonoBehaviour
     private ShipDamageController _damageController;
     private ShipLandingGear _landingGear;
     private OWAudioSource _audioSource;
-    private GameObject _gravityEffects;
+    private ParticleSystem _gravityEffects;
     private float _gravityMagnitude = 10f;
     private bool _gravityEnabled = false;
     private bool _shipDestroyed = false;
@@ -21,7 +21,7 @@ public class GravityLandingGear : MonoBehaviour
         GameObject audioObject = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/Audio_GravityLandingGear.prefab");
         _audioSource = Instantiate(audioObject, transform).GetComponent<OWAudioSource>();
         GameObject effectsObject = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/Effects_GravityLandingGear_WarpParticles.prefab");
-        _gravityEffects = Instantiate(effectsObject, transform);
+        _gravityEffects = Instantiate(effectsObject, transform).GetComponent<ParticleSystem>();
 
         ShipEnhancements.Instance.OnGravityLandingGearSwitch += SetGravityEnabled;
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
@@ -36,9 +36,9 @@ public class GravityLandingGear : MonoBehaviour
         _gravityEnabled = enabled;
         if (!enabled)
         {
-            if (_gravityEffects.GetComponent<ParticleSystem>().isPlaying)
+            if (_gravityEffects.isPlaying)
             {
-                _gravityEffects.GetComponent<ParticleSystem>().Stop();
+                _gravityEffects.Stop();
             }
             if (_audioSource.isPlaying)
             {
@@ -46,11 +46,11 @@ public class GravityLandingGear : MonoBehaviour
                 _audioSource.time = 0f;
             }
         }
-        else if (enabled)
+        else if (enabled && !_damaged && !_shipDestroyed)
         {
-            if (_landed && !_gravityEffects.GetComponent<ParticleSystem>().isPlaying)
+            if (_landed && !_gravityEffects.isPlaying)
             {
-                _gravityEffects.GetComponent<ParticleSystem>().Play();
+                _gravityEffects.Play();
             }
             if (!_audioSource.isPlaying)
             {
@@ -88,7 +88,7 @@ public class GravityLandingGear : MonoBehaviour
             _landed = true;
             if (!_shipDestroyed && !_damaged && _gravityEnabled)
             {
-                _gravityEffects.GetComponent<ParticleSystem>().Play();
+                _gravityEffects.Play();
             }
         }
     }
@@ -98,26 +98,51 @@ public class GravityLandingGear : MonoBehaviour
         if (hitCollider.attachedRigidbody != null)
         {
             _landed = false;
-           _gravityEffects.GetComponent<ParticleSystem>().Stop();
+           _gravityEffects.Stop();
         }
     }
 
     private void OnShipSystemFailure()
     {
         _shipDestroyed = true;
-        SetGravityEnabled(false);
+        if (_gravityEffects.isPlaying)
+        {
+            _gravityEffects.Stop();
+        }
+        if (_audioSource.isPlaying)
+        {
+            _audioSource.Stop();
+            _audioSource.time = 0f;
+        }
     }
 
     private void OnLandingGearDamaged()
     {
         _damaged = true;
-        SetGravityEnabled(false);
+        if (_gravityEffects.isPlaying)
+        {
+            _gravityEffects.Stop();
+        }
+        if (_audioSource.isPlaying)
+        {
+            _audioSource.Stop();
+            _audioSource.time = 0f;
+        }
     }
 
     private void OnLandingGearRepaired()
     {
         _damaged = false;
-        SetGravityEnabled(true);
+
+        if (_shipDestroyed || !_gravityEnabled) return;
+
+        if (_landed)
+        {
+            _gravityEffects.Play();
+        }
+        _audioSource.Play();
+        _audioSource.pitch = 1f;
+        //SetGravityEnabled(true);
     }
 
     private void OnDestroy()

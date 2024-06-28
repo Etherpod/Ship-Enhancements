@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 724687343
+CRC: 2827365481
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 5989f8c8b287f506de502705fbfcc695
+    Hash: cc18d359eff81f8c6235bba4b52685b8
   TypeTreeHash:
     serializedVersion: 2
-    Hash: d786731a0840f2e51801c4a105d8a048
+    Hash: 691d977824ebd1cdbdfda0b960ba8388
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -80,7 +80,6 @@ Assets:
 - Assets/ShipEnhancements/Audio_GravityLandingGear.prefab
 - Assets/ShipEnhancements/TemperatureZone_CaveTwinCold.prefab
 - Assets/ShipEnhancements/TemperatureZone_BrittleHollowSouth.prefab
-- Assets/ShipEnhancements/LandingGearParticlesFix.prefab
 - Assets/ShipEnhancements/Switch.prefab
 - Assets/ShipEnhancements/TemperatureZone_InterloperDarkSide.prefab
 - Assets/ShipEnhancements/TemperatureZone_TimberHearthGeyser.prefab
@@ -91,6 +90,7 @@ Assets:
 - Assets/ShipEnhancements/ShipInterior_HEA_VillageCabin_Recolored_mat.mat
 - Assets/ShipEnhancements/TemperatureZone_Sun.prefab
 - Assets/ShipEnhancements/Effects_GravityLandingGear_WarpParticles.prefab
+- Assets/ShipEnhancements/AudioClip/ModulatorButton.mp3
 - Assets/ShipEnhancements/AudioClip/GravityLandingGear.mp3
 - Assets/ShipEnhancements/TemperatureZone_GiantsDeepCore.prefab
 - Assets/ShipEnhancements/TemperatureZone_BrittleHollowNorth.prefab

@@ -6,6 +6,9 @@ namespace ShipEnhancements;
 
 public class ThrustModulatorController : ElectricalComponent
 {
+    [SerializeField]
+    private OWAudioSource _audioSource;
+
     private ThrustModulatorButton[] _modulatorButtons;
     private int _lastLevel;
 
@@ -62,5 +65,11 @@ public class ThrustModulatorController : ElectricalComponent
                 button.SetInteractable(false);
             }
         }
+    }
+
+    public void PlayButtonSound(AudioClip clip, float volume)
+    {
+        _audioSource.pitch = Random.Range(0.9f, 1.1f);
+        _audioSource.PlayOneShot(clip, volume);
     }
 }

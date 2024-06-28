@@ -6,6 +6,8 @@ public class ThrustModulatorButton : MonoBehaviour
 {
     [SerializeField]
     private int _modulatorLevel;
+    [SerializeField]
+    private AudioClip _buttonAudio;
 
     private InteractReceiver _interactReceiver;
     private ThrustModulatorController _modulatorController;
@@ -53,6 +55,10 @@ public class ThrustModulatorButton : MonoBehaviour
     {
         ShipEnhancements.Instance.SetThrustModulatorLevel(_modulatorLevel);
         _modulatorController.UpdateModulatorDisplay(_modulatorLevel);
+        if (_buttonAudio)
+        {
+            _modulatorController.PlayButtonSound(_buttonAudio, 0.3f);
+        }
     }
 
     public int GetModulatorLevel()
