@@ -12,6 +12,12 @@ public abstract class CockpitSwitch : ElectricalComponent
     protected InteractReceiver _interactReceiver;
     [SerializeField]
     protected string _label;
+    [SerializeField]
+    protected OWAudioSource _audioSource;
+    [SerializeField]
+    protected AudioClip _onAudio;
+    [SerializeField]
+    protected AudioClip _offAudio;
 
     protected Quaternion _initialRotation;
     protected OWRenderer _renderer;
@@ -19,12 +25,13 @@ public abstract class CockpitSwitch : ElectricalComponent
 
     private void Start()
     {
+        _renderer = GetComponent<OWRenderer>();
+
         _interactReceiver.OnPressInteract += FlipSwitch;
 
         _interactReceiver.ChangePrompt("Turn on " + _label);
         transform.localRotation = Quaternion.Euler(_initialRotation.eulerAngles.x + _rotationOffset,
             _initialRotation.eulerAngles.y, _initialRotation.eulerAngles.z);
-        _renderer = GetComponent<OWRenderer>();
         _renderer.SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 0f);
 
         ElectricalSystem cockpitElectricalSystem = Locator.GetShipBody().transform
@@ -44,6 +51,10 @@ public abstract class CockpitSwitch : ElectricalComponent
                 _initialRotation.eulerAngles.y, _initialRotation.eulerAngles.z);
             _interactReceiver.ChangePrompt("Turn off " + _label);
             _renderer.SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 1f);
+            if (_onAudio)
+            {
+                _audioSource.PlayOneShot(_onAudio);
+            }
         }
         else
         {
@@ -51,6 +62,10 @@ public abstract class CockpitSwitch : ElectricalComponent
                 _initialRotation.eulerAngles.y, _initialRotation.eulerAngles.z);
             _interactReceiver.ChangePrompt("Turn on " + _label);
             _renderer.SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 0f);
+            if (_offAudio)
+            {
+                _audioSource.PlayOneShot(_offAudio);
+            }
         }
 
         OnFlipSwitch(_on);
@@ -78,4 +93,9 @@ public abstract class CockpitSwitch : ElectricalComponent
     }
 
     protected virtual void OnFlipSwitch(bool state) { }
+
+    protected void OnDestroy()
+    {
+        _interactReceiver.OnPressInteract -= FlipSwitch;
+    }
 }

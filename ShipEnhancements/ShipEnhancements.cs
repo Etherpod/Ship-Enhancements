@@ -409,6 +409,11 @@ public class ShipEnhancements : ModBehaviour
         return (GameObject)Instance._shipEnhancementsBundle.LoadAsset(path);
     }
 
+    public static AudioClip LoadAudio(string path)
+    {
+        return (AudioClip)Instance._shipEnhancementsBundle.LoadAsset(path);
+    }
+
     public override void Configure(IModConfig config)
     {
         _gravityCrystalDisabled = ModHelper.Config.GetSettingsValue<bool>("disableGravityCrystal");

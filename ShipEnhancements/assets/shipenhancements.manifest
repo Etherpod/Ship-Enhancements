@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 28507884
+CRC: 724687343
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: b6f142dde8915a844ec7058587097386
+    Hash: 5989f8c8b287f506de502705fbfcc695
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 4dd0be37683a5f4ad9334bb25eb847bc
+    Hash: d786731a0840f2e51801c4a105d8a048
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -25,12 +25,18 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 48
   Script: {instanceID: 0}
+- Class: 82
+  Script: {instanceID: 0}
+- Class: 83
+  Script: {instanceID: 0}
 - Class: 114
   Script: {fileID: 11500000, guid: fbb2498122f7e23a2e87544333cb528f, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 0053d129d589d30957bcc3b1958fc878, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 25b7e56961bf1df33ed31b8c786ab1c3, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 2145ed3a866d4bd5a94d98ee05d0fa4f, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 4d37ab8d4d1e425918e8172c84cb8288, type: 3}
 - Class: 114
@@ -53,9 +59,16 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 136
   Script: {instanceID: 0}
+- Class: 198
+  Script: {instanceID: 0}
+- Class: 199
+  Script: {instanceID: 0}
 SerializeReferenceClassIdentifiers: []
 Assets:
+- Assets/ShipEnhancements/GravityLandingGearParticles.mat
+- Assets/ShipEnhancements/AudioClip/Switch_Off.mp3
 - Assets/ShipEnhancements/ButtonGlowOrange.mat
+- Assets/ShipEnhancements/AudioClip/Switch_On.mp3
 - Assets/ShipEnhancements/ButtonGlow.mat
 - Assets/ShipEnhancements/IndicatorLight_TemperatureGauge.prefab
 - Assets/ShipEnhancements/TemperatureZone_DarkBramble.prefab
@@ -64,8 +77,10 @@ Assets:
 - Assets/ShipEnhancements/TemperatureZone_TimberHearthCore.prefab
 - Assets/ShipEnhancements/TemperatureZone_GiantsDeepOcean.prefab
 - Assets/ShipEnhancements/ThrustModulator.fbx
+- Assets/ShipEnhancements/Audio_GravityLandingGear.prefab
 - Assets/ShipEnhancements/TemperatureZone_CaveTwinCold.prefab
 - Assets/ShipEnhancements/TemperatureZone_BrittleHollowSouth.prefab
+- Assets/ShipEnhancements/LandingGearParticlesFix.prefab
 - Assets/ShipEnhancements/Switch.prefab
 - Assets/ShipEnhancements/TemperatureZone_InterloperDarkSide.prefab
 - Assets/ShipEnhancements/TemperatureZone_TimberHearthGeyser.prefab
@@ -75,6 +90,8 @@ Assets:
 - Assets/ShipEnhancements/TemperatureZone_VolcanicMoon.prefab
 - Assets/ShipEnhancements/ShipInterior_HEA_VillageCabin_Recolored_mat.mat
 - Assets/ShipEnhancements/TemperatureZone_Sun.prefab
+- Assets/ShipEnhancements/Effects_GravityLandingGear_WarpParticles.prefab
+- Assets/ShipEnhancements/AudioClip/GravityLandingGear.mp3
 - Assets/ShipEnhancements/TemperatureZone_GiantsDeepCore.prefab
 - Assets/ShipEnhancements/TemperatureZone_BrittleHollowNorth.prefab
 - Assets/ShipEnhancements/FuelTransferVolume.prefab

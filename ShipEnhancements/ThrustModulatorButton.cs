@@ -21,9 +21,10 @@ public class ThrustModulatorButton : MonoBehaviour
         _interactReceiver = GetComponent<InteractReceiver>();
         _modulatorController = GetComponentInParent<ThrustModulatorController>();
         _emissiveRenderer = GetComponent<OWEmissiveRenderer>();
-        _interactReceiver._screenPrompt._text = "Set Thrust Modulator";
+
         _interactReceiver.OnPressInteract += OnPressInteract;
 
+        _interactReceiver._screenPrompt._text = "Set Modulator to level " + _modulatorLevel;
         SetButtonLight(true);
     }
 
@@ -70,5 +71,10 @@ public class ThrustModulatorButton : MonoBehaviour
     public void SetInteractable(bool interactable)
     {
         _interactReceiver.SetInteractionEnabled(interactable);
+    }
+
+    private void OnDestroy()
+    {
+        _interactReceiver.OnPressInteract -= OnPressInteract;
     }
 }

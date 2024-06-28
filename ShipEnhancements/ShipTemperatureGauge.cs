@@ -18,11 +18,13 @@ public class ShipTemperatureGauge : MonoBehaviour
 
     private void Awake()
     {
+        _temperatureDetector = Locator.GetShipDetector().GetComponent<ShipTemperatureDetector>();
+
+        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+
         _needleTransform = Locator.GetShipBody().transform.Find("Module_Cockpit/Geo_Cockpit/Cockpit_Tech/Cockpit_Tech_Interior/TemperaturePointerPivot/TemperaturePointer_Geo");
         _currentNeedleRotation = _needleTransform.localRotation;
-        _temperatureDetector = Locator.GetShipDetector().GetComponent<ShipTemperatureDetector>();
         _warningLightColor = new Color(1.3f, 0.55f, 0.55f);
-        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
     }
 
     private void Start()

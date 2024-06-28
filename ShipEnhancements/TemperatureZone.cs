@@ -25,10 +25,12 @@ public class TemperatureZone : MonoBehaviour
     private void Start()
     {
         _shape = GetComponent<SphereShape>();
-        _outerRadius = _shape.radius;
         _triggerVolume = GetComponent<OWTriggerVolume>();
+
         _triggerVolume.OnEntry += OnEffectVolumeEnter;
         _triggerVolume.OnExit += OnEffectVolumeExit;
+
+        _outerRadius = _shape.radius;
     }
 
     private void OnEffectVolumeEnter(GameObject hitObj)
@@ -68,5 +70,11 @@ public class TemperatureZone : MonoBehaviour
     {
         _scale = scale;
         _shape.transform.localScale = Vector3.one * scale;
+    }
+
+    private void OnDestroy()
+    {
+        _triggerVolume.OnEntry -= OnEffectVolumeEnter;
+        _triggerVolume.OnExit -= OnEffectVolumeExit;
     }
 }

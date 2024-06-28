@@ -11,6 +11,7 @@ public class ShipRecoveryPoint : MonoBehaviour
     {
         _recoveryPoint = GetComponent<PlayerRecoveryPoint>();
         _shipResources = Locator.GetShipBody().GetComponent<ShipResources>();
+
         if (!_recoveryPoint._refuelsPlayer)
         {
             enabled = false;

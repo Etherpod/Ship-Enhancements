@@ -19,8 +19,9 @@ public class ThrustModulatorController : ElectricalComponent
         }
 
         _modulatorButtons = GetComponentsInChildren<ThrustModulatorButton>();
-        _lastLevel = 5;
+
         GetComponentInParent<CockpitButtonPanel>().AddButton();
+        _lastLevel = 5;
 
         ElectricalSystem cockpitElectricalSystem = Locator.GetShipBody().transform
             .Find("Module_Cockpit/Systems_Cockpit/FlightControlsElectricalSystem")

@@ -11,7 +11,6 @@ public class ShipTemperatureDetector : MonoBehaviour
     private List<TemperatureZone> _activeZones = [];
     private ShipHull[] _shipHulls;
     private ShipComponent[] _shipComponents;
-    private HazardVolume[] _heatVolumes;
     private float _currentTemperature;
     private float _highTempCutoff = 50f;
     private bool _highTemperature = false;
@@ -23,14 +22,13 @@ public class ShipTemperatureDetector : MonoBehaviour
     private float _cooldownStartTime;
     private float _cooldownTime;
 
-    private int _frameDelay = 5;
-
     private void Start()
     {
         ShipDamageController damageController = Locator.GetShipBody().GetComponent<ShipDamageController>();
-        _currentTemperature = 0f;
         _shipHulls = damageController._shipHulls;
         _shipComponents = damageController._shipComponents;
+
+        _currentTemperature = 0f;
         _delayStartTime = Time.time;
         _randDamageDelay = _damageDelay + UnityEngine.Random.Range(-1f, 1f);
         _tempMeterChargeLength /= ShipEnhancements.Instance.DamageSpeedMultiplier;
@@ -45,11 +43,8 @@ public class ShipTemperatureDetector : MonoBehaviour
             foreach (TemperatureZone zone in _activeZones)
             {
                 float temp = zone.GetTemperature();
-                if (_frameDelay == 5) ShipEnhancements.WriteDebugMessage(temp);
                 totalTemperature += temp;
             }
-            _frameDelay--;
-            if (_frameDelay == 0) _frameDelay = 5;
             _currentTemperature = Mathf.Clamp(totalTemperature, -100f, 100f);
 
             if (!_highTemperature)
@@ -121,15 +116,6 @@ public class ShipTemperatureDetector : MonoBehaviour
             targetHull._damageEffect.SetEffectBlend(1f - targetHull._integrity);
         }
     }
-
-    /*private void ComponentTemperatureDamage()
-    {
-        ShipComponent[] enabledComponents = _shipComponents.Where(component => {
-            return component.repairFraction == 1f && !component.isDamaged;
-        }).ToArray();
-        ShipComponent targetComponent = enabledComponents[UnityEngine.Random.Range(0, enabledComponents.Length)];
-        targetComponent.SetDamaged(true);
-    }*/
 
     public float GetTemperatureRatio()
     {
