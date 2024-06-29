@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Reflection;
 using HarmonyLib;
-using NAudio.MediaFoundation;
 using UnityEngine;
 
 namespace ShipEnhancements;
@@ -157,6 +156,11 @@ public class PatchClass
     [HarmonyPatch(typeof(ShipHull), nameof(ShipHull.FixedUpdate))]
     public static bool ApplyHullDamageMultiplier(ShipHull __instance)
     {
+        if (ShipEnhancements.Instance.DamageMultiplier == 1 && ShipEnhancements.Instance.DamageSpeedMultiplier == 0)
+        {
+            return true;
+        }
+
         if (__instance._debugImpact)
         {
             __instance._integrity = 0.5f;
@@ -235,6 +239,11 @@ public class PatchClass
     [HarmonyPatch(typeof(ShipComponent), nameof(ShipComponent.ApplyImpact))]
     public static bool ApplyComponentDamageMultiplier(ShipComponent __instance, ImpactData impact)
     {
+        if (ShipEnhancements.Instance.DamageMultiplier == 1 && ShipEnhancements.Instance.DamageSpeedMultiplier == 0)
+        {
+            return true;
+        }
+
         if (__instance._damaged)
         {
             return false;
@@ -270,11 +279,16 @@ public class PatchClass
     [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.OnImpact))]
     public static bool ApplyExplosionDamageMultiplier(ShipDamageController __instance, ImpactData impact)
     {
+        if (ShipEnhancements.Instance.DamageMultiplier == 1 && ShipEnhancements.Instance.DamageSpeedMultiplier == 0)
+        {
+            return true;
+        }
+
         if (impact.otherCollider.attachedRigidbody != null && impact.otherCollider.attachedRigidbody.CompareTag("Player") && PlayerState.IsInsideShip())
         {
             return false;
         }
-        if (impact.speed >= 300f * ShipEnhancements.Instance.DamageSpeedMultiplier && !__instance._exploded)
+        if (impact.speed >= 300f * ShipEnhancements.Instance.DamageSpeedMultiplier / (ShipEnhancements.Instance.DamageMultiplier / 10) && !__instance._exploded)
         {
             __instance.Explode(false);
             return false;
