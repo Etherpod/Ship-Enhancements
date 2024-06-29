@@ -1,11 +1,8 @@
-﻿using System;
-using OWML.Common;
+﻿using OWML.Common;
 using OWML.ModHelper;
 using System.Collections;
 using UnityEngine;
 using System.IO;
-using System.Security.Policy;
-using UnityEngine.PostProcessing;
 
 namespace ShipEnhancements;
 public class ShipEnhancements : ModBehaviour
@@ -399,9 +396,20 @@ public class ShipEnhancements : ModBehaviour
         ThrustModulatorLevel = level;
     }
 
-    public static void WriteDebugMessage(object msg)
+    public static void WriteDebugMessage(object msg, bool warning = false, bool error = false)
     {
-        Instance.ModHelper.Console.WriteLine(msg.ToString());
+        if (warning)
+        {
+            Instance.ModHelper.Console.WriteLine(msg.ToString(), MessageType.Warning);
+        }
+        else if (error)
+        {
+            Instance.ModHelper.Console.WriteLine(msg.ToString(), MessageType.Error);
+        }
+        else
+        {
+            Instance.ModHelper.Console.WriteLine(msg.ToString());
+        }
     }
 
     public static GameObject LoadPrefab(string path)
@@ -436,5 +444,10 @@ public class ShipEnhancements : ModBehaviour
         _temperatureDamageEnabled = ModHelper.Config.GetSettingsValue<bool>("enableTemperatureDamage");
         _shipFuelTransferEnabled = ModHelper.Config.GetSettingsValue<bool>("enableShipFuelTransfer");
         _refuelDrainsShip = ModHelper.Config.GetSettingsValue<bool>("enableJetpackRefuelDrain");
+    }
+
+    public override object GetApi()
+    {
+        return new ShipEnhancementsAPI();
     }
 }

@@ -72,6 +72,18 @@ public class TemperatureZone : MonoBehaviour
         _shape.transform.localScale = Vector3.one * scale;
     }
 
+    public void SetProperties(float temperature, float outerRadius, float innerRadius, 
+        bool isShell, float shellCenterRadius, float shellCenterThickness)
+    {
+        _temperature = temperature;
+        _outerRadius = outerRadius;
+        _shape.radius = outerRadius;
+        _innerRadius = innerRadius;
+        _isShell = isShell;
+        _shellCenterRadius = shellCenterRadius;
+        _shellCenterThickness = shellCenterThickness;
+    }
+
     private void OnDestroy()
     {
         _triggerVolume.OnEntry -= OnEffectVolumeEnter;
