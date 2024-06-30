@@ -1,0 +1,1 @@
+Ship Enhancements makes numerous changes to the ship that are all toggleable in the options.

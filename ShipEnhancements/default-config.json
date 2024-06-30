@@ -2,6 +2,11 @@
   "$schema": "https://raw.githubusercontent.com/ow-mods/owml/master/schemas/config_schema.json",
   "enabled": true,
   "settings": {
+
+    "Disable Ship Parts": {
+      "type": "separator"
+    },
+
     "disableGravityCrystal": {
       "title": "Disable Ship Gravity",
       "type": "toggle",
@@ -38,6 +43,29 @@
       "value": false,
       "tooltip": "Removes all of the oxygen from your ship. Don't stay out in space for too long!"
     },
+    "disableShipRepair": {
+      "title": "Disable Ship Repairing",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Removes your ability to repair your ship. Be careful out there!"
+    },
+    "disableAirAutoRoll": {
+      "title": "Disable Air Auto Roll",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Allows your ship to rotate freely in atmospheres."
+    },
+    "disableWaterAutoRoll": {
+      "title": "Disable Water Auto Roll",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Allows your ship to rotate freely in water."
+    },
+
+    "Adjust Ship Parts": {
+      "type": "separator"
+    },
+
     "oxygenDrainMultiplier": {
       "title": "Ship Oxygen Drain Multiplier",
       "type": "number",
@@ -62,35 +90,34 @@
       "value": 1,
       "tooltip": "A multiplier that influences the speed at which the ship starts taking damage. Higher numbers result in higher speeds before taking damage."
     },
+
+    "Add Ship Functions": {
+      "type": "separator"
+    },
+
     "shipOxygenRefill": {
       "title": "Enable Ship Oxygen Refill",
       "type": "toggle",
       "value": false,
       "tooltip": "Refills the ship's oxygen tank when near oxygen sources. Doesn't work when oxygen is disabled."
     },
-    "disableShipRepair": {
-      "title": "Disable Ship Repairing",
+    "enableShipFuelTransfer": {
+      "title": "Enable Ship Fuel Transfer",
       "type": "toggle",
       "value": false,
-      "tooltip": "Removes your ability to repair your ship. Be careful out there!"
+      "tooltip": "Lets you transfer your jetpack fuel to the ship through the fuel tank to refill it."
+    },
+    "enableJetpackRefuelDrain": {
+      "title": "Enable Jetpack Refuel Drain",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Drains the ship's fuel when you refill your jetpack in the ship."
     },
     "enableGravityLandingGear": {
       "title": "Enable Gravity Landing Gear",
       "type": "toggle",
       "value": false,
       "tooltip": "Adds a switch to the cockpit to enable gravity-powered landing gear."
-    },
-    "disableAirAutoRoll": {
-      "title": "Disable Air Auto Roll",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Allows your ship to rotate freely in atmospheres."
-    },
-    "disableWaterAutoRoll": {
-      "title": "Disable Water Auto Roll",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Allows your ship to rotate freely in water."
     },
     "enableThrustModulator": {
       "title": "Enable Thrust Modulator",
@@ -114,18 +141,6 @@
       "type": "toggle",
       "value": false,
       "tooltip": "Damages the ship over time in extremely high or low temperatures."
-    },
-    "enableShipFuelTransfer": {
-      "title": "Enable Ship Fuel Transfer",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Lets you transfer your jetpack fuel to the ship through the fuel tank to refill it."
-    },
-    "enableJetpackRefuelDrain": {
-      "title": "Enable Jetpack Refuel Drain",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Drains the ship's fuel when you refill your jetpack in the ship."
     }
   }
 }
