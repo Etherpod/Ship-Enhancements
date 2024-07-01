@@ -30,6 +30,16 @@ public class PatchClass
         return true;
     }
 
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(OxygenDetector), nameof(OxygenDetector.GetDetectOxygen))]
+    public static void DisableOxygenDetection(OxygenDetector __instance, ref bool __result)
+    {
+        if (ShipEnhancements.Instance.OxygenDisabled && __instance.gameObject.CompareTag("ShipDetector"))
+        {
+            __result = false;
+        }
+    }
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.OnPressInteract))]
     public static bool KeepHelmetOnAtCockpit(ShipCockpitController __instance)
@@ -319,7 +329,7 @@ public class PatchClass
     [HarmonyPatch(typeof(ShipResources), nameof(ShipResources.Update))]
     public static bool RefillShipOxygen(ShipResources __instance)
     {
-        if (ShipEnhancements.Instance.OxygenDisabled || !ShipEnhancements.Instance.ShipOxygenRefill) return true;
+        if (ShipEnhancements.Instance.OxygenDisabled || !ShipEnhancements.Instance.ShipOxygenRefill || ModCompatibility.resourceManagementEnabled) return true;
 
         if (__instance._killingResources)
         {
