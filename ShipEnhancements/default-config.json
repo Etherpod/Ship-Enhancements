@@ -3,6 +3,18 @@
   "enabled": true,
   "settings": {
 
+    "preset": {
+      "title": "Preset",
+      "type": "selector",
+      "value": "Vanilla",
+      "options": [
+        "Vanilla",
+        "Bare-bones",
+        "Hardcore",
+        "Custom"
+      ]
+    },
+
     "Disable Ship Parts": {
       "type": "separator"
     },
