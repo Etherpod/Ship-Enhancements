@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 
+namespace ShipEnhancements;
+
 public class CockpitButtonPanel : MonoBehaviour
 {
     private int _numButtons = 0;

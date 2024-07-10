@@ -63,7 +63,7 @@ public class ShipFuelTransfer : MonoBehaviour
             else
             {
                 _playerResources._currentFuel -= (PlayerResources._maxFuel * Time.deltaTime) / 3f;
-                _shipResources.AddFuel(PlayerResources._maxFuel * Time.deltaTime * 10f);
+                _shipResources.AddFuel(PlayerResources._maxFuel * Time.deltaTime * 5f * ShipEnhancements.Instance.FuelTransferMultiplier);
                 if (_playerResources._currentFuel <= 0)
                 {
                     OnReleaseInteract();

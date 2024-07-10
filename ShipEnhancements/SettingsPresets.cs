@@ -1,6 +1,6 @@
 ﻿using OWML.Common;
 using System.Collections.Generic;
-using System.Linq;
+using System;
 
 namespace ShipEnhancements;
 
@@ -28,9 +28,17 @@ public static class SettingsPresets
         { "enableTemperatureDamage", false },
         { "enableShipFuelTransfer", false },
         { "enableJetpackRefuelDrain", false },
+        { "disableReferenceFrame", false },
+        { "disableMapMarkers", false },
+        { "gravityMultiplier", 1f },
+        { "fuelTransferMultiplier", 1f },
+        { "oxygenRefillMultiplier", 1f },
+        { "temperatureDamageMultiplier", 1f },
+        { "temperatureResistanceMultiplier", 1f },
+        { "enableAutoHatch", false },
     };
 
-    public static readonly Dictionary<string, object> BarebonesSettings = new Dictionary<string, object>()
+    public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
     {
         { "disableGravityCrystal", true },
         { "disableEjectButton", false },
@@ -52,6 +60,14 @@ public static class SettingsPresets
         { "enableTemperatureDamage", false },
         { "enableShipFuelTransfer", false },
         { "enableJetpackRefuelDrain", false },
+        { "disableReferenceFrame", false },
+        { "disableMapMarkers", false },
+        { "gravityMultiplier", 1f },
+        { "fuelTransferMultiplier", 1f },
+        { "oxygenRefillMultiplier", 1f },
+        { "temperatureDamageMultiplier", 1f },
+        { "temperatureResistanceMultiplier", 1f },
+        { "enableAutoHatch", true },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -76,34 +92,119 @@ public static class SettingsPresets
         { "enableTemperatureDamage", true },
         { "enableShipFuelTransfer", true },
         { "enableJetpackRefuelDrain", true },
+        { "disableReferenceFrame", false },
+        { "disableMapMarkers", false },
+        { "gravityMultiplier", 1f },
+        { "fuelTransferMultiplier", 0.8f },
+        { "oxygenRefillMultiplier", 0.75f },
+        { "temperatureDamageMultiplier", 2f },
+        { "temperatureResistanceMultiplier", 1.5f },
+        { "enableAutoHatch", false },
     };
 
+    public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
+    {
+        { "disableGravityCrystal", false },
+        { "disableEjectButton", false },
+        { "disableHeadlights", false },
+        { "disableLandingCamera", false },
+        { "disableShipLights", false },
+        { "disableShipOxygen", false },
+        { "oxygenDrainMultiplier", 25f },
+        { "fuelDrainMultiplier", 1f },
+        { "shipDamageMultiplier", 0.5f },
+        { "shipDamageSpeedMultiplier", 1.2f },
+        { "shipOxygenRefill", true },
+        { "disableShipRepair", false },
+        { "enableGravityLandingGear", false },
+        { "disableAirAutoRoll", false },
+        { "disableWaterAutoRoll", false },
+        { "enableThrustModulator", false },
+        { "temperatureZonesAmount", "None" },
+        { "enableTemperatureDamage", false },
+        { "enableShipFuelTransfer", false },
+        { "enableJetpackRefuelDrain", true },
+        { "disableReferenceFrame", true },
+        { "disableMapMarkers", true },
+        { "gravityMultiplier", 1f },
+        { "fuelTransferMultiplier", 1f },
+        { "oxygenRefillMultiplier", 1f },
+        { "temperatureDamageMultiplier", 1f },
+        { "temperatureResistanceMultiplier", 1f },
+        { "enableAutoHatch", false },
+    };
+
+    public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
+    {
+        { "disableGravityCrystal", false },
+        { "disableEjectButton", false },
+        { "disableHeadlights", false },
+        { "disableLandingCamera", false },
+        { "disableShipLights", false },
+        { "disableShipOxygen", false },
+        { "oxygenDrainMultiplier", 120f },
+        { "fuelDrainMultiplier", 6f },
+        { "shipDamageMultiplier", 5f },
+        { "shipDamageSpeedMultiplier", 1.5f },
+        { "shipOxygenRefill", true },
+        { "disableShipRepair", false },
+        { "enableGravityLandingGear", false },
+        { "disableAirAutoRoll", true },
+        { "disableWaterAutoRoll", true },
+        { "enableThrustModulator", false },
+        { "temperatureZonesAmount", "All" },
+        { "enableTemperatureDamage", true },
+        { "enableShipFuelTransfer", true },
+        { "enableJetpackRefuelDrain", true },
+        { "disableReferenceFrame", false },
+        { "disableMapMarkers", false },
+        { "gravityMultiplier", 0.3f },
+        { "fuelTransferMultiplier", 2f },
+        { "oxygenRefillMultiplier", 2f },
+        { "temperatureDamageMultiplier", 4f },
+        { "temperatureResistanceMultiplier", 0.6f },
+        { "enableAutoHatch", false },
+    };
+
+    public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }
+
     public static Dictionary<string, Dictionary<PresetName, object>> settingsPresets { get; private set; }
+
+    private static bool _initialized = false;
 
     public enum PresetName
     {
         Vanilla,
-        Barebones,
+        Minimal,
         Hardcore,
+        Wanderer,
+        Pandemonium,
         Custom
     }
 
     public static void InitializePresets()
     {
+        presetDicts = new()
+        {
+            { PresetName.Vanilla, VanillaSettings },
+            { PresetName.Minimal, MinimalSettings },
+            { PresetName.Hardcore, HardcoreSettings },
+            { PresetName.Wanderer, WandererSettings },
+            { PresetName.Pandemonium, PandemoniumSettings },
+        };
+
         settingsPresets = new();
 
-        VanillaSettings.ForEach(setting => 
+        foreach (KeyValuePair<PresetName, Dictionary<string, object>> pair in presetDicts)
         {
-            PresetName.Vanilla.AddSetting(setting.Key, setting.Value); 
-        });
-        BarebonesSettings.ForEach(setting => 
-        {
-            PresetName.Vanilla.AddSetting(setting.Key, setting.Value); 
-        });
-        HardcoreSettings.ForEach(setting => 
-        {
-            PresetName.Hardcore.AddSetting(setting.Key, setting.Value); 
-        });
+            foreach (KeyValuePair<string, object> setting in pair.Value)
+            {
+                pair.Key.AddSetting(setting.Key, setting.Value);
+            }
+        }
+
+        _initialized = true;
+        ShipEnhancements.Instance.Configure(ShipEnhancements.Instance.ModHelper.Config);
     }
 
     public static void AddSetting(this PresetName preset, string name, object value)
@@ -133,57 +234,71 @@ public static class SettingsPresets
 
     public static void ApplyPreset(PresetName preset, IModConfig config)
     {
-        ShipEnhancements.WriteDebugMessage("Applying");
-        switch (preset)
+        if (preset == PresetName.Custom) return;
+        foreach (KeyValuePair<string, object> setting in presetDicts[preset])
         {
-            case PresetName.Vanilla:
-                ShipEnhancements.WriteDebugMessage("Vanilla");
-                VanillaSettings.ForEach(setting =>
-                {
-                    ShipEnhancements.WriteDebugMessage("Selecting");
-                    ShipEnhancements.WriteDebugMessage("Before: " + ShipEnhancements.Instance.ModHelper.Config.GetSettingsValue<object>(setting.Key));
-                    config.SetSettingsValue(setting.Key, setting.Value);
-                    ShipEnhancements.WriteDebugMessage("After: " + ShipEnhancements.Instance.ModHelper.Config.GetSettingsValue<object>(setting.Key));
-                });
-                break;
-
-            case PresetName.Barebones:
-                ShipEnhancements.WriteDebugMessage("Barebones");
-                BarebonesSettings.ForEach(setting => 
-                {
-                    ShipEnhancements.WriteDebugMessage("Selecting");
-                    config.SetSettingsValue(setting.Key, setting.Value); 
-                });
-                break;
-
-            case PresetName.Hardcore:
-                ShipEnhancements.WriteDebugMessage("Hardcore");
-                HardcoreSettings.ForEach(setting => 
-                {
-                    ShipEnhancements.WriteDebugMessage("Selecting");
-                    config.SetSettingsValue(setting.Key, setting.Value); 
-                });
-                break;
+            config.SetSettingsValue(setting.Key, setting.Value);
         }
     }
 
-    public static PresetName GetPresetName(string configPreset)
+    public static PresetName GetPresetFromConfig(string configPreset)
     {
-        if (configPreset == "Vanilla")
+        if (Enum.TryParse(configPreset, out PresetName preset))
         {
-            return PresetName.Vanilla;
+            return preset;
         }
-        else if (configPreset == "Bare-bones")
+        ShipEnhancements.WriteDebugMessage($"Failed to convert {configPreset} to preset.", error: true);
+        return PresetName.Custom;
+    }
+
+    public static string GetName(this PresetName preset)
+    {
+        return preset.ToString();
+    }
+
+    public static object GetPresetSetting(this PresetName preset, string setting)
+    {
+        /*switch (preset)
         {
-            return PresetName.Barebones;
+            case PresetName.Vanilla:
+                if (VanillaSettings.ContainsKey(setting))
+                {
+                    return VanillaSettings[setting];
+                }
+                else
+                {
+                    ShipEnhancements.WriteDebugMessage($"No setting found for Vanilla preset: {setting}", error: true);
+                }
+                break;
+
+            case PresetName.Barebones:
+                if (BarebonesSettings.ContainsKey(setting))
+                {
+                    return BarebonesSettings[setting];
+                }
+                else
+                {
+                    ShipEnhancements.WriteDebugMessage($"No setting found for Barebones preset: {setting}", error: true);
+                }
+                break;
+
+            case PresetName.Hardcore:
+                if (HardcoreSettings.ContainsKey(setting))
+                {
+                    return HardcoreSettings[setting];
+                }
+                else
+                {
+                    ShipEnhancements.WriteDebugMessage($"No setting found for Hardcore preset: {setting}", error: true);
+                }
+                break;
         }
-        else if (configPreset == "Hardcore")
-        {
-            return PresetName.Hardcore;
-        }
-        else
-        {
-            return PresetName.Custom;
-        }
+        return null;*/
+        return settingsPresets[setting][preset];
+    }
+
+    public static bool Initialized()
+    {
+        return _initialized;
     }
 }

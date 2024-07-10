@@ -31,7 +31,7 @@ public class ShipTemperatureDetector : MonoBehaviour
         _currentTemperature = 0f;
         _delayStartTime = Time.time;
         _randDamageDelay = _damageDelay + UnityEngine.Random.Range(-1f, 1f);
-        _tempMeterChargeLength /= ShipEnhancements.Instance.DamageSpeedMultiplier;
+        _tempMeterChargeLength *= ShipEnhancements.Instance.TemperatureResistanceMultiplier;
         _tempMeterStartTime = Time.time - _tempMeterChargeLength;
     }
 
@@ -65,7 +65,7 @@ public class ShipTemperatureDetector : MonoBehaviour
                     float timeMultiplier = Mathf.InverseLerp(_tempMeterStartTime, _tempMeterStartTime + _tempMeterChargeLength, Time.time)
                         * Mathf.Abs(GetTemperatureRatio());
 
-                    float damageChance = 0.05f * Mathf.LerpUnclamped(0f, 3f, timeMultiplier);
+                    float damageChance = 0.05f * Mathf.LerpUnclamped(0f, 1f + (Mathf.InverseLerp(_highTempCutoff, 100f, Mathf.Abs(_currentTemperature)) * 2f), timeMultiplier);
                     if (UnityEngine.Random.value < damageChance)
                     {
                         HullTemperatureDamage();
@@ -101,7 +101,7 @@ public class ShipTemperatureDetector : MonoBehaviour
             targetHull._damaged = true;
         }
 
-        float damage = UnityEngine.Random.Range(0.03f, 0.15f) * ShipEnhancements.Instance.DamageMultiplier;
+        float damage = UnityEngine.Random.Range(0.03f, 0.15f) * ShipEnhancements.Instance.TemperatureDamageMultiplier;
         targetHull._integrity = Mathf.Max(targetHull._integrity - damage, 0f);
         var eventDelegate1 = (MulticastDelegate)typeof(ShipHull).GetField("OnDamaged", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).GetValue(targetHull);
         if (eventDelegate1 != null)

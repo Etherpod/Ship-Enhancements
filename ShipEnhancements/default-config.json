@@ -9,8 +9,10 @@
       "value": "Vanilla",
       "options": [
         "Vanilla",
-        "Bare-bones",
+        "Minimal",
         "Hardcore",
+        "Wanderer",
+        "Pandemonium",
         "Custom"
       ]
     },
@@ -73,34 +75,76 @@
       "value": false,
       "tooltip": "Allows your ship to rotate freely in water."
     },
+    "disableReferenceFrame": {
+      "title": "Disable Lock-on",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Disables your ability to lock on to objects. You may find it difficult to use autopilot with this enabled."
+    },
+    "disableMapMarkers": {
+      "title": "Disable Map Markers",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Removes the markers that tell you the location of your ship, your scout, and any marked locations in the ship log. Try not to lose your ship."
+    },
 
     "Adjust Ship Functions": {
       "type": "separator"
     },
 
     "oxygenDrainMultiplier": {
-      "title": "Ship Oxygen Drain Multiplier",
+      "title": "Oxygen Drain Multiplier",
       "type": "number",
       "value": 1,
       "tooltip": "A multipler that influences how quickly the ship oxygen drains."
     },
     "fuelDrainMultiplier": {
-      "title": "Ship Fuel Drain Multiplier",
+      "title": "Fuel Drain Multiplier",
       "type": "number",
       "value": 1,
       "tooltip": "A multiplier that influences how quickly the ship fuel drains."
     },
     "shipDamageMultiplier": {
-      "title": "Ship Damage Multiplier",
+      "title": "Damage Multiplier",
       "type": "number",
       "value": 1,
       "tooltip": "A multiplier that influences how much damage the ship takes when it crashes."
     },
     "shipDamageSpeedMultiplier": {
-      "title": "Ship Damage Speed Multiplier",
+      "title": "Damage Speed Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "A multiplier that influences the speed at which the ship starts taking damage. Higher numbers result in higher speeds before taking damage."
+      "tooltip": "A multiplier that influences the speed at which the ship starts taking damage. Larger numbers result in higher speeds before taking damage."
+    },
+    "temperatureDamageMultiplier": {
+      "title": "Temperature Damage Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "A multiplier that influences how much damage the ship takes from high or low temperatures."
+    },
+    "gravityMultiplier": {
+      "title": "Ship Gravity Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "A multiplier that influences how strong the ship's gravity crystal is. Larger numbers result in stronger gravity."
+    },
+    "fuelTransferMultiplier": {
+      "title": "Fuel Transfer Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "A multiplier that influences how much fuel is subtracted when refueling your jetpack and how much fuel is added when transferring your jetpack fuel to the ship. Larger numbers result in more fuel being transferred both directions."
+    },
+    "oxygenRefillMultiplier": {
+      "title": "Oxygen Refill Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "A multiplier that influences how quickly the ship's oxygen tank refills when within a source of oxygen."
+    },
+    "temperatureResistanceMultiplier": {
+      "title": "Temperature Resistance Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "A multiplier that influences how long it takes for the ship to start taking damage in high or low temperatures. Larger numbers result in a longer time before taking damage."
     },
 
     "Add Ship Functions": {
@@ -124,6 +168,12 @@
       "type": "toggle",
       "value": false,
       "tooltip": "Drains the ship's fuel when you refill your jetpack in the ship."
+    },
+    "enableAutoHatch": {
+      "title": "Enable Automatic Hatch",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Automatically closes the ship hatch when you leave the ship."
     },
     "enableGravityLandingGear": {
       "title": "Enable Gravity Landing Gear",

@@ -3,6 +3,12 @@ using OWML.ModHelper;
 using System.Collections;
 using UnityEngine;
 using System.IO;
+using System;
+using DitzyExtensions.Collection;
+using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
+using System.Linq;
+using System.EnterpriseServices;
 
 namespace ShipEnhancements;
 
@@ -29,28 +35,15 @@ public class ShipEnhancements : ModBehaviour
     public bool WaterAutoRollDisabled { get; private set; }
     public bool ThrustModulatorEnabled { get; private set; }
     public int ThrustModulatorLevel { get; private set; }
+    public bool ReferenceFrameDisabled { get; private set; }
+    public bool MapMarkersDisabled { get; private set; }
+    public float FuelTransferMultiplier { get; private set; }
+    public float OxygenRefillMultiplier { get; private set; }
+    public float TemperatureDamageMultiplier { get; private set; }
+    public float TemperatureResistanceMultiplier { get; private set; }
+    public bool AutoHatchEnabled { get; private set; }
 
     private SettingsPresets.PresetName _currentPreset = (SettingsPresets.PresetName)(-1);
-    private bool _gravityCrystalDisabled;
-    private bool _ejectButtonDisabled;
-    private bool _headlightsDisabled;
-    private bool _landingCameraDisabled;
-    private bool _shipLightsDisabled;
-    private bool _oxygenDisabled;
-    private float _oxygenDrainMultiplier;
-    private float _fuelDrainMultiplier;
-    private float _damageMultiplier;
-    private float _damageSpeedMultiplier;
-    private bool _shipOxygenRefill;
-    private bool _shipRepairDisabled;
-    private bool _gravityLandingGearEnabled;
-    private bool _airAutoRollDisabled;
-    private bool _waterAutoRollDisabled;
-    private bool _thrustModulatorEnabled;
-    private string _temperatureZonesAmount;
-    private bool _temperatureDamageEnabled;
-    private bool _shipFuelTransferEnabled;
-    private bool _refuelDrainsShip;
 
     private AssetBundle _shipEnhancementsBundle;
     private float _lastSuitOxygen;
@@ -60,6 +53,37 @@ public class ShipEnhancements : ModBehaviour
     private OxygenVolume _shipOxygen;
     private PlayerResources _playerResources;
 
+    public enum Settings
+    {
+        disableGravityCrystal,
+        disableEjectButton,
+        disableHeadlights,
+        disableLandingCamera,
+        disableShipLights,
+        disableShipOxygen,
+        oxygenDrainMultiplier,
+        fuelDrainMultiplier,
+        shipDamageMultiplier,
+        shipDamageSpeedMultiplier,
+        shipOxygenRefill,
+        disableShipRepair,
+        enableGravityLandingGear,
+        disableAirAutoRoll,
+        disableWaterAutoRoll,
+        enableThrustModulator,
+        temperatureZonesAmount,
+        enableTemperatureDamage,
+        enableShipFuelTransfer,
+        enableJetpackRefuelDrain,
+        disableReferenceFrame,
+        disableMapMarkers,
+        gravityMultiplier,
+        fuelTransferMultiplier,
+        oxygenRefillMultiplier,
+        temperatureDamageMultiplier,
+        temperatureResistanceMultiplier,
+        enableAutoHatch,
+    }
 
     private void Awake()
     {
@@ -71,36 +95,8 @@ public class ShipEnhancements : ModBehaviour
     {
         _shipEnhancementsBundle = AssetBundle.LoadFromFile(Path.Combine(ModHelper.Manifest.ModFolderPath, "assets/shipenhancements"));
 
-        SettingsPresets.InitializePresets();
-
-        /*_currentPreset = SettingsPresets.GetPresetName(ModHelper.Config.GetSettingsValue<string>("preset"));
-        WriteDebugMessage(_currentPreset);
-        if (_currentPreset != SettingsPresets.PresetName.Custom)
-        {
-            SettingsPresets.ApplyPreset(_currentPreset);
-        }
-        _gravityCrystalDisabled = ModHelper.Config.GetSettingsValue<bool>("disableGravityCrystal");
-        _ejectButtonDisabled = ModHelper.Config.GetSettingsValue<bool>("disableEjectButton");
-        _headlightsDisabled = ModHelper.Config.GetSettingsValue<bool>("disableHeadlights");
-        _landingCameraDisabled = ModHelper.Config.GetSettingsValue<bool>("disableLandingCamera");
-        _shipLightsDisabled = ModHelper.Config.GetSettingsValue<bool>("disableShipLights");
-        _oxygenDisabled = ModHelper.Config.GetSettingsValue<bool>("disableShipOxygen");
-        _oxygenDrainMultiplier = ModHelper.Config.GetSettingsValue<float>("oxygenDrainMultiplier");
-        _fuelDrainMultiplier = ModHelper.Config.GetSettingsValue<float>("fuelDrainMultiplier");
-        _damageMultiplier = ModHelper.Config.GetSettingsValue<float>("shipDamageMultiplier");
-        _damageSpeedMultiplier = ModHelper.Config.GetSettingsValue<float>("shipDamageSpeedMultiplier");
-        _shipOxygenRefill = ModHelper.Config.GetSettingsValue<bool>("shipOxygenRefill");
-        _shipRepairDisabled = ModHelper.Config.GetSettingsValue<bool>("disableShipRepair");
-        _gravityLandingGearEnabled = ModHelper.Config.GetSettingsValue<bool>("enableGravityLandingGear");
-        _airAutoRollDisabled = ModHelper.Config.GetSettingsValue<bool>("disableAirAutoRoll");
-        _waterAutoRollDisabled = ModHelper.Config.GetSettingsValue<bool>("disableWaterAutoRoll");
-        _thrustModulatorEnabled = ModHelper.Config.GetSettingsValue<bool>("enableThrustModulator");
-        _temperatureZonesAmount = ModHelper.Config.GetSettingsValue<string>("temperatureZonesAmount");
-        _temperatureDamageEnabled = ModHelper.Config.GetSettingsValue<bool>("enableTemperatureDamage");
-        _shipFuelTransferEnabled = ModHelper.Config.GetSettingsValue<bool>("enableShipFuelTransfer");
-        _refuelDrainsShip = ModHelper.Config.GetSettingsValue<bool>("enableJetpackRefuelDrain");*/
-
         ModCompatibility.Initialize();
+        SettingsPresets.InitializePresets();
 
         LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
         {
@@ -121,6 +117,11 @@ public class ShipEnhancements : ModBehaviour
             UpdateProperties();
             GlobalMessenger.RemoveListener("SuitUp", OnPlayerSuitUp);
             GlobalMessenger.RemoveListener("RemoveSuit", OnPlayerRemoveSuit);
+            if ((bool)Settings.enableAutoHatch.GetValue())
+            {
+                GlobalMessenger.RemoveListener("EnterShip", OnEnterShip);
+                GlobalMessenger.RemoveListener("ExitShip", OnExitShip);
+            }
             _lastSuitOxygen = 0f;
             _shipOxygenDetector = null;
             _shipLoaded = false;
@@ -129,7 +130,8 @@ public class ShipEnhancements : ModBehaviour
 
     private void Update()
     {
-        if (!_shipLoaded || LoadManager.GetCurrentScene() != OWScene.SolarSystem || ModCompatibility.resourceManagementEnabled) return;
+        if (!_shipLoaded || LoadManager.GetCurrentScene() != OWScene.SolarSystem 
+            || ModCompatibility.GetModSetting("Stonesword.ResourceManagement", "Enable Oxygen Refill")) return;
 
         if (!oxygenDepleted && _shipResources.GetOxygen() <= 0)
         {
@@ -174,20 +176,27 @@ public class ShipEnhancements : ModBehaviour
 
     private void UpdateProperties()
     {
-        HeadlightsDisabled = _headlightsDisabled;
-        LandingCameraDisabled = _landingCameraDisabled;
-        OxygenDrainMultiplier = _oxygenDrainMultiplier;
-        FuelDrainMultiplier = _fuelDrainMultiplier;
-        DamageMultiplier = _damageMultiplier;
-        DamageSpeedMultiplier = _damageSpeedMultiplier;
-        ShipOxygenRefill = _shipOxygenRefill;
-        OxygenDisabled = _oxygenDisabled;
-        ShipRepairDisabled = _shipRepairDisabled;
-        GravityLandingGearEnabled = _gravityLandingGearEnabled;
-        AirAutoRollDisabled = _airAutoRollDisabled;
-        WaterAutoRollDisabled = _waterAutoRollDisabled;
-        ThrustModulatorEnabled = _thrustModulatorEnabled;
+        HeadlightsDisabled = (bool)Settings.disableHeadlights.GetValue();
+        LandingCameraDisabled = (bool)Settings.disableLandingCamera.GetValue();
+        OxygenDrainMultiplier = (float)Settings.oxygenDrainMultiplier.GetValue();
+        FuelDrainMultiplier = (float)Settings.fuelDrainMultiplier.GetValue();
+        DamageMultiplier = (float)Settings.shipDamageMultiplier.GetValue();
+        DamageSpeedMultiplier = (float)Settings.shipDamageSpeedMultiplier.GetValue();
+        ShipOxygenRefill = (bool)Settings.shipOxygenRefill.GetValue();
+        OxygenDisabled = (bool)Settings.disableShipOxygen.GetValue();
+        ShipRepairDisabled = (bool)Settings.disableShipRepair.GetValue();
+        GravityLandingGearEnabled = (bool)Settings.enableGravityLandingGear.GetValue();
+        AirAutoRollDisabled = (bool)Settings.disableAirAutoRoll.GetValue();
+        WaterAutoRollDisabled = (bool)Settings.disableWaterAutoRoll.GetValue();
+        ThrustModulatorEnabled = (bool)Settings.enableThrustModulator.GetValue();
         ThrustModulatorLevel = 5;
+        ReferenceFrameDisabled = (bool)Settings.disableReferenceFrame.GetValue();
+        MapMarkersDisabled = (bool)Settings.disableMapMarkers.GetValue();
+        FuelTransferMultiplier = (float)Settings.fuelTransferMultiplier.GetValue();
+        OxygenRefillMultiplier = (float)Settings.oxygenRefillMultiplier.GetValue();
+        TemperatureDamageMultiplier = (float)Settings.temperatureDamageMultiplier.GetValue();
+        TemperatureResistanceMultiplier = (float)Settings.temperatureResistanceMultiplier.GetValue();
+        AutoHatchEnabled = (bool)Settings.enableAutoHatch.GetValue();
     }
 
     private IEnumerator InitializeShip()
@@ -197,6 +206,16 @@ public class ShipEnhancements : ModBehaviour
         GameObject buttonConsole = LoadPrefab("Assets/ShipEnhancements/ButtonConsole.prefab");
         AssetBundleUtilities.ReplaceShaders(buttonConsole);
         Instantiate(buttonConsole, Locator.GetShipBody().transform.Find("Module_Cockpit"));
+
+        Material material1 = (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillageCabin_Recolored_mat.mat");
+        Material material2 = (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillageMetal_Recolored_mat.mat");
+        Material material3 = (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillagePlanks_Recolored_mat.mat");
+        List<Material> materials = [.. GameObject.Find("Pointlight_HEA_ShipCockpit").GetComponent<LightmapController>()._materials];
+        materials.Add(material1);
+        materials.Add(material2);
+        materials.Add(material3);
+        GameObject.Find("Pointlight_HEA_ShipCockpit").GetComponent<LightmapController>()._materials = [.. materials];
+
         _shipResources = Locator.GetShipBody().GetComponent<ShipResources>();
         _shipOxygen = Locator.GetShipBody().GetComponentInChildren<OxygenVolume>();
         _playerResources = Locator.GetPlayerBody().GetComponent<PlayerResources>();
@@ -204,23 +223,23 @@ public class ShipEnhancements : ModBehaviour
         _shipLoaded = true;
         UpdateSuitOxygen();
 
-        if (_gravityCrystalDisabled)
+        if ((bool)Settings.disableGravityCrystal.GetValue())
         {
             DisableGravityCrystal();
         }
-        if (_ejectButtonDisabled)
+        if ((bool)Settings.disableEjectButton.GetValue())
         {
             Locator.GetShipBody().GetComponentInChildren<ShipEjectionSystem>().GetComponent<InteractReceiver>().DisableInteraction();
         }
-        if (_headlightsDisabled)
+        if ((bool)Settings.disableHeadlights.GetValue())
         {
             DisableHeadlights();
         }
-        if (_landingCameraDisabled)
+        if ((bool)Settings.disableLandingCamera.GetValue())
         {
             DisableLandingCamera();
         }
-        if (_shipLightsDisabled)
+        if ((bool)Settings.disableShipLights.GetValue())
         {
             foreach (ElectricalSystem system in Locator.GetShipBody().GetComponentsInChildren<ElectricalSystem>())
             {
@@ -240,16 +259,16 @@ public class ShipEnhancements : ModBehaviour
                 beacon.gameObject.SetActive(false);
             }
         }
-        if (_oxygenDisabled)
+        if ((bool)Settings.disableShipOxygen.GetValue())
         {
             _shipResources.SetOxygen(0f);
             oxygenDepleted = true;
         }
-        if (_shipOxygenRefill)
+        if ((bool)Settings.shipOxygenRefill.GetValue())
         {
             _shipOxygenDetector = Locator.GetShipDetector().gameObject.AddComponent<OxygenDetector>();
         }
-        if (_temperatureZonesAmount == "Sun")
+        if (Settings.temperatureZonesAmount.GetValue().ToString() == "Sun")
         {
             GameObject sun = GameObject.Find("Sun_Body");
             if (sun != null)
@@ -258,23 +277,35 @@ public class ShipEnhancements : ModBehaviour
                 Instantiate(sunTempZone, sun.transform.Find("Sector_SUN"));
             }
         }
-        else if (_temperatureZonesAmount == "All")
+        else if (Settings.temperatureZonesAmount.GetValue().ToString() == "All")
         {
             AddTemperatureZones();
         }
-        if (_temperatureDamageEnabled)
+        if ((bool)Settings.enableTemperatureDamage.GetValue())
         {
             Locator.GetShipDetector().gameObject.AddComponent<ShipTemperatureDetector>();
             Locator.GetShipBody().GetComponentInChildren<ShipFuelGauge>().gameObject.AddComponent<ShipTemperatureGauge>();
         }
-        if (_shipFuelTransferEnabled)
+        if ((bool)Settings.enableShipFuelTransfer.GetValue())
         {
             GameObject transferVolume = LoadPrefab("Assets/ShipEnhancements/FuelTransferVolume.prefab");
             Instantiate(transferVolume, Locator.GetShipBody().GetComponentInChildren<ShipFuelTankComponent>().transform);
         }
-        if (_refuelDrainsShip)
+        if ((bool)Settings.enableJetpackRefuelDrain.GetValue())
         {
             Locator.GetShipBody().GetComponentInChildren<PlayerRecoveryPoint>().gameObject.AddComponent<ShipRecoveryPoint>();
+        }
+        if ((float)Settings.gravityMultiplier.GetValue() != 1f && !(bool)Settings.disableGravityCrystal.GetValue())
+        {
+            ShipDirectionalForceVolume shipGravity = Locator.GetShipBody().GetComponentInChildren<ShipDirectionalForceVolume>();
+            shipGravity._fieldMagnitude *= (float)Settings.gravityMultiplier.GetValue();
+        }
+        if ((bool)Settings.enableAutoHatch.GetValue())
+        {
+            GlobalMessenger.AddListener("EnterShip", OnEnterShip);
+            GlobalMessenger.AddListener("ExitShip", OnExitShip);
+            GameObject autoHatchController = LoadPrefab("Assets/ShipEnhancements/ExteriorHatchControls.prefab");
+            Instantiate(autoHatchController, Locator.GetShipBody().GetComponentInChildren<HatchController>().transform.parent);
         }
     }
 
@@ -413,6 +444,23 @@ public class ShipEnhancements : ModBehaviour
         ThrustModulatorLevel = level;
     }
 
+    private void OnEnterShip()
+    {
+        HatchController hatchController = Locator.GetShipBody().GetComponentInChildren<HatchController>();
+        hatchController._interactVolume.EnableInteraction();
+        hatchController.GetComponent<SphereShape>().radius = 1f;
+        hatchController.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+        hatchController.transform.parent.GetComponentInChildren<AutoHatchController>().DisableInteraction();
+    }
+
+    private void OnExitShip()
+    {
+        HatchController hatchController = Locator.GetShipBody().GetComponentInChildren<HatchController>();
+        hatchController._interactVolume.DisableInteraction();
+        hatchController.GetComponent<SphereShape>().radius = 3.5f;
+        hatchController.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+    }
+
     public static void WriteDebugMessage(object msg, bool warning = false, bool error = false)
     {
         if (warning)
@@ -441,16 +489,45 @@ public class ShipEnhancements : ModBehaviour
 
     public override void Configure(IModConfig config)
     {
-        SettingsPresets.PresetName newPreset = SettingsPresets.GetPresetName(config.GetSettingsValue<string>("preset"));
-        WriteDebugMessage("new: " + newPreset);
-        WriteDebugMessage("old: " + _currentPreset);
+        if (!SettingsPresets.Initialized()) return;
+
+        SettingsPresets.PresetName newPreset = SettingsPresets.GetPresetFromConfig(config.GetSettingsValue<string>("preset"));
+        var allSettings = Enum.GetValues(typeof(Settings)) as Settings[];
         if (newPreset != _currentPreset || _currentPreset == (SettingsPresets.PresetName)(-1))
         {
             _currentPreset = newPreset;
             SettingsPresets.ApplyPreset(newPreset, config);
+            config.SetSettingsValue("preset", _currentPreset.GetName());
+            foreach (Settings setting in allSettings)
+            {
+                setting.SetValue(config.GetSettingsValue<object>(setting.GetName()));
+            }
+        }
+        else
+        {
+            var isCustom = false;
+            foreach (Settings setting in allSettings)
+            {
+                setting.SetValue(config.GetSettingsValue<object>(setting.GetName()));
+                if (_currentPreset != SettingsPresets.PresetName.Custom)
+                {
+                    isCustom = isCustom || !_currentPreset.GetPresetSetting(setting.GetName()).Equals(setting.GetValue());
+                    /*if (!_currentPreset.GetPresetSetting(setting.GetName()).Equals(setting.GetValue()))
+                    {
+                        WriteDebugMessage($"{setting.GetValue()} ({setting.GetValue().GetType()}) : {_currentPreset.GetPresetSetting(setting.GetName())} ({_currentPreset.GetPresetSetting(setting.GetName()).GetType()})");
+                    }*/
+                }
+            }
+            if (isCustom)
+            {
+                //WriteDebugMessage("custom");
+                _currentPreset = SettingsPresets.PresetName.Custom;
+                config.SetSettingsValue("preset", SettingsPresets.PresetName.Custom.GetName());
+                SettingsPresets.ApplyPreset(SettingsPresets.PresetName.Custom, config);
+            }
         }
 
-        _gravityCrystalDisabled = config.GetSettingsValue<bool>("disableGravityCrystal");
+        /*_gravityCrystalDisabled = config.GetSettingsValue<bool>("disableGravityCrystal");
         _ejectButtonDisabled = config.GetSettingsValue<bool>("disableEjectButton");
         _headlightsDisabled = config.GetSettingsValue<bool>("disableHeadlights");
         _landingCameraDisabled = config.GetSettingsValue<bool>("disableLandingCamera");
@@ -469,7 +546,7 @@ public class ShipEnhancements : ModBehaviour
         _temperatureZonesAmount = config.GetSettingsValue<string>("temperatureZonesAmount");
         _temperatureDamageEnabled = config.GetSettingsValue<bool>("enableTemperatureDamage");
         _shipFuelTransferEnabled = config.GetSettingsValue<bool>("enableShipFuelTransfer");
-        _refuelDrainsShip = config.GetSettingsValue<bool>("enableJetpackRefuelDrain");
+        _refuelDrainsShip = config.GetSettingsValue<bool>("enableJetpackRefuelDrain");*/
     }
 
     public override object GetApi()

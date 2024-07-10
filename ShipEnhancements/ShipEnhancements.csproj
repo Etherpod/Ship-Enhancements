@@ -22,6 +22,7 @@
   </Target>
   
   <ItemGroup>
+    <PackageReference Include="DitzyExtensions" Version="1.0.1" />
     <PackageReference Include="OWML" Version="2.9.8" />
     <PackageReference Include="OuterWildsGameLibs" Version="1.1.14.768" />
   </ItemGroup>

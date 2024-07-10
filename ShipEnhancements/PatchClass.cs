@@ -329,7 +329,8 @@ public class PatchClass
     [HarmonyPatch(typeof(ShipResources), nameof(ShipResources.Update))]
     public static bool RefillShipOxygen(ShipResources __instance)
     {
-        if (ShipEnhancements.Instance.OxygenDisabled || !ShipEnhancements.Instance.ShipOxygenRefill || ModCompatibility.resourceManagementEnabled) return true;
+        if (ShipEnhancements.Instance.OxygenDisabled || !ShipEnhancements.Instance.ShipOxygenRefill 
+            || ModCompatibility.GetModSetting("Stonesword.ResourceManagement", "Enable Oxygen Refill")) return true;
 
         if (__instance._killingResources)
         {
@@ -357,7 +358,7 @@ public class PatchClass
         {
             if (ShipEnhancements.Instance.IsShipInOxygen())
             {
-                __instance.AddOxygen(100f * Time.deltaTime);
+                __instance.AddOxygen(100f * Time.deltaTime * ShipEnhancements.Instance.OxygenRefillMultiplier);
             }
             else if (PlayerState.IsInsideShip())
             {
@@ -590,6 +591,128 @@ public class PatchClass
         {
             tempZone.SetScale(scale);
         }
+    }
+    #endregion
+
+    #region DisableReferenceFrame
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ReferenceFrameTracker), nameof(ReferenceFrameTracker.Update))]
+    public static bool DisableReferenceFrame(ReferenceFrameTracker __instance)
+    {
+        if (!ShipEnhancements.Instance.ReferenceFrameDisabled) return true;
+
+        if (__instance._activeCam == null)
+        {
+            return false;
+        }
+        if (__instance._cloakController != null && __instance._hasTarget && !__instance._currentReferenceFrame.GetOWRigidBody().IsKinematic() 
+            && __instance._cloakController.CheckBodyInsideCloak(__instance._currentReferenceFrame.GetOWRigidBody()) != __instance._cloakController.isPlayerInsideCloak)
+        {
+            __instance.UntargetReferenceFrame();
+        }
+        //__instance._playerTargetingActive = Locator.GetPlayerSuit().IsWearingHelmet() && PlayerState.InZeroG() && __instance._blockerCount <= 0;
+        //__instance._shipTargetingActive = PlayerState.AtFlightConsole();
+        //__instance._mapTargetingActive = __instance._isMapView && (__instance._playerTargetingActive || PlayerState.IsInsideShip());
+        __instance._playerTargetingActive = false;
+        __instance._shipTargetingActive = false;
+        __instance._mapTargetingActive = false;
+        if (__instance._playerTargetingActive || __instance._shipTargetingActive || __instance._mapTargetingActive)
+        {
+            __instance.UpdateTargeting();
+        }
+        return false;
+    }
+    #endregion
+
+    #region DisableHUDMarkers
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(CanvasMarker), nameof(CanvasMarker.SetVisibility))]
+    public static bool DisableHUDMarker(bool value)
+    {
+        if (!ShipEnhancements.Instance.MapMarkersDisabled) return true;
+
+        if (value && (ShipLogEntryHUDMarker.s_entryLocation == null || !ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField() 
+            || (ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField() && Locator.GetCloakFieldController().isPlayerInsideCloak)))
+        {
+            return false;
+        }
+        return true;
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(MapMarker), nameof(MapMarker.Start))]
+    public static void DisableMapMarker(MapMarker __instance)
+    {
+        if (!ShipEnhancements.Instance.MapMarkersDisabled || !__instance) return;
+        if (__instance.GetComponent<ShipLogEntryHUDMarker>() && !Locator.GetCloakFieldController().isPlayerInsideCloak
+            && ShipLogEntryHUDMarker.s_entryLocation != null && ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField())
+        {
+            return;
+        }
+
+        __instance.DisableMarker();
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(MapMarker), nameof(MapMarker.EnableMarker))]
+    public static bool CancelMapMarkerEnable(MapMarker __instance)
+    {
+        if (!ShipEnhancements.Instance.MapMarkersDisabled || !__instance) return true;
+        if (__instance.GetComponent<ShipLogEntryHUDMarker>() && !Locator.GetCloakFieldController().isPlayerInsideCloak
+            && ShipLogEntryHUDMarker.s_entryLocation != null && ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField())
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipLogEntryHUDMarker), nameof(ShipLogEntryHUDMarker.RefreshOwnVisibility))]
+    public static bool DisableInsideCloak(ShipLogEntryHUDMarker __instance)
+    {
+        if (!ShipEnhancements.Instance.MapMarkersDisabled) return true;
+        if (ShipLogEntryHUDMarker.s_entryLocation != null 
+            && ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField() && Locator.GetCloakFieldController().isPlayerInsideCloak)
+        {
+            __instance._isVisible = false;
+            __instance._canvasMarker.SetVisibility(false);
+            return false;
+        }
+        return true;
+    }
+    #endregion
+
+    #region AutoHatch
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(HatchController), nameof(HatchController.OpenHatch))]
+    public static void ActivateHatchTractorBeam(HatchController __instance)
+    {
+        if (!ShipEnhancements.Instance.AutoHatchEnabled) return;
+
+        if (!__instance.IsPlayerInShip())
+        {
+            Locator.GetShipBody().GetComponentInChildren<ShipTractorBeamSwitch>().ActivateTractorBeam();
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipTractorBeamSwitch), nameof(ShipTractorBeamSwitch.OnTriggerExit))]
+    public static bool CloseHatchOutsideShip(ShipTractorBeamSwitch __instance)
+    {
+        if (!ShipEnhancements.Instance.AutoHatchEnabled) return true;
+
+        HatchController hatch = Locator.GetShipBody().GetComponentInChildren<HatchController>();
+        if (!hatch._hatchObject.activeInHierarchy)
+        {
+            hatch.CloseHatch();
+            __instance.transform.parent.GetComponentInChildren<AutoHatchController>().EnableInteraction();
+            if (__instance._beamFluid._triggerVolume._active)
+            {
+                __instance.DeactivateTractorBeam();
+            }
+        }
+        return false;
     }
     #endregion
 }

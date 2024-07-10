@@ -32,7 +32,7 @@ public class ShipRecoveryPoint : MonoBehaviour
 
         if (_recoveryPoint._recovering && PlayerState.IsWearingSuit())
         {
-            _shipResources._currentFuel = Mathf.Max(_shipResources._currentFuel - (PlayerResources._maxFuel * 10f * Time.deltaTime * 3f), 0f);
+            _shipResources._currentFuel = Mathf.Max(_shipResources._currentFuel - (PlayerResources._maxFuel * 5f * Time.deltaTime * 3f * ShipEnhancements.Instance.FuelTransferMultiplier), 0f);
         }
     }
 }
