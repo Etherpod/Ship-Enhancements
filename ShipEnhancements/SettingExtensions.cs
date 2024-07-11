@@ -26,7 +26,7 @@ public static class SettingExtensions
         { Settings.disableWaterAutoRoll, false },
         { Settings.enableThrustModulator, false },
         { Settings.temperatureZonesAmount, "None" },
-        { Settings.enableTemperatureDamage, false },
+        { Settings.hullTemperatureDamage, false },
         { Settings.enableShipFuelTransfer, false },
         { Settings.enableJetpackRefuelDrain, false },
         { Settings.disableReferenceFrame, false },
@@ -37,6 +37,9 @@ public static class SettingExtensions
         { Settings.temperatureDamageMultiplier, 1f },
         { Settings.temperatureResistanceMultiplier, 1f },
         { Settings.enableAutoHatch, false },
+        { Settings.oxygenTankDrainMultiplier, 1f },
+        { Settings.fuelTankDrainMultiplier, 1f },
+        { Settings.componentTemperatureDamage, false },
     };
 
     public static string GetName(this Settings setting)

@@ -13,7 +13,6 @@ public class ShipTemperatureGauge : MonoBehaviour
     private OWRenderer _indicatorLight;
     private bool _lightActive;
     private Color _warningLightColor;
-    private bool _shipDestroyed = false;
     private bool _interpolating;
 
     private void Awake()
@@ -82,9 +81,9 @@ public class ShipTemperatureGauge : MonoBehaviour
 
     private void OnShipSystemFailure()
     {
-        _shipDestroyed = true;
         _indicatorLight.SetEmissionColor(Color.black);
         _lightActive = false;
+        enabled = false;
     }
 
     private void OnDestroy()

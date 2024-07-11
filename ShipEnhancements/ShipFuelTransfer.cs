@@ -28,6 +28,7 @@ public class ShipFuelTransfer : MonoBehaviour
         GlobalMessenger.AddListener("SuitUp", OnSuitUp);
         GlobalMessenger.AddListener("RemoveSuit", OnRemoveSuit);
 
+        _fuelTankComponent._damageEffect._particleSystem.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
         _interactReceiver.SetPromptText(UITextType.HoldPrompt, "Transfer jetpack fuel");
         if (_shipFuelFull)
         {
@@ -89,6 +90,11 @@ public class ShipFuelTransfer : MonoBehaviour
     {
         if (_shipFuelFull || _jetpackFuelDepleted || !PlayerState.IsWearingSuit()) return;
 
+        if (ShipEnhancements.Instance.ShipRepairDisabled && _fuelTankComponent.isDamaged)
+        {
+            _fuelTankComponent._damageEffect._particleSystem.Stop();
+        }
+
         _fuelTankComponent._damageEffect._particleAudioSource.Play();
         _transferring = true;
     }
@@ -97,19 +103,29 @@ public class ShipFuelTransfer : MonoBehaviour
     {
         if (_shipFuelFull || _jetpackFuelDepleted || !PlayerState.IsWearingSuit()) return;
 
+        if (ShipEnhancements.Instance.ShipRepairDisabled && _fuelTankComponent.isDamaged)
+        {
+            _fuelTankComponent._damageEffect._particleSystem.Play();
+        }
+        else
+        {
+            _fuelTankComponent._damageEffect._particleAudioSource.Stop();
+        }
+
         _playerResources._playerAudioController.PlayRefuel();
-        _fuelTankComponent._damageEffect._particleAudioSource.Stop();
         _transferring = false;
         _interactReceiver.ResetInteraction();
     }
 
     private void OnComponentRepaired()
     {
+        if (ShipEnhancements.Instance.ShipRepairDisabled) return;
         _interactReceiver.EnableInteraction();
     }
 
     private void OnComponentDamaged()
     {
+        if (ShipEnhancements.Instance.ShipRepairDisabled) return;
         _interactReceiver.DisableInteraction();
     }
 

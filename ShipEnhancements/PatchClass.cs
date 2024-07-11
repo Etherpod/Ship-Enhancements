@@ -272,14 +272,17 @@ public class PatchClass
     public static void FixExitShipToRepairNotification(ShipDamageController __instance, ref bool __result)
     {
         bool flag = false;
-        for (int j = 0; j < __instance._shipComponents.Length; j++)
+        if (!ShipEnhancements.Instance.ShipRepairDisabled)
         {
-            if (__instance._shipComponents[j].isDamaged && __instance._shipComponents[j].componentName != UITextType.ShipPartGravity
-                && __instance._shipComponents[j].componentName != UITextType.ShipPartReactor
-                && !(ShipEnhancements.Instance.LandingCameraDisabled && __instance._shipComponents[j].componentName == UITextType.ShipPartCamera)
-                && !(ShipEnhancements.Instance.HeadlightsDisabled && __instance._shipComponents[j].componentName == UITextType.ShipPartLights))
+            for (int j = 0; j < __instance._shipComponents.Length; j++)
             {
-                flag = true;
+                if (__instance._shipComponents[j].isDamaged && __instance._shipComponents[j].componentName != UITextType.ShipPartGravity
+                    && __instance._shipComponents[j].componentName != UITextType.ShipPartReactor
+                    && !(ShipEnhancements.Instance.LandingCameraDisabled && __instance._shipComponents[j].componentName == UITextType.ShipPartCamera)
+                    && !(ShipEnhancements.Instance.HeadlightsDisabled && __instance._shipComponents[j].componentName == UITextType.ShipPartLights))
+                {
+                    flag = true;
+                }
             }
         }
         __result = flag;
@@ -712,6 +715,34 @@ public class PatchClass
                 __instance.DeactivateTractorBeam();
             }
         }
+        return false;
+    }
+    #endregion
+
+    #region TankDrainMultipliers
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipOxygenTankComponent), nameof(ShipOxygenTankComponent.Update))]
+    public static bool DamagedOxygenTankDrain(ShipOxygenTankComponent __instance)
+    {
+        if (__instance._damaged)
+        {
+            __instance._shipResources.DrainOxygen(__instance._oxygenLeakRate * Time.deltaTime * ShipEnhancements.Instance.OxygenTankDrainMultiplier);
+            return false;
+        }
+        __instance.enabled = false;
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipFuelTankComponent), nameof(ShipFuelTankComponent.Update))]
+    public static bool DamagedOxygenTankDrain(ShipFuelTankComponent __instance)
+    {
+        if (__instance._damaged)
+        {
+            __instance._shipResources.DrainFuel(__instance._fuelLeakRate * Time.deltaTime * ShipEnhancements.Instance.FuelTankDrainMultiplier);
+            return false;
+        }
+        __instance.enabled = false;
         return false;
     }
     #endregion

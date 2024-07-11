@@ -4,11 +4,7 @@ using System.Collections;
 using UnityEngine;
 using System.IO;
 using System;
-using DitzyExtensions.Collection;
-using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
-using System.Linq;
-using System.EnterpriseServices;
 
 namespace ShipEnhancements;
 
@@ -20,6 +16,7 @@ public class ShipEnhancements : ModBehaviour
     public static ShipEnhancements Instance;
     public bool oxygenDepleted;
     public bool refillingOxygen;
+    public bool fuelDepleted;
 
     public bool HeadlightsDisabled { get; private set; }
     public bool LandingCameraDisabled { get; private set; }
@@ -42,16 +39,23 @@ public class ShipEnhancements : ModBehaviour
     public float TemperatureDamageMultiplier { get; private set; }
     public float TemperatureResistanceMultiplier { get; private set; }
     public bool AutoHatchEnabled { get; private set; }
+    public float OxygenTankDrainMultiplier { get; private set; }
+    public float FuelTankDrainMultiplier { get; private set; }
+    public bool HullTemperatureDamage { get; private set; }
+    public bool ComponentTemperatureDamage { get; private set; }
 
     private SettingsPresets.PresetName _currentPreset = (SettingsPresets.PresetName)(-1);
 
     private AssetBundle _shipEnhancementsBundle;
     private float _lastSuitOxygen;
+    private float _lastShipOxygen;
+    private bool _startOxygenRefill = false;
     private bool _shipLoaded = false;
     private OxygenDetector _shipOxygenDetector;
     private ShipResources _shipResources;
     private OxygenVolume _shipOxygen;
     private PlayerResources _playerResources;
+    private NotificationData _oxygenDepletedNotification = new NotificationData(NotificationTarget.Ship, "SHIP OXYGEN DEPLETED", 5f, true);
 
     public enum Settings
     {
@@ -72,7 +76,7 @@ public class ShipEnhancements : ModBehaviour
         disableWaterAutoRoll,
         enableThrustModulator,
         temperatureZonesAmount,
-        enableTemperatureDamage,
+        hullTemperatureDamage,
         enableShipFuelTransfer,
         enableJetpackRefuelDrain,
         disableReferenceFrame,
@@ -83,6 +87,9 @@ public class ShipEnhancements : ModBehaviour
         temperatureDamageMultiplier,
         temperatureResistanceMultiplier,
         enableAutoHatch,
+        oxygenTankDrainMultiplier,
+        fuelTankDrainMultiplier,
+        componentTemperatureDamage,
     }
 
     private void Awake()
@@ -105,6 +112,8 @@ public class ShipEnhancements : ModBehaviour
             GlobalMessenger.AddListener("SuitUp", OnPlayerSuitUp);
             GlobalMessenger.AddListener("RemoveSuit", OnPlayerRemoveSuit);
             oxygenDepleted = false;
+            fuelDepleted = false;
+            _startOxygenRefill = false;
 
             StartCoroutine(InitializeShip());
         };
@@ -130,36 +139,85 @@ public class ShipEnhancements : ModBehaviour
 
     private void Update()
     {
-        if (!_shipLoaded || LoadManager.GetCurrentScene() != OWScene.SolarSystem 
-            || ModCompatibility.GetModSetting("Stonesword.ResourceManagement", "Enable Oxygen Refill")) return;
+        if (!_shipLoaded || LoadManager.GetCurrentScene() != OWScene.SolarSystem) return;
 
-        if (!oxygenDepleted && _shipResources.GetOxygen() <= 0)
+        if (!oxygenDepleted && _shipResources.GetOxygen() <= 0 && !(ShipOxygenRefill && IsShipInOxygen()))
         {
             oxygenDepleted = true;
+
+            NotificationManager.SharedInstance.PostNotification(_oxygenDepletedNotification, true);
+
             if (PlayerState.IsInsideShip())
             {
-                string text = "OXYGEN SOURCE DEPLETED";
-                NotificationData notificationData = new NotificationData(NotificationTarget.Ship, text, 5f, true);
-                NotificationManager.SharedInstance.PostNotification(notificationData, false);
-
-                if (PlayerState.AtFlightConsole() && PlayerState.IsWearingSuit())
+                if (PlayerState.IsWearingSuit() && !Locator.GetPlayerSuit().IsWearingHelmet())
                 {
                     Locator.GetPlayerSuit().PutOnHelmet();
                 }
                 _shipOxygen.OnEffectVolumeExit(Locator.GetPlayerDetector());
             }
+
+            ShipOxygenTankComponent oxygenTank = Locator.GetShipBody().GetComponentInChildren<ShipOxygenTankComponent>();
+            if (oxygenTank.isDamaged)
+            {
+                oxygenTank._damageEffect._particleSystem.Stop();
+                oxygenTank._damageEffect._particleAudioSource.Stop();
+            }
         }
-        else if (oxygenDepleted && _shipResources.GetOxygen() > 0)
+        else if (oxygenDepleted && (_shipResources.GetOxygen() > 0 || (ShipOxygenRefill && IsShipInOxygen())))
         {
             oxygenDepleted = false;
+            refillingOxygen = true;
+
+            NotificationManager.SharedInstance.UnpinNotification(_oxygenDepletedNotification);
+
             if (PlayerState.IsInsideShip())
             {
+                _shipOxygen.OnEffectVolumeEnter(Locator.GetPlayerDetector());
+            }
+
+            ShipOxygenTankComponent oxygenTank = Locator.GetShipBody().GetComponentInChildren<ShipOxygenTankComponent>();
+            if (oxygenTank.isDamaged)
+            {
+                oxygenTank._damageEffect._particleSystem.Play();
+                oxygenTank._damageEffect._particleAudioSource.Play();
+            }
+        }
+
+        if (ShipOxygenRefill)
+        {
+            if (!_startOxygenRefill && _shipResources._currentOxygen > _lastShipOxygen)
+            {
+                _startOxygenRefill = true;
                 string text = "REFILLING OXYGEN TANK";
                 NotificationData notificationData = new NotificationData(NotificationTarget.Ship, text, 3f, true);
                 NotificationManager.SharedInstance.PostNotification(notificationData, false);
+            }
+            else if (_startOxygenRefill && _shipResources._currentOxygen < _lastShipOxygen && _shipResources._currentOxygen / _shipResources._maxOxygen < 0.99f)
+            {
+                _startOxygenRefill = false;
+            }
 
-                refillingOxygen = true;
-                _shipOxygen.OnEffectVolumeEnter(Locator.GetPlayerDetector());
+            _lastShipOxygen = _shipResources._currentOxygen;
+        }
+
+        if (!fuelDepleted && _shipResources._currentFuel <= 0f)
+        {
+            fuelDepleted = true;
+            ShipFuelTankComponent fuelTank = Locator.GetShipBody().GetComponentInChildren<ShipFuelTankComponent>();
+            if (fuelTank.isDamaged)
+            {
+                fuelTank._damageEffect._particleSystem.Stop();
+                fuelTank._damageEffect._particleAudioSource.Stop();
+            }
+        }
+        else if (fuelDepleted && _shipResources._currentFuel > 0f)
+        {
+            fuelDepleted = false;
+            ShipFuelTankComponent fuelTank = Locator.GetShipBody().GetComponentInChildren<ShipFuelTankComponent>();
+            if (fuelTank.isDamaged)
+            {
+                fuelTank._damageEffect._particleSystem.Play();
+                fuelTank._damageEffect._particleAudioSource.Play();
             }
         }
     }
@@ -197,6 +255,10 @@ public class ShipEnhancements : ModBehaviour
         TemperatureDamageMultiplier = (float)Settings.temperatureDamageMultiplier.GetValue();
         TemperatureResistanceMultiplier = (float)Settings.temperatureResistanceMultiplier.GetValue();
         AutoHatchEnabled = (bool)Settings.enableAutoHatch.GetValue();
+        OxygenTankDrainMultiplier = (float)Settings.oxygenTankDrainMultiplier.GetValue();
+        FuelTankDrainMultiplier = (float)Settings.fuelTankDrainMultiplier.GetValue();
+        HullTemperatureDamage = (bool)Settings.hullTemperatureDamage.GetValue();
+        ComponentTemperatureDamage = (bool)Settings.componentTemperatureDamage.GetValue();
     }
 
     private IEnumerator InitializeShip()
@@ -222,6 +284,7 @@ public class ShipEnhancements : ModBehaviour
 
         _shipLoaded = true;
         UpdateSuitOxygen();
+        _lastShipOxygen = _shipResources._currentOxygen;
 
         if ((bool)Settings.disableGravityCrystal.GetValue())
         {
@@ -281,10 +344,12 @@ public class ShipEnhancements : ModBehaviour
         {
             AddTemperatureZones();
         }
-        if ((bool)Settings.enableTemperatureDamage.GetValue())
+        if ((bool)Settings.hullTemperatureDamage.GetValue() || (bool)Settings.componentTemperatureDamage.GetValue())
         {
             Locator.GetShipDetector().gameObject.AddComponent<ShipTemperatureDetector>();
             Locator.GetShipBody().GetComponentInChildren<ShipFuelGauge>().gameObject.AddComponent<ShipTemperatureGauge>();
+            GameObject hullTempDial = LoadPrefab("Assets/ShipEnhancements/ShipTempDial.prefab");
+            Instantiate(hullTempDial, Locator.GetShipTransform().Find("Module_Cockpit"));
         }
         if ((bool)Settings.enableShipFuelTransfer.GetValue())
         {

@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 3722590247
+CRC: 1206765572
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 7b600b04f712494df5299a4e4c5cdda1
+    Hash: 46d3e0a85ff83951e459892a24f2b5c5
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 83ce8a2d33011d2856d7cb2f26789ebc
+    Hash: b3184b2709741a9e12efe703886b9e09
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -44,6 +44,8 @@ ClassTypes:
 - Class: 114
   Script: {fileID: 11500000, guid: 4d37ab8d4d1e425918e8172c84cb8288, type: 3}
 - Class: 114
+  Script: {fileID: -43499969, guid: 56e5cf1f6ac64bc4d8feff9ed2c6da44, type: 3}
+- Class: 114
   Script: {fileID: -614091766, guid: 56e5cf1f6ac64bc4d8feff9ed2c6da44, type: 3}
 - Class: 114
   Script: {fileID: -1299268282, guid: 56e5cf1f6ac64bc4d8feff9ed2c6da44, type: 3}
@@ -58,7 +60,7 @@ ClassTypes:
 - Class: 114
   Script: {fileID: 11500000, guid: 5b69738f164a5a2451d76a672bae5943, type: 3}
 - Class: 114
-  Script: {fileID: -43499969, guid: 56e5cf1f6ac64bc4d8feff9ed2c6da44, type: 3}
+  Script: {fileID: 909461860, guid: 56e5cf1f6ac64bc4d8feff9ed2c6da44, type: 3}
 - Class: 115
   Script: {instanceID: 0}
 - Class: 128
@@ -85,6 +87,7 @@ Assets:
 - Assets/ShipEnhancements/AudioClip/Switch_On.mp3
 - Assets/ShipEnhancements/ButtonGlow.mat
 - Assets/ShipEnhancements/IndicatorLight_TemperatureGauge.prefab
+- Assets/ShipEnhancements/TempDial.fbx
 - Assets/ShipEnhancements/TemperatureZone_DarkBramble.prefab
 - Assets/ShipEnhancements/TemperatureZone_CaveTwinHot.prefab
 - Assets/ShipEnhancements/ShipInterior_HEA_VillageMetal_Recolored_mat.mat
@@ -104,6 +107,7 @@ Assets:
 - Assets/ShipEnhancements/TemperatureZone_VolcanicMoon.prefab
 - Assets/ShipEnhancements/ShipInterior_HEA_VillageCabin_Recolored_mat.mat
 - Assets/ShipEnhancements/TemperatureZone_Sun.prefab
+- Assets/ShipEnhancements/ShipTempDial.prefab
 - Assets/ShipEnhancements/Effects_GravityLandingGear_WarpParticles.prefab
 - Assets/ShipEnhancements/AudioClip/ModulatorButton.mp3
 - Assets/ShipEnhancements/AudioClip/GravityLandingGear.mp3
