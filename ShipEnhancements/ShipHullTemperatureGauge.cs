@@ -25,17 +25,9 @@ public class ShipHullTemperatureGauge : MonoBehaviour
 
     private void Update()
     {
-        ShipEnhancements.WriteDebugMessage(_needleTransform.localRotation);
         Quaternion targetQuaternion;
         float ratio = _temperatureDetector.GetShipTemperatureRatio();
-        if (ratio > 0)
-        {
-            targetQuaternion = Quaternion.AngleAxis(Mathf.Lerp(0f, _needleAngleMax, _temperatureDetector.GetShipTemperatureRatio()), Vector3.right);
-        }
-        else
-        {
-            targetQuaternion = Quaternion.AngleAxis(Mathf.Lerp(0f, _needleAngleMin, -_temperatureDetector.GetShipTemperatureRatio()), Vector3.right);
-        }
+        targetQuaternion = Quaternion.AngleAxis(Mathf.Lerp(_needleAngleMin, _needleAngleMax, _temperatureDetector.GetShipTemperatureRatio()), Vector3.right);
 
         if (Quaternion.Angle(_currentNeedleRotation, targetQuaternion) >= 0.1f)
         {

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Reflection;
 using HarmonyLib;
+using OWML.Common;
+using OWML.ModHelper;
 using UnityEngine;
 
 namespace ShipEnhancements;
@@ -590,9 +592,21 @@ public class PatchClass
     [HarmonyPatch(typeof(SunController), nameof(SunController.UpdateScale))]
     public static void UpdateSunTempZone(SunController __instance, float scale)
     {
-        if (__instance.TryGetComponent(out TemperatureZone tempZone)) 
+        TemperatureZone tempZone = __instance.GetComponentInChildren<TemperatureZone>();
+        if (tempZone != null) 
         {
             tempZone.SetScale(scale);
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(SupernovaEffectController), nameof(SupernovaEffectController.FixedUpdate))]
+    public static void UpdateSupernovaTempZone(SupernovaEffectController __instance)
+    {
+        TemperatureZone tempZone = __instance.GetComponentInChildren<TemperatureZone>();
+        if (tempZone != null)
+        {
+            tempZone.SetScale(__instance._currentSupernovaScale);
         }
     }
     #endregion
@@ -746,4 +760,11 @@ public class PatchClass
         return false;
     }
     #endregion
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ModConfig), "SetSettingsValue")]
+    public static void test(IModConfig __instance, string key, object value)
+    {
+        ShipEnhancements.WriteDebugMessage(key + ": " + value);
+    }
 }

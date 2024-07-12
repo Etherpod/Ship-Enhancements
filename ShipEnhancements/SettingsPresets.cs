@@ -177,7 +177,7 @@ public static class SettingsPresets
         { "temperatureResistanceMultiplier", 1f },
         { "enableAutoHatch", false },
         { "oxygenTankDrainMultiplier", 1f },
-        { "fuelTankDrainMultiplier", 1f },
+        { "fuelTankDrainMultiplier", 1.2f },
         { "componentTemperatureDamage", false },
     };
 
@@ -310,42 +310,6 @@ public static class SettingsPresets
 
     public static object GetPresetSetting(this PresetName preset, string setting)
     {
-        /*switch (preset)
-        {
-            case PresetName.Vanilla:
-                if (VanillaSettings.ContainsKey(setting))
-                {
-                    return VanillaSettings[setting];
-                }
-                else
-                {
-                    ShipEnhancements.WriteDebugMessage($"No setting found for Vanilla preset: {setting}", error: true);
-                }
-                break;
-
-            case PresetName.Barebones:
-                if (BarebonesSettings.ContainsKey(setting))
-                {
-                    return BarebonesSettings[setting];
-                }
-                else
-                {
-                    ShipEnhancements.WriteDebugMessage($"No setting found for Barebones preset: {setting}", error: true);
-                }
-                break;
-
-            case PresetName.Hardcore:
-                if (HardcoreSettings.ContainsKey(setting))
-                {
-                    return HardcoreSettings[setting];
-                }
-                else
-                {
-                    ShipEnhancements.WriteDebugMessage($"No setting found for Hardcore preset: {setting}", error: true);
-                }
-                break;
-        }
-        return null;*/
         return settingsPresets[setting][preset];
     }
 

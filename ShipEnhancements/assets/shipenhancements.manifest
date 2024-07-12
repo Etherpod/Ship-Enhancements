@@ -1,9 +1,9 @@
 ManifestFileVersion: 0
-CRC: 1206765572
+CRC: 3105985848
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 46d3e0a85ff83951e459892a24f2b5c5
+    Hash: d1e1a47fa1df53ce653eed92996d8f5d
   TypeTreeHash:
     serializedVersion: 2
     Hash: b3184b2709741a9e12efe703886b9e09
@@ -91,6 +91,7 @@ Assets:
 - Assets/ShipEnhancements/TemperatureZone_DarkBramble.prefab
 - Assets/ShipEnhancements/TemperatureZone_CaveTwinHot.prefab
 - Assets/ShipEnhancements/ShipInterior_HEA_VillageMetal_Recolored_mat.mat
+- Assets/ShipEnhancements/TemperatureZone_Supernova.prefab
 - Assets/ShipEnhancements/TemperatureZone_TimberHearthCore.prefab
 - Assets/ShipEnhancements/TemperatureZone_GiantsDeepOcean.prefab
 - Assets/ShipEnhancements/ThrustModulator.fbx

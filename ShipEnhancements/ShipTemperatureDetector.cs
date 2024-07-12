@@ -17,10 +17,8 @@ public class ShipTemperatureDetector : MonoBehaviour
     private float _damageDelay = 1.5f;
     private float _randDamageDelay;
     private float _delayStartTime;
-    private float _tempMeterChargeLength = 360f;
-    private float _tempMeterStartTime;
-    private float _cooldownStartTime;
-    private float _cooldownTime;
+    private float _tempMeterChargeLength = 180f;
+    private float _tempMeter;
     private bool _componentDamageNextTime = false;
 
     private void Start()
@@ -33,7 +31,6 @@ public class ShipTemperatureDetector : MonoBehaviour
         _delayStartTime = Time.time;
         _randDamageDelay = _damageDelay + UnityEngine.Random.Range(-1f, 1f);
         _tempMeterChargeLength *= ShipEnhancements.Instance.TemperatureResistanceMultiplier;
-        _tempMeterStartTime = Time.time - _tempMeterChargeLength;
     }
 
     private void Update()
@@ -53,21 +50,24 @@ public class ShipTemperatureDetector : MonoBehaviour
                 if (Mathf.Abs(_currentTemperature) > _highTempCutoff)
                 {
                     _highTemperature = true;
-                    float ratio = Mathf.InverseLerp(_cooldownStartTime, _cooldownStartTime + _cooldownTime, Time.time);
-                    _tempMeterStartTime = Time.time - (_cooldownTime * (1 - ratio));
                 }
             }
             else
             {
+                if (Mathf.Abs(_tempMeter) < _tempMeterChargeLength)
+                {
+                    _tempMeter += Time.deltaTime * Mathf.InverseLerp(_highTempCutoff, 100f, Mathf.Abs(_currentTemperature)) * Mathf.Sign(GetTemperatureRatio());
+                }
+
                 if (Time.time > _delayStartTime + _randDamageDelay)
                 {
                     _delayStartTime = Time.time;
                     _randDamageDelay = _damageDelay + UnityEngine.Random.Range(-1f, 1f);
 
-                    float timeMultiplier = Mathf.InverseLerp(_tempMeterStartTime, _tempMeterStartTime + _tempMeterChargeLength * (1 - Mathf.Abs(GetTemperatureRatio()) / 2), Time.time);
+                    float timeMultiplier = Mathf.InverseLerp(0f, _tempMeterChargeLength, Mathf.Abs(_tempMeter));
 
-                    float damageChance = 0.05f * Mathf.LerpUnclamped(0f, 1f + (Mathf.InverseLerp(_highTempCutoff, 100f, Mathf.Abs(_currentTemperature)) * 2f), timeMultiplier);
-                    if (ShipEnhancements.Instance.ComponentTemperatureDamage && UnityEngine.Random.value 
+                    float damageChance = 0.05f * Mathf.Lerp(0f, 1f + (Mathf.InverseLerp(_highTempCutoff, 100f, Mathf.Abs(_currentTemperature)) * 2f), timeMultiplier);
+                    if (ShipEnhancements.Instance.ComponentTemperatureDamage && UnityEngine.Random.value
                         < damageChance * ShipEnhancements.Instance.TemperatureDamageMultiplier / 8)
                     {
                         _componentDamageNextTime = true;
@@ -88,8 +88,25 @@ public class ShipTemperatureDetector : MonoBehaviour
         if (_highTemperature && (_activeZones.Count == 0 || Mathf.Abs(_currentTemperature) < _highTempCutoff))
         {
             _highTemperature = false;
-            _cooldownStartTime = Time.time;
-            _cooldownTime = Mathf.Max(_tempMeterChargeLength - ((_tempMeterStartTime + _tempMeterChargeLength) - Time.time), 0f);
+        }
+        if (!_highTemperature)
+        {
+            if (Mathf.Abs(_tempMeter) / _tempMeterChargeLength < 0.01f)
+            {
+                _tempMeter = 0f;
+            }
+            else
+            {
+                float step = Time.deltaTime * Mathf.InverseLerp(_highTempCutoff, 0f, Mathf.Abs(_currentTemperature));
+                if (_tempMeter > 0f)
+                {
+                    _tempMeter -= step;
+                }
+                else if (_tempMeter < 0f)
+                {
+                    _tempMeter += step;
+                }
+            }
         }
     }
 
@@ -138,17 +155,7 @@ public class ShipTemperatureDetector : MonoBehaviour
 
     public float GetShipTemperatureRatio()
     {
-        float ratio;
-        if (!_highTemperature)
-        {
-            ratio = Mathf.InverseLerp(_cooldownStartTime, _cooldownStartTime + _cooldownTime, Time.time);
-        }
-        ratio = Mathf.InverseLerp(_tempMeterStartTime, _tempMeterStartTime + _tempMeterChargeLength * (1 - Mathf.Abs(GetTemperatureRatio()) / 2), Time.time);
-        if (_currentTemperature < 0)
-        {
-            ratio *= -1f;
-        }
-        return ratio;
+        return Mathf.InverseLerp(-_tempMeterChargeLength, _tempMeterChargeLength, _tempMeter);
     }
 
     public bool IsHighTemperature()

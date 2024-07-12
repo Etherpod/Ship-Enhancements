@@ -5,6 +5,7 @@ using UnityEngine;
 using System.IO;
 using System;
 using System.Collections.Generic;
+using OWML.ModHelper.Menus;
 
 namespace ShipEnhancements;
 
@@ -381,6 +382,8 @@ public class ShipEnhancements : ModBehaviour
         {
             GameObject sunTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Sun.prefab");
             Instantiate(sunTempZone, sun.transform.Find("Sector_SUN"));
+            GameObject supernovaTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Supernova.prefab");
+            Instantiate(supernovaTempZone, sun.GetComponentInChildren<SupernovaEffectController>().transform);
         }
 
         GameObject vm = GameObject.Find("VolcanicMoon_Body");
@@ -554,19 +557,22 @@ public class ShipEnhancements : ModBehaviour
 
     public override void Configure(IModConfig config)
     {
-        if (!SettingsPresets.Initialized()) return;
+        var allSettings = Enum.GetValues(typeof(Settings)) as Settings[];
+        if (!SettingsPresets.Initialized())
+        {
+            return;
+        }
 
         SettingsPresets.PresetName newPreset = SettingsPresets.GetPresetFromConfig(config.GetSettingsValue<string>("preset"));
-        var allSettings = Enum.GetValues(typeof(Settings)) as Settings[];
         if (newPreset != _currentPreset || _currentPreset == (SettingsPresets.PresetName)(-1))
         {
             _currentPreset = newPreset;
-            SettingsPresets.ApplyPreset(newPreset, config);
             config.SetSettingsValue("preset", _currentPreset.GetName());
             foreach (Settings setting in allSettings)
             {
                 setting.SetValue(config.GetSettingsValue<object>(setting.GetName()));
             }
+            SettingsPresets.ApplyPreset(newPreset, config);
         }
         else
         {
@@ -577,41 +583,21 @@ public class ShipEnhancements : ModBehaviour
                 if (_currentPreset != SettingsPresets.PresetName.Custom)
                 {
                     isCustom = isCustom || !_currentPreset.GetPresetSetting(setting.GetName()).Equals(setting.GetValue());
-                    /*if (!_currentPreset.GetPresetSetting(setting.GetName()).Equals(setting.GetValue()))
-                    {
-                        WriteDebugMessage($"{setting.GetValue()} ({setting.GetValue().GetType()}) : {_currentPreset.GetPresetSetting(setting.GetName())} ({_currentPreset.GetPresetSetting(setting.GetName()).GetType()})");
-                    }*/
                 }
             }
             if (isCustom)
             {
-                //WriteDebugMessage("custom");
                 _currentPreset = SettingsPresets.PresetName.Custom;
-                config.SetSettingsValue("preset", SettingsPresets.PresetName.Custom.GetName());
-                SettingsPresets.ApplyPreset(SettingsPresets.PresetName.Custom, config);
+                config.SetSettingsValue("preset", _currentPreset.GetName());
+                foreach (Settings setting in allSettings)
+                {
+                    config.SetSettingsValue(setting.GetName(), setting.GetValue());
+                }
+                WriteDebugMessage(config.GetSettingsValue<string>("preset"));
+                ModHelper.Menus.ModsMenu.GetModMenu(this).UpdateUIValues();
+                //SettingsPresets.ApplyPreset(SettingsPresets.PresetName.Custom, config);
             }
         }
-
-        /*_gravityCrystalDisabled = config.GetSettingsValue<bool>("disableGravityCrystal");
-        _ejectButtonDisabled = config.GetSettingsValue<bool>("disableEjectButton");
-        _headlightsDisabled = config.GetSettingsValue<bool>("disableHeadlights");
-        _landingCameraDisabled = config.GetSettingsValue<bool>("disableLandingCamera");
-        _shipLightsDisabled = config.GetSettingsValue<bool>("disableShipLights");
-        _oxygenDisabled = config.GetSettingsValue<bool>("disableShipOxygen");
-        _oxygenDrainMultiplier = config.GetSettingsValue<float>("oxygenDrainMultiplier");
-        _fuelDrainMultiplier = config.GetSettingsValue<float>("fuelDrainMultiplier");
-        _damageMultiplier = config.GetSettingsValue<float>("shipDamageMultiplier");
-        _damageSpeedMultiplier = config.GetSettingsValue<float>("shipDamageSpeedMultiplier");
-        _shipOxygenRefill = config.GetSettingsValue<bool>("shipOxygenRefill");
-        _shipRepairDisabled = config.GetSettingsValue<bool>("disableShipRepair");
-        _gravityLandingGearEnabled = config.GetSettingsValue<bool>("enableGravityLandingGear");
-        _airAutoRollDisabled = config.GetSettingsValue<bool>("disableAirAutoRoll");
-        _waterAutoRollDisabled = config.GetSettingsValue<bool>("disableWaterAutoRoll");
-        _thrustModulatorEnabled = config.GetSettingsValue<bool>("enableThrustModulator");
-        _temperatureZonesAmount = config.GetSettingsValue<string>("temperatureZonesAmount");
-        _temperatureDamageEnabled = config.GetSettingsValue<bool>("enableTemperatureDamage");
-        _shipFuelTransferEnabled = config.GetSettingsValue<bool>("enableShipFuelTransfer");
-        _refuelDrainsShip = config.GetSettingsValue<bool>("enableJetpackRefuelDrain");*/
     }
 
     public override object GetApi()
