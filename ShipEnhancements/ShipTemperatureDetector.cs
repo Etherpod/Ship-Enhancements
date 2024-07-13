@@ -20,9 +20,12 @@ public class ShipTemperatureDetector : MonoBehaviour
     private float _tempMeterChargeLength = 180f;
     private float _tempMeter;
     private bool _componentDamageNextTime = false;
+    private bool _shipDestroyed = false;
 
     private void Start()
     {
+        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+
         ShipDamageController damageController = Locator.GetShipBody().GetComponent<ShipDamageController>();
         _shipHulls = damageController._shipHulls;
         _shipComponents = damageController._shipComponents;
@@ -35,7 +38,7 @@ public class ShipTemperatureDetector : MonoBehaviour
 
     private void Update()
     {
-        if (_activeZones.Count > 0)
+        if (_activeZones.Count > 0 && !_shipDestroyed)
         {
             float totalTemperature = 0f;
             foreach (TemperatureZone zone in _activeZones)
@@ -56,7 +59,12 @@ public class ShipTemperatureDetector : MonoBehaviour
             {
                 if (Mathf.Abs(_tempMeter) < _tempMeterChargeLength)
                 {
-                    _tempMeter += Time.deltaTime * Mathf.InverseLerp(_highTempCutoff, 100f, Mathf.Abs(_currentTemperature)) * Mathf.Sign(GetTemperatureRatio());
+                    _tempMeter += Time.deltaTime * 3f * Mathf.InverseLerp(_highTempCutoff, 100f, Mathf.Abs(_currentTemperature)) * Mathf.Sign(GetTemperatureRatio());
+                }
+
+                if ((GetShipTemperatureRatio() - 0.5f < 0) != (GetTemperatureRatio() < 0))
+                {
+                    return;
                 }
 
                 if (Time.time > _delayStartTime + _randDamageDelay)
@@ -66,7 +74,7 @@ public class ShipTemperatureDetector : MonoBehaviour
 
                     float timeMultiplier = Mathf.InverseLerp(0f, _tempMeterChargeLength, Mathf.Abs(_tempMeter));
 
-                    float damageChance = 0.05f * Mathf.Lerp(0f, 1f + (Mathf.InverseLerp(_highTempCutoff, 100f, Mathf.Abs(_currentTemperature)) * 2f), timeMultiplier);
+                    float damageChance = 0.05f * Mathf.Lerp(0f, 1f + (Mathf.InverseLerp(_highTempCutoff, 100f, Mathf.Abs(_currentTemperature)) * 2f), Mathf.Pow(timeMultiplier, 2));
                     if (ShipEnhancements.Instance.ComponentTemperatureDamage && UnityEngine.Random.value
                         < damageChance * ShipEnhancements.Instance.TemperatureDamageMultiplier / 8)
                     {
@@ -177,5 +185,10 @@ public class ShipTemperatureDetector : MonoBehaviour
         {
             _activeZones.Remove(zone);
         }
+    }
+
+    private void OnShipSystemFailure()
+    {
+        _shipDestroyed = true;
     }
 }
