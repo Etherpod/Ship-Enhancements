@@ -26,6 +26,9 @@ Ship Enhancements makes numerous changes to the ship that are all toggleable in 
 - **Fuel Transfer Multiplier**: Larger numbers increase the amount of fuel that is subtracted when refueling your jetpack, and increase the amount of fuel that is added when transferring fuel to the ship.
 - **Oxygen Refill Multiplier**: Larger numbers increase the speed at which your ship's oxygen tank refills when near an oxygen source.
 - **Temperature Resistance Multiplier**: Larger numbers increase the time it takes for your ship to start taking damage in high or low temperature areas.
+- **Angular Drag Multiplier**: Larger numbers make it harder to turn your ship. Setting this to 0 lets you spin your ship forever.
+- **Disable Space Angular Drag**: Disables angular drag in space, meaning your ship will spin forever. The angular drag multiplier will still affect atmospheres.
+- **Disable Rotation Speed Limit**: Lets you spin your ship as quickly as you want, though spinning too fast may tear your ship apart. Enabling this may lead to motion sickness.
 
 ## Add Ship Functions
 - **Oxygen Refill**: Refills the ship's oxygen tank when it gets close to trees or enters an oxygen-filled atmosphere.

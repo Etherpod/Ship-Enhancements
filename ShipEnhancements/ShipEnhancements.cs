@@ -18,6 +18,7 @@ public class ShipEnhancements : ModBehaviour
     public bool oxygenDepleted;
     public bool refillingOxygen;
     public bool fuelDepleted;
+    public bool angularDragEnabled;
 
     public bool HeadlightsDisabled { get; private set; }
     public bool LandingCameraDisabled { get; private set; }
@@ -44,6 +45,9 @@ public class ShipEnhancements : ModBehaviour
     public float FuelTankDrainMultiplier { get; private set; }
     public bool HullTemperatureDamage { get; private set; }
     public bool ComponentTemperatureDamage { get; private set; }
+    public bool RotationSpeedLimitDisabled { get; private set; }
+    public float AngularDragMultiplier { get; private set; }
+    public bool SpaceAngularDragDisabled { get; private set; }
 
     private SettingsPresets.PresetName _currentPreset = (SettingsPresets.PresetName)(-1);
 
@@ -91,6 +95,9 @@ public class ShipEnhancements : ModBehaviour
         oxygenTankDrainMultiplier,
         fuelTankDrainMultiplier,
         componentTemperatureDamage,
+        angularDragMultiplier,
+        disableSpaceAngularDrag,
+        disableRotationSpeedLimit,
     }
 
     private void Awake()
@@ -114,6 +121,7 @@ public class ShipEnhancements : ModBehaviour
             GlobalMessenger.AddListener("RemoveSuit", OnPlayerRemoveSuit);
             oxygenDepleted = false;
             fuelDepleted = false;
+            angularDragEnabled = false;
             _startOxygenRefill = false;
 
             StartCoroutine(InitializeShip());
@@ -127,6 +135,11 @@ public class ShipEnhancements : ModBehaviour
             UpdateProperties();
             GlobalMessenger.RemoveListener("SuitUp", OnPlayerSuitUp);
             GlobalMessenger.RemoveListener("RemoveSuit", OnPlayerRemoveSuit);
+            if ((bool)Settings.disableSpaceAngularDrag.GetValue())
+            {
+                Locator.GetShipDetector().GetComponent<ShipFluidDetector>().OnEnterFluid -= OnEnterFluid;
+                Locator.GetShipDetector().GetComponent<ShipFluidDetector>().OnExitFluid -= OnExitFluid;
+            }
             if ((bool)Settings.enableAutoHatch.GetValue())
             {
                 GlobalMessenger.RemoveListener("EnterShip", OnEnterShip);
@@ -260,6 +273,9 @@ public class ShipEnhancements : ModBehaviour
         FuelTankDrainMultiplier = (float)Settings.fuelTankDrainMultiplier.GetValue();
         HullTemperatureDamage = (bool)Settings.hullTemperatureDamage.GetValue();
         ComponentTemperatureDamage = (bool)Settings.componentTemperatureDamage.GetValue();
+        RotationSpeedLimitDisabled = (bool)Settings.disableRotationSpeedLimit.GetValue();
+        AngularDragMultiplier = (float)Settings.angularDragMultiplier.GetValue();
+        SpaceAngularDragDisabled = (bool)Settings.disableSpaceAngularDrag.GetValue();
     }
 
     private IEnumerator InitializeShip()
@@ -373,6 +389,11 @@ public class ShipEnhancements : ModBehaviour
             GameObject autoHatchController = LoadPrefab("Assets/ShipEnhancements/ExteriorHatchControls.prefab");
             Instantiate(autoHatchController, Locator.GetShipBody().GetComponentInChildren<HatchController>().transform.parent);
         }
+        if ((bool)Settings.disableSpaceAngularDrag.GetValue())
+        {
+            Locator.GetShipDetector().GetComponent<ShipFluidDetector>().OnEnterFluid += OnEnterFluid;
+            Locator.GetShipDetector().GetComponent<ShipFluidDetector>().OnExitFluid += OnExitFluid;
+        }
     }
 
     private static void AddTemperatureZones()
@@ -381,7 +402,7 @@ public class ShipEnhancements : ModBehaviour
         if (sun != null)
         {
             GameObject sunTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Sun.prefab");
-            Instantiate(sunTempZone, sun.transform.Find("Sector_SUN"));
+            Instantiate(sunTempZone, sun.transform.Find("Sector_SUN/Volumes_SUN"));
             GameObject supernovaTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Supernova.prefab");
             Instantiate(supernovaTempZone, sun.GetComponentInChildren<SupernovaEffectController>().transform);
         }
@@ -512,6 +533,23 @@ public class ShipEnhancements : ModBehaviour
         ThrustModulatorLevel = level;
     }
 
+    private void OnEnterFluid(FluidVolume fluid)
+    {
+        angularDragEnabled = true;
+        Locator.GetShipBody()._rigidbody.angularDrag = 0.94f * AngularDragMultiplier;
+        Locator.GetShipBody().GetComponent<ShipThrusterModel>()._angularDrag = 0.94f * AngularDragMultiplier;
+    }
+
+    private void OnExitFluid(FluidVolume fluid)
+    {
+        if (Locator.GetShipDetector().GetComponent<ShipFluidDetector>()._activeVolumes.Count == 0)
+        {
+            angularDragEnabled = false;
+            Locator.GetShipBody()._rigidbody.angularDrag = 0f;
+            Locator.GetShipBody().GetComponent<ShipThrusterModel>()._angularDrag = 0f;
+        }
+    }
+
     private void OnEnterShip()
     {
         HatchController hatchController = Locator.GetShipBody().GetComponentInChildren<HatchController>();
@@ -557,22 +595,22 @@ public class ShipEnhancements : ModBehaviour
 
     public override void Configure(IModConfig config)
     {
-        var allSettings = Enum.GetValues(typeof(Settings)) as Settings[];
         if (!SettingsPresets.Initialized())
         {
             return;
         }
 
+        var allSettings = Enum.GetValues(typeof(Settings)) as Settings[];
         SettingsPresets.PresetName newPreset = SettingsPresets.GetPresetFromConfig(config.GetSettingsValue<string>("preset"));
         if (newPreset != _currentPreset || _currentPreset == (SettingsPresets.PresetName)(-1))
         {
             _currentPreset = newPreset;
             config.SetSettingsValue("preset", _currentPreset.GetName());
+            SettingsPresets.ApplyPreset(newPreset, config);
             foreach (Settings setting in allSettings)
             {
                 setting.SetValue(config.GetSettingsValue<object>(setting.GetName()));
             }
-            SettingsPresets.ApplyPreset(newPreset, config);
         }
         else
         {
@@ -593,9 +631,6 @@ public class ShipEnhancements : ModBehaviour
                 {
                     config.SetSettingsValue(setting.GetName(), setting.GetValue());
                 }
-                WriteDebugMessage(config.GetSettingsValue<string>("preset"));
-                ModHelper.Menus.ModsMenu.GetModMenu(this).UpdateUIValues();
-                //SettingsPresets.ApplyPreset(SettingsPresets.PresetName.Custom, config);
             }
         }
     }

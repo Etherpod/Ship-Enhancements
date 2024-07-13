@@ -15,7 +15,8 @@
         "Wanderer",
         "Pandemonium",
         "Custom"
-      ]
+      ],
+      "tooltip": "Chooses the settings for you. You can still change the settings after selecting a preset. Close and open the settings menu again to see the changes (the mod manager is buggy)."
     },
 
     "Disable Ship Parts": {
@@ -158,6 +159,24 @@
       "type": "number",
       "value": 1,
       "tooltip": "Larger numbers increase the time it takes for the ship to start taking damage in extreme temperatures."
+    },
+    "angularDragMultiplier": {
+      "title": "Angular Drag Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers make your ship harder to turn. Set to zero to make your ship spin forever. WARNING: Values below 1 may cause motion sickness."
+    },
+    "disableSpaceAngularDrag": {
+      "title": "Disable Space Angular Drag",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Disables angular drag in space, meaning you won't stop spinning. DO NOT ENABLE IF YOU ARE PRONE TO MOTION SICKNESS."
+    },
+    "disableRotationSpeedLimit": {
+      "title": "Disable Rotation Speed Limit",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Lets you spin your ship as quickly as you want, though spinning too fast may tear your ship apart. DO NOT ENABLE IF YOU ARE PRONE TO MOTION SICKNESS."
     },
 
     "Add Ship Functions": {

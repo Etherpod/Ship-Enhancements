@@ -3,6 +3,7 @@ using System.Reflection;
 using HarmonyLib;
 using OWML.Common;
 using OWML.ModHelper;
+using OWML.ModHelper.Menus;
 using UnityEngine;
 
 namespace ShipEnhancements;
@@ -592,7 +593,7 @@ public class PatchClass
     [HarmonyPatch(typeof(SunController), nameof(SunController.UpdateScale))]
     public static void UpdateSunTempZone(SunController __instance, float scale)
     {
-        TemperatureZone tempZone = __instance.GetComponentInChildren<TemperatureZone>();
+        TemperatureZone tempZone = __instance.transform.Find("Sector_SUN/Volumes_SUN").GetComponentInChildren<TemperatureZone>();
         if (tempZone != null) 
         {
             tempZone.SetScale(scale);
@@ -761,10 +762,52 @@ public class PatchClass
     }
     #endregion
 
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(ModConfig), "SetSettingsValue")]
-    public static void test(IModConfig __instance, string key, object value)
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ThrusterModel), nameof(ThrusterModel.Awake))]
+    public static void RemoveAngularDrag(ThrusterModel __instance)
     {
-        ShipEnhancements.WriteDebugMessage(key + ": " + value);
+        if (!__instance.gameObject.CompareTag("Ship")) return;
+
+        if (ShipEnhancements.Instance.SpaceAngularDragDisabled)
+        {
+            __instance._angularDrag = 0f;
+        }
+        else
+        {
+            __instance._angularDrag *= ShipEnhancements.Instance.AngularDragMultiplier;
+        }
+
+        if (ShipEnhancements.Instance.RotationSpeedLimitDisabled)
+        {
+            __instance._owRigidbody.SetMaxAngularVelocity(20f);
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ThrusterModel), nameof(ThrusterModel.FireRotationalThrusters))]
+    public static bool RemoveRotationLimit(ThrusterModel __instance)
+    {
+        if (!ShipEnhancements.Instance.RotationSpeedLimitDisabled || !__instance.gameObject.CompareTag("Ship")) return true;
+
+        __instance._localAngularAcceleration = __instance._rotationalInput * __instance._maxRotationalThrust;
+        if (__instance._localAngularAcceleration.sqrMagnitude <= 0f)
+        {
+            __instance._isRotationalFiring = false;
+            return false;
+        }
+        /*float num = (OWInput.UsingGamepad() ? 1f : 2f);
+        float num2 = __instance._maxRotationalThrust * num ;
+        __instance._localAngularAcceleration.x = Mathf.Clamp(__instance._localAngularAcceleration.x, -num2, num2);
+        __instance._localAngularAcceleration.y = Mathf.Clamp(__instance._localAngularAcceleration.y, -num2, num2);
+        __instance._localAngularAcceleration.z = Mathf.Clamp(__instance._localAngularAcceleration.z, -num2, num2);*/
+        __instance._isRotationalFiring = true;
+        if (__instance._usePhysicsToRotate)
+        {
+            __instance._owRigidbody.AddLocalAngularAcceleration(__instance._localAngularAcceleration);
+            return false;
+        }
+        __instance._manualAngularVelocity += __instance.transform.TransformDirection(__instance._localAngularAcceleration * Time.fixedDeltaTime);
+
+        return false;
     }
 }

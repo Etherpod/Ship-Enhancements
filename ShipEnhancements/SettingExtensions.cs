@@ -40,6 +40,9 @@ public static class SettingExtensions
         { Settings.oxygenTankDrainMultiplier, 1f },
         { Settings.fuelTankDrainMultiplier, 1f },
         { Settings.componentTemperatureDamage, false },
+        { Settings.angularDragMultiplier, 1f },
+        { Settings.disableSpaceAngularDrag, false },
+        { Settings.disableRotationSpeedLimit, false },
     };
 
     public static string GetName(this Settings setting)
