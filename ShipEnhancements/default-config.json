@@ -142,6 +142,19 @@
       "value": 1,
       "tooltip": "Larger numbers increase the power of the ship's gravity crystal."
     },
+    "gravityDirection": {
+      "title": "Ship Gravity Direction",
+      "type": "selector",
+      "value": "Down",
+      "options": [
+        "Down",
+        "Up",
+        "Left",
+        "Right",
+        "Forward",
+        "Back"
+      ]
+    },
     "fuelTransferMultiplier": {
       "title": "Fuel Transfer Multiplier",
       "type": "number",

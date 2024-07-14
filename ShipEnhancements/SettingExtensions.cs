@@ -43,6 +43,7 @@ public static class SettingExtensions
         { Settings.angularDragMultiplier, 1f },
         { Settings.disableSpaceAngularDrag, false },
         { Settings.disableRotationSpeedLimit, false },
+        { Settings.gravityDirection, "Down" },
     };
 
     public static string GetName(this Settings setting)

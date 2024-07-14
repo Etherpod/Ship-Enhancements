@@ -762,6 +762,7 @@ public class PatchClass
     }
     #endregion
 
+    #region AngularDrag
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ThrusterModel), nameof(ThrusterModel.Awake))]
     public static void RemoveAngularDrag(ThrusterModel __instance)
@@ -776,6 +777,13 @@ public class PatchClass
         {
             __instance._angularDrag *= ShipEnhancements.Instance.AngularDragMultiplier;
         }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ThrusterModel), nameof(ThrusterModel.Awake))]
+    public static void RemoveRotationSpeedLimit(ThrusterModel __instance)
+    {
+        if (!__instance.gameObject.CompareTag("Ship")) return;
 
         if (ShipEnhancements.Instance.RotationSpeedLimitDisabled)
         {
@@ -810,4 +818,5 @@ public class PatchClass
 
         return false;
     }
+    #endregion
 }

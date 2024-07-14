@@ -98,6 +98,7 @@ public class ShipEnhancements : ModBehaviour
         angularDragMultiplier,
         disableSpaceAngularDrag,
         disableRotationSpeedLimit,
+        gravityDirection,
     }
 
     private void Awake()
@@ -394,6 +395,30 @@ public class ShipEnhancements : ModBehaviour
             Locator.GetShipDetector().GetComponent<ShipFluidDetector>().OnEnterFluid += OnEnterFluid;
             Locator.GetShipDetector().GetComponent<ShipFluidDetector>().OnExitFluid += OnExitFluid;
         }
+        if ((string)Settings.gravityDirection.GetValue() != "Down" && !(bool)Settings.disableGravityCrystal.GetValue())
+        {
+            ShipDirectionalForceVolume shipGravity = Locator.GetShipBody().GetComponentInChildren<ShipDirectionalForceVolume>();
+            Vector3 direction = Vector3.down;
+            switch ((string)Settings.gravityDirection.GetValue())
+            {
+                case "Up":
+                    direction = Vector3.up;
+                    break;
+                case "Left":
+                    direction = Vector3.left;
+                    break;
+                case "Right":
+                    direction = Vector3.right;
+                    break;
+                case "Forward":
+                    direction = Vector3.forward;
+                    break;
+                case "Back":
+                    direction = Vector3.back;
+                    break;
+            }
+            shipGravity._fieldDirection = direction;
+        }
     }
 
     private static void AddTemperatureZones()
@@ -517,7 +542,8 @@ public class ShipEnhancements : ModBehaviour
 
     public bool IsShipInOxygen()
     {
-        return _shipOxygenDetector != null && _shipOxygenDetector.GetDetectOxygen();
+        return _shipOxygenDetector != null && _shipOxygenDetector.GetDetectOxygen() 
+            && !Locator.GetShipDetector().GetComponent<ShipFluidDetector>().InFluidType(FluidVolume.Type.WATER);
     }
 
     public void SetGravityLandingGearEnabled(bool enabled)
