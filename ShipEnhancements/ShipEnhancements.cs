@@ -6,6 +6,8 @@ using System.IO;
 using System;
 using System.Collections.Generic;
 using OWML.ModHelper.Menus;
+using OWML.Utils;
+using Mono.Cecil.Cil;
 
 namespace ShipEnhancements;
 
@@ -19,6 +21,8 @@ public class ShipEnhancements : ModBehaviour
     public bool refillingOxygen;
     public bool fuelDepleted;
     public bool angularDragEnabled;
+    public UITextType probeLauncherName { get; private set; }
+    public bool probeDestroyed;
 
     public bool HeadlightsDisabled { get; private set; }
     public bool LandingCameraDisabled { get; private set; }
@@ -48,6 +52,9 @@ public class ShipEnhancements : ModBehaviour
     public bool RotationSpeedLimitDisabled { get; private set; }
     public float AngularDragMultiplier { get; private set; }
     public bool SpaceAngularDragDisabled { get; private set; }
+    public bool ScoutLauncherDisabled { get; private set; }
+    public bool ScoutLauncherComponentEnabled { get; private set; }
+    public bool ManualScoutRecallEnabled { get; private set; }
 
     private SettingsPresets.PresetName _currentPreset = (SettingsPresets.PresetName)(-1);
 
@@ -99,6 +106,9 @@ public class ShipEnhancements : ModBehaviour
         disableSpaceAngularDrag,
         disableRotationSpeedLimit,
         gravityDirection,
+        disableScoutLauncher,
+        enableScoutLauncherComponent,
+        enableManualScoutRecall,
     }
 
     private void Awake()
@@ -114,6 +124,8 @@ public class ShipEnhancements : ModBehaviour
         ModCompatibility.Initialize();
         SettingsPresets.InitializePresets();
 
+        probeLauncherName = EnumUtils.Create<UITextType>("ScoutLauncher");
+
         LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
         {
             if (loadScene != OWScene.SolarSystem) return;
@@ -124,6 +136,7 @@ public class ShipEnhancements : ModBehaviour
             fuelDepleted = false;
             angularDragEnabled = false;
             _startOxygenRefill = false;
+            probeDestroyed = false;
 
             StartCoroutine(InitializeShip());
         };
@@ -277,6 +290,9 @@ public class ShipEnhancements : ModBehaviour
         RotationSpeedLimitDisabled = (bool)Settings.disableRotationSpeedLimit.GetValue();
         AngularDragMultiplier = (float)Settings.angularDragMultiplier.GetValue();
         SpaceAngularDragDisabled = (bool)Settings.disableSpaceAngularDrag.GetValue();
+        ScoutLauncherDisabled = (bool)Settings.disableScoutLauncher.GetValue();
+        ScoutLauncherComponentEnabled = (bool)Settings.enableScoutLauncherComponent.GetValue();
+        ManualScoutRecallEnabled = (bool)Settings.enableManualScoutRecall.GetValue();
     }
 
     private IEnumerator InitializeShip()
@@ -418,6 +434,28 @@ public class ShipEnhancements : ModBehaviour
                     break;
             }
             shipGravity._fieldDirection = direction;
+        }
+        if ((bool)Settings.enableManualScoutRecall.GetValue())
+        {
+            ShipProbeLauncherEffects launcherEffects = Locator.GetShipBody().GetComponentInChildren<PlayerProbeLauncher>()
+                .gameObject.AddComponent<ShipProbeLauncherEffects>();
+            GameObject probePickupVolume = LoadPrefab("Assets/ShipEnhancements/PlayerProbePickupVolume.prefab");
+            Instantiate(probePickupVolume, Locator.GetProbe().transform);
+            GameObject shipProbePickupVolume = LoadPrefab("Assets/ShipEnhancements/ShipProbePickupVolume.prefab");
+            GameObject shipProbeVolume = Instantiate(shipProbePickupVolume, launcherEffects.transform);
+
+            if ((bool)Settings.enableScoutLauncherComponent.GetValue())
+            {
+                Locator.GetShipBody().GetComponentInChildren<ProbeLauncherComponent>().SetProbeLauncherEffects(launcherEffects);
+            }
+        }
+        if ((bool)Settings.disableScoutLauncher.GetValue() && (bool)Settings.enableScoutLauncherComponent.GetValue())
+        {
+            ProbeLauncherComponent component = Locator.GetShipBody().GetComponentInChildren<ProbeLauncherComponent>();
+            component._repairReceiver.repairDistance = 0f;
+            component._damaged = true;
+            component._repairFraction = 0f;
+            component.OnComponentDamaged();
         }
     }
 

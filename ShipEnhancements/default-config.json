@@ -53,6 +53,12 @@
       "value": false,
       "tooltip": "Turns off both the interior and exterior lighting fixtures."
     },
+    "disableScoutLauncher": {
+      "title": "Disable Ship Scout Launcher",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Removes your ability to launch or recall the scout with the ship."
+    },
     "disableShipOxygen": {
       "title": "Disable Ship Oxygen",
       "type": "toggle",
@@ -213,6 +219,18 @@
       "type": "toggle",
       "value": false,
       "tooltip": "Drains the ship's fuel when you refill your jetpack in the ship."
+    },
+    "enableScoutLauncherComponent": {
+      "title": "Add Scout Launcher Component",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Turns the ship's scout launcher into a fully functioning component."
+    },
+    "enableManualScoutRecall": {
+      "title": "Enable Manual Scout Recall",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Removes your ability to recall the scout with the handheld scout launcher. Don't worry, you can still use the ship, as long as it's not broken."
     },
     "enableAutoHatch": {
       "title": "Enable Automatic Hatch",

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using HarmonyLib;
 using OWML.Common;
 using OWML.ModHelper;
@@ -169,7 +170,7 @@ public class PatchClass
     [HarmonyPatch(typeof(ShipHull), nameof(ShipHull.FixedUpdate))]
     public static bool ApplyHullDamageMultiplier(ShipHull __instance)
     {
-        if (ShipEnhancements.Instance.DamageMultiplier == 1 && ShipEnhancements.Instance.DamageSpeedMultiplier == 0)
+        if (ShipEnhancements.Instance.DamageMultiplier == 1 && ShipEnhancements.Instance.DamageSpeedMultiplier == 1)
         {
             return true;
         }
@@ -252,7 +253,7 @@ public class PatchClass
     [HarmonyPatch(typeof(ShipComponent), nameof(ShipComponent.ApplyImpact))]
     public static bool ApplyComponentDamageMultiplier(ShipComponent __instance, ImpactData impact)
     {
-        if (ShipEnhancements.Instance.DamageMultiplier == 1 && ShipEnhancements.Instance.DamageSpeedMultiplier == 0)
+        if (ShipEnhancements.Instance.DamageMultiplier == 1 && ShipEnhancements.Instance.DamageSpeedMultiplier == 1)
         {
             return true;
         }
@@ -295,7 +296,7 @@ public class PatchClass
     [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.OnImpact))]
     public static bool ApplyExplosionDamageMultiplier(ShipDamageController __instance, ImpactData impact)
     {
-        if (ShipEnhancements.Instance.DamageMultiplier == 1 && ShipEnhancements.Instance.DamageSpeedMultiplier == 0)
+        if (ShipEnhancements.Instance.DamageMultiplier == 1 && ShipEnhancements.Instance.DamageSpeedMultiplier == 1)
         {
             return true;
         }
@@ -335,7 +336,7 @@ public class PatchClass
     [HarmonyPatch(typeof(ShipResources), nameof(ShipResources.Update))]
     public static bool RefillShipOxygen(ShipResources __instance)
     {
-        if (ShipEnhancements.Instance.OxygenDisabled || !ShipEnhancements.Instance.ShipOxygenRefill 
+        if (ShipEnhancements.Instance.OxygenDisabled || !ShipEnhancements.Instance.ShipOxygenRefill
             || ModCompatibility.GetModSetting("Stonesword.ResourceManagement", "Enable Oxygen Refill")) return true;
 
         if (__instance._killingResources)
@@ -594,7 +595,7 @@ public class PatchClass
     public static void UpdateSunTempZone(SunController __instance, float scale)
     {
         TemperatureZone tempZone = __instance.transform.Find("Sector_SUN/Volumes_SUN").GetComponentInChildren<TemperatureZone>();
-        if (tempZone != null) 
+        if (tempZone != null)
         {
             tempZone.SetScale(scale);
         }
@@ -623,7 +624,7 @@ public class PatchClass
         {
             return false;
         }
-        if (__instance._cloakController != null && __instance._hasTarget && !__instance._currentReferenceFrame.GetOWRigidBody().IsKinematic() 
+        if (__instance._cloakController != null && __instance._hasTarget && !__instance._currentReferenceFrame.GetOWRigidBody().IsKinematic()
             && __instance._cloakController.CheckBodyInsideCloak(__instance._currentReferenceFrame.GetOWRigidBody()) != __instance._cloakController.isPlayerInsideCloak)
         {
             __instance.UntargetReferenceFrame();
@@ -649,7 +650,7 @@ public class PatchClass
     {
         if (!ShipEnhancements.Instance.MapMarkersDisabled) return true;
 
-        if (value && (ShipLogEntryHUDMarker.s_entryLocation == null || !ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField() 
+        if (value && (ShipLogEntryHUDMarker.s_entryLocation == null || !ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField()
             || (ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField() && Locator.GetCloakFieldController().isPlayerInsideCloak)))
         {
             return false;
@@ -690,7 +691,7 @@ public class PatchClass
     public static bool DisableInsideCloak(ShipLogEntryHUDMarker __instance)
     {
         if (!ShipEnhancements.Instance.MapMarkersDisabled) return true;
-        if (ShipLogEntryHUDMarker.s_entryLocation != null 
+        if (ShipLogEntryHUDMarker.s_entryLocation != null
             && ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField() && Locator.GetCloakFieldController().isPlayerInsideCloak)
         {
             __instance._isVisible = false;
@@ -817,6 +818,142 @@ public class PatchClass
         __instance._manualAngularVelocity += __instance.transform.TransformDirection(__instance._localAngularAcceleration * Time.fixedDeltaTime);
 
         return false;
+    }
+    #endregion
+
+    #region Scout
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.RetrieveProbe))]
+    public static bool DisableProbeRetrieve(ProbeLauncher __instance)
+    {
+        if (!ShipEnhancements.Instance.ManualScoutRecallEnabled && !ShipEnhancements.Instance.ScoutLauncherComponentEnabled
+            && !ShipEnhancements.Instance.ScoutLauncherDisabled) return true;
+
+        if ((ShipEnhancements.Instance.ScoutLauncherDisabled && PlayerState.AtFlightConsole())
+            || (ShipEnhancements.Instance.ManualScoutRecallEnabled && __instance.GetName() == ProbeLauncher.Name.Player && !ProbePickupVolume.canRetrieveProbe)
+            || (ShipEnhancements.Instance.ScoutLauncherComponentEnabled
+            && __instance.GetName() == ProbeLauncher.Name.Ship && Locator.GetShipBody().GetComponentInChildren<ProbeLauncherComponent>().isDamaged)
+            || ShipEnhancements.Instance.probeDestroyed)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.LaunchProbe))]
+    public static bool DisableProbeLaunch(ProbeLauncher __instance)
+    {
+        if (!ShipEnhancements.Instance.ManualScoutRecallEnabled && !ShipEnhancements.Instance.ScoutLauncherComponentEnabled 
+            && !ShipEnhancements.Instance.ScoutLauncherDisabled) return true;
+
+        if ((ShipEnhancements.Instance.ScoutLauncherDisabled && PlayerState.AtFlightConsole())
+            || (ShipEnhancements.Instance.ManualScoutRecallEnabled 
+            && __instance.GetName() == ProbeLauncher.Name.Player && !__instance._preLaunchProbeProxy.activeInHierarchy)
+            || (ShipEnhancements.Instance.ScoutLauncherComponentEnabled
+            && __instance.GetName() == ProbeLauncher.Name.Ship && Locator.GetShipBody().GetComponentInChildren<ProbeLauncherComponent>().isDamaged)
+            || ShipEnhancements.Instance.probeDestroyed)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(UITextLibrary), nameof(UITextLibrary.GetString))]
+    public static void ReturnProbeLauncherName(UITextType TextID, ref string __result)
+    {
+        if (TextID == ShipEnhancements.Instance.probeLauncherName)
+        {
+            __result = "SCOUT LAUNCHER";
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipHull), nameof(ShipHull.Awake))]
+    public static void AddScoutLauncherComponent(ShipHull __instance)
+    {
+        if (!ShipEnhancements.Instance.ScoutLauncherComponentEnabled) return;
+
+        if (__instance.hullName != UITextType.ShipPartForward) return;
+        GameObject probeLauncherComponent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ProbeLauncherComponent.prefab");
+        GameObject componentObj = UnityEngine.Object.Instantiate(probeLauncherComponent, 
+            __instance.GetComponentInParent<ShipBody>().GetComponentInChildren<PlayerProbeLauncher>().transform.parent);
+        AssetBundleUtilities.ReplaceShaders(componentObj);
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.OnForceRetrieveProbe))]
+    public static bool ForceRetrieveToShip(ProbeLauncher __instance)
+    {
+        return !ShipEnhancements.Instance.ManualScoutRecallEnabled;
+    }
+
+    [HarmonyReversePatch]
+    [HarmonyPatch(typeof(PlayerTool), nameof(PlayerTool.Update))]
+    public static void PlayerTool_Update(PlayerTool __instance) { }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.Update))]
+    public static bool ShowConnectionLostNotification(ProbeLauncher __instance)
+    {
+        if (!ShipEnhancements.Instance.ManualScoutRecallEnabled) return true;
+
+        PlayerTool_Update(__instance);
+        __instance.enabled = true;
+        if (!__instance.AllowInput())
+        {
+            return true;
+        }
+        if (__instance._isEquipped && ShipEnhancements.Instance.probeDestroyed)
+        {
+            if (OWInput.IsNewlyPressed(InputLibrary.probeLaunch, InputMode.All) 
+                || OWInput.IsNewlyPressed(InputLibrary.toolActionPrimary, InputMode.All) 
+                || OWInput.IsNewlyPressed(InputLibrary.toolActionSecondary, InputMode.All))
+            {
+                NotificationData notificationData = new NotificationData(UITextLibrary.GetString(UITextType.NotificationUnableToRetrieveProbe));
+                NotificationManager.SharedInstance.PostNotification(notificationData, false);
+                Locator.GetPlayerAudioController().PlayNegativeUISound();
+            }
+            return false;
+        }
+        return true;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(SingularityWarpEffect), nameof(SingularityWarpEffect.WarpObjectIn))]
+    public static bool SkipWarpEffect(SingularityWarpEffect __instance)
+    {
+        if (!ShipEnhancements.Instance.ManualScoutRecallEnabled || !ProbePickupVolume.canRetrieveProbe)
+        {
+            return true;
+        }
+
+        PlayerProbeLauncher launcher = __instance.GetComponentInParent<PlayerProbeLauncher>();
+        if (launcher != null)
+        {
+            if (launcher.GetName() == ProbeLauncher.Name.Player && !__instance.transform.parent.gameObject.activeInHierarchy)
+            {
+                launcher._preLaunchProbeProxy.transform.localScale = Vector3.one;
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.SetActiveProbe))]
+    public static bool KeepProbeHidden(ProbeLauncher __instance)
+    {
+        if (!ShipEnhancements.Instance.ManualScoutRecallEnabled) return true;
+
+        ShipProbeLauncherEffects launcherEffects = __instance.GetComponent<ShipProbeLauncherEffects>();
+        if (launcherEffects != null && (ShipEnhancements.Instance.probeDestroyed || launcherEffects.componentDamaged))
+        {
+            return false;
+        }
+        return true;
     }
     #endregion
 }

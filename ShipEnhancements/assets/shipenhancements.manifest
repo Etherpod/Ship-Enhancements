@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 2177712381
+CRC: 2178424160
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 774290c1f835cc553324f90783409b4b
+    Hash: f1bfd85d6a3fcdb7a78ff834b695fda8
   TypeTreeHash:
     serializedVersion: 2
-    Hash: d08ff3dc22479177c4e6318707370da4
+    Hash: dd159cc34903e9fc297d5c7b843fedf2
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -29,6 +29,8 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 83
   Script: {instanceID: 0}
+- Class: 108
+  Script: {instanceID: 0}
 - Class: 114
   Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
 - Class: 114
@@ -39,6 +41,8 @@ ClassTypes:
   Script: {fileID: 11500000, guid: 25b7e56961bf1df33ed31b8c786ab1c3, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 2145ed3a866d4bd5a94d98ee05d0fa4f, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 9a2c44baac8e1d888e8ca92066d5d487, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 9a54ad2d6a6aa9fc507953cd15ad06fd, type: 3}
 - Class: 114
@@ -61,6 +65,12 @@ ClassTypes:
   Script: {fileID: 724769104, guid: 56e5cf1f6ac64bc4d8feff9ed2c6da44, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 5b69738f164a5a2451d76a672bae5943, type: 3}
+- Class: 114
+  Script: {fileID: -410793340, guid: 56e5cf1f6ac64bc4d8feff9ed2c6da44, type: 3}
+- Class: 114
+  Script: {fileID: 2059121185, guid: 56e5cf1f6ac64bc4d8feff9ed2c6da44, type: 3}
+- Class: 114
+  Script: {fileID: -619806332, guid: 56e5cf1f6ac64bc4d8feff9ed2c6da44, type: 3}
 - Class: 115
   Script: {instanceID: 0}
 - Class: 128
@@ -82,12 +92,14 @@ ClassTypes:
 SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/ShipEnhancements/GravityLandingGearParticles.mat
+- Assets/ShipEnhancements/ShipProbePickupVolume.prefab
 - Assets/ShipEnhancements/AudioClip/Switch_Off.mp3
 - Assets/ShipEnhancements/ButtonGlowOrange.mat
 - Assets/ShipEnhancements/AudioClip/Switch_On.mp3
 - Assets/ShipEnhancements/ButtonGlow.mat
 - Assets/ShipEnhancements/IndicatorLight_TemperatureGauge.prefab
 - Assets/ShipEnhancements/TempDial.fbx
+- Assets/ShipEnhancements/PlayerProbePickupVolume.prefab
 - Assets/ShipEnhancements/TemperatureZone_DarkBramble.prefab
 - Assets/ShipEnhancements/TemperatureZone_CaveTwinHot.prefab
 - Assets/ShipEnhancements/ShipInterior_HEA_VillageMetal_Recolored_mat.mat
@@ -116,6 +128,7 @@ Assets:
 - Assets/ShipEnhancements/TemperatureZone_GiantsDeepCore.prefab
 - Assets/ShipEnhancements/TemperatureZone_BrittleHollowNorth.prefab
 - Assets/ShipEnhancements/FuelTransferVolume.prefab
+- Assets/ShipEnhancements/ProbeLauncherComponent.prefab
 - Assets/ShipEnhancements/ButtonConsole.fbx
 - Assets/ShipEnhancements/Switch.fbx
 - Assets/ShipEnhancements/ButtonConsole_Lightmap.png

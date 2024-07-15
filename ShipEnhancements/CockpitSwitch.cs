@@ -24,12 +24,16 @@ public abstract class CockpitSwitch : ElectricalComponent
     protected OWRenderer _renderer;
     protected bool _on = false;
 
+    public override void Awake()
+    {
+        base.Awake();
+        _interactReceiver.OnPressInteract += FlipSwitch;
+    }
+
     private void Start()
     {
         _renderer = GetComponent<OWRenderer>();
         _damageController = Locator.GetShipBody().GetComponentInChildren<ShipDamageController>();
-
-        _interactReceiver.OnPressInteract += FlipSwitch;
 
         _interactReceiver.ChangePrompt("Turn on " + _label);
         transform.localRotation = Quaternion.Euler(_initialRotation.eulerAngles.x + _rotationOffset,
