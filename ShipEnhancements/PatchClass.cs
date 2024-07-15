@@ -824,12 +824,12 @@ public class PatchClass
     #region Scout
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.RetrieveProbe))]
-    public static bool DisableProbeRetrieve(ProbeLauncher __instance)
+    public static bool DisableProbeRetrieve(ProbeLauncher __instance, bool forcedRetrieval)
     {
         if (!ShipEnhancements.Instance.ManualScoutRecallEnabled && !ShipEnhancements.Instance.ScoutLauncherComponentEnabled
             && !ShipEnhancements.Instance.ScoutLauncherDisabled) return true;
 
-        if ((ShipEnhancements.Instance.ScoutLauncherDisabled && PlayerState.AtFlightConsole())
+        if ((ShipEnhancements.Instance.ScoutLauncherDisabled && PlayerState.AtFlightConsole() && __instance.GetName() == ProbeLauncher.Name.Ship)
             || (ShipEnhancements.Instance.ManualScoutRecallEnabled && __instance.GetName() == ProbeLauncher.Name.Player && !ProbePickupVolume.canRetrieveProbe)
             || (ShipEnhancements.Instance.ScoutLauncherComponentEnabled
             && __instance.GetName() == ProbeLauncher.Name.Ship && Locator.GetShipBody().GetComponentInChildren<ProbeLauncherComponent>().isDamaged)
@@ -886,7 +886,32 @@ public class PatchClass
     [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.OnForceRetrieveProbe))]
     public static bool ForceRetrieveToShip(ProbeLauncher __instance)
     {
-        return !ShipEnhancements.Instance.ManualScoutRecallEnabled;
+        if (ShipEnhancements.Instance.ManualScoutRecallEnabled) return false;
+
+        if (__instance.GetName() == ProbeLauncher.Name.Player)
+        {
+            bool flag = false;
+
+            if (ShipEnhancements.Instance.ScoutLauncherDisabled)
+            {
+                flag = true;
+            }
+            else if (ShipEnhancements.Instance.ScoutLauncherComponentEnabled)
+            {
+                ProbeLauncherComponent component = Locator.GetShipBody().GetComponentInChildren<ProbeLauncherComponent>();
+                if (component.isDamaged)
+                {
+                    flag = true;
+                }
+            }
+
+            if (flag)
+            {
+                __instance._activeProbe = Locator.GetProbe();
+            }
+        }
+
+        return true;
     }
 
     [HarmonyReversePatch]
@@ -954,6 +979,71 @@ public class PatchClass
             return false;
         }
         return true;
+    }
+    #endregion
+
+    #region ShipItemPlacing
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ItemTool), nameof(ItemTool.UpdateIsDroppable))]
+    public static bool DropItemsInShip(ItemTool __instance, out RaycastHit hit, out OWRigidbody targetRigidbody, out IItemDropTarget dropTarget, ref bool __result)
+    {
+
+        hit = default(RaycastHit);
+        targetRigidbody = null;
+        dropTarget = null;
+
+        if (!ShipEnhancements.Instance.ShipItemPlacementEnabled) return true;
+
+        PlayerCharacterController playerController = Locator.GetPlayerController();
+        if (!playerController.IsGrounded() || PlayerState.IsAttached()/* || PlayerState.IsInsideShip()*/)
+        {
+            __result = false;
+            return false;
+        }
+        if (__instance._heldItem != null && !__instance._heldItem.CheckIsDroppable())
+        {
+            __result = false;
+            return false;
+        }
+        if (playerController.GetRelativeGroundVelocity().sqrMagnitude >= playerController.GetRunSpeedMagnitude() * playerController.GetRunSpeedMagnitude())
+        {
+            __result = false;
+            return false;
+        }
+        Vector3 forward = Locator.GetPlayerTransform().forward;
+        Vector3 forward2 = Locator.GetPlayerCamera().transform.forward;
+        float num = Vector3.Angle(forward, forward2);
+        float num2 = Mathf.InverseLerp(0f, 70f, num);
+        float num3 = 2.5f;
+        if (num2 <= 1f)
+        {
+            num3 = Mathf.Lerp(2.5f, 4f, num2);
+        }
+        if (Physics.Raycast(Locator.GetPlayerCamera().transform.position, forward2, out hit, num3, OWLayerMask.physicalMask | OWLayerMask.interactMask))
+        {
+            if (OWLayerMask.IsLayerInMask(hit.collider.gameObject.layer, OWLayerMask.interactMask))
+            {
+                __result = false;
+                return false;
+            }
+            if (Vector3.Angle(Locator.GetPlayerTransform().up, hit.normal) <= __instance._maxDroppableSlopeAngle)
+            {
+                IgnoreCollision component = hit.collider.GetComponent<IgnoreCollision>();
+                if (component == null || !component.PreventsItemDrop())
+                {
+                    targetRigidbody = hit.collider.GetAttachedOWRigidbody(false);
+                    /*if (targetRigidbody.gameObject.CompareTag("Ship"))
+                    {
+                        return false;
+                    }*/
+                    dropTarget = hit.collider.GetComponentInParent<IItemDropTarget>();
+                    __result = true;
+                    return false;
+                }
+            }
+        }
+        __result = false;
+        return false;
     }
     #endregion
 }

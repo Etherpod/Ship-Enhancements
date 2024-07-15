@@ -44,6 +44,10 @@ public static class SettingExtensions
         { Settings.disableSpaceAngularDrag, false },
         { Settings.disableRotationSpeedLimit, false },
         { Settings.gravityDirection, "Down" },
+        { Settings.disableScoutLauncher, false },
+        { Settings.enableScoutLauncherComponent, false },
+        { Settings.enableManualScoutRecall, false },
+        { Settings.enableShipItemPlacement, false },
     };
 
     public static string GetName(this Settings setting)

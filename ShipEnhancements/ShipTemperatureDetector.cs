@@ -10,6 +10,7 @@ public class ShipTemperatureDetector : MonoBehaviour
 {
     private List<TemperatureZone> _activeZones = [];
     private ShipHull[] _shipHulls;
+    private ShipHull _lastDamagedHull;
     private ShipComponent[] _shipComponents;
     private float _currentTemperature;
     private float _highTempCutoff = 50f;
@@ -120,7 +121,21 @@ public class ShipTemperatureDetector : MonoBehaviour
 
     private void HullTemperatureDamage()
     {
-        ShipHull targetHull = _shipHulls[UnityEngine.Random.Range(0, _shipHulls.Length)];
+        ShipHull[] validHulls;
+
+        if (_lastDamagedHull != null)
+        {
+            validHulls = _shipHulls.Where(hull =>
+            {
+                return hull != _lastDamagedHull;
+            }).ToArray();
+        }
+        else
+        {
+            validHulls = _shipHulls;
+        }
+
+        ShipHull targetHull = validHulls[UnityEngine.Random.Range(0, validHulls.Length)];
 
         targetHull._damaged = true;
         float damage = UnityEngine.Random.Range(0.03f, 0.15f) * ShipEnhancements.Instance.TemperatureDamageMultiplier;
@@ -137,6 +152,7 @@ public class ShipTemperatureDetector : MonoBehaviour
         {
             targetHull._damageEffect.SetEffectBlend(1f - targetHull._integrity);
         }
+        _lastDamagedHull = targetHull;
     }
 
     private void ComponentTemperatureDamage()

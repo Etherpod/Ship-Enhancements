@@ -84,7 +84,7 @@ public class ShipProbeLauncherEffects : MonoBehaviour
     {
         if (probe != _probe || ShipEnhancements.Instance.probeDestroyed) return;
 
-        if (componentDamaged || Locator.GetShipBody().GetComponent<ShipDamageController>().IsSystemFailed())
+        if (ShipEnhancements.Instance.ScoutLauncherDisabled || componentDamaged || Locator.GetShipBody().GetComponent<ShipDamageController>().IsSystemFailed())
         {
             _probe.Deactivate();
             ShipEnhancements.Instance.probeDestroyed = true;

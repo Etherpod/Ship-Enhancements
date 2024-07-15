@@ -55,6 +55,7 @@ public class ShipEnhancements : ModBehaviour
     public bool ScoutLauncherDisabled { get; private set; }
     public bool ScoutLauncherComponentEnabled { get; private set; }
     public bool ManualScoutRecallEnabled { get; private set; }
+    public bool ShipItemPlacementEnabled { get; private set; }
 
     private SettingsPresets.PresetName _currentPreset = (SettingsPresets.PresetName)(-1);
 
@@ -109,6 +110,7 @@ public class ShipEnhancements : ModBehaviour
         disableScoutLauncher,
         enableScoutLauncherComponent,
         enableManualScoutRecall,
+        enableShipItemPlacement,
     }
 
     private void Awake()
@@ -293,6 +295,7 @@ public class ShipEnhancements : ModBehaviour
         ScoutLauncherDisabled = (bool)Settings.disableScoutLauncher.GetValue();
         ScoutLauncherComponentEnabled = (bool)Settings.enableScoutLauncherComponent.GetValue();
         ManualScoutRecallEnabled = (bool)Settings.enableManualScoutRecall.GetValue();
+        ShipItemPlacementEnabled = (bool)Settings.enableShipItemPlacement.GetValue();
     }
 
     private IEnumerator InitializeShip()

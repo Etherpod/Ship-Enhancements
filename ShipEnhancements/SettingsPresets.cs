@@ -46,6 +46,7 @@ public static class SettingsPresets
         { "disableScoutLauncher", false },
         { "enableScoutLauncherComponent", false },
         { "enableManualScoutRecall", false },
+        { "enableShipItemPlacement", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -86,8 +87,9 @@ public static class SettingsPresets
         { "disableRotationSpeedLimit", false },
         { "gravityDirection", "Down" },
         { "disableScoutLauncher", false },
-        { "enableScoutLauncherComponent", false },
-        { "enableManualScoutRecall", false },
+        { "enableScoutLauncherComponent", true },
+        { "enableManualScoutRecall", true },
+        { "enableShipItemPlacement", false },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -130,6 +132,7 @@ public static class SettingsPresets
         { "disableScoutLauncher", false },
         { "enableScoutLauncherComponent", false },
         { "enableManualScoutRecall", false },
+        { "enableShipItemPlacement", true },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -170,8 +173,9 @@ public static class SettingsPresets
         { "disableRotationSpeedLimit", false },
         { "gravityDirection", "Down" },
         { "disableScoutLauncher", false },
-        { "enableScoutLauncherComponent", false },
+        { "enableScoutLauncherComponent", true },
         { "enableManualScoutRecall", false },
+        { "enableShipItemPlacement", false },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -214,6 +218,7 @@ public static class SettingsPresets
         { "disableScoutLauncher", false },
         { "enableScoutLauncherComponent", false },
         { "enableManualScoutRecall", false },
+        { "enableShipItemPlacement", true },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -243,7 +248,7 @@ public static class SettingsPresets
         { "gravityMultiplier", 0.2f },
         { "fuelTransferMultiplier", 2f },
         { "oxygenRefillMultiplier", 0.4f },
-        { "temperatureDamageMultiplier", 12f },
+        { "temperatureDamageMultiplier", 8f },
         { "temperatureResistanceMultiplier", 0.4f },
         { "enableAutoHatch", true },
         { "oxygenTankDrainMultiplier", 10f },
@@ -254,8 +259,9 @@ public static class SettingsPresets
         { "disableRotationSpeedLimit", false },
         { "gravityDirection", "Right" },
         { "disableScoutLauncher", false },
-        { "enableScoutLauncherComponent", false },
-        { "enableManualScoutRecall", false },
+        { "enableScoutLauncherComponent", true },
+        { "enableManualScoutRecall", true },
+        { "enableShipItemPlacement", false },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

@@ -238,6 +238,12 @@
       "value": false,
       "tooltip": "Automatically closes the hatch when you leave the ship."
     },
+    "enableShipItemPlacement": {
+      "title": "Enable Ship Item Placement",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Lets you drop items inside of the ship and live out your hoarding dreams."
+    },
     "enableGravityLandingGear": {
       "title": "Enable Gravity Landing Gear",
       "type": "toggle",
