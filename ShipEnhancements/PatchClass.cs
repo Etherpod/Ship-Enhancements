@@ -826,8 +826,8 @@ public class PatchClass
     [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.RetrieveProbe))]
     public static bool DisableProbeRetrieve(ProbeLauncher __instance, bool forcedRetrieval)
     {
-        if (!ShipEnhancements.Instance.ManualScoutRecallEnabled && !ShipEnhancements.Instance.ScoutLauncherComponentEnabled
-            && !ShipEnhancements.Instance.ScoutLauncherDisabled) return true;
+        if ((!ShipEnhancements.Instance.ManualScoutRecallEnabled && !ShipEnhancements.Instance.ScoutLauncherComponentEnabled
+            && !ShipEnhancements.Instance.ScoutLauncherDisabled) || (__instance.GetName() != ProbeLauncher.Name.Player && __instance.GetName() != ProbeLauncher.Name.Ship)) return true;
 
         if ((ShipEnhancements.Instance.ScoutLauncherDisabled && PlayerState.AtFlightConsole() && __instance.GetName() == ProbeLauncher.Name.Ship)
             || (ShipEnhancements.Instance.ManualScoutRecallEnabled && __instance.GetName() == ProbeLauncher.Name.Player && !ProbePickupVolume.canRetrieveProbe)
@@ -844,8 +844,9 @@ public class PatchClass
     [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.LaunchProbe))]
     public static bool DisableProbeLaunch(ProbeLauncher __instance)
     {
-        if (!ShipEnhancements.Instance.ManualScoutRecallEnabled && !ShipEnhancements.Instance.ScoutLauncherComponentEnabled 
-            && !ShipEnhancements.Instance.ScoutLauncherDisabled) return true;
+        if ((!ShipEnhancements.Instance.ManualScoutRecallEnabled && !ShipEnhancements.Instance.ScoutLauncherComponentEnabled 
+            && !ShipEnhancements.Instance.ScoutLauncherDisabled) 
+            || (__instance.GetName() != ProbeLauncher.Name.Player && __instance.GetName() != ProbeLauncher.Name.Ship)) return true;
 
         if ((ShipEnhancements.Instance.ScoutLauncherDisabled && PlayerState.AtFlightConsole())
             || (ShipEnhancements.Instance.ManualScoutRecallEnabled 
@@ -922,7 +923,8 @@ public class PatchClass
     [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.Update))]
     public static bool ShowConnectionLostNotification(ProbeLauncher __instance)
     {
-        if (!ShipEnhancements.Instance.ManualScoutRecallEnabled) return true;
+        if (!ShipEnhancements.Instance.ManualScoutRecallEnabled 
+            || (__instance.GetName() != ProbeLauncher.Name.Player && __instance.GetName() != ProbeLauncher.Name.Ship)) return true;
 
         PlayerTool_Update(__instance);
         __instance.enabled = true;
