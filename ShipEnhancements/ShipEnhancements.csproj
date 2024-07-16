@@ -39,4 +39,5 @@
   <ItemGroup>
     <Content Include="ShipEnhancements.csproj.user" />
   </ItemGroup>
+  <ProjectExtensions><VisualStudio><UserProperties default-config_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 </Project>

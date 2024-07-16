@@ -700,6 +700,14 @@ public class PatchClass
         }
         return true;
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(PlaneOffsetMarker), nameof(PlaneOffsetMarker.Awake))]
+    public static void HideMapOffsetMarker(PlaneOffsetMarker __instance)
+    {
+        __instance._lineColor = new Color(__instance._lineColor.r, __instance._lineColor.g, __instance._lineColor.b, 0f);
+        __instance._gridColor = new Color(__instance._gridColor.r, __instance._gridColor.g, __instance._gridColor.b, 0f);
+    }
     #endregion
 
     #region AutoHatch
