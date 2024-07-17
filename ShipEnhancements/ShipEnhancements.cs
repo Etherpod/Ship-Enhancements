@@ -23,6 +23,7 @@ public class ShipEnhancements : ModBehaviour
     public bool angularDragEnabled;
     public UITextType probeLauncherName { get; private set; }
     public bool probeDestroyed;
+    public ItemType portableCampfireType { get; private set; }
 
     public bool HeadlightsDisabled { get; private set; }
     public bool LandingCameraDisabled { get; private set; }
@@ -127,6 +128,7 @@ public class ShipEnhancements : ModBehaviour
         SettingsPresets.InitializePresets();
 
         probeLauncherName = EnumUtils.Create<UITextType>("ScoutLauncher");
+        portableCampfireType = EnumUtils.Create<ItemType>("PortableCampfire");
 
         LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
         {
@@ -314,6 +316,15 @@ public class ShipEnhancements : ModBehaviour
         materials.Add(material2);
         materials.Add(material3);
         GameObject.Find("Pointlight_HEA_ShipCockpit").GetComponent<LightmapController>()._materials = [.. materials];
+
+        Transform suppliesParent = Locator.GetShipTransform().Find("Module_Supplies");
+        GameObject portableCampfireSocket = LoadPrefab("Assets/ShipEnhancements/PortableCampfireSocket.prefab");
+        PortableCampfireSocket campfireSocket = Instantiate(portableCampfireSocket, suppliesParent).GetComponent<PortableCampfireSocket>();
+        GameObject portableCampfireItem = LoadPrefab("assets/ShipEnhancements/PortableCampfireItem.prefab");
+        AssetBundleUtilities.ReplaceShaders(portableCampfireItem);
+        PortableCampfireItem campfireItem = Instantiate(portableCampfireItem, suppliesParent).GetComponent<PortableCampfireItem>();
+        campfireSocket.SetCampfireItem(campfireItem);
+        
 
         _shipResources = Locator.GetShipBody().GetComponent<ShipResources>();
         _shipOxygen = Locator.GetShipBody().GetComponentInChildren<OxygenVolume>();
@@ -585,6 +596,16 @@ public class ShipEnhancements : ModBehaviour
     {
         return _shipOxygenDetector != null && _shipOxygenDetector.GetDetectOxygen() 
             && !Locator.GetShipDetector().GetComponent<ShipFluidDetector>().InFluidType(FluidVolume.Type.WATER);
+    }
+
+    public ShipResources GetShipResources()
+    {
+        return _shipResources;
+    }
+
+    public PlayerResources GetPlayerResources()
+    {
+        return _playerResources;
     }
 
     public void SetGravityLandingGearEnabled(bool enabled)

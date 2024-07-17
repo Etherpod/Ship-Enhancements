@@ -105,6 +105,143 @@ public class PatchClass
         }
         return false;
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Campfire), nameof(Campfire.StartSleeping))]
+    public static bool KeepHelmentOnWhenSleeping(Campfire __instance)
+    {
+        if (ShipEnhancements.Instance.GetPlayerResources().IsOxygenPresent() || !PlayerState.IsWearingSuit()) return true;
+
+        if (__instance.CheckUnequipToolWhileSleeping())
+        {
+            Locator.GetToolModeSwapper().UnequipTool();
+        }
+        __instance._attachPoint.AttachPlayer();
+        __instance._interactVolume.DisableInteraction();
+        Vector3 localPosition = Locator.GetPlayerTransform().localPosition;
+        Vector3 vector = new Vector3(localPosition.x, 0f, localPosition.z);
+        Vector3 vector2 = 2f * vector.normalized + Vector3.up;
+        __instance._attachPoint.SetAttachOffset(vector2);
+        if (__instance._lookUpWhileSleeping)
+        {
+            __instance._lockOnTargeting.LockOn(__instance.transform, Vector3.up * 10f, 1f, true, 1f);
+        }
+        else
+        {
+            __instance._lockOnTargeting.LockOn(__instance.transform, Vector3.up * 0.75f, 1f, true, 1f);
+        }
+        Locator.GetPlayerCamera().GetComponent<PlayerCameraEffectController>().CloseEyes(3f);
+        Locator.GetAudioMixer().MixSleepAtCampfire(3f);
+        Locator.GetPlayerAudioController().OnStartSleepingAtCampfire(__instance is DreamCampfire);
+        __instance._fastForwardStartTime = Time.timeSinceLevelLoad + 3f;
+        __instance._isPlayerSleeping = true;
+        Locator.GetPromptManager().AddScreenPrompt(__instance._wakePrompt, PromptPosition.Center, false);
+        __instance._sleepPrompt.SetVisibility(false);
+        __instance._wakePrompt.SetVisibility(false);
+        OWInput.ChangeInputMode(InputMode.None);
+        /*if (Locator.GetPlayerSuit().IsWearingSuit(true))
+        {
+            Locator.GetPlayerSuit().RemoveHelmet();
+        }*/
+        Locator.GetFlashlight().TurnOff(false);
+        GlobalMessenger<bool>.FireEvent("StartSleepingAtCampfire", __instance is DreamCampfire);
+
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Campfire), nameof(Campfire.StopSleeping))]
+    public static bool KeepHelmetOnWhenStopSleeping(Campfire __instance, bool sudden)
+    {
+        if (!Locator.GetPlayerSuit().IsWearingHelmet()
+            && (ShipEnhancements.Instance.GetPlayerResources().IsOxygenPresent() || !PlayerState.IsWearingSuit())) return true;
+
+        if (!__instance._isPlayerSleeping)
+        {
+            return false;
+        }
+        if (__instance._isTimeFastForwarding)
+        {
+            __instance.StopFastForwarding();
+        }
+        __instance._attachPoint.DetachPlayer();
+        __instance._lockOnTargeting.BreakLock();
+        __instance._interactVolume.EnableInteraction();
+        if (__instance._lookUpWhileSleeping || PlayerState.InZeroG())
+        {
+            Locator.GetPlayerCamera().GetComponent<PlayerCameraController>().CenterCamera(50f, true);
+        }
+        Locator.GetPlayerCamera().GetComponent<PlayerCameraEffectController>().OpenEyes(1f, sudden);
+        Locator.GetAudioMixer().UnmixSleepAtCampfire(sudden ? 1f : 3f);
+        Locator.GetPlayerAudioController().OnStopSleepingAtCampfire(sudden || Time.timeSinceLevelLoad - __instance._fastForwardStartTime > 60f, sudden);
+        __instance._isPlayerSleeping = false;
+        Locator.GetPromptManager().RemoveScreenPrompt(__instance._wakePrompt);
+        OWInput.ChangeInputMode(InputMode.Character);
+        /*if (Locator.GetPlayerSuit().IsWearingSuit(true))
+        {
+            Locator.GetPlayerSuit().PutOnHelmetAfterDelay(2f);
+        }*/
+        __instance.OnStopSleeping();
+        GlobalMessenger.FireEvent("StopSleepingAtCampfire");
+
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Campfire), nameof(Campfire.StartRoasting))]
+    public static bool KeepHelmetOnWhenRoasting(Campfire __instance)
+    {
+        if (ShipEnhancements.Instance.GetPlayerResources().IsOxygenPresent() || !PlayerState.IsWearingSuit()) return true;
+
+        Locator.GetToolModeSwapper().UnequipTool();
+        __instance._attachPoint.AttachPlayer();
+        Vector3 localPosition = Locator.GetPlayerTransform().localPosition;
+        Vector3 vector = new Vector3(localPosition.x, 0f, localPosition.z);
+        Vector3 vector2 = 2f * vector.normalized + Vector3.up;
+        __instance._attachPoint.SetAttachOffset(vector2);
+        Vector3 vector3 = Vector3.up * 0.75f;
+        __instance._lockOnTargeting.LockOn(__instance.transform, vector3, 1f, true, 1f);
+        __instance._isPlayerRoasting = true;
+        GlobalMessenger<Campfire>.FireEvent("EnterRoastingMode", __instance);
+        /*if (Locator.GetPlayerSuit().IsWearingSuit(true))
+        {
+            Locator.GetPlayerSuit().RemoveHelmet();
+        }*/
+        if (__instance._canSleepHere)
+        {
+            __instance._sleepPrompt.SetVisibility(false);
+        }
+
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Campfire), nameof(Campfire.StopRoasting))]
+    public static bool KeepHelmetOnWhenStopRoasting(Campfire __instance)
+    {
+        if (!Locator.GetPlayerSuit().IsWearingHelmet() 
+            && (ShipEnhancements.Instance.GetPlayerResources().IsOxygenPresent() || !PlayerState.IsWearingSuit())) return true;
+
+        if (!__instance._isPlayerRoasting)
+        {
+            return false;
+        }
+        __instance._attachPoint.DetachPlayer();
+        __instance._lockOnTargeting.BreakLock();
+        __instance._interactVolume.ResetInteraction();
+        if (PlayerState.InZeroG())
+        {
+            Locator.GetPlayerCamera().GetComponent<PlayerCameraController>().CenterCamera(50f, true);
+        }
+        __instance._isPlayerRoasting = false;
+        GlobalMessenger.FireEvent("ExitRoastingMode");
+        /*if (Locator.GetPlayerSuit().IsWearingSuit(true))
+        {
+            Locator.GetPlayerSuit().PutOnHelmet();
+        }*/
+
+        return false;
+    }
     #endregion
 
     #region DisableGravity
@@ -1054,6 +1191,119 @@ public class PatchClass
         }
         __result = false;
         return false;
+    }
+    #endregion
+
+    #region PortableCampfire
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(Campfire), nameof(Campfire.Update))]
+    public static void SetExtinguishPromptVisibility(Campfire __instance)
+    {
+        PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
+        if (campfire)
+        {
+            campfire.extinguishPrompt.SetVisibility(false);
+            campfire.packUpPrompt.SetVisibility(false);
+            if (campfire._interactVolumeFocus && !campfire._isPlayerSleeping 
+                && !campfire._isPlayerRoasting && OWInput.IsInputMode(InputMode.Character))
+            {
+                if (campfire.extinguished)
+                {
+                    campfire.packUpPrompt.SetVisibility(true);
+                    if (OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.All))
+                    {
+                        campfire.PackUp();
+                    }
+                }
+                else
+                {
+                    campfire.extinguishPrompt.SetVisibility(true);
+                    if (OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.All))
+                    {
+                        campfire.SetState(Campfire.State.UNLIT);
+                    }
+                }
+            }
+            campfire.UpdateCampfire();
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(Campfire), nameof(Campfire.OnGainFocus))]
+    public static void AddExtinguishPrompt(Campfire __instance)
+    {
+        PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
+        if (campfire)
+        {
+            if (campfire.extinguished)
+            {
+                Locator.GetPromptManager().AddScreenPrompt(campfire.packUpPrompt, PromptPosition.Center, false);
+            }
+            else
+            {
+                Locator.GetPromptManager().AddScreenPrompt(campfire.extinguishPrompt, PromptPosition.Center, false);
+            }
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(Campfire), nameof(Campfire.OnLoseFocus))]
+    public static void RemoveExtinguishPrompt(Campfire __instance)
+    {
+        PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
+        if (campfire)
+        {
+            if (campfire.extinguished)
+            {
+                Locator.GetPromptManager().RemoveScreenPrompt(campfire.packUpPrompt, PromptPosition.Center);
+            }
+            else
+            {
+                Locator.GetPromptManager().RemoveScreenPrompt(campfire.extinguishPrompt, PromptPosition.Center);
+            }
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(Campfire), nameof(Campfire.StartRoasting))]
+    public static void RemoveExtinguishPromptWhenRoasting(Campfire __instance)
+    {
+        PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
+        if (campfire)
+        {
+            campfire.extinguishPrompt.SetVisibility(false);
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(Campfire), nameof(Campfire.StartRoasting))]
+    public static void AddExtinguishPromptWhenStopRoasting(Campfire __instance)
+    {
+        PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
+        if (campfire)
+        {
+            campfire.extinguishPrompt.SetVisibility(true);
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(Campfire), nameof(Campfire.SetState))]
+    public static void UpdateExtinguished(Campfire __instance, Campfire.State newState)
+    {
+        PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
+        if (campfire)
+        {
+            if (newState == Campfire.State.UNLIT)
+            {
+                campfire.extinguished = true;
+                Locator.GetPromptManager().RemoveScreenPrompt(campfire.extinguishPrompt, PromptPosition.Center);
+            }
+            else
+            {
+                campfire.extinguished = false;
+                Locator.GetPromptManager().AddScreenPrompt(campfire.extinguishPrompt, PromptPosition.Center, false);
+            }
+        }
     }
     #endregion
 }
