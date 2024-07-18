@@ -278,6 +278,12 @@
       "type": "toggle",
       "value": false,
       "tooltip": "Damages the ship components over time in extremely high or low temperatures."
+    },
+    "addPortableCampfire": {
+      "title": "Add Portable Campfire",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Adds a portable campfire to the ship near your suit. Unpack it anywhere you'd like and roast a marshmallow!"
     }
   }
 }

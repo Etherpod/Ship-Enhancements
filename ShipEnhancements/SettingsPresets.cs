@@ -47,6 +47,7 @@ public static class SettingsPresets
         { "enableScoutLauncherComponent", false },
         { "enableManualScoutRecall", false },
         { "enableShipItemPlacement", false },
+        { "addPortableCampfire", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -90,6 +91,7 @@ public static class SettingsPresets
         { "enableScoutLauncherComponent", true },
         { "enableManualScoutRecall", true },
         { "enableShipItemPlacement", false },
+        { "addPortableCampfire", false },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -133,6 +135,7 @@ public static class SettingsPresets
         { "enableScoutLauncherComponent", false },
         { "enableManualScoutRecall", false },
         { "enableShipItemPlacement", true },
+        { "addPortableCampfire", true },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -176,6 +179,7 @@ public static class SettingsPresets
         { "enableScoutLauncherComponent", true },
         { "enableManualScoutRecall", false },
         { "enableShipItemPlacement", false },
+        { "addPortableCampfire", false },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -219,6 +223,7 @@ public static class SettingsPresets
         { "enableScoutLauncherComponent", false },
         { "enableManualScoutRecall", false },
         { "enableShipItemPlacement", true },
+        { "addPortableCampfire", true },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -262,6 +267,7 @@ public static class SettingsPresets
         { "enableScoutLauncherComponent", true },
         { "enableManualScoutRecall", true },
         { "enableShipItemPlacement", false },
+        { "addPortableCampfire", false },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

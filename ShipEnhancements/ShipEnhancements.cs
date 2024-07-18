@@ -57,6 +57,7 @@ public class ShipEnhancements : ModBehaviour
     public bool ScoutLauncherComponentEnabled { get; private set; }
     public bool ManualScoutRecallEnabled { get; private set; }
     public bool ShipItemPlacementEnabled { get; private set; }
+    public bool PortableCampfireEnabled { get; private set; }
 
     private SettingsPresets.PresetName _currentPreset = (SettingsPresets.PresetName)(-1);
 
@@ -112,6 +113,7 @@ public class ShipEnhancements : ModBehaviour
         enableScoutLauncherComponent,
         enableManualScoutRecall,
         enableShipItemPlacement,
+        addPortableCampfire,
     }
 
     private void Awake()
@@ -298,6 +300,7 @@ public class ShipEnhancements : ModBehaviour
         ScoutLauncherComponentEnabled = (bool)Settings.enableScoutLauncherComponent.GetValue();
         ManualScoutRecallEnabled = (bool)Settings.enableManualScoutRecall.GetValue();
         ShipItemPlacementEnabled = (bool)Settings.enableShipItemPlacement.GetValue();
+        PortableCampfireEnabled = (bool)Settings.addPortableCampfire.GetValue();
     }
 
     private IEnumerator InitializeShip()
@@ -316,15 +319,6 @@ public class ShipEnhancements : ModBehaviour
         materials.Add(material2);
         materials.Add(material3);
         GameObject.Find("Pointlight_HEA_ShipCockpit").GetComponent<LightmapController>()._materials = [.. materials];
-
-        Transform suppliesParent = Locator.GetShipTransform().Find("Module_Supplies");
-        GameObject portableCampfireSocket = LoadPrefab("Assets/ShipEnhancements/PortableCampfireSocket.prefab");
-        PortableCampfireSocket campfireSocket = Instantiate(portableCampfireSocket, suppliesParent).GetComponent<PortableCampfireSocket>();
-        GameObject portableCampfireItem = LoadPrefab("assets/ShipEnhancements/PortableCampfireItem.prefab");
-        AssetBundleUtilities.ReplaceShaders(portableCampfireItem);
-        PortableCampfireItem campfireItem = Instantiate(portableCampfireItem, suppliesParent).GetComponent<PortableCampfireItem>();
-        campfireSocket.SetCampfireItem(campfireItem);
-        
 
         _shipResources = Locator.GetShipBody().GetComponent<ShipResources>();
         _shipOxygen = Locator.GetShipBody().GetComponentInChildren<OxygenVolume>();
@@ -470,6 +464,16 @@ public class ShipEnhancements : ModBehaviour
             component._damaged = true;
             component._repairFraction = 0f;
             component.OnComponentDamaged();
+        }
+        if ((bool)Settings.addPortableCampfire.GetValue())
+        {
+            Transform suppliesParent = Locator.GetShipTransform().Find("Module_Supplies");
+            GameObject portableCampfireSocket = LoadPrefab("Assets/ShipEnhancements/PortableCampfireSocket.prefab");
+            PortableCampfireSocket campfireSocket = Instantiate(portableCampfireSocket, suppliesParent).GetComponent<PortableCampfireSocket>();
+            GameObject portableCampfireItem = LoadPrefab("assets/ShipEnhancements/PortableCampfireItem.prefab");
+            AssetBundleUtilities.ReplaceShaders(portableCampfireItem);
+            PortableCampfireItem campfireItem = Instantiate(portableCampfireItem, suppliesParent).GetComponent<PortableCampfireItem>();
+            campfireSocket.SetCampfireItem(campfireItem);
         }
     }
 

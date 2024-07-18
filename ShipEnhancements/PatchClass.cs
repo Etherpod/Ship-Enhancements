@@ -1,10 +1,6 @@
 ﻿using System;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using HarmonyLib;
-using OWML.Common;
-using OWML.ModHelper;
-using OWML.ModHelper.Menus;
 using UnityEngine;
 
 namespace ShipEnhancements;
@@ -1199,6 +1195,8 @@ public class PatchClass
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.Update))]
     public static void SetExtinguishPromptVisibility(Campfire __instance)
     {
+        if (!ShipEnhancements.Instance.PortableCampfireEnabled) return;
+
         PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
         if (campfire)
         {
@@ -1232,6 +1230,8 @@ public class PatchClass
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.OnGainFocus))]
     public static void AddExtinguishPrompt(Campfire __instance)
     {
+        if (!ShipEnhancements.Instance.PortableCampfireEnabled) return;
+
         PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
         if (campfire)
         {
@@ -1250,6 +1250,8 @@ public class PatchClass
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.OnLoseFocus))]
     public static void RemoveExtinguishPrompt(Campfire __instance)
     {
+        if (!ShipEnhancements.Instance.PortableCampfireEnabled) return;
+
         PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
         if (campfire)
         {
@@ -1268,6 +1270,8 @@ public class PatchClass
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.StartRoasting))]
     public static void RemoveExtinguishPromptWhenRoasting(Campfire __instance)
     {
+        if (!ShipEnhancements.Instance.PortableCampfireEnabled) return;
+
         PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
         if (campfire)
         {
@@ -1279,6 +1283,8 @@ public class PatchClass
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.StartRoasting))]
     public static void AddExtinguishPromptWhenStopRoasting(Campfire __instance)
     {
+        if (!ShipEnhancements.Instance.PortableCampfireEnabled) return;
+
         PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
         if (campfire)
         {
@@ -1290,6 +1296,8 @@ public class PatchClass
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.SetState))]
     public static void UpdateExtinguished(Campfire __instance, Campfire.State newState)
     {
+        if (!ShipEnhancements.Instance.PortableCampfireEnabled) return;
+
         PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
         if (campfire)
         {
