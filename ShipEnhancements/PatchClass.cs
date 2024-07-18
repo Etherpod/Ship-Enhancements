@@ -44,7 +44,7 @@ public class PatchClass
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.OnPressInteract))]
     public static bool KeepHelmetOnAtCockpit(ShipCockpitController __instance)
     {
-        if (!ShipEnhancements.Instance.oxygenDepleted) return true;
+        if (!ShipEnhancements.Instance.KeepHelmetOn || !ShipEnhancements.Instance.oxygenDepleted) return true;
 
         if (!__instance._playerAtFlightConsole)
         {
@@ -106,7 +106,7 @@ public class PatchClass
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.StartSleeping))]
     public static bool KeepHelmentOnWhenSleeping(Campfire __instance)
     {
-        if (ShipEnhancements.Instance.GetPlayerResources().IsOxygenPresent() || !PlayerState.IsWearingSuit()) return true;
+        if (!ShipEnhancements.Instance.KeepHelmetOn || ShipEnhancements.Instance.GetPlayerResources().IsOxygenPresent() || !PlayerState.IsWearingSuit()) return true;
 
         if (__instance.CheckUnequipToolWhileSleeping())
         {
@@ -149,8 +149,8 @@ public class PatchClass
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.StopSleeping))]
     public static bool KeepHelmetOnWhenStopSleeping(Campfire __instance, bool sudden)
     {
-        if (!Locator.GetPlayerSuit().IsWearingHelmet()
-            && (ShipEnhancements.Instance.GetPlayerResources().IsOxygenPresent() || !PlayerState.IsWearingSuit())) return true;
+        if (!ShipEnhancements.Instance.KeepHelmetOn || (!Locator.GetPlayerSuit().IsWearingHelmet()
+            && (ShipEnhancements.Instance.GetPlayerResources().IsOxygenPresent() || !PlayerState.IsWearingSuit()))) return true;
 
         if (!__instance._isPlayerSleeping)
         {
@@ -187,7 +187,7 @@ public class PatchClass
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.StartRoasting))]
     public static bool KeepHelmetOnWhenRoasting(Campfire __instance)
     {
-        if (ShipEnhancements.Instance.GetPlayerResources().IsOxygenPresent() || !PlayerState.IsWearingSuit()) return true;
+        if (!ShipEnhancements.Instance.KeepHelmetOn || ShipEnhancements.Instance.GetPlayerResources().IsOxygenPresent() || !PlayerState.IsWearingSuit()) return true;
 
         Locator.GetToolModeSwapper().UnequipTool();
         __instance._attachPoint.AttachPlayer();
@@ -215,8 +215,8 @@ public class PatchClass
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.StopRoasting))]
     public static bool KeepHelmetOnWhenStopRoasting(Campfire __instance)
     {
-        if (!Locator.GetPlayerSuit().IsWearingHelmet() 
-            && (ShipEnhancements.Instance.GetPlayerResources().IsOxygenPresent() || !PlayerState.IsWearingSuit())) return true;
+        if (!ShipEnhancements.Instance.KeepHelmetOn || (!Locator.GetPlayerSuit().IsWearingHelmet() 
+            && (ShipEnhancements.Instance.GetPlayerResources().IsOxygenPresent() || !PlayerState.IsWearingSuit()))) return true;
 
         if (!__instance._isPlayerRoasting)
         {
@@ -1280,7 +1280,7 @@ public class PatchClass
     }
 
     [HarmonyPostfix]
-    [HarmonyPatch(typeof(Campfire), nameof(Campfire.StartRoasting))]
+    [HarmonyPatch(typeof(Campfire), nameof(Campfire.StopRoasting))]
     public static void AddExtinguishPromptWhenStopRoasting(Campfire __instance)
     {
         if (!ShipEnhancements.Instance.PortableCampfireEnabled) return;

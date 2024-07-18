@@ -284,6 +284,23 @@
       "type": "toggle",
       "value": false,
       "tooltip": "Adds a portable campfire to the ship near your suit. Unpack it anywhere you'd like and roast a marshmallow!"
+    },
+
+    "Quality of Life": {
+      "type": "separator"
+    },
+
+    "keepHelmetOn": {
+      "title": "Keep Helmet On",
+      "type": "toggle",
+      "value": true,
+      "tooltip": "Prevents the game from removing your helmet while doing specific actions if there isn't oxygen present."
+    },
+    "showWarningNotifications": {
+      "title": "Show Warning Notifications",
+      "type": "toggle",
+      "value": true,
+      "tooltip": "Notifies you in the ship about various things, such as your fuel or oxygen being low."
     }
   }
 }

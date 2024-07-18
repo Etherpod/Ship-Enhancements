@@ -58,19 +58,32 @@ public class ShipEnhancements : ModBehaviour
     public bool ManualScoutRecallEnabled { get; private set; }
     public bool ShipItemPlacementEnabled { get; private set; }
     public bool PortableCampfireEnabled { get; private set; }
+    public bool KeepHelmetOn { get; private set; }
+    public bool ShowWarningNotifications { get; private set; }
 
     private SettingsPresets.PresetName _currentPreset = (SettingsPresets.PresetName)(-1);
 
     private AssetBundle _shipEnhancementsBundle;
     private float _lastSuitOxygen;
     private float _lastShipOxygen;
+    private float _lastShipFuel;
     private bool _startOxygenRefill = false;
     private bool _shipLoaded = false;
+    private bool _oxygenLow = false;
+    private bool _oxygenCritical = false;
+    private bool _fuelLow = false;
+    private bool _fuelCritical = false;
     private OxygenDetector _shipOxygenDetector;
     private ShipResources _shipResources;
     private OxygenVolume _shipOxygen;
     private PlayerResources _playerResources;
     private NotificationData _oxygenDepletedNotification = new NotificationData(NotificationTarget.Ship, "SHIP OXYGEN DEPLETED", 5f, true);
+    private NotificationData _oxygenLowNotification = new NotificationData(NotificationTarget.Ship, "SHIP OXYGEN LOW", 5f, true);
+    private NotificationData _oxygenCriticalNotification = new NotificationData(NotificationTarget.Ship, "SHIP OXYGEN CRITICAL", 5f, true);
+    private NotificationData _fuelLowNotification = new NotificationData(NotificationTarget.Ship, "SHIP FUEL LOW", 5f, true);
+    private NotificationData _fuelCriticalNotification = new NotificationData(NotificationTarget.Ship, "SHIP FUEL CRITICAL", 5f, true);
+    private NotificationData _spinSpeedLowNotification = new NotificationData(NotificationTarget.Ship, "HULL INTEGRITY LOW", 5f, true);
+    private NotificationData _spinSpeedCriticalNotification = new NotificationData(NotificationTarget.Ship, "HULL INTEGRITY CRITICAL", 5f, true);
 
     public enum Settings
     {
@@ -114,6 +127,8 @@ public class ShipEnhancements : ModBehaviour
         enableManualScoutRecall,
         enableShipItemPlacement,
         addPortableCampfire,
+        keepHelmetOn,
+        showWarningNotifications,
     }
 
     private void Awake()
@@ -142,6 +157,10 @@ public class ShipEnhancements : ModBehaviour
             fuelDepleted = false;
             angularDragEnabled = false;
             _startOxygenRefill = false;
+            _oxygenLow = false;
+            _oxygenCritical = false;
+            _fuelLow = false;
+            _fuelCritical = false;
             probeDestroyed = false;
 
             StartCoroutine(InitializeShip());
@@ -183,7 +202,7 @@ public class ShipEnhancements : ModBehaviour
 
             if (PlayerState.IsInsideShip())
             {
-                if (PlayerState.IsWearingSuit() && !Locator.GetPlayerSuit().IsWearingHelmet())
+                if (KeepHelmetOn && PlayerState.IsWearingSuit() && !Locator.GetPlayerSuit().IsWearingHelmet())
                 {
                     Locator.GetPlayerSuit().PutOnHelmet();
                 }
@@ -217,23 +236,6 @@ public class ShipEnhancements : ModBehaviour
             }
         }
 
-        if (ShipOxygenRefill)
-        {
-            if (!_startOxygenRefill && _shipResources._currentOxygen > _lastShipOxygen)
-            {
-                _startOxygenRefill = true;
-                string text = "REFILLING OXYGEN TANK";
-                NotificationData notificationData = new NotificationData(NotificationTarget.Ship, text, 3f, true);
-                NotificationManager.SharedInstance.PostNotification(notificationData, false);
-            }
-            else if (_startOxygenRefill && _shipResources._currentOxygen < _lastShipOxygen && _shipResources._currentOxygen / _shipResources._maxOxygen < 0.99f)
-            {
-                _startOxygenRefill = false;
-            }
-
-            _lastShipOxygen = _shipResources._currentOxygen;
-        }
-
         if (!fuelDepleted && _shipResources._currentFuel <= 0f)
         {
             fuelDepleted = true;
@@ -254,6 +256,14 @@ public class ShipEnhancements : ModBehaviour
                 fuelTank._damageEffect._particleAudioSource.Play();
             }
         }
+
+        if (ShowWarningNotifications)
+        {
+            UpdateNotifications();
+        }
+
+        _lastShipOxygen = _shipResources._currentOxygen;
+        _lastShipFuel = _shipResources._currentFuel;
     }
 
     private void LateUpdate()
@@ -301,6 +311,8 @@ public class ShipEnhancements : ModBehaviour
         ManualScoutRecallEnabled = (bool)Settings.enableManualScoutRecall.GetValue();
         ShipItemPlacementEnabled = (bool)Settings.enableShipItemPlacement.GetValue();
         PortableCampfireEnabled = (bool)Settings.addPortableCampfire.GetValue();
+        KeepHelmetOn = (bool)Settings.keepHelmetOn.GetValue();
+        ShowWarningNotifications = (bool)Settings.showWarningNotifications.GetValue();
     }
 
     private IEnumerator InitializeShip()
@@ -477,7 +489,7 @@ public class ShipEnhancements : ModBehaviour
         }
     }
 
-    private static void AddTemperatureZones()
+    private void AddTemperatureZones()
     {
         GameObject sun = GameObject.Find("Sun_Body");
         if (sun != null)
@@ -548,7 +560,75 @@ public class ShipEnhancements : ModBehaviour
         }
     }
 
-    private static void DisableHeadlights()
+    private void UpdateNotifications()
+    {
+        if (ShipOxygenRefill)
+        {
+            if (!_startOxygenRefill && _shipResources._currentOxygen > _lastShipOxygen)
+            {
+                _startOxygenRefill = true;
+                string text = "REFILLING OXYGEN TANK";
+                NotificationData notificationData = new NotificationData(NotificationTarget.Ship, text, 3f, true);
+                NotificationManager.SharedInstance.PostNotification(notificationData, false);
+            }
+            else if (_startOxygenRefill && _shipResources._currentOxygen < _lastShipOxygen && _shipResources._currentOxygen / _shipResources._maxOxygen < 0.99f)
+            {
+                _startOxygenRefill = false;
+            }
+        }
+
+        if (_shipResources._currentOxygen < _lastShipOxygen)
+        {
+            if (!_oxygenCritical && _shipResources.GetFractionalOxygen() < 0.15f)
+            {
+                _oxygenCritical = true;
+                NotificationManager.SharedInstance.PostNotification(_oxygenCriticalNotification, false);
+            }
+            else if (!_oxygenLow && _shipResources.GetFractionalOxygen() < 0.3f)
+            {
+                _oxygenLow = true;
+                NotificationManager.SharedInstance.PostNotification(_oxygenLowNotification, false);
+            }
+        }
+        else
+        {
+            if (_oxygenCritical && _shipResources.GetFractionalOxygen() > 0.15f)
+            {
+                _oxygenCritical = false;
+            }
+            else if (_oxygenLow && _shipResources.GetFractionalOxygen() > 0.3f)
+            {
+                _oxygenLow = false;
+            }
+        }
+
+        if (_shipResources._currentFuel < _lastShipFuel)
+        {
+            if (!_fuelCritical && _shipResources.GetFractionalFuel() < 0.15f)
+            {
+                _fuelCritical = true;
+                NotificationManager.SharedInstance.PostNotification(_fuelCriticalNotification, false);
+            }
+            else if (!_fuelLow && _shipResources.GetFractionalFuel() < 0.3f)
+            {
+                _fuelLow = true;
+                NotificationManager.SharedInstance.PostNotification(_fuelLowNotification, false);
+            }
+        }
+        else
+        {
+            if (_fuelCritical && _shipResources.GetFractionalFuel() > 0.15f)
+            {
+                _fuelCritical = false;
+            }
+            else if (_fuelLow && _shipResources.GetFractionalFuel() > 0.3f)
+            {
+                _fuelLow = false;
+            }
+        }
+    }
+
+    private void DisableHeadlights()
     {
         ShipHeadlightComponent headlightComponent = Locator.GetShipBody().GetComponentInChildren<ShipHeadlightComponent>();
         headlightComponent._repairReceiver.repairDistance = 0f;

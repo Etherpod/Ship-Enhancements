@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace ShipEnhancements;
+﻿namespace ShipEnhancements;
 
 public class PortableCampfireSocket : OWItemSocket
 {
