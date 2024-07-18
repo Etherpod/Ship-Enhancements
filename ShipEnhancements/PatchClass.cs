@@ -929,7 +929,7 @@ public class PatchClass
 
         if (ShipEnhancements.Instance.RotationSpeedLimitDisabled)
         {
-            __instance._owRigidbody.SetMaxAngularVelocity(20f);
+            __instance._owRigidbody.SetMaxAngularVelocity(25f);
         }
     }
 

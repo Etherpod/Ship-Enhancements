@@ -73,6 +73,9 @@ public class ShipEnhancements : ModBehaviour
     private bool _oxygenCritical = false;
     private bool _fuelLow = false;
     private bool _fuelCritical = false;
+    private bool _hullIntegrityLow = false;
+    private bool _hullIntegrityCritical = false;
+    private bool _shipDestroyed;
     private OxygenDetector _shipOxygenDetector;
     private ShipResources _shipResources;
     private OxygenVolume _shipOxygen;
@@ -80,10 +83,14 @@ public class ShipEnhancements : ModBehaviour
     private NotificationData _oxygenDepletedNotification = new NotificationData(NotificationTarget.Ship, "SHIP OXYGEN DEPLETED", 5f, true);
     private NotificationData _oxygenLowNotification = new NotificationData(NotificationTarget.Ship, "SHIP OXYGEN LOW", 5f, true);
     private NotificationData _oxygenCriticalNotification = new NotificationData(NotificationTarget.Ship, "SHIP OXYGEN CRITICAL", 5f, true);
+    private NotificationData _oxygenRefillingNotification = new NotificationData(NotificationTarget.Ship, "REFILLING OXYGEN TANK", 5f, true);
     private NotificationData _fuelLowNotification = new NotificationData(NotificationTarget.Ship, "SHIP FUEL LOW", 5f, true);
     private NotificationData _fuelCriticalNotification = new NotificationData(NotificationTarget.Ship, "SHIP FUEL CRITICAL", 5f, true);
-    private NotificationData _spinSpeedLowNotification = new NotificationData(NotificationTarget.Ship, "HULL INTEGRITY LOW", 5f, true);
+    private NotificationData _spinSpeedHighNotification = new NotificationData(NotificationTarget.Ship, "HULL INTEGRITY LOW", 5f, true);
     private NotificationData _spinSpeedCriticalNotification = new NotificationData(NotificationTarget.Ship, "HULL INTEGRITY CRITICAL", 5f, true);
+    private float _levelOneSpinSpeed = 8f;
+    private float _levelTwoSpinSpeed = 16f;
+    private float _maxSpinSpeed = 24f;
 
     public enum Settings
     {
@@ -153,6 +160,7 @@ public class ShipEnhancements : ModBehaviour
 
             GlobalMessenger.AddListener("SuitUp", OnPlayerSuitUp);
             GlobalMessenger.AddListener("RemoveSuit", OnPlayerRemoveSuit);
+            GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
             oxygenDepleted = false;
             fuelDepleted = false;
             angularDragEnabled = false;
@@ -162,6 +170,7 @@ public class ShipEnhancements : ModBehaviour
             _fuelLow = false;
             _fuelCritical = false;
             probeDestroyed = false;
+            _shipDestroyed = false;
 
             StartCoroutine(InitializeShip());
         };
@@ -174,6 +183,7 @@ public class ShipEnhancements : ModBehaviour
             UpdateProperties();
             GlobalMessenger.RemoveListener("SuitUp", OnPlayerSuitUp);
             GlobalMessenger.RemoveListener("RemoveSuit", OnPlayerRemoveSuit);
+            GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
             if ((bool)Settings.disableSpaceAngularDrag.GetValue())
             {
                 Locator.GetShipDetector().GetComponent<ShipFluidDetector>().OnEnterFluid -= OnEnterFluid;
@@ -192,7 +202,24 @@ public class ShipEnhancements : ModBehaviour
 
     private void Update()
     {
-        if (!_shipLoaded || LoadManager.GetCurrentScene() != OWScene.SolarSystem) return;
+        if (!_shipLoaded || LoadManager.GetCurrentScene() != OWScene.SolarSystem || _shipDestroyed) return;
+
+        if (Locator.GetShipBody().GetAngularVelocity().sqrMagnitude > _maxSpinSpeed * _maxSpinSpeed)
+        {
+            ShipOxygenTankComponent oxygenTank = Locator.GetShipBody().GetComponentInChildren<ShipOxygenTankComponent>();
+            if (oxygenTank.isDamaged)
+            {
+                oxygenTank._damageEffect._particleSystem.Stop();
+                oxygenTank._damageEffect._particleAudioSource.Stop();
+            }
+            ShipFuelTankComponent fuelTank = Locator.GetShipBody().GetComponentInChildren<ShipFuelTankComponent>();
+            if (fuelTank.isDamaged)
+            {
+                fuelTank._damageEffect._particleSystem.Stop();
+                fuelTank._damageEffect._particleAudioSource.Stop();
+            }
+            Locator.GetShipBody().GetComponent<ShipDamageController>().Explode();
+        }
 
         if (!oxygenDepleted && _shipResources.GetOxygen() <= 0 && !(ShipOxygenRefill && IsShipInOxygen()))
         {
@@ -257,7 +284,7 @@ public class ShipEnhancements : ModBehaviour
             }
         }
 
-        if (ShowWarningNotifications)
+        if (ShowWarningNotifications && !_shipDestroyed)
         {
             UpdateNotifications();
         }
@@ -567,9 +594,7 @@ public class ShipEnhancements : ModBehaviour
             if (!_startOxygenRefill && _shipResources._currentOxygen > _lastShipOxygen)
             {
                 _startOxygenRefill = true;
-                string text = "REFILLING OXYGEN TANK";
-                NotificationData notificationData = new NotificationData(NotificationTarget.Ship, text, 3f, true);
-                NotificationManager.SharedInstance.PostNotification(notificationData, false);
+                NotificationManager.SharedInstance.PostNotification(_oxygenRefillingNotification, false);
             }
             else if (_startOxygenRefill && _shipResources._currentOxygen < _lastShipOxygen && _shipResources._currentOxygen / _shipResources._maxOxygen < 0.99f)
             {
@@ -626,6 +651,26 @@ public class ShipEnhancements : ModBehaviour
                 _fuelLow = false;
             }
         }
+        
+        if (!_hullIntegrityCritical && Locator.GetShipBody().GetAngularVelocity().sqrMagnitude > _levelTwoSpinSpeed * _levelTwoSpinSpeed)
+        {
+            _hullIntegrityCritical = true;
+            NotificationManager.SharedInstance.PostNotification(_spinSpeedCriticalNotification, false);
+        }
+        else if (_hullIntegrityCritical && Locator.GetShipBody().GetAngularVelocity().sqrMagnitude < _levelTwoSpinSpeed * _levelTwoSpinSpeed)
+        {
+            _hullIntegrityCritical = false;
+        }
+
+        if (!_hullIntegrityLow && Locator.GetShipBody().GetAngularVelocity().sqrMagnitude > _levelOneSpinSpeed * _levelOneSpinSpeed)
+        {
+            _hullIntegrityLow = true;
+            NotificationManager.SharedInstance.PostNotification(_spinSpeedHighNotification, false);
+        }
+        else if (_hullIntegrityLow && Locator.GetShipBody().GetAngularVelocity().sqrMagnitude < _levelOneSpinSpeed * _levelOneSpinSpeed)
+        {
+            _hullIntegrityLow = false;
+        }
     }
 
     private void DisableHeadlights()
@@ -678,7 +723,7 @@ public class ShipEnhancements : ModBehaviour
 
     public bool IsShipInOxygen()
     {
-        return _shipOxygenDetector != null && _shipOxygenDetector.GetDetectOxygen() 
+        return !_shipDestroyed && _shipOxygenDetector != null && _shipOxygenDetector.GetDetectOxygen()
             && !Locator.GetShipDetector().GetComponent<ShipFluidDetector>().InFluidType(FluidVolume.Type.WATER);
     }
 
@@ -737,6 +782,12 @@ public class ShipEnhancements : ModBehaviour
         hatchController._interactVolume.DisableInteraction();
         hatchController.GetComponent<SphereShape>().radius = 3.5f;
         hatchController.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+    }
+
+    private void OnShipSystemFailure()
+    {
+        _shipDestroyed = true;
+        Locator.GetShipBody().SetCenterOfMass(Locator.GetShipBody().GetWorldCenterOfMass());
     }
 
     public static void WriteDebugMessage(object msg, bool warning = false, bool error = false)
