@@ -60,6 +60,7 @@ public class ShipEnhancements : ModBehaviour
     public bool PortableCampfireEnabled { get; private set; }
     public bool KeepHelmetOn { get; private set; }
     public bool ShowWarningNotifications { get; private set; }
+    public float ShipExplosionMultiplier { get; private set; }
 
     private SettingsPresets.PresetName _currentPreset = (SettingsPresets.PresetName)(-1);
 
@@ -136,6 +137,7 @@ public class ShipEnhancements : ModBehaviour
         addPortableCampfire,
         keepHelmetOn,
         showWarningNotifications,
+        shipExplosionMultiplier,
     }
 
     private void Awake()
@@ -340,6 +342,7 @@ public class ShipEnhancements : ModBehaviour
         PortableCampfireEnabled = (bool)Settings.addPortableCampfire.GetValue();
         KeepHelmetOn = (bool)Settings.keepHelmetOn.GetValue();
         ShowWarningNotifications = (bool)Settings.showWarningNotifications.GetValue();
+        ShipExplosionMultiplier = (float)Settings.shipExplosionMultiplier.GetValue();
     }
 
     private IEnumerator InitializeShip()
@@ -513,6 +516,30 @@ public class ShipEnhancements : ModBehaviour
             AssetBundleUtilities.ReplaceShaders(portableCampfireItem);
             PortableCampfireItem campfireItem = Instantiate(portableCampfireItem, suppliesParent).GetComponent<PortableCampfireItem>();
             campfireSocket.SetCampfireItem(campfireItem);
+        }
+        if ((float)Settings.shipExplosionMultiplier.GetValue() != 1f)
+        {
+            Transform effectsTransform = Locator.GetShipTransform().Find("Effects");
+            ExplosionController explosion = effectsTransform.GetComponentInChildren<ExplosionController>();
+            explosion._length *= ((float)Settings.shipExplosionMultiplier.GetValue() * 0.75f) + 0.25f;
+            explosion._forceVolume._acceleration *= ((float)Settings.shipExplosionMultiplier.GetValue() * 0.25f) + 0.75f;
+            explosion.transform.localScale *= (float)Settings.shipExplosionMultiplier.GetValue();
+            explosion.GetComponent<SphereCollider>().radius = 0.1f;
+            OWAudioSource audio = effectsTransform.Find("ExplosionAudioSource").GetComponent<OWAudioSource>();
+            audio.maxDistance *= ((float)Settings.shipExplosionMultiplier.GetValue() * 0.1f) + 0.9f;
+            AnimationCurve curve = audio.GetCustomCurve(AudioSourceCurveType.CustomRolloff);
+            Keyframe[] newKeys = new Keyframe[curve.keys.Length];
+            for (int i = 0; i < curve.keys.Length; i++)
+            {
+                newKeys[i] = curve.keys[i];
+                newKeys[i].value *= ((float)Settings.shipExplosionMultiplier.GetValue() * 0.1f) + 0.9f;
+            }
+            AnimationCurve newCurve = new();
+            foreach (Keyframe key in newKeys)
+            {
+                newCurve.AddKey(key);
+            }
+            audio.SetCustomCurve(AudioSourceCurveType.CustomRolloff, newCurve);
         }
     }
 

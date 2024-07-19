@@ -48,6 +48,10 @@ public static class SettingExtensions
         { Settings.enableScoutLauncherComponent, false },
         { Settings.enableManualScoutRecall, false },
         { Settings.enableShipItemPlacement, false },
+        { Settings.addPortableCampfire, false },
+        { Settings.keepHelmetOn, false },
+        { Settings.showWarningNotifications, false },
+        { Settings.shipExplosionMultiplier, 1f },
     };
 
     public static string GetName(this Settings setting)

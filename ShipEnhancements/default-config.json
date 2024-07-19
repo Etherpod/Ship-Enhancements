@@ -197,6 +197,12 @@
       "value": false,
       "tooltip": "Lets you spin your ship as quickly as you want, though spinning too fast may tear your ship apart. DO NOT ENABLE IF YOU ARE PRONE TO MOTION SICKNESS."
     },
+    "shipExplosionMultiplier": {
+      "title": "Ship Explosion Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers increase the size of the explosion that is created when your ship blows up."
+    },
 
     "Add Ship Functions": {
       "type": "separator"

@@ -50,6 +50,7 @@ public static class SettingsPresets
         { "addPortableCampfire", false },
         { "keepHelmetOn", false },
         { "showWarningNotifications", false },
+        { "shipExplosionMultiplier", 1f },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -96,6 +97,7 @@ public static class SettingsPresets
         { "addPortableCampfire", false },
         { "keepHelmetOn", true },
         { "showWarningNotifications", true },
+        { "shipExplosionMultiplier", 1f },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -142,6 +144,7 @@ public static class SettingsPresets
         { "addPortableCampfire", true },
         { "keepHelmetOn", true },
         { "showWarningNotifications", true },
+        { "shipExplosionMultiplier", 0.8f },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -188,6 +191,7 @@ public static class SettingsPresets
         { "addPortableCampfire", false },
         { "keepHelmetOn", true },
         { "showWarningNotifications", true },
+        { "shipExplosionMultiplier", 1f },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -234,6 +238,7 @@ public static class SettingsPresets
         { "addPortableCampfire", true },
         { "keepHelmetOn", true },
         { "showWarningNotifications", true },
+        { "shipExplosionMultiplier", 1f },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -280,6 +285,7 @@ public static class SettingsPresets
         { "addPortableCampfire", false },
         { "keepHelmetOn", true },
         { "showWarningNotifications", true },
+        { "shipExplosionMultiplier", 50f },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

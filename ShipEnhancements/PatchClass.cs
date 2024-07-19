@@ -1203,7 +1203,8 @@ public class PatchClass
             campfire.extinguishPrompt.SetVisibility(false);
             campfire.packUpPrompt.SetVisibility(false);
             if (campfire._interactVolumeFocus && !campfire._isPlayerSleeping 
-                && !campfire._isPlayerRoasting && OWInput.IsInputMode(InputMode.Character))
+                && !campfire._isPlayerRoasting && OWInput.IsInputMode(InputMode.Character)
+                && Locator.GetToolModeSwapper().GetToolMode() == ToolMode.None)
             {
                 if (campfire.extinguished)
                 {
@@ -1314,4 +1315,36 @@ public class PatchClass
         }
     }
     #endregion
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ExplosionController), nameof(ExplosionController.Update))]
+    public static bool FixExplosionHeatVolume(ExplosionController __instance)
+    {
+        if (ShipEnhancements.Instance.ShipExplosionMultiplier == 1f) return true;
+
+        if (!__instance._playing)
+        {
+            __instance.enabled = false;
+            return false;
+        }
+        __instance.transform.rotation = Quaternion.identity;
+        __instance._timer += Time.deltaTime;
+        float num = Mathf.Clamp01(__instance._timer / __instance._length);
+        float num2 = (num - 2f) * -num;
+        __instance._matPropBlock.SetFloat(__instance._propID_ExplosionTime, num2);
+        __instance._renderer.SetPropertyBlock(__instance._matPropBlock);
+        __instance._light.intensity = __instance._lightIntensity * (1f - num);
+        __instance._light.range = __instance._lightRadius * Mathf.Clamp01(num * 10f);
+        __instance.GetComponent<SphereCollider>().radius = Mathf.Lerp(0.1f, 1f, num * 2f);
+        if (num > 0.5f)
+        {
+            __instance._forceVolume.SetVolumeActivation(false);
+        }
+        if (num == 1f)
+        {
+            UnityEngine.Object.Destroy(__instance.gameObject);
+        }
+
+        return false;
+    }
 }
