@@ -1224,24 +1224,21 @@ public class PatchClass
         PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
         if (campfire)
         {
-            campfire.extinguishPrompt.SetVisibility(false);
-            campfire.packUpPrompt.SetVisibility(false);
+            campfire.SetPromptVisibility(false);
             if (campfire._interactVolumeFocus && !campfire._isPlayerSleeping 
                 && !campfire._isPlayerRoasting && OWInput.IsInputMode(InputMode.Character)
                 && Locator.GetToolModeSwapper().GetToolMode() == ToolMode.None)
             {
-                if (campfire.extinguished)
+                campfire.SetPromptVisibility(true);
+                campfire.UpdatePrompt();
+                if (OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.All))
                 {
-                    campfire.packUpPrompt.SetVisibility(true);
-                    if (OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.All))
+                    if (campfire.IsExtinguished())
                     {
+                        Locator.GetPromptManager().RemoveScreenPrompt(campfire.GetPrompt(), PromptPosition.Center);
                         campfire.PackUp();
                     }
-                }
-                else
-                {
-                    campfire.extinguishPrompt.SetVisibility(true);
-                    if (OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.All))
+                    else
                     {
                         campfire.SetState(Campfire.State.UNLIT);
                     }
@@ -1265,14 +1262,7 @@ public class PatchClass
         PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
         if (campfire)
         {
-            if (campfire.extinguished)
-            {
-                Locator.GetPromptManager().AddScreenPrompt(campfire.packUpPrompt, PromptPosition.Center, false);
-            }
-            else
-            {
-                Locator.GetPromptManager().AddScreenPrompt(campfire.extinguishPrompt, PromptPosition.Center, false);
-            }
+            Locator.GetPromptManager().AddScreenPrompt(campfire.GetPrompt(), PromptPosition.Center, false);
         }
     }
 
@@ -1285,14 +1275,7 @@ public class PatchClass
         PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
         if (campfire)
         {
-            if (campfire.extinguished)
-            {
-                Locator.GetPromptManager().RemoveScreenPrompt(campfire.packUpPrompt, PromptPosition.Center);
-            }
-            else
-            {
-                Locator.GetPromptManager().RemoveScreenPrompt(campfire.extinguishPrompt, PromptPosition.Center);
-            }
+            Locator.GetPromptManager().RemoveScreenPrompt(campfire.GetPrompt(), PromptPosition.Center);
         }
     }
 
@@ -1305,7 +1288,7 @@ public class PatchClass
         PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
         if (campfire)
         {
-            campfire.extinguishPrompt.SetVisibility(false);
+            campfire.SetPromptVisibility(false);
         }
     }
 
@@ -1318,7 +1301,7 @@ public class PatchClass
         PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
         if (campfire)
         {
-            campfire.extinguishPrompt.SetVisibility(true);
+            campfire.SetPromptVisibility(true);
         }
     }
 
@@ -1333,13 +1316,11 @@ public class PatchClass
         {
             if (newState == Campfire.State.UNLIT)
             {
-                campfire.extinguished = true;
-                Locator.GetPromptManager().RemoveScreenPrompt(campfire.extinguishPrompt, PromptPosition.Center);
+                campfire.SetExtinguished(true);
             }
             else
             {
-                campfire.extinguished = false;
-                Locator.GetPromptManager().AddScreenPrompt(campfire.extinguishPrompt, PromptPosition.Center, false);
+                campfire.SetExtinguished(false);
             }
         }
     }

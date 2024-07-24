@@ -7,13 +7,10 @@ public class PortableCampfire : Campfire
     [SerializeField]
     private MeshCollider _collider;
 
-    [HideInInspector]
-    public ScreenPrompt extinguishPrompt;
-    [HideInInspector]
-    public ScreenPrompt packUpPrompt;
-    [HideInInspector]
-    public bool extinguished = true;
-
+    private ScreenPrompt _cancelPrompt;
+    private bool _extinguished = true;
+    private string _packUpText = "Pack up";
+    private string _extinguishText = "Extinguish";
     private bool _insideShip;
     private float _reactorHeatMeter;
     private float _reactorHeatMeterLength;
@@ -25,15 +22,14 @@ public class PortableCampfire : Campfire
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
 
-        extinguishPrompt = new ScreenPrompt(InputLibrary.cancel, "Extinguish", 0, ScreenPrompt.DisplayState.Normal, false);
-        packUpPrompt = new ScreenPrompt(InputLibrary.cancel, "Pack up", 0, ScreenPrompt.DisplayState.Normal, false);
+        _cancelPrompt = new ScreenPrompt(InputLibrary.cancel, "Pack up", 0, ScreenPrompt.DisplayState.Normal, false);
         _reactorHeatMeter = 0f;
         _reactorHeatMeterLength = Random.Range(10f, 30f);
     }
 
     public void UpdateCampfire()
     {
-        if (!_shipDestroyed && _insideShip && !extinguished)
+        if (!_shipDestroyed && _insideShip && !_extinguished)
         {
             ShipEnhancements.Instance.GetShipResources().DrainOxygen(10f * Time.deltaTime);
             _reactorHeatMeter += Time.deltaTime;
@@ -73,6 +69,31 @@ public class PortableCampfire : Campfire
             _reactorHeatMeter = 0f;
             _reactorHeatMeterLength = Random.Range(10f, 30f);
         }
+    }
+
+    public bool IsExtinguished()
+    {
+        return _extinguished;
+    }
+
+    public void SetExtinguished(bool value)
+    {
+        _extinguished = value;
+    }
+
+    public void UpdatePrompt()
+    {
+        _cancelPrompt.SetText(_extinguished ? _packUpText : _extinguishText);
+    }
+
+    public ScreenPrompt GetPrompt()
+    {
+        return _cancelPrompt;
+    }
+
+    public void SetPromptVisibility(bool value)
+    {
+        _cancelPrompt.SetVisibility(value);
     }
 
     private void OnShipSystemFailure()
