@@ -8,6 +8,8 @@ namespace ShipEnhancements;
 [HarmonyPatch]
 public class PatchClass
 {
+    public static float baseRoastingStickMaxZ = 0f;
+
     #region DisableHeadlights
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.UpdateShipLightInput))]
@@ -187,22 +189,42 @@ public class PatchClass
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.StartRoasting))]
     public static bool KeepHelmetOnWhenRoasting(Campfire __instance)
     {
-        if (!ShipEnhancements.Instance.KeepHelmetOn || ShipEnhancements.Instance.GetPlayerResources().IsOxygenPresent() || !PlayerState.IsWearingSuit()) return true;
+        bool portableCampfire = ShipEnhancements.Instance.PortableCampfireEnabled && __instance is PortableCampfire;
+        bool shouldKeepHelmetOn = ShipEnhancements.Instance.KeepHelmetOn && !ShipEnhancements.Instance.GetPlayerResources().IsOxygenPresent()
+            && PlayerState.IsWearingSuit();
+
+        if (!portableCampfire && !shouldKeepHelmetOn) return true;
+        else if (portableCampfire && !Locator.GetPlayerController().IsGrounded())
+        {
+            __instance._interactVolume.ResetInteraction();
+            return false;
+        }
 
         Locator.GetToolModeSwapper().UnequipTool();
         __instance._attachPoint.AttachPlayer();
+
         Vector3 localPosition = Locator.GetPlayerTransform().localPosition;
         Vector3 vector = new Vector3(localPosition.x, 0f, localPosition.z);
         Vector3 vector2 = 2f * vector.normalized + Vector3.up;
+        if (portableCampfire)
+        {
+            Vector3 projectedVector = Vector3.Project(localPosition, vector2);
+            float ratio = projectedVector.sqrMagnitude / vector2.sqrMagnitude;
+            RoastingStickController stickController = Locator.GetPlayerTransform().GetComponentInChildren<RoastingStickController>();
+            stickController._stickMaxZ = Mathf.LerpUnclamped(stickController._stickMinZ, baseRoastingStickMaxZ, ratio);
+            vector2 = localPosition;
+        }
+
         __instance._attachPoint.SetAttachOffset(vector2);
+
         Vector3 vector3 = Vector3.up * 0.75f;
         __instance._lockOnTargeting.LockOn(__instance.transform, vector3, 1f, true, 1f);
         __instance._isPlayerRoasting = true;
         GlobalMessenger<Campfire>.FireEvent("EnterRoastingMode", __instance);
-        /*if (Locator.GetPlayerSuit().IsWearingSuit(true))
+        if (!shouldKeepHelmetOn && Locator.GetPlayerSuit().IsWearingSuit(true))
         {
             Locator.GetPlayerSuit().RemoveHelmet();
-        }*/
+        }
         if (__instance._canSleepHere)
         {
             __instance._sleepPrompt.SetVisibility(false);
@@ -215,6 +237,8 @@ public class PatchClass
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.StopRoasting))]
     public static bool KeepHelmetOnWhenStopRoasting(Campfire __instance)
     {
+        Locator.GetPlayerTransform().GetComponentInChildren<RoastingStickController>()._stickMaxZ = baseRoastingStickMaxZ;
+
         if (!ShipEnhancements.Instance.KeepHelmetOn || (!Locator.GetPlayerSuit().IsWearingHelmet() 
             && (ShipEnhancements.Instance.GetPlayerResources().IsOxygenPresent() || !PlayerState.IsWearingSuit()))) return true;
 
@@ -1223,6 +1247,11 @@ public class PatchClass
                     }
                 }
             }
+            if (campfire._interactVolumeFocus && campfire._state == Campfire.State.LIT && !campfire._isPlayerRoasting && OWInput.IsInputMode(InputMode.Character))
+            {
+                campfire._interactVolume._screenPrompt.SetDisplayState(
+                    Locator.GetPlayerController().IsGrounded() ? ScreenPrompt.DisplayState.Normal : ScreenPrompt.DisplayState.GrayedOut);
+            }
             campfire.UpdateCampfire();
         }
     }
@@ -1314,8 +1343,16 @@ public class PatchClass
             }
         }
     }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(RoastingStickController), nameof(RoastingStickController.Awake))]
+    public static void SetBaseRoastingStickMaxZ(RoastingStickController __instance)
+    {
+        baseRoastingStickMaxZ = __instance._stickMaxZ;
+    }
     #endregion
 
+    #region ExplosionMultiplier
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ExplosionController), nameof(ExplosionController.Update))]
     public static bool FixExplosionHeatVolume(ExplosionController __instance)
@@ -1347,4 +1384,5 @@ public class PatchClass
 
         return false;
     }
+    #endregion
 }
