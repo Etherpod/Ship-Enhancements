@@ -106,9 +106,18 @@ public class PatchClass
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.StartSleeping))]
-    public static bool KeepHelmentOnWhenSleeping(Campfire __instance)
+    public static bool KeepHelmetOnWhenSleeping(Campfire __instance)
     {
-        if (!ShipEnhancements.Instance.KeepHelmetOn || ShipEnhancements.Instance.GetPlayerResources().IsOxygenPresent() || !PlayerState.IsWearingSuit()) return true;
+        bool portableCampfire = ShipEnhancements.Instance.PortableCampfireEnabled && __instance is PortableCampfire;
+        bool shouldKeepHelmetOn = ShipEnhancements.Instance.KeepHelmetOn && !ShipEnhancements.Instance.GetPlayerResources().IsOxygenPresent()
+            && PlayerState.IsWearingSuit();
+
+        if (!portableCampfire && !shouldKeepHelmetOn) return true;
+        else if (portableCampfire && !Locator.GetPlayerController().IsGrounded())
+        {
+            __instance._interactVolume.ResetInteraction();
+            return false;
+        }
 
         if (__instance.CheckUnequipToolWhileSleeping())
         {
@@ -119,6 +128,10 @@ public class PatchClass
         Vector3 localPosition = Locator.GetPlayerTransform().localPosition;
         Vector3 vector = new Vector3(localPosition.x, 0f, localPosition.z);
         Vector3 vector2 = 2f * vector.normalized + Vector3.up;
+        if (portableCampfire)
+        {
+            vector2 = localPosition;
+        }
         __instance._attachPoint.SetAttachOffset(vector2);
         if (__instance._lookUpWhileSleeping)
         {
@@ -137,10 +150,10 @@ public class PatchClass
         __instance._sleepPrompt.SetVisibility(false);
         __instance._wakePrompt.SetVisibility(false);
         OWInput.ChangeInputMode(InputMode.None);
-        /*if (Locator.GetPlayerSuit().IsWearingSuit(true))
+        if (!shouldKeepHelmetOn && Locator.GetPlayerSuit().IsWearingSuit(true))
         {
             Locator.GetPlayerSuit().RemoveHelmet();
-        }*/
+        }
         Locator.GetFlashlight().TurnOff(false);
         GlobalMessenger<bool>.FireEvent("StartSleepingAtCampfire", __instance is DreamCampfire);
 
@@ -1248,6 +1261,12 @@ public class PatchClass
             {
                 campfire._interactVolume._screenPrompt.SetDisplayState(
                     Locator.GetPlayerController().IsGrounded() ? ScreenPrompt.DisplayState.Normal : ScreenPrompt.DisplayState.GrayedOut);
+            }
+            if (campfire._canSleepHere && campfire._interactVolumeFocus && !campfire._isPlayerSleeping
+                && !campfire._isPlayerRoasting && OWInput.IsInputMode(InputMode.Character))
+            {
+                campfire._sleepPrompt.SetDisplayState(campfire.CanSleepHereNow() && Locator.GetPlayerController().IsGrounded() 
+                    ? ScreenPrompt.DisplayState.Normal : ScreenPrompt.DisplayState.GrayedOut);
             }
             campfire.UpdateCampfire();
         }
