@@ -6,7 +6,7 @@ using UnityEngine;
 namespace ShipEnhancements;
 
 [HarmonyPatch]
-public class PatchClass
+public static class PatchClass
 {
     public static float baseRoastingStickMaxZ = 0f;
 
@@ -1010,7 +1010,7 @@ public class PatchClass
         if ((ShipEnhancements.Instance.ScoutLauncherDisabled && PlayerState.AtFlightConsole() && __instance.GetName() == ProbeLauncher.Name.Ship)
             || (ShipEnhancements.Instance.ManualScoutRecallEnabled && __instance.GetName() == ProbeLauncher.Name.Player && !ProbePickupVolume.canRetrieveProbe)
             || (ShipEnhancements.Instance.ScoutLauncherComponentEnabled
-            && __instance.GetName() == ProbeLauncher.Name.Ship && Locator.GetShipBody().GetComponentInChildren<ProbeLauncherComponent>().isDamaged)
+            && __instance.GetName() == ProbeLauncher.Name.Ship && ShipEnhancements.Instance.GetProbeLauncherComponent().isDamaged)
             || ShipEnhancements.Instance.probeDestroyed)
         {
             return false;
@@ -1030,7 +1030,7 @@ public class PatchClass
             || (ShipEnhancements.Instance.ManualScoutRecallEnabled 
             && __instance.GetName() == ProbeLauncher.Name.Player && !__instance._preLaunchProbeProxy.activeInHierarchy)
             || (ShipEnhancements.Instance.ScoutLauncherComponentEnabled
-            && __instance.GetName() == ProbeLauncher.Name.Ship && Locator.GetShipBody().GetComponentInChildren<ProbeLauncherComponent>().isDamaged)
+            && __instance.GetName() == ProbeLauncher.Name.Ship && ShipEnhancements.Instance.GetProbeLauncherComponent().isDamaged)
             || ShipEnhancements.Instance.probeDestroyed)
         {
             return false;
@@ -1059,6 +1059,7 @@ public class PatchClass
         GameObject componentObj = UnityEngine.Object.Instantiate(probeLauncherComponent, 
             __instance.GetComponentInParent<ShipBody>().GetComponentInChildren<PlayerProbeLauncher>().transform.parent);
         AssetBundleUtilities.ReplaceShaders(componentObj);
+        ShipEnhancements.Instance.SetProbeLauncherComponent(componentObj.GetComponent<ProbeLauncherComponent>());
     }
 
     [HarmonyPrefix]
@@ -1077,8 +1078,7 @@ public class PatchClass
             }
             else if (ShipEnhancements.Instance.ScoutLauncherComponentEnabled)
             {
-                ProbeLauncherComponent component = Locator.GetShipBody().GetComponentInChildren<ProbeLauncherComponent>();
-                if (component.isDamaged)
+                if (ShipEnhancements.Instance.GetProbeLauncherComponent().isDamaged)
                 {
                     flag = true;
                 }
@@ -1159,6 +1159,45 @@ public class PatchClass
             return false;
         }
         return true;
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ProbePromptController), nameof(ProbePromptController.Update))]
+    public static void FixProbePrompts(ProbePromptController __instance)
+    {
+        if (!ShipEnhancements.Instance.ManualScoutRecallEnabled && !ShipEnhancements.Instance.ScoutLauncherDisabled
+            && !ShipEnhancements.Instance.ScoutLauncherComponentEnabled)
+        {
+            return;
+        }
+
+        bool manualRecall = ShipEnhancements.Instance.ManualScoutRecallEnabled && !PlayerState.AtFlightConsole();
+        bool shipLauncherBroken = (ShipEnhancements.Instance.ScoutLauncherDisabled
+            || (ShipEnhancements.Instance.ScoutLauncherComponentEnabled && ShipEnhancements.Instance.GetProbeLauncherComponent().isDamaged))
+            && PlayerState.AtFlightConsole();
+
+        if (manualRecall || shipLauncherBroken)
+        {
+            __instance._retrieveCenterPrompt.SetVisibility(false);
+            __instance._retrievePrompt.SetDisplayState(ScreenPrompt.DisplayState.GrayedOut);
+        }
+        else
+        {
+            __instance._retrievePrompt.SetDisplayState(ScreenPrompt.DisplayState.Normal);
+        }
+
+        if (shipLauncherBroken)
+        {
+            __instance._launchPrompt.SetDisplayState(ScreenPrompt.DisplayState.GrayedOut);
+        }
+        else if (manualRecall && !__instance.GetComponent<ProbeLauncher>()._preLaunchProbeProxy.activeInHierarchy)
+        {
+            __instance._launchPrompt.SetDisplayState(ScreenPrompt.DisplayState.GrayedOut);
+        }
+        else
+        {
+            __instance._launchPrompt.SetDisplayState(ScreenPrompt.DisplayState.Normal);
+        }
     }
     #endregion
 

@@ -81,6 +81,7 @@ public class ShipEnhancements : ModBehaviour
     private ShipResources _shipResources;
     private OxygenVolume _shipOxygen;
     private PlayerResources _playerResources;
+    private ProbeLauncherComponent _probeLauncherComponent;
     private NotificationData _oxygenDepletedNotification = new NotificationData(NotificationTarget.Ship, "SHIP OXYGEN DEPLETED", 5f, true);
     private NotificationData _oxygenLowNotification = new NotificationData(NotificationTarget.Ship, "SHIP OXYGEN LOW", 5f, true);
     private NotificationData _oxygenCriticalNotification = new NotificationData(NotificationTarget.Ship, "SHIP OXYGEN CRITICAL", 5f, true);
@@ -501,11 +502,10 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((bool)Settings.disableScoutLauncher.GetValue() && (bool)Settings.enableScoutLauncherComponent.GetValue())
         {
-            ProbeLauncherComponent component = Locator.GetShipBody().GetComponentInChildren<ProbeLauncherComponent>();
-            component._repairReceiver.repairDistance = 0f;
-            component._damaged = true;
-            component._repairFraction = 0f;
-            component.OnComponentDamaged();
+            _probeLauncherComponent._repairReceiver.repairDistance = 0f;
+            _probeLauncherComponent._damaged = true;
+            _probeLauncherComponent._repairFraction = 0f;
+            _probeLauncherComponent.OnComponentDamaged();
         }
         if ((bool)Settings.addPortableCampfire.GetValue())
         {
@@ -762,6 +762,15 @@ public class ShipEnhancements : ModBehaviour
     public PlayerResources GetPlayerResources()
     {
         return _playerResources;
+    }
+
+    public ProbeLauncherComponent GetProbeLauncherComponent()
+    {
+        return _probeLauncherComponent;
+    }
+    public void SetProbeLauncherComponent(ProbeLauncherComponent component)
+    {
+        _probeLauncherComponent = component;
     }
 
     public void SetGravityLandingGearEnabled(bool enabled)

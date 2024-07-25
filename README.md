@@ -31,6 +31,7 @@ Ship Enhancements makes numerous changes to the ship that are all toggleable in 
 - **Angular Drag Multiplier**: Larger numbers make it harder to turn your ship. Setting this to 0 lets you spin your ship forever.
 - **Disable Space Angular Drag**: Disables angular drag in space, meaning your ship will spin forever. The angular drag multiplier will still affect atmospheres.
 - **Disable Rotation Speed Limit**: Lets you spin your ship as quickly as you want, though spinning too fast may tear your ship apart. Enabling this may lead to motion sickness.
+- **Ship Explosion Multiplier**: Larger numbers increase the size of the explosion that is created when your ship blows up. Set this to something super high to simulate an atomic bomb.
 
 ## Add Ship Functions
 - **Oxygen Refill**: Refills the ship's oxygen tank when it gets close to trees or enters an oxygen-filled atmosphere.
@@ -45,6 +46,12 @@ Ship Enhancements makes numerous changes to the ship that are all toggleable in 
 - **Temperature Zones**: Implements a temperature mechanic for the unused temperature dial in the ship. High and low temperature zones are added around the solar system that increase or decrease your ship's temperature.
 - **Hull Temperature Damage**: Damages your ship over time in extreme temperatures, like near the Sun or on the dark side of the Interloper. Your temperature dial will start flashing if it's hot or cold enough to take damage.
 - **Component Temperature Damage**: Similar to hull temperature damage, but it damages random components instead.
+- **Add Portable Campfire**: Adds a portable campfire to the ship next to your suit. Place this anywhere you'd like and roast a marshmallow. Recommended to use with **Keep Helmet On**.
+
+## Quality of Life
+These are all enabled by default.
+- **Keep Helmet On**: When there is no oxygen present, this prevents the game from removing your helmet when doing things such as piloting the ship or roasting a marshmallow at a campfire.
+- **Show Warning Notifications**: Notifies you in the ship when resources are low or when the outside conditions are becoming dangerous.
 
 ## Presets
 In case there are too many settings to deal with, there are some pre-made presets for you to use. The settings can still be meddled with after choosing one.
