@@ -56,7 +56,7 @@ These are all enabled by default.
 ## Presets
 In case there are too many settings to deal with, there are some pre-made presets for you to use. The settings can still be meddled with after choosing one.
 
-- **Vanilla** - The classic Outer Wilds experience.
+- **Vanilla Plus** - The classic Outer Wilds experience wtih a few quality of life changes.
 - **Minimal** - What if Slate didn't add all those extra things to your ship? This is that reality.
 - **Relaxed** - Gives you more resources and less damage.
 - **Hardcore** - A much more difficult and punishing experience. Resources are lower and you are no longer able to repair damage done to your ship.

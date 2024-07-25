@@ -76,12 +76,19 @@ public class ShipEnhancements : ModBehaviour
     private bool _fuelCritical = false;
     private bool _hullIntegrityLow = false;
     private bool _hullIntegrityCritical = false;
+    private bool _hullTemperatureHigh = false;
+    private bool _hullTemperatureCritical = false;
     private bool _shipDestroyed;
     private OxygenDetector _shipOxygenDetector;
     private ShipResources _shipResources;
     private OxygenVolume _shipOxygen;
     private PlayerResources _playerResources;
     private ProbeLauncherComponent _probeLauncherComponent;
+    private ShipTemperatureDetector _shipTemperatureDetector;
+    private float _levelOneSpinSpeed = 8f;
+    private float _levelTwoSpinSpeed = 16f;
+    private float _maxSpinSpeed = 24f;
+
     private NotificationData _oxygenDepletedNotification = new NotificationData(NotificationTarget.Ship, "SHIP OXYGEN DEPLETED", 5f, true);
     private NotificationData _oxygenLowNotification = new NotificationData(NotificationTarget.Ship, "SHIP OXYGEN LOW", 5f, true);
     private NotificationData _oxygenCriticalNotification = new NotificationData(NotificationTarget.Ship, "SHIP OXYGEN CRITICAL", 5f, true);
@@ -90,9 +97,9 @@ public class ShipEnhancements : ModBehaviour
     private NotificationData _fuelCriticalNotification = new NotificationData(NotificationTarget.Ship, "SHIP FUEL CRITICAL", 5f, true);
     private NotificationData _spinSpeedHighNotification = new NotificationData(NotificationTarget.Ship, "HULL INTEGRITY LOW", 5f, true);
     private NotificationData _spinSpeedCriticalNotification = new NotificationData(NotificationTarget.Ship, "HULL INTEGRITY CRITICAL", 5f, true);
-    private float _levelOneSpinSpeed = 8f;
-    private float _levelTwoSpinSpeed = 16f;
-    private float _maxSpinSpeed = 24f;
+    private NotificationData _temperatureHighNotification = new NotificationData(NotificationTarget.Ship, "HULL TEMPERATURE INCREASING", 5f, true);
+    private NotificationData _temperatureLowNotification = new NotificationData(NotificationTarget.Ship, "HULL TEMPERATURE DECREASING", 5f, true);
+    private NotificationData _temperatureCriticalNotification = new NotificationData(NotificationTarget.Ship, "HULL TEMPERATURE CRITICAL", 5f, true);
 
     public enum Settings
     {
@@ -431,7 +438,7 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((bool)Settings.hullTemperatureDamage.GetValue() || (bool)Settings.componentTemperatureDamage.GetValue())
         {
-            Locator.GetShipDetector().gameObject.AddComponent<ShipTemperatureDetector>();
+            _shipTemperatureDetector = Locator.GetShipDetector().gameObject.AddComponent<ShipTemperatureDetector>();
             Locator.GetShipBody().GetComponentInChildren<ShipFuelGauge>().gameObject.AddComponent<ShipTemperatureGauge>();
             GameObject hullTempDial = LoadPrefab("Assets/ShipEnhancements/ShipTempDial.prefab");
             Instantiate(hullTempDial, Locator.GetShipTransform().Find("Module_Cockpit"));
@@ -678,25 +685,59 @@ public class ShipEnhancements : ModBehaviour
                 _fuelLow = false;
             }
         }
-        
-        if (!_hullIntegrityCritical && Locator.GetShipBody().GetAngularVelocity().sqrMagnitude > _levelTwoSpinSpeed * _levelTwoSpinSpeed)
+
+        if (RotationSpeedLimitDisabled)
         {
-            _hullIntegrityCritical = true;
-            NotificationManager.SharedInstance.PostNotification(_spinSpeedCriticalNotification, false);
-        }
-        else if (_hullIntegrityCritical && Locator.GetShipBody().GetAngularVelocity().sqrMagnitude < _levelTwoSpinSpeed * _levelTwoSpinSpeed)
-        {
-            _hullIntegrityCritical = false;
+            if (!_hullIntegrityCritical && Locator.GetShipBody().GetAngularVelocity().sqrMagnitude > _levelTwoSpinSpeed * _levelTwoSpinSpeed)
+            {
+                _hullIntegrityCritical = true;
+                NotificationManager.SharedInstance.PostNotification(_spinSpeedCriticalNotification, false);
+            }
+            else if (_hullIntegrityCritical && Locator.GetShipBody().GetAngularVelocity().sqrMagnitude < _levelTwoSpinSpeed * _levelTwoSpinSpeed)
+            {
+                _hullIntegrityCritical = false;
+            }
+
+            if (!_hullIntegrityLow && Locator.GetShipBody().GetAngularVelocity().sqrMagnitude > _levelOneSpinSpeed * _levelOneSpinSpeed)
+            {
+                _hullIntegrityLow = true;
+                NotificationManager.SharedInstance.PostNotification(_spinSpeedHighNotification, false);
+            }
+            else if (_hullIntegrityLow && Locator.GetShipBody().GetAngularVelocity().sqrMagnitude < _levelOneSpinSpeed * _levelOneSpinSpeed)
+            {
+                _hullIntegrityLow = false;
+            }
         }
 
-        if (!_hullIntegrityLow && Locator.GetShipBody().GetAngularVelocity().sqrMagnitude > _levelOneSpinSpeed * _levelOneSpinSpeed)
+        if ((ComponentTemperatureDamage || HullTemperatureDamage) && _shipTemperatureDetector)
         {
-            _hullIntegrityLow = true;
-            NotificationManager.SharedInstance.PostNotification(_spinSpeedHighNotification, false);
-        }
-        else if (_hullIntegrityLow && Locator.GetShipBody().GetAngularVelocity().sqrMagnitude < _levelOneSpinSpeed * _levelOneSpinSpeed)
-        {
-            _hullIntegrityLow = false;
+            float hullTempRatio = Mathf.Abs(_shipTemperatureDetector.GetShipTemperatureRatio() - 0.5f);
+            if (!_hullTemperatureCritical && hullTempRatio > 0.35f)
+            {
+                _hullTemperatureCritical = true;
+                NotificationManager.SharedInstance.PostNotification(_temperatureCriticalNotification, false);
+            }
+            else if (_hullTemperatureCritical && hullTempRatio < 0.35f)
+            {
+                _hullTemperatureCritical = false;
+            }
+
+            if (!_hullTemperatureHigh && hullTempRatio > 0.15f)
+            {
+                _hullTemperatureHigh = true;
+                if (_shipTemperatureDetector.GetTemperatureRatio() > 0)
+                {
+                    NotificationManager.SharedInstance.PostNotification(_temperatureHighNotification, false);
+                }
+                else
+                {
+                    NotificationManager.SharedInstance.PostNotification(_temperatureLowNotification, false);
+                }
+            }
+            else if (_hullTemperatureHigh && hullTempRatio < 0.15f)
+            {
+                _hullTemperatureHigh = false;
+            }
         }
     }
 

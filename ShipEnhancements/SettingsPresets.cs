@@ -6,7 +6,7 @@ namespace ShipEnhancements;
 
 public static class SettingsPresets
 {
-    public static readonly Dictionary<string, object> VanillaSettings = new Dictionary<string, object>()
+    public static readonly Dictionary<string, object> VanillaPlusSettings = new Dictionary<string, object>()
     {
         { "disableGravityCrystal", false },
         { "disableEjectButton", false },
@@ -48,8 +48,8 @@ public static class SettingsPresets
         { "enableManualScoutRecall", false },
         { "enableShipItemPlacement", false },
         { "addPortableCampfire", false },
-        { "keepHelmetOn", false },
-        { "showWarningNotifications", false },
+        { "keepHelmetOn", true },
+        { "showWarningNotifications", true },
         { "shipExplosionMultiplier", 1f },
     };
 
@@ -296,7 +296,7 @@ public static class SettingsPresets
 
     public enum PresetName
     {
-        Vanilla,
+        VanillaPlus,
         Minimal,
         Relaxed,
         Hardcore,
@@ -309,7 +309,7 @@ public static class SettingsPresets
     {
         presetDicts = new()
         {
-            { PresetName.Vanilla, VanillaSettings },
+            { PresetName.VanillaPlus, VanillaPlusSettings },
             { PresetName.Minimal, MinimalSettings },
             { PresetName.Relaxed, RelaxedSettings },
             { PresetName.Hardcore, HardcoreSettings },
@@ -367,6 +367,7 @@ public static class SettingsPresets
 
     public static PresetName GetPresetFromConfig(string configPreset)
     {
+        configPreset = configPreset.Replace(" ", "");
         if (Enum.TryParse(configPreset, out PresetName preset))
         {
             return preset;
@@ -377,7 +378,7 @@ public static class SettingsPresets
 
     public static string GetName(this PresetName preset)
     {
-        return preset.ToString();
+        return preset == PresetName.VanillaPlus ? "Vanilla Plus" : preset.ToString();
     }
 
     public static object GetPresetSetting(this PresetName preset, string setting)

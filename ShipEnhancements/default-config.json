@@ -6,9 +6,9 @@
     "preset": {
       "title": "Preset",
       "type": "selector",
-      "value": "Vanilla",
+      "value": "Vanilla Plus",
       "options": [
-        "Vanilla",
+        "Vanilla Plus",
         "Minimal",
         "Relaxed",
         "Hardcore",
