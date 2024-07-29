@@ -283,6 +283,8 @@ public static class PatchClass
     [HarmonyPatch(typeof(PlayerCameraController), nameof(PlayerCameraController.UpdateInput))]
     public static bool AllowZeroGCockpitFreeLook(PlayerCameraController __instance, float deltaTime)
     {
+        if (!(bool)zeroGravityCockpitFreeLook.GetProperty()) return true;
+
         bool flag = __instance._shipController != null && __instance._shipController.AllowFreeLook() && OWInput.IsPressed(InputLibrary.freeLook, 0f);
         bool flag2 = OWInput.IsInputMode(InputMode.Character | InputMode.ScopeZoom | InputMode.NomaiRemoteCam | InputMode.PatchingSuit);
         if (__instance._isSnapping || __instance._isLockedOn

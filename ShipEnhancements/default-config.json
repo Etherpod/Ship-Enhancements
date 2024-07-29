@@ -307,6 +307,12 @@
       "type": "toggle",
       "value": true,
       "tooltip": "Notifies you in the ship about various things, such as your fuel or oxygen being low."
+    },
+    "zeroGravityCockpitFreeLook": {
+      "title": "Zero-G Cockpit Free-Look",
+      "type": "toggle",
+      "value": true,
+      "tooltip": "Fixes a bug where you are unable to look around freely while piloting the ship in zero gravity."
     }
   }
 }

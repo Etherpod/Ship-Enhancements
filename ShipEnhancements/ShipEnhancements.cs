@@ -82,6 +82,7 @@ public class ShipEnhancements : ModBehaviour
         keepHelmetOn,
         showWarningNotifications,
         shipExplosionMultiplier,
+        zeroGravityCockpitFreeLook,
     }
 
     private void Awake()

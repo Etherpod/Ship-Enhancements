@@ -52,6 +52,7 @@ Ship Enhancements makes numerous changes to the ship that are all toggleable in 
 These are all enabled by default.
 - **Keep Helmet On**: When there is no oxygen present, this prevents the game from removing your helmet when doing things such as piloting the ship or roasting a marshmallow at a campfire.
 - **Show Warning Notifications**: Notifies you in the ship when resources are low or when the outside conditions are becoming dangerous.
+- **Zero-G Cockpit Free-Look**: Fixes a bug where you are unable to use free look in the cockpit when there is no gravity and no oxygen. I'm not sure why you would want to turn this off, but you have the option.
 
 ## Presets
 In case there are too many settings to deal with, there are some pre-made presets for you to use. The settings can still be meddled with after choosing one.
@@ -65,5 +66,7 @@ In case there are too many settings to deal with, there are some pre-made preset
 
 ## API
 - **CreateTemperatureZone()** - In case you're a modder and want to add your own high/low temperature zones. Temperature zones can stack, and will just take the sum of the temperatures.
+- **GetSettingsProperty()** - Returns the value of a config setting as seen from the player. These values only update at the beginning of the loop, so changing the config doesn't affect them.
+- **SetSettingsProperty()** - Lets you change the value of a config setting in the middle of the loop. Note that this change will be reverted on the next loop.
 
 Credit to Ditzy for helping with some of the code!

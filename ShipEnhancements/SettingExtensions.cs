@@ -52,6 +52,7 @@ public static class SettingExtensions
         { Settings.keepHelmetOn, (false, false) },
         { Settings.showWarningNotifications, (false, false) },
         { Settings.shipExplosionMultiplier, (1f, 1f) },
+        { Settings.zeroGravityCockpitFreeLook, (false, false) },
     };
 
     public static string GetName(this Settings setting)
