@@ -5,9 +5,7 @@ using UnityEngine;
 using System.IO;
 using System;
 using System.Collections.Generic;
-using OWML.ModHelper.Menus;
 using OWML.Utils;
-using Mono.Cecil.Cil;
 
 namespace ShipEnhancements;
 
@@ -21,46 +19,14 @@ public class ShipEnhancements : ModBehaviour
     public bool refillingOxygen;
     public bool fuelDepleted;
     public bool angularDragEnabled;
-    public UITextType probeLauncherName { get; private set; }
+    public float levelOneSpinSpeed = 8f;
+    public float levelTwoSpinSpeed = 16f;
+    public float maxSpinSpeed = 24f;
     public bool probeDestroyed;
-    public ItemType portableCampfireType { get; private set; }
 
-    public bool HeadlightsDisabled { get; private set; }
-    public bool LandingCameraDisabled { get; private set; }
-    public float OxygenDrainMultiplier { get; private set; }
-    public float FuelDrainMultiplier { get; private set; }
-    public float DamageMultiplier { get; private set; }
-    public float DamageSpeedMultiplier { get; private set; }
-    public bool ShipOxygenRefill { get; private set; }
-    public bool OxygenDisabled { get; private set; }
-    public bool ShipRepairDisabled { get; private set; }
-    public bool GravityLandingGearEnabled { get; private set; }
-    public bool AirAutoRollDisabled { get; private set; }
-    public bool WaterAutoRollDisabled { get; private set; }
-    public bool ThrustModulatorEnabled { get; private set; }
-    public int ThrustModulatorLevel { get; private set; }
-    public bool ReferenceFrameDisabled { get; private set; }
-    public bool MapMarkersDisabled { get; private set; }
-    public float FuelTransferMultiplier { get; private set; }
-    public float OxygenRefillMultiplier { get; private set; }
-    public float TemperatureDamageMultiplier { get; private set; }
-    public float TemperatureResistanceMultiplier { get; private set; }
-    public bool AutoHatchEnabled { get; private set; }
-    public float OxygenTankDrainMultiplier { get; private set; }
-    public float FuelTankDrainMultiplier { get; private set; }
-    public bool HullTemperatureDamage { get; private set; }
-    public bool ComponentTemperatureDamage { get; private set; }
-    public bool RotationSpeedLimitDisabled { get; private set; }
-    public float AngularDragMultiplier { get; private set; }
-    public bool SpaceAngularDragDisabled { get; private set; }
-    public bool ScoutLauncherDisabled { get; private set; }
-    public bool ScoutLauncherComponentEnabled { get; private set; }
-    public bool ManualScoutRecallEnabled { get; private set; }
-    public bool ShipItemPlacementEnabled { get; private set; }
-    public bool PortableCampfireEnabled { get; private set; }
-    public bool KeepHelmetOn { get; private set; }
-    public bool ShowWarningNotifications { get; private set; }
-    public float ShipExplosionMultiplier { get; private set; }
+    public UITextType probeLauncherName { get; private set; }
+    public ItemType portableCampfireType { get; private set; }
+    public int thrustModulatorLevel { get; private set; }
 
     private SettingsPresets.PresetName _currentPreset = (SettingsPresets.PresetName)(-1);
 
@@ -68,38 +34,8 @@ public class ShipEnhancements : ModBehaviour
     private float _lastSuitOxygen;
     private float _lastShipOxygen;
     private float _lastShipFuel;
-    private bool _startOxygenRefill = false;
     private bool _shipLoaded = false;
-    private bool _oxygenLow = false;
-    private bool _oxygenCritical = false;
-    private bool _fuelLow = false;
-    private bool _fuelCritical = false;
-    private bool _hullIntegrityLow = false;
-    private bool _hullIntegrityCritical = false;
-    private bool _hullTemperatureHigh = false;
-    private bool _hullTemperatureCritical = false;
     private bool _shipDestroyed;
-    private OxygenDetector _shipOxygenDetector;
-    private ShipResources _shipResources;
-    private OxygenVolume _shipOxygen;
-    private PlayerResources _playerResources;
-    private ProbeLauncherComponent _probeLauncherComponent;
-    private ShipTemperatureDetector _shipTemperatureDetector;
-    private float _levelOneSpinSpeed = 8f;
-    private float _levelTwoSpinSpeed = 16f;
-    private float _maxSpinSpeed = 24f;
-
-    private NotificationData _oxygenDepletedNotification = new NotificationData(NotificationTarget.Ship, "SHIP OXYGEN DEPLETED", 5f, true);
-    private NotificationData _oxygenLowNotification = new NotificationData(NotificationTarget.Ship, "SHIP OXYGEN LOW", 5f, true);
-    private NotificationData _oxygenCriticalNotification = new NotificationData(NotificationTarget.Ship, "SHIP OXYGEN CRITICAL", 5f, true);
-    private NotificationData _oxygenRefillingNotification = new NotificationData(NotificationTarget.Ship, "REFILLING OXYGEN TANK", 5f, true);
-    private NotificationData _fuelLowNotification = new NotificationData(NotificationTarget.Ship, "SHIP FUEL LOW", 5f, true);
-    private NotificationData _fuelCriticalNotification = new NotificationData(NotificationTarget.Ship, "SHIP FUEL CRITICAL", 5f, true);
-    private NotificationData _spinSpeedHighNotification = new NotificationData(NotificationTarget.Ship, "HULL INTEGRITY LOW", 5f, true);
-    private NotificationData _spinSpeedCriticalNotification = new NotificationData(NotificationTarget.Ship, "HULL INTEGRITY CRITICAL", 5f, true);
-    private NotificationData _temperatureHighNotification = new NotificationData(NotificationTarget.Ship, "HULL TEMPERATURE INCREASING", 5f, true);
-    private NotificationData _temperatureLowNotification = new NotificationData(NotificationTarget.Ship, "HULL TEMPERATURE DECREASING", 5f, true);
-    private NotificationData _temperatureCriticalNotification = new NotificationData(NotificationTarget.Ship, "HULL TEMPERATURE CRITICAL", 5f, true);
 
     public enum Settings
     {
@@ -174,11 +110,6 @@ public class ShipEnhancements : ModBehaviour
             oxygenDepleted = false;
             fuelDepleted = false;
             angularDragEnabled = false;
-            _startOxygenRefill = false;
-            _oxygenLow = false;
-            _oxygenCritical = false;
-            _fuelLow = false;
-            _fuelCritical = false;
             probeDestroyed = false;
             _shipDestroyed = false;
 
@@ -205,7 +136,6 @@ public class ShipEnhancements : ModBehaviour
                 GlobalMessenger.RemoveListener("ExitShip", OnExitShip);
             }
             _lastSuitOxygen = 0f;
-            _shipOxygenDetector = null;
             _shipLoaded = false;
         };
     }
@@ -214,7 +144,7 @@ public class ShipEnhancements : ModBehaviour
     {
         if (!_shipLoaded || LoadManager.GetCurrentScene() != OWScene.SolarSystem || _shipDestroyed) return;
 
-        if (Locator.GetShipBody().GetAngularVelocity().sqrMagnitude > _maxSpinSpeed * _maxSpinSpeed)
+        if (Locator.GetShipBody().GetAngularVelocity().sqrMagnitude > maxSpinSpeed * maxSpinSpeed)
         {
             ShipOxygenTankComponent oxygenTank = Locator.GetShipBody().GetComponentInChildren<ShipOxygenTankComponent>();
             if (oxygenTank.isDamaged)
@@ -231,19 +161,19 @@ public class ShipEnhancements : ModBehaviour
             Locator.GetShipBody().GetComponent<ShipDamageController>().Explode();
         }
 
-        if (!oxygenDepleted && _shipResources.GetOxygen() <= 0 && !(ShipOxygenRefill && IsShipInOxygen()))
+        if (!oxygenDepleted && SELocator.GetShipResources().GetOxygen() <= 0 && !((bool)Settings.shipOxygenRefill.GetProperty() && IsShipInOxygen()))
         {
             oxygenDepleted = true;
 
-            NotificationManager.SharedInstance.PostNotification(_oxygenDepletedNotification, true);
+            ShipNotifications.OnOxygenDepleted();
 
             if (PlayerState.IsInsideShip())
             {
-                if (KeepHelmetOn && PlayerState.IsWearingSuit() && !Locator.GetPlayerSuit().IsWearingHelmet())
+                if ((bool)Settings.keepHelmetOn.GetProperty() && PlayerState.IsWearingSuit() && !Locator.GetPlayerSuit().IsWearingHelmet())
                 {
                     Locator.GetPlayerSuit().PutOnHelmet();
                 }
-                _shipOxygen.OnEffectVolumeExit(Locator.GetPlayerDetector());
+                SELocator.GetShipOxygenVolume().OnEffectVolumeExit(Locator.GetPlayerDetector());
             }
 
             ShipOxygenTankComponent oxygenTank = Locator.GetShipBody().GetComponentInChildren<ShipOxygenTankComponent>();
@@ -253,16 +183,16 @@ public class ShipEnhancements : ModBehaviour
                 oxygenTank._damageEffect._particleAudioSource.Stop();
             }
         }
-        else if (oxygenDepleted && (_shipResources.GetOxygen() > 0 || (ShipOxygenRefill && IsShipInOxygen())))
+        else if (oxygenDepleted && (SELocator.GetShipResources().GetOxygen() > 0 || ((bool)Settings.shipOxygenRefill.GetProperty() && IsShipInOxygen())))
         {
             oxygenDepleted = false;
             refillingOxygen = true;
 
-            NotificationManager.SharedInstance.UnpinNotification(_oxygenDepletedNotification);
+            ShipNotifications.OnOxygenRestored();
 
             if (PlayerState.IsInsideShip())
             {
-                _shipOxygen.OnEffectVolumeEnter(Locator.GetPlayerDetector());
+                SELocator.GetShipOxygenVolume().OnEffectVolumeEnter(Locator.GetPlayerDetector());
             }
 
             ShipOxygenTankComponent oxygenTank = Locator.GetShipBody().GetComponentInChildren<ShipOxygenTankComponent>();
@@ -273,7 +203,7 @@ public class ShipEnhancements : ModBehaviour
             }
         }
 
-        if (!fuelDepleted && _shipResources._currentFuel <= 0f)
+        if (!fuelDepleted && SELocator.GetShipResources()._currentFuel <= 0f)
         {
             fuelDepleted = true;
             ShipFuelTankComponent fuelTank = Locator.GetShipBody().GetComponentInChildren<ShipFuelTankComponent>();
@@ -283,7 +213,7 @@ public class ShipEnhancements : ModBehaviour
                 fuelTank._damageEffect._particleAudioSource.Stop();
             }
         }
-        else if (fuelDepleted && _shipResources._currentFuel > 0f)
+        else if (fuelDepleted && SELocator.GetShipResources()._currentFuel > 0f)
         {
             fuelDepleted = false;
             ShipFuelTankComponent fuelTank = Locator.GetShipBody().GetComponentInChildren<ShipFuelTankComponent>();
@@ -294,68 +224,42 @@ public class ShipEnhancements : ModBehaviour
             }
         }
 
-        if (ShowWarningNotifications && !_shipDestroyed)
+        if ((bool)Settings.showWarningNotifications.GetProperty() && !_shipDestroyed)
         {
-            UpdateNotifications();
+            ShipNotifications.UpdateNotifications();
         }
 
-        _lastShipOxygen = _shipResources._currentOxygen;
-        _lastShipFuel = _shipResources._currentFuel;
+        _lastShipOxygen = SELocator.GetShipResources()._currentOxygen;
+        _lastShipFuel = SELocator.GetShipResources()._currentFuel;
     }
 
     private void LateUpdate()
     {
         if (!_shipLoaded || LoadManager.GetCurrentScene() != OWScene.SolarSystem) return;
 
-        if (!_playerResources._refillingOxygen && refillingOxygen)
+        if (!SELocator.GetPlayerResources()._refillingOxygen && refillingOxygen)
         {
             refillingOxygen = false;
         }
     }
 
+    #region Initialization
+
     private void UpdateProperties()
     {
-        HeadlightsDisabled = (bool)Settings.disableHeadlights.GetValue();
-        LandingCameraDisabled = (bool)Settings.disableLandingCamera.GetValue();
-        OxygenDrainMultiplier = (float)Settings.oxygenDrainMultiplier.GetValue();
-        FuelDrainMultiplier = (float)Settings.fuelDrainMultiplier.GetValue();
-        DamageMultiplier = (float)Settings.shipDamageMultiplier.GetValue();
-        DamageSpeedMultiplier = (float)Settings.shipDamageSpeedMultiplier.GetValue();
-        ShipOxygenRefill = (bool)Settings.shipOxygenRefill.GetValue();
-        OxygenDisabled = (bool)Settings.disableShipOxygen.GetValue();
-        ShipRepairDisabled = (bool)Settings.disableShipRepair.GetValue();
-        GravityLandingGearEnabled = (bool)Settings.enableGravityLandingGear.GetValue();
-        AirAutoRollDisabled = (bool)Settings.disableAirAutoRoll.GetValue();
-        WaterAutoRollDisabled = (bool)Settings.disableWaterAutoRoll.GetValue();
-        ThrustModulatorEnabled = (bool)Settings.enableThrustModulator.GetValue();
-        ThrustModulatorLevel = 5;
-        ReferenceFrameDisabled = (bool)Settings.disableReferenceFrame.GetValue();
-        MapMarkersDisabled = (bool)Settings.disableMapMarkers.GetValue();
-        FuelTransferMultiplier = (float)Settings.fuelTransferMultiplier.GetValue();
-        OxygenRefillMultiplier = (float)Settings.oxygenRefillMultiplier.GetValue();
-        TemperatureDamageMultiplier = (float)Settings.temperatureDamageMultiplier.GetValue();
-        TemperatureResistanceMultiplier = (float)Settings.temperatureResistanceMultiplier.GetValue();
-        AutoHatchEnabled = (bool)Settings.enableAutoHatch.GetValue();
-        OxygenTankDrainMultiplier = (float)Settings.oxygenTankDrainMultiplier.GetValue();
-        FuelTankDrainMultiplier = (float)Settings.fuelTankDrainMultiplier.GetValue();
-        HullTemperatureDamage = (bool)Settings.hullTemperatureDamage.GetValue();
-        ComponentTemperatureDamage = (bool)Settings.componentTemperatureDamage.GetValue();
-        RotationSpeedLimitDisabled = (bool)Settings.disableRotationSpeedLimit.GetValue();
-        AngularDragMultiplier = (float)Settings.angularDragMultiplier.GetValue();
-        SpaceAngularDragDisabled = (bool)Settings.disableSpaceAngularDrag.GetValue();
-        ScoutLauncherDisabled = (bool)Settings.disableScoutLauncher.GetValue();
-        ScoutLauncherComponentEnabled = (bool)Settings.enableScoutLauncherComponent.GetValue();
-        ManualScoutRecallEnabled = (bool)Settings.enableManualScoutRecall.GetValue();
-        ShipItemPlacementEnabled = (bool)Settings.enableShipItemPlacement.GetValue();
-        PortableCampfireEnabled = (bool)Settings.addPortableCampfire.GetValue();
-        KeepHelmetOn = (bool)Settings.keepHelmetOn.GetValue();
-        ShowWarningNotifications = (bool)Settings.showWarningNotifications.GetValue();
-        ShipExplosionMultiplier = (float)Settings.shipExplosionMultiplier.GetValue();
+        var allSettings = Enum.GetValues(typeof(Settings)) as Settings[];
+
+        foreach (Settings setting in allSettings)
+        {
+            setting.SetProperty(ModHelper.Config.GetSettingsValue<object>(setting.GetName()));
+        }
     }
 
     private IEnumerator InitializeShip()
     {
         yield return new WaitUntil(() => Locator._shipBody != null);
+
+        SELocator.Initalize();
 
         GameObject buttonConsole = LoadPrefab("Assets/ShipEnhancements/ButtonConsole.prefab");
         AssetBundleUtilities.ReplaceShaders(buttonConsole);
@@ -370,13 +274,9 @@ public class ShipEnhancements : ModBehaviour
         materials.Add(material3);
         GameObject.Find("Pointlight_HEA_ShipCockpit").GetComponent<LightmapController>()._materials = [.. materials];
 
-        _shipResources = Locator.GetShipBody().GetComponent<ShipResources>();
-        _shipOxygen = Locator.GetShipBody().GetComponentInChildren<OxygenVolume>();
-        _playerResources = Locator.GetPlayerBody().GetComponent<PlayerResources>();
-
         _shipLoaded = true;
         UpdateSuitOxygen();
-        _lastShipOxygen = _shipResources._currentOxygen;
+        _lastShipOxygen = SELocator.GetShipResources()._currentOxygen;
 
         if ((bool)Settings.disableGravityCrystal.GetValue())
         {
@@ -416,12 +316,8 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((bool)Settings.disableShipOxygen.GetValue())
         {
-            _shipResources.SetOxygen(0f);
+            SELocator.GetShipResources().SetOxygen(0f);
             oxygenDepleted = true;
-        }
-        if ((bool)Settings.shipOxygenRefill.GetValue())
-        {
-            _shipOxygenDetector = Locator.GetShipDetector().gameObject.AddComponent<OxygenDetector>();
         }
         if (Settings.temperatureZonesAmount.GetValue().ToString() == "Sun")
         {
@@ -438,7 +334,6 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((bool)Settings.hullTemperatureDamage.GetValue() || (bool)Settings.componentTemperatureDamage.GetValue())
         {
-            _shipTemperatureDetector = Locator.GetShipDetector().gameObject.AddComponent<ShipTemperatureDetector>();
             Locator.GetShipBody().GetComponentInChildren<ShipFuelGauge>().gameObject.AddComponent<ShipTemperatureGauge>();
             GameObject hullTempDial = LoadPrefab("Assets/ShipEnhancements/ShipTempDial.prefab");
             Instantiate(hullTempDial, Locator.GetShipTransform().Find("Module_Cockpit"));
@@ -509,10 +404,10 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((bool)Settings.disableScoutLauncher.GetValue() && (bool)Settings.enableScoutLauncherComponent.GetValue())
         {
-            _probeLauncherComponent._repairReceiver.repairDistance = 0f;
-            _probeLauncherComponent._damaged = true;
-            _probeLauncherComponent._repairFraction = 0f;
-            _probeLauncherComponent.OnComponentDamaged();
+            SELocator.GetProbeLauncherComponent()._repairReceiver.repairDistance = 0f;
+            SELocator.GetProbeLauncherComponent()._damaged = true;
+            SELocator.GetProbeLauncherComponent()._repairFraction = 0f;
+            SELocator.GetProbeLauncherComponent().OnComponentDamaged();
         }
         if ((bool)Settings.addPortableCampfire.GetValue())
         {
@@ -548,6 +443,8 @@ public class ShipEnhancements : ModBehaviour
             }
             audio.SetCustomCurve(AudioSourceCurveType.CustomRolloff, newCurve);
         }
+
+        ShipNotifications.Initialize();
     }
 
     private void AddTemperatureZones()
@@ -621,126 +518,6 @@ public class ShipEnhancements : ModBehaviour
         }
     }
 
-    private void UpdateNotifications()
-    {
-        if (ShipOxygenRefill)
-        {
-            if (!_startOxygenRefill && _shipResources._currentOxygen > _lastShipOxygen)
-            {
-                _startOxygenRefill = true;
-                NotificationManager.SharedInstance.PostNotification(_oxygenRefillingNotification, false);
-            }
-            else if (_startOxygenRefill && _shipResources._currentOxygen < _lastShipOxygen && _shipResources._currentOxygen / _shipResources._maxOxygen < 0.99f)
-            {
-                _startOxygenRefill = false;
-            }
-        }
-
-        if (_shipResources._currentOxygen < _lastShipOxygen)
-        {
-            if (!_oxygenCritical && _shipResources.GetFractionalOxygen() < 0.15f)
-            {
-                _oxygenCritical = true;
-                NotificationManager.SharedInstance.PostNotification(_oxygenCriticalNotification, false);
-            }
-            else if (!_oxygenLow && _shipResources.GetFractionalOxygen() < 0.3f)
-            {
-                _oxygenLow = true;
-                NotificationManager.SharedInstance.PostNotification(_oxygenLowNotification, false);
-            }
-        }
-        else
-        {
-            if (_oxygenCritical && _shipResources.GetFractionalOxygen() > 0.15f)
-            {
-                _oxygenCritical = false;
-            }
-            else if (_oxygenLow && _shipResources.GetFractionalOxygen() > 0.3f)
-            {
-                _oxygenLow = false;
-            }
-        }
-
-        if (_shipResources._currentFuel < _lastShipFuel)
-        {
-            if (!_fuelCritical && _shipResources.GetFractionalFuel() < 0.15f)
-            {
-                _fuelCritical = true;
-                NotificationManager.SharedInstance.PostNotification(_fuelCriticalNotification, false);
-            }
-            else if (!_fuelLow && _shipResources.GetFractionalFuel() < 0.3f)
-            {
-                _fuelLow = true;
-                NotificationManager.SharedInstance.PostNotification(_fuelLowNotification, false);
-            }
-        }
-        else
-        {
-            if (_fuelCritical && _shipResources.GetFractionalFuel() > 0.15f)
-            {
-                _fuelCritical = false;
-            }
-            else if (_fuelLow && _shipResources.GetFractionalFuel() > 0.3f)
-            {
-                _fuelLow = false;
-            }
-        }
-
-        if (RotationSpeedLimitDisabled)
-        {
-            if (!_hullIntegrityCritical && Locator.GetShipBody().GetAngularVelocity().sqrMagnitude > _levelTwoSpinSpeed * _levelTwoSpinSpeed)
-            {
-                _hullIntegrityCritical = true;
-                NotificationManager.SharedInstance.PostNotification(_spinSpeedCriticalNotification, false);
-            }
-            else if (_hullIntegrityCritical && Locator.GetShipBody().GetAngularVelocity().sqrMagnitude < _levelTwoSpinSpeed * _levelTwoSpinSpeed)
-            {
-                _hullIntegrityCritical = false;
-            }
-
-            if (!_hullIntegrityLow && Locator.GetShipBody().GetAngularVelocity().sqrMagnitude > _levelOneSpinSpeed * _levelOneSpinSpeed)
-            {
-                _hullIntegrityLow = true;
-                NotificationManager.SharedInstance.PostNotification(_spinSpeedHighNotification, false);
-            }
-            else if (_hullIntegrityLow && Locator.GetShipBody().GetAngularVelocity().sqrMagnitude < _levelOneSpinSpeed * _levelOneSpinSpeed)
-            {
-                _hullIntegrityLow = false;
-            }
-        }
-
-        if ((ComponentTemperatureDamage || HullTemperatureDamage) && _shipTemperatureDetector)
-        {
-            float hullTempRatio = Mathf.Abs(_shipTemperatureDetector.GetShipTemperatureRatio() - 0.5f);
-            if (!_hullTemperatureCritical && hullTempRatio > 0.35f)
-            {
-                _hullTemperatureCritical = true;
-                NotificationManager.SharedInstance.PostNotification(_temperatureCriticalNotification, false);
-            }
-            else if (_hullTemperatureCritical && hullTempRatio < 0.35f)
-            {
-                _hullTemperatureCritical = false;
-            }
-
-            if (!_hullTemperatureHigh && hullTempRatio > 0.15f)
-            {
-                _hullTemperatureHigh = true;
-                if (_shipTemperatureDetector.GetTemperatureRatio() > 0)
-                {
-                    NotificationManager.SharedInstance.PostNotification(_temperatureHighNotification, false);
-                }
-                else
-                {
-                    NotificationManager.SharedInstance.PostNotification(_temperatureLowNotification, false);
-                }
-            }
-            else if (_hullTemperatureHigh && hullTempRatio < 0.15f)
-            {
-                _hullTemperatureHigh = false;
-            }
-        }
-    }
-
     private void DisableHeadlights()
     {
         ShipHeadlightComponent headlightComponent = Locator.GetShipBody().GetComponentInChildren<ShipHeadlightComponent>();
@@ -771,6 +548,10 @@ public class ShipEnhancements : ModBehaviour
         cameraComponent._landingCamera.SetDamaged(true);
     }
 
+    #endregion
+
+    #region Events
+
     private void OnPlayerSuitUp()
     {
         if (Locator.GetPlayerBody().GetComponent<PlayerResources>()._currentOxygen < _lastSuitOxygen)
@@ -784,54 +565,11 @@ public class ShipEnhancements : ModBehaviour
         UpdateSuitOxygen();
     }
 
-    public void UpdateSuitOxygen()
-    {
-        _lastSuitOxygen = Locator.GetPlayerBody().GetComponent<PlayerResources>()._currentOxygen;
-    }
-
-    public bool IsShipInOxygen()
-    {
-        return !_shipDestroyed && _shipOxygenDetector != null && _shipOxygenDetector.GetDetectOxygen()
-            && !Locator.GetShipDetector().GetComponent<ShipFluidDetector>().InFluidType(FluidVolume.Type.WATER);
-    }
-
-    public ShipResources GetShipResources()
-    {
-        return _shipResources;
-    }
-
-    public PlayerResources GetPlayerResources()
-    {
-        return _playerResources;
-    }
-
-    public ProbeLauncherComponent GetProbeLauncherComponent()
-    {
-        return _probeLauncherComponent;
-    }
-    public void SetProbeLauncherComponent(ProbeLauncherComponent component)
-    {
-        _probeLauncherComponent = component;
-    }
-
-    public void SetGravityLandingGearEnabled(bool enabled)
-    {
-        if (OnGravityLandingGearSwitch != null)
-        {
-            OnGravityLandingGearSwitch(enabled);
-        }
-    }
-
-    public void SetThrustModulatorLevel(int level)
-    {
-        ThrustModulatorLevel = level;
-    }
-
     private void OnEnterFluid(FluidVolume fluid)
     {
         angularDragEnabled = true;
-        Locator.GetShipBody()._rigidbody.angularDrag = 0.94f * AngularDragMultiplier;
-        Locator.GetShipBody().GetComponent<ShipThrusterModel>()._angularDrag = 0.94f * AngularDragMultiplier;
+        Locator.GetShipBody()._rigidbody.angularDrag = 0.94f * (float)Settings.angularDragMultiplier.GetProperty();
+        Locator.GetShipBody().GetComponent<ShipThrusterModel>()._angularDrag = 0.94f * (float)Settings.angularDragMultiplier.GetProperty();
     }
 
     private void OnExitFluid(FluidVolume fluid)
@@ -866,6 +604,36 @@ public class ShipEnhancements : ModBehaviour
         _shipDestroyed = true;
         Locator.GetShipBody().SetCenterOfMass(Locator.GetShipBody().GetWorldCenterOfMass());
     }
+
+    #endregion
+
+    #region Properties
+
+    public void UpdateSuitOxygen()
+    {
+        _lastSuitOxygen = Locator.GetPlayerBody().GetComponent<PlayerResources>()._currentOxygen;
+    }
+
+    public bool IsShipInOxygen()
+    {
+        return !_shipDestroyed && SELocator.GetShipOxygenDetector() != null && SELocator.GetShipOxygenDetector().GetDetectOxygen()
+            && !Locator.GetShipDetector().GetComponent<ShipFluidDetector>().InFluidType(FluidVolume.Type.WATER);
+    }
+
+    public void SetGravityLandingGearEnabled(bool enabled)
+    {
+        if (OnGravityLandingGearSwitch != null)
+        {
+            OnGravityLandingGearSwitch(enabled);
+        }
+    }
+
+    public void SetThrustModulatorLevel(int level)
+    {
+        thrustModulatorLevel = level;
+    }
+
+    #endregion
 
     public static void WriteDebugMessage(object msg, bool warning = false, bool error = false)
     {

@@ -2,6 +2,7 @@
 using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
+using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -15,7 +16,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.UpdateShipLightInput))]
     public static bool DisableHeadlights(ShipCockpitController __instance)
     {
-        if (ShipEnhancements.Instance.HeadlightsDisabled) return false;
+        if ((bool)disableHeadlights.GetProperty()) return false;
         return true;
     }
     #endregion
@@ -36,7 +37,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(OxygenDetector), nameof(OxygenDetector.GetDetectOxygen))]
     public static void DisableOxygenDetection(OxygenDetector __instance, ref bool __result)
     {
-        if (ShipEnhancements.Instance.OxygenDisabled && __instance.gameObject.CompareTag("ShipDetector"))
+        if ((bool)disableShipOxygen.GetProperty() && __instance.gameObject.CompareTag("ShipDetector"))
         {
             __result = false;
         }
@@ -46,7 +47,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.OnPressInteract))]
     public static bool KeepHelmetOnAtCockpit(ShipCockpitController __instance)
     {
-        if (!ShipEnhancements.Instance.KeepHelmetOn || !ShipEnhancements.Instance.oxygenDepleted) return true;
+        if (!(bool)keepHelmetOn.GetProperty() || !ShipEnhancements.Instance.oxygenDepleted) return true;
 
         if (!__instance._playerAtFlightConsole)
         {
@@ -108,8 +109,8 @@ public static class PatchClass
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.StartSleeping))]
     public static bool KeepHelmetOnWhenSleeping(Campfire __instance)
     {
-        bool portableCampfire = ShipEnhancements.Instance.PortableCampfireEnabled && __instance is PortableCampfire;
-        bool shouldKeepHelmetOn = ShipEnhancements.Instance.KeepHelmetOn && !ShipEnhancements.Instance.GetPlayerResources().IsOxygenPresent()
+        bool portableCampfire = (bool)addPortableCampfire.GetProperty() && __instance is PortableCampfire;
+        bool shouldKeepHelmetOn = (bool)keepHelmetOn.GetProperty() && !SELocator.GetPlayerResources().IsOxygenPresent()
             && PlayerState.IsWearingSuit();
 
         if (!portableCampfire && !shouldKeepHelmetOn) return true;
@@ -164,8 +165,8 @@ public static class PatchClass
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.StopSleeping))]
     public static bool KeepHelmetOnWhenStopSleeping(Campfire __instance, bool sudden)
     {
-        if (!ShipEnhancements.Instance.KeepHelmetOn || (!Locator.GetPlayerSuit().IsWearingHelmet()
-            && (ShipEnhancements.Instance.GetPlayerResources().IsOxygenPresent() || !PlayerState.IsWearingSuit()))) return true;
+        if (!(bool)keepHelmetOn.GetProperty() || (!Locator.GetPlayerSuit().IsWearingHelmet()
+            && (SELocator.GetPlayerResources().IsOxygenPresent() || !PlayerState.IsWearingSuit()))) return true;
 
         if (!__instance._isPlayerSleeping)
         {
@@ -202,8 +203,8 @@ public static class PatchClass
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.StartRoasting))]
     public static bool KeepHelmetOnWhenRoasting(Campfire __instance)
     {
-        bool portableCampfire = ShipEnhancements.Instance.PortableCampfireEnabled && __instance is PortableCampfire;
-        bool shouldKeepHelmetOn = ShipEnhancements.Instance.KeepHelmetOn && !ShipEnhancements.Instance.GetPlayerResources().IsOxygenPresent()
+        bool portableCampfire = (bool)addPortableCampfire.GetProperty() && __instance is PortableCampfire;
+        bool shouldKeepHelmetOn = (bool)keepHelmetOn.GetProperty() && !SELocator.GetPlayerResources().IsOxygenPresent()
             && PlayerState.IsWearingSuit();
 
         if (!portableCampfire && !shouldKeepHelmetOn) return true;
@@ -252,8 +253,8 @@ public static class PatchClass
     {
         Locator.GetPlayerTransform().GetComponentInChildren<RoastingStickController>()._stickMaxZ = baseRoastingStickMaxZ;
 
-        if (!ShipEnhancements.Instance.KeepHelmetOn || (!Locator.GetPlayerSuit().IsWearingHelmet() 
-            && (ShipEnhancements.Instance.GetPlayerResources().IsOxygenPresent() || !PlayerState.IsWearingSuit()))) return true;
+        if (!(bool)keepHelmetOn.GetProperty() || (!Locator.GetPlayerSuit().IsWearingHelmet() 
+            && (SELocator.GetPlayerResources().IsOxygenPresent() || !PlayerState.IsWearingSuit()))) return true;
 
         if (!__instance._isPlayerRoasting)
         {
@@ -322,7 +323,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipResources), nameof(ShipResources.DrainOxygen))]
     public static bool ApplyOxygenDrainMultiplier(ShipResources __instance, float amount)
     {
-        __instance._currentOxygen = Mathf.Max(__instance._currentOxygen - (amount * ShipEnhancements.Instance.OxygenDrainMultiplier), 0f);
+        __instance._currentOxygen = Mathf.Max(__instance._currentOxygen - (amount * (float)oxygenDrainMultiplier.GetProperty()), 0f);
         return false;
     }
 
@@ -330,7 +331,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipResources), nameof(ShipResources.DrainFuel))]
     public static bool ApplyFuelDrainMultiplier(ShipResources __instance, float amount)
     {
-        __instance._currentFuel = Mathf.Max(__instance._currentFuel - (amount * ShipEnhancements.Instance.FuelDrainMultiplier), 0f);
+        __instance._currentFuel = Mathf.Max(__instance._currentFuel - (amount * (float)fuelDrainMultiplier.GetProperty()), 0f);
         return false;
     }
     #endregion
@@ -340,7 +341,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipHull), nameof(ShipHull.FixedUpdate))]
     public static bool ApplyHullDamageMultiplier(ShipHull __instance)
     {
-        if (ShipEnhancements.Instance.DamageMultiplier == 1 && ShipEnhancements.Instance.DamageSpeedMultiplier == 1)
+        if ((float)shipDamageMultiplier.GetProperty() == 1 && (float)shipDamageSpeedMultiplier.GetProperty() == 1)
         {
             return true;
         }
@@ -368,8 +369,8 @@ public static class PatchClass
         }
         if (__instance._dominantImpact != null)
         {
-            float num = Mathf.InverseLerp(30f * ShipEnhancements.Instance.DamageSpeedMultiplier,
-                200f * ShipEnhancements.Instance.DamageSpeedMultiplier, __instance._dominantImpact.speed);
+            float num = Mathf.InverseLerp(30f * (float)shipDamageSpeedMultiplier.GetProperty(),
+                200f * (float)shipDamageSpeedMultiplier.GetProperty(), __instance._dominantImpact.speed);
             if (num > 0f)
             {
                 float num2 = 0.15f;
@@ -377,7 +378,7 @@ public static class PatchClass
                 {
                     num = num2;
                 }
-                num *= ShipEnhancements.Instance.DamageMultiplier;
+                num *= (float)shipDamageMultiplier.GetProperty();
                 __instance._integrity = Mathf.Max(__instance._integrity - num, 0f);
                 if (!__instance._damaged)
                 {
@@ -423,7 +424,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipComponent), nameof(ShipComponent.ApplyImpact))]
     public static bool ApplyComponentDamageMultiplier(ShipComponent __instance, ImpactData impact)
     {
-        if (ShipEnhancements.Instance.DamageMultiplier == 1 && ShipEnhancements.Instance.DamageSpeedMultiplier == 1)
+        if ((float)shipDamageMultiplier.GetProperty() == 1 && (float)shipDamageSpeedMultiplier.GetProperty() == 1)
         {
             return true;
         }
@@ -432,8 +433,8 @@ public static class PatchClass
         {
             return false;
         }
-        if (UnityEngine.Random.value / ShipEnhancements.Instance.DamageMultiplier
-            < __instance._damageProbabilityCurve.Evaluate(impact.speed / ShipEnhancements.Instance.DamageSpeedMultiplier))
+        if (UnityEngine.Random.value / (float)shipDamageMultiplier.GetProperty()
+            < __instance._damageProbabilityCurve.Evaluate(impact.speed / (float)shipDamageSpeedMultiplier.GetProperty()))
         {
             __instance.SetDamaged(true);
             return true;
@@ -446,14 +447,14 @@ public static class PatchClass
     public static void FixExitShipToRepairNotification(ShipDamageController __instance, ref bool __result)
     {
         bool flag = false;
-        if (!ShipEnhancements.Instance.ShipRepairDisabled)
+        if (!(bool)disableShipRepair.GetProperty())
         {
             for (int j = 0; j < __instance._shipComponents.Length; j++)
             {
                 if (__instance._shipComponents[j].isDamaged && __instance._shipComponents[j].componentName != UITextType.ShipPartGravity
                     && __instance._shipComponents[j].componentName != UITextType.ShipPartReactor
-                    && !(ShipEnhancements.Instance.LandingCameraDisabled && __instance._shipComponents[j].componentName == UITextType.ShipPartCamera)
-                    && !(ShipEnhancements.Instance.HeadlightsDisabled && __instance._shipComponents[j].componentName == UITextType.ShipPartLights))
+                    && !((bool)disableLandingCamera.GetProperty() && __instance._shipComponents[j].componentName == UITextType.ShipPartCamera)
+                    && !((bool)disableHeadlights.GetProperty() && __instance._shipComponents[j].componentName == UITextType.ShipPartLights))
                 {
                     flag = true;
                 }
@@ -466,7 +467,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.OnImpact))]
     public static bool ApplyExplosionDamageMultiplier(ShipDamageController __instance, ImpactData impact)
     {
-        if (ShipEnhancements.Instance.DamageMultiplier == 1 && ShipEnhancements.Instance.DamageSpeedMultiplier == 1)
+        if ((float)shipDamageMultiplier.GetProperty() == 1 && (float)shipDamageSpeedMultiplier.GetProperty() == 1)
         {
             return true;
         }
@@ -475,7 +476,7 @@ public static class PatchClass
         {
             return false;
         }
-        if (impact.speed >= 300f * ShipEnhancements.Instance.DamageSpeedMultiplier / (ShipEnhancements.Instance.DamageMultiplier / 10) && !__instance._exploded)
+        if (impact.speed >= 300f * (float)shipDamageSpeedMultiplier.GetProperty() / ((float)shipDamageMultiplier.GetProperty() / 10) && !__instance._exploded)
         {
             __instance.Explode(false);
             return false;
@@ -506,7 +507,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipResources), nameof(ShipResources.Update))]
     public static bool RefillShipOxygen(ShipResources __instance)
     {
-        if (ShipEnhancements.Instance.OxygenDisabled || !ShipEnhancements.Instance.ShipOxygenRefill
+        if ((bool)disableShipOxygen.GetProperty() || !(bool)shipOxygenRefill.GetProperty()
             || ModCompatibility.GetModSetting("Stonesword.ResourceManagement", "Enable Oxygen Refill")) return true;
 
         if (__instance._killingResources)
@@ -535,7 +536,7 @@ public static class PatchClass
         {
             if (ShipEnhancements.Instance.IsShipInOxygen())
             {
-                __instance.AddOxygen(100f * Time.deltaTime * ShipEnhancements.Instance.OxygenRefillMultiplier);
+                __instance.AddOxygen(100f * Time.deltaTime * (float)oxygenRefillMultiplier.GetProperty());
             }
             else if (PlayerState.IsInsideShip())
             {
@@ -551,7 +552,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipComponent), nameof(ShipComponent.Awake))]
     public static void DisableShipComponentRepair(ShipComponent __instance)
     {
-        if (!ShipEnhancements.Instance.ShipRepairDisabled) return;
+        if (!(bool)disableShipRepair.GetProperty()) return;
 
         __instance._repairReceiver._repairDistance = 0f;
     }
@@ -560,7 +561,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipHull), nameof(ShipHull.Start))]
     public static void DisableShipHullRepair(ShipHull __instance)
     {
-        if (!ShipEnhancements.Instance.ShipRepairDisabled) return;
+        if (!(bool)disableShipRepair.GetProperty()) return;
 
         for (int i = 0; i < __instance._colliders.Length; i++)
         {
@@ -577,7 +578,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(LandingPadSensor), nameof(LandingPadSensor.Awake))]
     public static void AddGravityComponent(LandingPadSensor __instance)
     {
-        if (!ShipEnhancements.Instance.GravityLandingGearEnabled) return;
+        if (!(bool)enableGravityLandingGear.GetProperty()) return;
         __instance.gameObject.AddComponent<GravityLandingGear>();
     }
     #endregion
@@ -587,11 +588,11 @@ public static class PatchClass
     [HarmonyPatch(typeof(FluidVolume), nameof(FluidVolume.Start))]
     public static void Attempt3(FluidVolume __instance)
     {
-        if (ShipEnhancements.Instance.AirAutoRollDisabled && __instance._fluidType == FluidVolume.Type.AIR)
+        if ((bool)disableAirAutoRoll.GetProperty() && __instance._fluidType == FluidVolume.Type.AIR)
         {
             __instance._allowShipAutoroll = false;
         }
-        else if (ShipEnhancements.Instance.WaterAutoRollDisabled && __instance._fluidType == FluidVolume.Type.WATER)
+        else if ((bool)disableWaterAutoRoll.GetProperty() && __instance._fluidType == FluidVolume.Type.WATER)
         {
             __instance._allowShipAutoroll = false;
         }
@@ -603,15 +604,15 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipThrusterController), nameof(ShipThrusterController.ReadTranslationalInput))]
     public static void LimitTranslationalInput(ShipThrusterController __instance, ref Vector3 __result)
     {
-        if (!ShipEnhancements.Instance.ThrustModulatorEnabled) return;
-        __result *= ShipEnhancements.Instance.ThrustModulatorLevel / 5f;
+        if (!(bool)enableThrustModulator.GetProperty()) return;
+        __result *= ShipEnhancements.Instance.thrustModulatorLevel / 5f;
     }
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(Autopilot), nameof(Autopilot.ReadTranslationalInput))]
     public static bool LimitAutopilotTranslationalInput(Autopilot __instance, ref Vector3 __result)
     {
-        if (!ShipEnhancements.Instance.ThrustModulatorEnabled) return true;
+        if (!(bool)enableThrustModulator.GetProperty()) return true;
 
         if (__instance._isShipAutopilot && !__instance._shipResources.AreThrustersUsable())
         {
@@ -627,7 +628,7 @@ public static class PatchClass
             return false;
         }
 
-        float multiplier = ShipEnhancements.Instance.ThrustModulatorLevel / 5f;
+        float multiplier = ShipEnhancements.Instance.thrustModulatorLevel / 5f;
 
         if (__instance._isMatchingVelocity && __instance._referenceFrame != null)
         {
@@ -788,7 +789,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ReferenceFrameTracker), nameof(ReferenceFrameTracker.Update))]
     public static bool DisableReferenceFrame(ReferenceFrameTracker __instance)
     {
-        if (!ShipEnhancements.Instance.ReferenceFrameDisabled) return true;
+        if (!(bool)disableReferenceFrame.GetProperty()) return true;
 
         if (__instance._activeCam == null)
         {
@@ -818,7 +819,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(CanvasMarker), nameof(CanvasMarker.SetVisibility))]
     public static bool DisableHUDMarker(bool value)
     {
-        if (!ShipEnhancements.Instance.MapMarkersDisabled) return true;
+        if (!(bool)disableMapMarkers.GetProperty()) return true;
 
         if (value && (ShipLogEntryHUDMarker.s_entryLocation == null || !ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField()
             || (ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField() && Locator.GetCloakFieldController().isPlayerInsideCloak)))
@@ -832,7 +833,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(MapMarker), nameof(MapMarker.Start))]
     public static void DisableMapMarker(MapMarker __instance)
     {
-        if (!ShipEnhancements.Instance.MapMarkersDisabled || !__instance) return;
+        if (!(bool)disableMapMarkers.GetProperty() || !__instance) return;
         if (__instance.GetComponent<ShipLogEntryHUDMarker>() && !Locator.GetCloakFieldController().isPlayerInsideCloak
             && ShipLogEntryHUDMarker.s_entryLocation != null && ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField())
         {
@@ -846,7 +847,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(MapMarker), nameof(MapMarker.EnableMarker))]
     public static bool CancelMapMarkerEnable(MapMarker __instance)
     {
-        if (!ShipEnhancements.Instance.MapMarkersDisabled || !__instance) return true;
+        if (!(bool)disableMapMarkers.GetProperty() || !__instance) return true;
         if (__instance.GetComponent<ShipLogEntryHUDMarker>() && !Locator.GetCloakFieldController().isPlayerInsideCloak
             && ShipLogEntryHUDMarker.s_entryLocation != null && ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField())
         {
@@ -860,7 +861,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipLogEntryHUDMarker), nameof(ShipLogEntryHUDMarker.RefreshOwnVisibility))]
     public static bool DisableInsideCloak(ShipLogEntryHUDMarker __instance)
     {
-        if (!ShipEnhancements.Instance.MapMarkersDisabled) return true;
+        if (!(bool)disableMapMarkers.GetProperty()) return true;
         if (ShipLogEntryHUDMarker.s_entryLocation != null
             && ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField() && Locator.GetCloakFieldController().isPlayerInsideCloak)
         {
@@ -885,7 +886,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(HatchController), nameof(HatchController.OpenHatch))]
     public static void ActivateHatchTractorBeam(HatchController __instance)
     {
-        if (!ShipEnhancements.Instance.AutoHatchEnabled) return;
+        if (!(bool)enableAutoHatch.GetProperty()) return;
 
         if (!__instance.IsPlayerInShip())
         {
@@ -897,7 +898,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipTractorBeamSwitch), nameof(ShipTractorBeamSwitch.OnTriggerExit))]
     public static bool CloseHatchOutsideShip(ShipTractorBeamSwitch __instance)
     {
-        if (!ShipEnhancements.Instance.AutoHatchEnabled) return true;
+        if (!(bool)enableAutoHatch.GetProperty()) return true;
 
         HatchController hatch = Locator.GetShipBody().GetComponentInChildren<HatchController>();
         if (!hatch._hatchObject.activeInHierarchy)
@@ -920,7 +921,7 @@ public static class PatchClass
     {
         if (__instance._damaged)
         {
-            __instance._shipResources.DrainOxygen(__instance._oxygenLeakRate * Time.deltaTime * ShipEnhancements.Instance.OxygenTankDrainMultiplier);
+            __instance._shipResources.DrainOxygen(__instance._oxygenLeakRate * Time.deltaTime * (float)oxygenTankDrainMultiplier.GetProperty());
             return false;
         }
         __instance.enabled = false;
@@ -933,7 +934,7 @@ public static class PatchClass
     {
         if (__instance._damaged)
         {
-            __instance._shipResources.DrainFuel(__instance._fuelLeakRate * Time.deltaTime * ShipEnhancements.Instance.FuelTankDrainMultiplier);
+            __instance._shipResources.DrainFuel(__instance._fuelLeakRate * Time.deltaTime * (float)fuelTankDrainMultiplier.GetProperty());
             return false;
         }
         __instance.enabled = false;
@@ -948,13 +949,13 @@ public static class PatchClass
     {
         if (!__instance.gameObject.CompareTag("Ship")) return;
 
-        if (ShipEnhancements.Instance.SpaceAngularDragDisabled)
+        if ((bool)disableSpaceAngularDrag.GetProperty())
         {
             __instance._angularDrag = 0f;
         }
         else
         {
-            __instance._angularDrag *= ShipEnhancements.Instance.AngularDragMultiplier;
+            __instance._angularDrag *= (float)angularDragMultiplier.GetProperty();
         }
     }
 
@@ -964,7 +965,7 @@ public static class PatchClass
     {
         if (!__instance.gameObject.CompareTag("Ship")) return;
 
-        if (ShipEnhancements.Instance.RotationSpeedLimitDisabled)
+        if ((bool)disableRotationSpeedLimit.GetProperty())
         {
             __instance._owRigidbody.SetMaxAngularVelocity(25f);
         }
@@ -974,7 +975,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ThrusterModel), nameof(ThrusterModel.FireRotationalThrusters))]
     public static bool RemoveRotationLimit(ThrusterModel __instance)
     {
-        if (!ShipEnhancements.Instance.RotationSpeedLimitDisabled || !__instance.gameObject.CompareTag("Ship")) return true;
+        if (!(bool)disableRotationSpeedLimit.GetProperty() || !__instance.gameObject.CompareTag("Ship")) return true;
 
         __instance._localAngularAcceleration = __instance._rotationalInput * __instance._maxRotationalThrust;
         if (__instance._localAngularAcceleration.sqrMagnitude <= 0f)
@@ -1004,13 +1005,13 @@ public static class PatchClass
     [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.RetrieveProbe))]
     public static bool DisableProbeRetrieve(ProbeLauncher __instance, bool forcedRetrieval)
     {
-        if ((!ShipEnhancements.Instance.ManualScoutRecallEnabled && !ShipEnhancements.Instance.ScoutLauncherComponentEnabled
-            && !ShipEnhancements.Instance.ScoutLauncherDisabled) || (__instance.GetName() != ProbeLauncher.Name.Player && __instance.GetName() != ProbeLauncher.Name.Ship)) return true;
+        if ((!(bool)enableManualScoutRecall.GetProperty() && !(bool)enableScoutLauncherComponent.GetProperty()
+            && !(bool)disableScoutLauncher.GetProperty()) || (__instance.GetName() != ProbeLauncher.Name.Player && __instance.GetName() != ProbeLauncher.Name.Ship)) return true;
 
-        if ((ShipEnhancements.Instance.ScoutLauncherDisabled && PlayerState.AtFlightConsole() && __instance.GetName() == ProbeLauncher.Name.Ship)
-            || (ShipEnhancements.Instance.ManualScoutRecallEnabled && __instance.GetName() == ProbeLauncher.Name.Player && !ProbePickupVolume.canRetrieveProbe)
-            || (ShipEnhancements.Instance.ScoutLauncherComponentEnabled
-            && __instance.GetName() == ProbeLauncher.Name.Ship && ShipEnhancements.Instance.GetProbeLauncherComponent().isDamaged)
+        if (((bool)disableScoutLauncher.GetProperty() && PlayerState.AtFlightConsole() && __instance.GetName() == ProbeLauncher.Name.Ship)
+            || ((bool)enableManualScoutRecall.GetProperty() && __instance.GetName() == ProbeLauncher.Name.Player && !ProbePickupVolume.canRetrieveProbe)
+            || ((bool)enableScoutLauncherComponent.GetProperty()
+            && __instance.GetName() == ProbeLauncher.Name.Ship && SELocator.GetProbeLauncherComponent().isDamaged)
             || ShipEnhancements.Instance.probeDestroyed)
         {
             return false;
@@ -1022,15 +1023,15 @@ public static class PatchClass
     [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.LaunchProbe))]
     public static bool DisableProbeLaunch(ProbeLauncher __instance)
     {
-        if ((!ShipEnhancements.Instance.ManualScoutRecallEnabled && !ShipEnhancements.Instance.ScoutLauncherComponentEnabled 
-            && !ShipEnhancements.Instance.ScoutLauncherDisabled) 
+        if ((!(bool)enableManualScoutRecall.GetProperty() && !(bool)enableScoutLauncherComponent.GetProperty() 
+            && !(bool)disableScoutLauncher.GetProperty()) 
             || (__instance.GetName() != ProbeLauncher.Name.Player && __instance.GetName() != ProbeLauncher.Name.Ship)) return true;
 
-        if ((ShipEnhancements.Instance.ScoutLauncherDisabled && PlayerState.AtFlightConsole())
-            || (ShipEnhancements.Instance.ManualScoutRecallEnabled 
+        if (((bool)disableScoutLauncher.GetProperty() && PlayerState.AtFlightConsole())
+            || ((bool)enableManualScoutRecall.GetProperty() 
             && __instance.GetName() == ProbeLauncher.Name.Player && !__instance._preLaunchProbeProxy.activeInHierarchy)
-            || (ShipEnhancements.Instance.ScoutLauncherComponentEnabled
-            && __instance.GetName() == ProbeLauncher.Name.Ship && ShipEnhancements.Instance.GetProbeLauncherComponent().isDamaged)
+            || ((bool)enableScoutLauncherComponent.GetProperty()
+            && __instance.GetName() == ProbeLauncher.Name.Ship && SELocator.GetProbeLauncherComponent().isDamaged)
             || ShipEnhancements.Instance.probeDestroyed)
         {
             return false;
@@ -1052,33 +1053,33 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipHull), nameof(ShipHull.Awake))]
     public static void AddScoutLauncherComponent(ShipHull __instance)
     {
-        if (!ShipEnhancements.Instance.ScoutLauncherComponentEnabled) return;
+        if (!(bool)enableScoutLauncherComponent.GetProperty()) return;
 
         if (__instance.hullName != UITextType.ShipPartForward) return;
         GameObject probeLauncherComponent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ProbeLauncherComponent.prefab");
         GameObject componentObj = UnityEngine.Object.Instantiate(probeLauncherComponent, 
             __instance.GetComponentInParent<ShipBody>().GetComponentInChildren<PlayerProbeLauncher>().transform.parent);
         AssetBundleUtilities.ReplaceShaders(componentObj);
-        ShipEnhancements.Instance.SetProbeLauncherComponent(componentObj.GetComponent<ProbeLauncherComponent>());
+        SELocator.SetProbeLauncherComponent(componentObj.GetComponent<ProbeLauncherComponent>());
     }
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.OnForceRetrieveProbe))]
     public static bool ForceRetrieveToShip(ProbeLauncher __instance)
     {
-        if (ShipEnhancements.Instance.ManualScoutRecallEnabled) return false;
+        if ((bool)enableManualScoutRecall.GetProperty()) return false;
 
         if (__instance.GetName() == ProbeLauncher.Name.Player)
         {
             bool flag = false;
 
-            if (ShipEnhancements.Instance.ScoutLauncherDisabled)
+            if ((bool)disableScoutLauncher.GetProperty())
             {
                 flag = true;
             }
-            else if (ShipEnhancements.Instance.ScoutLauncherComponentEnabled)
+            else if ((bool)enableScoutLauncherComponent.GetProperty())
             {
-                if (ShipEnhancements.Instance.GetProbeLauncherComponent().isDamaged)
+                if (SELocator.GetProbeLauncherComponent().isDamaged)
                 {
                     flag = true;
                 }
@@ -1101,7 +1102,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.Update))]
     public static bool ShowConnectionLostNotification(ProbeLauncher __instance)
     {
-        if (!ShipEnhancements.Instance.ManualScoutRecallEnabled 
+        if (!(bool)enableManualScoutRecall.GetProperty() 
             || (__instance.GetName() != ProbeLauncher.Name.Player && __instance.GetName() != ProbeLauncher.Name.Ship)) return true;
 
         PlayerTool_Update(__instance);
@@ -1129,7 +1130,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(SingularityWarpEffect), nameof(SingularityWarpEffect.WarpObjectIn))]
     public static bool SkipWarpEffect(SingularityWarpEffect __instance)
     {
-        if (!ShipEnhancements.Instance.ManualScoutRecallEnabled || !ProbePickupVolume.canRetrieveProbe)
+        if (!(bool)enableManualScoutRecall.GetProperty() || !ProbePickupVolume.canRetrieveProbe)
         {
             return true;
         }
@@ -1151,7 +1152,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.SetActiveProbe))]
     public static bool KeepProbeHidden(ProbeLauncher __instance)
     {
-        if (!ShipEnhancements.Instance.ManualScoutRecallEnabled) return true;
+        if (!(bool)enableManualScoutRecall.GetProperty() || __instance.GetName() == ProbeLauncher.Name.Ship) return true;
 
         ShipProbeLauncherEffects launcherEffects = __instance.GetComponent<ShipProbeLauncherEffects>();
         if (launcherEffects != null && (ShipEnhancements.Instance.probeDestroyed || launcherEffects.componentDamaged))
@@ -1165,15 +1166,15 @@ public static class PatchClass
     [HarmonyPatch(typeof(ProbePromptController), nameof(ProbePromptController.Update))]
     public static void FixProbePrompts(ProbePromptController __instance)
     {
-        if (!ShipEnhancements.Instance.ManualScoutRecallEnabled && !ShipEnhancements.Instance.ScoutLauncherDisabled
-            && !ShipEnhancements.Instance.ScoutLauncherComponentEnabled)
+        if (!(bool)enableManualScoutRecall.GetProperty() && !(bool)disableScoutLauncher.GetProperty()
+            && !(bool)enableScoutLauncherComponent.GetProperty())
         {
             return;
         }
 
-        bool manualRecall = ShipEnhancements.Instance.ManualScoutRecallEnabled && !PlayerState.AtFlightConsole();
-        bool shipLauncherBroken = (ShipEnhancements.Instance.ScoutLauncherDisabled
-            || (ShipEnhancements.Instance.ScoutLauncherComponentEnabled && ShipEnhancements.Instance.GetProbeLauncherComponent().isDamaged))
+        bool manualRecall = (bool)enableManualScoutRecall.GetProperty() && !PlayerState.AtFlightConsole();
+        bool shipLauncherBroken = ((bool)disableScoutLauncher.GetProperty()
+            || ((bool)enableScoutLauncherComponent.GetProperty() && SELocator.GetProbeLauncherComponent().isDamaged))
             && PlayerState.AtFlightConsole();
 
         if (manualRecall || shipLauncherBroken)
@@ -1211,7 +1212,7 @@ public static class PatchClass
         targetRigidbody = null;
         dropTarget = null;
 
-        if (!ShipEnhancements.Instance.ShipItemPlacementEnabled) return true;
+        if (!(bool)enableShipItemPlacement.GetProperty()) return true;
 
         PlayerCharacterController playerController = Locator.GetPlayerController();
         if (!playerController.IsGrounded() || PlayerState.IsAttached()/* || PlayerState.IsInsideShip()*/)
@@ -1271,7 +1272,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.Update))]
     public static void SetExtinguishPromptVisibility(Campfire __instance)
     {
-        if (!ShipEnhancements.Instance.PortableCampfireEnabled) return;
+        if (!(bool)addPortableCampfire.GetProperty()) return;
 
         PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
         if (campfire)
@@ -1315,7 +1316,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.OnGainFocus))]
     public static void AddExtinguishPrompt(Campfire __instance)
     {
-        if (!ShipEnhancements.Instance.PortableCampfireEnabled) return;
+        if (!(bool)addPortableCampfire.GetProperty()) return;
 
         PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
         if (campfire)
@@ -1328,7 +1329,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.OnLoseFocus))]
     public static void RemoveExtinguishPrompt(Campfire __instance)
     {
-        if (!ShipEnhancements.Instance.PortableCampfireEnabled) return;
+        if (!(bool)addPortableCampfire.GetProperty()) return;
 
         PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
         if (campfire)
@@ -1341,7 +1342,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.StartRoasting))]
     public static void RemoveExtinguishPromptWhenRoasting(Campfire __instance)
     {
-        if (!ShipEnhancements.Instance.PortableCampfireEnabled) return;
+        if (!(bool)addPortableCampfire.GetProperty()) return;
 
         PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
         if (campfire)
@@ -1354,7 +1355,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.StopRoasting))]
     public static void AddExtinguishPromptWhenStopRoasting(Campfire __instance)
     {
-        if (!ShipEnhancements.Instance.PortableCampfireEnabled) return;
+        if (!(bool)addPortableCampfire.GetProperty()) return;
 
         PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
         if (campfire)
@@ -1367,7 +1368,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.SetState))]
     public static void UpdateExtinguished(Campfire __instance, Campfire.State newState)
     {
-        if (!ShipEnhancements.Instance.PortableCampfireEnabled) return;
+        if (!(bool)addPortableCampfire.GetProperty()) return;
 
         PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
         if (campfire)
@@ -1396,7 +1397,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ExplosionController), nameof(ExplosionController.Update))]
     public static bool FixExplosionHeatVolume(ExplosionController __instance)
     {
-        if (ShipEnhancements.Instance.ShipExplosionMultiplier == 1f) return true;
+        if ((float)shipExplosionMultiplier.GetProperty() == 1f) return true;
 
         if (!__instance._playing)
         {

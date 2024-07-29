@@ -17,4 +17,18 @@ public interface IShipEnhancements
     public GameObject CreateTemperatureZone(float temperature, float outerRadius, float innerRadius,
         bool isShell = false, float shellCenterRadius = 0f, float shellCenterThickness = 0f, 
         string objectName = "TemperatureZone");
+
+    /// <summary>
+    /// Gets the in-game value of the specified config setting.
+    /// </summary>
+    /// <param name="configName"></param>
+    /// <returns>The current in-game value of the config setting, not the value as seen in the config.</returns>
+    public object GetSettingsProperty(string configName);
+
+    /// <summary>
+    /// Sets the in-game value of the specified config setting. Doesn't affect the displayed value in the mod config.
+    /// </summary>
+    /// <param name="configName"></param>
+    /// <param name="value"></param>
+    public void SetSettingsProperty(string configName, object value);
 }

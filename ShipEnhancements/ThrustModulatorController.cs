@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -15,7 +16,7 @@ public class ThrustModulatorController : ElectricalComponent
     public override void Awake()
     {
         _powered = true;
-        if (!ShipEnhancements.Instance.ThrustModulatorEnabled)
+        if (!(bool)enableThrustModulator.GetProperty())
         {
             gameObject.SetActive(false);
             return;

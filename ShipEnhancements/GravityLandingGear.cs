@@ -4,7 +4,6 @@ namespace ShipEnhancements;
 
 public class GravityLandingGear : MonoBehaviour
 {
-    private ShipDamageController _damageController;
     private ShipLandingGear _landingGear;
     private OWAudioSource _audioSource;
     private ParticleSystem _gravityEffects;
@@ -16,7 +15,6 @@ public class GravityLandingGear : MonoBehaviour
 
     private void Start()
     {
-        _damageController = Locator.GetShipBody().GetComponent<ShipDamageController>();
         _landingGear = GetComponentInParent<ShipLandingGear>();
         GameObject audioObject = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/Audio_GravityLandingGear.prefab");
         _audioSource = Instantiate(audioObject, transform).GetComponent<OWAudioSource>();

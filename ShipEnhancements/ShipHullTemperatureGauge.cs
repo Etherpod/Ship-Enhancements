@@ -12,12 +12,9 @@ public class ShipHullTemperatureGauge : MonoBehaviour
     private float _needleAngleMax;
     private float _lastNeedleAngle;
     private Quaternion _currentNeedleRotation;
-    private ShipTemperatureDetector _temperatureDetector;
 
     private void Awake()
     {
-        _temperatureDetector = Locator.GetShipDetector().GetComponent<ShipTemperatureDetector>();
-
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
 
         _currentNeedleRotation = _needleTransform.localRotation;
@@ -26,8 +23,8 @@ public class ShipHullTemperatureGauge : MonoBehaviour
     private void Update()
     {
         Quaternion targetQuaternion;
-        float ratio = _temperatureDetector.GetShipTemperatureRatio();
-        targetQuaternion = Quaternion.AngleAxis(Mathf.Lerp(_needleAngleMin, _needleAngleMax, _temperatureDetector.GetShipTemperatureRatio()), Vector3.right);
+        float ratio = SELocator.GetShipTemperatureDetector().GetShipTemperatureRatio();
+        targetQuaternion = Quaternion.AngleAxis(Mathf.Lerp(_needleAngleMin, _needleAngleMax, SELocator.GetShipTemperatureDetector().GetShipTemperatureRatio()), Vector3.right);
 
         if (Quaternion.Angle(_currentNeedleRotation, targetQuaternion) >= 0.1f)
         {

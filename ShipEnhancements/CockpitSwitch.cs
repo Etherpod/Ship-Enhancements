@@ -19,7 +19,6 @@ public abstract class CockpitSwitch : ElectricalComponent
     [SerializeField]
     protected AudioClip _offAudio;
 
-    protected ShipDamageController _damageController;
     protected Quaternion _initialRotation;
     protected OWRenderer _renderer;
     protected bool _on = false;
@@ -33,7 +32,6 @@ public abstract class CockpitSwitch : ElectricalComponent
     private void Start()
     {
         _renderer = GetComponent<OWRenderer>();
-        _damageController = Locator.GetShipBody().GetComponentInChildren<ShipDamageController>();
 
         _interactReceiver.ChangePrompt("Turn on " + _label);
         transform.localRotation = Quaternion.Euler(_initialRotation.eulerAngles.x + _rotationOffset,

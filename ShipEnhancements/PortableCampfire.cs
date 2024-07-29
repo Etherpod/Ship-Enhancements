@@ -31,7 +31,7 @@ public class PortableCampfire : Campfire
     {
         if (!_shipDestroyed && _insideShip && !_extinguished)
         {
-            ShipEnhancements.Instance.GetShipResources().DrainOxygen(10f * Time.deltaTime);
+            SELocator.GetShipResources().DrainOxygen(10f * Time.deltaTime);
             _reactorHeatMeter += Time.deltaTime;
             if (_reactorHeatMeter >= _reactorHeatMeterLength)
             {

@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -45,7 +46,7 @@ public class ShipFuelTransfer : MonoBehaviour
 
         if (_jetpackFuelDepleted)
         {
-            if (ShipEnhancements.Instance.GetPlayerResources()._currentFuel > 0)
+            if (SELocator.GetPlayerResources()._currentFuel > 0)
             {
                 _jetpackFuelDepleted = false;
                 _interactReceiver.EnableInteraction();
@@ -59,9 +60,9 @@ public class ShipFuelTransfer : MonoBehaviour
             }
             else
             {
-                ShipEnhancements.Instance.GetPlayerResources()._currentFuel -= (PlayerResources._maxFuel * Time.deltaTime) / 3f;
-                ShipEnhancements.Instance.GetShipResources().AddFuel(PlayerResources._maxFuel * Time.deltaTime * 5f * ShipEnhancements.Instance.FuelTransferMultiplier);
-                if (ShipEnhancements.Instance.GetPlayerResources()._currentFuel <= 0)
+                SELocator.GetPlayerResources()._currentFuel -= (PlayerResources._maxFuel * Time.deltaTime) / 3f;
+                SELocator.GetShipResources().AddFuel(PlayerResources._maxFuel * Time.deltaTime * 5f * (float)fuelTransferMultiplier.GetProperty());
+                if (SELocator.GetPlayerResources()._currentFuel <= 0)
                 {
                     OnReleaseInteract();
                     _jetpackFuelDepleted = true;
@@ -79,14 +80,14 @@ public class ShipFuelTransfer : MonoBehaviour
 
     private bool IsShipFuelFull()
     {
-        return ShipEnhancements.Instance.GetShipResources()._currentFuel >= ShipEnhancements.Instance.GetShipResources()._maxFuel;
+        return SELocator.GetShipResources()._currentFuel >= SELocator.GetShipResources()._maxFuel;
     }
 
     private void OnPressInteract()
     {
         if (_shipFuelFull || _jetpackFuelDepleted || !PlayerState.IsWearingSuit()) return;
 
-        if (ShipEnhancements.Instance.ShipRepairDisabled && _fuelTankComponent.isDamaged)
+        if ((bool)disableShipRepair.GetProperty() && _fuelTankComponent.isDamaged)
         {
             _fuelTankComponent._damageEffect._particleSystem.Stop();
         }
@@ -99,7 +100,7 @@ public class ShipFuelTransfer : MonoBehaviour
     {
         if (_shipFuelFull || _jetpackFuelDepleted || !PlayerState.IsWearingSuit()) return;
 
-        if (ShipEnhancements.Instance.ShipRepairDisabled && _fuelTankComponent.isDamaged)
+        if ((bool)disableShipRepair.GetProperty() && _fuelTankComponent.isDamaged)
         {
             _fuelTankComponent._damageEffect._particleSystem.Play();
         }
@@ -108,20 +109,20 @@ public class ShipFuelTransfer : MonoBehaviour
             _fuelTankComponent._damageEffect._particleAudioSource.Stop();
         }
 
-        ShipEnhancements.Instance.GetPlayerResources()._playerAudioController.PlayRefuel();
+        SELocator.GetPlayerResources()._playerAudioController.PlayRefuel();
         _transferring = false;
         _interactReceiver.ResetInteraction();
     }
 
     private void OnComponentRepaired()
     {
-        if (ShipEnhancements.Instance.ShipRepairDisabled) return;
+        if ((bool)disableShipRepair.GetProperty()) return;
         _interactReceiver.EnableInteraction();
     }
 
     private void OnComponentDamaged()
     {
-        if (ShipEnhancements.Instance.ShipRepairDisabled) return;
+        if ((bool)disableShipRepair.GetProperty()) return;
         _interactReceiver.DisableInteraction();
     }
 

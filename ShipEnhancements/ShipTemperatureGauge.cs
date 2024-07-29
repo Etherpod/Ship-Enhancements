@@ -9,7 +9,6 @@ public class ShipTemperatureGauge : MonoBehaviour
     private float _needleAngleMax = 126f;
     private float _lastNeedleAngle;
     private Quaternion _currentNeedleRotation;
-    private ShipTemperatureDetector _temperatureDetector;
     private OWRenderer _indicatorLight;
     private bool _lightActive;
     private Color _warningLightColor;
@@ -17,8 +16,6 @@ public class ShipTemperatureGauge : MonoBehaviour
 
     private void Awake()
     {
-        _temperatureDetector = Locator.GetShipDetector().GetComponent<ShipTemperatureDetector>();
-
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
 
         _needleTransform = Locator.GetShipBody().transform.Find("Module_Cockpit/Geo_Cockpit/Cockpit_Tech/Cockpit_Tech_Interior/TemperaturePointerPivot/TemperaturePointer_Geo");
@@ -36,14 +33,14 @@ public class ShipTemperatureGauge : MonoBehaviour
     private void Update()
     {
         Quaternion targetQuaternion;
-        float ratio = _temperatureDetector.GetTemperatureRatio();
+        float ratio = SELocator.GetShipTemperatureDetector().GetTemperatureRatio();
         if (ratio > 0)
         {
-            targetQuaternion = Quaternion.AngleAxis(Mathf.Lerp(0f, _needleAngleMax, _temperatureDetector.GetTemperatureRatio()), Vector3.right);
+            targetQuaternion = Quaternion.AngleAxis(Mathf.Lerp(0f, _needleAngleMax, SELocator.GetShipTemperatureDetector().GetTemperatureRatio()), Vector3.right);
         }
         else
         {
-            targetQuaternion = Quaternion.AngleAxis(Mathf.Lerp(0f, _needleAngleMin, -_temperatureDetector.GetTemperatureRatio()), Vector3.right);
+            targetQuaternion = Quaternion.AngleAxis(Mathf.Lerp(0f, _needleAngleMin, -SELocator.GetShipTemperatureDetector().GetTemperatureRatio()), Vector3.right);
         }
 
         if (Quaternion.Angle(_currentNeedleRotation, targetQuaternion) >= 0.1f)
@@ -66,7 +63,7 @@ public class ShipTemperatureGauge : MonoBehaviour
             _currentNeedleRotation = _needleTransform.localRotation;
         }
 
-        if (_temperatureDetector.IsHighTemperature())
+        if (SELocator.GetShipTemperatureDetector().IsHighTemperature())
         {
             _lightActive = true;
             bool flag = Time.timeSinceLevelLoad * 2f % 2f < 1.33f;

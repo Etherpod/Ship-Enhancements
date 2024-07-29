@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -84,7 +85,7 @@ public class ShipProbeLauncherEffects : MonoBehaviour
     {
         if (probe != _probe || ShipEnhancements.Instance.probeDestroyed) return;
 
-        if (ShipEnhancements.Instance.ScoutLauncherDisabled || componentDamaged || Locator.GetShipBody().GetComponent<ShipDamageController>().IsSystemFailed())
+        if ((bool)disableScoutLauncher.GetProperty() || componentDamaged || Locator.GetShipBody().GetComponent<ShipDamageController>().IsSystemFailed())
         {
             _probe.Deactivate();
             ShipEnhancements.Instance.probeDestroyed = true;

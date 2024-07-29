@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -18,20 +19,20 @@ public class ShipRecoveryPoint : MonoBehaviour
 
     private void Update()
     {
-        if (_recoveryPoint._refuelsPlayer && ShipEnhancements.Instance.GetShipResources()._currentFuel == 0f)
+        if (_recoveryPoint._refuelsPlayer && SELocator.GetShipResources()._currentFuel == 0f)
         {
             _recoveryPoint._refuelsPlayer = false;
             return;
         }
-        else if (!_recoveryPoint._refuelsPlayer && ShipEnhancements.Instance.GetShipResources()._currentFuel > 0f)
+        else if (!_recoveryPoint._refuelsPlayer && SELocator.GetShipResources()._currentFuel > 0f)
         {
             _recoveryPoint._refuelsPlayer = true;
         }
 
         if (_recoveryPoint._recovering && PlayerState.IsWearingSuit())
         {
-            ShipEnhancements.Instance.GetShipResources()._currentFuel = Mathf.Max(ShipEnhancements.Instance.GetShipResources()._currentFuel 
-                - (PlayerResources._maxFuel * 5f * Time.deltaTime * 3f * ShipEnhancements.Instance.FuelTransferMultiplier), 0f);
+            SELocator.GetShipResources()._currentFuel = Mathf.Max(SELocator.GetShipResources()._currentFuel 
+                - (PlayerResources._maxFuel * 5f * Time.deltaTime * 3f * (float)fuelTransferMultiplier.GetProperty()), 0f);
         }
     }
 }
