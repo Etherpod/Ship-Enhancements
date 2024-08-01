@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+﻿using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -19,8 +19,12 @@ public class ShipProbePickupVolume : ProbePickupVolume
 
     protected override void OnRetrieveProbe()
     {
-        if (PlayerState.AtFlightConsole() && !(_probeLauncherEffects.componentDamaged || ShipEnhancements.Instance.probeDestroyed))
+        if ((PlayerState.AtFlightConsole() || (bool)disableScoutRecall.GetProperty()) && !(_probeLauncherEffects.componentDamaged || ShipEnhancements.Instance.probeDestroyed))
         {
+            if ((bool)disableScoutRecall.GetProperty())
+            {
+                _interactReceiver.ChangePrompt("Insert Scout");
+            }
             _interactReceiver.EnableInteraction();
         }
     }
@@ -32,11 +36,27 @@ public class ShipProbePickupVolume : ProbePickupVolume
 
     protected override void OnPressInteract()
     {
-        if (_probeLauncherEffects.componentDamaged || ShipEnhancements.Instance.probeDestroyed) return;
+        if (_probeLauncherEffects.componentDamaged || ShipEnhancements.Instance.probeDestroyed || (bool)disableScoutLaunching.GetProperty()) return;
+
+        if ((bool)disableScoutRecall.GetProperty() && _probeLauncher._preLaunchProbeProxy.activeSelf)
+        {
+            _interactReceiver.ChangePrompt("Pick up Scout");
+            _interactReceiver.ResetInteraction();
+            _probeLauncherEffects.OnPressInteract();
+            return;
+        }
 
         canRetrieveProbe = true;
         _probeLauncher.RetrieveProbe(true, false);
-        _interactReceiver.DisableInteraction();
+
+        if ((bool)disableScoutRecall.GetProperty())
+        {
+            _interactReceiver.ResetInteraction();
+        }
+        else
+        {
+            _interactReceiver.DisableInteraction();
+        }
         _probeLauncherEffects.OnPressInteract();
         canRetrieveProbe = false;
     }

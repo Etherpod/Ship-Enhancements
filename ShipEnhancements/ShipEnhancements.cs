@@ -74,7 +74,8 @@ public class ShipEnhancements : ModBehaviour
         disableSpaceAngularDrag,
         disableRotationSpeedLimit,
         gravityDirection,
-        disableScoutLauncher,
+        disableScoutRecall,
+        disableScoutLaunching,
         enableScoutLauncherComponent,
         enableManualScoutRecall,
         enableShipItemPlacement,
@@ -389,12 +390,15 @@ public class ShipEnhancements : ModBehaviour
             }
             shipGravity._fieldDirection = direction;
         }
-        if ((bool)Settings.enableManualScoutRecall.GetValue())
+        if ((bool)Settings.enableManualScoutRecall.GetValue() || (bool)Settings.disableScoutRecall.GetValue() || (bool)Settings.disableScoutLaunching.GetValue())
         {
             ShipProbeLauncherEffects launcherEffects = Locator.GetShipBody().GetComponentInChildren<PlayerProbeLauncher>()
                 .gameObject.AddComponent<ShipProbeLauncherEffects>();
-            GameObject probePickupVolume = LoadPrefab("Assets/ShipEnhancements/PlayerProbePickupVolume.prefab");
-            Instantiate(probePickupVolume, Locator.GetProbe().transform);
+            if ((bool)Settings.enableManualScoutRecall.GetValue())
+            {
+                GameObject probePickupVolume = LoadPrefab("Assets/ShipEnhancements/PlayerProbePickupVolume.prefab");
+                Instantiate(probePickupVolume, Locator.GetProbe().transform);
+            }
             GameObject shipProbePickupVolume = LoadPrefab("Assets/ShipEnhancements/ShipProbePickupVolume.prefab");
             GameObject shipProbeVolume = Instantiate(shipProbePickupVolume, launcherEffects.transform);
 
@@ -403,7 +407,7 @@ public class ShipEnhancements : ModBehaviour
                 Locator.GetShipBody().GetComponentInChildren<ProbeLauncherComponent>().SetProbeLauncherEffects(launcherEffects);
             }
         }
-        if ((bool)Settings.disableScoutLauncher.GetValue() && (bool)Settings.enableScoutLauncherComponent.GetValue())
+        if ((bool)Settings.disableScoutRecall.GetValue() && (bool)Settings.disableScoutLaunching.GetValue() && (bool)Settings.enableScoutLauncherComponent.GetValue())
         {
             SELocator.GetProbeLauncherComponent()._repairReceiver.repairDistance = 0f;
             SELocator.GetProbeLauncherComponent()._damaged = true;

@@ -53,11 +53,17 @@
       "value": false,
       "tooltip": "Turns off both the interior and exterior lighting fixtures."
     },
-    "disableScoutLauncher": {
-      "title": "Disable Ship Scout Launcher",
+    "disableScoutRecall": {
+      "title": "Disable Ship Scout Recall",
       "type": "toggle",
       "value": false,
-      "tooltip": "Removes your ability to launch or recall the scout with the ship."
+      "tooltip": "Removes your ability to recall the scout with the ship."
+    },
+    "disableScoutLaunching": {
+      "title": "Disable Ship Scout Launching",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Removes your ability to launch the scout with the ship."
     },
     "disableShipOxygen": {
       "title": "Disable Ship Oxygen",

@@ -1008,9 +1008,16 @@ public static class PatchClass
     public static bool DisableProbeRetrieve(ProbeLauncher __instance, bool forcedRetrieval)
     {
         if ((!(bool)enableManualScoutRecall.GetProperty() && !(bool)enableScoutLauncherComponent.GetProperty()
-            && !(bool)disableScoutLauncher.GetProperty()) || (__instance.GetName() != ProbeLauncher.Name.Player && __instance.GetName() != ProbeLauncher.Name.Ship)) return true;
+            && !(bool)disableScoutRecall.GetProperty() && !(bool)disableScoutLaunching.GetProperty()) 
+            || (__instance.GetName() != ProbeLauncher.Name.Player && __instance.GetName() != ProbeLauncher.Name.Ship)) return true;
 
-        if (((bool)disableScoutLauncher.GetProperty() && PlayerState.AtFlightConsole() && __instance.GetName() == ProbeLauncher.Name.Ship)
+        if ((bool)disableScoutRecall.GetProperty() && __instance.GetName() == ProbeLauncher.Name.Player && !(bool)enableManualScoutRecall.GetProperty()
+            && !PlayerState.AtFlightConsole() && !__instance._preLaunchProbeProxy.activeInHierarchy)
+        {
+            return true;
+        }
+
+        if (((bool)disableScoutRecall.GetProperty() && PlayerState.AtFlightConsole() && __instance.GetName() == ProbeLauncher.Name.Ship)
             || ((bool)enableManualScoutRecall.GetProperty() && __instance.GetName() == ProbeLauncher.Name.Player && !ProbePickupVolume.canRetrieveProbe)
             || ((bool)enableScoutLauncherComponent.GetProperty()
             && __instance.GetName() == ProbeLauncher.Name.Ship && SELocator.GetProbeLauncherComponent().isDamaged)
@@ -1026,14 +1033,16 @@ public static class PatchClass
     public static bool DisableProbeLaunch(ProbeLauncher __instance)
     {
         if ((!(bool)enableManualScoutRecall.GetProperty() && !(bool)enableScoutLauncherComponent.GetProperty() 
-            && !(bool)disableScoutLauncher.GetProperty()) 
+            && !(bool)disableScoutRecall.GetProperty() && !(bool)disableScoutLaunching.GetProperty())
             || (__instance.GetName() != ProbeLauncher.Name.Player && __instance.GetName() != ProbeLauncher.Name.Ship)) return true;
 
-        if (((bool)disableScoutLauncher.GetProperty() && PlayerState.AtFlightConsole())
-            || ((bool)enableManualScoutRecall.GetProperty() 
+        if (((bool)disableScoutLaunching.GetProperty() && PlayerState.AtFlightConsole())
+            || (((bool)enableManualScoutRecall.GetProperty() || (bool)disableScoutRecall.GetProperty())
             && __instance.GetName() == ProbeLauncher.Name.Player && !__instance._preLaunchProbeProxy.activeInHierarchy)
             || ((bool)enableScoutLauncherComponent.GetProperty()
             && __instance.GetName() == ProbeLauncher.Name.Ship && SELocator.GetProbeLauncherComponent().isDamaged)
+            || ((bool)disableScoutRecall.GetProperty()
+            && __instance.GetName() == ProbeLauncher.Name.Ship && !__instance._preLaunchProbeProxy.activeInHierarchy)
             || ShipEnhancements.Instance.probeDestroyed)
         {
             return false;
@@ -1075,7 +1084,7 @@ public static class PatchClass
         {
             bool flag = false;
 
-            if ((bool)disableScoutLauncher.GetProperty())
+            if ((bool)disableScoutRecall.GetProperty())
             {
                 flag = true;
             }
@@ -1168,18 +1177,22 @@ public static class PatchClass
     [HarmonyPatch(typeof(ProbePromptController), nameof(ProbePromptController.Update))]
     public static void FixProbePrompts(ProbePromptController __instance)
     {
-        if (!(bool)enableManualScoutRecall.GetProperty() && !(bool)disableScoutLauncher.GetProperty()
-            && !(bool)enableScoutLauncherComponent.GetProperty())
+        if (!(bool)enableManualScoutRecall.GetProperty() && !(bool)disableScoutRecall.GetProperty()
+            && !(bool)disableScoutLaunching.GetProperty() && !(bool)enableScoutLauncherComponent.GetProperty())
         {
             return;
         }
 
         bool manualRecall = (bool)enableManualScoutRecall.GetProperty() && !PlayerState.AtFlightConsole();
-        bool shipLauncherBroken = ((bool)disableScoutLauncher.GetProperty()
+        bool noScoutLaunch = ((bool)disableScoutLaunching.GetProperty()
+            || ((bool)enableScoutLauncherComponent.GetProperty() && SELocator.GetProbeLauncherComponent().isDamaged)
+            || (bool)disableScoutRecall.GetProperty() && PlayerState.AtFlightConsole() && !__instance._activeLauncher._preLaunchProbeProxy.activeInHierarchy)
+            && PlayerState.AtFlightConsole();
+        bool noScoutRecall = ((bool)disableScoutRecall.GetProperty()
             || ((bool)enableScoutLauncherComponent.GetProperty() && SELocator.GetProbeLauncherComponent().isDamaged))
             && PlayerState.AtFlightConsole();
 
-        if (manualRecall || shipLauncherBroken)
+        if (manualRecall || noScoutRecall)
         {
             __instance._retrieveCenterPrompt.SetVisibility(false);
             __instance._retrievePrompt.SetDisplayState(ScreenPrompt.DisplayState.GrayedOut);
@@ -1187,19 +1200,40 @@ public static class PatchClass
         else
         {
             __instance._retrievePrompt.SetDisplayState(ScreenPrompt.DisplayState.Normal);
+            if (__instance._activeLauncher.GetName() == ProbeLauncher.Name.Player && !(bool)enableManualScoutRecall.GetProperty()
+                && !__instance._activeLauncher._preLaunchProbeProxy.activeInHierarchy)
+            {
+                __instance._retrievePrompt.SetVisibility(true);
+            }
         }
 
-        if (shipLauncherBroken)
+        if (noScoutLaunch)
         {
             __instance._launchPrompt.SetDisplayState(ScreenPrompt.DisplayState.GrayedOut);
         }
-        else if (manualRecall && !__instance.GetComponent<ProbeLauncher>()._preLaunchProbeProxy.activeInHierarchy)
+        else if ((manualRecall || (bool)disableScoutRecall.GetProperty()) && !__instance._activeLauncher._preLaunchProbeProxy.activeInHierarchy)
         {
             __instance._launchPrompt.SetDisplayState(ScreenPrompt.DisplayState.GrayedOut);
         }
         else
         {
             __instance._launchPrompt.SetDisplayState(ScreenPrompt.DisplayState.Normal);
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.UpdatePreLaunch))]
+    public static void PreLaunchRecall(ProbeLauncher __instance)
+    {
+        if ((bool)disableScoutRecall.GetProperty() && __instance.GetName() == ProbeLauncher.Name.Player && !(bool)enableManualScoutRecall.GetProperty()
+            && !PlayerState.AtFlightConsole() && !__instance._preLaunchProbeProxy.activeInHierarchy)
+        {
+            bool flag = InputLibrary.toolActionPrimary.HasSameBinding(InputLibrary.probeRetrieve, OWInput.UsingGamepad());
+            if ((flag && OWInput.IsPressed(InputLibrary.probeRetrieve, 0.5f)) || (!flag && OWInput.IsNewlyPressed(InputLibrary.probeRetrieve, InputMode.All)))
+            {
+                Locator.GetShipTransform().GetComponentInChildren<ShipProbeLauncherEffects>().OnPressInteract();
+                return;
+            }
         }
     }
     #endregion
