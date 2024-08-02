@@ -86,7 +86,21 @@ public class ShipProbeLauncherEffects : MonoBehaviour
     // Manual recall
     private void OnExitFlightConsole()
     {
-        if (ShipEnhancements.Instance.probeDestroyed || _probe.IsLaunched() || _hasLaunched || (bool)disableScoutRecall.GetProperty()) return;
+        if (ShipEnhancements.Instance.probeDestroyed)
+        {
+            return;
+        }
+
+        if (_hasLaunched && (bool)enableManualScoutRecall.GetProperty())
+        {
+            _playerProbeLauncher.ExitPhotoMode();
+            return;
+        }
+
+        if (_probe.IsLaunched() || (_hasLaunched && (bool)enableManualScoutRecall.GetProperty()) || (bool)disableScoutRecall.GetProperty())
+        {
+            return;
+        }
         _playerProbeLauncher._preLaunchProbeProxy.SetActive(true);
         _warpingOutShip = true;
         _shipProbeLauncher._probeRetrievalEffect.WarpObjectOut(_shipProbeLauncher._probeRetrievalLength);
@@ -103,10 +117,11 @@ public class ShipProbeLauncherEffects : MonoBehaviour
     {
         if (probe != _probe || ShipEnhancements.Instance.probeDestroyed) return;
 
-        if ((bool)disableScoutRecall.GetProperty() || componentDamaged || Locator.GetShipBody().GetComponent<ShipDamageController>().IsSystemFailed())
+        if ((bool)enableManualScoutRecall.GetProperty()
+            && (bool)disableScoutRecall.GetProperty() || componentDamaged || SELocator.GetShipDamageController().IsSystemFailed())
         {
-            _probe.Deactivate();
             ShipEnhancements.Instance.probeDestroyed = true;
+            _probe.Deactivate();
             return;
         }
 
