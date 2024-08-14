@@ -18,12 +18,15 @@ public class ThrustModulatorButton : MonoBehaviour
     private bool _fading = false;
     private float _lastEmissiveScale = 0f;
 
-    private void Start()
+    private void Awake()
     {
         _interactReceiver = GetComponent<InteractReceiver>();
         _modulatorController = GetComponentInParent<ThrustModulatorController>();
         _emissiveRenderer = GetComponent<OWEmissiveRenderer>();
+    }
 
+    private void Start()
+    {
         _interactReceiver.OnPressInteract += OnPressInteract;
 
         _interactReceiver._screenPrompt._text = "Set Modulator to level " + _modulatorLevel;
@@ -53,12 +56,12 @@ public class ThrustModulatorButton : MonoBehaviour
 
     private void OnPressInteract()
     {
-        ShipEnhancements.Instance.SetThrustModulatorLevel(_modulatorLevel);
-        _modulatorController.UpdateModulatorDisplay(_modulatorLevel);
         if (_buttonAudio)
         {
-            _modulatorController.PlayButtonSound(_buttonAudio, 0.3f);
+            _modulatorController.PlayButtonSound(_buttonAudio, 0.3f, _modulatorLevel);
         }
+        ShipEnhancements.Instance.SetThrustModulatorLevel(_modulatorLevel);
+        _modulatorController.UpdateModulatorDisplay(_modulatorLevel);
     }
 
     public int GetModulatorLevel()

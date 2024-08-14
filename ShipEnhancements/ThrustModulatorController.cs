@@ -26,7 +26,6 @@ public class ThrustModulatorController : ElectricalComponent
 
         GetComponentInParent<CockpitButtonPanel>().AddButton();
         ShipEnhancements.Instance.SetThrustModulatorLevel(5);
-        _lastLevel = 5;
 
         ElectricalSystem cockpitElectricalSystem = Locator.GetShipBody().transform
             .Find("Module_Cockpit/Systems_Cockpit/FlightControlsElectricalSystem")
@@ -34,6 +33,11 @@ public class ThrustModulatorController : ElectricalComponent
         List<ElectricalComponent> componentList = cockpitElectricalSystem._connectedComponents.ToList();
         componentList.Add(this);
         cockpitElectricalSystem._connectedComponents = componentList.ToArray();
+    }
+
+    private void Start()
+    {
+        UpdateModulatorDisplay(5);
     }
 
     public void UpdateModulatorDisplay(int setLevel)
@@ -45,6 +49,7 @@ public class ThrustModulatorController : ElectricalComponent
         foreach (ThrustModulatorButton button in _modulatorButtons)
         {
             button.SetButtonLight(button.GetModulatorLevel() <= setLevel);
+            button.SetInteractable(button.GetModulatorLevel() != setLevel);
         }
     }
 
@@ -56,7 +61,7 @@ public class ThrustModulatorController : ElectricalComponent
             UpdateModulatorDisplay(_lastLevel);
             foreach (ThrustModulatorButton button in _modulatorButtons)
             {
-                button.SetInteractable(true);
+                button.SetInteractable(button.GetModulatorLevel() != _lastLevel);
             }
         }
         else
@@ -69,9 +74,9 @@ public class ThrustModulatorController : ElectricalComponent
         }
     }
 
-    public void PlayButtonSound(AudioClip clip, float volume)
+    public void PlayButtonSound(AudioClip clip, float volume, int level)
     {
-        _audioSource.pitch = Random.Range(0.9f, 1.1f);
+        _audioSource.pitch = level < _lastLevel ? Random.Range(0.9f, 1f) : Random.Range(1f, 1.1f);
         _audioSource.PlayOneShot(clip, volume);
     }
 }

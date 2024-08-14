@@ -320,6 +320,7 @@ public class ShipEnhancements : ModBehaviour
         {
             SELocator.GetShipResources().SetOxygen(0f);
             oxygenDepleted = true;
+            Locator.GetShipTransform().Find("Module_Cockpit/Props_Cockpit/Props_HEA_ShipFoliage").gameObject.SetActive(false);
         }
         if (Settings.temperatureZonesAmount.GetValue().ToString() == "Sun")
         {
