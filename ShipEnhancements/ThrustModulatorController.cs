@@ -16,15 +16,9 @@ public class ThrustModulatorController : ElectricalComponent
     public override void Awake()
     {
         _powered = true;
-        if (!(bool)enableThrustModulator.GetProperty())
-        {
-            gameObject.SetActive(false);
-            return;
-        }
+        GetComponentInParent<CockpitButtonPanel>().SetThrustModulatorActive((bool)enableThrustModulator.GetProperty());
 
         _modulatorButtons = GetComponentsInChildren<ThrustModulatorButton>();
-
-        GetComponentInParent<CockpitButtonPanel>().AddButton();
         ShipEnhancements.Instance.SetThrustModulatorLevel(5);
 
         ElectricalSystem cockpitElectricalSystem = Locator.GetShipBody().transform

@@ -7,13 +7,7 @@ public class GravityLandingGearSwitch : CockpitSwitch
     public override void Awake()
     {
         base.Awake();
-        if (!(bool)enableGravityLandingGear.GetProperty())
-        {
-            transform.parent.gameObject.SetActive(false);
-            return;
-        }
-
-        GetComponentInParent<CockpitButtonPanel>().AddButton();
+        GetComponentInParent<CockpitButtonPanel>().SetGravityLandingGearActive((bool)enableGravityLandingGear.GetProperty());
     }
 
     protected override void OnFlipSwitch(bool state)
