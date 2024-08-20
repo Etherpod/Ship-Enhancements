@@ -19,7 +19,10 @@ public class ThrustModulatorController : ElectricalComponent
         GetComponentInParent<CockpitButtonPanel>().SetThrustModulatorActive((bool)enableThrustModulator.GetProperty());
 
         _modulatorButtons = GetComponentsInChildren<ThrustModulatorButton>();
-        ShipEnhancements.Instance.SetThrustModulatorLevel(5);
+        foreach (ThrustModulatorButton button in _modulatorButtons)
+        {
+            button.SetInteractable(button.GetModulatorLevel() != 5);
+        }
 
         ElectricalSystem cockpitElectricalSystem = Locator.GetShipBody().transform
             .Find("Module_Cockpit/Systems_Cockpit/FlightControlsElectricalSystem")

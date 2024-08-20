@@ -276,6 +276,15 @@ public class ShipEnhancements : ModBehaviour
         materials.Add(material3);
         GameObject.Find("Pointlight_HEA_ShipCockpit").GetComponent<LightmapController>()._materials = [.. materials];
 
+        PhysicMaterial bouncyShip = (PhysicMaterial)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipBouncy.physicMaterial");
+        foreach (Collider col in Locator.GetShipTransform().GetComponentsInChildren<Collider>())
+        {
+            if (!col.isTrigger)
+            {
+                col.material = bouncyShip;
+            }
+        }
+
         _shipLoaded = true;
         UpdateSuitOxygen();
         _lastShipOxygen = SELocator.GetShipResources()._currentOxygen;
