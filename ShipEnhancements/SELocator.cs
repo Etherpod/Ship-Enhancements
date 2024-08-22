@@ -18,6 +18,7 @@ public static class SELocator
         _shipResources = Locator.GetShipBody().GetComponent<ShipResources>();
         _shipOxygenVolume = Locator.GetShipBody().GetComponentInChildren<OxygenVolume>();
         _playerResources = Locator.GetPlayerBody().GetComponent<PlayerResources>();
+        _shipDamageController = Locator.GetShipTransform().GetComponent<ShipDamageController>();
 
         if ((bool)shipOxygenRefill.GetValue())
         {

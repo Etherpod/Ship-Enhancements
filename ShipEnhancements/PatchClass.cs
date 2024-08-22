@@ -588,7 +588,7 @@ public static class PatchClass
     #region DisableAutoRoll
     [HarmonyPrefix]
     [HarmonyPatch(typeof(FluidVolume), nameof(FluidVolume.Start))]
-    public static void Attempt3(FluidVolume __instance)
+    public static void DisableAutoRoll(FluidVolume __instance)
     {
         if ((bool)disableAirAutoRoll.GetProperty() && __instance._fluidType == FluidVolume.Type.AIR)
         {
@@ -951,13 +951,13 @@ public static class PatchClass
     {
         if (!__instance.gameObject.CompareTag("Ship")) return;
 
-        if ((bool)disableSpaceAngularDrag.GetProperty())
+        if (Locator.GetShipDetector().GetComponent<ShipFluidDetector>()._activeVolumes.Count == 0)
         {
-            __instance._angularDrag = 0f;
+            __instance._angularDrag *= (float)spaceAngularDragMultiplier.GetProperty();
         }
         else
         {
-            __instance._angularDrag *= (float)angularDragMultiplier.GetProperty();
+            __instance._angularDrag *= (float)atmosphereAngularDragMultiplier.GetProperty();
         }
     }
 
@@ -985,11 +985,6 @@ public static class PatchClass
             __instance._isRotationalFiring = false;
             return false;
         }
-        /*float num = (OWInput.UsingGamepad() ? 1f : 2f);
-        float num2 = __instance._maxRotationalThrust * num ;
-        __instance._localAngularAcceleration.x = Mathf.Clamp(__instance._localAngularAcceleration.x, -num2, num2);
-        __instance._localAngularAcceleration.y = Mathf.Clamp(__instance._localAngularAcceleration.y, -num2, num2);
-        __instance._localAngularAcceleration.z = Mathf.Clamp(__instance._localAngularAcceleration.z, -num2, num2);*/
         __instance._isRotationalFiring = true;
         if (__instance._usePhysicsToRotate)
         {
@@ -999,6 +994,17 @@ public static class PatchClass
         __instance._manualAngularVelocity += __instance.transform.TransformDirection(__instance._localAngularAcceleration * Time.fixedDeltaTime);
 
         return false;
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(FluidDetector), nameof(FluidDetector.AddAngularDrag))]
+    public static void RemoveFluidAngularDrag(FluidDetector __instance)
+    {
+        // Only runs when in fluid
+        if (__instance.CompareTag("ShipDetector"))
+        {
+            __instance._netAngularAcceleration *= (float)atmosphereAngularDragMultiplier.GetProperty();
+        }
     }
     #endregion
 

@@ -69,4 +69,4 @@ In case there are too many settings to deal with, there are some pre-made preset
 - **GetSettingsProperty()** - Returns the value of a config setting as seen from the player. These values only update at the beginning of the loop, so changing the config doesn't affect them.
 - **SetSettingsProperty()** - Lets you change the value of a config setting in the middle of the loop. Note that this change will be reverted on the next loop.
 
-Credit to Ditzy for helping with some of the code!
+Credit to Ditzy and JohnCorby for helping with some of the code!

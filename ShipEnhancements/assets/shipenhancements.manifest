@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 4185622042
+CRC: 3633546491
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 61b3d87f18af406cda9dee2a9529bfc0
+    Hash: 1a453a091d8d7f4456e26422d1210a29
   TypeTreeHash:
     serializedVersion: 2
-    Hash: da50b65f97ab12751029c3fa2c54796f
+    Hash: 461549ba2d2a0fa2618dcc6e41026624
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -34,9 +34,9 @@ ClassTypes:
 - Class: 108
   Script: {instanceID: 0}
 - Class: 114
-  Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
-- Class: 114
   Script: {fileID: 2059121185, guid: 56e5cf1f6ac64bc4d8feff9ed2c6da44, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
 - Class: 114
   Script: {fileID: 11500000, guid: 3e2cd530bcd6ab93471c4405ca1c5b6a, type: 3}
 - Class: 114
@@ -99,6 +99,8 @@ ClassTypes:
   Script: {instanceID: 0}
 - Class: 128
   Script: {instanceID: 0}
+- Class: 134
+  Script: {instanceID: 0}
 - Class: 135
   Script: {instanceID: 0}
 - Class: 136
@@ -116,6 +118,7 @@ ClassTypes:
 SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/ShipEnhancements/GravityLandingGearParticles.mat
+- Assets/ShipEnhancements/ShipBouncy.physicMaterial
 - Assets/ShipEnhancements/ShipProbePickupVolume.prefab
 - Assets/ShipEnhancements/AudioClip/Switch_Off.mp3
 - Assets/ShipEnhancements/ButtonGlowOrange.mat

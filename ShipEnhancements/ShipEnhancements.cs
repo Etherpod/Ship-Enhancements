@@ -6,6 +6,7 @@ using System.IO;
 using System;
 using System.Collections.Generic;
 using OWML.Utils;
+using Newtonsoft.Json.Linq;
 
 namespace ShipEnhancements;
 
@@ -31,6 +32,7 @@ public class ShipEnhancements : ModBehaviour
     private SettingsPresets.PresetName _currentPreset = (SettingsPresets.PresetName)(-1);
 
     private AssetBundle _shipEnhancementsBundle;
+    private PhysicMaterial _bouncyMaterial;
     private float _lastSuitOxygen;
     private float _lastShipOxygen;
     private float _lastShipFuel;
@@ -70,8 +72,8 @@ public class ShipEnhancements : ModBehaviour
         oxygenTankDrainMultiplier,
         fuelTankDrainMultiplier,
         componentTemperatureDamage,
-        angularDragMultiplier,
-        disableSpaceAngularDrag,
+        atmosphereAngularDragMultiplier,
+        spaceAngularDragMultiplier,
         disableRotationSpeedLimit,
         gravityDirection,
         disableScoutRecall,
@@ -84,6 +86,7 @@ public class ShipEnhancements : ModBehaviour
         showWarningNotifications,
         shipExplosionMultiplier,
         zeroGravityCockpitFreeLook,
+        shipBounciness,
     }
 
     private void Awake()
@@ -127,7 +130,7 @@ public class ShipEnhancements : ModBehaviour
             GlobalMessenger.RemoveListener("SuitUp", OnPlayerSuitUp);
             GlobalMessenger.RemoveListener("RemoveSuit", OnPlayerRemoveSuit);
             GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
-            if ((bool)Settings.disableSpaceAngularDrag.GetValue())
+            if ((float)Settings.spaceAngularDragMultiplier.GetValue() > 0 || (float)Settings.atmosphereAngularDragMultiplier.GetValue() > 0)
             {
                 Locator.GetShipDetector().GetComponent<ShipFluidDetector>().OnEnterFluid -= OnEnterFluid;
                 Locator.GetShipDetector().GetComponent<ShipFluidDetector>().OnExitFluid -= OnExitFluid;
@@ -276,15 +279,6 @@ public class ShipEnhancements : ModBehaviour
         materials.Add(material3);
         GameObject.Find("Pointlight_HEA_ShipCockpit").GetComponent<LightmapController>()._materials = [.. materials];
 
-        PhysicMaterial bouncyShip = (PhysicMaterial)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipBouncy.physicMaterial");
-        foreach (Collider col in Locator.GetShipTransform().GetComponentsInChildren<Collider>())
-        {
-            if (!col.isTrigger)
-            {
-                col.material = bouncyShip;
-            }
-        }
-
         _shipLoaded = true;
         UpdateSuitOxygen();
         _lastShipOxygen = SELocator.GetShipResources()._currentOxygen;
@@ -371,7 +365,7 @@ public class ShipEnhancements : ModBehaviour
             GameObject autoHatchController = LoadPrefab("Assets/ShipEnhancements/ExteriorHatchControls.prefab");
             Instantiate(autoHatchController, Locator.GetShipBody().GetComponentInChildren<HatchController>().transform.parent);
         }
-        if ((bool)Settings.disableSpaceAngularDrag.GetValue())
+        if ((float)Settings.spaceAngularDragMultiplier.GetValue() > 0 || (float)Settings.atmosphereAngularDragMultiplier.GetValue() > 0)
         {
             Locator.GetShipDetector().GetComponent<ShipFluidDetector>().OnEnterFluid += OnEnterFluid;
             Locator.GetShipDetector().GetComponent<ShipFluidDetector>().OnExitFluid += OnExitFluid;
@@ -457,6 +451,20 @@ public class ShipEnhancements : ModBehaviour
                 newCurve.AddKey(key);
             }
             audio.SetCustomCurve(AudioSourceCurveType.CustomRolloff, newCurve);
+        }
+        WriteDebugMessage((float)Settings.shipBounciness.GetValue());
+        if ((float)Settings.shipBounciness.GetValue() > 0f)
+        {
+            /*_bouncyMaterial = (PhysicMaterial)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipBouncy.physicMaterial");
+            foreach (Collider col in Locator.GetShipTransform().GetComponentsInChildren<Collider>())
+            {
+                if (!col.isTrigger)
+                {
+                    col.material = _bouncyMaterial;
+                }
+            }*/
+
+            Locator.GetShipTransform().gameObject.AddComponent<ShipBouncyHull>();
         }
 
         ShipNotifications.Initialize();
@@ -583,8 +591,8 @@ public class ShipEnhancements : ModBehaviour
     private void OnEnterFluid(FluidVolume fluid)
     {
         angularDragEnabled = true;
-        Locator.GetShipBody()._rigidbody.angularDrag = 0.94f * (float)Settings.angularDragMultiplier.GetProperty();
-        Locator.GetShipBody().GetComponent<ShipThrusterModel>()._angularDrag = 0.94f * (float)Settings.angularDragMultiplier.GetProperty();
+        Locator.GetShipBody()._rigidbody.angularDrag = 0.94f * (float)Settings.atmosphereAngularDragMultiplier.GetProperty();
+        Locator.GetShipBody().GetComponent<ShipThrusterModel>()._angularDrag = 0.94f * (float)Settings.atmosphereAngularDragMultiplier.GetProperty();
     }
 
     private void OnExitFluid(FluidVolume fluid)
@@ -592,8 +600,8 @@ public class ShipEnhancements : ModBehaviour
         if (Locator.GetShipDetector().GetComponent<ShipFluidDetector>()._activeVolumes.Count == 0)
         {
             angularDragEnabled = false;
-            Locator.GetShipBody()._rigidbody.angularDrag = 0f;
-            Locator.GetShipBody().GetComponent<ShipThrusterModel>()._angularDrag = 0f;
+            Locator.GetShipBody()._rigidbody.angularDrag = 0.94f * (float)Settings.spaceAngularDragMultiplier.GetProperty();
+            Locator.GetShipBody().GetComponent<ShipThrusterModel>()._angularDrag = 0.94f * (float)Settings.spaceAngularDragMultiplier.GetProperty();
         }
     }
 

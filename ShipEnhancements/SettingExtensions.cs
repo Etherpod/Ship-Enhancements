@@ -40,8 +40,8 @@ public static class SettingExtensions
         { Settings.oxygenTankDrainMultiplier, (1f, 1f) },
         { Settings.fuelTankDrainMultiplier, (1f, 1f) },
         { Settings.componentTemperatureDamage, (false, false) },
-        { Settings.angularDragMultiplier, (1f, 1f) },
-        { Settings.disableSpaceAngularDrag, (false, false) },
+        { Settings.atmosphereAngularDragMultiplier, (1f, 1f) },
+        { Settings.spaceAngularDragMultiplier, (1f, 1f) },
         { Settings.disableRotationSpeedLimit, (false, false) },
         { Settings.gravityDirection, ("Down", "Down") },
         { Settings.disableScoutRecall, (false, false) },
@@ -54,6 +54,7 @@ public static class SettingExtensions
         { Settings.showWarningNotifications, (false, false) },
         { Settings.shipExplosionMultiplier, (1f, 1f) },
         { Settings.zeroGravityCockpitFreeLook, (false, false) },
+        { Settings.shipBounciness, (0f, 0f) },
     };
 
     public static string GetName(this Settings setting)

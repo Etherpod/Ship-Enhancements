@@ -185,17 +185,17 @@
       "value": 1,
       "tooltip": "Larger numbers increase the time it takes for the ship to start taking damage in extreme temperatures."
     },
-    "angularDragMultiplier": {
-      "title": "Angular Drag Multiplier",
+    "atmosphereAngularDragMultiplier": {
+      "title": "Atmosphere Angular Drag Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers make your ship harder to turn. Set to zero to make your ship spin forever. WARNING: Values below 1 may cause motion sickness."
+      "tooltip": "Larger numbers make your ship harder to turn while in an atmosphere. Set to zero to make your ship spin forever. WARNING: Values below 1 may cause motion sickness."
     },
-    "disableSpaceAngularDrag": {
-      "title": "Disable Space Angular Drag",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Disables angular drag in space, meaning you won't stop spinning. DO NOT ENABLE IF YOU ARE PRONE TO MOTION SICKNESS."
+    "spaceAngularDragMultiplier": {
+      "title": "Space Angular Drag Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers make your ship harder to turn while in space. Set to zero to make your ship spin forever. WARNING: Values below 1 may cause motion sickness."
     },
     "disableRotationSpeedLimit": {
       "title": "Disable Rotation Speed Limit",
@@ -208,6 +208,12 @@
       "type": "number",
       "value": 1,
       "tooltip": "Larger numbers increase the size of the explosion that is created when your ship blows up."
+    },
+    "shipBounciness": {
+      "title": "Ship Bounciness",
+      "type": "number",
+      "value": 0,
+      "tooltip": "Adjusts how bouncy the ship is. Maximum bounciness makes the ship retain all of its speed when colliding with something."
     },
 
     "Add Ship Functions": {

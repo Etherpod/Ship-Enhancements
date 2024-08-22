@@ -39,8 +39,8 @@ public static class SettingsPresets
         { "oxygenTankDrainMultiplier", 1f },
         { "fuelTankDrainMultiplier", 1f },
         { "componentTemperatureDamage", false },
-        { "angularDragMultiplier", 1f },
-        { "disableSpaceAngularDrag", false },
+        { "atmosphereAngularDragMultiplier", 1f },
+        { "spaceAngularDragMultiplier", 1f },
         { "disableRotationSpeedLimit", false },
         { "gravityDirection", "Down" },
         { "disableScoutRecall", false },
@@ -53,6 +53,7 @@ public static class SettingsPresets
         { "showWarningNotifications", true },
         { "shipExplosionMultiplier", 1f },
         { "zeroGravityCockpitFreeLook", true },
+        { "shipBounciness", 0f },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -88,8 +89,8 @@ public static class SettingsPresets
         { "oxygenTankDrainMultiplier", 1f },
         { "fuelTankDrainMultiplier", 5f },
         { "componentTemperatureDamage", false },
-        { "angularDragMultiplier", 1f },
-        { "disableSpaceAngularDrag", false },
+        { "atmosphereAngularDragMultiplier", 1f },
+        { "spaceAngularDragMultiplier", 1f },
         { "disableRotationSpeedLimit", false },
         { "gravityDirection", "Down" },
         { "disableScoutRecall", false },
@@ -102,6 +103,7 @@ public static class SettingsPresets
         { "showWarningNotifications", true },
         { "shipExplosionMultiplier", 1f },
         { "zeroGravityCockpitFreeLook", true },
+        { "shipBounciness", 0f },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -137,8 +139,8 @@ public static class SettingsPresets
         { "oxygenTankDrainMultiplier", 0.5f },
         { "fuelTankDrainMultiplier", 0.5f },
         { "componentTemperatureDamage", false },
-        { "angularDragMultiplier", 1f },
-        { "disableSpaceAngularDrag", false },
+        { "atmosphereAngularDragMultiplier", 1f },
+        { "spaceAngularDragMultiplier", 1f },
         { "disableRotationSpeedLimit", false },
         { "gravityDirection", "Down" },
         { "disableScoutRecall", false },
@@ -151,6 +153,7 @@ public static class SettingsPresets
         { "showWarningNotifications", true },
         { "shipExplosionMultiplier", 0.8f },
         { "zeroGravityCockpitFreeLook", true },
+        { "shipBounciness", 0f },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -186,8 +189,8 @@ public static class SettingsPresets
         { "oxygenTankDrainMultiplier", 0.01f },
         { "fuelTankDrainMultiplier", 0.1f },
         { "componentTemperatureDamage", false },
-        { "angularDragMultiplier", 1f },
-        { "disableSpaceAngularDrag", false },
+        { "atmosphereAngularDragMultiplier", 1f },
+        { "spaceAngularDragMultiplier", 1f },
         { "disableRotationSpeedLimit", false },
         { "gravityDirection", "Down" },
         { "disableScoutRecall", false },
@@ -200,6 +203,7 @@ public static class SettingsPresets
         { "showWarningNotifications", true },
         { "shipExplosionMultiplier", 1f },
         { "zeroGravityCockpitFreeLook", true },
+        { "shipBounciness", 0f },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -235,8 +239,8 @@ public static class SettingsPresets
         { "oxygenTankDrainMultiplier", 1f },
         { "fuelTankDrainMultiplier", 1.2f },
         { "componentTemperatureDamage", false },
-        { "angularDragMultiplier", 1f },
-        { "disableSpaceAngularDrag", false },
+        { "atmosphereAngularDragMultiplier", 1f },
+        { "spaceAngularDragMultiplier", 1f },
         { "disableRotationSpeedLimit", false },
         { "gravityDirection", "Down" },
         { "disableScoutRecall", false },
@@ -249,6 +253,7 @@ public static class SettingsPresets
         { "showWarningNotifications", true },
         { "shipExplosionMultiplier", 1f },
         { "zeroGravityCockpitFreeLook", true },
+        { "shipBounciness", 0f },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -284,8 +289,8 @@ public static class SettingsPresets
         { "oxygenTankDrainMultiplier", 10f },
         { "fuelTankDrainMultiplier", 10f },
         { "componentTemperatureDamage", true },
-        { "angularDragMultiplier", 1.5f },
-        { "disableSpaceAngularDrag", false },
+        { "atmosphereAngularDragMultiplier", 1.5f },
+        { "spaceAngularDragMultiplier", 1f },
         { "disableRotationSpeedLimit", false },
         { "gravityDirection", "Right" },
         { "disableScoutRecall", false },
@@ -298,6 +303,7 @@ public static class SettingsPresets
         { "showWarningNotifications", true },
         { "shipExplosionMultiplier", 50f },
         { "zeroGravityCockpitFreeLook", true },
+        { "shipBounciness", 1f },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }
