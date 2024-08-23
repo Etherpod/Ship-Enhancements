@@ -951,14 +951,7 @@ public static class PatchClass
     {
         if (!__instance.gameObject.CompareTag("Ship")) return;
 
-        if (Locator.GetShipDetector().GetComponent<ShipFluidDetector>()._activeVolumes.Count == 0)
-        {
-            __instance._angularDrag *= (float)spaceAngularDragMultiplier.GetProperty();
-        }
-        else
-        {
-            __instance._angularDrag *= (float)atmosphereAngularDragMultiplier.GetProperty();
-        }
+        __instance._angularDrag *= (float)spaceAngularDragMultiplier.GetProperty();
     }
 
     [HarmonyPostfix]

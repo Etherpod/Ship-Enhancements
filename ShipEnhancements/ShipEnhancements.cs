@@ -283,6 +283,8 @@ public class ShipEnhancements : ModBehaviour
         UpdateSuitOxygen();
         _lastShipOxygen = SELocator.GetShipResources()._currentOxygen;
 
+        Locator.GetShipBody().gameObject.AddComponent<ShipPersistentInput>();
+
         if ((bool)Settings.disableGravityCrystal.GetValue())
         {
             DisableGravityCrystal();

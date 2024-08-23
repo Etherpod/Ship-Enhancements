@@ -49,22 +49,15 @@ public class ThrustModulatorController : ElectricalComponent
 
     public override void SetPowered(bool powered)
     {
+        if (!(bool)enableThrustModulator.GetProperty()) return;
         base.SetPowered(powered);
         if (powered)
         {
             UpdateModulatorDisplay(_lastLevel);
-            foreach (ThrustModulatorButton button in _modulatorButtons)
-            {
-                button.SetInteractable(button.GetModulatorLevel() != _lastLevel);
-            }
         }
         else
         {
             UpdateModulatorDisplay(0);
-            foreach (ThrustModulatorButton button in _modulatorButtons)
-            {
-                button.SetInteractable(false);
-            }
         }
     }
 
