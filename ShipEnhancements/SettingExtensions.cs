@@ -55,7 +55,8 @@ public static class SettingExtensions
         { Settings.shipExplosionMultiplier, (1f, 1f) },
         { Settings.zeroGravityCockpitFreeLook, (false, false) },
         { Settings.shipBounciness, (0f, 0f) },
-        { Settings.shipIgnitionCancelFix, (false, false) }
+        { Settings.shipIgnitionCancelFix, (false, false) },
+        { Settings.enablePersistentInput, (false, false) },
     };
 
     public static string GetName(this Settings setting)

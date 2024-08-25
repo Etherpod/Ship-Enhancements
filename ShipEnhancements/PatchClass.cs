@@ -1710,6 +1710,8 @@ public static class PatchClass
     [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.OnExitFlightConsole))]
     public static bool KeepThrustIndicatorOn(ThrustAndAttitudeIndicator __instance)
     {
+        if (!(bool)enablePersistentInput.GetProperty() || !Locator.GetShipBody().GetComponent<ShipPersistentInput>().InputEnabled()) return true;
+
         __instance._activeThrusterModel = __instance._jetpackThrusterModel;
         __instance._activeThrusterController = __instance._jetpackThrusterController;
         if (__instance._shipIndicatorMode)

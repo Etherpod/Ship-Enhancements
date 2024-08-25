@@ -274,6 +274,12 @@
       "value": false,
       "tooltip": "Adds an interface to the cockpit for decreasing your ship's maximum thrust."
     },
+    "enablePersistentInput": {
+      "title": "Enable Persistent Input",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Adds a switch to the cockpit to enable persistent input, which holds your last input after you exit the flight console."
+    },
     "temperatureZonesAmount": {
       "title": "Temperature Zones",
       "type": "selector",

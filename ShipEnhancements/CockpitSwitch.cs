@@ -30,12 +30,13 @@ public abstract class CockpitSwitch : ElectricalComponent
         _interactReceiver.OnPressInteract += FlipSwitch;
         _interactReceiver.OnGainFocus += OnGainFocus;
         _interactReceiver.OnLoseFocus += OnLoseFocus;
+
+        _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
     }
 
-    private void Start()
+    protected virtual void Start()
     {
         _renderer = GetComponent<OWRenderer>();
-        _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
 
         _interactReceiver.ChangePrompt("Turn on " + _label);
         transform.localRotation = Quaternion.Euler(_initialRotation.eulerAngles.x + _rotationOffset,

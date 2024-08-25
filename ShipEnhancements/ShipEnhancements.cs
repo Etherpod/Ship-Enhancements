@@ -88,6 +88,7 @@ public class ShipEnhancements : ModBehaviour
         zeroGravityCockpitFreeLook,
         shipBounciness,
         shipIgnitionCancelFix,
+        enablePersistentInput,
     }
 
     private void Awake()
@@ -284,8 +285,6 @@ public class ShipEnhancements : ModBehaviour
         UpdateSuitOxygen();
         _lastShipOxygen = SELocator.GetShipResources()._currentOxygen;
 
-        Locator.GetShipBody().gameObject.AddComponent<ShipPersistentInput>();
-
         if ((bool)Settings.disableGravityCrystal.GetValue())
         {
             DisableGravityCrystal();
@@ -455,19 +454,13 @@ public class ShipEnhancements : ModBehaviour
             }
             audio.SetCustomCurve(AudioSourceCurveType.CustomRolloff, newCurve);
         }
-        WriteDebugMessage((float)Settings.shipBounciness.GetValue());
         if ((float)Settings.shipBounciness.GetValue() > 0f)
         {
-            /*_bouncyMaterial = (PhysicMaterial)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipBouncy.physicMaterial");
-            foreach (Collider col in Locator.GetShipTransform().GetComponentsInChildren<Collider>())
-            {
-                if (!col.isTrigger)
-                {
-                    col.material = _bouncyMaterial;
-                }
-            }*/
-
             Locator.GetShipTransform().gameObject.AddComponent<ShipBouncyHull>();
+        }
+        if ((bool)Settings.enablePersistentInput.GetValue())
+        {
+            Locator.GetShipBody().gameObject.AddComponent<ShipPersistentInput>();
         }
 
         ShipNotifications.Initialize();
