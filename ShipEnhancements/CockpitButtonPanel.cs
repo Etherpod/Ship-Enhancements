@@ -57,6 +57,8 @@ public class CockpitButtonPanel : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if (SELocator.GetShipDamageController().IsSystemFailed()) return;
+
         if (_extending && _buttonPanelT < 1f)
         {
             _buttonPanelT = Mathf.Clamp01(_buttonPanelT + Time.deltaTime / _extensionTime);
