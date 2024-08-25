@@ -1,6 +1,8 @@
 ﻿using System;
 using UnityEngine;
 
+namespace ShipEnhancements;
+
 public class ShipPersistentInput : ThrusterController
 {
     private Vector3 _currentInput;
@@ -19,7 +21,7 @@ public class ShipPersistentInput : ThrusterController
 
     public override Vector3 ReadTranslationalInput()
     {
-        return _currentInput;
+        return _currentInput * ShipEnhancements.Instance.thrustModulatorLevel / 5f;
     }
 
     private void OnEnterFlightConsole(OWRigidbody shipBody)
@@ -30,10 +32,19 @@ public class ShipPersistentInput : ThrusterController
 
     private void OnExitFlightConsole()
     {
+        ShipThrusterController thrusterController = GetComponent<ShipThrusterController>();
         _currentInput = GetComponent<ShipThrusterController>()._lastTranslationalInput;
-        if (_currentInput != Vector3.zero)
+        Autopilot autopilot = GetComponent<Autopilot>();
+        bool autopilotEnabled = autopilot.IsMatchingVelocity() || autopilot.IsFlyingToDestination() || autopilot.IsApproachingDestination() || autopilot.IsLiningUpDestination();
+
+        if (_currentInput != Vector3.zero && !autopilotEnabled && !thrusterController.RequiresIgnition())
         {
             enabled = true;
+        }
+        else if (thrusterController._isIgniting && (bool)ShipEnhancements.Settings.shipIgnitionCancelFix.GetProperty())
+        {
+            thrusterController._isIgniting = false;
+            GlobalMessenger.FireEvent("CancelShipIgnition");
         }
     }
 

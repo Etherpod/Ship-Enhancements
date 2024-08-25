@@ -87,6 +87,7 @@ public class ShipEnhancements : ModBehaviour
         shipExplosionMultiplier,
         zeroGravityCockpitFreeLook,
         shipBounciness,
+        shipIgnitionCancelFix,
     }
 
     private void Awake()

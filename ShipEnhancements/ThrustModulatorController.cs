@@ -11,12 +11,16 @@ public class ThrustModulatorController : ElectricalComponent
     private OWAudioSource _audioSource;
 
     private ThrustModulatorButton[] _modulatorButtons;
+    private CockpitButtonPanel _buttonPanel;
     private int _lastLevel;
+    private int _focusedButtons;
+    private bool _focused = false;
 
     public override void Awake()
     {
         _powered = true;
-        GetComponentInParent<CockpitButtonPanel>().SetThrustModulatorActive((bool)enableThrustModulator.GetProperty());
+        _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
+        _buttonPanel.SetThrustModulatorActive((bool)enableThrustModulator.GetProperty());
 
         _modulatorButtons = GetComponentsInChildren<ThrustModulatorButton>();
         ShipEnhancements.Instance.SetThrustModulatorLevel(5);
@@ -65,5 +69,15 @@ public class ThrustModulatorController : ElectricalComponent
     {
         _audioSource.pitch = level < _lastLevel ? Random.Range(0.9f, 1f) : Random.Range(1f, 1.1f);
         _audioSource.PlayOneShot(clip, volume);
+    }
+
+    public void UpdateFocusedButtons(bool add)
+    {
+        _focusedButtons = Mathf.Max(_focusedButtons + (add ? 1 : -1), 0);
+        if (_focused != _focusedButtons > 0)
+        {
+            _focused = _focusedButtons > 0;
+            _buttonPanel.UpdateFocusedButtons(_focused);
+        }
     }
 }

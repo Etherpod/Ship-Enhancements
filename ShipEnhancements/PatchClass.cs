@@ -1704,4 +1704,24 @@ public static class PatchClass
         return false;
     }
     #endregion
+
+    #region PersistentInput
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.OnExitFlightConsole))]
+    public static bool KeepThrustIndicatorOn(ThrustAndAttitudeIndicator __instance)
+    {
+        __instance._activeThrusterModel = __instance._jetpackThrusterModel;
+        __instance._activeThrusterController = __instance._jetpackThrusterController;
+        if (__instance._shipIndicatorMode)
+        {
+            //__instance.ResetAllArrows();
+            //__instance._thrusterArrowRoot.gameObject.SetActive(false);
+            __instance.enabled = false;
+            return false;
+        }
+        __instance._thrusterArrowRoot.gameObject.SetActive(true);
+        __instance.enabled = true;
+        return false;
+    }
+    #endregion
 }

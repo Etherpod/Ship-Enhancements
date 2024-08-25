@@ -7,7 +7,7 @@ public class GravityLandingGearSwitch : CockpitSwitch
     public override void Awake()
     {
         base.Awake();
-        GetComponentInParent<CockpitButtonPanel>().SetGravityLandingGearActive((bool)enableGravityLandingGear.GetProperty());
+        _buttonPanel.SetGravityLandingGearActive((bool)enableGravityLandingGear.GetProperty());
     }
 
     protected override void OnFlipSwitch(bool state)
@@ -18,6 +18,6 @@ public class GravityLandingGearSwitch : CockpitSwitch
     public override void SetPowered(bool powered)
     {
         base.SetPowered(powered);
-        ShipEnhancements.Instance.SetGravityLandingGearEnabled(_on && !Locator.GetShipBody().GetComponent<ShipDamageController>().IsElectricalFailed());
+        ShipEnhancements.Instance.SetGravityLandingGearEnabled(_on && !SELocator.GetShipDamageController().IsElectricalFailed());
     }
 }

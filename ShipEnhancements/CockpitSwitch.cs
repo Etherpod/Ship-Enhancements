@@ -21,17 +21,21 @@ public abstract class CockpitSwitch : ElectricalComponent
 
     protected Quaternion _initialRotation;
     protected OWRenderer _renderer;
+    protected CockpitButtonPanel _buttonPanel;
     protected bool _on = false;
 
     public override void Awake()
     {
         base.Awake();
         _interactReceiver.OnPressInteract += FlipSwitch;
+        _interactReceiver.OnGainFocus += OnGainFocus;
+        _interactReceiver.OnLoseFocus += OnLoseFocus;
     }
 
     private void Start()
     {
         _renderer = GetComponent<OWRenderer>();
+        _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
 
         _interactReceiver.ChangePrompt("Turn on " + _label);
         transform.localRotation = Quaternion.Euler(_initialRotation.eulerAngles.x + _rotationOffset,
@@ -104,8 +108,20 @@ public abstract class CockpitSwitch : ElectricalComponent
 
     protected virtual void OnFlipSwitch(bool state) { }
 
+    private void OnGainFocus()
+    {
+        _buttonPanel.UpdateFocusedButtons(true);
+    }
+
+    private void OnLoseFocus()
+    {
+        _buttonPanel.UpdateFocusedButtons(false);
+    }
+
     protected void OnDestroy()
     {
         _interactReceiver.OnPressInteract -= FlipSwitch;
+        _interactReceiver.OnGainFocus -= OnGainFocus;
+        _interactReceiver.OnLoseFocus -= OnLoseFocus;
     }
 }

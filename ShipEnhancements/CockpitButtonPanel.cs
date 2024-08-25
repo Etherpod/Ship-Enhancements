@@ -23,6 +23,7 @@ public class CockpitButtonPanel : MonoBehaviour
     private bool _extending = false;
     private float _buttonPanelT = 0f;
     private float _extensionTime = 0.6f;
+    private int _focusedButtons;
 
     private void Start()
     {
@@ -85,6 +86,20 @@ public class CockpitButtonPanel : MonoBehaviour
         {
             _gravityGearObject.SetActive(false);
             _gravityGearReplacement.SetActive(true);
+        }
+    }
+
+    public void UpdateFocusedButtons(bool add)
+    {
+        _focusedButtons = Mathf.Max(_focusedButtons + (add ? 1 : -1), 0);
+        SingleInteractionVolume interactVolume = (InteractZone)Locator.GetShipBody().GetComponentInChildren<ShipCockpitController>()._interactVolume;
+        if (_focusedButtons > 0)
+        {
+            interactVolume.DisableInteraction();
+        }
+        else
+        {
+            interactVolume.EnableInteraction();
         }
     }
 }

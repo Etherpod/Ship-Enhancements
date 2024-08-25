@@ -54,6 +54,7 @@ public static class SettingsPresets
         { "shipExplosionMultiplier", 1f },
         { "zeroGravityCockpitFreeLook", true },
         { "shipBounciness", 0f },
+        { "shipIgnitionCancelFix", true },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -104,6 +105,7 @@ public static class SettingsPresets
         { "shipExplosionMultiplier", 1f },
         { "zeroGravityCockpitFreeLook", true },
         { "shipBounciness", 0f },
+        { "shipIgnitionCancelFix", true },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -154,6 +156,7 @@ public static class SettingsPresets
         { "shipExplosionMultiplier", 0.8f },
         { "zeroGravityCockpitFreeLook", true },
         { "shipBounciness", 0f },
+        { "shipIgnitionCancelFix", true },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -204,6 +207,7 @@ public static class SettingsPresets
         { "shipExplosionMultiplier", 1f },
         { "zeroGravityCockpitFreeLook", true },
         { "shipBounciness", 0f },
+        { "shipIgnitionCancelFix", true },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -254,6 +258,7 @@ public static class SettingsPresets
         { "shipExplosionMultiplier", 1f },
         { "zeroGravityCockpitFreeLook", true },
         { "shipBounciness", 0f },
+        { "shipIgnitionCancelFix", true },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -304,6 +309,7 @@ public static class SettingsPresets
         { "shipExplosionMultiplier", 50f },
         { "zeroGravityCockpitFreeLook", true },
         { "shipBounciness", 1f },
+        { "shipIgnitionCancelFix", true },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

@@ -28,6 +28,8 @@ public class ThrustModulatorButton : MonoBehaviour
     private void Start()
     {
         _interactReceiver.OnPressInteract += OnPressInteract;
+        _interactReceiver.OnGainFocus += OnGainFocus;
+        _interactReceiver.OnLoseFocus += OnLoseFocus;
 
         _interactReceiver._screenPrompt._text = "Set Modulator to level " + _modulatorLevel;
         SetButtonLight(true);
@@ -64,6 +66,16 @@ public class ThrustModulatorButton : MonoBehaviour
         _modulatorController.UpdateModulatorDisplay(_modulatorLevel);
     }
 
+    private void OnGainFocus()
+    {
+        _modulatorController.UpdateFocusedButtons(true);
+    }
+
+    private void OnLoseFocus()
+    {
+        _modulatorController.UpdateFocusedButtons(false);
+    }
+
     public int GetModulatorLevel()
     {
         return _modulatorLevel;
@@ -85,5 +97,7 @@ public class ThrustModulatorButton : MonoBehaviour
     private void OnDestroy()
     {
         _interactReceiver.OnPressInteract -= OnPressInteract;
+        _interactReceiver.OnGainFocus -= OnGainFocus;
+        _interactReceiver.OnLoseFocus -= OnLoseFocus;
     }
 }
