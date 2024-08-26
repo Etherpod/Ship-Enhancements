@@ -215,6 +215,12 @@
       "value": 0,
       "tooltip": "Adjusts how bouncy the ship is. Maximum bounciness makes the ship retain all of its speed when colliding with something."
     },
+    "shipInputLatency": {
+      "title": "Ship Input Latency",
+      "type": "number",
+      "value": 0,
+      "tooltip": "Adds a delay while piloting the ship between when you press the button and when the ship recieves the input. Now you can pretend you're playing online!"
+    },
 
     "Add Ship Functions": {
       "type": "separator"

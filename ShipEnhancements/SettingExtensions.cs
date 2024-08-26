@@ -54,9 +54,10 @@ public static class SettingExtensions
         { Settings.showWarningNotifications, (false, false) },
         { Settings.shipExplosionMultiplier, (1f, 1f) },
         { Settings.zeroGravityCockpitFreeLook, (false, false) },
-        { Settings.shipBounciness, (0f, 0f) },
+        { Settings.shipBounciness, (1f, 1f) },
         { Settings.shipIgnitionCancelFix, (false, false) },
         { Settings.enablePersistentInput, (false, false) },
+        { Settings.shipInputLatency, (1f, 1f) },
     };
 
     public static string GetName(this Settings setting)

@@ -1730,7 +1730,33 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.ExitFlightConsole))]
     public static void UpdatePersistentInputAutopilotState()
     {
-        Locator.GetShipBody().GetComponent<ShipPersistentInput>().UpdateLastAutopilotState();
+        if ((bool)enablePersistentInput.GetProperty())
+        {
+            Locator.GetShipBody().GetComponent<ShipPersistentInput>().UpdateLastAutopilotState();
+        }
     }
+    #endregion
+
+    #region InputLatency
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ThrusterModel), nameof(ThrusterModel.AddTranslationalInput))]
+    public static bool DelayTranslationalInput(ThrusterModel __instance, Vector3 input)
+    {
+        if (__instance is not ShipThrusterModel || (float)shipInputLatency.GetProperty() == 0f) return true;
+
+        InputLatencyController.AddTranslationalInput(input);
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ThrusterModel), nameof(ThrusterModel.AddRotationalInput))]
+    public static bool DelayRotationalInput(ThrusterModel __instance, Vector3 input)
+    {
+        if (__instance is not ShipThrusterModel || (float)shipInputLatency.GetProperty() == 0f) return true;
+
+        InputLatencyController.AddRotationalInput(input);
+        return false;
+    }
+
     #endregion
 }

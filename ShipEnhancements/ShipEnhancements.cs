@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using OWML.Utils;
 using Newtonsoft.Json.Linq;
+using System.Threading.Tasks;
+using System.Runtime.CompilerServices;
 
 namespace ShipEnhancements;
 
@@ -89,6 +91,7 @@ public class ShipEnhancements : ModBehaviour
         shipBounciness,
         shipIgnitionCancelFix,
         enablePersistentInput,
+        shipInputLatency,
     }
 
     private void Awake()
@@ -247,6 +250,14 @@ public class ShipEnhancements : ModBehaviour
         if (!SELocator.GetPlayerResources()._refillingOxygen && refillingOxygen)
         {
             refillingOxygen = false;
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if ((float)Settings.shipInputLatency.GetProperty() > 0f)
+        {
+            InputLatencyController.FixedUpdate();
         }
     }
 
@@ -461,6 +472,10 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)Settings.enablePersistentInput.GetValue())
         {
             Locator.GetShipBody().gameObject.AddComponent<ShipPersistentInput>();
+        }
+        if ((float)Settings.shipInputLatency.GetValue() > 0f)
+        {
+            InputLatencyController.Initialize();
         }
 
         ShipNotifications.Initialize();
