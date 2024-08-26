@@ -1725,5 +1725,12 @@ public static class PatchClass
         __instance.enabled = true;
         return false;
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.ExitFlightConsole))]
+    public static void UpdatePersistentInputAutopilotState()
+    {
+        Locator.GetShipBody().GetComponent<ShipPersistentInput>().UpdateLastAutopilotState();
+    }
     #endregion
 }

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ShipEnhancements;
 
@@ -11,11 +10,14 @@ public class ShipPersistentInput : ThrusterController
     private MeshRenderer[] _displayRenderers;
     private float[] _lastRendererValues = new float[6];
     private RulesetDetector _rulesetDetector;
+    private Autopilot _shipAutopilot;
+    private bool _lastAutopilotState;
 
     private void Start()
     {
         _thrustDisplay = GetComponentInChildren<ThrustAndAttitudeIndicator>(true);
         _rulesetDetector = Locator.GetShipDetector().GetComponent<RulesetDetector>();
+        _shipAutopilot = Locator.GetShipBody().GetComponent<Autopilot>();
         _displayRenderers =
         [
             _thrustDisplay._rendererForward,
@@ -26,9 +28,10 @@ public class ShipPersistentInput : ThrusterController
             _thrustDisplay._rendererDown,
 
         ];
-        ShipEnhancements.WriteDebugMessage(_thrustDisplay);
         GlobalMessenger<OWRigidbody>.AddListener("EnterFlightConsole", OnEnterFlightConsole);
         GlobalMessenger.AddListener("ExitFlightConsole", OnExitFlightConsole);
+        _shipAutopilot.OnInitMatchVelocity += OnInitMatchVelocity;
+        _lastAutopilotState = IsAutopilotEnabled();
         enabled = false;
     }
 
@@ -58,10 +61,8 @@ public class ShipPersistentInput : ThrusterController
         if (!_inputEnabled) return;
         ShipThrusterController thrusterController = GetComponent<ShipThrusterController>();
         _currentInput = GetComponent<ShipThrusterController>()._lastTranslationalInput;
-        Autopilot autopilot = GetComponent<Autopilot>();
-        bool autopilotEnabled = autopilot.IsMatchingVelocity() || autopilot.IsFlyingToDestination() || autopilot.IsApproachingDestination() || autopilot.IsLiningUpDestination();
 
-        if (_currentInput != Vector3.zero && !autopilotEnabled && !thrusterController.RequiresIgnition())
+        if (_currentInput != Vector3.zero && !IsAutopilotEnabled() && !thrusterController.RequiresIgnition())
         {
             enabled = true;
         }
@@ -97,9 +98,34 @@ public class ShipPersistentInput : ThrusterController
         }
     }
 
+    public void UpdateLastAutopilotState()
+    {
+        _lastAutopilotState = IsAutopilotEnabled();
+    }
+
+    private void OnInitMatchVelocity()
+    {
+        if (enabled)
+        {
+            _currentInput = Vector3.zero;
+            for (int i = 0; i < _lastRendererValues.Length; i++)
+            {
+                _lastRendererValues[i] = 0f;
+            }
+            enabled = false;
+        }
+    }
+
+    private bool IsAutopilotEnabled()
+    {
+        return _shipAutopilot.IsMatchingVelocity() || _shipAutopilot.IsFlyingToDestination() 
+            || _shipAutopilot.IsApproachingDestination() || _shipAutopilot.IsLiningUpDestination(); ;
+    }
+
     public bool InputEnabled()
     {
-        return _inputEnabled;
+        ShipEnhancements.WriteDebugMessage("check if autopilot enabled: " + _lastAutopilotState);
+        return _inputEnabled && !_lastAutopilotState;
     }
 
     public override void OnDestroy()

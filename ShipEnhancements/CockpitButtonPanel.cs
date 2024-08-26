@@ -131,7 +131,7 @@ public class CockpitButtonPanel : MonoBehaviour
         {
             _cockpitInteractVolume.DisableInteraction();
         }
-        else
+        else if (!PlayerState.AtFlightConsole())
         {
             _cockpitInteractVolume.EnableInteraction();
         }
