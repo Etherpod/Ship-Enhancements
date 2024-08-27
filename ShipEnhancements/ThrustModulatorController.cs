@@ -51,6 +51,15 @@ public class ThrustModulatorController : ElectricalComponent
         }
     }
 
+    public void DisableModulatorDisplay()
+    {
+        foreach (ThrustModulatorButton button in _modulatorButtons)
+        {
+            button.SetButtonLight(false);
+            button.SetInteractable(false);
+        }
+    }
+
     public override void SetPowered(bool powered)
     {
         if (!(bool)enableThrustModulator.GetProperty()) return;
@@ -61,7 +70,7 @@ public class ThrustModulatorController : ElectricalComponent
         }
         else
         {
-            UpdateModulatorDisplay(0);
+            DisableModulatorDisplay();
         }
     }
 

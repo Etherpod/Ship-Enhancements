@@ -1759,4 +1759,34 @@ public static class PatchClass
     }
 
     #endregion
+
+    #region EngineSwitch
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipResources), nameof(ShipResources.AreThrustersUsable))]
+    public static void DisableThrustersWhenEngineOff(ShipResources __instance, ref bool __result)
+    {
+        __result = __result && ShipEnhancements.Instance.engineOn;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipThrusterController), nameof(ShipThrusterController.OnEnable))]
+    public static bool DisableConsoleEngineIgnition(ShipThrusterController __instance)
+    {
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ElectricalSystem), nameof(ElectricalSystem.SetPowered))]
+    public static bool LinkElectricalSystemsToEngine(ElectricalSystem __instance, bool powered)
+    {
+        return !powered || ShipEnhancements.Instance.engineOn;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ElectricalComponent), nameof(ElectricalComponent.SetPowered))]
+    public static bool LinkElectricalComponentsToEngine(ElectricalComponent __instance, bool powered)
+    {
+        return !powered || ShipEnhancements.Instance.engineOn;
+    }
+    #endregion
 }

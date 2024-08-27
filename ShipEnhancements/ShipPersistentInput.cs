@@ -12,12 +12,14 @@ public class ShipPersistentInput : ThrusterController
     private RulesetDetector _rulesetDetector;
     private Autopilot _shipAutopilot;
     private bool _lastAutopilotState;
+    private ShipThrusterController _thrustController;
 
     private void Start()
     {
         _thrustDisplay = GetComponentInChildren<ThrustAndAttitudeIndicator>(true);
         _rulesetDetector = Locator.GetShipDetector().GetComponent<RulesetDetector>();
         _shipAutopilot = Locator.GetShipBody().GetComponent<Autopilot>();
+        _thrustController = GetComponent<ShipThrusterController>();
         _displayRenderers =
         [
             _thrustDisplay._rendererForward,
@@ -42,7 +44,8 @@ public class ShipPersistentInput : ThrusterController
 
     public override Vector3 ReadTranslationalInput()
     {
-        float num = Mathf.Min(_rulesetDetector.GetThrustLimit(), 1);
+        float num = Mathf.Min(_rulesetDetector.GetThrustLimit(), _thrustController._thrusterModel.GetMaxTranslationalThrust()) 
+            / _thrustController._thrusterModel.GetMaxTranslationalThrust();
         return _currentInput * ShipEnhancements.Instance.thrustModulatorLevel / 5f * num;
     }
 
@@ -58,17 +61,16 @@ public class ShipPersistentInput : ThrusterController
 
     private void OnExitFlightConsole()
     {
-        if (!_inputEnabled) return;
-        ShipThrusterController thrusterController = GetComponent<ShipThrusterController>();
+        if (!_inputEnabled || !ShipEnhancements.Instance.engineOn) return;
         _currentInput = GetComponent<ShipThrusterController>()._lastTranslationalInput;
 
-        if (_currentInput != Vector3.zero && !IsAutopilotEnabled() && !thrusterController.RequiresIgnition())
+        if (_currentInput != Vector3.zero && !IsAutopilotEnabled() && !_thrustController.RequiresIgnition())
         {
             enabled = true;
         }
-        else if (thrusterController._isIgniting && (bool)ShipEnhancements.Settings.shipIgnitionCancelFix.GetProperty())
+        else if (_thrustController._isIgniting && (bool)ShipEnhancements.Settings.shipIgnitionCancelFix.GetProperty())
         {
-            thrusterController._isIgniting = false;
+            _thrustController._isIgniting = false;
             GlobalMessenger.FireEvent("CancelShipIgnition");
         }
     }
@@ -98,6 +100,20 @@ public class ShipPersistentInput : ThrusterController
         }
     }
 
+    public void OnDisableEngine()
+    {
+        if (_currentInput != Vector3.zero && enabled)
+        {
+            enabled = false;
+            _thrustDisplay._thrusterArrowRoot.gameObject.SetActive(false);
+            for (int i = 0; i < _displayRenderers.Length; i++)
+            {
+                _displayRenderers[i].material.SetFloat(_thrustDisplay._propID_BarPosition, 0f);
+            }
+            _currentInput = Vector3.zero;
+        }
+    }
+
     public void UpdateLastAutopilotState()
     {
         _lastAutopilotState = IsAutopilotEnabled();
@@ -124,8 +140,7 @@ public class ShipPersistentInput : ThrusterController
 
     public bool InputEnabled()
     {
-        ShipEnhancements.WriteDebugMessage("check if autopilot enabled: " + _lastAutopilotState);
-        return _inputEnabled && !_lastAutopilotState;
+        return _inputEnabled && !_lastAutopilotState && ShipEnhancements.Instance.engineOn;
     }
 
     public override void OnDestroy()

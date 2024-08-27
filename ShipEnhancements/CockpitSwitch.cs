@@ -46,9 +46,9 @@ public abstract class CockpitSwitch : ElectricalComponent
         ElectricalSystem cockpitElectricalSystem = Locator.GetShipBody().transform
             .Find("Module_Cockpit/Systems_Cockpit/FlightControlsElectricalSystem")
             .GetComponent<ElectricalSystem>();
-        List<ElectricalComponent> componentList = cockpitElectricalSystem._connectedComponents.ToList();
+        List<ElectricalComponent> componentList = [.. cockpitElectricalSystem._connectedComponents];
         componentList.Add(this);
-        cockpitElectricalSystem._connectedComponents = componentList.ToArray();
+        cockpitElectricalSystem._connectedComponents = [.. componentList];
     }
 
     private void FlipSwitch()

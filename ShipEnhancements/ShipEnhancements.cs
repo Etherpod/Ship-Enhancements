@@ -9,6 +9,7 @@ using OWML.Utils;
 using Newtonsoft.Json.Linq;
 using System.Threading.Tasks;
 using System.Runtime.CompilerServices;
+using Mono.Cecil.Cil;
 
 namespace ShipEnhancements;
 
@@ -26,6 +27,7 @@ public class ShipEnhancements : ModBehaviour
     public float levelTwoSpinSpeed = 16f;
     public float maxSpinSpeed = 24f;
     public bool probeDestroyed;
+    public bool engineOn;
 
     public UITextType probeLauncherName { get; private set; }
     public ItemType portableCampfireType { get; private set; }
@@ -665,6 +667,11 @@ public class ShipEnhancements : ModBehaviour
     public void SetThrustModulatorLevel(int level)
     {
         thrustModulatorLevel = level;
+    }
+
+    public void SetEngineOn(bool state)
+    {
+        engineOn = state;
     }
 
     #endregion
