@@ -18,6 +18,10 @@ public class ShipEnhancements : ModBehaviour
     public delegate void SwitchEvent(bool enabled);
     public event SwitchEvent OnGravityLandingGearSwitch;
 
+    public delegate void ResourceEvent();
+    public event ResourceEvent OnFuelDepleted;
+    public event ResourceEvent OnFuelRestored;
+
     public static ShipEnhancements Instance;
     public bool oxygenDepleted;
     public bool refillingOxygen;
@@ -224,6 +228,10 @@ public class ShipEnhancements : ModBehaviour
                 fuelTank._damageEffect._particleSystem.Stop();
                 fuelTank._damageEffect._particleAudioSource.Stop();
             }
+            if (OnFuelDepleted != null)
+            {
+                OnFuelDepleted();
+            }
         }
         else if (fuelDepleted && SELocator.GetShipResources()._currentFuel > 0f)
         {
@@ -233,6 +241,10 @@ public class ShipEnhancements : ModBehaviour
             {
                 fuelTank._damageEffect._particleSystem.Play();
                 fuelTank._damageEffect._particleAudioSource.Play();
+            }
+            if (OnFuelRestored != null)
+            {
+                OnFuelRestored();
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿using static ShipEnhancements.ShipEnhancements.Settings;
 using UnityEngine;
+using System.Collections;
 
 namespace ShipEnhancements;
 
@@ -11,6 +12,10 @@ public class ShipEngineSwitch : MonoBehaviour
     private Transform _switchTransform;
     [SerializeField]
     private float _targetYRotation;
+    [SerializeField]
+    private OWRenderer _thrustersIndicatorLight;
+    [SerializeField]
+    private OWRenderer _powerIndicatorLight;
 
     private CockpitButtonPanel _buttonPanel;
     private ShipThrusterController _thrusterController;
@@ -24,6 +29,8 @@ public class ShipEngineSwitch : MonoBehaviour
     private float _ignitionTime;
     private float _ignitionDuration;
     private bool _completedIgnition = false;
+    private Color _indicatorLightColor = new Color(1.3f, 0.55f, 0.55f);
+    private bool _lastShipPowerState = false;
 
     private void Awake()
     {
@@ -39,6 +46,8 @@ public class ShipEngineSwitch : MonoBehaviour
         _interactReceiver.OnPressInteract += OnPressInteract;
         _interactReceiver.OnReleaseInteract += OnReleaseInteract;
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+        ShipEnhancements.Instance.OnFuelDepleted += OnFuelDepleted;
+        ShipEnhancements.Instance.OnFuelRestored += OnFuelRestored;
 
         _baseRotation = _switchTransform.localRotation;
         _targetRotation = Quaternion.Euler(_switchTransform.localRotation.eulerAngles.x, _targetYRotation, 
@@ -58,6 +67,12 @@ public class ShipEngineSwitch : MonoBehaviour
         if (_completedIgnition)
         {
             SELocator.GetShipResources().DrainFuel(0.5f * Time.deltaTime);
+            bool electricalFailed = SELocator.GetShipDamageController().IsElectricalFailed();
+            if (electricalFailed != _lastShipPowerState)
+            {
+                _lastShipPowerState = electricalFailed;
+                _powerIndicatorLight.SetEmissionColor(electricalFailed ? Color.black : _indicatorLightColor);
+            }
         }
     }
 
@@ -91,6 +106,7 @@ public class ShipEngineSwitch : MonoBehaviour
                         electricalComponent._audioSource.PlayOneShot(clip, 0.8f);
                     }
                     _audioController.PlayShipAmbient();
+                    StartCoroutine(ActivateIndicatorLights(electricalComponent._electricalSystem._systemDelay));
                     GlobalMessenger.FireEvent("CompleteShipIgnition");
                 }
             }
@@ -104,6 +120,25 @@ public class ShipEngineSwitch : MonoBehaviour
                 _switchTransform.localRotation = Quaternion.Slerp(_baseRotation, _targetRotation, num);
             }
         }
+    }
+
+    private IEnumerator ActivateIndicatorLights(float delay)
+    {
+        if (SELocator.GetShipResources().AreThrustersUsable())
+        {
+            _thrustersIndicatorLight.SetEmissionColor(_indicatorLightColor);
+        }
+        yield return new WaitForSeconds(delay);
+        if (!SELocator.GetShipDamageController().IsElectricalFailed())
+        {
+            _powerIndicatorLight.SetEmissionColor(_indicatorLightColor);
+        }
+    }
+
+    private void DeactivateIndicatorLights()
+    {
+        _thrustersIndicatorLight.SetEmissionColor(Color.black);
+        _powerIndicatorLight.SetEmissionColor(Color.black);
     }
 
     private void OnGainFocus()
@@ -140,6 +175,8 @@ public class ShipEngineSwitch : MonoBehaviour
                 Locator.GetToolModeSwapper().UnequipTool();
             }
             _audioController.StopShipAmbient();
+            StopAllCoroutines();
+            DeactivateIndicatorLights();
         }
         else
         {
@@ -158,6 +195,19 @@ public class ShipEngineSwitch : MonoBehaviour
         _interactReceiver.ResetInteraction();
     }
 
+    private void OnFuelDepleted()
+    {
+        _thrustersIndicatorLight.SetEmissionColor(Color.black);
+    }
+
+    private void OnFuelRestored()
+    {
+        if (_completedIgnition)
+        {
+            _thrustersIndicatorLight.SetEmissionColor(_indicatorLightColor);
+        }
+    }
+
     private void OnShipSystemFailure()
     {
         _interactReceiver.DisableInteraction();
@@ -170,5 +220,7 @@ public class ShipEngineSwitch : MonoBehaviour
         _interactReceiver.OnPressInteract += OnPressInteract;
         _interactReceiver.OnReleaseInteract += OnReleaseInteract;
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
+        ShipEnhancements.Instance.OnFuelDepleted -= OnFuelDepleted;
+        ShipEnhancements.Instance.OnFuelRestored -= OnFuelRestored;
     }
 }
