@@ -130,7 +130,7 @@ public class ShipPersistentInput : ThrusterController
     private bool IsAutopilotEnabled()
     {
         return _shipAutopilot.IsMatchingVelocity() || _shipAutopilot.IsFlyingToDestination() 
-            || _shipAutopilot.IsApproachingDestination() || _shipAutopilot.IsLiningUpDestination(); ;
+            || _shipAutopilot.IsApproachingDestination() || _shipAutopilot.IsLiningUpDestination();
     }
 
     public bool InputEnabled()

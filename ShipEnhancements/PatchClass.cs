@@ -1743,6 +1743,12 @@ public static class PatchClass
     public static bool DelayTranslationalInput(ThrusterModel __instance, Vector3 input)
     {
         if (__instance is not ShipThrusterModel || (float)shipInputLatency.GetProperty() == 0f) return true;
+        Autopilot autopilot = Locator.GetShipBody().GetComponent<Autopilot>();
+        if (autopilot.IsMatchingVelocity() || autopilot.IsFlyingToDestination()
+            || autopilot.IsApproachingDestination() || autopilot.IsLiningUpDestination())
+        {
+            return true;
+        }
 
         InputLatencyController.AddTranslationalInput(input);
         return false;
@@ -1753,6 +1759,12 @@ public static class PatchClass
     public static bool DelayRotationalInput(ThrusterModel __instance, Vector3 input)
     {
         if (__instance is not ShipThrusterModel || (float)shipInputLatency.GetProperty() == 0f) return true;
+        Autopilot autopilot = Locator.GetShipBody().GetComponent<Autopilot>();
+        if (autopilot.IsMatchingVelocity() || autopilot.IsFlyingToDestination()
+            || autopilot.IsApproachingDestination() || autopilot.IsLiningUpDestination())
+        {
+            return true;
+        }
 
         InputLatencyController.AddRotationalInput(input);
         return false;
