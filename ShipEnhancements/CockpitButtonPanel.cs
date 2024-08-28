@@ -15,15 +15,20 @@ public class CockpitButtonPanel : MonoBehaviour
     [SerializeField]
     private GameObject _persistentInputObject;
     [SerializeField]
+    private GameObject _engineSwitchObject;
+    [SerializeField]
     private GameObject _thrustModulatorReplacement;
     [SerializeField]
     private GameObject _gravityGearReplacement;
+    [SerializeField]
+    private GameObject _engineSwitchReplacement;
     [SerializeField]
     private Transform _retractedTransform;
     [SerializeField]
     private Transform _extendedTransform;
 
     private int _numButtons = 0;
+    private int _numBottomButtons = 0;
     private bool _extending = false;
     private float _buttonPanelT = 0f;
     private float _extensionTime = 0.4f;
@@ -36,6 +41,10 @@ public class CockpitButtonPanel : MonoBehaviour
         {
             gameObject.SetActive(false);
             return;
+        }
+        else if (_numBottomButtons == 0)
+        {
+            _bottomPanel.SetActive(false);
         }
         _cockpitInteractVolume = (InteractZone)Locator.GetShipBody().GetComponentInChildren<ShipCockpitController>()._interactVolume;
         GlobalMessenger.AddListener("ExitFlightConsole", OnExitFlightConsole);
@@ -114,13 +123,28 @@ public class CockpitButtonPanel : MonoBehaviour
         if (active)
         {
             _numButtons++;
+            _numBottomButtons++;
             _persistentInputObject.SetActive(true);
-            _bottomPanel.SetActive(true);
         }
         else
         {
             _persistentInputObject.SetActive(false);
-            _bottomPanel.SetActive(false);
+        }
+    }
+
+    public void SetEngineSwitchActive(bool active)
+    {
+        if (active)
+        {
+            _numButtons++;
+            _numBottomButtons++;
+            _engineSwitchObject.SetActive(true);
+            _engineSwitchReplacement.SetActive(false);
+        }
+        else
+        {
+            _engineSwitchObject.SetActive(false);
+            _engineSwitchReplacement.SetActive(true);
         }
     }
 

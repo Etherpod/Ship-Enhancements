@@ -1788,5 +1788,25 @@ public static class PatchClass
     {
         return !powered || ShipEnhancements.Instance.engineOn;
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ToolModeSwapper), nameof(ToolModeSwapper.EquipToolMode))]
+    public static bool DisableShipEquip(ToolModeSwapper __instance, ToolMode mode)
+    {
+        if (ShipEnhancements.Instance.engineOn || !OWInput.IsInputMode(InputMode.ShipCockpit)
+            || (mode != ToolMode.Probe && mode != ToolMode.SignalScope))
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipAudioController), nameof(ShipAudioController.PlayShipAmbient))]
+    public static bool DisableShipAmbience(ShipAudioController __instance)
+    {
+        return ShipEnhancements.Instance.engineOn;
+    }
     #endregion
 }
