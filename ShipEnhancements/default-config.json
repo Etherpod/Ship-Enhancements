@@ -221,6 +221,12 @@
       "value": 0,
       "tooltip": "Adds a delay while piloting the ship between when you press the button and when the ship recieves the input. Now you can pretend you're playing online!"
     },
+    "idleFuelConsumptionMultiplier": {
+      "title": "Idle Fuel Consumption Multiplier",
+      "type": "number",
+      "value": 0,
+      "tooltip": "Larger numbers increase the rate at which your ship's fuel drains while it is on. Intended to be used with the Engine Switch."
+    },
 
     "Add Ship Functions": {
       "type": "separator"
@@ -314,6 +320,12 @@
       "type": "toggle",
       "value": false,
       "tooltip": "Adds a portable campfire to the ship near your suit. Unpack it anywhere you'd like and roast a marshmallow!"
+    },
+    "addEngineSwitch": {
+      "title": "Add Engine Switch",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Adds a switch to the cockpit that turns on the ship. While the ship is on it will slowly drain fuel, so make sure you turn it off before you leave!"
     },
 
     "Quality of Life": {

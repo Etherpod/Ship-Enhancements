@@ -58,6 +58,8 @@ public static class SettingExtensions
         { Settings.shipIgnitionCancelFix, (false, false) },
         { Settings.enablePersistentInput, (false, false) },
         { Settings.shipInputLatency, (1f, 1f) },
+        { Settings.addEngineSwitch, (false, false) },
+        { Settings.idleFuelConsumptionMultiplier, (1f, 1f) },
     };
 
     public static string GetName(this Settings setting)

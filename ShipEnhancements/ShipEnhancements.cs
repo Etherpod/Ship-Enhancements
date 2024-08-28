@@ -98,6 +98,8 @@ public class ShipEnhancements : ModBehaviour
         shipIgnitionCancelFix,
         enablePersistentInput,
         shipInputLatency,
+        addEngineSwitch,
+        idleFuelConsumptionMultiplier,
     }
 
     private void Awake()
@@ -175,6 +177,11 @@ public class ShipEnhancements : ModBehaviour
                 fuelTank._damageEffect._particleAudioSource.Stop();
             }
             Locator.GetShipBody().GetComponent<ShipDamageController>().Explode();
+        }
+
+        if ((float)Settings.idleFuelConsumptionMultiplier.GetProperty() > 0f && !(bool)Settings.addEngineSwitch.GetProperty())
+        {
+            SELocator.GetShipResources().DrainFuel(0.5f * (float)Settings.idleFuelConsumptionMultiplier.GetProperty() * Time.deltaTime);
         }
 
         if (!oxygenDepleted && SELocator.GetShipResources().GetOxygen() <= 0 && !((bool)Settings.shipOxygenRefill.GetProperty() && IsShipInOxygen()))
@@ -491,6 +498,8 @@ public class ShipEnhancements : ModBehaviour
         {
             InputLatencyController.Initialize();
         }
+
+        engineOn = !(bool)Settings.addEngineSwitch.GetProperty();
 
         ShipNotifications.Initialize();
     }

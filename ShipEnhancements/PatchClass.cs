@@ -1763,50 +1763,65 @@ public static class PatchClass
     #region EngineSwitch
     [HarmonyPostfix]
     [HarmonyPatch(typeof(ShipResources), nameof(ShipResources.AreThrustersUsable))]
-    public static void DisableThrustersWhenEngineOff(ShipResources __instance, ref bool __result)
+    public static void DisableThrustersWhenEngineOff(ref bool __result)
     {
-        __result = __result && ShipEnhancements.Instance.engineOn;
+        if ((bool)addEngineSwitch.GetProperty())
+        {
+            __result = __result && ShipEnhancements.Instance.engineOn;
+        }
     }
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ShipThrusterController), nameof(ShipThrusterController.OnEnable))]
-    public static bool DisableConsoleEngineIgnition(ShipThrusterController __instance)
+    public static bool DisableConsoleEngineIgnition()
     {
-        return false;
+        return !(bool)addEngineSwitch.GetProperty();
     }
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ElectricalSystem), nameof(ElectricalSystem.SetPowered))]
-    public static bool LinkElectricalSystemsToEngine(ElectricalSystem __instance, bool powered)
+    public static bool LinkElectricalSystemsToEngine(bool powered)
     {
-        return !powered || ShipEnhancements.Instance.engineOn;
+        return !powered || !(bool)addEngineSwitch.GetProperty() || ShipEnhancements.Instance.engineOn;
     }
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ElectricalComponent), nameof(ElectricalComponent.SetPowered))]
-    public static bool LinkElectricalComponentsToEngine(ElectricalComponent __instance, bool powered)
+    public static bool LinkElectricalComponentsToEngine(bool powered)
     {
-        return !powered || ShipEnhancements.Instance.engineOn;
+        return !powered || !(bool)addEngineSwitch.GetProperty() || ShipEnhancements.Instance.engineOn;
     }
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ToolModeSwapper), nameof(ToolModeSwapper.EquipToolMode))]
-    public static bool DisableShipEquip(ToolModeSwapper __instance, ToolMode mode)
+    public static bool DisableShipEquip(ToolMode mode)
     {
-        if (ShipEnhancements.Instance.engineOn || !OWInput.IsInputMode(InputMode.ShipCockpit)
-            || (mode != ToolMode.Probe && mode != ToolMode.SignalScope))
-        {
-            return true;
-        }
-
-        return false;
+        return !(bool)addEngineSwitch.GetProperty() || ShipEnhancements.Instance.engineOn || !OWInput.IsInputMode(InputMode.ShipCockpit)
+            || (mode != ToolMode.Probe && mode != ToolMode.SignalScope);
     }
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ShipAudioController), nameof(ShipAudioController.PlayShipAmbient))]
-    public static bool DisableShipAmbience(ShipAudioController __instance)
+    public static bool DisableShipAmbience()
     {
-        return ShipEnhancements.Instance.engineOn;
+        return !(bool)addEngineSwitch.GetProperty() || ShipEnhancements.Instance.engineOn;
+    }
+    #endregion
+
+    #region IgnitionCancelFix
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.ExitFlightConsole))]
+    public static void IgnitionCancelFix()
+    {
+        if ((bool)shipIgnitionCancelFix.GetProperty())
+        {
+            ShipThrusterController thrustController = Locator.GetShipBody().GetComponent<ShipThrusterController>();
+            if (thrustController && thrustController._isIgniting)
+            {
+                thrustController._isIgniting = false;
+                GlobalMessenger.FireEvent("CancelShipIgnition");
+            }
+        }
     }
     #endregion
 }

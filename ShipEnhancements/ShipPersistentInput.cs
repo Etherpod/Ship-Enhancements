@@ -68,11 +68,6 @@ public class ShipPersistentInput : ThrusterController
         {
             enabled = true;
         }
-        else if (_thrustController._isIgniting && (bool)ShipEnhancements.Settings.shipIgnitionCancelFix.GetProperty())
-        {
-            _thrustController._isIgniting = false;
-            GlobalMessenger.FireEvent("CancelShipIgnition");
-        }
     }
 
     public void SetInputEnabled(bool flag)

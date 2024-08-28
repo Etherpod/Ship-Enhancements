@@ -36,7 +36,15 @@ public class ShipEngineSwitch : MonoBehaviour
     {
         _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
 
-        _buttonPanel.SetEngineSwitchActive(true);
+        if ((bool)addEngineSwitch.GetProperty())
+        {
+            _buttonPanel.SetEngineSwitchActive(true);
+        }
+        else
+        {
+            _buttonPanel.SetEngineSwitchActive(false);
+            return;
+        }
 
         _thrusterController = Locator.GetShipBody().GetComponent<ShipThrusterController>();
         _audioController = Locator.GetShipBody().GetComponentInChildren<ShipAudioController>();
@@ -66,7 +74,8 @@ public class ShipEngineSwitch : MonoBehaviour
     {
         if (_completedIgnition)
         {
-            SELocator.GetShipResources().DrainFuel(0.5f * Time.deltaTime);
+            SELocator.GetShipResources().DrainFuel(0.5f * (float)idleFuelConsumptionMultiplier.GetProperty() * Time.deltaTime);
+
             bool electricalFailed = SELocator.GetShipDamageController().IsElectricalFailed();
             if (electricalFailed != _lastShipPowerState)
             {

@@ -20,7 +20,15 @@ public class ThrustModulatorController : ElectricalComponent
     {
         _powered = true;
         _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
-        _buttonPanel.SetThrustModulatorActive((bool)enableThrustModulator.GetProperty());
+        if ((bool)enableThrustModulator.GetProperty())
+        {
+            _buttonPanel.SetThrustModulatorActive(true);
+        }
+        else
+        {
+            _buttonPanel.SetThrustModulatorActive(false);
+            return;
+        }
 
         _modulatorButtons = GetComponentsInChildren<ThrustModulatorButton>();
         ShipEnhancements.Instance.SetThrustModulatorLevel(5);
