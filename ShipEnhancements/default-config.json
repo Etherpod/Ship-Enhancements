@@ -328,6 +328,35 @@
       "tooltip": "Adds a switch to the cockpit that turns on the ship. While the ship is on it will slowly drain fuel, so make sure you turn it off before you leave!"
     },
 
+    "Asethetics": {
+      "type": "separator"
+    },
+
+    "shipLightColor": {
+      "title": "Ship Light Color",
+      "type": "selector",
+      "value": "Default",
+      "options": [
+        "Default",
+        "Red",
+        "Hearthian-Orange",
+        "Orange",
+        "Yellow",
+        "Green",
+        "Ghostly-Green",
+        "Turquoise",
+        "Blue",
+        "Nomaian-Blue",
+        "Blacklight",
+        "Purple",
+        "Magenta",
+        "White",
+        "Divine",
+        "Rainbow"
+      ],
+      "tooltip": "Changes the color of the interior and exterior ship lights."
+    },
+
     "Quality of Life": {
       "type": "separator"
     },

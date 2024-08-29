@@ -60,6 +60,7 @@ public static class SettingExtensions
         { Settings.shipInputLatency, (1f, 1f) },
         { Settings.addEngineSwitch, (false, false) },
         { Settings.idleFuelConsumptionMultiplier, (1f, 1f) },
+        { Settings.shipLightColor, ("Default", "Default") },
     };
 
     public static string GetName(this Settings setting)

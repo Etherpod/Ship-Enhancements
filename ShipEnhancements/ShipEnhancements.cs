@@ -100,6 +100,7 @@ public class ShipEnhancements : ModBehaviour
         shipInputLatency,
         addEngineSwitch,
         idleFuelConsumptionMultiplier,
+        shipLightColor,
     }
 
     private void Awake()
@@ -139,20 +140,20 @@ public class ShipEnhancements : ModBehaviour
             if (scene == OWScene.TitleScreen) UpdateProperties();
             if (scene != OWScene.SolarSystem) return;
 
-            UpdateProperties();
             GlobalMessenger.RemoveListener("SuitUp", OnPlayerSuitUp);
             GlobalMessenger.RemoveListener("RemoveSuit", OnPlayerRemoveSuit);
             GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
-            if ((float)Settings.spaceAngularDragMultiplier.GetValue() > 0 || (float)Settings.atmosphereAngularDragMultiplier.GetValue() > 0)
+            if ((float)Settings.spaceAngularDragMultiplier.GetProperty() > 0 || (float)Settings.atmosphereAngularDragMultiplier.GetProperty() > 0)
             {
                 Locator.GetShipDetector().GetComponent<ShipFluidDetector>().OnEnterFluid -= OnEnterFluid;
                 Locator.GetShipDetector().GetComponent<ShipFluidDetector>().OnExitFluid -= OnExitFluid;
             }
-            if ((bool)Settings.enableAutoHatch.GetValue())
+            if ((bool)Settings.enableAutoHatch.GetProperty())
             {
                 GlobalMessenger.RemoveListener("EnterShip", OnEnterShip);
                 GlobalMessenger.RemoveListener("ExitShip", OnExitShip);
             }
+            UpdateProperties();
             _lastSuitOxygen = 0f;
             _shipLoaded = false;
         };
@@ -235,10 +236,7 @@ public class ShipEnhancements : ModBehaviour
                 fuelTank._damageEffect._particleSystem.Stop();
                 fuelTank._damageEffect._particleAudioSource.Stop();
             }
-            if (OnFuelDepleted != null)
-            {
-                OnFuelDepleted();
-            }
+            OnFuelDepleted?.Invoke();
         }
         else if (fuelDepleted && SELocator.GetShipResources()._currentFuel > 0f)
         {
@@ -249,10 +247,7 @@ public class ShipEnhancements : ModBehaviour
                 fuelTank._damageEffect._particleSystem.Play();
                 fuelTank._damageEffect._particleAudioSource.Play();
             }
-            if (OnFuelRestored != null)
-            {
-                OnFuelRestored();
-            }
+            OnFuelRestored?.Invoke();
         }
 
         if ((bool)Settings.showWarningNotifications.GetProperty() && !_shipDestroyed)
@@ -311,7 +306,8 @@ public class ShipEnhancements : ModBehaviour
         materials.Add(material1);
         materials.Add(material2);
         materials.Add(material3);
-        GameObject.Find("Pointlight_HEA_ShipCockpit").GetComponent<LightmapController>()._materials = [.. materials];
+        GameObject cockpitLight = GameObject.Find("Pointlight_HEA_ShipCockpit");
+        cockpitLight.GetComponent<LightmapController>()._materials = [.. materials];
 
         _shipLoaded = true;
         UpdateSuitOxygen();
@@ -333,24 +329,48 @@ public class ShipEnhancements : ModBehaviour
         {
             DisableLandingCamera();
         }
-        if ((bool)Settings.disableShipLights.GetValue())
+        bool coloredLights = (string)Settings.shipLightColor.GetValue() != "Default";
+        if ((bool)Settings.disableShipLights.GetValue() || coloredLights)
         {
+            Color lightColor = SettingsColors.GetColor((string)Settings.shipLightColor.GetValue());
             foreach (ElectricalSystem system in Locator.GetShipBody().GetComponentsInChildren<ElectricalSystem>())
             {
                 foreach (ElectricalComponent component in system._connectedComponents)
                 {
-                    if (component.gameObject.name.Contains("Point") && component.TryGetComponent(out ShipLight light))
+                    if (component.gameObject.name.Contains("Pointlight") && component.TryGetComponent(out ShipLight light))
                     {
-                        light.SetOn(false);
-                        light.GetComponent<Light>().enabled = false;
+                        Light lightComponent = light.GetComponent<Light>();
+                        if ((bool)Settings.disableShipLights.GetValue())
+                        {
+                            light.SetOn(false);
+                            lightComponent.enabled = false;
+                        }
+                        else if (coloredLights)
+                        {
+                            lightComponent.color = lightColor;
+                            light._baseEmission = lightColor;
+                            if (light.IsOn())
+                            {
+                                light._matPropBlock.SetColor(light._propID_EmissionColor, lightColor);
+                                light._emissiveRenderer.SetPropertyBlock(light._matPropBlock);
+                            }
+                        }
                     }
                 }
             }
             foreach (PulsingLight beacon in Locator.GetShipBody().transform.Find("Module_Cabin/Lights_Cabin/ShipBeacon_Proxy").GetComponentsInChildren<PulsingLight>())
             {
-                PulsingLight.s_matPropBlock.SetColor(PulsingLight.s_propID_EmissionColor, beacon._initEmissionColor * 0f);
-                beacon._emissiveRenderer.SetPropertyBlock(PulsingLight.s_matPropBlock);
-                beacon.gameObject.SetActive(false);
+                if ((bool)Settings.disableShipLights.GetValue())
+                {
+                    PulsingLight.s_matPropBlock.SetColor(PulsingLight.s_propID_EmissionColor, beacon._initEmissionColor * 0f);
+                    beacon._emissiveRenderer.SetPropertyBlock(PulsingLight.s_matPropBlock);
+                    beacon.gameObject.SetActive(false);
+                }
+                else if (coloredLights)
+                {
+                    beacon.GetComponent<Light>().color = lightColor;
+                    beacon._initEmissionColor = lightColor;
+                }
             }
         }
         if ((bool)Settings.disableShipOxygen.GetValue())
@@ -499,7 +519,7 @@ public class ShipEnhancements : ModBehaviour
             InputLatencyController.Initialize();
         }
 
-        engineOn = !(bool)Settings.addEngineSwitch.GetProperty();
+        engineOn = !(bool)Settings.addEngineSwitch.GetValue();
 
         ShipNotifications.Initialize();
     }
