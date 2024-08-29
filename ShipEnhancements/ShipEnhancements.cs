@@ -373,6 +373,10 @@ public class ShipEnhancements : ModBehaviour
                 {
                     beacon.GetComponent<Light>().color = lightColor;
                     beacon._initEmissionColor = lightColor;
+                    if ((string)Settings.shipLightColor.GetValue() == "Rainbow")
+                    {
+                        beacon.gameObject.AddComponent<RainbowShipLight>();
+                    }
                 }
             }
         }
