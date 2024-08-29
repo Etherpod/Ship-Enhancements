@@ -339,20 +339,23 @@ public class ShipEnhancements : ModBehaviour
                 {
                     if (component.gameObject.name.Contains("Pointlight") && component.TryGetComponent(out ShipLight light))
                     {
-                        Light lightComponent = light.GetComponent<Light>();
                         if ((bool)Settings.disableShipLights.GetValue())
                         {
                             light.SetOn(false);
-                            lightComponent.enabled = false;
+                            light._light.enabled = false;
                         }
                         else if (coloredLights)
                         {
-                            lightComponent.color = lightColor;
+                            light._light.color = lightColor;
                             light._baseEmission = lightColor;
                             if (light.IsOn())
                             {
                                 light._matPropBlock.SetColor(light._propID_EmissionColor, lightColor);
                                 light._emissiveRenderer.SetPropertyBlock(light._matPropBlock);
+                            }
+                            if ((string)Settings.shipLightColor.GetValue() == "Rainbow")
+                            {
+                                light.gameObject.AddComponent<RainbowShipLight>();
                             }
                         }
                     }
