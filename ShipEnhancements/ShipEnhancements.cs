@@ -310,6 +310,9 @@ public class ShipEnhancements : ModBehaviour
         GameObject cockpitLight = GameObject.Find("Pointlight_HEA_ShipCockpit");
         cockpitLight.GetComponent<LightmapController>()._materials = [.. materials];
 
+        GameObject overdriveController = LoadPrefab("Assets/ShipEnhancements/OverdriveController.prefab");
+        Instantiate(overdriveController, Locator.GetShipTransform());
+
         _shipLoaded = true;
         UpdateSuitOxygen();
         _lastShipOxygen = SELocator.GetShipResources()._currentOxygen;
