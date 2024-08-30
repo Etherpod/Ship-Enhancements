@@ -101,6 +101,12 @@
       "value": false,
       "tooltip": "Removes the markers that tell you the location of your ship, your scout, and any marked locations in the ship log. Try not to lose your ship."
     },
+    "disableRotationSpeedLimit": {
+      "title": "Disable Rotation Speed Limit",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Lets you spin your ship as quickly as you want, though spinning too fast may tear your ship apart. DO NOT ENABLE IF YOU ARE PRONE TO MOTION SICKNESS."
+    },
 
     "Adjust Ship Functions": {
       "type": "separator"
@@ -196,12 +202,6 @@
       "type": "number",
       "value": 1,
       "tooltip": "Larger numbers make your ship harder to turn while in space. Set to zero to make your ship spin forever. WARNING: Values below 1 may cause motion sickness."
-    },
-    "disableRotationSpeedLimit": {
-      "title": "Disable Rotation Speed Limit",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Lets you spin your ship as quickly as you want, though spinning too fast may tear your ship apart. DO NOT ENABLE IF YOU ARE PRONE TO MOTION SICKNESS."
     },
     "shipExplosionMultiplier": {
       "title": "Ship Explosion Multiplier",
@@ -315,6 +315,12 @@
       "value": false,
       "tooltip": "Damages the ship components over time in extremely high or low temperatures."
     },
+    "hotThrusters": {
+      "title": "Enable Hazardous Thrusters",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Makes the ship thruster flames do damage when you stand in them."
+    },
     "addPortableCampfire": {
       "title": "Add Portable Campfire",
       "type": "toggle",
@@ -328,7 +334,7 @@
       "tooltip": "Adds a switch to the cockpit that turns on the ship. While the ship is on it will slowly drain fuel, so make sure you turn it off before you leave!"
     },
 
-    "Asethetics": {
+    "Decoration": {
       "type": "separator"
     },
 

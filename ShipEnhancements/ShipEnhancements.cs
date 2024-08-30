@@ -101,6 +101,7 @@ public class ShipEnhancements : ModBehaviour
         addEngineSwitch,
         idleFuelConsumptionMultiplier,
         shipLightColor,
+        hotThrusters,
     }
 
     private void Awake()
@@ -524,6 +525,16 @@ public class ShipEnhancements : ModBehaviour
         if ((float)Settings.shipInputLatency.GetValue() > 0f)
         {
             InputLatencyController.Initialize();
+        }
+        if ((bool)Settings.hotThrusters.GetValue())
+        {
+            GameObject flameHazardVolume = LoadPrefab("Assets/ShipEnhancements/FlameHeatVolume.prefab");
+            foreach (ThrusterFlameController flame in Locator.GetShipTransform().GetComponentsInChildren<ThrusterFlameController>())
+            {
+                GameObject volume = Instantiate(flameHazardVolume, Vector3.zero, Quaternion.identity, flame.transform);
+                volume.transform.localPosition = Vector3.zero;
+                volume.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+            }
         }
 
         engineOn = !(bool)Settings.addEngineSwitch.GetValue();

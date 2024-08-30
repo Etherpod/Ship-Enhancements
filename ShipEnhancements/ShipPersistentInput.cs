@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -46,7 +47,7 @@ public class ShipPersistentInput : ThrusterController
     {
         float num = Mathf.Min(_rulesetDetector.GetThrustLimit(), _thrustController._thrusterModel.GetMaxTranslationalThrust()) 
             / _thrustController._thrusterModel.GetMaxTranslationalThrust();
-        return _currentInput * ShipEnhancements.Instance.thrustModulatorLevel / 5f * num;
+        return _currentInput * ((bool)enableThrustModulator.GetProperty() ? ShipEnhancements.Instance.thrustModulatorLevel / 5f : 1f) * num;
     }
 
     private void OnEnterFlightConsole(OWRigidbody shipBody)
@@ -61,9 +62,8 @@ public class ShipPersistentInput : ThrusterController
 
     private void OnExitFlightConsole()
     {
-        if (!_inputEnabled || !ShipEnhancements.Instance.engineOn) return;
+        if (!_inputEnabled) return;
         _currentInput = GetComponent<ShipThrusterController>()._lastTranslationalInput;
-
         if (_currentInput != Vector3.zero && !IsAutopilotEnabled() && !_thrustController.RequiresIgnition())
         {
             enabled = true;
