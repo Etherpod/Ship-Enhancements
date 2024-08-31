@@ -606,8 +606,11 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipThrusterController), nameof(ShipThrusterController.ReadTranslationalInput))]
     public static void LimitTranslationalInput(ShipThrusterController __instance, ref Vector3 __result)
     {
-        if (!(bool)enableThrustModulator.GetProperty()) return;
-        __result *= ShipEnhancements.Instance.thrustModulatorLevel / 5f;
+        if ((bool)enableThrustModulator.GetProperty())
+        {
+            __result *= ShipEnhancements.Instance.thrustModulatorLevel / 5f
+                * (SELocator.GetShipOverdriveController().OnCooldown ? SELocator.GetShipOverdriveController().ThrustMultiplier : 1f);
+        }
     }
 
     [HarmonyPrefix]
@@ -1834,6 +1837,20 @@ public static class PatchClass
                 GlobalMessenger.FireEvent("CancelShipIgnition");
             }
         }
+    }
+    #endregion
+
+    #region Overdrive
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipThrusterController), nameof(ShipThrusterController.ReadTranslationalInput))]
+    public static bool DisableInputWhenChargingOverdrive(ShipThrusterController __instance, ref Vector3 __result)
+    {
+        if (SELocator.GetShipOverdriveController().Charging)
+        {
+            __result = Vector3.zero;
+            return false;
+        }
+        return true;
     }
     #endregion
 }

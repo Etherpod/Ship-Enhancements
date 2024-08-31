@@ -12,6 +12,7 @@ public static class SELocator
     private static ProbeLauncherComponent _probeLauncherComponent;
     private static ShipTemperatureDetector _shipTemperatureDetector;
     private static ShipDamageController _shipDamageController;
+    private static ShipOverdriveController _shipOverdriveController;
 
     public static void Initalize()
     {
@@ -27,6 +28,14 @@ public static class SELocator
         if ((bool)hullTemperatureDamage.GetValue() || (bool)componentTemperatureDamage.GetValue())
         {
             _shipTemperatureDetector = Locator.GetShipDetector().gameObject.AddComponent<ShipTemperatureDetector>();
+        }
+    }
+
+    public static void LateInitialize()
+    {
+        if ((bool)enableThrustModulator.GetValue())
+        {
+            _shipOverdriveController = Locator.GetShipTransform().GetComponentInChildren<ShipOverdriveController>();
         }
     }
 
@@ -68,5 +77,10 @@ public static class SELocator
     public static ShipDamageController GetShipDamageController()
     {
         return _shipDamageController;
+    }
+
+    public static ShipOverdriveController GetShipOverdriveController()
+    {
+        return _shipOverdriveController;
     }
 }
