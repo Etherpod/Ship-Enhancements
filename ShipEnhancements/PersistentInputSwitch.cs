@@ -27,6 +27,7 @@ public class PersistentInputSwitch : CockpitSwitch
     public override void SetPowered(bool powered)
     {
         base.SetPowered(powered);
+        if (_electricalSystem.IsDisrupted()) return;
         if (_persistentInput)
         {
             _persistentInput.SetInputEnabled(_on && !SELocator.GetShipDamageController().IsElectricalFailed());

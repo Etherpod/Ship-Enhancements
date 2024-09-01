@@ -23,6 +23,8 @@ public abstract class CockpitSwitch : ElectricalComponent
     protected OWRenderer _renderer;
     protected CockpitButtonPanel _buttonPanel;
     protected bool _on = false;
+    protected ElectricalSystem _electricalSystem;
+    protected bool _wasDisrupted = false;
 
     public override void Awake()
     {
@@ -43,12 +45,21 @@ public abstract class CockpitSwitch : ElectricalComponent
             _initialRotation.eulerAngles.y, _initialRotation.eulerAngles.z);
         _renderer.SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 0f);
 
-        ElectricalSystem cockpitElectricalSystem = Locator.GetShipBody().transform
+        _electricalSystem = Locator.GetShipBody().transform
             .Find("Module_Cockpit/Systems_Cockpit/FlightControlsElectricalSystem")
             .GetComponent<ElectricalSystem>();
-        List<ElectricalComponent> componentList = [.. cockpitElectricalSystem._connectedComponents];
+        List<ElectricalComponent> componentList = [.. _electricalSystem._connectedComponents];
         componentList.Add(this);
-        cockpitElectricalSystem._connectedComponents = [.. componentList];
+        _electricalSystem._connectedComponents = [.. componentList];
+    }
+
+    protected void Update()
+    {
+        if (_wasDisrupted != _electricalSystem.IsDisrupted())
+        {
+            _wasDisrupted = _electricalSystem.IsDisrupted();
+            _interactReceiver.SetInteractionEnabled(!_wasDisrupted);
+        }
     }
 
     private void FlipSwitch()
@@ -88,22 +99,36 @@ public abstract class CockpitSwitch : ElectricalComponent
 
     public override void SetPowered(bool powered)
     {
-        base.SetPowered(powered);
-        if (powered)
+        if (!_electricalSystem.IsDisrupted())
         {
-            _interactReceiver.EnableInteraction();
-            if (_on)
+            base.SetPowered(powered);
+            if (powered)
+            {
+                _interactReceiver.EnableInteraction();
+                if (_on)
+                {
+                    _renderer.SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 1f);
+                }
+            }
+            else
+            {
+                if (_on)
+                {
+                    _renderer.SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 0f);
+                }
+                _interactReceiver.DisableInteraction();
+            }
+        }
+        else if (_on)
+        {
+            if (powered)
             {
                 _renderer.SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 1f);
             }
-        }
-        else
-        {
-            if (_on)
+            else
             {
                 _renderer.SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 0f);
             }
-            _interactReceiver.DisableInteraction();
         }
     }
 

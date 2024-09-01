@@ -718,10 +718,7 @@ public class ShipEnhancements : ModBehaviour
 
     public void SetGravityLandingGearEnabled(bool enabled)
     {
-        if (OnGravityLandingGearSwitch != null)
-        {
-            OnGravityLandingGearSwitch(enabled);
-        }
+        OnGravityLandingGearSwitch?.Invoke(enabled);
     }
 
     public void SetThrustModulatorLevel(int level)
