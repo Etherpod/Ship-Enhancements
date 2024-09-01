@@ -1,12 +1,17 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.InputSystem;
+using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
-public class ShipOverdriveController : MonoBehaviour
+public class ShipOverdriveController : ElectricalComponent
 {
+    [SerializeField]
+    private OverdriveButton _primeButton;
+    [SerializeField]
+    private OverdriveButton _activateButton;
+
     private Renderer[] _thrusterRenderers;
     private Light[] _thrusterLights;
     private bool _charging = false;
@@ -17,6 +22,8 @@ public class ShipOverdriveController : MonoBehaviour
     private Color _overdriveColor;
     private readonly float _thrustMultiplier = 6f;
     private ShipReactorComponent _reactor;
+    private ElectricalSystem _electricalSystem;
+    private bool _wasDisrupted = false;
 
     public bool Charging { get { return _charging; } }
     public bool OnCooldown { get { return _onCooldown; } }
@@ -28,11 +35,19 @@ public class ShipOverdriveController : MonoBehaviour
         }
     }
 
-    private void Awake()
+    public override void Awake()
     {
+        base.Awake();
         _reactor = Locator.GetShipTransform().GetComponentInChildren<ShipReactorComponent>();
-        GlobalMessenger.AddListener("ShipSystemFailure", StopAllCoroutines);
-        ShipEnhancements.Instance.OnFuelDepleted += StopAllCoroutines;
+        GlobalMessenger.AddListener("ShipSystemFailure", InterruptOverdrive);
+        ShipEnhancements.Instance.OnFuelDepleted += InterruptOverdrive;
+
+        _electricalSystem = Locator.GetShipTransform()
+            .Find("Module_Cockpit/Systems_Cockpit/FlightControlsElectricalSystem")
+            .GetComponent<ElectricalSystem>();
+        List<ElectricalComponent> componentList = [.. _electricalSystem._connectedComponents];
+        componentList.Add(this);
+        _electricalSystem._connectedComponents = [.. componentList];
     }
 
     private void Start()
@@ -49,14 +64,12 @@ public class ShipOverdriveController : MonoBehaviour
         _defaultColor = _thrusterRenderers[0].material.GetColor("_Color");
         Material overdriveMat = (Material)ShipEnhancements.LoadAsset("Assets/ShipEnhancements/Effects_HEA_ThrusterFlames_Overdrive_mat.mat");
         _overdriveColor = overdriveMat.GetColor("_Color");
+        _primeButton.SetButtonOn(false);
+        _activateButton.SetButtonActive(false);
     }
 
     private void Update()
     {
-        if (Keyboard.current.gKey.wasPressedThisFrame && !_charging && !_onCooldown)
-        {
-            StartCoroutine(OverdriveDelay());
-        }
         if (_onCooldown)
         {
             if (_cooldownT > 0f)
@@ -71,6 +84,12 @@ public class ShipOverdriveController : MonoBehaviour
             {
                 _onCooldown = false;
             }
+        }
+        if (_electricalSystem.IsDisrupted() != _wasDisrupted)
+        {
+            _wasDisrupted = _electricalSystem.IsDisrupted();
+            _primeButton.OnDisruptedEvent(_wasDisrupted);
+            _activateButton.OnDisruptedEvent(_wasDisrupted);
         }
     }
 
@@ -90,6 +109,8 @@ public class ShipOverdriveController : MonoBehaviour
         SELocator.GetShipResources().DrainFuel(150f);
         ShipElectricalComponent electrical = SELocator.GetShipDamageController()._shipElectricalComponent;
         electrical._electricalSystem.Disrupt(electrical._disruptionLength);
+        _primeButton.SetButtonOn(false);
+        _activateButton.SetButtonActive(false);
         _cooldownT = 1f;
         _onCooldown = true;
     }
@@ -103,9 +124,63 @@ public class ShipOverdriveController : MonoBehaviour
         Overdrive();
     }
 
+    private IEnumerator DisableSafetiesDelay()
+    {
+        yield return new WaitForSeconds(0.4f);
+        _activateButton.SetButtonActive(true);
+    }
+
+    private void InterruptOverdrive()
+    {
+        if (_charging)
+        {
+            StopAllCoroutines();
+            _charging = false;
+        }
+    }
+
+    public void OnPressInteract(bool isPrimeButton, bool isButtonOn)
+    {
+        if (isPrimeButton)
+        {
+            if (_activateButton.IsOn() && !isButtonOn)
+            {
+                InterruptOverdrive();
+                _activateButton.SetButtonActive(false);
+            }
+            else if (_activateButton.IsActive() && !isButtonOn)
+            {
+                _activateButton.SetButtonActive(false);
+            }
+            else if (!_activateButton.IsActive() && !isButtonOn)
+            {
+                StopAllCoroutines();
+            }
+            else if (!_activateButton.IsOn() && isButtonOn)
+            {
+                StartCoroutine(DisableSafetiesDelay());
+            }
+        }
+        else
+        {
+            if (_primeButton.IsOn())
+            {
+                StartCoroutine(OverdriveDelay());
+            }
+        }
+    }
+
+    public override void SetPowered(bool powered)
+    {
+        if (!(bool)enableThrustModulator.GetProperty()) return;
+        base.SetPowered(powered);
+        _primeButton.SetPowered(powered, _electricalSystem.IsDisrupted());
+        _activateButton.SetPowered(powered, _electricalSystem.IsDisrupted());
+    }
+
     private void OnDestroy()
     {
-        GlobalMessenger.RemoveListener("ShipSystemFailure", StopAllCoroutines);
-        ShipEnhancements.Instance.OnFuelDepleted -= StopAllCoroutines;
+        GlobalMessenger.RemoveListener("ShipSystemFailure", InterruptOverdrive);
+        ShipEnhancements.Instance.OnFuelDepleted -= InterruptOverdrive;
     }
 }

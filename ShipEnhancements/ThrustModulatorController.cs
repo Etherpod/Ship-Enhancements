@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
@@ -15,6 +14,8 @@ public class ThrustModulatorController : ElectricalComponent
     private int _lastLevel;
     private int _focusedButtons;
     private bool _focused = false;
+    private ElectricalSystem _electricalSystem;
+    private bool _wasDisrupted = false;
 
     public override void Awake()
     {
@@ -33,17 +34,29 @@ public class ThrustModulatorController : ElectricalComponent
         _modulatorButtons = GetComponentsInChildren<ThrustModulatorButton>();
         ShipEnhancements.Instance.SetThrustModulatorLevel(5);
 
-        ElectricalSystem cockpitElectricalSystem = Locator.GetShipBody().transform
+        _electricalSystem = Locator.GetShipTransform()
             .Find("Module_Cockpit/Systems_Cockpit/FlightControlsElectricalSystem")
             .GetComponent<ElectricalSystem>();
-        List<ElectricalComponent> componentList = cockpitElectricalSystem._connectedComponents.ToList();
+        List<ElectricalComponent> componentList = [.. _electricalSystem._connectedComponents];
         componentList.Add(this);
-        cockpitElectricalSystem._connectedComponents = componentList.ToArray();
+        _electricalSystem._connectedComponents = [.. componentList];
     }
 
     private void Start()
     {
         UpdateModulatorDisplay(5);
+    }
+
+    private void Update()
+    {
+        if (_electricalSystem.IsDisrupted() != _wasDisrupted)
+        {
+            _wasDisrupted = _electricalSystem.IsDisrupted();
+            foreach (ThrustModulatorButton button in _modulatorButtons)
+            {
+                button.SetInteractable(button.GetModulatorLevel() != _lastLevel && !_wasDisrupted);
+            }
+        }
     }
 
     public void UpdateModulatorDisplay(int setLevel)
@@ -55,7 +68,7 @@ public class ThrustModulatorController : ElectricalComponent
         foreach (ThrustModulatorButton button in _modulatorButtons)
         {
             button.SetButtonLight(button.GetModulatorLevel() <= setLevel);
-            button.SetInteractable(button.GetModulatorLevel() != setLevel);
+            button.SetInteractable(button.GetModulatorLevel() != setLevel && !_wasDisrupted);
         }
     }
 
@@ -71,14 +84,24 @@ public class ThrustModulatorController : ElectricalComponent
     public override void SetPowered(bool powered)
     {
         if (!(bool)enableThrustModulator.GetProperty()) return;
-        base.SetPowered(powered);
-        if (powered)
+        if (!_electricalSystem.IsDisrupted())
         {
-            UpdateModulatorDisplay(_lastLevel);
+            base.SetPowered(powered);
+            if (powered)
+            {
+                UpdateModulatorDisplay(_lastLevel);
+            }
+            else
+            {
+                DisableModulatorDisplay();
+            }
         }
         else
         {
-            DisableModulatorDisplay();
+            foreach (ThrustModulatorButton button in _modulatorButtons)
+            {
+                button.SetButtonLight(powered && button.GetModulatorLevel() <= _lastLevel, true);
+            }
         }
     }
 

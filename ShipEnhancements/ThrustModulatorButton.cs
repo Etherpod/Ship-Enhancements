@@ -81,12 +81,19 @@ public class ThrustModulatorButton : MonoBehaviour
         return _modulatorLevel;
     }
 
-    public void SetButtonLight(bool state)
+    public void SetButtonLight(bool state, bool instant = false)
     {
         _active = state;
-        _fadeStartTime = Time.time;
-        _lastEmissiveScale = _emissiveRenderer.GetEmissiveScale();
-        _fading = true;
+        if (instant)
+        {
+            _emissiveRenderer.SetEmissiveScale(state ? 1f : 0f);
+        }
+        else
+        {
+            _fadeStartTime = Time.time;
+            _lastEmissiveScale = _emissiveRenderer.GetEmissiveScale();
+            _fading = true;
+        }
     }
 
     public void SetInteractable(bool interactable)
