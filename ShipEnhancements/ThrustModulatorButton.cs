@@ -7,7 +7,9 @@ public class ThrustModulatorButton : MonoBehaviour
     [SerializeField]
     private int _modulatorLevel;
     [SerializeField]
-    private AudioClip _buttonAudio;
+    private AudioClip _buttonPressedAudio;
+    [SerializeField]
+    private AudioClip _buttonReleasedAudio;
 
     private InteractReceiver _interactReceiver;
     private ThrustModulatorController _modulatorController;
@@ -17,6 +19,8 @@ public class ThrustModulatorButton : MonoBehaviour
     private float _fadeStartTime;
     private bool _fading = false;
     private float _lastEmissiveScale = 0f;
+    private float _depressionDistance = 0.0054f;
+    private bool _pressed = false;
 
     private void Awake()
     {
@@ -28,6 +32,7 @@ public class ThrustModulatorButton : MonoBehaviour
     private void Start()
     {
         _interactReceiver.OnPressInteract += OnPressInteract;
+        _interactReceiver.OnReleaseInteract += OnReleaseInteract;
         _interactReceiver.OnGainFocus += OnGainFocus;
         _interactReceiver.OnLoseFocus += OnLoseFocus;
 
@@ -58,12 +63,25 @@ public class ThrustModulatorButton : MonoBehaviour
 
     private void OnPressInteract()
     {
-        if (_buttonAudio)
+        _pressed = true;
+        if (_buttonPressedAudio)
         {
-            _modulatorController.PlayButtonSound(_buttonAudio, 0.3f, _modulatorLevel);
+            _modulatorController.PlayButtonSound(_buttonPressedAudio, 0.3f, _modulatorLevel);
         }
         ShipEnhancements.Instance.SetThrustModulatorLevel(_modulatorLevel);
-        _modulatorController.UpdateModulatorDisplay(_modulatorLevel);
+        _modulatorController.UpdateModulatorDisplay(_modulatorLevel, false);
+        transform.localPosition -= new Vector3(0f, _depressionDistance, 0f);
+    }
+
+    private void OnReleaseInteract()
+    {
+        _pressed = false;
+        if (_buttonReleasedAudio)
+        {
+            _modulatorController.PlayButtonSound(_buttonReleasedAudio, 0.3f, _modulatorLevel);
+        }
+        transform.localPosition += new Vector3(0f, _depressionDistance, 0f);
+        _interactReceiver.DisableInteraction();
     }
 
     private void OnGainFocus()
@@ -74,6 +92,10 @@ public class ThrustModulatorButton : MonoBehaviour
     private void OnLoseFocus()
     {
         _modulatorController.UpdateFocusedButtons(false);
+        if (_pressed)
+        {
+            OnReleaseInteract();
+        }
     }
 
     public int GetModulatorLevel()
@@ -104,6 +126,7 @@ public class ThrustModulatorButton : MonoBehaviour
     private void OnDestroy()
     {
         _interactReceiver.OnPressInteract -= OnPressInteract;
+        _interactReceiver.OnReleaseInteract -= OnReleaseInteract;
         _interactReceiver.OnGainFocus -= OnGainFocus;
         _interactReceiver.OnLoseFocus -= OnLoseFocus;
     }

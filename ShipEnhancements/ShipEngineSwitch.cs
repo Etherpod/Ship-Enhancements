@@ -16,6 +16,12 @@ public class ShipEngineSwitch : MonoBehaviour
     private OWRenderer _thrustersIndicatorLight;
     [SerializeField]
     private OWRenderer _powerIndicatorLight;
+    [SerializeField]
+    private OWAudioSource _audioSource;
+    [SerializeField]
+    private AudioClip _turnAudio;
+    [SerializeField]
+    private AudioClip _releaseAudio;
 
     private CockpitButtonPanel _buttonPanel;
     private ShipThrusterController _thrusterController;
@@ -31,6 +37,7 @@ public class ShipEngineSwitch : MonoBehaviour
     private bool _completedIgnition = false;
     private Color _indicatorLightColor = new Color(1.3f, 0.55f, 0.55f);
     private bool _lastShipPowerState = false;
+    private bool _reset = true;
 
     private void Awake()
     {
@@ -124,9 +131,14 @@ public class ShipEngineSwitch : MonoBehaviour
         {
             if (_turningT > 0)
             {
-                _turningT -= Time.deltaTime / _turnTime;
+                _turningT -= Time.deltaTime / _turnTime * 2f;
                 float num = Mathf.InverseLerp(0f, 1f, _turningT);
-                _switchTransform.localRotation = Quaternion.Slerp(_baseRotation, _targetRotation, num);
+                _switchTransform.localRotation = Quaternion.Lerp(_baseRotation, _targetRotation, num);
+            }
+            else if (!_reset)
+            {
+                _audioSource.Stop();
+                _reset = true;
             }
         }
     }
@@ -167,6 +179,7 @@ public class ShipEngineSwitch : MonoBehaviour
             _completedTurn = false;
             _turnSwitch = false;
             _completedIgnition = false;
+            _reset = false;
             ShipEnhancements.Instance.SetEngineOn(false);
             ShipElectricalComponent electricalComponent = SELocator.GetShipDamageController()._shipElectricalComponent;
             if (!electricalComponent.isDamaged && electricalComponent._electricalSystem.IsPowered())
@@ -183,6 +196,12 @@ public class ShipEngineSwitch : MonoBehaviour
             {
                 Locator.GetToolModeSwapper().UnequipTool();
             }
+            if (_releaseAudio)
+            {
+                _audioSource.clip = _releaseAudio;
+                _audioSource.pitch = Random.Range(0.9f, 1.1f);
+                _audioSource.Play();
+            }
             _audioController.StopShipAmbient();
             StopAllCoroutines();
             DeactivateIndicatorLights();
@@ -190,16 +209,33 @@ public class ShipEngineSwitch : MonoBehaviour
         else
         {
             _turnSwitch = true;
+            _reset = false;
+            if (_turnAudio)
+            {
+                _audioSource.clip = _turnAudio;
+                _audioSource.pitch = Random.Range(0.9f, 1.1f);
+                _audioSource.Play();
+            }
         }
     }
 
     private void OnReleaseInteract()
     {
-        if (!_completedIgnition)
+        if (!_completedIgnition && _turnSwitch)
         {
             _turnSwitch = false;
             _completedTurn = false;
             GlobalMessenger.FireEvent("CancelShipIgnition");
+            if (_audioSource.isPlaying)
+            {
+                _audioSource.Stop();
+            }
+            if (_releaseAudio)
+            {
+                _audioSource.clip = _releaseAudio;
+                _audioSource.pitch = Random.Range(0.9f, 1.1f);
+                _audioSource.Play();
+            }
         }
         _interactReceiver.ResetInteraction();
     }
@@ -219,6 +255,14 @@ public class ShipEngineSwitch : MonoBehaviour
 
     private void OnShipSystemFailure()
     {
+        if (!_completedTurn)
+        {
+            OnReleaseInteract();
+            if (_audioSource.isPlaying)
+            {
+                _audioSource.Stop();
+            }
+        }
         _interactReceiver.DisableInteraction();
     }
 

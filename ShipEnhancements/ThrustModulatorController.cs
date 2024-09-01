@@ -31,6 +31,8 @@ public class ThrustModulatorController : ElectricalComponent
             return;
         }
 
+        base.Awake();
+
         _modulatorButtons = GetComponentsInChildren<ThrustModulatorButton>();
         ShipEnhancements.Instance.SetThrustModulatorLevel(5);
 
@@ -59,7 +61,7 @@ public class ThrustModulatorController : ElectricalComponent
         }
     }
 
-    public void UpdateModulatorDisplay(int setLevel)
+    public void UpdateModulatorDisplay(int setLevel, bool disable = true)
     {
         if (setLevel > 0)
         {
@@ -68,7 +70,14 @@ public class ThrustModulatorController : ElectricalComponent
         foreach (ThrustModulatorButton button in _modulatorButtons)
         {
             button.SetButtonLight(button.GetModulatorLevel() <= setLevel);
-            button.SetInteractable(button.GetModulatorLevel() != setLevel && !_wasDisrupted);
+            if (disable)
+            {
+                button.SetInteractable(button.GetModulatorLevel() != setLevel && !_wasDisrupted);
+            }
+            else
+            {
+                button.SetInteractable(!_wasDisrupted);
+            }
         }
     }
 

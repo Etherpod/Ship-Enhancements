@@ -11,6 +11,8 @@ public class ShipOverdriveController : ElectricalComponent
     private OverdriveButton _primeButton;
     [SerializeField]
     private OverdriveButton _activateButton;
+    [SerializeField]
+    private OWAudioSource _audioSource;
 
     private Renderer[] _thrusterRenderers;
     private Light[] _thrusterLights;
@@ -23,7 +25,10 @@ public class ShipOverdriveController : ElectricalComponent
     private readonly float _thrustMultiplier = 6f;
     private ShipReactorComponent _reactor;
     private ElectricalSystem _electricalSystem;
+    private CockpitButtonPanel _buttonPanel;
     private bool _wasDisrupted = false;
+    private int _focusedButtons;
+    private bool _focused = false;
 
     public bool Charging { get { return _charging; } }
     public bool OnCooldown { get { return _onCooldown; } }
@@ -37,7 +42,13 @@ public class ShipOverdriveController : ElectricalComponent
 
     public override void Awake()
     {
+        if (!(bool)enableThrustModulator.GetProperty())
+        {
+            return;
+        }
+
         base.Awake();
+        _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
         _reactor = Locator.GetShipTransform().GetComponentInChildren<ShipReactorComponent>();
         GlobalMessenger.AddListener("ShipSystemFailure", InterruptOverdrive);
         ShipEnhancements.Instance.OnFuelDepleted += InterruptOverdrive;
@@ -135,6 +146,7 @@ public class ShipOverdriveController : ElectricalComponent
         if (_charging)
         {
             StopAllCoroutines();
+            _audioSource.Stop();
             _charging = false;
         }
     }
@@ -176,6 +188,26 @@ public class ShipOverdriveController : ElectricalComponent
         base.SetPowered(powered);
         _primeButton.SetPowered(powered, _electricalSystem.IsDisrupted());
         _activateButton.SetPowered(powered, _electricalSystem.IsDisrupted());
+        if (!_electricalSystem.IsDisrupted())
+        {
+            InterruptOverdrive();
+        }
+    }
+
+    public void PlayButtonAudio(AudioClip audio, float volume)
+    {
+        _audioSource.pitch = Random.Range(0.9f, 1.1f);
+        _audioSource.PlayOneShot(audio, volume);
+    }
+
+    public void UpdateFocusedButtons(bool add)
+    {
+        _focusedButtons = Mathf.Max(_focusedButtons + (add ? 1 : -1), 0);
+        if (_focused != _focusedButtons > 0)
+        {
+            _focused = _focusedButtons > 0;
+            _buttonPanel.UpdateFocusedButtons(_focused);
+        }
     }
 
     private void OnDestroy()

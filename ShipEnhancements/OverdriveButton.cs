@@ -1,6 +1,4 @@
-﻿using System;
-using System.Security.Cryptography;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ShipEnhancements;
 
@@ -19,12 +17,20 @@ public class OverdriveButton : MonoBehaviour
     private bool _isPrimeButton;
     [SerializeField]
     private OWEmissiveRenderer _emissiveRenderer;
+    [SerializeField]
+    private Transform _buttonTransform;
+    [SerializeField]
+    private AudioClip _buttonPressedAudio;
+    [SerializeField]
+    private AudioClip _buttonReleasedAudio;
 
     private InteractReceiver _interactReceiver;
     private ShipOverdriveController _overdriveController;
     private bool _active;
     private bool _on;
     private bool _powered;
+    private float _depressionDistance = 0.00521f;
+    private bool _pressed;
 
     private void Awake()
     {
@@ -35,15 +41,32 @@ public class OverdriveButton : MonoBehaviour
     private void Start()
     {
         _interactReceiver.OnPressInteract += OnPressInteract;
+        _interactReceiver.OnReleaseInteract += OnReleaseInteract;
+        _interactReceiver.OnGainFocus += OnGainFocus;
+        _interactReceiver.OnLoseFocus += OnLoseFocus;
+
         _interactReceiver.ChangePrompt(_isPrimeButton ? "Disable safeties" : "Activate Overdrive");
     }
 
     private void OnPressInteract()
     {
+        _pressed = true;
         if (!_active || !_powered) return;
 
         _on = !_on;
         _emissiveRenderer.SetEmissionColor(_on ? _onColor : _offColor);
+        if (_buttonPressedAudio)
+        {
+            _overdriveController.PlayButtonAudio(_buttonPressedAudio, 0.3f);
+        }
+        _buttonTransform.localPosition -= new Vector3(0f, _depressionDistance, 0f);
+        _overdriveController.OnPressInteract(_isPrimeButton, _on);
+    }
+
+    private void OnReleaseInteract()
+    {
+        _pressed = false;
+        _buttonTransform.localPosition += new Vector3(0f, _depressionDistance, 0f);
         if (!_isPrimeButton)
         {
             _interactReceiver.DisableInteraction();
@@ -52,7 +75,24 @@ public class OverdriveButton : MonoBehaviour
         {
             _interactReceiver.ChangePrompt(_on ? "Enable safeties" : "Disable safeties");
         }
-        _overdriveController.OnPressInteract(_isPrimeButton, _on);
+        if (_buttonReleasedAudio)
+        {
+            _overdriveController.PlayButtonAudio(_buttonReleasedAudio, 0.3f);
+        }
+    }
+
+    private void OnGainFocus()
+    {
+        _overdriveController.UpdateFocusedButtons(true);
+    }
+
+    private void OnLoseFocus()
+    {
+        _overdriveController.UpdateFocusedButtons(false);
+        if (_pressed)
+        {
+            OnReleaseInteract();
+        }
     }
 
     public bool IsOn()
@@ -67,7 +107,17 @@ public class OverdriveButton : MonoBehaviour
 
     public void OnDisruptedEvent(bool disrupted)
     {
-        _interactReceiver.SetInteractionEnabled(!disrupted);
+        if (disrupted)
+        {
+            _interactReceiver.DisableInteraction();
+        }
+        else
+        {
+            if (_active && _powered && (_isPrimeButton || !_on))
+            {
+                _interactReceiver.EnableInteraction();
+            }
+        }
     }
 
     public void SetButtonActive(bool active)
@@ -82,8 +132,16 @@ public class OverdriveButton : MonoBehaviour
         else
         {
             _emissiveRenderer.SetEmissionColor(_inactiveColor);
+            if (_pressed)
+            {
+                OnReleaseInteract();
+            }
             _interactReceiver.DisableInteraction();
             _on = false;
+            if (_isPrimeButton)
+            {
+                _interactReceiver.ChangePrompt("Disable safeties");
+            }
         }
     }
 
@@ -91,6 +149,10 @@ public class OverdriveButton : MonoBehaviour
     {
         _active = true;
         _on = on;
+        if (_isPrimeButton)
+        {
+            _interactReceiver.ChangePrompt(_on ? "Enable safeties" : "Disable safeties");
+        }
         if (!_powered) return;
         _emissiveRenderer.SetEmissionColor(_on ? _onColor : _offColor);
     }
@@ -118,6 +180,14 @@ public class OverdriveButton : MonoBehaviour
             _emissiveRenderer.SetEmissionColor(_inactiveColor);
             if (!disrupted)
             {
+                if (_pressed)
+                {
+                    OnReleaseInteract();
+                }
+                if (!_isPrimeButton)
+                {
+                    _on = false;
+                }
                 _interactReceiver.DisableInteraction();
             }
         }
@@ -126,5 +196,8 @@ public class OverdriveButton : MonoBehaviour
     private void OnDestroy()
     {
         _interactReceiver.OnPressInteract -= OnPressInteract;
+        _interactReceiver.OnReleaseInteract -= OnReleaseInteract;
+        _interactReceiver.OnGainFocus -= OnGainFocus;
+        _interactReceiver.OnLoseFocus -= OnLoseFocus;
     }
 }
