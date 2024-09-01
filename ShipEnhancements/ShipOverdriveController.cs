@@ -29,6 +29,7 @@ public class ShipOverdriveController : ElectricalComponent
     private bool _wasDisrupted = false;
     private int _focusedButtons;
     private bool _focused = false;
+    private bool _wasInFreeLook = false;
 
     public bool Charging { get { return _charging; } }
     public bool OnCooldown { get { return _onCooldown; } }
@@ -101,6 +102,15 @@ public class ShipOverdriveController : ElectricalComponent
             _wasDisrupted = _electricalSystem.IsDisrupted();
             _primeButton.OnDisruptedEvent(_wasDisrupted);
             _activateButton.OnDisruptedEvent(_wasDisrupted);
+        }
+        if (OWInput.IsPressed(InputLibrary.freeLook) != _wasInFreeLook)
+        {
+            _wasInFreeLook = OWInput.IsPressed(InputLibrary.freeLook);
+            if (!_wasInFreeLook && !_charging)
+            {
+                _primeButton.SetButtonOn(false);
+                _activateButton.SetButtonActive(false);
+            }
         }
     }
 
