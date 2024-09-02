@@ -155,6 +155,10 @@ public class OverdriveButton : MonoBehaviour
         }
         if (!_powered) return;
         _emissiveRenderer.SetEmissionColor(_on ? _onColor : _offColor);
+        if (_pressed)
+        {
+            OnReleaseInteract();
+        }
     }
 
     public void SetPowered(bool powered, bool disrupted)

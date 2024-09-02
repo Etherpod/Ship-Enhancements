@@ -30,6 +30,9 @@ public class ShipOverdriveController : ElectricalComponent
     private int _focusedButtons;
     private bool _focused = false;
     private bool _wasInFreeLook = false;
+    private float _buttonResetTime = 2.5f;
+    private float _resetStartTime;
+    private bool _onResetTimer = false;
 
     public bool Charging { get { return _charging; } }
     public bool OnCooldown { get { return _onCooldown; } }
@@ -108,6 +111,16 @@ public class ShipOverdriveController : ElectricalComponent
             _wasInFreeLook = OWInput.IsPressed(InputLibrary.freeLook);
             if (!_wasInFreeLook && !_charging)
             {
+                StopAllCoroutines();
+                _primeButton.SetButtonOn(false);
+                _activateButton.SetButtonActive(false);
+            }
+        }
+        if (_onResetTimer && !_charging)
+        {
+            if (Time.time > _resetStartTime + _buttonResetTime)
+            {
+                _onResetTimer = false;
                 _primeButton.SetButtonOn(false);
                 _activateButton.SetButtonActive(false);
             }
@@ -149,6 +162,8 @@ public class ShipOverdriveController : ElectricalComponent
     {
         yield return new WaitForSeconds(0.4f);
         _activateButton.SetButtonActive(true);
+        _resetStartTime = Time.time;
+        _onResetTimer = true;
     }
 
     private void InterruptOverdrive()
