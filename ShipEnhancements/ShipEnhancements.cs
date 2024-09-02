@@ -6,10 +6,6 @@ using System.IO;
 using System;
 using System.Collections.Generic;
 using OWML.Utils;
-using Newtonsoft.Json.Linq;
-using System.Threading.Tasks;
-using System.Runtime.CompilerServices;
-using Mono.Cecil.Cil;
 
 namespace ShipEnhancements;
 
@@ -21,6 +17,9 @@ public class ShipEnhancements : ModBehaviour
     public delegate void ResourceEvent();
     public event ResourceEvent OnFuelDepleted;
     public event ResourceEvent OnFuelRestored;
+
+    public delegate void EngineEvent(bool enabled);
+    public event EngineEvent OnEngineStateChanged;
 
     public static ShipEnhancements Instance;
     public bool oxygenDepleted;
@@ -729,6 +728,7 @@ public class ShipEnhancements : ModBehaviour
     public void SetEngineOn(bool state)
     {
         engineOn = state;
+        OnEngineStateChanged?.Invoke(state);
     }
 
     #endregion

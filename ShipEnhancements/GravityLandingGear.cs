@@ -25,6 +25,7 @@ public class GravityLandingGear : MonoBehaviour
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
         _landingGear.OnDamaged += ctx => OnLandingGearDamaged();
         _landingGear.OnRepaired += ctx => OnLandingGearRepaired();
+        ShipEnhancements.Instance.OnEngineStateChanged += OnEngineStateChanged;
 
         _damaged = _landingGear.isDamaged;
     }
@@ -60,7 +61,7 @@ public class GravityLandingGear : MonoBehaviour
 
     private void OnTriggerStay(Collider hitCollider)
     {
-        if (_shipDestroyed || _landingGear.isDamaged || !_gravityEnabled)
+        if (_shipDestroyed || _landingGear.isDamaged || !_gravityEnabled || !ShipEnhancements.Instance.engineOn)
         {
             return;
         }
@@ -114,6 +115,34 @@ public class GravityLandingGear : MonoBehaviour
         }
     }
 
+    private void OnEngineStateChanged(bool enabled)
+    {
+        if (enabled && _gravityEnabled && !_damaged && !_shipDestroyed)
+        {
+            if (_landed && !_gravityEffects.isPlaying)
+            {
+                _gravityEffects.Play();
+            }
+            if (!_audioSource.isPlaying)
+            {
+                _audioSource.Play();
+                _audioSource.pitch = 1f;
+            }
+        }
+        else
+        {
+            if (_gravityEffects.isPlaying)
+            {
+                _gravityEffects.Stop();
+            }
+            if (_audioSource.isPlaying)
+            {
+                _audioSource.Stop();
+                _audioSource.time = 0f;
+            }
+        }
+    }
+
     private void OnLandingGearDamaged()
     {
         _damaged = true;
@@ -140,7 +169,6 @@ public class GravityLandingGear : MonoBehaviour
         }
         _audioSource.Play();
         _audioSource.pitch = 1f;
-        //SetGravityEnabled(true);
     }
 
     private void OnDestroy()
