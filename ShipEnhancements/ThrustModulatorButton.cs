@@ -123,6 +123,16 @@ public class ThrustModulatorButton : MonoBehaviour
         _interactReceiver.SetInteractionEnabled(interactable);
     }
 
+    public void SetButtonColor(Color color)
+    {
+        _emissiveRenderer.SetEmissionColor(color);
+    }
+
+    public void ResetButtonColor()
+    {
+        _emissiveRenderer.SetEmissionColor(_emissiveRenderer.GetOriginalEmissionColor());
+    }
+
     private void OnDestroy()
     {
         _interactReceiver.OnPressInteract -= OnPressInteract;

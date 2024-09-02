@@ -177,5 +177,6 @@ public class GravityLandingGear : MonoBehaviour
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
         _landingGear.OnDamaged -= ctx => OnLandingGearDamaged();
         _landingGear.OnRepaired -= ctx => OnLandingGearRepaired();
+        ShipEnhancements.Instance.OnEngineStateChanged -= OnEngineStateChanged;
     }
 }

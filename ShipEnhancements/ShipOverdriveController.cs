@@ -12,7 +12,9 @@ public class ShipOverdriveController : ElectricalComponent
     [SerializeField]
     private OverdriveButton _activateButton;
     [SerializeField]
-    private OWAudioSource _audioSource;
+    private OWAudioSource _panelAudioSource;
+    [SerializeField]
+    private OWAudioSource _shipAudioSource;
 
     private Renderer[] _thrusterRenderers;
     private Light[] _thrusterLights;
@@ -26,6 +28,7 @@ public class ShipOverdriveController : ElectricalComponent
     private ShipReactorComponent _reactor;
     private ElectricalSystem _electricalSystem;
     private CockpitButtonPanel _buttonPanel;
+    private ThrustModulatorController _modulatorController;
     private bool _wasDisrupted = false;
     private int _focusedButtons;
     private bool _focused = false;
@@ -54,6 +57,7 @@ public class ShipOverdriveController : ElectricalComponent
         base.Awake();
         _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
         _reactor = Locator.GetShipTransform().GetComponentInChildren<ShipReactorComponent>();
+        _modulatorController = GetComponent<ThrustModulatorController>();
         GlobalMessenger.AddListener("ShipSystemFailure", InterruptOverdrive);
         ShipEnhancements.Instance.OnFuelDepleted += InterruptOverdrive;
 
@@ -131,7 +135,7 @@ public class ShipOverdriveController : ElectricalComponent
     {
         if (!_reactor.isDamaged)
         {
-            Locator.GetPlayerAudioController()._oneShotSource.PlayOneShot(AudioType.EyeBigBang);
+            _shipAudioSource.PlayOneShot(AudioType.EyeBigBang);
             _reactor.SetDamaged(true);
         }
         else
@@ -152,10 +156,14 @@ public class ShipOverdriveController : ElectricalComponent
     private IEnumerator OverdriveDelay()
     {
         _charging = true;
-        Locator.GetPlayerAudioController()._oneShotSource.PlayOneShot(AudioType.NomaiTimeLoopClose);
+        _shipAudioSource.AssignAudioLibraryClip(AudioType.NomaiTimeLoopClose);
+        _shipAudioSource.Play();
+        _panelAudioSource.Play();
+        _modulatorController.BeginOverdriveSequence();
         yield return new WaitForSeconds(3f);
         _charging = false;
         Overdrive();
+        _modulatorController.EndOverdriveSequence();
     }
 
     private IEnumerator DisableSafetiesDelay()
@@ -171,7 +179,9 @@ public class ShipOverdriveController : ElectricalComponent
         if (_charging)
         {
             StopAllCoroutines();
-            _audioSource.Stop();
+            _modulatorController.EndOverdriveSequence();
+            _shipAudioSource.Stop();
+            _panelAudioSource.Stop();
             _charging = false;
         }
     }
@@ -211,6 +221,7 @@ public class ShipOverdriveController : ElectricalComponent
     {
         if (!(bool)enableThrustModulator.GetProperty()) return;
         base.SetPowered(powered);
+        InterruptOverdrive();
         _primeButton.SetPowered(powered, _electricalSystem.IsDisrupted());
         _activateButton.SetPowered(powered, _electricalSystem.IsDisrupted());
         if (!_electricalSystem.IsDisrupted())
@@ -221,8 +232,8 @@ public class ShipOverdriveController : ElectricalComponent
 
     public void PlayButtonAudio(AudioClip audio, float volume)
     {
-        _audioSource.pitch = Random.Range(0.9f, 1.1f);
-        _audioSource.PlayOneShot(audio, volume);
+        _panelAudioSource.pitch = Random.Range(0.9f, 1.1f);
+        _panelAudioSource.PlayOneShot(audio, volume);
     }
 
     public void UpdateFocusedButtons(bool add)

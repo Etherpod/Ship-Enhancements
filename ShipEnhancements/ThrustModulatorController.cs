@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
@@ -8,6 +9,11 @@ public class ThrustModulatorController : ElectricalComponent
 {
     [SerializeField]
     private OWAudioSource _audioSource;
+    [SerializeField]
+    private AudioClip _overdriveButtonAudio;
+    [SerializeField]
+    [ColorUsage(true, true)]
+    private Color _overdriveButtonColor = Color.blue;
 
     private ThrustModulatorButton[] _modulatorButtons;
     private CockpitButtonPanel _buttonPanel;
@@ -16,6 +22,7 @@ public class ThrustModulatorController : ElectricalComponent
     private bool _focused = false;
     private ElectricalSystem _electricalSystem;
     private bool _wasDisrupted = false;
+    private Coroutine _overdriveSequence;
 
     public override void Awake()
     {
@@ -61,8 +68,45 @@ public class ThrustModulatorController : ElectricalComponent
         }
     }
 
+    private IEnumerator OverdriveSequence()
+    {
+        DisableModulatorDisplay();
+        yield return new WaitForSeconds(0.6f);
+        for (int i = 0; i < _modulatorButtons.Length; i++)
+        {
+            _modulatorButtons[i].SetButtonLight(true, true);
+            _modulatorButtons[i].SetButtonColor(_overdriveButtonColor);
+            _audioSource.pitch += Random.Range(0.3f, 0.5f);
+            _audioSource.PlayOneShot(_overdriveButtonAudio, 0.8f);
+            yield return new WaitForSeconds(0.4f);
+        }
+        _overdriveSequence = null;
+    }
+
+    private IEnumerator ResetModulator()
+    {
+        foreach (ThrustModulatorButton button in _modulatorButtons)
+        {
+            button.SetButtonLight(false);
+            button.SetInteractable(false);
+        }
+
+        yield return new WaitForSeconds(0.5f);
+
+        foreach (ThrustModulatorButton button in _modulatorButtons)
+        {
+            button.ResetButtonColor();
+            if (_electricalSystem.IsPowered())
+            {
+                button.SetButtonLight(button.GetModulatorLevel() <= _lastLevel);
+                button.SetInteractable(button.GetModulatorLevel() != _lastLevel && !_wasDisrupted);
+            }
+        }
+    }
+
     public void UpdateModulatorDisplay(int setLevel, bool disable = true)
     {
+        StopAllCoroutines();
         if (setLevel > 0)
         {
             _lastLevel = setLevel;
@@ -90,11 +134,35 @@ public class ThrustModulatorController : ElectricalComponent
         }
     }
 
+    public void BeginOverdriveSequence()
+    {
+        if (_overdriveSequence == null)
+        {
+            StopAllCoroutines();
+            _overdriveSequence = StartCoroutine(OverdriveSequence());
+        }
+    }
+
+    public void EndOverdriveSequence()
+    {
+        if (_overdriveSequence != null)
+        {
+            StopCoroutine(_overdriveSequence);
+            _overdriveSequence = null;
+        }
+        _audioSource.pitch = 1f;
+        if (_electricalSystem.IsPowered())
+        {
+            StartCoroutine(ResetModulator());
+        }
+    }
+
     public override void SetPowered(bool powered)
     {
         if (!(bool)enableThrustModulator.GetProperty()) return;
         if (!_electricalSystem.IsDisrupted())
         {
+            StopAllCoroutines();
             base.SetPowered(powered);
             if (powered)
             {
