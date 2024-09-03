@@ -63,6 +63,8 @@ public static class SettingExtensions
         { Settings.shipLightColor, ("Default", "Default") },
         { Settings.hotThrusters, (false, false) },
         { Settings.extraNoise, (false, false) },
+        { Settings.interiorHullColor, ("Default", "Default") },
+        { Settings.exteriorHullColor, ("Default", "Default") },
     };
 
     public static string GetName(this Settings setting)

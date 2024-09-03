@@ -368,6 +368,54 @@
       ],
       "tooltip": "Changes the color of the interior and exterior ship lights."
     },
+    "interiorHullColor": {
+      "title": "Interior Hull Color",
+      "type": "selector",
+      "value": "Default",
+      "options": [
+        "Default",
+        "Red",
+        "Copper",
+        "Brown",
+        "Golden",
+        "Green",
+        "Ghostly-Green",
+        "Turquoise",
+        "Blue",
+        "Navy Blue",
+        "Nomaian Blue",
+        "Purple",
+        "Pink",
+        "Gray",
+        "Black",
+        "Rainbow"
+      ],
+      "tooltip": "Changes the color of the inside of the ship."
+    },
+    "exteriorHullColor": {
+      "title": "Exterior Hull Color",
+      "type": "selector",
+      "value": "Default",
+      "options": [
+        "Default",
+        "Red",
+        "Copper",
+        "Brown",
+        "Golden",
+        "Green",
+        "Ghostly-Green",
+        "Turquoise",
+        "Blue",
+        "Navy Blue",
+        "Nomaian Blue",
+        "Purple",
+        "Pink",
+        "Gray",
+        "Black",
+        "Rainbow"
+      ],
+      "tooltip": "Changes the color of the outside of the ship."
+    },
 
     "Quality of Life": {
       "type": "separator"

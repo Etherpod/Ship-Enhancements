@@ -1,12 +1,9 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
-namespace ShipEnhancements;
-
-public class RainbowShipLight : MonoBehaviour
+public class RainbowShipHull : MonoBehaviour
 {
-    private ShipLight _shipLight;
-    private PulsingLight _pulsingLight;
+    private List<Material> _sharedMaterials = [];
     private float _colorTransitionTime = 6f;
     private float _red;
     private float _green;
@@ -16,8 +13,6 @@ public class RainbowShipLight : MonoBehaviour
 
     private void Start()
     {
-        _shipLight = GetComponent<ShipLight>();
-        _pulsingLight = GetComponent<PulsingLight>();
         _red = 1f;
         _green = 0f;
         _blue = 0f;
@@ -25,10 +20,7 @@ public class RainbowShipLight : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if ((_shipLight && !_shipLight.IsOn()) || (_pulsingLight && !_pulsingLight.enabled))
-        {
-            return;
-        }
+        if (_sharedMaterials.Count == 0) return;
 
         float num = Mathf.InverseLerp(0f, _colorTransitionTime, Time.time % (_colorTransitionTime));
 
@@ -64,22 +56,16 @@ public class RainbowShipLight : MonoBehaviour
         }
         Color color = new Color(_red, _green, _blue);
 
-        if (_shipLight)
+        foreach (Material mat in _sharedMaterials)
         {
-            _shipLight._baseEmission = color;
-            if (_shipLight._light.intensity == _shipLight._baseIntensity)
-            {
-                _shipLight._matPropBlock.SetColor(_shipLight._propID_EmissionColor, color);
-                _shipLight._emissiveRenderer.SetPropertyBlock(_shipLight._matPropBlock);
-            }
-            _shipLight._light.color = color;
-        }
-        else if (_pulsingLight)
-        {
-            _pulsingLight._initEmissionColor = color;
-            _pulsingLight._light.color = color;
+            mat.SetColor("_Color", color);
         }
 
         _lastDelta = num;
+    }
+
+    public void AddSharedMaterial(Material mat)
+    {
+        _sharedMaterials.Add(mat);
     }
 }

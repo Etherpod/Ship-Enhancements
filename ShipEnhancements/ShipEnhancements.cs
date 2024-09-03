@@ -102,6 +102,8 @@ public class ShipEnhancements : ModBehaviour
         shipLightColor,
         hotThrusters,
         extraNoise,
+        interiorHullColor,
+        exteriorHullColor,
     }
 
     private void Awake()
@@ -333,7 +335,7 @@ public class ShipEnhancements : ModBehaviour
         bool coloredLights = (string)Settings.shipLightColor.GetValue() != "Default";
         if ((bool)Settings.disableShipLights.GetValue() || coloredLights)
         {
-            Color lightColor = SettingsColors.GetColor((string)Settings.shipLightColor.GetValue());
+            Color lightColor = SettingsColors.GetLightingColor((string)Settings.shipLightColor.GetValue());
             foreach (ElectricalSystem system in Locator.GetShipBody().GetComponentsInChildren<ElectricalSystem>())
             {
                 foreach (ElectricalComponent component in system._connectedComponents)
@@ -534,6 +536,62 @@ public class ShipEnhancements : ModBehaviour
                 GameObject volume = Instantiate(flameHazardVolume, Vector3.zero, Quaternion.identity, flame.transform);
                 volume.transform.localPosition = Vector3.zero;
                 volume.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+            }
+        }
+        if ((string)Settings.interiorHullColor.GetProperty() != "Default")
+        {
+            MeshRenderer suppliesRenderer = Locator.GetShipTransform().
+                Find("Module_Supplies/Geo_Supplies/Supplies_Geometry/Supplies_Interior").GetComponent<MeshRenderer>();
+            Material sharedMat = suppliesRenderer.sharedMaterials[0];
+
+            Transform buttonPanel = Locator.GetShipTransform().GetComponentInChildren<CockpitButtonPanel>().transform;
+            MeshRenderer buttonPanelRenderer = buttonPanel.Find("Panel/PanelBody.001").GetComponent<MeshRenderer>();
+            Material sharedMat2 = buttonPanelRenderer.sharedMaterials[0];
+
+            if ((string)Settings.exteriorHullColor.GetProperty() == "Rainbow")
+            {
+                if (Locator.GetShipTransform().TryGetComponent(out RainbowShipHull rainbowHull))
+                {
+                    rainbowHull.AddSharedMaterial(sharedMat);
+                    rainbowHull.AddSharedMaterial(sharedMat2);
+                }
+                else
+                {
+                    rainbowHull = Locator.GetShipTransform().gameObject.AddComponent<RainbowShipHull>();
+                    rainbowHull.AddSharedMaterial(sharedMat);
+                    rainbowHull.AddSharedMaterial(sharedMat2);
+                }
+            }
+            else
+            {
+                sharedMat.SetColor("_Color",
+                    SettingsColors.GetShipColor((string)Settings.interiorHullColor.GetProperty()));
+                sharedMat2.SetColor("_Color",
+                    SettingsColors.GetShipColor((string)Settings.interiorHullColor.GetProperty()));
+            }
+        }
+        if ((string)Settings.exteriorHullColor.GetProperty() != "Default")
+        {
+            MeshRenderer cabinRenderer = Locator.GetShipTransform().
+                Find("Module_Cabin/Geo_Cabin/Cabin_Geometry/Cabin_Exterior").GetComponent<MeshRenderer>();
+            Material sharedMat = cabinRenderer.sharedMaterials[3];
+
+            if ((string)Settings.exteriorHullColor.GetProperty() == "Rainbow")
+            {
+                if (Locator.GetShipTransform().TryGetComponent(out RainbowShipHull rainbowHull))
+                {
+                    rainbowHull.AddSharedMaterial(sharedMat);
+                }
+                else
+                {
+                    rainbowHull = Locator.GetShipTransform().gameObject.AddComponent<RainbowShipHull>();
+                    rainbowHull.AddSharedMaterial(sharedMat);
+                }
+            }
+            else
+            {
+                sharedMat.SetColor("_Color",
+                    SettingsColors.GetShipColor((string)Settings.exteriorHullColor.GetProperty()));
             }
         }
 
