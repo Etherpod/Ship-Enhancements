@@ -161,6 +161,7 @@ public class ShipOverdriveController : ElectricalComponent
     {
         _charging = true;
         _shipAudioSource.AssignAudioLibraryClip(AudioType.NomaiTimeLoopClose);
+        _shipAudioSource.time = 0f;
         _shipAudioSource.Play();
         _panelAudioSource.Play();
         _modulatorController.BeginOverdriveSequence();

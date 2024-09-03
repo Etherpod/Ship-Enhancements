@@ -76,7 +76,7 @@ public class ShipProbeLauncherEffects : MonoBehaviour
     // Manual recall
     private void OnEnterFlightConsole(OWRigidbody shipBody)
     {
-        if (ShipEnhancements.Instance.probeDestroyed || componentDamaged || (bool)disableScoutRecall.GetProperty()) return;
+        if (ShipEnhancements.Instance.probeDestroyed || componentDamaged || (bool)disableScoutRecall.GetProperty() || SELocator.GetShipDamageController().IsSystemFailed()) return;
         _playerProbeLauncher._preLaunchProbeProxy.SetActive(false);
         _shipProbeLauncher._preLaunchProbeProxy.SetActive(true);
         _shipProbeLauncher._probeRetrievalEffect.WarpObjectIn(_shipProbeLauncher._probeRetrievalLength);
@@ -86,18 +86,14 @@ public class ShipProbeLauncherEffects : MonoBehaviour
     // Manual recall
     private void OnExitFlightConsole()
     {
-        if (ShipEnhancements.Instance.probeDestroyed)
-        {
-            return;
-        }
-
         if (_hasLaunched && (bool)enableManualScoutRecall.GetProperty())
         {
             _playerProbeLauncher.ExitPhotoMode();
             return;
         }
 
-        if (_probe.IsLaunched() || (_hasLaunched && (bool)enableManualScoutRecall.GetProperty()) || (bool)disableScoutRecall.GetProperty())
+        if (ShipEnhancements.Instance.probeDestroyed || _probe.IsLaunched() || (_hasLaunched && (bool)enableManualScoutRecall.GetProperty()) 
+            || (bool)disableScoutRecall.GetProperty() || (!_shipProbeLauncher._preLaunchProbeProxy.activeInHierarchy && SELocator.GetShipDamageController().IsSystemFailed()))
         {
             return;
         }

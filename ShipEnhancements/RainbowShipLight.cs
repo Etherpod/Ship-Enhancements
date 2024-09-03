@@ -30,7 +30,7 @@ public class RainbowShipLight : MonoBehaviour
             return;
         }
 
-        float num = Mathf.InverseLerp(0f, _colorTransitionTime, Time.time % (_colorTransitionTime));
+        float num = Mathf.InverseLerp(0f, _colorTransitionTime, Time.time % _colorTransitionTime);
 
         if (_lastDelta > num)
         {
