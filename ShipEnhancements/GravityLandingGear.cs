@@ -41,19 +41,19 @@ public class GravityLandingGear : MonoBehaviour
             }
             if (_audioSource.isPlaying)
             {
-                _audioSource.Stop();
+                _audioSource.FadeOut(0.5f);
                 _audioSource.time = 0f;
             }
         }
         else if (enabled && !_damaged && !_shipDestroyed)
         {
-            if (_landed && !_gravityEffects.isPlaying)
+            if (_landed)
             {
                 _gravityEffects.Play();
             }
             if (!_audioSource.isPlaying)
             {
-                _audioSource.Play();
+                _audioSource.FadeIn(1f);
                 _audioSource.pitch = 1f;
             }
         }
@@ -110,7 +110,7 @@ public class GravityLandingGear : MonoBehaviour
         }
         if (_audioSource.isPlaying)
         {
-            _audioSource.Stop();
+            _audioSource.FadeOut(0.5f);
             _audioSource.time = 0f;
         }
     }
@@ -119,13 +119,15 @@ public class GravityLandingGear : MonoBehaviour
     {
         if (enabled && _gravityEnabled && !_damaged && !_shipDestroyed)
         {
-            if (_landed && !_gravityEffects.isPlaying)
+            ShipEnhancements.WriteDebugMessage("play ");
+            if (_landed)
             {
+                ShipEnhancements.WriteDebugMessage("effect");
                 _gravityEffects.Play();
             }
             if (!_audioSource.isPlaying)
             {
-                _audioSource.Play();
+                _audioSource.FadeIn(1f);
                 _audioSource.pitch = 1f;
             }
         }
@@ -137,7 +139,7 @@ public class GravityLandingGear : MonoBehaviour
             }
             if (_audioSource.isPlaying)
             {
-                _audioSource.Stop();
+                _audioSource.FadeOut(0.5f);
                 _audioSource.time = 0f;
             }
         }
@@ -152,7 +154,7 @@ public class GravityLandingGear : MonoBehaviour
         }
         if (_audioSource.isPlaying)
         {
-            _audioSource.Stop();
+            _audioSource.FadeOut(0.5f);
             _audioSource.time = 0f;
         }
     }
@@ -167,7 +169,7 @@ public class GravityLandingGear : MonoBehaviour
         {
             _gravityEffects.Play();
         }
-        _audioSource.Play();
+        _audioSource.FadeIn(1f);
         _audioSource.pitch = 1f;
     }
 

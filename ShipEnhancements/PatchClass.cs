@@ -1742,37 +1742,29 @@ public static class PatchClass
 
     #region InputLatency
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(ThrusterModel), nameof(ThrusterModel.AddTranslationalInput))]
-    public static bool DelayTranslationalInput(ThrusterModel __instance, Vector3 input)
+    [HarmonyPatch(typeof(ThrusterController), nameof(ThrusterController.FixedUpdate))]
+    public static bool DelayShipInput(ThrusterController __instance)
     {
-        if (__instance is not ShipThrusterModel || (float)shipInputLatency.GetProperty() == 0f) return true;
-        Autopilot autopilot = Locator.GetShipBody().GetComponent<Autopilot>();
-        if (autopilot.IsMatchingVelocity() || autopilot.IsFlyingToDestination()
-            || autopilot.IsApproachingDestination() || autopilot.IsLiningUpDestination())
+        if (__instance is not ShipThrusterController || (float)shipInputLatency.GetProperty() == 0f)
         {
             return true;
         }
 
-        InputLatencyController.AddTranslationalInput(input);
-        return false;
-    }
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(ThrusterModel), nameof(ThrusterModel.AddRotationalInput))]
-    public static bool DelayRotationalInput(ThrusterModel __instance, Vector3 input)
-    {
-        if (__instance is not ShipThrusterModel || (float)shipInputLatency.GetProperty() == 0f) return true;
-        Autopilot autopilot = Locator.GetShipBody().GetComponent<Autopilot>();
-        if (autopilot.IsMatchingVelocity() || autopilot.IsFlyingToDestination()
-            || autopilot.IsApproachingDestination() || autopilot.IsLiningUpDestination())
+        __instance._translationalInput = __instance.ReadTranslationalInput();
+        if (!__instance.AllowHorizontalThrust())
         {
-            return true;
+            __instance._translationalInput.x = 0f;
+            __instance._translationalInput.z = 0f;
+        }
+        InputLatencyController.AddTranslationalInput(__instance._translationalInput);
+        if (__instance._isRotationalThrustEnabled)
+        {
+            __instance._rotationalInput = __instance.ReadRotationalInput();
+            InputLatencyController.AddRotationalInput(__instance._rotationalInput);
         }
 
-        InputLatencyController.AddRotationalInput(input);
         return false;
     }
-
     #endregion
 
     #region EngineSwitch
