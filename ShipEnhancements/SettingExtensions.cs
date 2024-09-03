@@ -62,6 +62,7 @@ public static class SettingExtensions
         { Settings.idleFuelConsumptionMultiplier, (1f, 1f) },
         { Settings.shipLightColor, ("Default", "Default") },
         { Settings.hotThrusters, (false, false) },
+        { Settings.extraNoise, (false, false) },
     };
 
     public static string GetName(this Settings setting)

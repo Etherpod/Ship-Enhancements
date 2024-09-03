@@ -61,6 +61,7 @@ public static class SettingsPresets
         { "idleFuelConsumptionMultiplier", 0f },
         { "shipLightColor", "Default" },
         { "hotThrusters", false },
+        { "extraNoise", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -118,6 +119,7 @@ public static class SettingsPresets
         { "idleFuelConsumptionMultiplier", 0f },
         { "shipLightColor", "Default" },
         { "hotThrusters", false },
+        { "extraNoise", false },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -175,6 +177,7 @@ public static class SettingsPresets
         { "idleFuelConsumptionMultiplier", 0f },
         { "shipLightColor", "Default" },
         { "hotThrusters", false },
+        { "extraNoise", false },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -232,6 +235,7 @@ public static class SettingsPresets
         { "idleFuelConsumptionMultiplier", 0f },
         { "shipLightColor", "Default" },
         { "hotThrusters", false },
+        { "extraNoise", false },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -289,6 +293,7 @@ public static class SettingsPresets
         { "idleFuelConsumptionMultiplier", 0f },
         { "shipLightColor", "Default" },
         { "hotThrusters", false },
+        { "extraNoise", false },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -346,6 +351,7 @@ public static class SettingsPresets
         { "idleFuelConsumptionMultiplier", 1f },
         { "shipLightColor", "Default" },
         { "hotThrusters", true },
+        { "extraNoise", true },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

@@ -108,6 +108,7 @@ public class ShipEngineSwitch : MonoBehaviour
                 {
                     _completedTurn = true;
                     _ignitionTime = Time.time;
+                    _thrusterController._isIgniting = true;
                     GlobalMessenger.FireEvent("StartShipIgnition");
                 }
                 if (!_completedIgnition && Time.time > _ignitionTime + _ignitionDuration)
@@ -123,6 +124,8 @@ public class ShipEngineSwitch : MonoBehaviour
                     }
                     _audioController.PlayShipAmbient();
                     StartCoroutine(ActivateIndicatorLights(electricalComponent._electricalSystem._systemDelay));
+                    _thrusterController._isIgniting = false;
+                    _interactReceiver.ChangePrompt("Turn off engine");
                     GlobalMessenger.FireEvent("CompleteShipIgnition");
                 }
             }
@@ -203,6 +206,7 @@ public class ShipEngineSwitch : MonoBehaviour
                 _audioSource.Play();
             }
             _audioController.StopShipAmbient();
+            _interactReceiver.ChangePrompt("Start engine");
             StopAllCoroutines();
             DeactivateIndicatorLights();
         }
@@ -225,6 +229,7 @@ public class ShipEngineSwitch : MonoBehaviour
         {
             _turnSwitch = false;
             _completedTurn = false;
+            _thrusterController._isIgniting = false;
             GlobalMessenger.FireEvent("CancelShipIgnition");
             if (_audioSource.isPlaying)
             {

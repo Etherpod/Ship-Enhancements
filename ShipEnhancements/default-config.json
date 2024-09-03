@@ -321,6 +321,12 @@
       "value": false,
       "tooltip": "Makes the ship thruster flames do damage when you stand in them."
     },
+    "extraNoise": {
+      "title": "Enable Extra Noise",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Makes things such as the master alarm detectable by noise-sensing things."
+    },
     "addPortableCampfire": {
       "title": "Add Portable Campfire",
       "type": "toggle",

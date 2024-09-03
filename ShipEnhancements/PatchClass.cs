@@ -1845,4 +1845,40 @@ public static class PatchClass
         return true;
     }
     #endregion
+
+    #region ExtraNoise
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipNoiseMaker), nameof(ShipNoiseMaker.Update))]
+    public static bool AddExtraNoises(ShipNoiseMaker __instance)
+    {
+        if (!(bool)extraNoise.GetProperty()) return true;
+
+        if (Time.time > __instance._lastImpactTime + 1f)
+        {
+            __instance._impactNoiseRadius = 0f;
+        }
+
+        float thrusterNoiseRadius = Mathf.Lerp(0f, 400f, Mathf.InverseLerp(0f, 20f, __instance._thrusterModel.GetLocalAcceleration().magnitude));
+        MasterAlarm masterAlarm = Locator.GetShipTransform().GetComponentInChildren<MasterAlarm>();
+        float alarmNoiseRadius = masterAlarm._isAlarmOn ? 350f : 0f;
+        ShipThrusterController thrusterController = Locator.GetShipTransform().GetComponent<ShipThrusterController>();
+        float ignitionNoiseRadius = thrusterController._isIgniting ? 500f : 0f;
+        float overdriveNoiseRadius = (bool)enableThrustModulator.GetProperty() && SELocator.GetShipOverdriveController() != null 
+            && SELocator.GetShipOverdriveController().IsCharging() ? 300f : 0f;
+
+        __instance._noiseRadius = Mathf.Max(thrusterNoiseRadius, __instance._impactNoiseRadius, alarmNoiseRadius, ignitionNoiseRadius, overdriveNoiseRadius);
+
+        return false;
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.Explode))]
+    public static void AddExplosionNoise(ShipDamageController __instance)
+    {
+        if ((bool)extraNoise.GetProperty())
+        {
+            __instance.GetComponentInChildren<ShipNoiseMaker>()._noiseRadius = 1000f * (float)shipExplosionMultiplier.GetProperty();
+        }
+    }
+    #endregion
 }

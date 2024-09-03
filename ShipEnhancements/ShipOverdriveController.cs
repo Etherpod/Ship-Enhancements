@@ -137,6 +137,10 @@ public class ShipOverdriveController : ElectricalComponent
         {
             _shipAudioSource.PlayOneShot(AudioType.EyeBigBang);
             _reactor.SetDamaged(true);
+            if ((bool)extraNoise.GetProperty())
+            {
+                Locator.GetShipDetector().GetComponent<ShipNoiseMaker>()._noiseRadius = 800f;
+            }
         }
         else
         {
@@ -252,6 +256,11 @@ public class ShipOverdriveController : ElectricalComponent
             _focused = _focusedButtons > 0;
             _buttonPanel.UpdateFocusedButtons(_focused);
         }
+    }
+
+    public bool IsCharging()
+    {
+        return _charging;
     }
 
     private void OnDestroy()

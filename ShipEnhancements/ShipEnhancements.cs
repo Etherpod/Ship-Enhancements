@@ -101,6 +101,7 @@ public class ShipEnhancements : ModBehaviour
         idleFuelConsumptionMultiplier,
         shipLightColor,
         hotThrusters,
+        extraNoise,
     }
 
     private void Awake()
