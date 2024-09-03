@@ -13,9 +13,13 @@ public class ShipEngineSwitch : MonoBehaviour
     [SerializeField]
     private float _targetYRotation;
     [SerializeField]
-    private OWRenderer _thrustersIndicatorLight;
+    private OWRenderer _thrustersIndicator;
     [SerializeField]
-    private OWRenderer _powerIndicatorLight;
+    private Light _thrustersIndicatorLight;
+    [SerializeField]
+    private OWRenderer _powerIndicator;
+    [SerializeField]
+    private Light _powerIndicatorLight;
     [SerializeField]
     private OWAudioSource _audioSource;
     [SerializeField]
@@ -38,6 +42,7 @@ public class ShipEngineSwitch : MonoBehaviour
     private Color _indicatorLightColor = new Color(1.3f, 0.55f, 0.55f);
     private bool _lastShipPowerState = false;
     private bool _reset = true;
+    private float _baseIndicatorLightIntensity;
 
     private void Awake()
     {
@@ -75,6 +80,9 @@ public class ShipEngineSwitch : MonoBehaviour
     {
         _interactReceiver.SetPromptText(UITextType.HoldPrompt);
         _interactReceiver.ChangePrompt("Start engine");
+        _baseIndicatorLightIntensity = _powerIndicatorLight.intensity;
+        _thrustersIndicatorLight.intensity = 0f;
+        _powerIndicatorLight.intensity = 0f;
     }
     
     private void Update()
@@ -87,7 +95,8 @@ public class ShipEngineSwitch : MonoBehaviour
             if (electricalFailed != _lastShipPowerState)
             {
                 _lastShipPowerState = electricalFailed;
-                _powerIndicatorLight.SetEmissionColor(electricalFailed ? Color.black : _indicatorLightColor);
+                _powerIndicator.SetEmissionColor(electricalFailed ? Color.black : _indicatorLightColor);
+                _powerIndicatorLight.intensity = electricalFailed ? 0f : _baseIndicatorLightIntensity;
             }
         }
     }
@@ -150,19 +159,23 @@ public class ShipEngineSwitch : MonoBehaviour
     {
         if (SELocator.GetShipResources().AreThrustersUsable())
         {
-            _thrustersIndicatorLight.SetEmissionColor(_indicatorLightColor);
+            _thrustersIndicator.SetEmissionColor(_indicatorLightColor);
+            _thrustersIndicatorLight.intensity = _baseIndicatorLightIntensity;
         }
         yield return new WaitForSeconds(delay);
         if (!SELocator.GetShipDamageController().IsElectricalFailed())
         {
-            _powerIndicatorLight.SetEmissionColor(_indicatorLightColor);
+            _powerIndicator.SetEmissionColor(_indicatorLightColor);
+            _powerIndicatorLight.intensity = _baseIndicatorLightIntensity;
         }
     }
 
     private void DeactivateIndicatorLights()
     {
-        _thrustersIndicatorLight.SetEmissionColor(Color.black);
-        _powerIndicatorLight.SetEmissionColor(Color.black);
+        _thrustersIndicator.SetEmissionColor(Color.black);
+        _thrustersIndicatorLight.intensity = 0f;
+        _powerIndicator.SetEmissionColor(Color.black);
+        _powerIndicatorLight.intensity = 0f;
     }
 
     private void OnGainFocus()
@@ -247,14 +260,16 @@ public class ShipEngineSwitch : MonoBehaviour
 
     private void OnFuelDepleted()
     {
-        _thrustersIndicatorLight.SetEmissionColor(Color.black);
+        _thrustersIndicator.SetEmissionColor(Color.black);
+        _thrustersIndicatorLight.intensity = 0f;
     }
 
     private void OnFuelRestored()
     {
         if (_completedIgnition)
         {
-            _thrustersIndicatorLight.SetEmissionColor(_indicatorLightColor);
+            _thrustersIndicator.SetEmissionColor(_indicatorLightColor);
+            _thrustersIndicatorLight.intensity = _baseIndicatorLightIntensity;
         }
     }
 

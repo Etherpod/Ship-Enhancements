@@ -18,6 +18,8 @@ public abstract class CockpitSwitch : ElectricalComponent
     protected AudioClip _onAudio;
     [SerializeField]
     protected AudioClip _offAudio;
+    [SerializeField]
+    protected Light _light;
 
     protected Quaternion _initialRotation;
     protected OWRenderer _renderer;
@@ -25,6 +27,7 @@ public abstract class CockpitSwitch : ElectricalComponent
     protected bool _on = false;
     protected ElectricalSystem _electricalSystem;
     protected bool _wasDisrupted = false;
+    protected float _baseLightIntensity;
 
     public override void Awake()
     {
@@ -44,6 +47,8 @@ public abstract class CockpitSwitch : ElectricalComponent
         transform.localRotation = Quaternion.Euler(_initialRotation.eulerAngles.x + _rotationOffset,
             _initialRotation.eulerAngles.y, _initialRotation.eulerAngles.z);
         _renderer.SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 0f);
+        _baseLightIntensity = _light.intensity;
+        _light.intensity = 0f;
 
         _electricalSystem = Locator.GetShipBody().transform
             .Find("Module_Cockpit/Systems_Cockpit/FlightControlsElectricalSystem")
@@ -75,6 +80,7 @@ public abstract class CockpitSwitch : ElectricalComponent
             {
                 PlaySwitchAudio(_onAudio);
             }
+            _light.intensity = _baseLightIntensity;
         }
         else
         {
@@ -86,6 +92,7 @@ public abstract class CockpitSwitch : ElectricalComponent
             {
                 PlaySwitchAudio(_offAudio);
             }
+            _light.intensity = 0f;
         }
 
         OnFlipSwitch(_on);
@@ -108,6 +115,7 @@ public abstract class CockpitSwitch : ElectricalComponent
                 if (_on)
                 {
                     _renderer.SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 1f);
+                    _light.intensity = _baseLightIntensity;
                 }
             }
             else
@@ -115,6 +123,7 @@ public abstract class CockpitSwitch : ElectricalComponent
                 if (_on)
                 {
                     _renderer.SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 0f);
+                    _light.intensity = 0f;
                 }
                 _interactReceiver.DisableInteraction();
             }
@@ -124,10 +133,12 @@ public abstract class CockpitSwitch : ElectricalComponent
             if (powered)
             {
                 _renderer.SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 1f);
+                _light.intensity = _baseLightIntensity;
             }
             else
             {
                 _renderer.SetMaterialProperty(Shader.PropertyToID("_LightIntensity"), 0f);
+                _light.intensity = 0f;
             }
         }
     }

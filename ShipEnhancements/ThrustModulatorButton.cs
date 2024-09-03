@@ -10,6 +10,8 @@ public class ThrustModulatorButton : MonoBehaviour
     private AudioClip _buttonPressedAudio;
     [SerializeField]
     private AudioClip _buttonReleasedAudio;
+    [SerializeField]
+    private Light _light;
 
     private InteractReceiver _interactReceiver;
     private ThrustModulatorController _modulatorController;
@@ -21,6 +23,8 @@ public class ThrustModulatorButton : MonoBehaviour
     private float _lastEmissiveScale = 0f;
     private float _depressionDistance = 0.0054f;
     private bool _pressed = false;
+    private float _baseLightIntensity;
+    private Color _baseLightColor;
 
     private void Awake()
     {
@@ -37,6 +41,9 @@ public class ThrustModulatorButton : MonoBehaviour
         _interactReceiver.OnLoseFocus += OnLoseFocus;
 
         _interactReceiver._screenPrompt._text = "Set Modulator to level " + _modulatorLevel;
+        _baseLightIntensity = _light.intensity;
+        _baseLightColor = _light.color;
+
         SetButtonLight(true);
     }
 
@@ -48,10 +55,12 @@ public class ThrustModulatorButton : MonoBehaviour
             if (_active)
             {
                 _emissiveRenderer.SetEmissiveScale(Mathf.Lerp(_lastEmissiveScale, 1f, num));
+                _light.intensity = Mathf.Lerp(_lastEmissiveScale, 1f, num);
             }
             else
             {
                 _emissiveRenderer.SetEmissiveScale(Mathf.Lerp(_lastEmissiveScale, 0f, num));
+                _light.intensity = Mathf.Lerp(_lastEmissiveScale, 0f, num);
             }
 
             if (num >= 1)
@@ -109,6 +118,7 @@ public class ThrustModulatorButton : MonoBehaviour
         if (instant)
         {
             _emissiveRenderer.SetEmissiveScale(state ? 1f : 0f);
+            _light.intensity = state ? _baseLightIntensity : 0f;
         }
         else
         {
@@ -126,11 +136,13 @@ public class ThrustModulatorButton : MonoBehaviour
     public void SetButtonColor(Color color)
     {
         _emissiveRenderer.SetEmissionColor(color);
+        _light.color = color;
     }
 
     public void ResetButtonColor()
     {
         _emissiveRenderer.SetEmissionColor(_emissiveRenderer.GetOriginalEmissionColor());
+        _light.color = _baseLightColor;
     }
 
     private void OnDestroy()
