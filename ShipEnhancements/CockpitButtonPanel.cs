@@ -48,12 +48,11 @@ public class CockpitButtonPanel : MonoBehaviour
         }
         _cockpitInteractVolume = (InteractZone)Locator.GetShipBody().GetComponentInChildren<ShipCockpitController>()._interactVolume;
         GlobalMessenger.AddListener("ExitFlightConsole", OnExitFlightConsole);
+        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
     }
     
     private void Update()
     {
-        if (SELocator.GetShipDamageController().IsSystemFailed()) return;
-
         if (!_extending && OWInput.IsNewlyPressed(InputLibrary.freeLook, InputMode.ShipCockpit))
         {
             _extending = true;
@@ -66,8 +65,6 @@ public class CockpitButtonPanel : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (SELocator.GetShipDamageController().IsSystemFailed()) return;
-
         if (_extending && _buttonPanelT < 1f)
         {
             _buttonPanelT = Mathf.Clamp01(_buttonPanelT + Time.deltaTime / _extensionTime);
@@ -159,5 +156,15 @@ public class CockpitButtonPanel : MonoBehaviour
         {
             _cockpitInteractVolume.EnableInteraction();
         }
+    }
+
+    private void OnShipSystemFailure()
+    {
+        enabled = false;
+    }
+
+    private void OnDestroy()
+    {
+        GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
     }
 }

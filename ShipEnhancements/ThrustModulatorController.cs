@@ -43,6 +43,8 @@ public class ThrustModulatorController : ElectricalComponent
         _modulatorButtons = GetComponentsInChildren<ThrustModulatorButton>();
         ShipEnhancements.Instance.SetThrustModulatorLevel(5);
 
+        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+
         _electricalSystem = Locator.GetShipTransform()
             .Find("Module_Cockpit/Systems_Cockpit/FlightControlsElectricalSystem")
             .GetComponent<ElectricalSystem>();
@@ -61,6 +63,7 @@ public class ThrustModulatorController : ElectricalComponent
         if (_electricalSystem.IsDisrupted() != _wasDisrupted)
         {
             _wasDisrupted = _electricalSystem.IsDisrupted();
+            if (SELocator.GetShipDamageController().IsElectricalFailed() || SELocator.GetShipDamageController().IsSystemFailed()) return;
             foreach (ThrustModulatorButton button in _modulatorButtons)
             {
                 button.SetInteractable(button.GetModulatorLevel() != _lastLevel && !_wasDisrupted);
@@ -72,6 +75,7 @@ public class ThrustModulatorController : ElectricalComponent
     {
         DisableModulatorDisplay();
         yield return new WaitForSeconds(0.6f);
+        _audioSource.pitch = 1f;
         for (int i = 0; i < _modulatorButtons.Length; i++)
         {
             _modulatorButtons[i].SetButtonLight(true, true);
@@ -96,7 +100,8 @@ public class ThrustModulatorController : ElectricalComponent
         foreach (ThrustModulatorButton button in _modulatorButtons)
         {
             button.ResetButtonColor();
-            if (_electricalSystem.IsPowered())
+            if (_electricalSystem.IsPowered() &&
+                !(SELocator.GetShipDamageController().IsElectricalFailed() || SELocator.GetShipDamageController().IsSystemFailed()))
             {
                 button.SetButtonLight(button.GetModulatorLevel() <= _lastLevel);
                 button.SetInteractable(button.GetModulatorLevel() != _lastLevel && !_wasDisrupted);
@@ -150,11 +155,16 @@ public class ThrustModulatorController : ElectricalComponent
             StopCoroutine(_overdriveSequence);
             _overdriveSequence = null;
         }
-        _audioSource.pitch = 1f;
-        if (_electricalSystem.IsPowered())
+        if (_electricalSystem.IsPowered() && 
+            !(SELocator.GetShipDamageController().IsElectricalFailed() || SELocator.GetShipDamageController().IsSystemFailed()))
         {
             StartCoroutine(ResetModulator());
         }
+    }
+
+    private void OnShipSystemFailure()
+    {
+        enabled = false;
     }
 
     public override void SetPowered(bool powered)
@@ -196,5 +206,10 @@ public class ThrustModulatorController : ElectricalComponent
             _focused = _focusedButtons > 0;
             _buttonPanel.UpdateFocusedButtons(_focused);
         }
+    }
+
+    private void OnDestroy()
+    {
+        GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
     }
 }

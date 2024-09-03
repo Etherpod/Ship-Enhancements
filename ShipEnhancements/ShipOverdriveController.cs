@@ -58,7 +58,7 @@ public class ShipOverdriveController : ElectricalComponent
         _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
         _reactor = Locator.GetShipTransform().GetComponentInChildren<ShipReactorComponent>();
         _modulatorController = GetComponent<ThrustModulatorController>();
-        GlobalMessenger.AddListener("ShipSystemFailure", InterruptOverdrive);
+        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
         ShipEnhancements.Instance.OnFuelDepleted += InterruptOverdrive;
 
         _electricalSystem = Locator.GetShipTransform()
@@ -178,11 +178,12 @@ public class ShipOverdriveController : ElectricalComponent
     {
         if (_charging)
         {
+            _charging = false;
+            _onResetTimer = false;
             StopAllCoroutines();
             _modulatorController.EndOverdriveSequence();
             _shipAudioSource.Stop();
             _panelAudioSource.Stop();
-            _charging = false;
         }
     }
 
@@ -202,6 +203,7 @@ public class ShipOverdriveController : ElectricalComponent
             else if (!_activateButton.IsActive() && !isButtonOn)
             {
                 StopAllCoroutines();
+                _onResetTimer = false;
             }
             else if (!_activateButton.IsOn() && isButtonOn)
             {
@@ -215,6 +217,12 @@ public class ShipOverdriveController : ElectricalComponent
                 StartCoroutine(OverdriveDelay());
             }
         }
+    }
+
+    private void OnShipSystemFailure()
+    {
+        InterruptOverdrive();
+        enabled = false;
     }
 
     public override void SetPowered(bool powered)
@@ -248,7 +256,7 @@ public class ShipOverdriveController : ElectricalComponent
 
     private void OnDestroy()
     {
-        GlobalMessenger.RemoveListener("ShipSystemFailure", InterruptOverdrive);
+        GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
         ShipEnhancements.Instance.OnFuelDepleted -= InterruptOverdrive;
     }
 }
