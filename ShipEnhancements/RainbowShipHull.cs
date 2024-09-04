@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
+namespace ShipEnhancements;
+
 public class RainbowShipHull : MonoBehaviour
 {
     private List<Material> _sharedMaterials = [];

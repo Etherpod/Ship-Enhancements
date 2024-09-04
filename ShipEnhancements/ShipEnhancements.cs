@@ -595,6 +595,8 @@ public class ShipEnhancements : ModBehaviour
             }
         }
 
+        Locator.GetPlayerBody().gameObject.AddComponent<ShipTether>();
+
         engineOn = !(bool)Settings.addEngineSwitch.GetValue();
 
         ShipNotifications.Initialize();
