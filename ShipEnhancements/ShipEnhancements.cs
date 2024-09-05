@@ -34,6 +34,7 @@ public class ShipEnhancements : ModBehaviour
 
     public UITextType probeLauncherName { get; private set; }
     public ItemType portableCampfireType { get; private set; }
+    public ItemType tetherHookType { get; private set; }
     public int thrustModulatorLevel { get; private set; }
 
     private SettingsPresets.PresetName _currentPreset = (SettingsPresets.PresetName)(-1);
@@ -121,6 +122,7 @@ public class ShipEnhancements : ModBehaviour
 
         probeLauncherName = EnumUtils.Create<UITextType>("ScoutLauncher");
         portableCampfireType = EnumUtils.Create<ItemType>("PortableCampfire");
+        tetherHookType = EnumUtils.Create<ItemType>("TetherHook");
 
         LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
         {
@@ -595,7 +597,11 @@ public class ShipEnhancements : ModBehaviour
             }
         }
 
-        Locator.GetPlayerBody().gameObject.AddComponent<ShipTether>();
+        GameObject hook = LoadPrefab("Assets/ShipEnhancements/TetherHook.prefab");
+        TetherHookItem item = Instantiate(hook, new Vector3(0, 3, 0), Quaternion.identity).GetComponent<TetherHookItem>();
+        GameObject hookSocket = LoadPrefab("Assets/ShipEnhancements/TetherHookSocket.prefab");
+        TetherHookSocket socket = Instantiate(hookSocket, new Vector3(0, 3, 0), Quaternion.identity).GetComponent<TetherHookSocket>();
+        socket.PlaceIntoSocket(item);
 
         engineOn = !(bool)Settings.addEngineSwitch.GetValue();
 

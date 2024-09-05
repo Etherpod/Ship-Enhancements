@@ -1489,12 +1489,11 @@ public static class PatchClass
     [HarmonyPatch(typeof(ItemTool), nameof(ItemTool.UpdateIsDroppable))]
     public static bool DropItemsInShip(ItemTool __instance, out RaycastHit hit, out OWRigidbody targetRigidbody, out IItemDropTarget dropTarget, ref bool __result)
     {
-
         hit = default(RaycastHit);
         targetRigidbody = null;
         dropTarget = null;
 
-        if (!(bool)enableShipItemPlacement.GetProperty()) return true;
+        if (!(bool)enableShipItemPlacement.GetProperty() && false) return true;
 
         PlayerCharacterController playerController = Locator.GetPlayerController();
         if (!playerController.IsGrounded() || PlayerState.IsAttached()/* || PlayerState.IsInsideShip()*/)
@@ -1514,30 +1513,32 @@ public static class PatchClass
         }
         Vector3 forward = Locator.GetPlayerTransform().forward;
         Vector3 forward2 = Locator.GetPlayerCamera().transform.forward;
-        float num = Vector3.Angle(forward, forward2);
-        float num2 = Mathf.InverseLerp(0f, 70f, num);
-        float num3 = 2.5f;
-        if (num2 <= 1f)
+        float cameraForwardsAngle = Vector3.Angle(forward, forward2);
+        float angleRatio = Mathf.InverseLerp(0f, 70f, cameraForwardsAngle);
+        float dist = 2.5f;
+        if (angleRatio <= 1f)
         {
-            num3 = Mathf.Lerp(2.5f, 4f, num2);
+            dist = Mathf.Lerp(2.5f, 4f, angleRatio);
         }
-        if (Physics.Raycast(Locator.GetPlayerCamera().transform.position, forward2, out hit, num3, OWLayerMask.physicalMask | OWLayerMask.interactMask))
+        if (Physics.Raycast(Locator.GetPlayerCamera().transform.position, forward2, out hit, dist, OWLayerMask.physicalMask | OWLayerMask.interactMask))
         {
             if (OWLayerMask.IsLayerInMask(hit.collider.gameObject.layer, OWLayerMask.interactMask))
             {
                 __result = false;
                 return false;
             }
-            if (Vector3.Angle(Locator.GetPlayerTransform().up, hit.normal) <= __instance._maxDroppableSlopeAngle)
+            bool isTether = __instance._heldItem.GetItemType() == ShipEnhancements.Instance.tetherHookType;
+            float maxSlopeAngle = isTether ? 360f : __instance._maxDroppableSlopeAngle;
+            if (Vector3.Angle(Locator.GetPlayerTransform().up, hit.normal) <= maxSlopeAngle)
             {
                 IgnoreCollision component = hit.collider.GetComponent<IgnoreCollision>();
                 if (component == null || !component.PreventsItemDrop())
                 {
                     targetRigidbody = hit.collider.GetAttachedOWRigidbody(false);
-                    /*if (targetRigidbody.gameObject.CompareTag("Ship"))
+                    if (targetRigidbody.gameObject.CompareTag("Ship") && __instance._heldItem.GetItemType() != ShipEnhancements.Instance.tetherHookType)
                     {
                         return false;
-                    }*/
+                    }
                     dropTarget = hit.collider.GetComponentInParent<IItemDropTarget>();
                     __result = true;
                     return false;
