@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using MonoMod.RuntimeDetour;
+using NAudio.Wave;
+using UnityEngine;
 
 namespace ShipEnhancements;
 
@@ -7,7 +9,7 @@ public class TetherHookItem : OWItem
     public static readonly ItemType ItemType = ShipEnhancements.Instance.tetherHookType;
 
     private ShipTether _tether;
-    private ShipTether _connectedTether;
+    private ShipTether _activeTether;
     private FirstPersonManipulator _cameraManipulator;
     private ScreenPrompt _tetherPrompt;
 
@@ -21,6 +23,7 @@ public class TetherHookItem : OWItem
         base.Awake();
         _type = ItemType;
         _tether = GetComponent<ShipTether>();
+        _activeTether = _tether;
         _cameraManipulator = Locator.GetPlayerCamera().GetComponent<FirstPersonManipulator>();
         _tetherPrompt = new ScreenPrompt(InputLibrary.interactSecondary, "Attach Tether", 0, ScreenPrompt.DisplayState.Normal, false);
     }
@@ -37,14 +40,43 @@ public class TetherHookItem : OWItem
 
     private void OnPressInteract()
     {
-        if (!_tether.IsTethered())
+        // if untethered
+        if (!_activeTether.IsTethered())
         {
-            _tether.CreateTether(Locator.GetPlayerBody());
+            // if player is not tethered to anything
+            if (!ShipEnhancements.Instance.playerTether)
+            {
+                _activeTether.CreateTether(Locator.GetPlayerBody(), Vector3.zero);
+                ShipEnhancements.Instance.playerTether = _activeTether;
+            }
+            // if player is tethered to a hook already
+            else
+            {
+                _activeTether = ShipEnhancements.Instance.playerTether;
+                _activeTether.TransferTether(GetComponentInParent<OWRigidbody>(), transform.localPosition, this);
+                ShipEnhancements.Instance.playerTether = null;
+            }
         }
+        // if tethered
         else
         {
-            _tether.DisconnectTether();
+            DisconnectTether();
         }
+    }
+
+    public void DisconnectTether()
+    {
+        _activeTether.DisconnectTether();
+        _activeTether = _tether;
+        if (_activeTether == ShipEnhancements.Instance.playerTether)
+        {
+            ShipEnhancements.Instance.playerTether = null;
+        }
+    }
+
+    public void DisconnectFromHook()
+    {
+        _activeTether = _tether;
     }
 
     public override void DropItem(Vector3 position, Vector3 normal, Transform parent, Sector sector, IItemDropTarget customDropTarget)
@@ -58,7 +90,7 @@ public class TetherHookItem : OWItem
     {
         base.PickUpItem(holdTranform);
         Locator.GetPromptManager().RemoveScreenPrompt(_tetherPrompt);
-        _tether.DisconnectTether();
+        DisconnectTether();
     }
 
     public override void SocketItem(Transform socketTransform, Sector sector)

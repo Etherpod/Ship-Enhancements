@@ -31,6 +31,7 @@ public class ShipEnhancements : ModBehaviour
     public float maxSpinSpeed = 24f;
     public bool probeDestroyed;
     public bool engineOn;
+    public ShipTether playerTether;
 
     public UITextType probeLauncherName { get; private set; }
     public ItemType portableCampfireType { get; private set; }
@@ -161,6 +162,7 @@ public class ShipEnhancements : ModBehaviour
             UpdateProperties();
             _lastSuitOxygen = 0f;
             _shipLoaded = false;
+            playerTether = null;
         };
     }
 
@@ -598,10 +600,20 @@ public class ShipEnhancements : ModBehaviour
         }
 
         GameObject hook = LoadPrefab("Assets/ShipEnhancements/TetherHook.prefab");
-        TetherHookItem item = Instantiate(hook, new Vector3(0, 3, 0), Quaternion.identity).GetComponent<TetherHookItem>();
+        TetherHookItem item = Instantiate(hook, new Vector3(0, 3, 0), Quaternion.identity, 
+            Locator.GetAstroObject(AstroObject.Name.TimberHearth).transform).GetComponent<TetherHookItem>();
         GameObject hookSocket = LoadPrefab("Assets/ShipEnhancements/TetherHookSocket.prefab");
-        TetherHookSocket socket = Instantiate(hookSocket, new Vector3(0, 3, 0), Quaternion.identity).GetComponent<TetherHookSocket>();
+        TetherHookSocket socket = Instantiate(hookSocket, new Vector3(0, 3, 0), Quaternion.identity, 
+            Locator.GetAstroObject(AstroObject.Name.TimberHearth).transform).GetComponent<TetherHookSocket>();
         socket.PlaceIntoSocket(item);
+
+        GameObject hook2 = LoadPrefab("Assets/ShipEnhancements/TetherHook.prefab");
+        TetherHookItem item2 = Instantiate(hook2, new Vector3(0, -3, 0), Quaternion.identity,
+            Locator.GetAstroObject(AstroObject.Name.TimberHearth).transform).GetComponent<TetherHookItem>();
+        GameObject hookSocket2 = LoadPrefab("Assets/ShipEnhancements/TetherHookSocket.prefab");
+        TetherHookSocket socket2 = Instantiate(hookSocket2, new Vector3(0, -3, 0), Quaternion.identity,
+            Locator.GetAstroObject(AstroObject.Name.TimberHearth).transform).GetComponent<TetherHookSocket>();
+        socket2.PlaceIntoSocket(item2);
 
         engineOn = !(bool)Settings.addEngineSwitch.GetValue();
 

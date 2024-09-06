@@ -1492,11 +1492,12 @@ public static class PatchClass
         hit = default(RaycastHit);
         targetRigidbody = null;
         dropTarget = null;
+        bool isTether = __instance._heldItem.GetItemType() == ShipEnhancements.Instance.tetherHookType;
 
         if (!(bool)enableShipItemPlacement.GetProperty() && false) return true;
 
         PlayerCharacterController playerController = Locator.GetPlayerController();
-        if (!playerController.IsGrounded() || PlayerState.IsAttached()/* || PlayerState.IsInsideShip()*/)
+        if ((!playerController.IsGrounded() && !isTether) || PlayerState.IsAttached()/* || PlayerState.IsInsideShip()*/)
         {
             __result = false;
             return false;
@@ -1506,7 +1507,7 @@ public static class PatchClass
             __result = false;
             return false;
         }
-        if (playerController.GetRelativeGroundVelocity().sqrMagnitude >= playerController.GetRunSpeedMagnitude() * playerController.GetRunSpeedMagnitude())
+        if (playerController.GetRelativeGroundVelocity().sqrMagnitude >= playerController.GetRunSpeedMagnitude() * playerController.GetRunSpeedMagnitude() && !isTether)
         {
             __result = false;
             return false;
@@ -1527,7 +1528,6 @@ public static class PatchClass
                 __result = false;
                 return false;
             }
-            bool isTether = __instance._heldItem.GetItemType() == ShipEnhancements.Instance.tetherHookType;
             float maxSlopeAngle = isTether ? 360f : __instance._maxDroppableSlopeAngle;
             if (Vector3.Angle(Locator.GetPlayerTransform().up, hit.normal) <= maxSlopeAngle)
             {
