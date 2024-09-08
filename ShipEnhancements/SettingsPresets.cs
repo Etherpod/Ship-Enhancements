@@ -66,6 +66,7 @@ public static class SettingsPresets
         { "exteriorHullColor", "Default" },
         { "addTether", false },
         { "disableDamageIndicators", false },
+        { "addShipSignal", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -128,6 +129,7 @@ public static class SettingsPresets
         { "exteriorHullColor", "Default" },
         { "addTether", false },
         { "disableDamageIndicators", false },
+        { "addShipSignal", false },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -190,6 +192,7 @@ public static class SettingsPresets
         { "exteriorHullColor", "Default" },
         { "addTether", false },
         { "disableDamageIndicators", false },
+        { "addShipSignal", false },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -252,6 +255,7 @@ public static class SettingsPresets
         { "exteriorHullColor", "Default" },
         { "addTether", true },
         { "disableDamageIndicators", false },
+        { "addShipSignal", false },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -314,6 +318,7 @@ public static class SettingsPresets
         { "exteriorHullColor", "Default" },
         { "addTether", true },
         { "disableDamageIndicators", false },
+        { "addShipSignal", false },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -376,6 +381,7 @@ public static class SettingsPresets
         { "exteriorHullColor", "Rainbow" },
         { "addTether", true },
         { "disableDamageIndicators", true },
+        { "addShipSignal", true },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

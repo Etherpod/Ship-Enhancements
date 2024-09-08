@@ -1972,4 +1972,59 @@ public static class PatchClass
         return true;
     }
     #endregion
+
+    #region ShipSignal
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(SignalscopeReticleController), nameof(SignalscopeReticleController.UpdateText))]
+    public static bool InsertShipSignalText(SignalscopeReticleController __instance)
+    {
+        if (!(bool)addShipSignal.GetProperty())
+        {
+            return true;
+        }
+
+        string text = string.Empty;
+        if (!PlayerState.AtFlightConsole())
+        {
+            AudioSignal strongestSignal = __instance._sigScopeTool.GetStrongestSignal();
+
+            if ((strongestSignal != null && strongestSignal.GetName() != ShipEnhancements.Instance.shipSignalName) 
+                || (SELocator.GetShipDamageController()?.IsSystemFailed() ?? false))
+            {
+                return true;
+            }
+
+            if (strongestSignal != null && strongestSignal.GetSignalStrength() > SignalscopeUI.s_distanceTextThreshold)
+            {
+                float distanceFromScope = strongestSignal.GetDistanceFromScope();
+                string text2 = "m";
+                string text3 = ((distanceFromScope > 1000f) ? __instance._longDistanceHexColor : "ffffffff");
+                string text4;
+                if (strongestSignal.GetName() == ShipEnhancements.Instance.shipSignalName)
+                {
+                    text4 = "SHIP";
+                }
+                else
+                {
+                    text4 = (PlayerData.KnowsSignal(strongestSignal.GetName())
+                    ? AudioSignal.SignalNameToString(strongestSignal.GetName()) : UITextLibrary.GetString(UITextType.UnknownSignal));
+                }
+
+                text = string.Concat(new object[]
+                {
+                    text4,
+                    ": <color=#",
+                    text3,
+                    ">",
+                    Mathf.Round(distanceFromScope),
+                    text2,
+                    "</color>"
+                });
+            }
+        }
+        __instance._scopeDistanceText.text = text;
+
+        return false;
+    }
+    #endregion
 }
