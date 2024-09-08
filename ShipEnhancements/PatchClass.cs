@@ -1537,7 +1537,7 @@ public static class PatchClass
                 if (component == null || !component.PreventsItemDrop())
                 {
                     targetRigidbody = hit.collider.GetAttachedOWRigidbody(false);
-                    if (targetRigidbody.gameObject.CompareTag("Ship") && __instance._heldItem.GetItemType() != ShipEnhancements.Instance.tetherHookType)
+                    if (targetRigidbody.gameObject.CompareTag("Ship") && !shipItemPlacement && !isTether)
                     {
                         return false;
                     }
