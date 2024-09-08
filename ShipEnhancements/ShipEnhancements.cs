@@ -600,20 +600,35 @@ public class ShipEnhancements : ModBehaviour
         }
 
         GameObject hook = LoadPrefab("Assets/ShipEnhancements/TetherHook.prefab");
-        TetherHookItem item = Instantiate(hook, new Vector3(0, 3, 0), Quaternion.identity, 
-            Locator.GetAstroObject(AstroObject.Name.TimberHearth).transform).GetComponent<TetherHookItem>();
         GameObject hookSocket = LoadPrefab("Assets/ShipEnhancements/TetherHookSocket.prefab");
-        TetherHookSocket socket = Instantiate(hookSocket, new Vector3(0, 3, 0), Quaternion.identity, 
-            Locator.GetAstroObject(AstroObject.Name.TimberHearth).transform).GetComponent<TetherHookSocket>();
+        AssetBundleUtilities.ReplaceShaders(hook);
+
+        Vector3 pos1 = new Vector3(2.5f, 3.154f, 0.479f);
+        TetherHookItem item = Instantiate(hook, pos1, Quaternion.identity, 
+            Locator.GetShipTransform()).GetComponent<TetherHookItem>();
+        item.transform.localPosition = pos1;
+        TetherHookSocket socket = Instantiate(hookSocket, pos1, Quaternion.identity, 
+            Locator.GetShipTransform()).GetComponent<TetherHookSocket>();
+        socket.transform.localPosition = pos1;
         socket.PlaceIntoSocket(item);
 
-        GameObject hook2 = LoadPrefab("Assets/ShipEnhancements/TetherHook.prefab");
-        TetherHookItem item2 = Instantiate(hook2, new Vector3(0, -3, 0), Quaternion.identity,
-            Locator.GetAstroObject(AstroObject.Name.TimberHearth).transform).GetComponent<TetherHookItem>();
-        GameObject hookSocket2 = LoadPrefab("Assets/ShipEnhancements/TetherHookSocket.prefab");
-        TetherHookSocket socket2 = Instantiate(hookSocket2, new Vector3(0, -3, 0), Quaternion.identity,
-            Locator.GetAstroObject(AstroObject.Name.TimberHearth).transform).GetComponent<TetherHookSocket>();
+        Vector3 pos2 = new Vector3(3.517f, 3.121f, -0.39f);
+        TetherHookItem item2 = Instantiate(hook, pos2, Quaternion.identity,
+            Locator.GetShipTransform()).GetComponent<TetherHookItem>();
+        item2.transform.localPosition = pos2;
+        TetherHookSocket socket2 = Instantiate(hookSocket, pos2, Quaternion.identity,
+            Locator.GetShipTransform()).GetComponent<TetherHookSocket>();
+        socket2.transform.localPosition = pos2;
         socket2.PlaceIntoSocket(item2);
+
+        Vector3 pos3 = new Vector3(2.937f, 3.125f, -0.431f);
+        TetherHookItem item3 = Instantiate(hook, pos3, Quaternion.identity,
+            Locator.GetShipTransform()).GetComponent<TetherHookItem>();
+        item3.transform.localPosition = pos3;
+        TetherHookSocket socket3 = Instantiate(hookSocket, pos3, Quaternion.identity,
+            Locator.GetShipTransform()).GetComponent<TetherHookSocket>();
+        socket3.transform.localPosition = pos3;
+        socket3.PlaceIntoSocket(item3);
 
         engineOn = !(bool)Settings.addEngineSwitch.GetValue();
 

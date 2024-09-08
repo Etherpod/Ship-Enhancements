@@ -1493,11 +1493,12 @@ public static class PatchClass
         targetRigidbody = null;
         dropTarget = null;
         bool isTether = __instance._heldItem.GetItemType() == ShipEnhancements.Instance.tetherHookType;
+        bool shipItemPlacement = (bool)enableShipItemPlacement.GetProperty();
 
         if (!(bool)enableShipItemPlacement.GetProperty() && false) return true;
 
         PlayerCharacterController playerController = Locator.GetPlayerController();
-        if ((!playerController.IsGrounded() && !isTether) || PlayerState.IsAttached()/* || PlayerState.IsInsideShip()*/)
+        if ((!playerController.IsGrounded() && !isTether) || PlayerState.IsAttached() || (PlayerState.IsInsideShip() && (!shipItemPlacement || isTether)))
         {
             __result = false;
             return false;
