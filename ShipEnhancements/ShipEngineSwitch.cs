@@ -186,6 +186,7 @@ public class ShipEngineSwitch : MonoBehaviour
     private void OnLoseFocus()
     {
         _buttonPanel.UpdateFocusedButtons(false);
+        OnReleaseInteract();
     }
 
     private void OnPressInteract()
