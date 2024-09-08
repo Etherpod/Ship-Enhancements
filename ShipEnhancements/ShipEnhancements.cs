@@ -357,7 +357,7 @@ public class ShipEnhancements : ModBehaviour
                         {
                             light._light.color = lightColor;
                             light._baseEmission = lightColor;
-                            if (light.IsOn())
+                            if (light.IsPowered() && light.IsOn())
                             {
                                 light._matPropBlock.SetColor(light._propID_EmissionColor, lightColor);
                                 light._emissiveRenderer.SetPropertyBlock(light._matPropBlock);
