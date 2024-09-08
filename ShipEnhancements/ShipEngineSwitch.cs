@@ -30,6 +30,7 @@ public class ShipEngineSwitch : MonoBehaviour
     private CockpitButtonPanel _buttonPanel;
     private ShipThrusterController _thrusterController;
     private ShipAudioController _audioController;
+    private MasterAlarm _alarm;
     private bool _turnSwitch = false;
     private float _turnTime = 0.15f;
     private float _turningT;
@@ -60,6 +61,7 @@ public class ShipEngineSwitch : MonoBehaviour
 
         _thrusterController = Locator.GetShipBody().GetComponent<ShipThrusterController>();
         _audioController = Locator.GetShipBody().GetComponentInChildren<ShipAudioController>();
+        _alarm = Locator.GetShipTransform().GetComponentInChildren<MasterAlarm>();
 
         _interactReceiver.OnGainFocus += OnGainFocus;
         _interactReceiver.OnLoseFocus += OnLoseFocus;
@@ -131,6 +133,7 @@ public class ShipEngineSwitch : MonoBehaviour
                         AudioClip clip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/PowerRestored.mp3");
                         electricalComponent._audioSource.PlayOneShot(clip, 0.8f);
                     }
+                    _alarm.UpdateAlarmState();
                     _audioController.PlayShipAmbient();
                     StartCoroutine(ActivateIndicatorLights(electricalComponent._electricalSystem._systemDelay));
                     _thrusterController._isIgniting = false;
@@ -218,6 +221,10 @@ public class ShipEngineSwitch : MonoBehaviour
                 _audioSource.clip = _releaseAudio;
                 _audioSource.pitch = Random.Range(0.9f, 1.1f);
                 _audioSource.Play();
+            }
+            if (_alarm._isAlarmOn)
+            {
+                _alarm.TurnOffAlarm();
             }
             _audioController.StopShipAmbient();
             _interactReceiver.ChangePrompt("Start engine");
