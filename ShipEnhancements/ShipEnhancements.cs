@@ -107,6 +107,7 @@ public class ShipEnhancements : ModBehaviour
         interiorHullColor,
         exteriorHullColor,
         addTether,
+        disableDamageIndicators,
     }
 
     private void Awake()

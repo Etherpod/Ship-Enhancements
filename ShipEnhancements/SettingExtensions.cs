@@ -66,6 +66,7 @@ public static class SettingExtensions
         { Settings.interiorHullColor, ("Default", "Default") },
         { Settings.exteriorHullColor, ("Default", "Default") },
         { Settings.addTether, (false, false) },
+        { Settings.disableDamageIndicators, (false, false) },
     };
 
     public static string GetName(this Settings setting)

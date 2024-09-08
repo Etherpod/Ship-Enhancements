@@ -1884,4 +1884,92 @@ public static class PatchClass
         }
     }
     #endregion
+
+    #region NoDamageIndicators
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipCockpitUI), nameof(ShipCockpitUI.OnShipHullDamaged))]
+    public static bool DisableCockpitUIHullDamaged()
+    {
+        return !(bool)disableDamageIndicators.GetProperty();
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipCockpitUI), nameof(ShipCockpitUI.OnShipHullRepaired))]
+    public static bool DisableCockpitUIHullRepaired()
+    {
+        return !(bool)disableDamageIndicators.GetProperty();
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipCockpitUI), nameof(ShipCockpitUI.OnShipComponentDamaged))]
+    public static bool DisableCockpitUIComponentDamaged(ShipComponent shipComponent)
+    {
+        return !(bool)disableDamageIndicators.GetProperty();
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipCockpitUI), nameof(ShipCockpitUI.OnShipComponentRepaired))]
+    public static bool DisableCockpitUIComponentRepaired(ShipComponent shipComponent)
+    {
+        return !(bool)disableDamageIndicators.GetProperty();
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipDamageDisplayV2), nameof(ShipDamageDisplayV2.UpdateDisplay))]
+    public static bool DisableDamageDisplay(ShipDamageDisplayV2 __instance)
+    {
+        if ((bool)disableDamageIndicators.GetProperty())
+        {
+            return false;
+        }
+
+        bool allEnabled = !(bool)disableGravityCrystal.GetProperty() && !(bool)disableHeadlights.GetProperty() && !(bool)disableLandingCamera.GetProperty();
+
+        if (allEnabled)
+        {
+            return true;
+        }
+
+        int num = 0;
+        if (!__instance._shipDestroyed)
+        {
+            for (int i = 0; i < 8; i++)
+            {
+                if (__instance._shipHulls[i] != null && __instance._shipHulls[i].isDamaged)
+                {
+                    num |= 1 << i;
+                }
+            }
+            for (int j = 0; j < 16; j++)
+            {
+                if (__instance._shipComponents[j] != null && __instance._shipComponents[j].isDamaged
+                    && !(__instance._shipComponents[j] is ShipGravityComponent && (bool)disableGravityCrystal.GetProperty())
+                    && !(__instance._shipComponents[j] is ShipHeadlightComponent && (bool)disableHeadlights.GetProperty())
+                    && !(__instance._shipComponents[j] is ShipCameraComponent && (bool)disableLandingCamera.GetProperty()))
+                {
+                    num |= 1 << j + 8;
+                }
+            }
+        }
+        __instance._meshRenderer.material.SetInt(__instance._propID_RegionMask, num);
+
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(MasterAlarm), nameof(MasterAlarm.UpdateAlarmState))]
+    public static bool DisableAlarm()
+    {
+        if ((bool)disableDamageIndicators.GetProperty())
+        {
+            return false;
+        }
+        else if (!ShipEnhancements.Instance.engineOn && (bool)addEngineSwitch.GetProperty())
+        {
+            return false;
+        }
+
+        return true;
+    }
+    #endregion
 }

@@ -107,6 +107,12 @@
       "value": false,
       "tooltip": "Lets you spin your ship as quickly as you want, though spinning too fast may tear your ship apart. DO NOT ENABLE IF YOU ARE PRONE TO MOTION SICKNESS."
     },
+    "disableDamageIndicators": {
+      "title": "Disable Damage Indicators",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Removes all indicators that tell you the ship is damaged. Also disables the master alarm. Keep an eye or four on the reactor!"
+    },
 
     "Adjust Ship Functions": {
       "type": "separator"
