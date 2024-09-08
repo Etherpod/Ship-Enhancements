@@ -65,6 +65,7 @@ public static class SettingExtensions
         { Settings.extraNoise, (false, false) },
         { Settings.interiorHullColor, ("Default", "Default") },
         { Settings.exteriorHullColor, ("Default", "Default") },
+        { Settings.addTether, (false, false) },
     };
 
     public static string GetName(this Settings setting)

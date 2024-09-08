@@ -339,6 +339,12 @@
       "value": false,
       "tooltip": "Adds a switch to the cockpit that turns on the ship. While the ship is on it will slowly drain fuel, so make sure you turn it off before you leave!"
     },
+    "addTether": {
+      "title": "Add Ship Tether",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Adds a few hooks inside the ship that you can place anywhere you want. Interact with it to tether yourself to it, and interact with another to create a line between them."
+    },
 
     "Decoration": {
       "type": "separator"

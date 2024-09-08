@@ -53,6 +53,7 @@ public class TetherHookItem : OWItem
                 _activeTether.CreateTether(Locator.GetPlayerBody(), _anchorPos.localPosition, Vector3.zero);
                 ShipEnhancements.Instance.playerTether = _activeTether;
                 _connectionMesh.SetActive(true);
+                _tetherPrompt.SetText("Detach Tether");
             }
             // if player is tethered to a hook already
             else
@@ -74,6 +75,7 @@ public class TetherHookItem : OWItem
         _activeTether.DisconnectTether();
         _activeTether = _tether;
         _connectionMesh.SetActive(false);
+        _tetherPrompt.SetText("Attach Tether");
         if (_activeTether == ShipEnhancements.Instance.playerTether)
         {
             ShipEnhancements.Instance.playerTether = null;
@@ -84,11 +86,13 @@ public class TetherHookItem : OWItem
     {
         _activeTether = _tether;
         _connectionMesh.SetActive(false);
+        _tetherPrompt.SetText("Attach Tether");
     }
 
     public void TransferToHook()
     {
         _connectionMesh.SetActive(true);
+        _tetherPrompt.SetText("Detach Tether");
     }
 
     public override void DropItem(Vector3 position, Vector3 normal, Transform parent, Sector sector, IItemDropTarget customDropTarget)
@@ -96,6 +100,7 @@ public class TetherHookItem : OWItem
         base.DropItem(position, normal, parent, sector, customDropTarget);
         _tether.SetAttachedRigidbody(GetComponentInParent<OWRigidbody>());
         Locator.GetPromptManager().AddScreenPrompt(_tetherPrompt, PromptPosition.Center, false);
+        transform.localScale = Vector3.one;
     }
 
     public override void PickUpItem(Transform holdTranform)
@@ -103,10 +108,20 @@ public class TetherHookItem : OWItem
         DisconnectTether();
         base.PickUpItem(holdTranform);
         Locator.GetPromptManager().RemoveScreenPrompt(_tetherPrompt);
+        transform.localScale = Vector3.one * 0.6f;
+        transform.localPosition -= new Vector3(0f, 0.1f, 0f);
     }
 
     public override void SocketItem(Transform socketTransform, Sector sector)
     {
         base.SocketItem(socketTransform, sector);
+        transform.localScale = Vector3.one * 0.7f;
+    }
+
+    public override void OnCompleteUnsocket()
+    {
+        base.OnCompleteUnsocket();
+        transform.localScale = Vector3.one * 0.6f;
+        transform.localPosition -= new Vector3(0f, 0.1f, 0f);
     }
 }

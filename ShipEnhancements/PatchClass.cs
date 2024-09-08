@@ -1492,10 +1492,11 @@ public static class PatchClass
         hit = default(RaycastHit);
         targetRigidbody = null;
         dropTarget = null;
-        bool isTether = __instance._heldItem.GetItemType() == ShipEnhancements.Instance.tetherHookType;
-        bool shipItemPlacement = (bool)enableShipItemPlacement.GetProperty();
 
-        if (!(bool)enableShipItemPlacement.GetProperty() && false) return true;
+        if (!(bool)enableShipItemPlacement.GetProperty() && !(bool)addTether.GetProperty()) return true;
+
+        bool isTether = (bool)addTether.GetProperty() && __instance._heldItem.GetItemType() == ShipEnhancements.Instance.tetherHookType;
+        bool shipItemPlacement = (bool)enableShipItemPlacement.GetProperty();
 
         PlayerCharacterController playerController = Locator.GetPlayerController();
         if ((!playerController.IsGrounded() && !isTether) || PlayerState.IsAttached() || (PlayerState.IsInsideShip() && (!shipItemPlacement || isTether)))

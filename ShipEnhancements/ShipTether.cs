@@ -143,7 +143,6 @@ public class ShipTether : MonoBehaviour
         _hook.DisconnectFromHook();
         if (_connectedHook)
         {
-            ShipEnhancements.WriteDebugMessage("connected hook");
             _connectedHook.DisconnectFromHook();
             _connectedHook = null;
         }

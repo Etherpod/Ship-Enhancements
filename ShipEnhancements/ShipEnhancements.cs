@@ -106,6 +106,7 @@ public class ShipEnhancements : ModBehaviour
         extraNoise,
         interiorHullColor,
         exteriorHullColor,
+        addTether,
     }
 
     private void Awake()
@@ -540,6 +541,10 @@ public class ShipEnhancements : ModBehaviour
                 GameObject volume = Instantiate(flameHazardVolume, Vector3.zero, Quaternion.identity, flame.transform);
                 volume.transform.localPosition = Vector3.zero;
                 volume.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+                if (!flame.enabled)
+                {
+                    flame.transform.localScale = Vector3.zero;
+                }
             }
         }
         if ((string)Settings.interiorHullColor.GetProperty() != "Default")
@@ -598,37 +603,23 @@ public class ShipEnhancements : ModBehaviour
                     SettingsColors.GetShipColor((string)Settings.exteriorHullColor.GetProperty()));
             }
         }
+        if ((bool)Settings.addTether.GetProperty())
+        {
+            GameObject hook = LoadPrefab("Assets/ShipEnhancements/TetherHook.prefab");
+            AssetBundleUtilities.ReplaceShaders(hook);
 
-        GameObject hook = LoadPrefab("Assets/ShipEnhancements/TetherHook.prefab");
-        GameObject hookSocket = LoadPrefab("Assets/ShipEnhancements/TetherHookSocket.prefab");
-        AssetBundleUtilities.ReplaceShaders(hook);
-
-        Vector3 pos1 = new Vector3(2.5f, 3.154f, 0.479f);
-        TetherHookItem item = Instantiate(hook, pos1, Quaternion.identity, 
-            Locator.GetShipTransform()).GetComponent<TetherHookItem>();
-        item.transform.localPosition = pos1;
-        TetherHookSocket socket = Instantiate(hookSocket, pos1, Quaternion.identity, 
-            Locator.GetShipTransform()).GetComponent<TetherHookSocket>();
-        socket.transform.localPosition = pos1;
-        socket.PlaceIntoSocket(item);
-
-        Vector3 pos2 = new Vector3(3.517f, 3.121f, -0.39f);
-        TetherHookItem item2 = Instantiate(hook, pos2, Quaternion.identity,
-            Locator.GetShipTransform()).GetComponent<TetherHookItem>();
-        item2.transform.localPosition = pos2;
-        TetherHookSocket socket2 = Instantiate(hookSocket, pos2, Quaternion.identity,
-            Locator.GetShipTransform()).GetComponent<TetherHookSocket>();
-        socket2.transform.localPosition = pos2;
-        socket2.PlaceIntoSocket(item2);
-
-        Vector3 pos3 = new Vector3(2.937f, 3.125f, -0.431f);
-        TetherHookItem item3 = Instantiate(hook, pos3, Quaternion.identity,
-            Locator.GetShipTransform()).GetComponent<TetherHookItem>();
-        item3.transform.localPosition = pos3;
-        TetherHookSocket socket3 = Instantiate(hookSocket, pos3, Quaternion.identity,
-            Locator.GetShipTransform()).GetComponent<TetherHookSocket>();
-        socket3.transform.localPosition = pos3;
-        socket3.PlaceIntoSocket(item3);
+            GameObject socketParent = Instantiate(LoadPrefab("Assets/ShipEnhancements/HookSocketParent.prefab"), Locator.GetShipTransform());
+            socketParent.transform.localPosition = Vector3.zero;
+            foreach (TetherHookSocket socket in socketParent.GetComponentsInChildren<TetherHookSocket>())
+            {
+                GameObject hookItem = Instantiate(hook);
+                socket.PlaceIntoSocket(hookItem.GetComponent<TetherHookItem>());
+                ModHelper.Events.Unity.FireOnNextUpdate(() =>
+                {
+                    hookItem.transform.localScale = Vector3.one * 0.7f;
+                });
+            }
+        }
 
         engineOn = !(bool)Settings.addEngineSwitch.GetValue();
 
