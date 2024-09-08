@@ -10,6 +10,12 @@ public class TetherHookItem : OWItem
     private GameObject _connectionMesh;
     [SerializeField]
     private Transform _anchorPos;
+    [SerializeField]
+    private OWAudioSource _audioSource;
+    [SerializeField]
+    private AudioClip _attachTetherAudio;
+    [SerializeField]
+    private AudioClip _dropAudio;
 
     private ShipTether _tether;
     private ShipTether _activeTether;
@@ -54,6 +60,7 @@ public class TetherHookItem : OWItem
                 ShipEnhancements.Instance.playerTether = _activeTether;
                 _connectionMesh.SetActive(true);
                 _tetherPrompt.SetText("Detach Tether");
+                PlayOneShotAudio(_attachTetherAudio, 0.6f);
             }
             // if player is tethered to a hook already
             else
@@ -61,6 +68,7 @@ public class TetherHookItem : OWItem
                 _activeTether = ShipEnhancements.Instance.playerTether;
                 _activeTether.TransferTether(GetComponentInParent<OWRigidbody>(), transform.parent.InverseTransformPoint(_anchorPos.position), this);
                 ShipEnhancements.Instance.playerTether = null;
+                PlayOneShotAudio(_attachTetherAudio, 0.6f);
             }
         }
         // if tethered
@@ -101,6 +109,9 @@ public class TetherHookItem : OWItem
         _tether.SetAttachedRigidbody(GetComponentInParent<OWRigidbody>());
         Locator.GetPromptManager().AddScreenPrompt(_tetherPrompt, PromptPosition.Center, false);
         transform.localScale = Vector3.one;
+        _audioSource.clip = _dropAudio;
+        _audioSource.pitch = Random.Range(0.95f, 1.05f);
+        _audioSource.Play();
     }
 
     public override void PickUpItem(Transform holdTranform)
@@ -110,6 +121,7 @@ public class TetherHookItem : OWItem
         Locator.GetPromptManager().RemoveScreenPrompt(_tetherPrompt);
         transform.localScale = Vector3.one * 0.6f;
         transform.localPosition -= new Vector3(0f, 0.1f, 0f);
+        _audioSource.Stop();
     }
 
     public override void SocketItem(Transform socketTransform, Sector sector)
@@ -123,5 +135,12 @@ public class TetherHookItem : OWItem
         base.OnCompleteUnsocket();
         transform.localScale = Vector3.one * 0.6f;
         transform.localPosition -= new Vector3(0f, 0.1f, 0f);
+    }
+
+    private void PlayOneShotAudio(AudioClip clip, float volume)
+    {
+        ShipEnhancements.WriteDebugMessage(_audioSource.time);
+        _audioSource.pitch = _audioSource.time > 0 ? _audioSource.pitch : Random.Range(0.95f, 1.05f);
+        _audioSource.PlayOneShot(clip, volume);
     }
 }
