@@ -101,11 +101,25 @@ public class ShipTether : MonoBehaviour
         _tetherMesh = Instantiate(ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/TetherLine.prefab"), transform).transform;
         AssetBundleUtilities.ReplaceShaders(_tetherMesh.gameObject);
         _tetherMesh.localPosition = _anchor;
-        if (_tetheredToSelf)
+
+        Vector3 lineDir = _connectedRigidbody.transform.TransformPoint(_connectedAnchor) - transform.TransformPoint(_anchor);
+        RaycastHit[] hits = Physics.RaycastAll(transform.TransformPoint(_anchor), lineDir, lineDir.magnitude, OWLayerMask.physicalMask);
+        bool intersectingBody = false;
+        foreach (RaycastHit hit in hits)
+        {
+            Rigidbody rb = hit.collider.attachedRigidbody;
+            if (!(rb.isKinematic || rb == GetComponentInParent<Rigidbody>() || rb == Locator.GetPlayerBody().GetRigidbody()))
+            {
+                intersectingBody = true;
+                break;
+            }
+        }
+        if (_tetheredToSelf && !intersectingBody)
         {
             _collider = _tetherMesh.GetComponentInChildren<CapsuleCollider>();
             _collider.enabled = true;
         }
+
         UpdateTetherLine();
     }
 
@@ -119,7 +133,13 @@ public class ShipTether : MonoBehaviour
             DestroyImmediate(_joint);
         }
         _tetheredToSelf = false;
+
+        if (_collider && !ShipEnhancements.Instance.probeDestroyed && Locator.GetProbe().transform.parent == _collider.transform)
+        {
+            Locator.GetProbe().Unanchor();
+        }
         Destroy(_tetherMesh.gameObject);
+
         _hook.DisconnectFromHook();
         if (_connectedHook)
         {
@@ -136,6 +156,7 @@ public class ShipTether : MonoBehaviour
         DisconnectTether();
         CreateTether(newBody, _anchor, offset);
         _connectedHook = hook;
+        _hook.TransferToHook();
         hook.TransferToHook();
     }
 
@@ -147,7 +168,7 @@ public class ShipTether : MonoBehaviour
         _tetherMesh.rotation = Quaternion.LookRotation(lineDir);
         scaleParent.localScale = new Vector3(scaleParent.localScale.x, scaleParent.localScale.y, magnitude);
         scaleParent.GetComponentInChildren<MeshRenderer>().material.SetTextureScale("_MainTex", new Vector2(1f, magnitude));
-        if (_tetheredToSelf)
+        if (_tetheredToSelf && _collider)
         {
             _collider.center = new Vector3(0f, 0f, 0.5f * magnitude);
             _collider.height = magnitude;

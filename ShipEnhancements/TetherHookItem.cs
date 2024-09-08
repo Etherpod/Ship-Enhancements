@@ -100,9 +100,9 @@ public class TetherHookItem : OWItem
 
     public override void PickUpItem(Transform holdTranform)
     {
+        DisconnectTether();
         base.PickUpItem(holdTranform);
         Locator.GetPromptManager().RemoveScreenPrompt(_tetherPrompt);
-        DisconnectTether();
     }
 
     public override void SocketItem(Transform socketTransform, Sector sector)
