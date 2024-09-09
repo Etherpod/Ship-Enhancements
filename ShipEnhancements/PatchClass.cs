@@ -1165,7 +1165,6 @@ public static class PatchClass
         // This recalls to the player launcher
         if (__instance.GetName() == ProbeLauncher.Name.Player && flag)
         {
-            ShipEnhancements.WriteDebugMessage("unga bunga");
             __instance._activeProbe = Locator.GetProbe();
         }
 

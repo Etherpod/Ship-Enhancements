@@ -8,7 +8,6 @@ public class ShipBouncyHull : MonoBehaviour
 {
     private void Start()
     {
-        ShipEnhancements.WriteDebugMessage(SELocator.GetShipDamageController());
         SELocator.GetShipDamageController()._impactSensor.OnImpact += OnImpact;
     }
 

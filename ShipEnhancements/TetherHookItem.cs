@@ -139,7 +139,6 @@ public class TetherHookItem : OWItem
 
     private void PlayOneShotAudio(AudioClip clip, float volume)
     {
-        ShipEnhancements.WriteDebugMessage(_audioSource.time);
         _audioSource.pitch = _audioSource.time > 0 ? _audioSource.pitch : Random.Range(0.95f, 1.05f);
         _audioSource.PlayOneShot(clip, volume);
     }

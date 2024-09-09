@@ -28,20 +28,15 @@ public static class SettingsColors
     private static Dictionary<string, Color> _nameToShipColor = new()
     {
         { "Default", Color.white },
-        { "Red", new Color(154, 92, 93) },
-        { "Copper", new Color(168, 136, 115) },
-        { "Brown", new Color(115, 74, 45) },
+        { "Red", new Color(221, 185, 185) },
+        { "Orange", new Color(255, 201, 170) },
         { "Golden", new Color(255, 230, 152) },
-        { "Green", new Color(108, 123, 77) },
-        { "Ghostly Green", new Color(58, 168, 112) },
-        { "Turquoise", new Color(113, 156, 154) },
-        { "Blue", new Color(89, 119, 183) },
-        { "Navy Blue", new Color(64, 72, 101) },
-        { "Nomaian Blue", new Color(113, 112, 168) },
-        { "Purple", new Color(110, 86, 154) },
-        { "Pink", new Color(204, 165, 214) },
-        { "Gray", new Color(115, 115, 115) },
-        { "Black", Color.black },
+        { "Green", new Color(163, 188, 146) },
+        { "Turquoise", new Color(213, 255, 254) },
+        { "Blue", new Color(210, 231, 255) },
+        { "Lavender", new Color(222, 203, 245) },
+        { "Pink", new Color(255, 218, 225) },
+        { "Gray", new Color(119, 122, 140) },
         { "Rainbow", Color.white }
     };
 

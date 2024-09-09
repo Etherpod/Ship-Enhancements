@@ -119,10 +119,8 @@ public class GravityLandingGear : MonoBehaviour
     {
         if (enabled && _gravityEnabled && !_damaged && !_shipDestroyed)
         {
-            ShipEnhancements.WriteDebugMessage("play ");
             if (_landed)
             {
-                ShipEnhancements.WriteDebugMessage("effect");
                 _gravityEffects.Play();
             }
             if (!_audioSource.isPlaying)

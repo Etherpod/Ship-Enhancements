@@ -393,19 +393,14 @@
       "options": [
         "Default",
         "Red",
-        "Copper",
-        "Brown",
+        "Orange",
         "Golden",
         "Green",
-        "Ghostly-Green",
         "Turquoise",
         "Blue",
-        "Navy Blue",
-        "Nomaian Blue",
-        "Purple",
+        "Lavender",
         "Pink",
         "Gray",
-        "Black",
         "Rainbow"
       ],
       "tooltip": "Changes the color of the inside of the ship."
@@ -417,19 +412,14 @@
       "options": [
         "Default",
         "Red",
-        "Copper",
-        "Brown",
+        "Orange",
         "Golden",
         "Green",
-        "Ghostly-Green",
         "Turquoise",
         "Blue",
-        "Navy Blue",
-        "Nomaian Blue",
-        "Purple",
+        "Lavender",
         "Pink",
         "Gray",
-        "Black",
         "Rainbow"
       ],
       "tooltip": "Changes the color of the outside of the ship."
