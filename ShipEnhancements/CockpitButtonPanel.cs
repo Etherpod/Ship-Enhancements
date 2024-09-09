@@ -21,15 +21,26 @@ public class CockpitButtonPanel : MonoBehaviour
     [SerializeField]
     private GameObject _gravityGearReplacement;
     [SerializeField]
+    private GameObject _persistentInputReplacement;
+    [SerializeField]
     private GameObject _engineSwitchReplacement;
     [SerializeField]
     private Transform _retractedTransform;
     [SerializeField]
     private Transform _extendedTransform;
+    [SerializeField]
+    private OWAudioSource _audioSource;
+    [SerializeField]
+    private AudioClip _extendAudio;
+    [SerializeField]
+    private AudioClip _retractAudio;
+    [SerializeField]
+    private AudioClip _finishSlideAudio;
 
     private int _numButtons = 0;
     private int _numBottomButtons = 0;
     private bool _extending = false;
+    private bool _completedSlide = false;
     private float _buttonPanelT = 0f;
     private float _extensionTime = 0.4f;
     private int _focusedButtons;
@@ -56,24 +67,48 @@ public class CockpitButtonPanel : MonoBehaviour
         if (!_extending && OWInput.IsNewlyPressed(InputLibrary.freeLook, InputMode.ShipCockpit))
         {
             _extending = true;
+            _completedSlide = false;
+            _audioSource.Stop();
+            _audioSource.clip = _extendAudio;
+            _audioSource.Play();
         }
         else if (_extending && OWInput.IsNewlyReleased(InputLibrary.freeLook, InputMode.ShipCockpit))
         {
             _extending = false;
+            _completedSlide = false;
+            _audioSource.Stop();
+            _audioSource.clip = _retractAudio;
+            _audioSource.Play();
         }
     }
 
     private void FixedUpdate()
     {
-        if (_extending && _buttonPanelT < 1f)
+        if (_extending)
         {
-            _buttonPanelT = Mathf.Clamp01(_buttonPanelT + Time.deltaTime / _extensionTime);
-            _panelTransform.position = Vector3.Lerp(_retractedTransform.position, _extendedTransform.position, Mathf.SmoothStep(0f, 1f, _buttonPanelT));
+            if (_buttonPanelT < 1f)
+            {
+                _buttonPanelT = Mathf.Clamp01(_buttonPanelT + Time.deltaTime / _extensionTime);
+                _panelTransform.position = Vector3.Lerp(_retractedTransform.position, _extendedTransform.position, Mathf.SmoothStep(0f, 1f, _buttonPanelT));
+            }
+            else if (!_completedSlide)
+            {
+                _completedSlide = true;
+                _audioSource.PlayOneShot(_finishSlideAudio, 0.8f);
+            }
         }
-        else if (!_extending && _buttonPanelT > 0f)
+        else if (!_extending)
         {
-            _buttonPanelT = Mathf.Clamp01(_buttonPanelT - Time.deltaTime / _extensionTime);
-            _panelTransform.position = Vector3.Lerp(_retractedTransform.position, _extendedTransform.position, Mathf.SmoothStep(0f, 1f, _buttonPanelT));
+            if (_buttonPanelT > 0f)
+            {
+                _buttonPanelT = Mathf.Clamp01(_buttonPanelT - Time.deltaTime / _extensionTime);
+                _panelTransform.position = Vector3.Lerp(_retractedTransform.position, _extendedTransform.position, Mathf.SmoothStep(0f, 1f, _buttonPanelT));
+            }
+            else if (!_completedSlide)
+            {
+                _completedSlide = true;
+                _audioSource.PlayOneShot(_finishSlideAudio, 0.8f);
+            }
         }
     }
 
@@ -82,6 +117,10 @@ public class CockpitButtonPanel : MonoBehaviour
         if (_extending)
         {
             _extending = false;
+            _completedSlide = false;
+            _audioSource.Stop();
+            _audioSource.clip = _retractAudio;
+            _audioSource.Play();
         }
     }
 
@@ -122,10 +161,12 @@ public class CockpitButtonPanel : MonoBehaviour
             _numButtons++;
             _numBottomButtons++;
             _persistentInputObject.SetActive(true);
+            _persistentInputReplacement.SetActive(false);
         }
         else
         {
             _persistentInputObject.SetActive(false);
+            _persistentInputReplacement.SetActive(true);
         }
     }
 
@@ -161,6 +202,7 @@ public class CockpitButtonPanel : MonoBehaviour
     private void OnShipSystemFailure()
     {
         enabled = false;
+        _audioSource.Stop();
     }
 
     private void OnDestroy()
