@@ -464,6 +464,10 @@ public class ShipEnhancements : ModBehaviour
                 case "Back":
                     direction = Vector3.back;
                     break;
+                case "Random":
+                    direction = new Vector3(UnityEngine.Random.Range(-1f, 1f), 
+                        UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f)).normalized;
+                    break;
             }
             shipGravity._fieldDirection = direction;
         }

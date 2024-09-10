@@ -176,7 +176,8 @@
         "Left",
         "Right",
         "Forward",
-        "Back"
+        "Back",
+        "Random"
       ]
     },
     "fuelTransferMultiplier": {
