@@ -178,6 +178,12 @@
       "value": 1,
       "tooltip": "Larger numbers increase the damage that the ship takes from extreme temperatures."
     },
+    "temperatureResistanceMultiplier": {
+      "title": "Temperature Resistance Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers increase the time it takes for the ship to start taking damage in extreme temperatures."
+    },
     "gravityMultiplier": {
       "title": "Ship Gravity Multiplier",
       "type": "number",
@@ -209,12 +215,6 @@
       "type": "number",
       "value": 1,
       "tooltip": "Larger numbers make your ship harder to turn while in space. Set to zero to make your ship spin forever. WARNING: Values below 1 may cause motion sickness."
-    },
-    "temperatureResistanceMultiplier": {
-      "title": "Temperature Resistance Multiplier",
-      "type": "number",
-      "value": 1,
-      "tooltip": "Larger numbers increase the time it takes for the ship to start taking damage in extreme temperatures."
     },
     "shipExplosionMultiplier": {
       "title": "Ship Explosion Multiplier",
