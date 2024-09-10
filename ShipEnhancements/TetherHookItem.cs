@@ -17,8 +17,8 @@ public class TetherHookItem : OWItem
     [SerializeField]
     private AudioClip _dropAudio;
 
-    private ShipTether _tether;
-    private ShipTether _activeTether;
+    private Tether _tether;
+    private Tether _activeTether;
     private FirstPersonManipulator _cameraManipulator;
     private ScreenPrompt _tetherPrompt;
 
@@ -31,7 +31,7 @@ public class TetherHookItem : OWItem
     {
         base.Awake();
         _type = ItemType;
-        _tether = GetComponent<ShipTether>();
+        _tether = GetComponent<Tether>();
         _activeTether = _tether;
         _cameraManipulator = Locator.GetPlayerCamera().GetComponent<FirstPersonManipulator>();
         _tetherPrompt = new ScreenPrompt(InputLibrary.interactSecondary, "Attach Tether", 0, ScreenPrompt.DisplayState.Normal, false);
@@ -116,7 +116,10 @@ public class TetherHookItem : OWItem
 
     public override void PickUpItem(Transform holdTranform)
     {
-        DisconnectTether();
+        if (_activeTether?.IsTethered() ?? false)
+        {
+            DisconnectTether();
+        }
         base.PickUpItem(holdTranform);
         Locator.GetPromptManager().RemoveScreenPrompt(_tetherPrompt);
         transform.localScale = Vector3.one * 0.6f;

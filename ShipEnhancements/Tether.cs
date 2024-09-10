@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace ShipEnhancements;
 
-public class ShipTether : MonoBehaviour
+public class Tether : MonoBehaviour
 {
     private bool _tethered = false;
     private SpringJoint _joint;
@@ -17,6 +16,8 @@ public class ShipTether : MonoBehaviour
     private TetherHookItem _connectedHook;
     private bool _tetheredToSelf = false;
     private CapsuleCollider _collider;
+    private readonly float _minTetherDistance = 0.25f;
+    private readonly float _maxTetherDistance = 50f;
 
     private void Awake()
     {
@@ -41,17 +42,22 @@ public class ShipTether : MonoBehaviour
 
             if (_connectedRigidbody == Locator.GetPlayerBody())
             {
-                if (Keyboard.current.rightBracketKey.isPressed)
+                float tetherDist = (_connectedRigidbody.transform.TransformPoint(_connectedAnchor) - transform.TransformPoint(_anchor)).sqrMagnitude;
+                if (OWInput.IsPressed(InputLibrary.toolOptionDown) && _joint.minDistance < _maxTetherDistance)
                 {
                     _joint.minDistance += Time.deltaTime * 5f;
+                    // Play reel noise
                 }
-                else if (Keyboard.current.leftBracketKey.isPressed)
+                else if (tetherDist < Mathf.Pow(_joint.minDistance + 2f, 2) && OWInput.IsPressed(InputLibrary.toolOptionUp) && _joint.minDistance > _minTetherDistance)
                 {
                     _joint.minDistance -= Time.deltaTime * 5f;
+                    // Play reel noise
                 }
-                else if (Keyboard.current.backslashKey.wasPressedThisFrame)
+
+                if (OWInput.IsPressed(InputLibrary.toolActionSecondary, 0.8f))
                 {
                     _hook.DisconnectTether();
+                    // Play untether noise
                 }
             }
         }
@@ -67,6 +73,8 @@ public class ShipTether : MonoBehaviour
         _connectedAnchor = connectedOffset;
         _anchor = anchorOffset;
 
+        bool attachedToPlayer = false;
+
         if (_connectedRigidbody != GetComponentInParent<OWRigidbody>())
         {
             _joint = _rigidbody.gameObject.AddComponent<SpringJoint>();
@@ -74,6 +82,7 @@ public class ShipTether : MonoBehaviour
 
             if (connectedBody == Locator.GetPlayerBody())
             {
+                attachedToPlayer = true;
                 connectedBody.MoveToPosition(connectedBody.transform.position);
                 _joint.massScale = 250f;
             }
@@ -121,6 +130,11 @@ public class ShipTether : MonoBehaviour
         }
 
         UpdateTetherLine();
+
+        if (attachedToPlayer)
+        {
+            GlobalMessenger.FireEvent("AttachPlayerTether");
+        }
     }
 
     public void DisconnectTether()
@@ -128,6 +142,7 @@ public class ShipTether : MonoBehaviour
         if (!_tethered) return;
 
         _tethered = false;
+        bool attachedToPlayer = _connectedRigidbody == Locator.GetPlayerBody();
         if (!_tetheredToSelf)
         {
             DestroyImmediate(_joint);
@@ -145,6 +160,11 @@ public class ShipTether : MonoBehaviour
         {
             _connectedHook.DisconnectFromHook();
             _connectedHook = null;
+        }
+
+        if (attachedToPlayer)
+        {
+            GlobalMessenger.FireEvent("DetachPlayerTether");
         }
     }
 

@@ -31,7 +31,7 @@ public class ShipEnhancements : ModBehaviour
     public float maxSpinSpeed = 24f;
     public bool probeDestroyed;
     public bool engineOn;
-    public ShipTether playerTether;
+    public Tether playerTether;
 
     public UITextType probeLauncherName { get; private set; }
     public ItemType portableCampfireType { get; private set; }
@@ -623,6 +623,8 @@ public class ShipEnhancements : ModBehaviour
                     hookItem.transform.localScale = Vector3.one * 0.7f;
                 });
             }
+
+            Locator.GetPlayerBody().gameObject.AddComponent<TetherPromptController>();
         }
         if ((bool)Settings.addShipSignal.GetProperty())
         {
