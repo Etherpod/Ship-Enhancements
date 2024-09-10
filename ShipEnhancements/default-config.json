@@ -29,12 +29,6 @@
       "value": false,
       "tooltip": "Disables the gravity crystal inside the ship."
     },
-    "disableEjectButton": {
-      "title": "Disable Eject Button",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Disables the eject button in the cockpit."
-    },
     "disableHeadlights": {
       "title": "Disable Headlights",
       "type": "toggle",
@@ -47,11 +41,23 @@
       "value": false,
       "tooltip": "Disables the landing camera. Good luck making a proper landing!"
     },
+    "disableEjectButton": {
+      "title": "Disable Eject Button",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Disables the eject button in the cockpit."
+    },
     "disableShipLights": {
       "title": "Disable Ship Lights",
       "type": "toggle",
       "value": false,
       "tooltip": "Turns off both the interior and exterior lighting fixtures."
+    },
+    "disableShipOxygen": {
+      "title": "Disable Ship Oxygen",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Removes all of the oxygen from your ship. Don't stay out in space for too long!"
     },
     "disableScoutRecall": {
       "title": "Disable Ship Scout Recall",
@@ -65,17 +71,17 @@
       "value": false,
       "tooltip": "Removes your ability to launch the scout with the ship."
     },
-    "disableShipOxygen": {
-      "title": "Disable Ship Oxygen",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Removes all of the oxygen from your ship. Don't stay out in space for too long!"
-    },
     "disableShipRepair": {
       "title": "Disable Ship Repairing",
       "type": "toggle",
       "value": false,
       "tooltip": "Removes your ability to repair your ship. Be careful out there!"
+    },
+    "disableDamageIndicators": {
+      "title": "Disable Damage Indicators",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Removes all indicators that tell you the ship is damaged. Also disables the master alarm. Keep an eye or four on the reactor!"
     },
     "disableAirAutoRoll": {
       "title": "Disable Air Auto Roll",
@@ -89,6 +95,12 @@
       "value": false,
       "tooltip": "Allows your ship to rotate freely in water."
     },
+    "disableRotationSpeedLimit": {
+      "title": "Disable Rotation Speed Limit",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Lets you spin your ship as quickly as you want, though spinning too fast may tear your ship apart. DO NOT ENABLE IF YOU ARE PRONE TO MOTION SICKNESS."
+    },
     "disableReferenceFrame": {
       "title": "Disable Lock-on",
       "type": "toggle",
@@ -100,18 +112,6 @@
       "type": "toggle",
       "value": false,
       "tooltip": "Removes the markers that tell you the location of your ship, your scout, and any marked locations in the ship log. Try not to lose your ship."
-    },
-    "disableRotationSpeedLimit": {
-      "title": "Disable Rotation Speed Limit",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Lets you spin your ship as quickly as you want, though spinning too fast may tear your ship apart. DO NOT ENABLE IF YOU ARE PRONE TO MOTION SICKNESS."
-    },
-    "disableDamageIndicators": {
-      "title": "Disable Damage Indicators",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Removes all indicators that tell you the ship is damaged. Also disables the master alarm. Keep an eye or four on the reactor!"
     },
 
     "Adjust Ship Functions": {
@@ -141,6 +141,24 @@
       "type": "number",
       "value": 1,
       "tooltip": "Larger numbers increase the amount of fuel that drains when the fuel tank is damaged in addition to the regular drain rate."
+    },
+    "oxygenRefillMultiplier": {
+      "title": "Oxygen Refill Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers increase the speed at which the ship oxygen refills."
+    },
+    "fuelTransferMultiplier": {
+      "title": "Fuel Transfer Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers increase the amount of fuel added to the ship when transferring fuel, and also increase the amount of fuel subtracted when refueling the jetpack."
+    },
+    "idleFuelConsumptionMultiplier": {
+      "title": "Idle Fuel Consumption Multiplier",
+      "type": "number",
+      "value": 0,
+      "tooltip": "Larger numbers increase the rate at which your ship's fuel drains while it is on. Intended to be used with the Engine Switch."
     },
     "shipDamageMultiplier": {
       "title": "Damage Multiplier",
@@ -180,24 +198,6 @@
         "Random"
       ]
     },
-    "fuelTransferMultiplier": {
-      "title": "Fuel Transfer Multiplier",
-      "type": "number",
-      "value": 1,
-      "tooltip": "Larger numbers increase the amount of fuel added to the ship when transferring fuel, and also increase the amount of fuel subtracted when refueling the jetpack."
-    },
-    "oxygenRefillMultiplier": {
-      "title": "Oxygen Refill Multiplier",
-      "type": "number",
-      "value": 1,
-      "tooltip": "Larger numbers increase the speed at which the ship oxygen refills."
-    },
-    "temperatureResistanceMultiplier": {
-      "title": "Temperature Resistance Multiplier",
-      "type": "number",
-      "value": 1,
-      "tooltip": "Larger numbers increase the time it takes for the ship to start taking damage in extreme temperatures."
-    },
     "atmosphereAngularDragMultiplier": {
       "title": "Atmosphere Angular Drag Multiplier",
       "type": "number",
@@ -209,6 +209,12 @@
       "type": "number",
       "value": 1,
       "tooltip": "Larger numbers make your ship harder to turn while in space. Set to zero to make your ship spin forever. WARNING: Values below 1 may cause motion sickness."
+    },
+    "temperatureResistanceMultiplier": {
+      "title": "Temperature Resistance Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers increase the time it takes for the ship to start taking damage in extreme temperatures."
     },
     "shipExplosionMultiplier": {
       "title": "Ship Explosion Multiplier",
@@ -227,12 +233,6 @@
       "type": "number",
       "value": 0,
       "tooltip": "Adds a delay while piloting the ship between when you press the button and when the ship recieves the input. Now you can pretend you're playing online!"
-    },
-    "idleFuelConsumptionMultiplier": {
-      "title": "Idle Fuel Consumption Multiplier",
-      "type": "number",
-      "value": 0,
-      "tooltip": "Larger numbers increase the rate at which your ship's fuel drains while it is on. Intended to be used with the Engine Switch."
     },
 
     "Add Ship Functions": {
@@ -257,23 +257,17 @@
       "value": false,
       "tooltip": "Drains the ship's fuel when you refill your jetpack in the ship."
     },
-    "enableScoutLauncherComponent": {
-      "title": "Add Scout Launcher Component",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Turns the ship's scout launcher into a fully functioning component."
-    },
-    "enableManualScoutRecall": {
-      "title": "Enable Manual Scout Recall",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Removes your ability to recall the scout with the handheld scout launcher. Don't worry, you can still use the ship, as long as it's not broken."
-    },
     "enableAutoHatch": {
       "title": "Enable Automatic Hatch",
       "type": "toggle",
       "value": false,
       "tooltip": "Automatically closes the hatch when you leave the ship."
+    },
+    "extraNoise": {
+      "title": "Enable Extra Noise",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Makes things such as the master alarm detectable by noise-sensing things."
     },
     "enableShipItemPlacement": {
       "title": "Enable Ship Item Placement",
@@ -281,26 +275,14 @@
       "value": false,
       "tooltip": "Lets you drop items inside of the ship and live out your hoarding dreams."
     },
-    "enableGravityLandingGear": {
-      "title": "Enable Gravity Landing Gear",
+    "enableManualScoutRecall": {
+      "title": "Enable Manual Scout Recall",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds a switch to the cockpit to enable gravity-powered landing gear."
-    },
-    "enableThrustModulator": {
-      "title": "Enable Thrust Modulator",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Adds an interface to the cockpit for decreasing your ship's maximum thrust."
-    },
-    "enablePersistentInput": {
-      "title": "Enable Persistent Input",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Adds a switch to the cockpit to enable persistent input, which holds your last input after you exit the flight console."
+      "tooltip": "Brings back the good old days where you had to go retrieve your Little Scout by hand. If you lose your scout to the depths of space, don't worry; you can still recall it with the ship."
     },
     "temperatureZonesAmount": {
-      "title": "Temperature Zones",
+      "title": "Add Temperature Zones",
       "type": "selector",
       "value": "None",
       "options": [
@@ -328,11 +310,11 @@
       "value": false,
       "tooltip": "Makes the ship thruster flames do damage when you stand in them."
     },
-    "extraNoise": {
-      "title": "Enable Extra Noise",
+    "enableScoutLauncherComponent": {
+      "title": "Add Scout Launcher Component",
       "type": "toggle",
       "value": false,
-      "tooltip": "Makes things such as the master alarm detectable by noise-sensing things."
+      "tooltip": "Turns the ship's scout launcher into a fully functioning component."
     },
     "addShipSignal": {
       "title": "Add Ship Signal",
@@ -346,17 +328,35 @@
       "value": false,
       "tooltip": "Adds a portable campfire to the ship near your suit. Unpack it anywhere you'd like and roast a marshmallow!"
     },
-    "addEngineSwitch": {
-      "title": "Add Engine Switch",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Adds a switch to the cockpit that turns on the ship. While the ship is on it will slowly drain fuel, so make sure you turn it off before you leave!"
-    },
     "addTether": {
       "title": "Add Ship Tether",
       "type": "toggle",
       "value": false,
       "tooltip": "Adds a few hooks inside the ship that you can place anywhere you want. Interact with it to tether yourself to it, and interact with another to create a line between them."
+    },
+    "enableGravityLandingGear": {
+      "title": "Add Gravity Landing Gear",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Adds a switch to the cockpit to enable gravity-powered landing gear."
+    },
+    "enableThrustModulator": {
+      "title": "Add Thrust Modulator",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Adds an interface to the cockpit for decreasing your ship's maximum thrust."
+    },
+    "enablePersistentInput": {
+      "title": "Add Persistent Input",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Adds a switch to the cockpit to enable persistent input, which holds your last input after you exit the flight console."
+    },
+    "addEngineSwitch": {
+      "title": "Add Engine Switch",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Adds a switch to the cockpit that turns on the ship. While the ship is on it will slowly drain fuel, so make sure you turn it off before you leave!"
     },
 
     "Decoration": {
