@@ -37,6 +37,8 @@ public abstract class CockpitSwitch : ElectricalComponent
         _interactReceiver.OnLoseFocus += OnLoseFocus;
 
         _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
+
+        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
     }
 
     protected virtual void Start()
@@ -155,10 +157,17 @@ public abstract class CockpitSwitch : ElectricalComponent
         _buttonPanel.UpdateFocusedButtons(false);
     }
 
+    private void OnShipSystemFailure()
+    {
+        enabled = false;
+        _interactReceiver.DisableInteraction();
+    }
+
     protected void OnDestroy()
     {
         _interactReceiver.OnPressInteract -= FlipSwitch;
         _interactReceiver.OnGainFocus -= OnGainFocus;
         _interactReceiver.OnLoseFocus -= OnLoseFocus;
+        GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
     }
 }

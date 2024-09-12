@@ -822,12 +822,17 @@ public static class PatchClass
     #region DisableHUDMarkers
     [HarmonyPrefix]
     [HarmonyPatch(typeof(CanvasMarker), nameof(CanvasMarker.SetVisibility))]
-    public static bool DisableHUDMarker(bool value)
+    public static bool DisableHUDMarker(CanvasMarker __instance, bool value)
     {
         if (!(bool)disableMapMarkers.GetProperty()) return true;
 
-        if (value && (ShipLogEntryHUDMarker.s_entryLocation == null || !ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField()
-            || (ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField() && Locator.GetCloakFieldController().isPlayerInsideCloak)))
+        bool tryEnable = value;
+        bool isLogMarker = ShipLogEntryHUDMarker.s_entryLocation != null && __instance._visualTarget == ShipLogEntryHUDMarker.s_entryLocation.GetTransform();
+        bool logMarkerOutsideCloak = !isLogMarker || !ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField();
+        bool playerInCloak = Locator.GetCloakFieldController().isPlayerInsideCloak;
+        bool logMarkerInCloak = isLogMarker && ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField();
+
+        if (tryEnable && (logMarkerOutsideCloak || (playerInCloak && logMarkerInCloak)))
         {
             return false;
         }
@@ -839,8 +844,12 @@ public static class PatchClass
     public static void DisableMapMarker(MapMarker __instance)
     {
         if (!(bool)disableMapMarkers.GetProperty() || !__instance) return;
-        if (__instance.GetComponent<ShipLogEntryHUDMarker>() && !Locator.GetCloakFieldController().isPlayerInsideCloak
-            && ShipLogEntryHUDMarker.s_entryLocation != null && ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField())
+
+        bool isLogMarker = __instance.GetComponent<ShipLogEntryHUDMarker>() != null;
+        bool playerInCloak = Locator.GetCloakFieldController().isPlayerInsideCloak;
+        bool markerInCloak = ShipLogEntryHUDMarker.s_entryLocation != null && ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField();
+
+        if (isLogMarker && !playerInCloak && markerInCloak)
         {
             return;
         }
@@ -853,8 +862,12 @@ public static class PatchClass
     public static bool CancelMapMarkerEnable(MapMarker __instance)
     {
         if (!(bool)disableMapMarkers.GetProperty() || !__instance) return true;
-        if (__instance.GetComponent<ShipLogEntryHUDMarker>() && !Locator.GetCloakFieldController().isPlayerInsideCloak
-            && ShipLogEntryHUDMarker.s_entryLocation != null && ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField())
+
+        bool isLogMarker = __instance.GetComponent<ShipLogEntryHUDMarker>() != null;
+        bool playerInCloak = Locator.GetCloakFieldController().isPlayerInsideCloak;
+        bool markerInCloak = ShipLogEntryHUDMarker.s_entryLocation != null && ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField();
+
+        if (isLogMarker && !playerInCloak && markerInCloak)
         {
             return true;
         }
@@ -867,8 +880,11 @@ public static class PatchClass
     public static bool DisableInsideCloak(ShipLogEntryHUDMarker __instance)
     {
         if (!(bool)disableMapMarkers.GetProperty()) return true;
-        if (ShipLogEntryHUDMarker.s_entryLocation != null
-            && ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField() && Locator.GetCloakFieldController().isPlayerInsideCloak)
+
+        bool markerInCloak = ShipLogEntryHUDMarker.s_entryLocation != null && ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField();
+        bool playerInCloak = Locator.GetCloakFieldController().isPlayerInsideCloak;
+
+        if (playerInCloak && markerInCloak)
         {
             __instance._isVisible = false;
             __instance._canvasMarker.SetVisibility(false);
@@ -944,6 +960,27 @@ public static class PatchClass
         }
         __instance.enabled = false;
         return false;
+    }
+    #endregion
+
+    #region FixTankEffects
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(DamageEffect), nameof(DamageEffect.OnEnable))]
+    public static void TryDisableFuelOxygenTankEffects(DamageEffect __instance)
+    {
+        bool oxygen = __instance.GetComponent<ShipOxygenTankComponent>() != null;
+        bool fuel = __instance.GetComponent<ShipFuelTankComponent>() != null;
+
+        if (oxygen && (ShipEnhancements.Instance.oxygenDepleted || (bool)disableShipOxygen.GetProperty()))
+        {
+            __instance._particleSystem.Stop();
+            __instance._particleAudioSource.Stop();
+        }
+        else if (fuel && ShipEnhancements.Instance.fuelDepleted)
+        {
+            __instance._particleSystem.Stop();
+            __instance._particleAudioSource.Stop();
+        }
     }
     #endregion
 
@@ -1421,14 +1458,13 @@ public static class PatchClass
     {
         bool recallOrLaunchingDisabled = (bool)disableScoutRecall.GetProperty() || (bool)disableScoutLaunching.GetProperty();
         bool manualScoutRecall = (bool)enableManualScoutRecall.GetProperty();
-        bool scoutLauncherComponent = (bool)enableScoutLauncherComponent.GetProperty();
 
-        if (!recallOrLaunchingDisabled && !manualScoutRecall && !scoutLauncherComponent)
+        if (!recallOrLaunchingDisabled && !manualScoutRecall)
         {
             return true;
         }
 
-        if (recallOrLaunchingDisabled && ShipProbePickupVolume.probeInShip)
+        if ((recallOrLaunchingDisabled || manualScoutRecall) && ShipProbePickupVolume.probeInShip)
         {
             if (OWInput.IsNewlyPressed(InputLibrary.toolActionPrimary, InputMode.All))
             {
