@@ -314,11 +314,13 @@ public class ShipEnhancements : ModBehaviour
         Material material1 = (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillageCabin_Recolored_mat.mat");
         Material material2 = (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillageMetal_Recolored_mat.mat");
         Material material3 = (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillagePlanks_Recolored_mat.mat");
-        List<Material> materials = [.. GameObject.Find("Pointlight_HEA_ShipCockpit").GetComponent<LightmapController>()._materials];
+        Material material4 = (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_CampsiteProps_Recolored_mat.mat");
+        Transform cockpitLight = Locator.GetShipTransform().Find("Module_Cockpit/Lights_Cockpit/Pointlight_HEA_ShipCockpit");
+        List<Material> materials = [.. cockpitLight.GetComponent<LightmapController>()._materials];
         materials.Add(material1);
         materials.Add(material2);
         materials.Add(material3);
-        GameObject cockpitLight = GameObject.Find("Pointlight_HEA_ShipCockpit");
+        materials.Add(material4);
         cockpitLight.GetComponent<LightmapController>()._materials = [.. materials];
 
         _shipLoaded = true;
@@ -332,6 +334,9 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)Settings.disableEjectButton.GetValue())
         {
             Locator.GetShipBody().GetComponentInChildren<ShipEjectionSystem>().GetComponent<InteractReceiver>().DisableInteraction();
+            GameObject ejectButtonTape = LoadPrefab("Assets/ShipEnhancements/EjectButtonTape.prefab");
+            AssetBundleUtilities.ReplaceShaders(ejectButtonTape);
+            Instantiate(ejectButtonTape, Locator.GetShipBody().transform.Find("Module_Cockpit/Geo_Cockpit"));
         }
         if ((bool)Settings.disableHeadlights.GetValue())
         {
