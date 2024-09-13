@@ -8,6 +8,8 @@ public class PortableCampfire : Campfire
     private MeshCollider _collider;
     [SerializeField]
     private FluidDetector _fluidDetector;
+    [SerializeField]
+    private AudioClip _waterExtinguishAudio;
 
     private ScreenPrompt _cancelPrompt;
     private bool _extinguished = true;
@@ -62,6 +64,7 @@ public class PortableCampfire : Campfire
             {
                 StopSleeping();
             }
+            _oneShotAudio.PlayOneShot(_waterExtinguishAudio);
             SetState(State.UNLIT);
         }
     }
