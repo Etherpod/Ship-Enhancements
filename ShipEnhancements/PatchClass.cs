@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reflection;
+using System.Security.Policy;
 using HarmonyLib;
 using UnityEngine;
 using static ShipEnhancements.ShipEnhancements.Settings;
@@ -1709,6 +1710,21 @@ public static class PatchClass
     public static void SetBaseRoastingStickMaxZ(RoastingStickController __instance)
     {
         baseRoastingStickMaxZ = __instance._stickMaxZ;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Campfire), nameof(Campfire.OnPressInteract))]
+    public static bool CancelLightWhenInWater(Campfire __instance)
+    {
+        if (__instance is PortableCampfire)
+        {
+            if (!(__instance as PortableCampfire).IsOutsideWater())
+            {
+                __instance._interactVolume.ResetInteraction();
+                return false;
+            }
+        }
+        return true;
     }
     #endregion
 

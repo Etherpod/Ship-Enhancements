@@ -6,6 +6,8 @@ public class PortableCampfire : Campfire
 {
     [SerializeField]
     private MeshCollider _collider;
+    [SerializeField]
+    private FluidDetector _fluidDetector;
 
     private ScreenPrompt _cancelPrompt;
     private bool _extinguished = true;
@@ -15,6 +17,7 @@ public class PortableCampfire : Campfire
     private float _reactorHeatMeter;
     private float _reactorHeatMeterLength;
     private bool _shipDestroyed;
+    private bool _lastWaterState = false;
 
     public override void Awake()
     {
@@ -39,6 +42,27 @@ public class PortableCampfire : Campfire
                 _reactorHeatMeterLength = Random.Range(10f, 30f);
                 Locator.GetShipBody().GetComponentInChildren<ShipReactorComponent>().SetDamaged(true);
             }
+        }
+        if (_extinguished)
+        {
+            bool outsideWater = IsOutsideWater();
+            if (_lastWaterState != outsideWater)
+            {
+                _lastWaterState = outsideWater;
+                _interactVolume._screenPrompt.SetDisplayState(outsideWater ? ScreenPrompt.DisplayState.Normal : ScreenPrompt.DisplayState.GrayedOut);
+            }
+        }
+        else if (!IsOutsideWater())
+        {
+            if (_isPlayerRoasting)
+            {
+                StopRoasting();
+            }
+            else if (_isPlayerSleeping)
+            {
+                StopSleeping();
+            }
+            SetState(State.UNLIT);
         }
     }
 
@@ -79,6 +103,11 @@ public class PortableCampfire : Campfire
     public void SetExtinguished(bool value)
     {
         _extinguished = value;
+    }
+
+    public bool IsOutsideWater()
+    {
+        return !_fluidDetector.InFluidType(FluidVolume.Type.WATER);
     }
 
     public void UpdatePrompt()
