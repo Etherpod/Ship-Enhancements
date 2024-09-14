@@ -19,7 +19,7 @@ public class PortableCampfire : Campfire
     private float _reactorHeatMeter;
     private float _reactorHeatMeterLength;
     private bool _shipDestroyed;
-    private bool _lastWaterState = false;
+    private bool _lastOutsideWaterState = false;
 
     public override void Awake()
     {
@@ -48,9 +48,10 @@ public class PortableCampfire : Campfire
         if (_extinguished)
         {
             bool outsideWater = IsOutsideWater();
-            if (_lastWaterState != outsideWater)
+            if (_lastOutsideWaterState != outsideWater)
             {
-                _lastWaterState = outsideWater;
+                ShipEnhancements.WriteDebugMessage("Change state to " + outsideWater);
+                _lastOutsideWaterState = outsideWater;
                 _interactVolume._screenPrompt.SetDisplayState(outsideWater ? ScreenPrompt.DisplayState.Normal : ScreenPrompt.DisplayState.GrayedOut);
             }
         }
@@ -72,6 +73,8 @@ public class PortableCampfire : Campfire
     public void PackUp()
     {
         UpdateInsideShip(false);
+        SetState(State.UNLIT, true);
+        _lastOutsideWaterState = true;
         GetComponentInParent<PortableCampfireItem>().TogglePackUp(true);
     }
 
@@ -132,6 +135,11 @@ public class PortableCampfire : Campfire
     {
         SetState(State.UNLIT);
         _shipDestroyed = true;
+    }
+
+    private void OnEnable()
+    {
+        _fluidDetector.RebuildActiveLayers();
     }
 
     public override void OnDestroy()
