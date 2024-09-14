@@ -8,6 +8,7 @@ public class GravityLandingGearSwitch : CockpitSwitch
     {
         base.Awake();
         _buttonPanel.SetGravityLandingGearActive((bool)enableGravityLandingGear.GetProperty());
+        _enabledInShip = (bool)enableGravityLandingGear.GetProperty();
     }
 
     protected override void OnFlipSwitch(bool state)

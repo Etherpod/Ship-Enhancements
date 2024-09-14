@@ -28,6 +28,7 @@ public abstract class CockpitSwitch : ElectricalComponent
     protected ElectricalSystem _electricalSystem;
     protected bool _wasDisrupted = false;
     protected float _baseLightIntensity;
+    protected bool _enabledInShip;
 
     public override void Awake()
     {
@@ -37,12 +38,18 @@ public abstract class CockpitSwitch : ElectricalComponent
         _interactReceiver.OnLoseFocus += OnLoseFocus;
 
         _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
-
-        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
     }
 
     protected virtual void Start()
     {
+        if (!_enabledInShip)
+        {
+            enabled = false;
+            return;
+        }
+
+        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+
         _renderer = GetComponent<OWRenderer>();
 
         _interactReceiver.ChangePrompt("Turn on " + _label);

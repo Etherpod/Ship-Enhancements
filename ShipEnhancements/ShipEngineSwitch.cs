@@ -56,6 +56,7 @@ public class ShipEngineSwitch : MonoBehaviour
         else
         {
             _buttonPanel.SetEngineSwitchActive(false);
+            enabled = false;
             return;
         }
 
@@ -80,6 +81,8 @@ public class ShipEngineSwitch : MonoBehaviour
 
     private void Start()
     {
+        if (!(bool)addEngineSwitch.GetProperty()) return;
+
         _interactReceiver.SetPromptText(UITextType.HoldPrompt);
         _interactReceiver.ChangePrompt("Start engine");
         _baseIndicatorLightIntensity = _powerIndicatorLight.intensity;

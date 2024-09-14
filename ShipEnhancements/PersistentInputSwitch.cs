@@ -10,13 +10,17 @@ public class PersistentInputSwitch : CockpitSwitch
     {
         base.Awake();
         _buttonPanel.SetPersistentInputActive((bool)enablePersistentInput.GetProperty());
+        _enabledInShip = (bool)enablePersistentInput.GetProperty();
     }
 
     protected override void Start()
     {
         base.Start();
-        _persistentInput = Locator.GetShipBody().GetComponent<ShipPersistentInput>();
-        _persistentInput.SetInputEnabled(_on && !SELocator.GetShipDamageController().IsElectricalFailed());
+        if (_enabledInShip)
+        {
+            _persistentInput = Locator.GetShipBody().GetComponent<ShipPersistentInput>();
+            _persistentInput.SetInputEnabled(_on && !SELocator.GetShipDamageController().IsElectricalFailed());
+        }
     }
 
     protected override void OnFlipSwitch(bool state)

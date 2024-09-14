@@ -35,6 +35,7 @@ public class ThrustModulatorController : ElectricalComponent
         else
         {
             _buttonPanel.SetThrustModulatorActive(false);
+            enabled = false;
             return;
         }
 
@@ -55,6 +56,7 @@ public class ThrustModulatorController : ElectricalComponent
 
     private void Start()
     {
+        if (!(bool)enableThrustModulator.GetProperty()) return;
         UpdateModulatorDisplay(5);
     }
 
