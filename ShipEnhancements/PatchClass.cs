@@ -2077,5 +2077,20 @@ public static class PatchClass
 
         return false;
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(AudioSignal), nameof(AudioSignal.UpdateSignalStrength))]
+    public static bool RemoveSignalFromShip(AudioSignal __instance)
+    {
+        if (__instance.GetName() == ShipEnhancements.Instance.shipSignalName && (OWInput.IsInputMode(InputMode.ShipCockpit) 
+            || (SELocator.GetShipDamageController()?.IsSystemFailed() ?? false) || PlayerState.IsInsideShip()))
+        {
+            __instance._canBePickedUpByScope = false;
+            __instance._signalStrength = 0f;
+            __instance._degreesFromScope = 180f;
+            return false;
+        }
+        return true;
+    }
     #endregion
 }

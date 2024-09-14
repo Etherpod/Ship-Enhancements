@@ -357,7 +357,7 @@ public static class SettingsPresets
         { "atmosphereAngularDragMultiplier", 1.5f },
         { "spaceAngularDragMultiplier", 1f },
         { "disableRotationSpeedLimit", false },
-        { "gravityDirection", "Right" },
+        { "gravityDirection", "Random" },
         { "disableScoutRecall", false },
         { "disableScoutLaunching", false },
         { "enableScoutLauncherComponent", true },
