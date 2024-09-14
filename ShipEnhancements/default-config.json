@@ -441,18 +441,6 @@
       "type": "toggle",
       "value": true,
       "tooltip": "Notifies you in the ship about various things, such as your fuel or oxygen being low."
-    },
-    "zeroGravityCockpitFreeLook": {
-      "title": "Zero-G Cockpit Free-Look Fix",
-      "type": "toggle",
-      "value": true,
-      "tooltip": "Fixes a bug where you are unable to look around freely while piloting the ship in zero gravity."
-    },
-    "shipIgnitionCancelFix": {
-      "title": "Ship Ignition Cancel Fix",
-      "type": "toggle",
-      "value": true,
-      "tooltip": "Fixes a bug where the ship continues the liftoff sequence if you leave the flight console while holding the upwards thrust button."
     }
   }
 }

@@ -1,3 +1,5 @@
+![Ship Enhancements banner](banner.png)
+
 Ship Enhancements adds way too many options for changing the ship and things relating to the ship. Experiment and have fun!
 
 # Feature Overview
@@ -25,7 +27,7 @@ Ship Enhancements adds way too many options for changing the ship and things rel
 - **Fuel Tank Drain Multiplier**: Larger numbers increase the amount of fuel that drains when the ship's fuel tank is damaged.
 - **Oxygen Refill Multiplier**: Larger numbers increase the speed at which your ship's oxygen tank refills when near an oxygen source.
 - **Fuel Transfer Multiplier**: Larger numbers increase the amount of fuel that is subtracted when refueling your jetpack, and increase the amount of fuel that is added when transferring fuel to the ship.
-- **Idle Fuel Consumption Multiplier**: Larger numbers increase 
+- **Idle Fuel Consumption Multiplier**: Larger numbers increase how quickly your fuel drains over time. If the Engine Switch is enabled, it will not drain fuel while the ship is off.
 - **Damage Multiplier**: Larger numbers increase the damage done to the ship from impacts.
 - **Damage Speed Multiplier**: Larger numbers increase the speed you need to be traveling at before taking damage. Set this to something really small to blow up your ship when you touch something.
 - **Temperature Damage Multiplier**: Larger numbers increase the damage done to your ship inside high or low temperature areas.
@@ -38,13 +40,13 @@ Ship Enhancements adds way too many options for changing the ship and things rel
 ## Add Ship Functions
 - **Oxygen Refill**: Refills the ship's oxygen tank when it gets close to trees or enters an oxygen-filled atmosphere.
 - **Fuel Transfer**: Lets you transfer your jetpack fuel to the ship's fuel tank to refill it.
-- **Jetpack Refuel Drain**: Drains the ship's fuel reserve when you refuel your jetpack. The amount drained is the same as the amount gained if you transfer your fuel back to the ship.
+- **Jetpack Refuel Drain**: Drains the ship's fuel reserve when you refuel your jetpack. The amount drained is the same as the amount gained if you transfer your fuel back to the ship, meaning you can't duplicate fuel.
 - **Automatic Hatch**: Automatically closes the hatch when you leave the ship.
 - **Extra Noise**: Makes noisy parts of the ship, like the master alarm, alert things that can hear you.
-- **Ship Item Placement**: Lets you drop items inside of your ship to bring with you. If you want to hoard items, check out the mod Hoarder's Ship, which does a much better job of this.
-- **Manual Scout Recall**: Brings you back to the days when Little Scouts didn't have warping technology. If you shoot your scout somewhere, you'll have to go over and pick it up to use it again. If you accidentally launch it into deep space, don't worry; the ship can still recall it. You'll have to go get it from the top of the ship, though.
-- **Temperature Zones**: Implements a temperature mechanic for the unused temperature dial in the ship. High and low temperature zones are added around the solar system that increase or decrease your ship's temperature.
-- **Hull Temperature Damage**: Damages your ship over time in extreme temperatures, like near the Sun or on the dark side of the Interloper. Your temperature dial will start flashing if it's hot or cold enough to take damage.
+- **Ship Item Placement**: Lets you place items inside or on top of your ship.
+- **Manual Scout Recall**: Brings you back to the days when Little Scouts didn't have warping technology. If you shoot your scout somewhere, you'll have to go over and pick it up to use it again. If you accidentally launch it into deep space, don't worry; the ship can still recall it, and you can go retrieve it from the top of the ship in the scout launcher.
+- **Temperature Zones**: Implements a temperature mechanic for the unused temperature dial in the ship. High and low temperature zones are added around the solar system that increase or decrease your ship's hull temperature. The longer you allow your hull's temperature to fluctuate, the more likely it is for your ship to take damage.
+- **Hull Temperature Damage**: Damages your ship over time in extreme temperatures, like near the Sun or on the dark side of the Interloper. Your temperature dial will start flashing if it's hot or cold enough to start taking damage.
 - **Component Temperature Damage**: Similar to hull temperature damage, but it damages random components instead.
 - **Hazardous Thrusters**: Makes your ship's thruster flames actually damage you. Good luck finding out how to get near them in the first place.
 - **Scout Launcher Component**: Turns the ship's scout launcher into a fully functioning ship component. If you damage it, you won't be able to launch or recall your scout from the ship until you repair it.
@@ -65,8 +67,6 @@ Haven't you ever wished your ship had a little more color?
 These are all enabled by default.
 - **Keep Helmet On**: When there is no oxygen present, this prevents the game from removing your helmet when doing things such as piloting the ship or roasting a marshmallow at a campfire.
 - **Show Warning Notifications**: Notifies you in the ship when resources are low or when the outside conditions are becoming dangerous.
-- **Zero-G Cockpit Free-Look Fix**: Fixes a bug where you are unable to use free look in the cockpit when there is no gravity and no oxygen. I'm not sure why you would want to turn this off, but you have the option.
-- **Ship Ignition Cancel Fix**: Fixes a bug where the ship will continue the ignition sequence if you unbuckle from the ship while still holding the upwards thrust button. You can turn it off if you want to, maybe it was your favorite feature from the game or something.
 
 ## Presets
 In case there are too many settings to deal with, there are some pre-made presets for you to use. The settings can still be meddled with after choosing one.

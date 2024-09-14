@@ -284,7 +284,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(PlayerCameraController), nameof(PlayerCameraController.UpdateInput))]
     public static bool AllowZeroGCockpitFreeLook(PlayerCameraController __instance, float deltaTime)
     {
-        if (!(bool)zeroGravityCockpitFreeLook.GetProperty()) return true;
+        //if (!(bool)zeroGravityCockpitFreeLook.GetProperty()) return true;
 
         bool flag = __instance._shipController != null && __instance._shipController.AllowFreeLook() && OWInput.IsPressed(InputLibrary.freeLook, 0f);
         bool flag2 = OWInput.IsInputMode(InputMode.Character | InputMode.ScopeZoom | InputMode.NomaiRemoteCam | InputMode.PatchingSuit);
@@ -1874,7 +1874,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.ExitFlightConsole))]
     public static void IgnitionCancelFix()
     {
-        if ((bool)shipIgnitionCancelFix.GetProperty())
+        /*if ((bool)shipIgnitionCancelFix.GetProperty())
         {
             ShipThrusterController thrustController = Locator.GetShipBody().GetComponent<ShipThrusterController>();
             if (thrustController && thrustController._isIgniting)
@@ -1882,6 +1882,12 @@ public static class PatchClass
                 thrustController._isIgniting = false;
                 GlobalMessenger.FireEvent("CancelShipIgnition");
             }
+        }*/
+        ShipThrusterController thrustController = Locator.GetShipBody().GetComponent<ShipThrusterController>();
+        if (thrustController && thrustController._isIgniting)
+        {
+            thrustController._isIgniting = false;
+            GlobalMessenger.FireEvent("CancelShipIgnition");
         }
     }
     #endregion
