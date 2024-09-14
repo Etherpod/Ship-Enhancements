@@ -25,7 +25,7 @@ public static class SELocator
         {
             _shipOxygenDetector = Locator.GetShipDetector().gameObject.AddComponent<OxygenDetector>();
         }
-        if ((bool)hullTemperatureDamage.GetValue() || (bool)componentTemperatureDamage.GetValue())
+        if (temperatureZonesAmount.GetValue().ToString() != "None")
         {
             _shipTemperatureDetector = Locator.GetShipDetector().gameObject.AddComponent<ShipTemperatureDetector>();
         }

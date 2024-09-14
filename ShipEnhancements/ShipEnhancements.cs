@@ -95,9 +95,7 @@ public class ShipEnhancements : ModBehaviour
         keepHelmetOn,
         showWarningNotifications,
         shipExplosionMultiplier,
-        //zeroGravityCockpitFreeLook,
         shipBounciness,
-        //shipIgnitionCancelFix,
         enablePersistentInput,
         shipInputLatency,
         addEngineSwitch,
@@ -403,24 +401,25 @@ public class ShipEnhancements : ModBehaviour
             oxygenDepleted = true;
             Locator.GetShipTransform().Find("Module_Cockpit/Props_Cockpit/Props_HEA_ShipFoliage").gameObject.SetActive(false);
         }
-        if (Settings.temperatureZonesAmount.GetValue().ToString() == "Sun")
-        {
-            GameObject sun = GameObject.Find("Sun_Body");
-            if (sun != null)
-            {
-                GameObject sunTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Sun.prefab");
-                Instantiate(sunTempZone, sun.transform.Find("Sector_SUN"));
-            }
-        }
-        else if (Settings.temperatureZonesAmount.GetValue().ToString() == "All")
-        {
-            AddTemperatureZones();
-        }
-        if ((bool)Settings.hullTemperatureDamage.GetValue() || (bool)Settings.componentTemperatureDamage.GetValue())
+        if (Settings.temperatureZonesAmount.GetValue().ToString() != "None")
         {
             Locator.GetShipBody().GetComponentInChildren<ShipFuelGauge>().gameObject.AddComponent<ShipTemperatureGauge>();
             GameObject hullTempDial = LoadPrefab("Assets/ShipEnhancements/ShipTempDial.prefab");
             Instantiate(hullTempDial, Locator.GetShipTransform().Find("Module_Cockpit"));
+
+            if (Settings.temperatureZonesAmount.GetValue().ToString() == "Sun")
+            {
+                GameObject sun = GameObject.Find("Sun_Body");
+                if (sun != null)
+                {
+                    GameObject sunTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Sun.prefab");
+                    Instantiate(sunTempZone, sun.transform.Find("Sector_SUN"));
+                }
+            }
+            else
+            {
+                AddTemperatureZones();
+            }
         }
         if ((bool)Settings.enableShipFuelTransfer.GetValue())
         {

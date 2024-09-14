@@ -135,7 +135,7 @@ public static class ShipNotifications
             }
         }
 
-        if (((bool)componentTemperatureDamage.GetProperty() || (bool)hullTemperatureDamage.GetProperty()) && SELocator.GetShipTemperatureDetector() != null)
+        if (temperatureZonesAmount.GetProperty().ToString() != "None" && SELocator.GetShipTemperatureDetector() != null)
         {
             float hullTempRatio = Mathf.Abs(SELocator.GetShipTemperatureDetector().GetShipTemperatureRatio() - 0.5f);
             if (!_hullTemperatureCritical && hullTempRatio > 0.35f)
