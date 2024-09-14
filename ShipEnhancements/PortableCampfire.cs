@@ -133,13 +133,46 @@ public class PortableCampfire : Campfire
 
     private void OnShipSystemFailure()
     {
-        SetState(State.UNLIT);
+        if (_insideShip)
+        {
+            SetState(State.UNLIT);
+        }
         _shipDestroyed = true;
     }
 
     private void OnEnable()
     {
-        _fluidDetector.RebuildActiveLayers();
+        if (_fluidDetector.GetShape())
+        {
+            _fluidDetector.GetShape().SetActivation(true);
+        }
+        if (_fluidDetector.GetCollider())
+        {
+            _fluidDetector.GetCollider().enabled = true;
+        }
+        ShipEnhancements.Instance.ModHelper.Events.Unity.FireOnNextUpdate(() =>
+        {
+            bool outsideWater = IsOutsideWater();
+            _lastOutsideWaterState = outsideWater;
+            _interactVolume._screenPrompt.SetDisplayState(outsideWater ? ScreenPrompt.DisplayState.Normal : ScreenPrompt.DisplayState.GrayedOut);
+        });
+    }
+
+    private void OnDisable()
+    {
+        if (_fluidDetector.GetShape())
+        {
+            _fluidDetector.GetShape().SetActivation(false);
+        }
+        if (_fluidDetector.GetCollider())
+        {
+            _fluidDetector.GetCollider().enabled = false;
+        }
+        EffectVolume[] volsToRemove = [.. _fluidDetector._activeVolumes];
+        foreach (EffectVolume vol in volsToRemove)
+        {
+            vol._triggerVolume.RemoveObjectFromVolume(_fluidDetector.gameObject);
+        }
     }
 
     public override void OnDestroy()
