@@ -6,6 +6,8 @@ using System.IO;
 using System;
 using System.Collections.Generic;
 using OWML.Utils;
+using NewHorizons.Components.Stars;
+using NewHorizons.Components.SizeControllers;
 
 namespace ShipEnhancements;
 
@@ -407,19 +409,14 @@ public class ShipEnhancements : ModBehaviour
             GameObject hullTempDial = LoadPrefab("Assets/ShipEnhancements/ShipTempDial.prefab");
             Instantiate(hullTempDial, Locator.GetShipTransform().Find("Module_Cockpit"));
 
-            if (Settings.temperatureZonesAmount.GetValue().ToString() == "Sun")
+            ModHelper.Events.Unity.FireOnNextUpdate(() =>
             {
-                GameObject sun = GameObject.Find("Sun_Body");
-                if (sun != null)
+                SpawnSunTemperatureZones();
+                if (Settings.temperatureZonesAmount.GetValue().ToString() == "All")
                 {
-                    GameObject sunTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Sun.prefab");
-                    Instantiate(sunTempZone, sun.transform.Find("Sector_SUN"));
+                    SpawnExtraTemperatureZones();
                 }
-            }
-            else
-            {
-                AddTemperatureZones();
-            }
+            });
         }
         if ((bool)Settings.enableShipFuelTransfer.GetValue())
         {
@@ -596,17 +593,8 @@ public class ShipEnhancements : ModBehaviour
         SELocator.LateInitialize();
     }
 
-    private void AddTemperatureZones()
+    private void SpawnExtraTemperatureZones()
     {
-        GameObject sun = GameObject.Find("Sun_Body");
-        if (sun != null)
-        {
-            GameObject sunTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Sun.prefab");
-            Instantiate(sunTempZone, sun.transform.Find("Sector_SUN/Volumes_SUN"));
-            GameObject supernovaTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Supernova.prefab");
-            Instantiate(supernovaTempZone, sun.GetComponentInChildren<SupernovaEffectController>().transform);
-        }
-
         GameObject vm = GameObject.Find("VolcanicMoon_Body");
         if (vm != null)
         {
@@ -664,6 +652,39 @@ public class ShipEnhancements : ModBehaviour
             Instantiate(ctTempZone1, ct.transform.Find("Sector_CaveTwin"));
             GameObject ctTempZone2 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_CaveTwinCold.prefab");
             Instantiate(ctTempZone2, ct.transform.Find("Sector_CaveTwin"));
+        }
+    }
+
+    private void SpawnSunTemperatureZones()
+    {
+        bool usingNH = ModHelper.Interaction.ModExists("xen.NewHorizons");
+        GameObject sunTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Sun.prefab");
+
+        SunController[] suns = FindObjectsOfType<SunController>();
+        foreach (SunController sun in suns)
+        {
+            if (sun.GetComponentInChildren<HeatHazardVolume>() && !sun.GetComponentInChildren<TemperatureZone>())
+            {
+                TemperatureZone zone = Instantiate(sunTempZone, sun.GetComponentInChildren<Sector>().transform).GetComponent<TemperatureZone>();
+                zone.transform.localPosition = Vector3.zero;
+                float sunScale = sun.GetComponentInChildren<TessellatedSphereRenderer>().transform.localScale.magnitude / 2;
+                zone.SetProperties(100f, sunScale * 2.25f, sunScale, false, 0f, 0f);
+            }
+        }
+
+        if (usingNH)
+        {
+            StarController[] nhSuns = FindObjectsOfType<StarController>();
+            foreach (StarController nhSun in nhSuns)
+            {
+                if (nhSun.GetComponentInChildren<HeatHazardVolume>() && !nhSun.GetComponentInChildren<TemperatureZone>())
+                {
+                    TemperatureZone zone = Instantiate(sunTempZone, nhSun.GetComponentInChildren<Sector>().transform).GetComponent<TemperatureZone>();
+                    zone.transform.localPosition = Vector3.zero;
+                    float sunScale = nhSun.GetComponentInChildren<StarEvolutionController>().transform.localScale.magnitude / 2;
+                    zone.SetProperties(100f, sunScale * 2.25f, sunScale, false, 0f, 0f);
+                }
+            }
         }
     }
 

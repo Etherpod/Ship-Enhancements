@@ -21,7 +21,7 @@ public class TemperatureZone : MonoBehaviour
     private float _outerRadius;
     private float _scale = 1f;
 
-    private void Start()
+    private void Awake()
     {
         _shape = GetComponent<SphereShape>();
         _triggerVolume = GetComponent<OWTriggerVolume>();
