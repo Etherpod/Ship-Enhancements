@@ -101,6 +101,12 @@
       "value": false,
       "tooltip": "Lets you spin your ship as quickly as you want, though spinning too fast may tear your ship apart. DO NOT ENABLE IF YOU ARE PRONE TO MOTION SICKNESS."
     },
+    "disableShipFriction": {
+      "title": "Disable Ship Friction",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Turns off the ship's friction so that it slides everywhere. Good luck landing on anything."
+    },
     "disableReferenceFrame": {
       "title": "Disable Lock-on",
       "type": "toggle",

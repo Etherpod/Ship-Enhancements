@@ -67,6 +67,7 @@ public static class SettingExtensions
         { Settings.disableDamageIndicators, (false, false) },
         { Settings.addShipSignal, (false, false) },
         { Settings.reactorLifetimeMultiplier, (1f, 1f) },
+        { Settings.disableShipFriction, (false, false) },
     };
 
     public static string GetName(this Settings setting)

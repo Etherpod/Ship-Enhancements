@@ -109,6 +109,7 @@ public class ShipEnhancements : ModBehaviour
         disableDamageIndicators,
         addShipSignal,
         reactorLifetimeMultiplier,
+        disableShipFriction,
     }
 
     private void Awake()
@@ -596,6 +597,14 @@ public class ShipEnhancements : ModBehaviour
                 .Find("Module_Cockpit/Geo_Cockpit/Cockpit_Tech/Cockpit_Tech_Exterior/SignalDishPivot")).GetComponent<AudioSignal>();
             shipSignal.SetSector(Locator.GetShipTransform().GetComponentInChildren<Sector>());
             shipSignal._name = shipSignalName;
+        }
+        if ((bool)Settings.disableShipFriction.GetProperty())
+        {
+            PhysicMaterial mat = (PhysicMaterial)LoadAsset("Assets/ShipEnhancements/FrictionlessShip.physicMaterial");
+            foreach (Collider collider in Locator.GetShipTransform().GetComponentsInChildren<Collider>())
+            {
+                collider.material = mat;
+            }
         }
 
         engineOn = !(bool)Settings.addEngineSwitch.GetValue();
