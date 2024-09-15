@@ -122,31 +122,31 @@
       "title": "Oxygen Drain Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the speed at which the ship oxygen drains."
+      "tooltip": "Larger numbers increase the speed at which the ship oxygen drains. The default speed takes about 12.8 hours to fully drain."
     },
     "fuelDrainMultiplier": {
       "title": "Fuel Drain Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the speed at which the ship fuel drains."
+      "tooltip": "Larger numbers increase the speed at which the ship fuel drains. The default speed takes about 34 minutes to fully drain."
     },
     "oxygenTankDrainMultiplier": {
       "title": "Oxygen Tank Drain Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the amount of oxygen that drains when the oxygen tank is damaged in addition to the regular drain rate."
+      "tooltip": "Larger numbers increase the amount of oxygen that drains when the oxygen tank is damaged in addition to the regular drain rate. The default speed is 38 times faster."
     },
     "fuelTankDrainMultiplier": {
       "title": "Fuel Tank Drain Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the amount of fuel that drains when the fuel tank is damaged in addition to the regular drain rate."
+      "tooltip": "Larger numbers increase the amount of fuel that drains when the fuel tank is damaged in addition to the regular drain rate. The default speed is about 10 times faster."
     },
     "oxygenRefillMultiplier": {
       "title": "Oxygen Refill Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the speed at which the ship oxygen refills."
+      "tooltip": "Larger numbers increase the speed at which the ship oxygen refills. The default speed takes about a minute to completely refill."
     },
     "fuelTransferMultiplier": {
       "title": "Fuel Transfer Multiplier",
@@ -158,7 +158,7 @@
       "title": "Idle Fuel Consumption Multiplier",
       "type": "number",
       "value": 0,
-      "tooltip": "Larger numbers increase the rate at which your ship's fuel drains while it is on. Intended to be used with the Engine Switch."
+      "tooltip": "Larger numbers increase the rate at which your ship's fuel drains while it is on. The default speed is about 100 times slower than the active consumption rate."
     },
     "shipDamageMultiplier": {
       "title": "Damage Multiplier",
@@ -182,7 +182,7 @@
       "title": "Temperature Resistance Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the time it takes for the ship to start taking damage in extreme temperatures."
+      "tooltip": "Larger numbers increase the time the ship can resist extreme temperatures. The default resistance gives the ship around 3 minutes before the hull reaches max temperature, meaning max damage."
     },
     "gravityMultiplier": {
       "title": "Ship Gravity Multiplier",
@@ -221,6 +221,12 @@
       "type": "number",
       "value": 1,
       "tooltip": "Larger numbers increase the size of the explosion that is created when your ship blows up."
+    },
+    "reactorLifetimeMultiplier": {
+      "title": "Reactor Lifetime Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers increase the time it takes for the reactor to blow up the ship. The default time is between 25 and 35 seconds."
     },
     "shipBounciness": {
       "title": "Ship Bounciness",

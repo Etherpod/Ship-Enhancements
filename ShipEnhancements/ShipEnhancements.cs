@@ -108,6 +108,7 @@ public class ShipEnhancements : ModBehaviour
         addTether,
         disableDamageIndicators,
         addShipSignal,
+        reactorLifetimeMultiplier,
     }
 
     private void Awake()
@@ -558,6 +559,13 @@ public class ShipEnhancements : ModBehaviour
                     flame.transform.localScale = Vector3.zero;
                 }
             }
+        }
+        if ((float)Settings.reactorLifetimeMultiplier.GetValue() != 1f)
+        {
+            ShipReactorComponent reactor = Locator.GetShipTransform().GetComponentInChildren<ShipReactorComponent>();
+            float multiplier = (float)Settings.reactorLifetimeMultiplier.GetValue();
+            reactor._minCountdown *= multiplier;
+            reactor._maxCountdown *= multiplier;
         }
 
         SetHullColor();

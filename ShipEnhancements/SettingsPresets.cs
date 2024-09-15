@@ -52,9 +52,7 @@ public static class SettingsPresets
         { "keepHelmetOn", true },
         { "showWarningNotifications", true },
         { "shipExplosionMultiplier", 1f },
-        //{ "zeroGravityCockpitFreeLook", true },
         { "shipBounciness", 0f },
-        //{ "shipIgnitionCancelFix", true },
         { "enablePersistentInput", false },
         { "shipInputLatency", 0f },
         { "addEngineSwitch", false },
@@ -67,6 +65,7 @@ public static class SettingsPresets
         { "addTether", false },
         { "disableDamageIndicators", false },
         { "addShipSignal", false },
+        { "reactorLifetimeMultiplier", 1f },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -115,9 +114,7 @@ public static class SettingsPresets
         { "keepHelmetOn", true },
         { "showWarningNotifications", true },
         { "shipExplosionMultiplier", 1f },
-        //{ "zeroGravityCockpitFreeLook", true },
         { "shipBounciness", 0f },
-        //{ "shipIgnitionCancelFix", true },
         { "enablePersistentInput", false },
         { "shipInputLatency", 0f },
         { "addEngineSwitch", false },
@@ -130,6 +127,7 @@ public static class SettingsPresets
         { "addTether", false },
         { "disableDamageIndicators", true },
         { "addShipSignal", false },
+        { "reactorLifetimeMultiplier", 1f },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -178,9 +176,7 @@ public static class SettingsPresets
         { "keepHelmetOn", true },
         { "showWarningNotifications", true },
         { "shipExplosionMultiplier", 0.8f },
-        //{ "zeroGravityCockpitFreeLook", true },
         { "shipBounciness", 0f },
-        //{ "shipIgnitionCancelFix", true },
         { "enablePersistentInput", false },
         { "shipInputLatency", 0f },
         { "addEngineSwitch", false },
@@ -193,6 +189,7 @@ public static class SettingsPresets
         { "addTether", true },
         { "disableDamageIndicators", false },
         { "addShipSignal", true },
+        { "reactorLifetimeMultiplier", 1f },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -241,9 +238,7 @@ public static class SettingsPresets
         { "keepHelmetOn", true },
         { "showWarningNotifications", true },
         { "shipExplosionMultiplier", 2f },
-        //{ "zeroGravityCockpitFreeLook", true },
         { "shipBounciness", 0.2f },
-        //{ "shipIgnitionCancelFix", true },
         { "enablePersistentInput", false },
         { "shipInputLatency", 0f },
         { "addEngineSwitch", true },
@@ -256,6 +251,7 @@ public static class SettingsPresets
         { "addTether", true },
         { "disableDamageIndicators", false },
         { "addShipSignal", false },
+        { "reactorLifetimeMultiplier", 1f },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -304,9 +300,7 @@ public static class SettingsPresets
         { "keepHelmetOn", true },
         { "showWarningNotifications", true },
         { "shipExplosionMultiplier", 1f },
-        //{ "zeroGravityCockpitFreeLook", true },
         { "shipBounciness", 0f },
-        //{ "shipIgnitionCancelFix", true },
         { "enablePersistentInput", false },
         { "shipInputLatency", 0f },
         { "addEngineSwitch", false },
@@ -319,6 +313,7 @@ public static class SettingsPresets
         { "addTether", true },
         { "disableDamageIndicators", false },
         { "addShipSignal", false },
+        { "reactorLifetimeMultiplier", 1f },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -367,9 +362,7 @@ public static class SettingsPresets
         { "keepHelmetOn", true },
         { "showWarningNotifications", true },
         { "shipExplosionMultiplier", 50f },
-        //{ "zeroGravityCockpitFreeLook", true },
         { "shipBounciness", 1f },
-        //{ "shipIgnitionCancelFix", true },
         { "enablePersistentInput", false },
         { "shipInputLatency", 0.1f },
         { "addEngineSwitch", true },
@@ -382,6 +375,7 @@ public static class SettingsPresets
         { "addTether", true },
         { "disableDamageIndicators", true },
         { "addShipSignal", true },
+        { "reactorLifetimeMultiplier", 1f },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

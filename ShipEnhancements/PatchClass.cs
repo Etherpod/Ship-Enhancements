@@ -326,6 +326,8 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipResources), nameof(ShipResources.DrainOxygen))]
     public static bool ApplyOxygenDrainMultiplier(ShipResources __instance, float amount)
     {
+        if ((float)oxygenDrainMultiplier.GetProperty() == 1f) return true;
+
         __instance._currentOxygen = Mathf.Max(__instance._currentOxygen - (amount * (float)oxygenDrainMultiplier.GetProperty()), 0f);
         return false;
     }
@@ -334,6 +336,8 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipResources), nameof(ShipResources.DrainFuel))]
     public static bool ApplyFuelDrainMultiplier(ShipResources __instance, float amount)
     {
+        if ((float)fuelDrainMultiplier.GetProperty() == 1f) return true;
+
         __instance._currentFuel = Mathf.Max(__instance._currentFuel - (amount * (float)fuelDrainMultiplier.GetProperty()), 0f);
         return false;
     }

@@ -53,9 +53,7 @@ public static class SettingExtensions
         { Settings.keepHelmetOn, (false, false) },
         { Settings.showWarningNotifications, (false, false) },
         { Settings.shipExplosionMultiplier, (1f, 1f) },
-        //{ Settings.zeroGravityCockpitFreeLook, (false, false) },
         { Settings.shipBounciness, (1f, 1f) },
-        //{ Settings.shipIgnitionCancelFix, (false, false) },
         { Settings.enablePersistentInput, (false, false) },
         { Settings.shipInputLatency, (1f, 1f) },
         { Settings.addEngineSwitch, (false, false) },
@@ -68,6 +66,7 @@ public static class SettingExtensions
         { Settings.addTether, (false, false) },
         { Settings.disableDamageIndicators, (false, false) },
         { Settings.addShipSignal, (false, false) },
+        { Settings.reactorLifetimeMultiplier, (1f, 1f) },
     };
 
     public static string GetName(this Settings setting)
