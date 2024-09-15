@@ -36,6 +36,9 @@ Ship Enhancements adds way too many options for changing the ship and things rel
 - **Ship Gravity Direction**: Lets you change the direction of your ship's gravity. Set this to Random if you feel like the game isn't painful enough.
 - **Atmosphere/Space Angular Drag Multiplier**: Larger numbers make it harder to turn your ship. Setting this to 0 lets you spin your ship forever.
 - **Ship Explosion Multiplier**: Larger numbers increase the size of the explosion that is created when your ship blows up. Set this to something between 10 and 30 to simulate an atomic bomb.
+- **Reactor Lifetime Multiplier**: Larger numbers increase the time it takes for the reactor to blow up when it has been damaged. Set this to something small to give yourself a panic attack every time the master alarm goes off.
+- **Ship Bounciness**: Larger numbers increase the bounciness of the ship. A value of 0.5 means the ship will retain half of its speed when hitting something, and a value of 2 means the ship will double its speed every time it hits something.
+- **Ship Input Latency**: Larger numbers increase the time it takes for the ship to process your inputs. A value of 1 means it takes 1 second for your up input to register. This basically simulates lag.
 
 ## Add Ship Functions
 - **Oxygen Refill**: Refills the ship's oxygen tank when it gets close to trees or enters an oxygen-filled atmosphere.
