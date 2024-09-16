@@ -390,6 +390,111 @@ public static class SettingsPresets
         { "enableSignalscopeComponent", true },
     };
 
+    public static readonly Dictionary<string, object[]> RandomSettings = new Dictionary<string, object[]>()
+    {
+        { "disableGravityCrystal", [false, false, true] },
+        { "disableEjectButton", [false, false, true] },
+        { "disableHeadlights", [false, true] },
+        { "disableLandingCamera", [false, true] },
+        { "disableShipLights", [false, false, true] },
+        { "disableShipOxygen", [false, false, true] },
+        { "oxygenDrainMultiplier", [1f, 100f, 500f, 1f, 2000f] },
+        { "fuelDrainMultiplier", [1f, 10f, 0.5f, 100f] },
+        { "shipDamageMultiplier", [1f, 2f, 3f, 0.1f, 20f] },
+        { "shipDamageSpeedMultiplier", [1f, 0.1f, 5f] },
+        { "shipOxygenRefill", [false, true, true, true] },
+        { "disableShipRepair", [false, false, false, false, true] },
+        { "enableGravityLandingGear", [false, false, true] },
+        { "disableAirAutoRoll", [false, true] },
+        { "disableWaterAutoRoll", [false, true] },
+        { "enableThrustModulator", [false, false, true] },
+        { "temperatureZonesAmount", ["None", "None", "Sun", "All"] },
+        { "hullTemperatureDamage", [false, true] },
+        { "enableShipFuelTransfer", [false, true, true, true] },
+        { "enableJetpackRefuelDrain", [false, true, true, true] },
+        { "disableReferenceFrame", [false, false, true] },
+        { "disableMapMarkers", [false, true] },
+        { "gravityMultiplier", [1f, 1f, 0.1f, 3f] },
+        { "fuelTransferMultiplier", [0.2f, 10f] },
+        { "oxygenRefillMultiplier", [0.1f, 3f] },
+        { "temperatureDamageMultiplier", [0.2f, 20f] },
+        { "temperatureResistanceMultiplier", [0.05f, 2.5f] },
+        { "enableAutoHatch", [false, false, true] },
+        { "oxygenTankDrainMultiplier", [0.01f, 10f] },
+        { "fuelTankDrainMultiplier", [0.01f, 10f] },
+        { "componentTemperatureDamage", [false, false, true] },
+        { "atmosphereAngularDragMultiplier", [1f, 1f, 0f, 2f] },
+        { "spaceAngularDragMultiplier", [1f, 1f, 0f, 2f] },
+        { "disableRotationSpeedLimit", [false, false, false, true] },
+        { "gravityDirection", ["Down", "Down", "Random"] },
+        { "disableScoutRecall", [false, false, true] },
+        { "disableScoutLaunching", [false, false, true] },
+        { "enableScoutLauncherComponent", [false, true] },
+        { "enableManualScoutRecall", [false, false, true] },
+        { "enableShipItemPlacement", [false, true] },
+        { "addPortableCampfire", [false, false, true] },
+        { "keepHelmetOn", [true] },
+        { "showWarningNotifications", [true] },
+        { "shipExplosionMultiplier", [0.1f, 50f] },
+        { "shipBounciness", [0f, 0f, 0f, 2f] },
+        { "enablePersistentInput", [false, false, true] },
+        { "shipInputLatency", [0f, 0f, 0f, 0f, 0.5f] },
+        { "addEngineSwitch", [false, false, true] },
+        { "idleFuelConsumptionMultiplier", [1f, 1f, 1f, 1f, 0f, 5f] },
+        { "shipLightColor", [
+            "Default",
+            "Red",
+            "Hearthian Orange",
+            "Orange",
+            "Yellow",
+            "Green",
+            "Ghostly Green",
+            "Turquoise",
+            "Blue",
+            "Nomaian Blue",
+            "Blacklight",
+            "Purple",
+            "Magenta",
+            "White",
+            "Divine",
+            "Rainbow"
+            ] },
+        { "hotThrusters", [false, true] },
+        { "extraNoise", [false, true] },
+        { "interiorHullColor", [
+            "Default",
+            "Red",
+            "Orange",
+            "Golden",
+            "Green",
+            "Turquoise",
+            "Blue",
+            "Lavender",
+            "Pink",
+            "Gray",
+            "Rainbow"
+            ] },
+        { "exteriorHullColor", [
+            "Default",
+            "Red",
+            "Orange",
+            "Golden",
+            "Green",
+            "Turquoise",
+            "Blue",
+            "Lavender",
+            "Pink",
+            "Gray",
+            "Rainbow"
+            ] },
+        { "addTether", [false, false, true] },
+        { "disableDamageIndicators", [false, false, true] },
+        { "addShipSignal", [false, true] },
+        { "reactorLifetimeMultiplier", [1f, 0.1f, 3f] },
+        { "disableShipFriction", [false, false, false, true] },
+        { "enableSignalscopeComponent", [false, true] },
+    };
+
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }
 
     public static Dictionary<string, Dictionary<PresetName, object>> settingsPresets { get; private set; }
@@ -404,6 +509,7 @@ public static class SettingsPresets
         Hardcore,
         Wanderer,
         Pandemonium,
+        Random,
         Custom
     }
 
@@ -460,7 +566,7 @@ public static class SettingsPresets
 
     public static void ApplyPreset(PresetName preset, IModConfig config)
     {
-        if (preset == PresetName.Custom) return;
+        if (preset == PresetName.Custom || preset == PresetName.Random) return;
         foreach (KeyValuePair<string, object> setting in presetDicts[preset])
         {
             config.SetSettingsValue(setting.Key, setting.Value);
@@ -485,6 +591,16 @@ public static class SettingsPresets
 
     public static object GetPresetSetting(this PresetName preset, string setting)
     {
+        if (preset == PresetName.Random)
+        {
+            object[] randValues = RandomSettings[setting];
+            if (randValues[0] is float)
+            {
+                return UnityEngine.Random.Range((float)randValues[randValues.Length - 2], (float)randValues[randValues.Length - 1]);
+            }
+            int index = UnityEngine.Random.Range(0, randValues.Length);
+            return randValues[index];
+        }
         return settingsPresets[setting][preset];
     }
 

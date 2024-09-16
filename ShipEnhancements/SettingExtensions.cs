@@ -78,6 +78,11 @@ public static class SettingExtensions
 
     public static object GetValue(this Settings setting)
     {
+        if (Instance.ModHelper.Config.GetSettingsValue<string>("preset") == "Random")
+        {
+            return GetProperty(setting);
+        }
+
         JValue value = (JValue)settingValues[setting].Item1;
         if (value.Type == JTokenType.Boolean)
         {

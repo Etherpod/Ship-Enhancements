@@ -300,7 +300,14 @@ public class ShipEnhancements : ModBehaviour
 
         foreach (Settings setting in allSettings)
         {
-            setting.SetProperty(ModHelper.Config.GetSettingsValue<object>(setting.GetName()));
+            if (ModHelper.Config.GetSettingsValue<string>("preset") == "Random")
+            {
+                setting.SetProperty(SettingsPresets.GetPresetSetting(SettingsPresets.PresetName.Random, setting.GetName()));
+            }
+            else
+            {
+                setting.SetProperty(ModHelper.Config.GetSettingsValue<object>(setting.GetName()));
+            }
         }
     }
 
