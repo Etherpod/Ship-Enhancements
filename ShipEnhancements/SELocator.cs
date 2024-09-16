@@ -1,5 +1,4 @@
-﻿using System;
-using static ShipEnhancements.ShipEnhancements.Settings;
+﻿using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -13,6 +12,7 @@ public static class SELocator
     private static ShipTemperatureDetector _shipTemperatureDetector;
     private static ShipDamageController _shipDamageController;
     private static ShipOverdriveController _shipOverdriveController;
+    private static SignalscopeComponent _signalscopeComponent;
 
     public static void Initalize()
     {
@@ -67,6 +67,16 @@ public static class SELocator
     public static void SetProbeLauncherComponent(ProbeLauncherComponent obj)
     {
         _probeLauncherComponent = obj;
+    }
+
+    public static SignalscopeComponent GetSignalscopeComponent()
+    {
+        return _signalscopeComponent;
+    }
+
+    public static void SetSignalscopeComponent(SignalscopeComponent obj)
+    {
+        _signalscopeComponent = obj;
     }
 
     public static ShipTemperatureDetector GetShipTemperatureDetector()

@@ -34,6 +34,7 @@ public class ShipEnhancements : ModBehaviour
     public Tether playerTether;
 
     public UITextType probeLauncherName { get; private set; }
+    public UITextType signalscopeName { get; private set; }
     public ItemType portableCampfireType { get; private set; }
     public ItemType tetherHookType { get; private set; }
     public SignalName shipSignalName { get; private set; }
@@ -110,6 +111,7 @@ public class ShipEnhancements : ModBehaviour
         addShipSignal,
         reactorLifetimeMultiplier,
         disableShipFriction,
+        enableSignalscopeComponent,
     }
 
     private void Awake()
@@ -126,6 +128,7 @@ public class ShipEnhancements : ModBehaviour
         SettingsPresets.InitializePresets();
 
         probeLauncherName = EnumUtils.Create<UITextType>("ScoutLauncher");
+        signalscopeName = EnumUtils.Create<UITextType>("Signalscope");
         portableCampfireType = EnumUtils.Create<ItemType>("PortableCampfire");
         tetherHookType = EnumUtils.Create<ItemType>("TetherHook");
         shipSignalName = EnumUtils.Create<SignalName>("Ship");
@@ -594,7 +597,7 @@ public class ShipEnhancements : ModBehaviour
         {
             GameObject signal = LoadPrefab("Assets/ShipEnhancements/ShipSignal.prefab");
             AudioSignal shipSignal = Instantiate(signal, Locator.GetShipTransform()
-                .Find("Module_Cockpit/Geo_Cockpit/Cockpit_Tech/Cockpit_Tech_Exterior/SignalDishPivot")).GetComponent<AudioSignal>();
+                .GetComponentInChildren<ShipCockpitUI>()._sigScopeDish).GetComponent<AudioSignal>();
             shipSignal.SetSector(Locator.GetShipTransform().GetComponentInChildren<Sector>());
             shipSignal._name = shipSignalName;
         }

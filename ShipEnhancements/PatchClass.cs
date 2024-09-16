@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Security.Policy;
 using HarmonyLib;
@@ -1154,30 +1155,6 @@ public static class PatchClass
         return true;
     }
 
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(UITextLibrary), nameof(UITextLibrary.GetString))]
-    public static void ReturnProbeLauncherName(UITextType TextID, ref string __result)
-    {
-        if (TextID == ShipEnhancements.Instance.probeLauncherName)
-        {
-            __result = "SCOUT LAUNCHER";
-        }
-    }
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(ShipHull), nameof(ShipHull.Awake))]
-    public static void AddScoutLauncherComponent(ShipHull __instance)
-    {
-        if (!(bool)enableScoutLauncherComponent.GetProperty()) return;
-
-        if (__instance.hullName != UITextType.ShipPartForward) return;
-        GameObject probeLauncherComponent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ProbeLauncherComponent.prefab");
-        GameObject componentObj = UnityEngine.Object.Instantiate(probeLauncherComponent, 
-            __instance.GetComponentInParent<ShipBody>().GetComponentInChildren<PlayerProbeLauncher>().transform.parent);
-        AssetBundleUtilities.ReplaceShaders(componentObj);
-        SELocator.SetProbeLauncherComponent(componentObj.GetComponent<ProbeLauncherComponent>());
-    }
-
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.OnForceRetrieveProbe))]
     public static bool FixForceRetrieveProbe(ProbeLauncher __instance)
@@ -2092,8 +2069,16 @@ public static class PatchClass
     [HarmonyPatch(typeof(AudioSignal), nameof(AudioSignal.UpdateSignalStrength))]
     public static bool RemoveSignalFromShip(AudioSignal __instance)
     {
-        if (__instance.GetName() == ShipEnhancements.Instance.shipSignalName && (OWInput.IsInputMode(InputMode.ShipCockpit) 
-            || (SELocator.GetShipDamageController()?.IsSystemFailed() ?? false) || PlayerState.IsInsideShip()))
+        if ((SELocator.GetSignalscopeComponent()?.isDamaged ?? false) && OWInput.IsInputMode(InputMode.ShipCockpit))
+        {
+            __instance._canBePickedUpByScope = false;
+            __instance._signalStrength = 0f;
+            __instance._degreesFromScope = 180f;
+            return false;
+        }
+        else if (__instance.GetName() == ShipEnhancements.Instance.shipSignalName && (OWInput.IsInputMode(InputMode.ShipCockpit) 
+            || (SELocator.GetShipDamageController()?.IsSystemFailed() ?? false) || PlayerState.IsInsideShip()
+            || (SELocator.GetSignalscopeComponent()?.isDamaged ?? false)))
         {
             __instance._canBePickedUpByScope = false;
             __instance._signalStrength = 0f;
@@ -2101,6 +2086,124 @@ public static class PatchClass
             return false;
         }
         return true;
+    }
+    #endregion
+
+    #region CockpitComponents
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipHull), nameof(ShipHull.Awake))]
+    public static void AddComponents(ShipHull __instance)
+    {
+        if (__instance.hullName != UITextType.ShipPartForward) return;
+
+        if ((bool)enableScoutLauncherComponent.GetProperty())
+        {
+            GameObject probeLauncherComponent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ProbeLauncherComponent.prefab");
+            GameObject componentObj = UnityEngine.Object.Instantiate(probeLauncherComponent,
+                __instance.GetComponentInParent<ShipBody>().GetComponentInChildren<PlayerProbeLauncher>().transform.parent);
+            AssetBundleUtilities.ReplaceShaders(componentObj);
+            SELocator.SetProbeLauncherComponent(componentObj.GetComponent<ProbeLauncherComponent>());
+        }
+        if ((bool)enableSignalscopeComponent.GetProperty())
+        {
+            GameObject signalscopeComponent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/SignalscopeComponent.prefab");
+            Transform signalscopePivot = __instance.transform.Find("Geo_Cockpit/Cockpit_Tech/Cockpit_Tech_Exterior/SignalDishPivot");
+            GameObject componentObj2 = UnityEngine.Object.Instantiate(signalscopeComponent,
+                signalscopePivot);
+            AssetBundleUtilities.ReplaceShaders(componentObj2);
+            SignalscopeComponent comp = componentObj2.GetComponent<SignalscopeComponent>();
+            SELocator.SetSignalscopeComponent(comp);
+
+            ShipDamageDisplayV2 damageDisplay = __instance.GetComponentInChildren<ShipDamageDisplayV2>();
+            damageDisplay._shipComponents[8] = comp;
+            comp.OnDamaged += damageDisplay.OnComponentUpdate;
+            comp.OnRepaired += damageDisplay.OnComponentUpdate;
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipHull), nameof(ShipHull.Awake))]
+    public static void AddSignalscopeComponentToList(ShipHull __instance)
+    {
+        if ((bool)enableSignalscopeComponent.GetProperty() && __instance.hullName == UITextType.ShipPartForward)
+        {
+            List<ShipComponent> comps = [.. __instance._components];
+            comps.Add(SELocator.GetSignalscopeComponent());
+            __instance._components = [.. comps];
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(UITextLibrary), nameof(UITextLibrary.GetString))]
+    public static void InjectComponentNames(UITextType TextID, ref string __result)
+    {
+        if (TextID == ShipEnhancements.Instance.probeLauncherName)
+        {
+            __result = "SCOUT LAUNCHER";
+        }
+        else if (TextID == ShipEnhancements.Instance.signalscopeName)
+        {
+            __result = "SIGNALSCOPE";
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipCockpitUI), nameof(ShipCockpitUI.FixedUpdate))]
+    public static bool DisableSignalscopeAnimation(ShipCockpitUI __instance)
+    {
+        if (!(bool)enableSignalscopeComponent.GetProperty()) return true;
+
+        __instance.UpdateShipConsole();
+        __instance.UpdateSignalscopeCanvas();
+        if (__instance._displayProbeLauncherScreen && __instance._probeScreenT < 1f)
+        {
+            __instance._probeScreenT = Mathf.Clamp01(__instance._probeScreenT + Time.deltaTime / __instance._probeRotateTime);
+            __instance._probeLauncherDisplay.rotation = Quaternion.Lerp(__instance._probeLauncherStowRotation.rotation, __instance._probeLauncherDisplayRotation.rotation, Mathf.SmoothStep(0f, 1f, __instance._probeScreenT));
+            if (__instance._probeScreenT >= 1f)
+            {
+                __instance._shipAudioController.StopProbeScreenMotor();
+            }
+        }
+        else if (!__instance._displayProbeLauncherScreen && __instance._probeScreenT > 0f)
+        {
+            __instance._probeScreenT = Mathf.Clamp01(__instance._probeScreenT - Time.deltaTime / __instance._probeRotateTime);
+            __instance._probeLauncherDisplay.rotation = Quaternion.Lerp(__instance._probeLauncherStowRotation.rotation, __instance._probeLauncherDisplayRotation.rotation, Mathf.SmoothStep(0f, 1f, __instance._probeScreenT));
+            if (__instance._probeScreenT <= 0f)
+            {
+                __instance._shipAudioController.StopProbeScreenMotor();
+            }
+        }
+        if (__instance._displaySignalscopeScreen && __instance._signalscopeScreenT < 1f)
+        {
+            __instance._signalscopeScreenT = Mathf.Clamp01(__instance._signalscopeScreenT + Time.deltaTime / __instance._scopeRotateTime);
+            __instance._sigScopeDisplay.rotation = Quaternion.Lerp(__instance._sigScopeStowRotation.rotation, __instance._sigScopeDisplayRotation.rotation, Mathf.SmoothStep(0f, 1f, __instance._signalscopeScreenT));
+            if (!SELocator.GetSignalscopeComponent().isDamaged)
+            {
+                __instance._sigScopeDish.localEulerAngles = new Vector3(Mathf.SmoothStep(0f, 90f, __instance._signalscopeScreenT), 0f, 0f);
+            }
+            if (__instance._signalscopeScreenT >= 1f)
+            {
+                __instance._shipAudioController.StopSigScopeSlide();
+                __instance._shipAudioController.PlaySignalscopeInPosition();
+                return false;
+            }
+        }
+        else if (!__instance._displaySignalscopeScreen && __instance._signalscopeScreenT > 0f)
+        {
+            __instance._signalscopeScreenT = Mathf.Clamp01(__instance._signalscopeScreenT - Time.deltaTime / __instance._scopeRotateTime);
+            __instance._sigScopeDisplay.rotation = Quaternion.Lerp(__instance._sigScopeStowRotation.rotation, __instance._sigScopeDisplayRotation.rotation, Mathf.SmoothStep(0f, 1f, __instance._signalscopeScreenT));
+            if (!SELocator.GetSignalscopeComponent().isDamaged)
+            {
+                __instance._sigScopeDish.localEulerAngles = new Vector3(Mathf.SmoothStep(0f, 90f, __instance._signalscopeScreenT), 0f, 0f);
+            }
+            if (__instance._signalscopeScreenT <= 0f)
+            {
+                __instance._shipAudioController.StopSigScopeSlide();
+                __instance._shipAudioController.PlaySignalscopeInPosition();
+            }
+        }
+
+        return false;
     }
     #endregion
 }

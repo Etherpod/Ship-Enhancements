@@ -328,6 +328,12 @@
       "value": false,
       "tooltip": "Turns the ship's scout launcher into a fully functioning component."
     },
+    "enableSignalscopeComponent": {
+      "title": "Add Signalscope Component",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Turns the ship's signalscope into a fully functioning component. You won't be able to track signals in the ship or hear the ship's signal if the signalscope is damaged."
+    },
     "addShipSignal": {
       "title": "Add Ship Signal",
       "type": "toggle",

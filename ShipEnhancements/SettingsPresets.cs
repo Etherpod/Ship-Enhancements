@@ -67,6 +67,7 @@ public static class SettingsPresets
         { "addShipSignal", false },
         { "reactorLifetimeMultiplier", 1f },
         { "disableShipFriction", false },
+        { "enableSignalscopeComponent", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -130,6 +131,7 @@ public static class SettingsPresets
         { "addShipSignal", false },
         { "reactorLifetimeMultiplier", 1f },
         { "disableShipFriction", false },
+        { "enableSignalscopeComponent", false },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -193,6 +195,7 @@ public static class SettingsPresets
         { "addShipSignal", true },
         { "reactorLifetimeMultiplier", 1f },
         { "disableShipFriction", false },
+        { "enableSignalscopeComponent", false },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -256,6 +259,7 @@ public static class SettingsPresets
         { "addShipSignal", false },
         { "reactorLifetimeMultiplier", 1f },
         { "disableShipFriction", false },
+        { "enableSignalscopeComponent", false },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -319,6 +323,7 @@ public static class SettingsPresets
         { "addShipSignal", false },
         { "reactorLifetimeMultiplier", 1f },
         { "disableShipFriction", false },
+        { "enableSignalscopeComponent", true },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -382,6 +387,7 @@ public static class SettingsPresets
         { "addShipSignal", true },
         { "reactorLifetimeMultiplier", 0.5f },
         { "disableShipFriction", true },
+        { "enableSignalscopeComponent", true },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }
