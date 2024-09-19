@@ -112,6 +112,7 @@ public class ShipEnhancements : ModBehaviour
         reactorLifetimeMultiplier,
         disableShipFriction,
         enableSignalscopeComponent,
+        rustLevel,
     }
 
     private void Awake()
@@ -581,7 +582,7 @@ public class ShipEnhancements : ModBehaviour
 
         SetHullColor();
 
-        if ((bool)Settings.addTether.GetProperty())
+        if ((bool)Settings.addTether.GetValue())
         {
             GameObject hook = LoadPrefab("Assets/ShipEnhancements/TetherHook.prefab");
             AssetBundleUtilities.ReplaceShaders(hook);
@@ -600,7 +601,7 @@ public class ShipEnhancements : ModBehaviour
 
             Locator.GetPlayerBody().gameObject.AddComponent<TetherPromptController>();
         }
-        if ((bool)Settings.addShipSignal.GetProperty())
+        if ((bool)Settings.addShipSignal.GetValue())
         {
             GameObject signal = LoadPrefab("Assets/ShipEnhancements/ShipSignal.prefab");
             AudioSignal shipSignal = Instantiate(signal, Locator.GetShipTransform()
@@ -608,13 +609,27 @@ public class ShipEnhancements : ModBehaviour
             shipSignal.SetSector(Locator.GetShipTransform().GetComponentInChildren<Sector>());
             shipSignal._name = shipSignalName;
         }
-        if ((bool)Settings.disableShipFriction.GetProperty())
+        if ((bool)Settings.disableShipFriction.GetValue())
         {
             PhysicMaterial mat = (PhysicMaterial)LoadAsset("Assets/ShipEnhancements/FrictionlessShip.physicMaterial");
             foreach (Collider collider in Locator.GetShipTransform().GetComponentsInChildren<Collider>())
             {
                 collider.material = mat;
             }
+        }
+        if ((float)Settings.rustLevel.GetValue() > 0f)
+        {
+            GameObject rustController = LoadPrefab("Assets/ShipEnhancements/RustController.prefab");
+            AssetBundleUtilities.ReplaceShaders(rustController);
+            Instantiate(rustController, Locator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry"));
+            /*GameObject insideCover = LoadPrefab("Assets/ShipEnhancements/DirtCoverInside.prefab");
+            AssetBundleUtilities.ReplaceShaders(insideCover);
+            GameObject outsideCover = LoadPrefab("Assets/ShipEnhancements/DirtCoverOutside.prefab");
+            AssetBundleUtilities.ReplaceShaders(outsideCover);
+            GameObject insideCoverObj = Instantiate(insideCover, Locator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry/Cockpit_Interior"));
+            GameObject outsideCoverObj = Instantiate(outsideCover, Locator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry/Cockpit_Exterior"));
+            float dirtyRatio = UnityEngine.Random.Range(0f, 1f);
+            insideCoverObj.GetComponent<MeshRenderer>().sharedMaterial.SetFloat("_Cutoff", dirtyRatio);*/
         }
 
         engineOn = !(bool)Settings.addEngineSwitch.GetValue();

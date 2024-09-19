@@ -69,6 +69,7 @@ public static class SettingExtensions
         { Settings.reactorLifetimeMultiplier, (1f, 1f) },
         { Settings.disableShipFriction, (false, false) },
         { Settings.enableSignalscopeComponent, (false, false) },
+        { Settings.rustLevel, (1f, 1f) },
     };
 
     public static string GetName(this Settings setting)

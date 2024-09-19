@@ -323,6 +323,14 @@
       "value": false,
       "tooltip": "Makes the ship thruster flames do damage when you stand in them."
     },
+    "rustLevel": {
+      "title": "Cockpit Rust Level",
+      "type": "slider",
+      "value": 0,
+      "min": 0,
+      "max": 1,
+      "tooltip": "Controls how much rust is applied to the ship cockpit. Setting this to 1 will completely cover the cockpit in rust."
+    },
     "enableScoutLauncherComponent": {
       "title": "Add Scout Launcher Component",
       "type": "toggle",
@@ -389,14 +397,14 @@
       "options": [
         "Default",
         "Red",
-        "Hearthian-Orange",
+        "Hearthian Orange",
         "Orange",
         "Yellow",
         "Green",
-        "Ghostly-Green",
+        "Ghostly Green",
         "Turquoise",
         "Blue",
-        "Nomaian-Blue",
+        "Nomaian Blue",
         "Blacklight",
         "Purple",
         "Magenta",
