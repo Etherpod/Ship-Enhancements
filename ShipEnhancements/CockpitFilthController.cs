@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 using static ShipEnhancements.ShipEnhancements.Settings;
+using System.Collections.Generic;
 
 namespace ShipEnhancements;
 
-public class CockpitRustController : MonoBehaviour
+public class CockpitFilthController : MonoBehaviour
 {
     [SerializeField]
     Texture2D[] _rustTextures;
@@ -17,21 +18,30 @@ public class CockpitRustController : MonoBehaviour
     private Material _dirtMat;
     private string _dirtLowerClipPropID = "_LowerClip";
     private string _dirtUpperClipPropID = "_UpperClip";
-    private ShipFluidDetector _shipDetector;
+    private FluidDetector _cockpitDetector;
 
     private float _dirtBuildupProgression;
-    private readonly float _dirtBuildupTime = 60f;
+    private float _dirtBuildupTime;
     private bool _addDirtBuildup = false;
-    private readonly float _dirtClearTime = 3f;
+    private float _dirtClearTime = 3f;
     private bool _clearDirt = false;
+
+    private readonly Dictionary<FluidVolume.Type, float> _fluidClearTimes = new()
+    {
+        { FluidVolume.Type.WATER, 5f },
+        { FluidVolume.Type.GEYSER, 2f },
+        { FluidVolume.Type.SAND, 8f },
+        { FluidVolume.Type.CLOUD, 15f }
+    };
 
     private void Awake()
     {
         _rustProgression = Mathf.Lerp(1f, 0.15f, (float)rustLevel.GetValue());
-        _shipDetector = Locator.GetShipDetector().GetComponent<ShipFluidDetector>();
+        _dirtBuildupTime = (float)dirtAccumulationTime.GetValue();
+        _cockpitDetector = GetComponentInChildren<StaticFluidDetector>();
 
-        _shipDetector.OnEnterFluidType += OnEnterFluidType;
-        _shipDetector.OnExitFluidType += OnExitFluidType;
+        _cockpitDetector.OnEnterFluidType += OnEnterFluidType;
+        _cockpitDetector.OnExitFluidType += OnExitFluidType;
     }
 
     private void Start()
@@ -83,8 +93,9 @@ public class CockpitRustController : MonoBehaviour
         {
             _addDirtBuildup = true;
         }
-        else if (type == FluidVolume.Type.WATER)
+        else if (_fluidClearTimes.ContainsKey(type))
         {
+            _dirtClearTime = _fluidClearTimes[type];
             _clearDirt = true;
         }
     }
@@ -95,15 +106,22 @@ public class CockpitRustController : MonoBehaviour
         {
             _addDirtBuildup = false;
         }
-        else if (type == FluidVolume.Type.WATER)
+        else if (_fluidClearTimes.ContainsKey(type))
         {
+            foreach (FluidVolume.Type volType in _fluidClearTimes.Keys)
+            {
+                if (volType != type && _cockpitDetector.InFluidType(volType))
+                {
+                    return;
+                }
+            }
             _clearDirt = false;
         }
     }
     
     private void OnDestroy()
     {
-        _shipDetector.OnEnterFluidType -= OnEnterFluidType;
-        _shipDetector.OnExitFluidType -= OnExitFluidType;
+        _cockpitDetector.OnEnterFluidType -= OnEnterFluidType;
+        _cockpitDetector.OnExitFluidType -= OnExitFluidType;
     }
 }

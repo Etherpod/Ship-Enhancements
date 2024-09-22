@@ -70,6 +70,7 @@ public static class SettingExtensions
         { Settings.disableShipFriction, (false, false) },
         { Settings.enableSignalscopeComponent, (false, false) },
         { Settings.rustLevel, (1f, 1f) },
+        { Settings.dirtAccumulationTime, (1f, 1f) },
     };
 
     public static string GetName(this Settings setting)

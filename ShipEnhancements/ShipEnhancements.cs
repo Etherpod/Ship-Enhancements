@@ -113,6 +113,7 @@ public class ShipEnhancements : ModBehaviour
         disableShipFriction,
         enableSignalscopeComponent,
         rustLevel,
+        dirtAccumulationTime,
     }
 
     private void Awake()
@@ -617,19 +618,11 @@ public class ShipEnhancements : ModBehaviour
                 collider.material = mat;
             }
         }
-        if ((float)Settings.rustLevel.GetValue() > 0f)
+        if ((float)Settings.rustLevel.GetValue() > 0f || (float)Settings.dirtAccumulationTime.GetValue() > 0f)
         {
             GameObject rustController = LoadPrefab("Assets/ShipEnhancements/RustController.prefab");
             AssetBundleUtilities.ReplaceShaders(rustController);
             Instantiate(rustController, Locator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry"));
-            /*GameObject insideCover = LoadPrefab("Assets/ShipEnhancements/DirtCoverInside.prefab");
-            AssetBundleUtilities.ReplaceShaders(insideCover);
-            GameObject outsideCover = LoadPrefab("Assets/ShipEnhancements/DirtCoverOutside.prefab");
-            AssetBundleUtilities.ReplaceShaders(outsideCover);
-            GameObject insideCoverObj = Instantiate(insideCover, Locator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry/Cockpit_Interior"));
-            GameObject outsideCoverObj = Instantiate(outsideCover, Locator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry/Cockpit_Exterior"));
-            float dirtyRatio = UnityEngine.Random.Range(0f, 1f);
-            insideCoverObj.GetComponent<MeshRenderer>().sharedMaterial.SetFloat("_Cutoff", dirtyRatio);*/
         }
 
         engineOn = !(bool)Settings.addEngineSwitch.GetValue();

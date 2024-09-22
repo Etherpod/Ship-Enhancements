@@ -2,7 +2,7 @@
 
 namespace ShipEnhancements;
 
-public class CampfireFluidDetector : FluidDetector
+public class StaticFluidDetector : FluidDetector
 {
     // Basically overrides original
     private void OnValidate()

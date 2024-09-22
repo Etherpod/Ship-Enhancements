@@ -247,6 +247,12 @@
       "value": 0,
       "tooltip": "Adds a delay while piloting the ship between when you press the button and when the ship recieves the input. Now you can pretend you're playing online!"
     },
+    "dirtAccumulationTime": {
+      "title": "Dirt Accumulation Time",
+      "type": "number",
+      "value": 0,
+      "tooltip": "Specifies the time in seconds that it takes for dirt to build up on your cockpit (0 is disabled). Find some water if you want to wash it off."
+    },
 
     "Add Ship Functions": {
       "type": "separator"

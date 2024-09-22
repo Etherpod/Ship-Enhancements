@@ -69,6 +69,7 @@ public static class SettingsPresets
         { "disableShipFriction", false },
         { "enableSignalscopeComponent", false },
         { "rustLevel", 0f },
+        { "dirtAccumulationTime", 0f },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -134,6 +135,7 @@ public static class SettingsPresets
         { "disableShipFriction", false },
         { "enableSignalscopeComponent", false },
         { "rustLevel", 0f },
+        { "dirtAccumulationTime", 0f },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -199,6 +201,7 @@ public static class SettingsPresets
         { "disableShipFriction", false },
         { "enableSignalscopeComponent", false },
         { "rustLevel", 0f },
+        { "dirtAccumulationTime", 0f },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -264,6 +267,7 @@ public static class SettingsPresets
         { "disableShipFriction", false },
         { "enableSignalscopeComponent", false },
         { "rustLevel", 0f },
+        { "dirtAccumulationTime", 0f },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -329,6 +333,7 @@ public static class SettingsPresets
         { "disableShipFriction", false },
         { "enableSignalscopeComponent", true },
         { "rustLevel", 0f },
+        { "dirtAccumulationTime", 0f },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -394,6 +399,7 @@ public static class SettingsPresets
         { "disableShipFriction", true },
         { "enableSignalscopeComponent", true },
         { "rustLevel", 0.5f },
+        { "dirtAccumulationTime", 350f },
     };
 
     public static readonly Dictionary<string, object[]> RandomSettings = new Dictionary<string, object[]>()
@@ -500,6 +506,7 @@ public static class SettingsPresets
         { "disableShipFriction", [false, false, false, true] },
         { "enableSignalscopeComponent", [false, true] },
         { "rustLevel", [0f, 0f, 0f, 1f] },
+        { "dirtAccumulationTime", [0f, 0f, 100f, 500f] },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }
