@@ -40,6 +40,18 @@ public static class SettingsColors
         { "Rainbow", Color.white }
     };
 
+    private static Dictionary<string, (Color, float)> _nameToThrusterColor = new()
+    {
+        { "Default", (Color.white, 1f) },
+        { "Red", (new Color(191, 23, 23), 3.278829f) },
+        { "Lime", (new Color(50, 191, 0), 2.6f) },
+        { "Ghostly Green", (new Color(3, 191, 117), 3.8f) },
+        { "Turquoise", (new Color(3, 71, 191), 4.8f) },
+        { "Blue", (new Color(1, 12, 191), 5.900001f) },
+        { "Purple", (new Color(3, 2, 191), 7.4f) },
+        { "Pink", (new Color(122, 9, 191), 4.128854f) },
+    };
+
     public static Color GetLightingColor(string name)
     {
         if (name == "Divine")
@@ -52,5 +64,10 @@ public static class SettingsColors
     public static Color GetShipColor(string name)
     {
         return _nameToShipColor.ContainsKey(name) ? _nameToShipColor[name] / 255f : Color.white;
+    }
+
+    public static (Color, float) GetThrusterColor(string name)
+    {
+        return _nameToThrusterColor.ContainsKey(name) ? (_nameToThrusterColor[name].Item1 / 255f, _nameToThrusterColor[name].Item2) : _nameToThrusterColor["Default"];
     }
 }

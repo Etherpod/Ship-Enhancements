@@ -571,6 +571,13 @@ public class ShipEnhancements : ModBehaviour
                 {
                     flame.transform.localScale = Vector3.zero;
                 }
+
+                MeshRenderer rend = flame.GetComponent<MeshRenderer>();
+                Color baseColor = rend.material.GetColor("_Color");
+                float alpha = baseColor.a;
+                Color newColor = SettingsColors.GetThrusterColor("Red");
+                newColor.a = alpha;
+                rend.material.SetColor("_Color", newColor);
             }
         }
         if ((float)Settings.reactorLifetimeMultiplier.GetValue() != 1f)
