@@ -70,6 +70,7 @@ public static class SettingsPresets
         { "enableSignalscopeComponent", false },
         { "rustLevel", 0f },
         { "dirtAccumulationTime", 0f },
+        { "thrusterColor", "Default" },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -136,6 +137,7 @@ public static class SettingsPresets
         { "enableSignalscopeComponent", false },
         { "rustLevel", 0f },
         { "dirtAccumulationTime", 0f },
+        { "thrusterColor", "Default" },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -202,6 +204,7 @@ public static class SettingsPresets
         { "enableSignalscopeComponent", false },
         { "rustLevel", 0f },
         { "dirtAccumulationTime", 0f },
+        { "thrusterColor", "Default" },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -268,6 +271,7 @@ public static class SettingsPresets
         { "enableSignalscopeComponent", false },
         { "rustLevel", 0f },
         { "dirtAccumulationTime", 0f },
+        { "thrusterColor", "Default" },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -334,6 +338,7 @@ public static class SettingsPresets
         { "enableSignalscopeComponent", true },
         { "rustLevel", 0f },
         { "dirtAccumulationTime", 0f },
+        { "thrusterColor", "Default" },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -400,6 +405,7 @@ public static class SettingsPresets
         { "enableSignalscopeComponent", true },
         { "rustLevel", 0.5f },
         { "dirtAccumulationTime", 350f },
+        { "thrusterColor", "Default" },
     };
 
     public static readonly Dictionary<string, object[]> RandomSettings = new Dictionary<string, object[]>()
@@ -507,6 +513,20 @@ public static class SettingsPresets
         { "enableSignalscopeComponent", [false, true] },
         { "rustLevel", [0f, 0f, 0f, 1f] },
         { "dirtAccumulationTime", [0f, 0f, 100f, 500f] },
+        { "thrusterColor", [
+            "Default",
+            "Red",
+            "White-Orange",
+            "Lime-Orange",
+            "Lime",
+            "Ghostly Green",
+            "Turquoise",
+            "Blue",
+            "Purple",
+            "Rose",
+            "Pink",
+            "Rainbow"
+            ] },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

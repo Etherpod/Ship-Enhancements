@@ -114,6 +114,7 @@ public class ShipEnhancements : ModBehaviour
         enableSignalscopeComponent,
         rustLevel,
         dirtAccumulationTime,
+        thrusterColor,
     }
 
     private void Awake()
@@ -559,7 +560,7 @@ public class ShipEnhancements : ModBehaviour
         {
             InputLatencyController.Initialize();
         }
-        if ((bool)Settings.hotThrusters.GetValue())
+        if ((bool)Settings.hotThrusters.GetValue() || (string)Settings.thrusterColor.GetValue() != "Default")
         {
             GameObject flameHazardVolume = LoadPrefab("Assets/ShipEnhancements/FlameHeatVolume.prefab");
             foreach (ThrusterFlameController flame in Locator.GetShipTransform().GetComponentsInChildren<ThrusterFlameController>())
@@ -572,12 +573,25 @@ public class ShipEnhancements : ModBehaviour
                     flame.transform.localScale = Vector3.zero;
                 }
 
-                MeshRenderer rend = flame.GetComponent<MeshRenderer>();
-                Color baseColor = rend.material.GetColor("_Color");
-                float alpha = baseColor.a;
-                Color newColor = SettingsColors.GetThrusterColor("Red");
-                newColor.a = alpha;
-                rend.material.SetColor("_Color", newColor);
+                string color = (string)Settings.thrusterColor.GetValue();
+
+                if (color == "Rainbow")
+                {
+                    flame.gameObject.AddComponent<RainbowShipThrusters>();
+                }
+                else if (color != "Default")
+                {
+                    MeshRenderer rend = flame.GetComponent<MeshRenderer>();
+                    Color baseColor = rend.material.GetColor("_Color");
+                    float alpha = baseColor.a;
+                    (Color, float, Color) emissiveColor = SettingsColors.GetThrusterColor(color);
+                    Color newColor = emissiveColor.Item1 * Mathf.Pow(emissiveColor.Item2, 2);
+                    newColor.a = alpha;
+                    rend.material.SetColor("_Color", newColor);
+
+                    Light light = flame.GetComponentInChildren<Light>();
+                    light.color = emissiveColor.Item3;
+                }
             }
         }
         if ((float)Settings.reactorLifetimeMultiplier.GetValue() != 1f)

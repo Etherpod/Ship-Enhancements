@@ -40,16 +40,20 @@ public static class SettingsColors
         { "Rainbow", Color.white }
     };
 
-    private static Dictionary<string, (Color, float)> _nameToThrusterColor = new()
+    private static Dictionary<string, (Color, float, Color)> _nameToThrusterColor = new()
     {
-        { "Default", (Color.white, 1f) },
-        { "Red", (new Color(191, 23, 23), 3.278829f) },
-        { "Lime", (new Color(50, 191, 0), 2.6f) },
-        { "Ghostly Green", (new Color(3, 191, 117), 3.8f) },
-        { "Turquoise", (new Color(3, 71, 191), 4.8f) },
-        { "Blue", (new Color(1, 12, 191), 5.900001f) },
-        { "Purple", (new Color(3, 2, 191), 7.4f) },
-        { "Pink", (new Color(122, 9, 191), 4.128854f) },
+        { "Default", (Color.white, 1f, Color.white) },
+        { "Red", (new Color(191, 23, 23), 3.278829f, new Color(255, 101, 30)) },
+        { "White-Orange", (new Color(26, 54, 191), 5.2f, new Color(255, 214, 179)) },
+        { "Lime-Orange", (new Color(64, 191, 68), 2.5f, new Color(230, 255, 105)) },
+        { "Lime", (new Color(25, 191, 0), 2.574406f, new Color(143, 255, 47)) },
+        { "Ghostly Green", (new Color(3, 191, 117), 3.8f, new Color(83, 255, 150)) },
+        { "Turquoise", (new Color(4, 39, 191), 4.8f, new Color(131, 239, 255)) },
+        { "Blue", (new Color(1, 12, 191), 5.900001f, new Color(177, 218, 255)) },
+        { "Purple", (new Color(3, 2, 191), 6.2f, new Color(214, 158, 255)) },
+        { "Rose", (new Color(31, 26, 191), 4.2f, new Color(252, 182, 255)) },
+        { "Pink", (new Color(137, 7, 191), 4.8f, new Color(255, 162, 233)) },
+        { "Rainbow", (Color.white, 1f, Color.white) },
     };
 
     public static Color GetLightingColor(string name)
@@ -66,8 +70,9 @@ public static class SettingsColors
         return _nameToShipColor.ContainsKey(name) ? _nameToShipColor[name] / 255f : Color.white;
     }
 
-    public static (Color, float) GetThrusterColor(string name)
+    public static (Color, float, Color) GetThrusterColor(string name)
     {
-        return _nameToThrusterColor.ContainsKey(name) ? (_nameToThrusterColor[name].Item1 / 255f, _nameToThrusterColor[name].Item2) : _nameToThrusterColor["Default"];
+        return _nameToThrusterColor.ContainsKey(name) ? (_nameToThrusterColor[name].Item1 / 191f, 
+            _nameToThrusterColor[name].Item2, _nameToThrusterColor[name].Item3 / 255f) : _nameToThrusterColor["Default"];
     }
 }

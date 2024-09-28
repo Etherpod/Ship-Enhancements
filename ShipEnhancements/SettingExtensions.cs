@@ -71,6 +71,7 @@ public static class SettingExtensions
         { Settings.enableSignalscopeComponent, (false, false) },
         { Settings.rustLevel, (1f, 1f) },
         { Settings.dirtAccumulationTime, (1f, 1f) },
+        { Settings.thrusterColor, ("Default", "Default") },
     };
 
     public static string GetName(this Settings setting)

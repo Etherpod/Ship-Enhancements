@@ -93,9 +93,19 @@ public class ShipOverdriveController : ElectricalComponent
         {
             if (_cooldownT > 0f)
             {
-                foreach (Renderer renderer in _thrusterRenderers)
+                if ((string)thrusterColor.GetProperty() == "Rainbow")
                 {
-                    renderer.material.SetColor("_Color", Color.Lerp(_defaultColor, _overdriveColor, _cooldownT));
+                    foreach (Renderer renderer in _thrusterRenderers)
+                    {
+                        renderer.material.SetColor("_Color", Color.Lerp(RainbowShipThrusters.currentColor, _overdriveColor, _cooldownT));
+                    }
+                }
+                else
+                {
+                    foreach (Renderer renderer in _thrusterRenderers)
+                    {
+                        renderer.material.SetColor("_Color", Color.Lerp(_defaultColor, _overdriveColor, _cooldownT));
+                    }
                 }
                 _cooldownT -= Time.deltaTime / _cooldownLength;
             }
@@ -149,6 +159,7 @@ public class ShipOverdriveController : ElectricalComponent
         }
         Locator.GetShipBody().AddImpulse(Locator.GetShipTransform().forward * 500f);
         SELocator.GetShipResources().DrainFuel(150f);
+        _defaultColor = _thrusterRenderers[0].material.GetColor("_Color");
         ShipElectricalComponent electrical = SELocator.GetShipDamageController()._shipElectricalComponent;
         electrical._electricalSystem.Disrupt(electrical._disruptionLength);
         _primeButton.SetButtonOn(false);

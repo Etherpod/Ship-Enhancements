@@ -458,6 +458,26 @@
       ],
       "tooltip": "Changes the color of the outside of the ship."
     },
+    "thrusterColor": {
+      "title": "Ship Thruster Flame Color",
+      "type": "selector",
+      "value": "Default",
+      "options": [
+        "Default",
+        "Red",
+        "White-Orange",
+        "Lime-Orange",
+        "Lime",
+        "Ghostly Green",
+        "Turquoise",
+        "Blue",
+        "Purple",
+        "Rose",
+        "Pink",
+        "Rainbow"
+      ],
+      "tooltip": "Changes the color of the thruster flames produced by the ship."
+    },
 
     "Quality of Life": {
       "type": "separator"
