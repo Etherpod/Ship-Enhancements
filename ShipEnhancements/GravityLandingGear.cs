@@ -7,6 +7,7 @@ public class GravityLandingGear : MonoBehaviour
     private ShipLandingGear _landingGear;
     private OWAudioSource _audioSource;
     private ParticleSystem _gravityEffects;
+    private ShipThrusterModel _thrusterModel;
     private float _gravityMagnitude = 10f;
     private bool _gravityEnabled = false;
     private bool _shipDestroyed = false;
@@ -20,6 +21,7 @@ public class GravityLandingGear : MonoBehaviour
         _audioSource = Instantiate(audioObject, transform).GetComponent<OWAudioSource>();
         GameObject effectsObject = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/Effects_GravityLandingGear_WarpParticles.prefab");
         _gravityEffects = Instantiate(effectsObject, transform).GetComponent<ParticleSystem>();
+        _thrusterModel = Locator.GetShipBody().GetComponent<ShipThrusterModel>();
 
         ShipEnhancements.Instance.OnGravityLandingGearSwitch += SetGravityEnabled;
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
@@ -61,7 +63,8 @@ public class GravityLandingGear : MonoBehaviour
 
     private void OnTriggerStay(Collider hitCollider)
     {
-        if (_shipDestroyed || _landingGear.isDamaged || !_gravityEnabled || !ShipEnhancements.Instance.engineOn)
+        if (_shipDestroyed || _landingGear.isDamaged || !_gravityEnabled || !ShipEnhancements.Instance.engineOn
+            || _thrusterModel.GetLocalAcceleration().y > 0f)
         {
             return;
         }
