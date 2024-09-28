@@ -319,6 +319,7 @@ public class ShipEnhancements : ModBehaviour
         yield return new WaitUntil(() => Locator._shipBody != null);
 
         SELocator.Initalize();
+        ThrustIndicatorManager.Initialize();
 
         GameObject buttonConsole = LoadPrefab("Assets/ShipEnhancements/ButtonConsole.prefab");
         AssetBundleUtilities.ReplaceShaders(buttonConsole);
@@ -591,6 +592,8 @@ public class ShipEnhancements : ModBehaviour
 
                     Light light = flame.GetComponentInChildren<Light>();
                     light.color = emissiveColor.Item3;
+
+                    ThrustIndicatorManager.SetColor(SettingsColors.GetIndicatorColor(color));
                 }
             }
         }

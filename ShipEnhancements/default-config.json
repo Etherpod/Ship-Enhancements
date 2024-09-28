@@ -472,8 +472,8 @@
         "Turquoise",
         "Blue",
         "Purple",
-        "Rose",
         "Pink",
+        "Rose",
         "Rainbow"
       ],
       "tooltip": "Changes the color of the thruster flames produced by the ship."

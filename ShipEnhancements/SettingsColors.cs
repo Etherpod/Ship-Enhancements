@@ -51,9 +51,25 @@ public static class SettingsColors
         { "Turquoise", (new Color(4, 39, 191), 4.8f, new Color(131, 239, 255)) },
         { "Blue", (new Color(1, 12, 191), 5.900001f, new Color(177, 218, 255)) },
         { "Purple", (new Color(3, 2, 191), 6.2f, new Color(214, 158, 255)) },
-        { "Rose", (new Color(31, 26, 191), 4.2f, new Color(252, 182, 255)) },
         { "Pink", (new Color(137, 7, 191), 4.8f, new Color(255, 162, 233)) },
+        { "Rose", (new Color(31, 26, 191), 4.2f, new Color(252, 182, 255)) },
         { "Rainbow", (Color.white, 1f, Color.white) },
+    };
+
+    private static Dictionary<string, Color> _nameToIndicatorColor = new()
+    {
+        { "Default", Color.white },
+        { "Red", new Color(255, 16, 23) },
+        { "White-Orange", new Color(255, 182, 124) },
+        { "Lime-Orange", new Color(211, 255, 30) },
+        { "Lime", new Color(106, 243, 0) },
+        { "Ghostly Green", new Color(28, 255, 43) },
+        { "Turquoise", new Color(37, 255, 236) },
+        { "Blue", new Color(19, 92, 255) },
+        { "Purple", new Color(78, 14, 383) },
+        { "Pink", new Color(255, 67, 255) },
+        { "Rose", new Color(255, 57, 109) },
+        { "Rainbow", Color.white },
     };
 
     public static Color GetLightingColor(string name)
@@ -74,5 +90,10 @@ public static class SettingsColors
     {
         return _nameToThrusterColor.ContainsKey(name) ? (_nameToThrusterColor[name].Item1 / 191f, 
             _nameToThrusterColor[name].Item2, _nameToThrusterColor[name].Item3 / 255f) : _nameToThrusterColor["Default"];
+    }
+
+    public static Color GetIndicatorColor(string name)
+    {
+        return _nameToIndicatorColor.ContainsKey(name) ? _nameToIndicatorColor[name] / 255f : _nameToIndicatorColor["Default"];
     }
 }

@@ -24,6 +24,7 @@ public class ShipOverdriveController : ElectricalComponent
     private float _cooldownT;
     private Color _defaultColor;
     private Color _overdriveColor;
+    private Color _indicatorColor = new Color(0.49853f, 0.38774f, 5.29f);
     private readonly float _thrustMultiplier = 6f;
     private ShipReactorComponent _reactor;
     private ElectricalSystem _electricalSystem;
@@ -97,7 +98,7 @@ public class ShipOverdriveController : ElectricalComponent
                 {
                     foreach (Renderer renderer in _thrusterRenderers)
                     {
-                        renderer.material.SetColor("_Color", Color.Lerp(RainbowShipThrusters.currentColor, _overdriveColor, _cooldownT));
+                        renderer.material.SetColor("_Color", Color.Lerp(RainbowShipThrusters.currentThrusterColor, _overdriveColor, _cooldownT));
                     }
                 }
                 else
@@ -107,6 +108,9 @@ public class ShipOverdriveController : ElectricalComponent
                         renderer.material.SetColor("_Color", Color.Lerp(_defaultColor, _overdriveColor, _cooldownT));
                     }
                 }
+
+                ThrustIndicatorManager.LayerColor(_indicatorColor, _cooldownT);
+
                 _cooldownT -= Time.deltaTime / _cooldownLength;
             }
             else
@@ -273,6 +277,11 @@ public class ShipOverdriveController : ElectricalComponent
     public bool IsCharging()
     {
         return _charging;
+    }
+
+    public bool IsCooldown()
+    {
+        return _onCooldown;
     }
 
     private void OnDestroy()

@@ -1,24 +1,31 @@
 ﻿using UnityEngine;
+using static ShipEnhancements.ShipEnhancements.Settings;
+
+namespace ShipEnhancements;
 
 public class RainbowShipThrusters : MonoBehaviour
 {
     private MeshRenderer _rend;
     private Material _thrustMat;
     private Light _light;
-    private float _colorTransitionTime = 6f;
+    private ThrustAndAttitudeIndicator _indicator;
+    private Material _indicatorMat;
+    private float _colorTransitionTime = 1f;
     private float _red;
     private float _green;
     private float _blue;
     private int _index;
     private float _lastDelta;
 
-    public static Color currentColor;
+    public static Color currentThrusterColor;
+    public static Color currentLightColor;
 
     private void Start()
     {
         _rend = GetComponent<MeshRenderer>();
         _thrustMat = _rend?.material;
         _light = GetComponentInChildren<Light>();
+        _indicator = Locator.GetShipTransform().GetComponentInChildren<ThrustAndAttitudeIndicator>(true);
         _red = 1f;
         _green = 0f;
         _blue = 0f;
@@ -68,13 +75,34 @@ public class RainbowShipThrusters : MonoBehaviour
         Color prevColor = _thrustMat.GetColor("_Color");
         Color thrusterColor = color * (_red * 2f + _green * 3f + _blue * 7f);
         thrusterColor.a = prevColor.a;
+
         _thrustMat.SetColor("_Color", thrusterColor);
         if (_light)
         {
             _light.color = color;
         }
 
-        currentColor = thrusterColor;
+        if (_indicator.isActiveAndEnabled)
+        {
+            ThrustIndicatorManager.SetColor(color);
+        }
+
+        /*if (!((bool)enableThrustModulator.GetProperty() && SELocator.GetShipOverdriveController().IsCooldown()))
+        {
+            _thrustMat.SetColor("_Color", thrusterColor);
+            if (_light)
+            {
+                _light.color = color;
+            }
+
+            if (_indicator.isActiveAndEnabled)
+            {
+                ThrustIndicatorManager.SetColor(color);
+            }
+        }*/
+
+        currentThrusterColor = thrusterColor;
+        currentLightColor = color;
         _lastDelta = num;
     }
 }
