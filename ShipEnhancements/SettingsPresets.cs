@@ -71,6 +71,7 @@ public static class SettingsPresets
         { "rustLevel", 0f },
         { "dirtAccumulationTime", 0f },
         { "thrusterColor", "Default" },
+        { "disableSeatbelt", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -138,6 +139,7 @@ public static class SettingsPresets
         { "rustLevel", 0f },
         { "dirtAccumulationTime", 0f },
         { "thrusterColor", "Default" },
+        { "disableSeatbelt", true },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -205,6 +207,7 @@ public static class SettingsPresets
         { "rustLevel", 0f },
         { "dirtAccumulationTime", 0f },
         { "thrusterColor", "Default" },
+        { "disableSeatbelt", false },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -272,6 +275,7 @@ public static class SettingsPresets
         { "rustLevel", 0f },
         { "dirtAccumulationTime", 0f },
         { "thrusterColor", "Default" },
+        { "disableSeatbelt", false },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -339,6 +343,7 @@ public static class SettingsPresets
         { "rustLevel", 0f },
         { "dirtAccumulationTime", 0f },
         { "thrusterColor", "Default" },
+        { "disableSeatbelt", false },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -406,6 +411,7 @@ public static class SettingsPresets
         { "rustLevel", 0.5f },
         { "dirtAccumulationTime", 350f },
         { "thrusterColor", "Default" },
+        { "disableSeatbelt", true },
     };
 
     public static readonly Dictionary<string, object[]> RandomSettings = new Dictionary<string, object[]>()
@@ -416,10 +422,10 @@ public static class SettingsPresets
         { "disableLandingCamera", [false, true] },
         { "disableShipLights", [false, false, true] },
         { "disableShipOxygen", [false, false, true] },
-        { "oxygenDrainMultiplier", [1f, 100f, 500f, 1f, 2000f] },
-        { "fuelDrainMultiplier", [1f, 10f, 0.5f, 100f] },
+        { "oxygenDrainMultiplier", [1f, 10f, 100f, 500f, 1f, 2000f] },
+        { "fuelDrainMultiplier", [1f, 2f, 5f, 10f, 0.5f, 100f] },
         { "shipDamageMultiplier", [1f, 2f, 3f, 0.1f, 20f] },
-        { "shipDamageSpeedMultiplier", [1f, 0.1f, 5f] },
+        { "shipDamageSpeedMultiplier", [1f, 0.8f, 1.2f, 0.1f, 5f] },
         { "shipOxygenRefill", [false, true, true, true] },
         { "disableShipRepair", [false, false, false, false, true] },
         { "enableGravityLandingGear", [false, false, true] },
@@ -527,6 +533,7 @@ public static class SettingsPresets
             "Pink",
             "Rainbow"
             ] },
+        { "disableSeatbelt", [false, false, false, true] },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

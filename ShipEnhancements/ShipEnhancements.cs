@@ -115,6 +115,7 @@ public class ShipEnhancements : ModBehaviour
         rustLevel,
         dirtAccumulationTime,
         thrusterColor,
+        disableSeatbelt,
     }
 
     private void Awake()

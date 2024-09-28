@@ -2206,4 +2206,66 @@ public static class PatchClass
         return false;
     }
     #endregion
+
+    #region NoSeatbelt
+    private static Vector3 _lastImpactVelocity;
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.OnImpact))]
+    public static void UnbucklePlayerOnImpact(ShipDamageController __instance, ImpactData impact)
+    {
+        if ((bool)disableSeatbelt.GetProperty() && PlayerState.AtFlightConsole() && impact.speed > 25f)
+        {
+            _lastImpactVelocity = impact.velocity.normalized * -impact.speed / 40f;
+            ShipCockpitController cockpit = Locator.GetShipTransform().GetComponentInChildren<ShipCockpitController>();
+            cockpit.ExitFlightConsole();
+            cockpit._exitFlightConsoleTime -= 0.2f;
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(FluidDetector), nameof(FluidDetector.OnEnterFluidType_Internal))]
+    public static void UnbucklePlayerOnFluidImpact(FluidDetector __instance, FluidVolume fluid)
+    {
+        if ((bool)disableSeatbelt.GetProperty() && PlayerState.AtFlightConsole() && __instance is ShipFluidDetector)
+        {
+            Vector3 vector = fluid.GetPointFluidVelocity(__instance.transform.position, __instance) - __instance._owRigidbody.GetVelocity();
+            float pointDensity = fluid.GetPointDensity(__instance.transform.position, __instance);
+            float fractionSubmerged = fluid.GetFractionSubmerged(__instance);
+            Vector3 impactVelocity = __instance.CalculateDragVelocityChange(vector, pointDensity, fractionSubmerged);
+            if (impactVelocity.magnitude > 10f)
+            {
+                _lastImpactVelocity = -impactVelocity / 25f;
+                ShipCockpitController cockpit = Locator.GetShipTransform().GetComponentInChildren<ShipCockpitController>();
+                cockpit.ExitFlightConsole();
+                cockpit._exitFlightConsoleTime -= 0.2f;
+            }
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.CompleteExitFlightConsole))]
+    public static void ApplyCrashForceToPlayer()
+    {
+        if ((bool)disableSeatbelt.GetProperty() && _lastImpactVelocity != Vector3.zero)
+        {
+            Locator.GetPlayerBody().AddForce(_lastImpactVelocity);
+            _lastImpactVelocity = Vector3.zero;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipAudioController), nameof(ShipAudioController.PlayBuckle))]
+    public static bool DisableBuckleAudio()
+    {
+        return !(bool)disableSeatbelt.GetProperty();
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipAudioController), nameof(ShipAudioController.PlayUnbuckle))]
+    public static bool DisableUnbuckleAudio()
+    {
+        return !(bool)disableSeatbelt.GetProperty();
+    }
+    #endregion
 }

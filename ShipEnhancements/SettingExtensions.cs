@@ -72,6 +72,7 @@ public static class SettingExtensions
         { Settings.rustLevel, (1f, 1f) },
         { Settings.dirtAccumulationTime, (1f, 1f) },
         { Settings.thrusterColor, ("Default", "Default") },
+        { Settings.disableSeatbelt, (false, false) },
     };
 
     public static string GetName(this Settings setting)

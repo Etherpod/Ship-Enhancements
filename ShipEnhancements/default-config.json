@@ -120,6 +120,12 @@
       "value": false,
       "tooltip": "Removes the markers that tell you the location of your ship, your scout, and any marked locations in the ship log. Try not to lose your ship."
     },
+    "disableSeatbelt": {
+      "title": "Disable Seatbelt",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Removes the seatbelt in your ship that keeps you from killing yourself. If you crash into something too quickly you'll fly out of your chair."
+    },
 
     "Adjust Ship Functions": {
       "type": "separator"
