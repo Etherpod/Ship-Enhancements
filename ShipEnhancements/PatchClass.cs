@@ -515,8 +515,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipResources), nameof(ShipResources.Update))]
     public static bool RefillShipOxygen(ShipResources __instance)
     {
-        if ((bool)disableShipOxygen.GetProperty() || !(bool)shipOxygenRefill.GetProperty()
-            || ModCompatibility.GetModSetting("Stonesword.ResourceManagement", "Enable Oxygen Refill")) return true;
+        if ((bool)disableShipOxygen.GetProperty() || !(bool)shipOxygenRefill.GetProperty()) return true;
 
         if (__instance._killingResources)
         {

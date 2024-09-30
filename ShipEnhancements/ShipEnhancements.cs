@@ -130,7 +130,6 @@ public class ShipEnhancements : ModBehaviour
     {
         _shipEnhancementsBundle = AssetBundle.LoadFromFile(Path.Combine(ModHelper.Manifest.ModFolderPath, "assets/shipenhancements"));
 
-        ModCompatibility.Initialize();
         SettingsPresets.InitializePresets();
 
         probeLauncherName = EnumUtils.Create<UITextType>("ScoutLauncher");
@@ -641,7 +640,7 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)Settings.disableShipFriction.GetValue())
         {
             PhysicMaterial mat = (PhysicMaterial)LoadAsset("Assets/ShipEnhancements/FrictionlessShip.physicMaterial");
-            foreach (Collider collider in Locator.GetShipTransform().GetComponentsInChildren<Collider>(true))
+            foreach (Collider collider in Locator.GetShipTransform().GetComponentsInChildren<Collider>())
             {
                 collider.material = mat;
             }
