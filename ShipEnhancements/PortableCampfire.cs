@@ -50,7 +50,6 @@ public class PortableCampfire : Campfire
             bool outsideWater = IsOutsideWater();
             if (_lastOutsideWaterState != outsideWater)
             {
-                ShipEnhancements.WriteDebugMessage("Change state to " + outsideWater);
                 _lastOutsideWaterState = outsideWater;
                 _interactVolume._screenPrompt.SetDisplayState(outsideWater ? ScreenPrompt.DisplayState.Normal : ScreenPrompt.DisplayState.GrayedOut);
             }

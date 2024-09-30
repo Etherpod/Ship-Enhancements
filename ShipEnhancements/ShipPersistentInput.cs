@@ -14,6 +14,7 @@ public class ShipPersistentInput : ThrusterController
     private Autopilot _shipAutopilot;
     private bool _lastAutopilotState;
     private ShipThrusterController _thrustController;
+    private bool _fuelDepleted;
 
     private void Start()
     {
@@ -62,7 +63,7 @@ public class ShipPersistentInput : ThrusterController
 
     private void OnExitFlightConsole()
     {
-        if (!_inputEnabled) return;
+        if (!_inputEnabled || _fuelDepleted) return;
         _currentInput = GetComponent<ShipThrusterController>()._lastTranslationalInput;
         if (_currentInput != Vector3.zero && !IsAutopilotEnabled() && !_thrustController.RequiresIgnition())
         {
@@ -70,10 +71,10 @@ public class ShipPersistentInput : ThrusterController
         }
     }
 
-    public void SetInputEnabled(bool flag)
+    public void SetInputEnabled(bool setEnabled)
     {
-        _inputEnabled = flag;
-        if (!flag && _currentInput != Vector3.zero && enabled)
+        _inputEnabled = setEnabled;
+        if (!setEnabled && _currentInput != Vector3.zero && enabled)
         {
             enabled = false;
             _thrustDisplay._thrusterArrowRoot.gameObject.SetActive(false);
@@ -83,7 +84,7 @@ public class ShipPersistentInput : ThrusterController
                 _displayRenderers[i].material.SetFloat(_thrustDisplay._propID_BarPosition, 0f);
             }
         }
-        else if (flag && _currentInput != Vector3.zero && !enabled)
+        else if (setEnabled && _currentInput != Vector3.zero && !enabled && !_fuelDepleted)
         {
             enabled = true;
             _thrustDisplay._thrusterArrowRoot.gameObject.SetActive(true);
@@ -136,6 +137,17 @@ public class ShipPersistentInput : ThrusterController
     public bool InputEnabled()
     {
         return _inputEnabled && !_lastAutopilotState && ShipEnhancements.Instance.engineOn;
+    }
+
+    private void OnFuelDepleted()
+    {
+        _fuelDepleted = true;
+        OnDisableEngine();
+    }
+
+    private void OnFuelRestored()
+    {
+        _fuelDepleted = false;
     }
 
     public override void OnDestroy()

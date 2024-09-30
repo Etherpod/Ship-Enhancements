@@ -28,7 +28,6 @@ public static class ThrustIndicatorManager
 
     public static void SetColor(Color color)
     {
-        ShipEnhancements.WriteDebugMessage("print");
         _currentColor = color;
         foreach (Light light in _barLights)
         {

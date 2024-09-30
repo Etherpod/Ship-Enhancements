@@ -985,7 +985,7 @@ public class ShipEnhancements : ModBehaviour
             foreach (Settings setting in allSettings)
             {
                 setting.SetValue(config.GetSettingsValue<object>(setting.GetName()));
-                if (_currentPreset != SettingsPresets.PresetName.Custom)
+                if (_currentPreset != SettingsPresets.PresetName.Custom && _currentPreset != SettingsPresets.PresetName.Random)
                 {
                     isCustom = isCustom || !_currentPreset.GetPresetSetting(setting.GetName()).Equals(setting.GetValue());
                 }

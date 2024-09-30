@@ -22,7 +22,6 @@ public class ShipBouncyHull : MonoBehaviour
         //Vector3 velocity = impact.otherBody.GetPointVelocity(impact.point) - body.GetPointVelocity(impact.point);
         Vector3 collisionVelocity = body.GetPointTangentialVelocity(impact.point) - impact.otherBody.GetPointTangentialVelocity(impact.point);
         //Vector3 collisionVelocity = body.GetVelocity() - impact.otherBody.GetVelocity();
-        //ShipEnhancements.WriteDebugMessage(collisionVelocity.magnitude);
         Vector3 directSpeed = Vector3.Project(collisionVelocity, impact.normal);
         Vector3 direction = Vector3.Reflect(collisionVelocity, impact.normal);
 
