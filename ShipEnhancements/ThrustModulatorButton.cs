@@ -25,6 +25,7 @@ public class ThrustModulatorButton : MonoBehaviour
     private bool _pressed = false;
     private float _baseLightIntensity;
     private Color _baseLightColor;
+    private bool _resetWhenOff = false;
 
     private void Awake()
     {
@@ -66,6 +67,11 @@ public class ThrustModulatorButton : MonoBehaviour
             if (num >= 1)
             {
                 _fading = false;
+                if (_resetWhenOff && !_active)
+                {
+                    _resetWhenOff = false;
+                    ResetButtonColor();
+                }
             }
         }
     }
@@ -128,6 +134,12 @@ public class ThrustModulatorButton : MonoBehaviour
         }
     }
 
+    public void TurnOffAndReset()
+    {
+        SetButtonLight(false);
+        _resetWhenOff = true;
+    }
+
     public void SetInteractable(bool interactable)
     {
         _interactReceiver.SetInteractionEnabled(interactable);
@@ -142,6 +154,7 @@ public class ThrustModulatorButton : MonoBehaviour
     public void ResetButtonColor()
     {
         _emissiveRenderer.SetEmissionColor(_emissiveRenderer.GetOriginalEmissionColor());
+        _emissiveRenderer.SetEmissiveScale(_active ? 1f : 0f);
         _light.color = _baseLightColor;
     }
 

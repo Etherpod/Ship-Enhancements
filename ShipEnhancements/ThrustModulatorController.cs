@@ -93,7 +93,7 @@ public class ThrustModulatorController : ElectricalComponent
     {
         foreach (ThrustModulatorButton button in _modulatorButtons)
         {
-            button.SetButtonLight(false);
+            button.TurnOffAndReset();
             button.SetInteractable(false);
         }
 
@@ -101,7 +101,6 @@ public class ThrustModulatorController : ElectricalComponent
 
         foreach (ThrustModulatorButton button in _modulatorButtons)
         {
-            button.ResetButtonColor();
             if (_electricalSystem.IsPowered() &&
                 !(SELocator.GetShipDamageController().IsElectricalFailed() || SELocator.GetShipDamageController().IsSystemFailed()))
             {
@@ -157,11 +156,7 @@ public class ThrustModulatorController : ElectricalComponent
             StopCoroutine(_overdriveSequence);
             _overdriveSequence = null;
         }
-        if (_electricalSystem.IsPowered() && 
-            !(SELocator.GetShipDamageController().IsElectricalFailed() || SELocator.GetShipDamageController().IsSystemFailed()))
-        {
-            StartCoroutine(ResetModulator());
-        }
+        StartCoroutine(ResetModulator());
     }
 
     private void OnShipSystemFailure()
