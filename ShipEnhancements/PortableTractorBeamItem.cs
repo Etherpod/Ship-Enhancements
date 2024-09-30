@@ -69,7 +69,6 @@ public class PortableTractorBeamItem : OWItem
 
     public override void SocketItem(Transform socketTransform, Sector sector)
     {
-        ShipEnhancements.WriteDebugMessage("Socketed");
         base.SocketItem(socketTransform, sector);
         _socketed = true;
         transform.localScale = Vector3.one * 0.5f;

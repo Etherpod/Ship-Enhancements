@@ -37,6 +37,7 @@ public class ShipOverdriveController : ElectricalComponent
     private float _buttonResetTime = 2.5f;
     private float _resetStartTime;
     private bool _onResetTimer = false;
+    private bool _fuelDepleted = false;
 
     public bool Charging { get { return _charging; } }
     public bool OnCooldown { get { return _onCooldown; } }
@@ -60,7 +61,8 @@ public class ShipOverdriveController : ElectricalComponent
         _reactor = Locator.GetShipTransform().GetComponentInChildren<ShipReactorComponent>();
         _modulatorController = GetComponent<ThrustModulatorController>();
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
-        ShipEnhancements.Instance.OnFuelDepleted += InterruptOverdrive;
+        ShipEnhancements.Instance.OnFuelDepleted += OnFuelDepleted;
+        ShipEnhancements.Instance.OnFuelRestored += OnFuelRestored;
 
         _electricalSystem = Locator.GetShipTransform()
             .Find("Module_Cockpit/Systems_Cockpit/FlightControlsElectricalSystem")
@@ -245,17 +247,37 @@ public class ShipOverdriveController : ElectricalComponent
         enabled = false;
     }
 
+    private void OnFuelDepleted()
+    {
+        _fuelDepleted = true;
+        _primeButton.SetButtonOn(false);
+        _activateButton.SetButtonActive(false);
+        SetPowered(false);
+    }
+
+    private void OnFuelRestored()
+    {
+        _fuelDepleted = false;
+        if (!_powered && !SELocator.GetShipDamageController().IsElectricalFailed())
+        {
+            SetPowered(true);
+        }
+    }
+
     public override void SetPowered(bool powered)
     {
-        if (!(bool)enableThrustModulator.GetProperty()) return;
+        if (!(bool)enableThrustModulator.GetProperty() || (powered && _fuelDepleted)) return;
         base.SetPowered(powered);
-        InterruptOverdrive();
-        _primeButton.SetPowered(powered, _electricalSystem.IsDisrupted());
-        _activateButton.SetPowered(powered, _electricalSystem.IsDisrupted());
-        if (!_electricalSystem.IsDisrupted())
+        if (!powered)
         {
             InterruptOverdrive();
         }
+        _primeButton.SetPowered(powered, _electricalSystem.IsDisrupted());
+        _activateButton.SetPowered(powered, _electricalSystem.IsDisrupted());
+        /*if (!_electricalSystem.IsDisrupted())
+        {
+            InterruptOverdrive();
+        }*/
     }
 
     public void PlayButtonAudio(AudioClip audio, float volume)
@@ -287,6 +309,7 @@ public class ShipOverdriveController : ElectricalComponent
     private void OnDestroy()
     {
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
-        ShipEnhancements.Instance.OnFuelDepleted -= InterruptOverdrive;
+        ShipEnhancements.Instance.OnFuelDepleted -= OnFuelDepleted;
+        ShipEnhancements.Instance.OnFuelRestored -= OnFuelRestored;
     }
 }

@@ -298,7 +298,7 @@
       "title": "Enable Manual Scout Recall",
       "type": "toggle",
       "value": false,
-      "tooltip": "Brings back the good old days where you had to go retrieve your Little Scout by hand. If you lose your scout to the depths of space, don't worry; you can still recall it with the ship."
+      "tooltip": "Forces you to retrieve your scout by hand when you launch it. If you retrieve it with the ship, you need to go get it from on top of the ship before you can fire it on foot."
     },
     "temperatureZonesAmount": {
       "title": "Add Temperature Zones",

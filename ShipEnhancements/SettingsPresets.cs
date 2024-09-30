@@ -468,10 +468,12 @@ public static class SettingsPresets
         { "shipExplosionMultiplier", [0.1f, 50f] },
         { "shipBounciness", [0f, 0f, 0f, 2f] },
         { "enablePersistentInput", [false, false, true] },
-        { "shipInputLatency", [0f, 0f, 0f, 0f, 0.5f] },
+        { "shipInputLatency", [0f, 0f, 0f, 0f, 0.2f, 1f, 0f, 0.5f] },
         { "addEngineSwitch", [false, false, true] },
-        { "idleFuelConsumptionMultiplier", [1f, 1f, 1f, 1f, 0f, 5f] },
+        { "idleFuelConsumptionMultiplier", [0f, 0f, 0f, 0f, 0f, 3f] },
         { "shipLightColor", [
+            "Default",
+            "Default",
             "Default",
             "Red",
             "Hearthian Orange",
@@ -493,6 +495,8 @@ public static class SettingsPresets
         { "extraNoise", [false, true] },
         { "interiorHullColor", [
             "Default",
+            "Default",
+            "Default",
             "Red",
             "Orange",
             "Golden",
@@ -505,6 +509,8 @@ public static class SettingsPresets
             "Rainbow"
             ] },
         { "exteriorHullColor", [
+            "Default",
+            "Default",
             "Default",
             "Red",
             "Orange",
@@ -523,9 +529,11 @@ public static class SettingsPresets
         { "reactorLifetimeMultiplier", [1f, 0.1f, 3f] },
         { "disableShipFriction", [false, false, false, true] },
         { "enableSignalscopeComponent", [false, true] },
-        { "rustLevel", [0f, 0f, 0f, 1f] },
-        { "dirtAccumulationTime", [0f, 0f, 100f, 500f] },
+        { "rustLevel", [0f, 0f, 0f, 0.1f, 0.2f, 0.5f, 0f, 1f] },
+        { "dirtAccumulationTime", [0f, 0f, 0f, 0f, 800f, 100f, 500f] },
         { "thrusterColor", [
+            "Default",
+            "Default",
             "Default",
             "Red",
             "White-Orange",
