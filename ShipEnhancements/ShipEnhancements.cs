@@ -641,7 +641,7 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)Settings.disableShipFriction.GetValue())
         {
             PhysicMaterial mat = (PhysicMaterial)LoadAsset("Assets/ShipEnhancements/FrictionlessShip.physicMaterial");
-            foreach (Collider collider in Locator.GetShipTransform().GetComponentsInChildren<Collider>())
+            foreach (Collider collider in Locator.GetShipTransform().GetComponentsInChildren<Collider>(true))
             {
                 collider.material = mat;
             }
