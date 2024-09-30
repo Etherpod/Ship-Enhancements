@@ -63,6 +63,7 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Signalscope Component**: Turns the ship's signalscope into a fully functioning ship component. If you damage it, you won't be able to receive or broadcast signals from the ship until you repair it.
 - **Ship Signal**: Adds a signal for the ship on the Deep Space Radio frequency. The signal will stop if the ship's signalscope is damaged.
 - **Add Portable Campfire**: Adds a portable campfire to the ship next to your suit. Place this anywhere you'd like and roast a marshmallow. Recommended to use with **Keep Helmet On** so that you don't suffocate yourself.
+- **Add Portable Tractor Beam**: Adds a portable Nomai tractor beam to the ship next to the reactor. If the gravity is too high to reach something, you can place this on the ground for an extra boost.
 - **Add Ship Tether**: Adds a few hooks to the ship cabin. You can attach these hooks to pretty much any surface- including the ship- and tether yourself to them. If you want to get even crazier, grab a second hook after tethering to one and tether to the new one; it will connect the two hooks together.
 - **Gravity Landing Gear**: Equips your ship's landing gear with the latest gravity-powered technology, letting you stick to surfaces if your landing gear is intact. You can toggle it on or off with a switch in the cockpit.
 - **Thrust Modulator**: Adds an interface to the cockpit that lets you lower or disproportionately raise the maximum thrust your ship can use. Stacks with the smooth thrust option from General Enhancements.

@@ -72,6 +72,7 @@ public static class SettingsPresets
         { "dirtAccumulationTime", 0f },
         { "thrusterColor", "Default" },
         { "disableSeatbelt", false },
+        { "addPortableTractorBeam", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -140,6 +141,7 @@ public static class SettingsPresets
         { "dirtAccumulationTime", 0f },
         { "thrusterColor", "Default" },
         { "disableSeatbelt", true },
+        { "addPortableTractorBeam", false },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -208,6 +210,7 @@ public static class SettingsPresets
         { "dirtAccumulationTime", 0f },
         { "thrusterColor", "Default" },
         { "disableSeatbelt", false },
+        { "addPortableTractorBeam", false },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -276,6 +279,7 @@ public static class SettingsPresets
         { "dirtAccumulationTime", 0f },
         { "thrusterColor", "Default" },
         { "disableSeatbelt", false },
+        { "addPortableTractorBeam", false },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -344,6 +348,7 @@ public static class SettingsPresets
         { "dirtAccumulationTime", 0f },
         { "thrusterColor", "Default" },
         { "disableSeatbelt", false },
+        { "addPortableTractorBeam", false },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -412,6 +417,7 @@ public static class SettingsPresets
         { "dirtAccumulationTime", 350f },
         { "thrusterColor", "Default" },
         { "disableSeatbelt", true },
+        { "addPortableTractorBeam", true },
     };
 
     public static readonly Dictionary<string, object[]> RandomSettings = new Dictionary<string, object[]>()
@@ -534,6 +540,7 @@ public static class SettingsPresets
             "Rainbow"
             ] },
         { "disableSeatbelt", [false, false, false, true] },
+        { "addPortableTractorBeam", [false, false, true] },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

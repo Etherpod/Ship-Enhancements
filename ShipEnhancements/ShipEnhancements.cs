@@ -37,6 +37,7 @@ public class ShipEnhancements : ModBehaviour
     public UITextType signalscopeName { get; private set; }
     public ItemType portableCampfireType { get; private set; }
     public ItemType tetherHookType { get; private set; }
+    public ItemType portableTractorBeamType { get; private set; }
     public SignalName shipSignalName { get; private set; }
     public int thrustModulatorLevel { get; private set; }
 
@@ -116,6 +117,7 @@ public class ShipEnhancements : ModBehaviour
         dirtAccumulationTime,
         thrusterColor,
         disableSeatbelt,
+        addPortableTractorBeam,
     }
 
     private void Awake()
@@ -135,6 +137,7 @@ public class ShipEnhancements : ModBehaviour
         signalscopeName = EnumUtils.Create<UITextType>("Signalscope");
         portableCampfireType = EnumUtils.Create<ItemType>("PortableCampfire");
         tetherHookType = EnumUtils.Create<ItemType>("TetherHook");
+        portableTractorBeamType = EnumUtils.Create<ItemType>("PortableTractorBeam");
         shipSignalName = EnumUtils.Create<SignalName>("Ship");
 
         LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
@@ -648,6 +651,16 @@ public class ShipEnhancements : ModBehaviour
             GameObject rustController = LoadPrefab("Assets/ShipEnhancements/RustController.prefab");
             AssetBundleUtilities.ReplaceShaders(rustController);
             Instantiate(rustController, Locator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry"));
+        }
+        if ((bool)Settings.addPortableTractorBeam.GetValue())
+        {
+            GameObject tractor = LoadPrefab("Assets/ShipEnhancements/PortableTractorBeamItem.prefab");
+            AssetBundleUtilities.ReplaceShaders(tractor);
+            GameObject tractorObj = Instantiate(tractor);
+            GameObject tractorSocket = LoadPrefab("Assets/ShipEnhancements/PortableTractorBeamSocket.prefab");
+            AssetBundleUtilities.ReplaceShaders(tractorSocket);
+            GameObject tractorSocketObj = Instantiate(tractorSocket, Locator.GetShipTransform().Find("Module_Cabin"));
+            tractorSocketObj.GetComponent<PortableTractorBeamSocket>().SetTractorBeamItem(tractorObj.GetComponent<PortableTractorBeamItem>());
         }
 
         engineOn = !(bool)Settings.addEngineSwitch.GetValue();

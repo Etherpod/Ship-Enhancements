@@ -73,6 +73,7 @@ public static class SettingExtensions
         { Settings.dirtAccumulationTime, (1f, 1f) },
         { Settings.thrusterColor, ("Default", "Default") },
         { Settings.disableSeatbelt, (false, false) },
+        { Settings.addPortableTractorBeam, (false, false) },
     };
 
     public static string GetName(this Settings setting)

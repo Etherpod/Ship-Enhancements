@@ -367,6 +367,12 @@
       "value": false,
       "tooltip": "Adds a portable campfire to the ship near your suit. Unpack it anywhere you'd like and roast a marshmallow!"
     },
+    "addPortableTractorBeam": {
+      "title": "Add Portable Tractor Beam",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Adds a portable Nomai tractor beam to the ship next to the reactor. Grab it and place it on the ground if you need an extra boost in height."
+    },
     "addTether": {
       "title": "Add Ship Tether",
       "type": "toggle",
