@@ -33,6 +33,8 @@ public class ShipEnhancements : ModBehaviour
     public bool engineOn;
     public Tether playerTether;
 
+    public IAchievements AchievementsAPI;
+
     public UITextType probeLauncherName { get; private set; }
     public UITextType signalscopeName { get; private set; }
     public ItemType portableCampfireType { get; private set; }
@@ -129,6 +131,7 @@ public class ShipEnhancements : ModBehaviour
     private void Start()
     {
         _shipEnhancementsBundle = AssetBundle.LoadFromFile(Path.Combine(ModHelper.Manifest.ModFolderPath, "assets/shipenhancements"));
+        AchievementsAPI = ModHelper.Interaction.TryGetModApi<IAchievements>("xen.AchievementTracker");
 
         SettingsPresets.InitializePresets();
 
@@ -315,6 +318,17 @@ public class ShipEnhancements : ModBehaviour
                 setting.SetProperty(ModHelper.Config.GetSettingsValue<object>(setting.GetName()));
             }
         }
+    }
+
+    private void InitializeAchievements()
+    {
+        AchievementsAPI.RegisterAchievement("SE_TORQUE_EXPLOSION", false, this);
+        AchievementsAPI.RegisterAchievement("SE_RGB_SETUP", false, this);
+        AchievementsAPI.RegisterAchievement("SE_HOW_DID_WE_GET_HERE", false, this);
+        AchievementsAPI.RegisterAchievement("SE_SCOUT_LOST_CONNECTION", false, this);
+        AchievementsAPI.RegisterAchievement("SE_FIRE_HAZARD", false, this);
+        AchievementsAPI.RegisterAchievement("SE_HULK_SMASH", false, this);
+        AchievementsAPI.RegisterAchievement("SE_BAD_INTERNET", false, this);
     }
 
     private IEnumerator InitializeShip()
