@@ -33,7 +33,7 @@ public class ShipEnhancements : ModBehaviour
     public bool engineOn;
     public Tether playerTether;
 
-    public IAchievements AchievementsAPI;
+    public static IAchievements AchievementsAPI;
 
     public UITextType probeLauncherName { get; private set; }
     public UITextType signalscopeName { get; private set; }
@@ -131,8 +131,8 @@ public class ShipEnhancements : ModBehaviour
     private void Start()
     {
         _shipEnhancementsBundle = AssetBundle.LoadFromFile(Path.Combine(ModHelper.Manifest.ModFolderPath, "assets/shipenhancements"));
-        AchievementsAPI = ModHelper.Interaction.TryGetModApi<IAchievements>("xen.AchievementTracker");
 
+        InitializeAchievements();
         SettingsPresets.InitializePresets();
 
         probeLauncherName = EnumUtils.Create<UITextType>("ScoutLauncher");
@@ -149,11 +149,17 @@ public class ShipEnhancements : ModBehaviour
             GlobalMessenger.AddListener("SuitUp", OnPlayerSuitUp);
             GlobalMessenger.AddListener("RemoveSuit", OnPlayerRemoveSuit);
             GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+            GlobalMessenger.AddListener("WakeUp", OnWakeUp);
             oxygenDepleted = false;
             fuelDepleted = false;
             angularDragEnabled = false;
             probeDestroyed = false;
             _shipDestroyed = false;
+
+            if (AchievementsAPI != null)
+            {
+                AchievementTracker.Reset();
+            }
 
             StartCoroutine(InitializeShip());
         };
@@ -166,10 +172,12 @@ public class ShipEnhancements : ModBehaviour
             GlobalMessenger.RemoveListener("SuitUp", OnPlayerSuitUp);
             GlobalMessenger.RemoveListener("RemoveSuit", OnPlayerRemoveSuit);
             GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
+            GlobalMessenger.RemoveListener("WakeUp", OnWakeUp);
             if ((float)Settings.spaceAngularDragMultiplier.GetProperty() > 0 || (float)Settings.atmosphereAngularDragMultiplier.GetProperty() > 0)
             {
-                Locator.GetShipDetector().GetComponent<ShipFluidDetector>().OnEnterFluid -= OnEnterFluid;
-                Locator.GetShipDetector().GetComponent<ShipFluidDetector>().OnExitFluid -= OnExitFluid;
+                ShipFluidDetector detector = Locator.GetShipDetector().GetComponent<ShipFluidDetector>();
+                detector.OnEnterFluid -= OnEnterFluid;
+                detector.OnExitFluid -= OnExitFluid;
             }
             if ((bool)Settings.enableAutoHatch.GetProperty())
             {
@@ -202,6 +210,12 @@ public class ShipEnhancements : ModBehaviour
                 fuelTank._damageEffect._particleAudioSource.Stop();
             }
             Locator.GetShipBody().GetComponent<ShipDamageController>().Explode();
+
+            if (!AchievementTracker.TorqueExplosion && AchievementsAPI != null)
+            {
+                AchievementTracker.TorqueExplosion = true;
+                AchievementsAPI?.EarnAchievement("SHIPENHANCEMENTS.TORQUE_EXPLOSION");
+            }
         }
 
         if ((float)Settings.idleFuelConsumptionMultiplier.GetProperty() > 0f && !(bool)Settings.addEngineSwitch.GetProperty())
@@ -279,6 +293,14 @@ public class ShipEnhancements : ModBehaviour
             ShipNotifications.UpdateNotifications();
         }
 
+        if (!AchievementTracker.DeadInTheWater && AchievementsAPI != null
+            && fuelDepleted && !(bool)Settings.enableShipFuelTransfer.GetProperty() 
+            && ((oxygenDepleted && !(bool)Settings.shipOxygenRefill.GetProperty()) || (bool)Settings.disableShipOxygen.GetProperty()))
+        {
+            AchievementTracker.DeadInTheWater = true;
+            AchievementsAPI?.EarnAchievement("SHIPENHANCEMENTS.NO_RESOURCES");
+        }
+
         _lastShipOxygen = SELocator.GetShipResources()._currentOxygen;
         _lastShipFuel = SELocator.GetShipResources()._currentFuel;
     }
@@ -322,13 +344,23 @@ public class ShipEnhancements : ModBehaviour
 
     private void InitializeAchievements()
     {
-        AchievementsAPI.RegisterAchievement("SE_TORQUE_EXPLOSION", false, this);
-        AchievementsAPI.RegisterAchievement("SE_RGB_SETUP", false, this);
-        AchievementsAPI.RegisterAchievement("SE_HOW_DID_WE_GET_HERE", false, this);
-        AchievementsAPI.RegisterAchievement("SE_SCOUT_LOST_CONNECTION", false, this);
-        AchievementsAPI.RegisterAchievement("SE_FIRE_HAZARD", false, this);
-        AchievementsAPI.RegisterAchievement("SE_HULK_SMASH", false, this);
-        AchievementsAPI.RegisterAchievement("SE_BAD_INTERNET", false, this);
+        AchievementsAPI = ModHelper.Interaction.ModExists("xen.AchievementTracker") ?
+            ModHelper.Interaction.TryGetModApi<IAchievements>("xen.AchievementTracker")
+            : null;
+
+        if (AchievementsAPI != null)
+        {
+            AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.TORQUE_EXPLOSION", true, this);
+            AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.RGB_SETUP", false, this);
+            AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.HOW_DID_WE_GET_HERE", false, this);
+            AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.SCOUT_LOST_CONNECTION", true, this);
+            AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.FIRE_HAZARD", true, this);
+            AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.HULK_SMASH", false, this);
+            AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.BAD_INTERNET", false, this);
+            AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.NO_RESOURCES", true, this);
+
+            AchievementsAPI.RegisterTranslationsFromFiles(this, "translations");
+        }
     }
 
     private IEnumerator InitializeShip()
@@ -477,8 +509,9 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((float)Settings.spaceAngularDragMultiplier.GetValue() > 0 || (float)Settings.atmosphereAngularDragMultiplier.GetValue() > 0)
         {
-            Locator.GetShipDetector().GetComponent<ShipFluidDetector>().OnEnterFluid += OnEnterFluid;
-            Locator.GetShipDetector().GetComponent<ShipFluidDetector>().OnExitFluid += OnExitFluid;
+            ShipFluidDetector detector = Locator.GetShipDetector().GetComponent<ShipFluidDetector>();
+            detector.OnEnterFluid += OnEnterFluid;
+            detector.OnExitFluid += OnExitFluid;
         }
         if ((string)Settings.gravityDirection.GetValue() != "Down" && !(bool)Settings.disableGravityCrystal.GetValue())
         {
@@ -907,6 +940,19 @@ public class ShipEnhancements : ModBehaviour
     {
         _shipDestroyed = true;
         Locator.GetShipBody().SetCenterOfMass(Locator.GetShipBody().GetWorldCenterOfMass());
+    }
+
+    private void OnWakeUp()
+    {
+        bool allRainbow = (string)Settings.interiorHullColor.GetProperty() == "Rainbow"
+            && (string)Settings.exteriorHullColor.GetProperty() == "Rainbow"
+            && (string)Settings.shipLightColor.GetProperty() == "Rainbow"
+            && (string)Settings.thrusterColor.GetProperty() == "Rainbow";
+        if (!AchievementTracker.RGBSetup && AchievementsAPI != null && allRainbow)
+        {
+            AchievementTracker.RGBSetup = true;
+            AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.RGB_SETUP");
+        }
     }
 
     #endregion

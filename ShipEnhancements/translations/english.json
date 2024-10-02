@@ -1,32 +1,36 @@
 {
   "AchievementTranslations": {
-    "SE_TORQUE_EXPLOSION": {
-      "Name": "You spin me right round, baby",
+    "SHIPENHANCEMENTS.TORQUE_EXPLOSION": {
+      "Name": "Centrifuge",
       "Description": "Blow up the ship by spinning it too quickly."
     },
-    "SE_RGB_SETUP": {
+    "SHIPENHANCEMENTS.RGB_SETUP": {
       "Name": "RGB Setup",
       "Description": "Set all of your ship colors to Rainbow."
     },
-    "SE_HOW_DID_WE_GET_HERE": {
+    "SHIPENHANCEMENTS.HOW_DID_WE_GET_HERE": {
       "Name": "How did we get here?",
       "Description": "Have all of the ship's components and hulls be damaged at once."
     },
-    "SE_SCOUT_LOST_CONNECTION": {
-      "Name": "placeholder_scout_lost_connection",
+    "SHIPENHANCEMENTS.SCOUT_LOST_CONNECTION": {
+      "Name": "What did you expect?",
       "Description": "Destroy your Little Scout and lose connection with it."
     },
-    "SE_FIRE_HAZARD": {
+    "SHIPENHANCEMENTS.FIRE_HAZARD": {
       "Name": "Fire Hazard",
       "Description": "Leave a campfire lit inside of the ship for too long."
     },
-    "SE_HULK_SMASH": {
-      "Name": "Hulk Smash!",
+    "SHIPENHANCEMENTS.HULK_SMASH": {
+      "Name": "HULK SMASH!",
       "Description": "Destroy your ship using only your character."
     },
-    "SE_BAD_INTERNET": {
+    "SHIPENHANCEMENTS.BAD_INTERNET": {
       "Name": "Bad Internet Connection",
       "Description": "Land your ship on another planet with at least 3 seconds of input latency."
+    },
+    "SHIPENHANCEMENTS.NO_RESOURCES": {
+      "Name": "Dead in the Water",
+      "Description": "Use up all of your ship's fuel and oxygen reserves with no way to refill them."
     }
   }
 }
