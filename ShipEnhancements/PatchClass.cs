@@ -1775,29 +1775,26 @@ public static class PatchClass
     #endregion
 
     #region InputLatency
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(ThrusterController), nameof(ThrusterController.FixedUpdate))]
-    public static bool DelayShipInput(ThrusterController __instance)
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipThrusterController), nameof(ShipThrusterController.ReadTranslationalInput))]
+    public static void DelayTranslational(ShipThrusterController __instance, ref Vector3 __result)
     {
-        if (__instance is not ShipThrusterController || (float)shipInputLatency.GetProperty() == 0f)
+        if ((float)shipInputLatency.GetProperty() > 0f)
         {
-            return true;
+            InputLatencyController.AddTranslationalInput(__result);
+            __result = __instance._translationalInput;
         }
+    }
 
-        __instance._translationalInput = __instance.ReadTranslationalInput();
-        if (!__instance.AllowHorizontalThrust())
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipThrusterController), nameof(ShipThrusterController.ReadRotationalInput))]
+    public static void DelayRotational(ShipThrusterController __instance, ref Vector3 __result)
+    {
+        if ((float)shipInputLatency.GetProperty() > 0f)
         {
-            __instance._translationalInput.x = 0f;
-            __instance._translationalInput.z = 0f;
+            InputLatencyController.AddRotationalInput(__result);
+            __result = __instance._rotationalInput;
         }
-        InputLatencyController.AddTranslationalInput(__instance._translationalInput);
-        if (__instance._isRotationalThrustEnabled)
-        {
-            __instance._rotationalInput = __instance.ReadRotationalInput();
-            InputLatencyController.AddRotationalInput(__instance._rotationalInput);
-        }
-        ShipEnhancements.WriteDebugMessage("ah");
-        return false;
     }
     #endregion
 
@@ -2220,7 +2217,7 @@ public static class PatchClass
             cockpit.ExitFlightConsole();
             cockpit._exitFlightConsoleTime -= 0.2f;
         }
-        if ((float)shipInputLatency.GetProperty() > 3f && !AchievementTracker.BadInternet && ShipEnhancements.AchievementsAPI != null
+        if ((float)shipInputLatency.GetProperty() >= 3f && !AchievementTracker.BadInternet && ShipEnhancements.AchievementsAPI != null
             && impact.otherBody.TryGetComponent(out AstroObject obj)
             && obj.GetAstroObjectName() != AstroObject.Name.TimberHearth)
         {

@@ -25,7 +25,7 @@
       "Description": "Destroy your ship using only your character."
     },
     "SHIPENHANCEMENTS.BAD_INTERNET": {
-      "Name": "Bad Internet Connection",
+      "Name": "Thinking Ahead",
       "Description": "Land your ship on another planet with at least 3 seconds of input latency."
     },
     "SHIPENHANCEMENTS.DEAD_IN_THE_WATER": {
