@@ -8,7 +8,8 @@ public static class AchievementTracker
     public static bool DeadInTheWater;
     public static bool FireHazard;
     public static bool ScoutLostConnection;
-    public static bool RGBSetup;
+    //public static bool RGBSetup;
+    public static bool BadInternet;
 
     public static void Reset()
     {
@@ -16,6 +17,6 @@ public static class AchievementTracker
         DeadInTheWater = false;
         FireHazard = false;
         ScoutLostConnection = false;
-        RGBSetup = false;
+        BadInternet = false;
     }
 }

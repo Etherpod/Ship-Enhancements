@@ -1796,7 +1796,7 @@ public static class PatchClass
             __instance._rotationalInput = __instance.ReadRotationalInput();
             InputLatencyController.AddRotationalInput(__instance._rotationalInput);
         }
-
+        ShipEnhancements.WriteDebugMessage("ah");
         return false;
     }
     #endregion
@@ -2219,6 +2219,13 @@ public static class PatchClass
             ShipCockpitController cockpit = Locator.GetShipTransform().GetComponentInChildren<ShipCockpitController>();
             cockpit.ExitFlightConsole();
             cockpit._exitFlightConsoleTime -= 0.2f;
+        }
+        if ((float)shipInputLatency.GetProperty() > 3f && !AchievementTracker.BadInternet && ShipEnhancements.AchievementsAPI != null
+            && impact.otherBody.TryGetComponent(out AstroObject obj)
+            && obj.GetAstroObjectName() != AstroObject.Name.TimberHearth)
+        {
+            AchievementTracker.BadInternet = true;
+            ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.BAD_INTERNET");
         }
     }
 

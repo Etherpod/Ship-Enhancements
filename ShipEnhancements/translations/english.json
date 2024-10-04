@@ -28,7 +28,7 @@
       "Name": "Bad Internet Connection",
       "Description": "Land your ship on another planet with at least 3 seconds of input latency."
     },
-    "SHIPENHANCEMENTS.NO_RESOURCES": {
+    "SHIPENHANCEMENTS.DEAD_IN_THE_WATER": {
       "Name": "Dead in the Water",
       "Description": "Use up all of your ship's fuel and oxygen reserves with no way to refill them."
     }

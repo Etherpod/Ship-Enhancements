@@ -298,7 +298,7 @@ public class ShipEnhancements : ModBehaviour
             && ((oxygenDepleted && !(bool)Settings.shipOxygenRefill.GetProperty()) || (bool)Settings.disableShipOxygen.GetProperty()))
         {
             AchievementTracker.DeadInTheWater = true;
-            AchievementsAPI?.EarnAchievement("SHIPENHANCEMENTS.NO_RESOURCES");
+            AchievementsAPI?.EarnAchievement("SHIPENHANCEMENTS.DEAD_IN_THE_WATER");
         }
 
         _lastShipOxygen = SELocator.GetShipResources()._currentOxygen;
@@ -357,7 +357,7 @@ public class ShipEnhancements : ModBehaviour
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.FIRE_HAZARD", true, this);
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.HULK_SMASH", false, this);
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.BAD_INTERNET", false, this);
-            AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.NO_RESOURCES", true, this);
+            AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.DEAD_IN_THE_WATER", true, this);
 
             AchievementsAPI.RegisterTranslationsFromFiles(this, "translations");
         }
@@ -610,6 +610,10 @@ public class ShipEnhancements : ModBehaviour
         if ((float)Settings.shipInputLatency.GetValue() > 0f)
         {
             InputLatencyController.Initialize();
+            if ((float)Settings.shipInputLatency.GetValue() > 3f)
+            {
+                
+            }
         }
         if ((bool)Settings.hotThrusters.GetValue() || (string)Settings.thrusterColor.GetValue() != "Default")
         {
@@ -948,11 +952,15 @@ public class ShipEnhancements : ModBehaviour
             && (string)Settings.exteriorHullColor.GetProperty() == "Rainbow"
             && (string)Settings.shipLightColor.GetProperty() == "Rainbow"
             && (string)Settings.thrusterColor.GetProperty() == "Rainbow";
-        if (!AchievementTracker.RGBSetup && AchievementsAPI != null && allRainbow)
+        if (AchievementsAPI != null && !AchievementsAPI.HasAchievement("SHIPENHANCEMENTS.RGB_SETUP") && allRainbow)
         {
-            AchievementTracker.RGBSetup = true;
             AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.RGB_SETUP");
         }
+    }
+
+    private void OnHitObject(Collision collision)
+    {
+
     }
 
     #endregion
