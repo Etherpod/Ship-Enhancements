@@ -2219,8 +2219,7 @@ public static class PatchClass
             cockpit._exitFlightConsoleTime -= 0.2f;
         }
         if ((float)shipInputLatency.GetProperty() >= 3f && !AchievementTracker.BadInternet && ShipEnhancements.AchievementsAPI != null
-            && impact.otherBody.TryGetComponent(out AstroObject obj)
-            && obj.GetAstroObjectName() != AstroObject.Name.TimberHearth)
+            && impact.otherBody.IsKinematic() && impact.otherBody != Locator.GetShipBody().GetOrigParentBody())
         {
             AchievementTracker.BadInternet = true;
             ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.BAD_INTERNET");
