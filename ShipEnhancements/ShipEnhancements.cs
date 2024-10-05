@@ -6,6 +6,7 @@ using System.IO;
 using System;
 using System.Collections.Generic;
 using OWML.Utils;
+using JetBrains.Annotations;
 
 namespace ShipEnhancements;
 
@@ -183,6 +184,11 @@ public class ShipEnhancements : ModBehaviour
             {
                 GlobalMessenger.RemoveListener("EnterShip", OnEnterShip);
                 GlobalMessenger.RemoveListener("ExitShip", OnExitShip);
+            }
+            if (AchievementsAPI != null)
+            {
+                SELocator.GetShipDamageController().OnShipComponentDamaged -= ctx => CheckAllPartsDamaged();
+                SELocator.GetShipDamageController().OnShipHullDamaged -= ctx => CheckAllPartsDamaged();
             }
             UpdateProperties();
             _lastSuitOxygen = 0f;
@@ -389,6 +395,12 @@ public class ShipEnhancements : ModBehaviour
         _shipLoaded = true;
         UpdateSuitOxygen();
         _lastShipOxygen = SELocator.GetShipResources()._currentOxygen;
+
+        if (AchievementsAPI != null)
+        {
+            SELocator.GetShipDamageController().OnShipComponentDamaged += ctx => CheckAllPartsDamaged();
+            SELocator.GetShipDamageController().OnShipHullDamaged += ctx => CheckAllPartsDamaged();
+        }
 
         if ((bool)Settings.disableGravityCrystal.GetValue())
         {
@@ -958,9 +970,35 @@ public class ShipEnhancements : ModBehaviour
         }
     }
 
-    private void OnHitObject(Collision collision)
+    private void CheckAllPartsDamaged()
     {
+        if (AchievementsAPI == null || AchievementTracker.HowDidWeGetHere) return;
 
+        bool allDamaged = true;
+        foreach (ShipComponent comp in SELocator.GetShipDamageController()._shipComponents)
+        {
+            if (!comp.isDamaged)
+            {
+                allDamaged = false;
+                break;
+            }
+        }
+        if (allDamaged)
+        {
+            foreach (ShipHull hull in SELocator.GetShipDamageController()._shipHulls)
+            {
+                if (!hull.isDamaged)
+                {
+                    allDamaged = false;
+                    break;
+                }
+            }
+        }
+        if (allDamaged)
+        {
+            AchievementTracker.HowDidWeGetHere = true;
+            AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.HOW_DID_WE_GET_HERE");
+        }
     }
 
     #endregion

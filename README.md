@@ -30,7 +30,7 @@ Change some of the values that control how the ship works or how the added featu
 - **Oxygen Refill Multiplier**: Larger numbers increase the speed at which your ship's oxygen tank refills when near an oxygen source.
 - **Fuel Transfer Multiplier**: Larger numbers increase the amount of fuel that is subtracted when refueling your jetpack, and increase the amount of fuel that is added when transferring fuel to the ship.
 - **Idle Fuel Consumption Multiplier**: Larger numbers increase how quickly your fuel drains over time. If the Engine Switch is enabled, it will not drain fuel while the ship is off.
-- **Damage Multiplier**: Larger numbers increase the damage done to the ship from impacts.
+- **Damage Multiplier**: Larger numbers increase the damage done to the ship hull and increase the probability that components will be damaged on impact.
 - **Damage Speed Multiplier**: Larger numbers increase the speed you need to be traveling at before taking damage. Set this to something really small to blow up your ship when you touch something.
 - **Temperature Damage Multiplier**: Larger numbers increase the damage done to your ship inside high or low temperature areas.
 - **Temperature Resistance Multiplier**: Larger numbers increase the time it takes for your ship to start taking damage in high or low temperature areas.

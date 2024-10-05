@@ -441,6 +441,7 @@ public static class PatchClass
         {
             return false;
         }
+        ShipEnhancements.WriteDebugMessage(__instance._damageProbabilityCurve.Evaluate(impact.speed / (float)shipDamageSpeedMultiplier.GetProperty()));
         if (UnityEngine.Random.value / (float)shipDamageMultiplier.GetProperty()
             < __instance._damageProbabilityCurve.Evaluate(impact.speed / (float)shipDamageSpeedMultiplier.GetProperty()))
         {

@@ -10,6 +10,7 @@ public static class AchievementTracker
     public static bool ScoutLostConnection;
     //public static bool RGBSetup;
     public static bool BadInternet;
+    public static bool HowDidWeGetHere;
 
     public static void Reset()
     {
@@ -18,5 +19,6 @@ public static class AchievementTracker
         FireHazard = false;
         ScoutLostConnection = false;
         BadInternet = false;
+        HowDidWeGetHere = false;
     }
 }

@@ -177,7 +177,7 @@
       "title": "Damage Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the damage done to the ship when crashing."
+      "tooltip": "Larger numbers increase the damage done to the ship hull and increase the probability that components will be damaged on impact."
     },
     "shipDamageSpeedMultiplier": {
       "title": "Damage Speed Multiplier",
