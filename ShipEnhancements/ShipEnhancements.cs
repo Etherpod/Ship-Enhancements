@@ -972,7 +972,7 @@ public class ShipEnhancements : ModBehaviour
 
     private void CheckAllPartsDamaged()
     {
-        if (AchievementsAPI == null || AchievementTracker.HowDidWeGetHere) return;
+        if (AchievementsAPI == null || AchievementTracker.HowDidWeGetHere || SELocator.GetShipDamageController().IsSystemFailed()) return;
 
         bool allDamaged = true;
         foreach (ShipComponent comp in SELocator.GetShipDamageController()._shipComponents)

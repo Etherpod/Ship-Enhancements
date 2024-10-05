@@ -11,6 +11,9 @@ public static class AchievementTracker
     //public static bool RGBSetup;
     public static bool BadInternet;
     public static bool HowDidWeGetHere;
+    public static bool HulkSmash;
+
+    public static OWRigidbody LastHitBody;
 
     public static void Reset()
     {
@@ -20,5 +23,8 @@ public static class AchievementTracker
         ScoutLostConnection = false;
         BadInternet = false;
         HowDidWeGetHere = false;
+        HulkSmash = false;
+
+        LastHitBody = null;
     }
 }

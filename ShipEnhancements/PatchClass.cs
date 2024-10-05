@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Security.Policy;
 using HarmonyLib;
 using UnityEngine;
+using XGamingRuntime;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
@@ -2218,11 +2219,18 @@ public static class PatchClass
             cockpit.ExitFlightConsole();
             cockpit._exitFlightConsoleTime -= 0.2f;
         }
-        if ((float)shipInputLatency.GetProperty() >= 3f && !AchievementTracker.BadInternet && ShipEnhancements.AchievementsAPI != null
-            && impact.otherBody.IsKinematic() && impact.otherBody != Locator.GetShipBody().GetOrigParentBody())
+        if (ShipEnhancements.AchievementsAPI != null)
         {
-            AchievementTracker.BadInternet = true;
-            ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.BAD_INTERNET");
+            if ((float)shipInputLatency.GetProperty() >= 3f && !AchievementTracker.BadInternet
+                && impact.otherBody.IsKinematic() && impact.otherBody != Locator.GetShipBody().GetOrigParentBody())
+            {
+                AchievementTracker.BadInternet = true;
+                ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.BAD_INTERNET");
+            }
+            if (!AchievementTracker.HulkSmash && impact.otherBody != AchievementTracker.LastHitBody)
+            {
+                AchievementTracker.LastHitBody = impact.otherBody;
+            }
         }
     }
 
@@ -2271,4 +2279,17 @@ public static class PatchClass
         return !(bool)disableSeatbelt.GetProperty();
     }
     #endregion
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.TriggerSystemFailure))]
+    public static void HulkSmashAchievement(ShipDamageController __instance)
+    {
+        if (ShipEnhancements.AchievementsAPI != null && !AchievementTracker.HulkSmash
+            && AchievementTracker.LastHitBody == Locator.GetPlayerBody())
+        {
+            AchievementTracker.HulkSmash = true;
+            ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.HULK_SMASH");
+            AchievementTracker.LastHitBody = null;
+        }
+    }
 }
