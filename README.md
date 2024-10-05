@@ -89,11 +89,14 @@ When you select a preset, you may have to close and reopen the settings menu for
 - **Hardcore** - A much more difficult and punishing experience. Resources are lower and damage is permanent.
 - **Wanderer** - Makes the possibility of getting lost very, very likely. Your ship's lock-on system is broken and you can no longer see the markers for your ship and scout.
 - **Pandemonium** - I basically just went through and turned everything on.
-- **Random** - Randomizes all of the options each loop. Preserves the settings you had previously selected so that you can switch back anytime.
+- **Random** - Randomizes all of the options each loop. Preserves the settings you had previously selected so that you can switch back anytime.\
+
+## Achievements
+Ship Enhancements adds 8 new achievements to the **Achievements+** mod! Use it with Ship Enhancements if you want to create some meaning from the chaos.
 
 ## API
 - **CreateTemperatureZone()** - In case you're a modder and want to add your own high/low temperature zones. Temperature zones can stack, and will just take the sum of the temperatures.
-- **GetSettingsProperty()** - Returns the value of a config setting as seen from the player. These values only update at the beginning of the loop, so changing the config doesn't affect them.
+- **GetSettingsProperty()** - Returns the value of a config setting as seen from the player. These values only update at the beginning of the loop, so changing the mod settings doesn't affect them.
 - **SetSettingsProperty()** - Lets you change the value of a config setting in the middle of the loop. Note that this change will be reverted on the next loop.
 
 ## Multiplayer
