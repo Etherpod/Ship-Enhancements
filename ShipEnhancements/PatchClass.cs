@@ -4,6 +4,7 @@ using System.Reflection;
 using System.Security.Policy;
 using HarmonyLib;
 using UnityEngine;
+using XGamingRuntime;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
@@ -475,17 +476,25 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.OnImpact))]
     public static bool ApplyExplosionDamageMultiplier(ShipDamageController __instance, ImpactData impact)
     {
-        if ((float)shipDamageMultiplier.GetProperty() == 1 && (float)shipDamageSpeedMultiplier.GetProperty() == 1)
+        if (ShipEnhancements.AchievementsAPI != null && !SEAchievementTracker.HulkSmash)
         {
-            return true;
+            SEAchievementTracker.LastHitBody = impact.otherBody;
         }
+
+        float explosionMultiplier = (float)shipDamageSpeedMultiplier.GetProperty()
+                / ((float)shipDamageMultiplier.GetProperty() != 1f ? Mathf.Lerp((float)shipDamageMultiplier.GetProperty(), 1f, 0.5f) : 1f);
+
 
         if (impact.otherCollider.attachedRigidbody != null && impact.otherCollider.attachedRigidbody.CompareTag("Player") && PlayerState.IsInsideShip())
         {
             return false;
         }
-        if (impact.speed >= 300f * (float)shipDamageSpeedMultiplier.GetProperty() / ((float)shipDamageMultiplier.GetProperty() / 10) && !__instance._exploded)
+        if (impact.speed >= 300f * explosionMultiplier && !__instance._exploded)
         {
+            if (impact.otherBody == Locator.GetPlayerBody())
+            {
+                SEAchievementTracker.PlayerCausedExplosion = true;
+            }
             __instance.Explode(false);
             return false;
         }
@@ -496,6 +505,7 @@ public static class PatchClass
                 __instance._shipModules[i].ApplyImpact(impact);
             }
         }
+
         return false;
     }
     #endregion
@@ -1133,6 +1143,7 @@ public static class PatchClass
         {
             if ((manualScoutRecall || recallDisabled) && ShipProbePickupVolume.probeInShip)
             {
+                ShipNotifications.PostScoutInShipNotification();
                 return false;
             }
         }
@@ -1148,6 +1159,7 @@ public static class PatchClass
             }
             if (recallDisabled && !ShipProbePickupVolume.probeInShip)
             {
+                ShipNotifications.PostScoutLauncherEmptyNotification();
                 return false;
             }
         }
@@ -1775,29 +1787,26 @@ public static class PatchClass
     #endregion
 
     #region InputLatency
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(ThrusterController), nameof(ThrusterController.FixedUpdate))]
-    public static bool DelayShipInput(ThrusterController __instance)
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipThrusterController), nameof(ShipThrusterController.ReadTranslationalInput))]
+    public static void DelayTranslational(ShipThrusterController __instance, ref Vector3 __result)
     {
-        if (__instance is not ShipThrusterController || (float)shipInputLatency.GetProperty() == 0f)
+        if ((float)shipInputLatency.GetProperty() > 0f)
         {
-            return true;
+            InputLatencyController.AddTranslationalInput(__result);
+            __result = __instance._translationalInput;
         }
+    }
 
-        __instance._translationalInput = __instance.ReadTranslationalInput();
-        if (!__instance.AllowHorizontalThrust())
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipThrusterController), nameof(ShipThrusterController.ReadRotationalInput))]
+    public static void DelayRotational(ShipThrusterController __instance, ref Vector3 __result)
+    {
+        if ((float)shipInputLatency.GetProperty() > 0f)
         {
-            __instance._translationalInput.x = 0f;
-            __instance._translationalInput.z = 0f;
+            InputLatencyController.AddRotationalInput(__result);
+            __result = __instance._rotationalInput;
         }
-        InputLatencyController.AddTranslationalInput(__instance._translationalInput);
-        if (__instance._isRotationalThrustEnabled)
-        {
-            __instance._rotationalInput = __instance.ReadRotationalInput();
-            InputLatencyController.AddRotationalInput(__instance._rotationalInput);
-        }
-
-        return false;
     }
     #endregion
 
@@ -2220,6 +2229,15 @@ public static class PatchClass
             cockpit.ExitFlightConsole();
             cockpit._exitFlightConsoleTime -= 0.2f;
         }
+        if (ShipEnhancements.AchievementsAPI != null)
+        {
+            if ((float)shipInputLatency.GetProperty() >= 3f && !SEAchievementTracker.BadInternet
+                && impact.otherBody.IsKinematic() && impact.otherBody != Locator.GetShipBody().GetOrigParentBody())
+            {
+                SEAchievementTracker.BadInternet = true;
+                ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.BAD_INTERNET");
+            }
+        }
     }
 
     [HarmonyPostfix]
@@ -2265,6 +2283,44 @@ public static class PatchClass
     public static bool DisableUnbuckleAudio()
     {
         return !(bool)disableSeatbelt.GetProperty();
+    }
+    #endregion
+
+    #region Achievements
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.TriggerSystemFailure))]
+    public static void HulkSmashAchievement(ShipDamageController __instance)
+    {
+        if (!__instance.IsSystemFailed() 
+            && ShipEnhancements.AchievementsAPI != null && !SEAchievementTracker.HulkSmash
+            && (!SEAchievementTracker.ShipExploded || SEAchievementTracker.PlayerCausedExplosion)
+            && !SEAchievementTracker.PlayerEjectedCockpit
+            && SEAchievementTracker.LastHitBody == Locator.GetPlayerBody())
+        {
+            SEAchievementTracker.HulkSmash = true;
+            ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.HULK_SMASH");
+            SEAchievementTracker.LastHitBody = null;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.Explode))]
+    public static void UpdateShipExploded()
+    {
+        if (ShipEnhancements.AchievementsAPI != null && !SEAchievementTracker.ShipExploded)
+        {
+            SEAchievementTracker.ShipExploded = true;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipEjectionSystem), nameof(ShipEjectionSystem.FixedUpdate))]
+    public static void UpdatePlayerEjected(ShipEjectionSystem __instance)
+    {
+        if (__instance._ejectPressed)
+        {
+            SEAchievementTracker.PlayerEjectedCockpit = true;
+        }
     }
     #endregion
 }

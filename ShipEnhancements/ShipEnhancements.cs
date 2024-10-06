@@ -6,6 +6,7 @@ using System.IO;
 using System;
 using System.Collections.Generic;
 using OWML.Utils;
+using JetBrains.Annotations;
 
 namespace ShipEnhancements;
 
@@ -158,7 +159,7 @@ public class ShipEnhancements : ModBehaviour
 
             if (AchievementsAPI != null)
             {
-                AchievementTracker.Reset();
+                SEAchievementTracker.Reset();
             }
 
             StartCoroutine(InitializeShip());
@@ -183,6 +184,11 @@ public class ShipEnhancements : ModBehaviour
             {
                 GlobalMessenger.RemoveListener("EnterShip", OnEnterShip);
                 GlobalMessenger.RemoveListener("ExitShip", OnExitShip);
+            }
+            if (AchievementsAPI != null)
+            {
+                SELocator.GetShipDamageController().OnShipComponentDamaged -= ctx => CheckAllPartsDamaged();
+                SELocator.GetShipDamageController().OnShipHullDamaged -= ctx => CheckAllPartsDamaged();
             }
             UpdateProperties();
             _lastSuitOxygen = 0f;
@@ -211,9 +217,9 @@ public class ShipEnhancements : ModBehaviour
             }
             Locator.GetShipBody().GetComponent<ShipDamageController>().Explode();
 
-            if (!AchievementTracker.TorqueExplosion && AchievementsAPI != null)
+            if (!SEAchievementTracker.TorqueExplosion && AchievementsAPI != null)
             {
-                AchievementTracker.TorqueExplosion = true;
+                SEAchievementTracker.TorqueExplosion = true;
                 AchievementsAPI?.EarnAchievement("SHIPENHANCEMENTS.TORQUE_EXPLOSION");
             }
         }
@@ -293,12 +299,12 @@ public class ShipEnhancements : ModBehaviour
             ShipNotifications.UpdateNotifications();
         }
 
-        if (!AchievementTracker.DeadInTheWater && AchievementsAPI != null
+        if (!SEAchievementTracker.DeadInTheWater && AchievementsAPI != null
             && fuelDepleted && !(bool)Settings.enableShipFuelTransfer.GetProperty() 
             && ((oxygenDepleted && !(bool)Settings.shipOxygenRefill.GetProperty()) || (bool)Settings.disableShipOxygen.GetProperty()))
         {
-            AchievementTracker.DeadInTheWater = true;
-            AchievementsAPI?.EarnAchievement("SHIPENHANCEMENTS.NO_RESOURCES");
+            SEAchievementTracker.DeadInTheWater = true;
+            AchievementsAPI?.EarnAchievement("SHIPENHANCEMENTS.DEAD_IN_THE_WATER");
         }
 
         _lastShipOxygen = SELocator.GetShipResources()._currentOxygen;
@@ -351,13 +357,13 @@ public class ShipEnhancements : ModBehaviour
         if (AchievementsAPI != null)
         {
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.TORQUE_EXPLOSION", true, this);
-            AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.RGB_SETUP", false, this);
-            AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.HOW_DID_WE_GET_HERE", false, this);
-            AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.SCOUT_LOST_CONNECTION", true, this);
+            AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.DEAD_IN_THE_WATER", true, this);
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.FIRE_HAZARD", true, this);
+            AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.HOW_DID_WE_GET_HERE", false, this);
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.HULK_SMASH", false, this);
+            AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.RGB_SETUP", false, this);
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.BAD_INTERNET", false, this);
-            AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.NO_RESOURCES", true, this);
+            AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.SCOUT_LOST_CONNECTION", true, this);
 
             AchievementsAPI.RegisterTranslationsFromFiles(this, "translations");
         }
@@ -389,6 +395,12 @@ public class ShipEnhancements : ModBehaviour
         _shipLoaded = true;
         UpdateSuitOxygen();
         _lastShipOxygen = SELocator.GetShipResources()._currentOxygen;
+
+        if (AchievementsAPI != null)
+        {
+            SELocator.GetShipDamageController().OnShipComponentDamaged += ctx => CheckAllPartsDamaged();
+            SELocator.GetShipDamageController().OnShipHullDamaged += ctx => CheckAllPartsDamaged();
+        }
 
         if ((bool)Settings.disableGravityCrystal.GetValue())
         {
@@ -683,6 +695,7 @@ public class ShipEnhancements : ModBehaviour
                 .GetComponentInChildren<ShipCockpitUI>()._sigScopeDish).GetComponent<AudioSignal>();
             shipSignal.SetSector(Locator.GetShipTransform().GetComponentInChildren<Sector>());
             shipSignal._name = shipSignalName;
+            shipSignal._frequency = SignalFrequency.Traveler;
         }
         if ((bool)Settings.disableShipFriction.GetValue())
         {
@@ -948,10 +961,40 @@ public class ShipEnhancements : ModBehaviour
             && (string)Settings.exteriorHullColor.GetProperty() == "Rainbow"
             && (string)Settings.shipLightColor.GetProperty() == "Rainbow"
             && (string)Settings.thrusterColor.GetProperty() == "Rainbow";
-        if (!AchievementTracker.RGBSetup && AchievementsAPI != null && allRainbow)
+        if (AchievementsAPI != null && !AchievementsAPI.HasAchievement("SHIPENHANCEMENTS.RGB_SETUP") && allRainbow)
         {
-            AchievementTracker.RGBSetup = true;
             AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.RGB_SETUP");
+        }
+    }
+
+    private void CheckAllPartsDamaged()
+    {
+        if (AchievementsAPI == null || SEAchievementTracker.HowDidWeGetHere || SELocator.GetShipDamageController().IsSystemFailed()) return;
+
+        bool allDamaged = true;
+        foreach (ShipComponent comp in SELocator.GetShipDamageController()._shipComponents)
+        {
+            if (!comp.isDamaged)
+            {
+                allDamaged = false;
+                break;
+            }
+        }
+        if (allDamaged)
+        {
+            foreach (ShipHull hull in SELocator.GetShipDamageController()._shipHulls)
+            {
+                if (!hull.isDamaged)
+                {
+                    allDamaged = false;
+                    break;
+                }
+            }
+        }
+        if (allDamaged)
+        {
+            SEAchievementTracker.HowDidWeGetHere = true;
+            AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.HOW_DID_WE_GET_HERE");
         }
     }
 

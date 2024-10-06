@@ -119,9 +119,9 @@ public class ShipProbeLauncherEffects : MonoBehaviour
             ShipEnhancements.Instance.probeDestroyed = true;
             _probe.Deactivate();
 
-            if (!AchievementTracker.ScoutLostConnection && ShipEnhancements.AchievementsAPI != null)
+            if (!SEAchievementTracker.ScoutLostConnection && ShipEnhancements.AchievementsAPI != null)
             {
-                AchievementTracker.ScoutLostConnection = true;
+                SEAchievementTracker.ScoutLostConnection = true;
                 ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.SCOUT_LOST_CONNECTION");
             }
 

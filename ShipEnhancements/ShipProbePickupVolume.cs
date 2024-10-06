@@ -25,6 +25,7 @@ public class ShipProbePickupVolume : ProbePickupVolume
             _interactReceiver.ChangePrompt("Insert Scout");
         }
         _shipProbeLauncher._preLaunchProbeProxy.SetActive(false);
+        probeInShip = false;
     }
 
     protected override void OnRetrieveProbe()
