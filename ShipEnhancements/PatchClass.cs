@@ -1143,6 +1143,7 @@ public static class PatchClass
         {
             if ((manualScoutRecall || recallDisabled) && ShipProbePickupVolume.probeInShip)
             {
+                ShipNotifications.PostScoutInShipNotification();
                 return false;
             }
         }
@@ -1158,6 +1159,7 @@ public static class PatchClass
             }
             if (recallDisabled && !ShipProbePickupVolume.probeInShip)
             {
+                ShipNotifications.PostScoutLauncherEmptyNotification();
                 return false;
             }
         }

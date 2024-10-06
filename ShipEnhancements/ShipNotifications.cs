@@ -17,6 +17,8 @@ public static class ShipNotifications
     private static NotificationData _temperatureHighNotification = new NotificationData(NotificationTarget.Ship, "HULL TEMPERATURE INCREASING", 5f, true);
     private static NotificationData _temperatureLowNotification = new NotificationData(NotificationTarget.Ship, "HULL TEMPERATURE DECREASING", 5f, true);
     private static NotificationData _temperatureCriticalNotification = new NotificationData(NotificationTarget.Ship, "HULL TEMPERATURE CRITICAL", 5f, true);
+    private static NotificationData _scoutInShipNotification = new NotificationData(NotificationTarget.Player, "SCOUT DOCKED IN SHIP", 5f, true);
+    private static NotificationData _noScoutInShipNotification = new NotificationData(NotificationTarget.Ship, "SCOUT LAUNCHER EMPTY", 5f, true);
 
     private static bool _oxygenLow = false;
     private static bool _oxygenCritical = false;
@@ -178,5 +180,15 @@ public static class ShipNotifications
     public static void OnOxygenRestored()
     {
         NotificationManager.SharedInstance.UnpinNotification(_oxygenDepletedNotification);
+    }
+
+    public static void PostScoutInShipNotification()
+    {
+        NotificationManager.SharedInstance.PostNotification(_scoutInShipNotification, false);
+    }
+
+    public static void PostScoutLauncherEmptyNotification()
+    {
+        NotificationManager.SharedInstance.PostNotification(_noScoutInShipNotification, false);
     }
 }
