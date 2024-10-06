@@ -4,33 +4,33 @@
       "Name": "Centrifuge",
       "Description": "Blow up the ship by spinning it too quickly."
     },
-    "SHIPENHANCEMENTS.RGB_SETUP": {
-      "Name": "RGB Setup",
-      "Description": "Set all of your ship colors to Rainbow."
-    },
-    "SHIPENHANCEMENTS.HOW_DID_WE_GET_HERE": {
-      "Name": "How did we get here?",
-      "Description": "Have all of the ship's components and hulls be damaged at once."
-    },
-    "SHIPENHANCEMENTS.SCOUT_LOST_CONNECTION": {
-      "Name": "What did you expect?",
-      "Description": "Destroy your Little Scout and lose connection with it."
+    "SHIPENHANCEMENTS.DEAD_IN_THE_WATER": {
+      "Name": "Dead in the Water",
+      "Description": "Use up all of your ship's fuel and oxygen reserves with no way to refill them."
     },
     "SHIPENHANCEMENTS.FIRE_HAZARD": {
       "Name": "Fire Hazard",
       "Description": "Leave a campfire lit inside of the ship for too long."
     },
+    "SHIPENHANCEMENTS.HOW_DID_WE_GET_HERE": {
+      "Name": "How Did We Get Here?",
+      "Description": "Have all of the ship's components and hulls be damaged at once."
+    },
     "SHIPENHANCEMENTS.HULK_SMASH": {
       "Name": "HULK SMASH!",
       "Description": "Destroy your ship using only your character."
+    },
+    "SHIPENHANCEMENTS.RGB_SETUP": {
+      "Name": "Party Time",
+      "Description": "Set all of your ship colors to Rainbow."
     },
     "SHIPENHANCEMENTS.BAD_INTERNET": {
       "Name": "Thinking Ahead",
       "Description": "Land (or crash) your ship on another planet with at least 3 seconds of input latency."
     },
-    "SHIPENHANCEMENTS.DEAD_IN_THE_WATER": {
-      "Name": "Dead in the Water",
-      "Description": "Use up all of your ship's fuel and oxygen reserves with no way to refill them."
+    "SHIPENHANCEMENTS.SCOUT_LOST_CONNECTION": {
+      "Name": "What Did You Expect?",
+      "Description": "Destroy your Little Scout and lose connection with it."
     }
   }
 }

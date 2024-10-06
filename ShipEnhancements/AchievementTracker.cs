@@ -14,6 +14,8 @@ public static class AchievementTracker
     public static bool HulkSmash;
 
     public static OWRigidbody LastHitBody;
+    public static bool PlayerCausedExplosion = false;
+    public static bool ShipExploded = false;
 
     public static void Reset()
     {
@@ -26,5 +28,7 @@ public static class AchievementTracker
         HulkSmash = false;
 
         LastHitBody = null;
+        PlayerCausedExplosion = false;
+        ShipExploded = false;
     }
 }
