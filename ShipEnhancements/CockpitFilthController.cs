@@ -12,6 +12,10 @@ public class CockpitFilthController : MonoBehaviour
     MeshRenderer _rustRenderer;
     [SerializeField]
     MeshRenderer _dirtRenderer;
+    [SerializeField]
+    GameObject _rustParent;
+    [SerializeField]
+    GameObject _dirtParent;
 
     private Material _rustMat;
     private float _rustProgression;
@@ -40,21 +44,39 @@ public class CockpitFilthController : MonoBehaviour
         _dirtBuildupTime = (float)dirtAccumulationTime.GetValue();
         _cockpitDetector = GetComponentInChildren<StaticFluidDetector>();
 
-        _cockpitDetector.OnEnterFluidType += OnEnterFluidType;
-        _cockpitDetector.OnExitFluidType += OnExitFluidType;
+        if (_dirtBuildupTime > 0f)
+        {
+            _cockpitDetector.OnEnterFluidType += OnEnterFluidType;
+            _cockpitDetector.OnExitFluidType += OnExitFluidType;
+        }
     }
 
     private void Start()
     {
-        _rustMat = _rustRenderer.sharedMaterial;
-        _rustMat.SetFloat("_Cutoff", _rustProgression);
-        _rustMat.SetTexture("_MainTex", _rustTextures[Random.Range(0, _rustTextures.Length)]);
-        _rustMat.SetTextureOffset("_MainTex", new Vector2(Random.Range(0f, 1f), Random.Range(0f, 1f)));
+        if ((float)rustLevel.GetValue() > 0)
+        {
+            _rustMat = _rustRenderer.sharedMaterial;
+            _rustMat.SetFloat("_Cutoff", _rustProgression);
+            _rustMat.SetTexture("_MainTex", _rustTextures[Random.Range(0, _rustTextures.Length)]);
+            _rustMat.SetTextureOffset("_MainTex", new Vector2(Random.Range(0f, 1f), Random.Range(0f, 1f)));
+        }
+        else
+        {
+            _rustParent.SetActive(false);
+        }
 
-        _dirtMat = _dirtRenderer.sharedMaterial;
-        _dirtMat.SetTextureOffset("_MainTex", new Vector2(Random.Range(0f, 1f), Random.Range(0f, 1f)));
-        _dirtMat.SetFloat(_dirtLowerClipPropID, 1f);
-        _dirtMat.SetFloat(_dirtUpperClipPropID, 1f);
+        if (_dirtBuildupTime > 0f)
+        {
+            _dirtMat = _dirtRenderer.sharedMaterial;
+            _dirtMat.SetTextureOffset("_MainTex", new Vector2(Random.Range(0f, 1f), Random.Range(0f, 1f)));
+            _dirtMat.SetFloat(_dirtLowerClipPropID, 1f);
+            _dirtMat.SetFloat(_dirtUpperClipPropID, 1f);
+        }
+        else
+        {
+            _dirtParent.SetActive(false);
+            enabled = false;
+        }
     }
 
     private void Update()
