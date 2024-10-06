@@ -1,8 +1,6 @@
-﻿using System;
+﻿namespace ShipEnhancements;
 
-namespace ShipEnhancements;
-
-public static class AchievementTracker
+public static class SEAchievementTracker
 {
     public static bool TorqueExplosion;
     public static bool DeadInTheWater;

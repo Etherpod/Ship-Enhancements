@@ -476,9 +476,9 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.OnImpact))]
     public static bool ApplyExplosionDamageMultiplier(ShipDamageController __instance, ImpactData impact)
     {
-        if (ShipEnhancements.AchievementsAPI != null && !AchievementTracker.HulkSmash)
+        if (ShipEnhancements.AchievementsAPI != null && !SEAchievementTracker.HulkSmash)
         {
-            AchievementTracker.LastHitBody = impact.otherBody;
+            SEAchievementTracker.LastHitBody = impact.otherBody;
         }
 
         float explosionMultiplier = (float)shipDamageSpeedMultiplier.GetProperty()
@@ -493,7 +493,7 @@ public static class PatchClass
         {
             if (impact.otherBody == Locator.GetPlayerBody())
             {
-                AchievementTracker.PlayerCausedExplosion = true;
+                SEAchievementTracker.PlayerCausedExplosion = true;
             }
             __instance.Explode(false);
             return false;
@@ -2229,10 +2229,10 @@ public static class PatchClass
         }
         if (ShipEnhancements.AchievementsAPI != null)
         {
-            if ((float)shipInputLatency.GetProperty() >= 3f && !AchievementTracker.BadInternet
+            if ((float)shipInputLatency.GetProperty() >= 3f && !SEAchievementTracker.BadInternet
                 && impact.otherBody.IsKinematic() && impact.otherBody != Locator.GetShipBody().GetOrigParentBody())
             {
-                AchievementTracker.BadInternet = true;
+                SEAchievementTracker.BadInternet = true;
                 ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.BAD_INTERNET");
             }
         }
@@ -2289,13 +2289,13 @@ public static class PatchClass
     public static void HulkSmashAchievement(ShipDamageController __instance)
     {
         if (!__instance.IsSystemFailed() 
-            && ShipEnhancements.AchievementsAPI != null && !AchievementTracker.HulkSmash
-            && (!AchievementTracker.ShipExploded || AchievementTracker.PlayerCausedExplosion)
-            && AchievementTracker.LastHitBody == Locator.GetPlayerBody())
+            && ShipEnhancements.AchievementsAPI != null && !SEAchievementTracker.HulkSmash
+            && (!SEAchievementTracker.ShipExploded || SEAchievementTracker.PlayerCausedExplosion)
+            && SEAchievementTracker.LastHitBody == Locator.GetPlayerBody())
         {
-            AchievementTracker.HulkSmash = true;
+            SEAchievementTracker.HulkSmash = true;
             ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.HULK_SMASH");
-            AchievementTracker.LastHitBody = null;
+            SEAchievementTracker.LastHitBody = null;
         }
     }
 
@@ -2303,9 +2303,9 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.Explode))]
     public static void UpdateShipExploded()
     {
-        if (ShipEnhancements.AchievementsAPI != null && !AchievementTracker.ShipExploded)
+        if (ShipEnhancements.AchievementsAPI != null && !SEAchievementTracker.ShipExploded)
         {
-            AchievementTracker.ShipExploded = true;
+            SEAchievementTracker.ShipExploded = true;
         }
     }
 }

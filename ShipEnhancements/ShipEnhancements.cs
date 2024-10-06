@@ -159,7 +159,7 @@ public class ShipEnhancements : ModBehaviour
 
             if (AchievementsAPI != null)
             {
-                AchievementTracker.Reset();
+                SEAchievementTracker.Reset();
             }
 
             StartCoroutine(InitializeShip());
@@ -217,9 +217,9 @@ public class ShipEnhancements : ModBehaviour
             }
             Locator.GetShipBody().GetComponent<ShipDamageController>().Explode();
 
-            if (!AchievementTracker.TorqueExplosion && AchievementsAPI != null)
+            if (!SEAchievementTracker.TorqueExplosion && AchievementsAPI != null)
             {
-                AchievementTracker.TorqueExplosion = true;
+                SEAchievementTracker.TorqueExplosion = true;
                 AchievementsAPI?.EarnAchievement("SHIPENHANCEMENTS.TORQUE_EXPLOSION");
             }
         }
@@ -299,11 +299,11 @@ public class ShipEnhancements : ModBehaviour
             ShipNotifications.UpdateNotifications();
         }
 
-        if (!AchievementTracker.DeadInTheWater && AchievementsAPI != null
+        if (!SEAchievementTracker.DeadInTheWater && AchievementsAPI != null
             && fuelDepleted && !(bool)Settings.enableShipFuelTransfer.GetProperty() 
             && ((oxygenDepleted && !(bool)Settings.shipOxygenRefill.GetProperty()) || (bool)Settings.disableShipOxygen.GetProperty()))
         {
-            AchievementTracker.DeadInTheWater = true;
+            SEAchievementTracker.DeadInTheWater = true;
             AchievementsAPI?.EarnAchievement("SHIPENHANCEMENTS.DEAD_IN_THE_WATER");
         }
 
@@ -972,7 +972,7 @@ public class ShipEnhancements : ModBehaviour
 
     private void CheckAllPartsDamaged()
     {
-        if (AchievementsAPI == null || AchievementTracker.HowDidWeGetHere || SELocator.GetShipDamageController().IsSystemFailed()) return;
+        if (AchievementsAPI == null || SEAchievementTracker.HowDidWeGetHere || SELocator.GetShipDamageController().IsSystemFailed()) return;
 
         bool allDamaged = true;
         foreach (ShipComponent comp in SELocator.GetShipDamageController()._shipComponents)
@@ -996,7 +996,7 @@ public class ShipEnhancements : ModBehaviour
         }
         if (allDamaged)
         {
-            AchievementTracker.HowDidWeGetHere = true;
+            SEAchievementTracker.HowDidWeGetHere = true;
             AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.HOW_DID_WE_GET_HERE");
         }
     }
