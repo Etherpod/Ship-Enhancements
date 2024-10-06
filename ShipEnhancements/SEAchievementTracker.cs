@@ -14,6 +14,7 @@ public static class SEAchievementTracker
     public static OWRigidbody LastHitBody;
     public static bool PlayerCausedExplosion = false;
     public static bool ShipExploded = false;
+    public static bool PlayerEjectedCockpit = false;
 
     public static void Reset()
     {
@@ -27,6 +28,7 @@ public static class SEAchievementTracker
 
         LastHitBody = null;
         PlayerCausedExplosion = false;
+        PlayerEjectedCockpit = false;
         ShipExploded = false;
     }
 }

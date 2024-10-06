@@ -2284,6 +2284,7 @@ public static class PatchClass
     }
     #endregion
 
+    #region Achievements
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.TriggerSystemFailure))]
     public static void HulkSmashAchievement(ShipDamageController __instance)
@@ -2291,6 +2292,7 @@ public static class PatchClass
         if (!__instance.IsSystemFailed() 
             && ShipEnhancements.AchievementsAPI != null && !SEAchievementTracker.HulkSmash
             && (!SEAchievementTracker.ShipExploded || SEAchievementTracker.PlayerCausedExplosion)
+            && !SEAchievementTracker.PlayerEjectedCockpit
             && SEAchievementTracker.LastHitBody == Locator.GetPlayerBody())
         {
             SEAchievementTracker.HulkSmash = true;
@@ -2308,4 +2310,15 @@ public static class PatchClass
             SEAchievementTracker.ShipExploded = true;
         }
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipEjectionSystem), nameof(ShipEjectionSystem.FixedUpdate))]
+    public static void UpdatePlayerEjected(ShipEjectionSystem __instance)
+    {
+        if (__instance._ejectPressed)
+        {
+            SEAchievementTracker.PlayerEjectedCockpit = true;
+        }
+    }
+    #endregion
 }

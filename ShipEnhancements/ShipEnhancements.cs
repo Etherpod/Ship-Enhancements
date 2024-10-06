@@ -622,10 +622,6 @@ public class ShipEnhancements : ModBehaviour
         if ((float)Settings.shipInputLatency.GetValue() > 0f)
         {
             InputLatencyController.Initialize();
-            if ((float)Settings.shipInputLatency.GetValue() > 3f)
-            {
-                
-            }
         }
         if ((bool)Settings.hotThrusters.GetValue() || (string)Settings.thrusterColor.GetValue() != "Default")
         {
@@ -699,6 +695,7 @@ public class ShipEnhancements : ModBehaviour
                 .GetComponentInChildren<ShipCockpitUI>()._sigScopeDish).GetComponent<AudioSignal>();
             shipSignal.SetSector(Locator.GetShipTransform().GetComponentInChildren<Sector>());
             shipSignal._name = shipSignalName;
+            shipSignal._frequency = SignalFrequency.Traveler;
         }
         if ((bool)Settings.disableShipFriction.GetValue())
         {
