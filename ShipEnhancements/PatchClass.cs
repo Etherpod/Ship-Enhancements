@@ -1886,7 +1886,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipThrusterController), nameof(ShipThrusterController.ReadTranslationalInput))]
     public static bool DisableInputWhenChargingOverdrive(ShipThrusterController __instance, ref Vector3 __result)
     {
-        if ((bool)enableThrustModulator.GetProperty() && SELocator.GetShipOverdriveController().Charging)
+        if ((bool)enableThrustModulator.GetProperty() && (SELocator.GetShipOverdriveController()?.Charging ?? false))
         {
             __result = Vector3.zero;
             return false;
