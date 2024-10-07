@@ -45,5 +45,8 @@
   <ItemGroup>
     <Content Include="ShipEnhancements.csproj.user" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ShipEnhancementsQSB\ShipEnhancementsQSB.csproj" />
+  </ItemGroup>
   <ProjectExtensions><VisualStudio><UserProperties default-config_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 </Project>

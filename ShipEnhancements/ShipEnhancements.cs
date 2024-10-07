@@ -6,7 +6,6 @@ using System.IO;
 using System;
 using System.Collections.Generic;
 using OWML.Utils;
-using JetBrains.Annotations;
 
 namespace ShipEnhancements;
 
@@ -759,6 +758,17 @@ public class ShipEnhancements : ModBehaviour
         }
 
         engineOn = !(bool)Settings.addEngineSwitch.GetProperty();
+
+        if (QSBAPI != null && !QSBAPI.GetIsHost())
+        {
+            foreach (uint id in QSBAPI.GetPlayerIDs())
+            {
+                if (id != QSBAPI.GetLocalPlayerID())
+                {
+                    QSBCompat.SendInitializedShip(id);
+                }
+            }
+        }
 
         ShipNotifications.Initialize();
         SELocator.LateInitialize();

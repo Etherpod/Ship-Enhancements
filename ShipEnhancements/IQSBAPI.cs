@@ -3,6 +3,8 @@ using OWML.Common;
 using UnityEngine;
 using UnityEngine.Events;
 
+namespace ShipEnhancements;
+
 public interface IQSBAPI
 {
     #region General

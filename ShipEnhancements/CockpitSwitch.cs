@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 namespace ShipEnhancements;
@@ -65,6 +64,11 @@ public abstract class CockpitSwitch : ElectricalComponent
         List<ElectricalComponent> componentList = [.. _electricalSystem._connectedComponents];
         componentList.Add(this);
         _electricalSystem._connectedComponents = [.. componentList];
+
+        if (ShipEnhancements.QSBAPI != null)
+        {
+            ShipEnhancements.QSBCompat.AddActiveSwitch(this);
+        }
     }
 
     protected void Update()
@@ -78,7 +82,23 @@ public abstract class CockpitSwitch : ElectricalComponent
 
     private void FlipSwitch()
     {
-        _on = !_on;
+        ChangeSwitchState(!_on);
+
+        if (ShipEnhancements.QSBAPI != null)
+        {
+            foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs())
+            {
+                if (id != ShipEnhancements.QSBAPI.GetLocalPlayerID())
+                {
+                    ShipEnhancements.QSBCompat.SendSwitchState(id, (this.GetType().Name, _on));
+                }
+            }
+        }
+    }
+
+    public void ChangeSwitchState(bool state)
+    {
+        _on = state;
         if (_on)
         {
             transform.localRotation = Quaternion.Euler(_initialRotation.eulerAngles.x - _rotationOffset,
@@ -154,6 +174,11 @@ public abstract class CockpitSwitch : ElectricalComponent
 
     protected virtual void OnFlipSwitch(bool state) { }
 
+    public bool IsOn()
+    {
+        return _on;
+    }
+
     private void OnGainFocus()
     {
         _buttonPanel.UpdateFocusedButtons(true);
@@ -176,5 +201,10 @@ public abstract class CockpitSwitch : ElectricalComponent
         _interactReceiver.OnGainFocus -= OnGainFocus;
         _interactReceiver.OnLoseFocus -= OnLoseFocus;
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
+
+        if (ShipEnhancements.QSBAPI != null)
+        {
+            ShipEnhancements.QSBCompat.RemoveActiveSwitch(this);
+        }
     }
 }

@@ -45,6 +45,8 @@ public class ShipEngineSwitch : MonoBehaviour
     private bool _reset = true;
     private float _baseIndicatorLightIntensity;
 
+    private bool _controlledRemote = false;
+
     private void Awake()
     {
         _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
@@ -88,6 +90,11 @@ public class ShipEngineSwitch : MonoBehaviour
         _baseIndicatorLightIntensity = _powerIndicatorLight.intensity;
         _thrustersIndicatorLight.intensity = 0f;
         _powerIndicatorLight.intensity = 0f;
+        
+        if (ShipEnhancements.QSBAPI != null)
+        {
+            ShipEnhancements.QSBCompat.SetEngineSwitch(this);
+        }
     }
     
     private void Update()
@@ -141,6 +148,7 @@ public class ShipEngineSwitch : MonoBehaviour
                     StartCoroutine(ActivateIndicatorLights(electricalComponent._electricalSystem._systemDelay));
                     _thrusterController._isIgniting = false;
                     _interactReceiver.ChangePrompt("Turn off engine");
+                    _interactReceiver.EnableInteraction();
                     GlobalMessenger.FireEvent("CompleteShipIgnition");
                 }
             }
@@ -157,6 +165,7 @@ public class ShipEngineSwitch : MonoBehaviour
             {
                 _audioSource.Stop();
                 _reset = true;
+                _interactReceiver.EnableInteraction();
             }
         }
     }
@@ -197,6 +206,22 @@ public class ShipEngineSwitch : MonoBehaviour
 
     private void OnPressInteract()
     {
+        OnStartPress();
+
+        if (ShipEnhancements.QSBAPI != null)
+        {
+            foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs())
+            {
+                if (id != ShipEnhancements.QSBAPI.GetLocalPlayerID())
+                {
+                    ShipEnhancements.QSBCompat.SendEngineSwitchState(id, true);
+                }
+            }
+        }
+    }
+
+    private void OnStartPress()
+    {
         if (_completedTurn)
         {
             _completedTurn = false;
@@ -214,7 +239,7 @@ public class ShipEngineSwitch : MonoBehaviour
             {
                 Locator.GetShipBody().GetComponent<ShipPersistentInput>().OnDisableEngine();
             }
-            if (OWInput.IsInputMode(InputMode.ShipCockpit) && Locator.GetToolModeSwapper().IsInToolMode(ToolMode.Probe) 
+            if (OWInput.IsInputMode(InputMode.ShipCockpit) && Locator.GetToolModeSwapper().IsInToolMode(ToolMode.Probe)
                 || Locator.GetToolModeSwapper().IsInToolMode(ToolMode.SignalScope))
             {
                 Locator.GetToolModeSwapper().UnequipTool();
@@ -249,6 +274,27 @@ public class ShipEngineSwitch : MonoBehaviour
 
     private void OnReleaseInteract()
     {
+        if (_controlledRemote)
+        {
+            return;
+        }
+
+        OnStopPress();
+
+        if (ShipEnhancements.QSBAPI != null)
+        {
+            foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs())
+            {
+                if (id != ShipEnhancements.QSBAPI.GetLocalPlayerID())
+                {
+                    ShipEnhancements.QSBCompat.SendEngineSwitchState(id, false);
+                }
+            }
+        }
+    }
+
+    private void OnStopPress()
+    {
         if (!_completedIgnition && _turnSwitch)
         {
             _turnSwitch = false;
@@ -267,6 +313,42 @@ public class ShipEngineSwitch : MonoBehaviour
             }
         }
         _interactReceiver.ResetInteraction();
+    }
+
+    public void UpdateWasPressed(bool wasPressed)
+    {
+        if (wasPressed)
+        {
+            OnStartPress();
+            _controlledRemote = true;
+            _interactReceiver.DisableInteraction();
+        }
+        else
+        {
+            OnStopPress();
+            _controlledRemote = false;
+            _interactReceiver.EnableInteraction();
+        }
+    }
+    
+    public void InitializeEngineSwitch(bool completedIgnition)
+    {
+        if (completedIgnition)
+        {
+            _switchTransform.localRotation = _targetRotation;
+            _completedTurn = true;
+            _completedIgnition = true;
+            ShipEnhancements.Instance.SetEngineOn(true);
+            /*ShipElectricalComponent electricalComponent = SELocator.GetShipDamageController()._shipElectricalComponent;
+            if (!electricalComponent.isDamaged && !electricalComponent._electricalSystem.IsPowered())
+            {
+                electricalComponent._electricalSystem.SetPowered(true);
+            }*/
+            //_alarm.UpdateAlarmState();
+            //_audioController.PlayShipAmbient();
+            StartCoroutine(ActivateIndicatorLights(0f));
+            _interactReceiver.ChangePrompt("Turn off engine");
+        }
     }
 
     private void OnFuelDepleted()
@@ -306,5 +388,10 @@ public class ShipEngineSwitch : MonoBehaviour
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
         ShipEnhancements.Instance.OnFuelDepleted -= OnFuelDepleted;
         ShipEnhancements.Instance.OnFuelRestored -= OnFuelRestored;
+
+        if (ShipEnhancements.QSBAPI != null)
+        {
+            ShipEnhancements.QSBCompat.RemoveEngineSwitch();
+        }
     }
 }
