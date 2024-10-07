@@ -21,11 +21,11 @@ public static class SELocator
         _playerResources = Locator.GetPlayerBody().GetComponent<PlayerResources>();
         _shipDamageController = Locator.GetShipTransform().GetComponent<ShipDamageController>();
 
-        if ((bool)shipOxygenRefill.GetValue())
+        if ((bool)shipOxygenRefill.GetProperty())
         {
             _shipOxygenDetector = Locator.GetShipDetector().gameObject.AddComponent<OxygenDetector>();
         }
-        if (temperatureZonesAmount.GetValue().ToString() != "None")
+        if (temperatureZonesAmount.GetProperty().ToString() != "None")
         {
             _shipTemperatureDetector = Locator.GetShipDetector().gameObject.AddComponent<ShipTemperatureDetector>();
         }
@@ -33,7 +33,7 @@ public static class SELocator
 
     public static void LateInitialize()
     {
-        if ((bool)enableThrustModulator.GetValue())
+        if ((bool)enableThrustModulator.GetProperty())
         {
             _shipOverdriveController = Locator.GetShipTransform().GetComponentInChildren<ShipOverdriveController>();
         }

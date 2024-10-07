@@ -35,6 +35,8 @@ public class ShipEnhancements : ModBehaviour
     public Tether playerTether;
 
     public static IAchievements AchievementsAPI;
+    public static IQSBAPI QSBAPI;
+    public static QSBCompatibility QSBCompat;
 
     public UITextType probeLauncherName { get; private set; }
     public UITextType signalscopeName { get; private set; }
@@ -134,6 +136,7 @@ public class ShipEnhancements : ModBehaviour
         _shipEnhancementsBundle = AssetBundle.LoadFromFile(Path.Combine(ModHelper.Manifest.ModFolderPath, "assets/shipenhancements"));
 
         InitializeAchievements();
+        InitializeQSB();
         SettingsPresets.InitializePresets();
 
         probeLauncherName = EnumUtils.Create<UITextType>("ScoutLauncher");
@@ -167,7 +170,14 @@ public class ShipEnhancements : ModBehaviour
 
         LoadManager.OnStartSceneLoad += (scene, loadScene) =>
         {
-            if (scene == OWScene.TitleScreen) UpdateProperties();
+            if (scene == OWScene.TitleScreen)
+            {
+                if (QSBAPI == null || !QSBAPI.GetIsInMultiplayer() || QSBAPI.GetIsHost())
+                {
+                    UpdateProperties();
+                }
+            }
+
             if (scene != OWScene.SolarSystem) return;
 
             GlobalMessenger.RemoveListener("SuitUp", OnPlayerSuitUp);
@@ -190,7 +200,22 @@ public class ShipEnhancements : ModBehaviour
                 SELocator.GetShipDamageController().OnShipComponentDamaged -= ctx => CheckAllPartsDamaged();
                 SELocator.GetShipDamageController().OnShipHullDamaged -= ctx => CheckAllPartsDamaged();
             }
-            UpdateProperties();
+            if (QSBAPI == null || !QSBAPI.GetIsInMultiplayer() || QSBAPI.GetIsHost())
+            {
+                UpdateProperties();
+
+                if (QSBAPI != null && QSBAPI.GetIsInMultiplayer() && QSBAPI.GetIsHost())
+                {
+                    foreach (uint id in QSBAPI.GetPlayerIDs())
+                    {
+                        if (id != QSBAPI.GetLocalPlayerID())
+                        {
+                            QSBCompat.SendSettingsData(id);
+                        }
+                    }
+                }
+            }
+
             _lastSuitOxygen = 0f;
             _shipLoaded = false;
             playerTether = null;
@@ -333,6 +358,7 @@ public class ShipEnhancements : ModBehaviour
 
     private void UpdateProperties()
     {
+        WriteDebugMessage("Updating properties");
         var allSettings = Enum.GetValues(typeof(Settings)) as Settings[];
 
         foreach (Settings setting in allSettings)
@@ -369,9 +395,19 @@ public class ShipEnhancements : ModBehaviour
         }
     }
 
+    private void InitializeQSB()
+    {
+        QSBAPI = ModHelper.Interaction.ModExists("Raicuparta.QuantumSpaceBuddies") ?
+            ModHelper.Interaction.TryGetModApi<IQSBAPI>("Raicuparta.QuantumSpaceBuddies")
+            : null;
+        QSBCompat = new QSBCompatibility(QSBAPI);
+    }
+
     private IEnumerator InitializeShip()
     {
         yield return new WaitUntil(() => Locator._shipBody != null);
+
+        WriteDebugMessage("Initialize Ship");
 
         SELocator.Initalize();
         ThrustIndicatorManager.Initialize();
@@ -402,36 +438,36 @@ public class ShipEnhancements : ModBehaviour
             SELocator.GetShipDamageController().OnShipHullDamaged += ctx => CheckAllPartsDamaged();
         }
 
-        if ((bool)Settings.disableGravityCrystal.GetValue())
+        if ((bool)Settings.disableGravityCrystal.GetProperty())
         {
             DisableGravityCrystal();
         }
-        if ((bool)Settings.disableEjectButton.GetValue())
+        if ((bool)Settings.disableEjectButton.GetProperty())
         {
             Locator.GetShipBody().GetComponentInChildren<ShipEjectionSystem>().GetComponent<InteractReceiver>().DisableInteraction();
             GameObject ejectButtonTape = LoadPrefab("Assets/ShipEnhancements/EjectButtonTape.prefab");
             AssetBundleUtilities.ReplaceShaders(ejectButtonTape);
             Instantiate(ejectButtonTape, Locator.GetShipBody().transform.Find("Module_Cockpit/Geo_Cockpit"));
         }
-        if ((bool)Settings.disableHeadlights.GetValue())
+        if ((bool)Settings.disableHeadlights.GetProperty())
         {
             DisableHeadlights();
         }
-        if ((bool)Settings.disableLandingCamera.GetValue())
+        if ((bool)Settings.disableLandingCamera.GetProperty())
         {
             DisableLandingCamera();
         }
-        bool coloredLights = (string)Settings.shipLightColor.GetValue() != "Default";
-        if ((bool)Settings.disableShipLights.GetValue() || coloredLights)
+        bool coloredLights = (string)Settings.shipLightColor.GetProperty() != "Default";
+        if ((bool)Settings.disableShipLights.GetProperty() || coloredLights)
         {
-            Color lightColor = SettingsColors.GetLightingColor((string)Settings.shipLightColor.GetValue());
+            Color lightColor = SettingsColors.GetLightingColor((string)Settings.shipLightColor.GetProperty());
             foreach (ElectricalSystem system in Locator.GetShipBody().GetComponentsInChildren<ElectricalSystem>())
             {
                 foreach (ElectricalComponent component in system._connectedComponents)
                 {
                     if (component.gameObject.name.Contains("Pointlight") && component.TryGetComponent(out ShipLight light))
                     {
-                        if ((bool)Settings.disableShipLights.GetValue())
+                        if ((bool)Settings.disableShipLights.GetProperty())
                         {
                             light.SetOn(false);
                             light._light.enabled = false;
@@ -445,7 +481,7 @@ public class ShipEnhancements : ModBehaviour
                                 light._matPropBlock.SetColor(light._propID_EmissionColor, lightColor);
                                 light._emissiveRenderer.SetPropertyBlock(light._matPropBlock);
                             }
-                            if ((string)Settings.shipLightColor.GetValue() == "Rainbow")
+                            if ((string)Settings.shipLightColor.GetProperty() == "Rainbow")
                             {
                                 light.gameObject.AddComponent<RainbowShipLight>();
                             }
@@ -455,7 +491,7 @@ public class ShipEnhancements : ModBehaviour
             }
             foreach (PulsingLight beacon in Locator.GetShipBody().transform.Find("Module_Cabin/Lights_Cabin/ShipBeacon_Proxy").GetComponentsInChildren<PulsingLight>())
             {
-                if ((bool)Settings.disableShipLights.GetValue())
+                if ((bool)Settings.disableShipLights.GetProperty())
                 {
                     PulsingLight.s_matPropBlock.SetColor(PulsingLight.s_propID_EmissionColor, beacon._initEmissionColor * 0f);
                     beacon._emissiveRenderer.SetPropertyBlock(PulsingLight.s_matPropBlock);
@@ -465,26 +501,26 @@ public class ShipEnhancements : ModBehaviour
                 {
                     beacon.GetComponent<Light>().color = lightColor;
                     beacon._initEmissionColor = lightColor;
-                    if ((string)Settings.shipLightColor.GetValue() == "Rainbow")
+                    if ((string)Settings.shipLightColor.GetProperty() == "Rainbow")
                     {
                         beacon.gameObject.AddComponent<RainbowShipLight>();
                     }
                 }
             }
         }
-        if ((bool)Settings.disableShipOxygen.GetValue())
+        if ((bool)Settings.disableShipOxygen.GetProperty())
         {
             SELocator.GetShipResources().SetOxygen(0f);
             oxygenDepleted = true;
             Locator.GetShipTransform().Find("Module_Cockpit/Props_Cockpit/Props_HEA_ShipFoliage").gameObject.SetActive(false);
         }
-        if (Settings.temperatureZonesAmount.GetValue().ToString() != "None")
+        if (Settings.temperatureZonesAmount.GetProperty().ToString() != "None")
         {
             Locator.GetShipBody().GetComponentInChildren<ShipFuelGauge>().gameObject.AddComponent<ShipTemperatureGauge>();
             GameObject hullTempDial = LoadPrefab("Assets/ShipEnhancements/ShipTempDial.prefab");
             Instantiate(hullTempDial, Locator.GetShipTransform().Find("Module_Cockpit"));
 
-            if (Settings.temperatureZonesAmount.GetValue().ToString() == "Sun")
+            if (Settings.temperatureZonesAmount.GetProperty().ToString() == "Sun")
             {
                 GameObject sun = GameObject.Find("Sun_Body");
                 if (sun != null)
@@ -498,38 +534,38 @@ public class ShipEnhancements : ModBehaviour
                 AddTemperatureZones();
             }
         }
-        if ((bool)Settings.enableShipFuelTransfer.GetValue())
+        if ((bool)Settings.enableShipFuelTransfer.GetProperty())
         {
             GameObject transferVolume = LoadPrefab("Assets/ShipEnhancements/FuelTransferVolume.prefab");
             Instantiate(transferVolume, Locator.GetShipBody().GetComponentInChildren<ShipFuelTankComponent>().transform);
         }
-        if ((bool)Settings.enableJetpackRefuelDrain.GetValue())
+        if ((bool)Settings.enableJetpackRefuelDrain.GetProperty())
         {
             Locator.GetShipBody().GetComponentInChildren<PlayerRecoveryPoint>().gameObject.AddComponent<ShipRecoveryPoint>();
         }
-        if ((float)Settings.gravityMultiplier.GetValue() != 1f && !(bool)Settings.disableGravityCrystal.GetValue())
+        if ((float)Settings.gravityMultiplier.GetProperty() != 1f && !(bool)Settings.disableGravityCrystal.GetProperty())
         {
             ShipDirectionalForceVolume shipGravity = Locator.GetShipBody().GetComponentInChildren<ShipDirectionalForceVolume>();
-            shipGravity._fieldMagnitude *= (float)Settings.gravityMultiplier.GetValue();
+            shipGravity._fieldMagnitude *= (float)Settings.gravityMultiplier.GetProperty();
         }
-        if ((bool)Settings.enableAutoHatch.GetValue())
+        if ((bool)Settings.enableAutoHatch.GetProperty())
         {
             GlobalMessenger.AddListener("EnterShip", OnEnterShip);
             GlobalMessenger.AddListener("ExitShip", OnExitShip);
             GameObject autoHatchController = LoadPrefab("Assets/ShipEnhancements/ExteriorHatchControls.prefab");
             Instantiate(autoHatchController, Locator.GetShipBody().GetComponentInChildren<HatchController>().transform.parent);
         }
-        if ((float)Settings.spaceAngularDragMultiplier.GetValue() > 0 || (float)Settings.atmosphereAngularDragMultiplier.GetValue() > 0)
+        if ((float)Settings.spaceAngularDragMultiplier.GetProperty() > 0 || (float)Settings.atmosphereAngularDragMultiplier.GetProperty() > 0)
         {
             ShipFluidDetector detector = Locator.GetShipDetector().GetComponent<ShipFluidDetector>();
             detector.OnEnterFluid += OnEnterFluid;
             detector.OnExitFluid += OnExitFluid;
         }
-        if ((string)Settings.gravityDirection.GetValue() != "Down" && !(bool)Settings.disableGravityCrystal.GetValue())
+        if ((string)Settings.gravityDirection.GetProperty() != "Down" && !(bool)Settings.disableGravityCrystal.GetProperty())
         {
             ShipDirectionalForceVolume shipGravity = Locator.GetShipBody().GetComponentInChildren<ShipDirectionalForceVolume>();
             Vector3 direction = Vector3.down;
-            switch ((string)Settings.gravityDirection.GetValue())
+            switch ((string)Settings.gravityDirection.GetProperty())
             {
                 case "Up":
                     direction = Vector3.up;
@@ -553,11 +589,11 @@ public class ShipEnhancements : ModBehaviour
             }
             shipGravity._fieldDirection = direction;
         }
-        if ((bool)Settings.enableManualScoutRecall.GetValue() || (bool)Settings.disableScoutRecall.GetValue() || (bool)Settings.disableScoutLaunching.GetValue())
+        if ((bool)Settings.enableManualScoutRecall.GetProperty() || (bool)Settings.disableScoutRecall.GetProperty() || (bool)Settings.disableScoutLaunching.GetProperty())
         {
             ShipProbeLauncherEffects launcherEffects = Locator.GetShipBody().GetComponentInChildren<PlayerProbeLauncher>()
                 .gameObject.AddComponent<ShipProbeLauncherEffects>();
-            if ((bool)Settings.enableManualScoutRecall.GetValue())
+            if ((bool)Settings.enableManualScoutRecall.GetProperty())
             {
                 GameObject probePickupVolume = LoadPrefab("Assets/ShipEnhancements/PlayerProbePickupVolume.prefab");
                 Instantiate(probePickupVolume, Locator.GetProbe().transform);
@@ -565,19 +601,19 @@ public class ShipEnhancements : ModBehaviour
             GameObject shipProbePickupVolume = LoadPrefab("Assets/ShipEnhancements/ShipProbePickupVolume.prefab");
             GameObject shipProbeVolume = Instantiate(shipProbePickupVolume, launcherEffects.transform);
 
-            if ((bool)Settings.enableScoutLauncherComponent.GetValue())
+            if ((bool)Settings.enableScoutLauncherComponent.GetProperty())
             {
                 Locator.GetShipBody().GetComponentInChildren<ProbeLauncherComponent>().SetProbeLauncherEffects(launcherEffects);
             }
         }
-        if ((bool)Settings.disableScoutRecall.GetValue() && (bool)Settings.disableScoutLaunching.GetValue() && (bool)Settings.enableScoutLauncherComponent.GetValue())
+        if ((bool)Settings.disableScoutRecall.GetProperty() && (bool)Settings.disableScoutLaunching.GetProperty() && (bool)Settings.enableScoutLauncherComponent.GetProperty())
         {
             SELocator.GetProbeLauncherComponent()._repairReceiver.repairDistance = 0f;
             SELocator.GetProbeLauncherComponent()._damaged = true;
             SELocator.GetProbeLauncherComponent()._repairFraction = 0f;
             SELocator.GetProbeLauncherComponent().OnComponentDamaged();
         }
-        if ((bool)Settings.addPortableCampfire.GetValue())
+        if ((bool)Settings.addPortableCampfire.GetProperty())
         {
             Transform suppliesParent = Locator.GetShipTransform().Find("Module_Supplies");
             GameObject portableCampfireSocket = LoadPrefab("Assets/ShipEnhancements/PortableCampfireSocket.prefab");
@@ -587,22 +623,22 @@ public class ShipEnhancements : ModBehaviour
             PortableCampfireItem campfireItem = Instantiate(portableCampfireItem, suppliesParent).GetComponent<PortableCampfireItem>();
             campfireSocket.SetCampfireItem(campfireItem);
         }
-        if ((float)Settings.shipExplosionMultiplier.GetValue() != 1f)
+        if ((float)Settings.shipExplosionMultiplier.GetProperty() != 1f)
         {
             Transform effectsTransform = Locator.GetShipTransform().Find("Effects");
             ExplosionController explosion = effectsTransform.GetComponentInChildren<ExplosionController>();
-            explosion._length *= ((float)Settings.shipExplosionMultiplier.GetValue() * 0.75f) + 0.25f;
-            explosion._forceVolume._acceleration *= ((float)Settings.shipExplosionMultiplier.GetValue() * 0.25f) + 0.75f;
-            explosion.transform.localScale *= (float)Settings.shipExplosionMultiplier.GetValue();
+            explosion._length *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.75f) + 0.25f;
+            explosion._forceVolume._acceleration *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.25f) + 0.75f;
+            explosion.transform.localScale *= (float)Settings.shipExplosionMultiplier.GetProperty();
             explosion.GetComponent<SphereCollider>().radius = 0.1f;
             OWAudioSource audio = effectsTransform.Find("ExplosionAudioSource").GetComponent<OWAudioSource>();
-            audio.maxDistance *= ((float)Settings.shipExplosionMultiplier.GetValue() * 0.1f) + 0.9f;
+            audio.maxDistance *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.1f) + 0.9f;
             AnimationCurve curve = audio.GetCustomCurve(AudioSourceCurveType.CustomRolloff);
             Keyframe[] newKeys = new Keyframe[curve.keys.Length];
             for (int i = 0; i < curve.keys.Length; i++)
             {
                 newKeys[i] = curve.keys[i];
-                newKeys[i].value *= ((float)Settings.shipExplosionMultiplier.GetValue() * 0.1f) + 0.9f;
+                newKeys[i].value *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.1f) + 0.9f;
             }
             AnimationCurve newCurve = new();
             foreach (Keyframe key in newKeys)
@@ -611,19 +647,19 @@ public class ShipEnhancements : ModBehaviour
             }
             audio.SetCustomCurve(AudioSourceCurveType.CustomRolloff, newCurve);
         }
-        if ((float)Settings.shipBounciness.GetValue() > 0f)
+        if ((float)Settings.shipBounciness.GetProperty() > 0f)
         {
             Locator.GetShipTransform().gameObject.AddComponent<ShipBouncyHull>();
         }
-        if ((bool)Settings.enablePersistentInput.GetValue())
+        if ((bool)Settings.enablePersistentInput.GetProperty())
         {
             Locator.GetShipBody().gameObject.AddComponent<ShipPersistentInput>();
         }
-        if ((float)Settings.shipInputLatency.GetValue() > 0f)
+        if ((float)Settings.shipInputLatency.GetProperty() > 0f)
         {
             InputLatencyController.Initialize();
         }
-        if ((bool)Settings.hotThrusters.GetValue() || (string)Settings.thrusterColor.GetValue() != "Default")
+        if ((bool)Settings.hotThrusters.GetProperty() || (string)Settings.thrusterColor.GetProperty() != "Default")
         {
             GameObject flameHazardVolume = LoadPrefab("Assets/ShipEnhancements/FlameHeatVolume.prefab");
             foreach (ThrusterFlameController flame in Locator.GetShipTransform().GetComponentsInChildren<ThrusterFlameController>())
@@ -636,7 +672,7 @@ public class ShipEnhancements : ModBehaviour
                     flame.transform.localScale = Vector3.zero;
                 }
 
-                string color = (string)Settings.thrusterColor.GetValue();
+                string color = (string)Settings.thrusterColor.GetProperty();
 
                 if (color == "Rainbow")
                 {
@@ -659,17 +695,17 @@ public class ShipEnhancements : ModBehaviour
                 }
             }
         }
-        if ((float)Settings.reactorLifetimeMultiplier.GetValue() != 1f)
+        if ((float)Settings.reactorLifetimeMultiplier.GetProperty() != 1f)
         {
             ShipReactorComponent reactor = Locator.GetShipTransform().GetComponentInChildren<ShipReactorComponent>();
-            float multiplier = (float)Settings.reactorLifetimeMultiplier.GetValue();
+            float multiplier = (float)Settings.reactorLifetimeMultiplier.GetProperty();
             reactor._minCountdown *= multiplier;
             reactor._maxCountdown *= multiplier;
         }
 
         SetHullColor();
 
-        if ((bool)Settings.addTether.GetValue())
+        if ((bool)Settings.addTether.GetProperty())
         {
             GameObject hook = LoadPrefab("Assets/ShipEnhancements/TetherHook.prefab");
             AssetBundleUtilities.ReplaceShaders(hook);
@@ -688,7 +724,7 @@ public class ShipEnhancements : ModBehaviour
 
             Locator.GetPlayerBody().gameObject.AddComponent<TetherPromptController>();
         }
-        if ((bool)Settings.addShipSignal.GetValue())
+        if ((bool)Settings.addShipSignal.GetProperty())
         {
             GameObject signal = LoadPrefab("Assets/ShipEnhancements/ShipSignal.prefab");
             AudioSignal shipSignal = Instantiate(signal, Locator.GetShipTransform()
@@ -697,7 +733,7 @@ public class ShipEnhancements : ModBehaviour
             shipSignal._name = shipSignalName;
             shipSignal._frequency = SignalFrequency.Traveler;
         }
-        if ((bool)Settings.disableShipFriction.GetValue())
+        if ((bool)Settings.disableShipFriction.GetProperty())
         {
             PhysicMaterial mat = (PhysicMaterial)LoadAsset("Assets/ShipEnhancements/FrictionlessShip.physicMaterial");
             foreach (Collider collider in Locator.GetShipTransform().GetComponentsInChildren<Collider>(true))
@@ -705,13 +741,13 @@ public class ShipEnhancements : ModBehaviour
                 collider.material = mat;
             }
         }
-        if ((float)Settings.rustLevel.GetValue() > 0f || (float)Settings.dirtAccumulationTime.GetValue() > 0f)
+        if ((float)Settings.rustLevel.GetProperty() > 0f || (float)Settings.dirtAccumulationTime.GetProperty() > 0f)
         {
             GameObject rustController = LoadPrefab("Assets/ShipEnhancements/RustController.prefab");
             AssetBundleUtilities.ReplaceShaders(rustController);
             Instantiate(rustController, Locator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry"));
         }
-        if ((bool)Settings.addPortableTractorBeam.GetValue())
+        if ((bool)Settings.addPortableTractorBeam.GetProperty())
         {
             GameObject tractor = LoadPrefab("Assets/ShipEnhancements/PortableTractorBeamItem.prefab");
             AssetBundleUtilities.ReplaceShaders(tractor);
@@ -722,7 +758,7 @@ public class ShipEnhancements : ModBehaviour
             tractorSocketObj.GetComponent<PortableTractorBeamSocket>().SetTractorBeamItem(tractorObj.GetComponent<PortableTractorBeamItem>());
         }
 
-        engineOn = !(bool)Settings.addEngineSwitch.GetValue();
+        engineOn = !(bool)Settings.addEngineSwitch.GetProperty();
 
         ShipNotifications.Initialize();
         SELocator.LateInitialize();

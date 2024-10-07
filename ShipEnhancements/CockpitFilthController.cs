@@ -40,8 +40,8 @@ public class CockpitFilthController : MonoBehaviour
 
     private void Awake()
     {
-        _rustProgression = Mathf.Lerp(1f, 0.15f, (float)rustLevel.GetValue());
-        _dirtBuildupTime = (float)dirtAccumulationTime.GetValue();
+        _rustProgression = Mathf.Lerp(1f, 0.15f, (float)rustLevel.GetProperty());
+        _dirtBuildupTime = (float)dirtAccumulationTime.GetProperty();
         _cockpitDetector = GetComponentInChildren<StaticFluidDetector>();
 
         if (_dirtBuildupTime > 0f)
@@ -53,7 +53,7 @@ public class CockpitFilthController : MonoBehaviour
 
     private void Start()
     {
-        if ((float)rustLevel.GetValue() > 0)
+        if ((float)rustLevel.GetProperty() > 0)
         {
             _rustMat = _rustRenderer.sharedMaterial;
             _rustMat.SetFloat("_Cutoff", _rustProgression);
