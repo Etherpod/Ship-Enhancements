@@ -94,13 +94,15 @@ When you select a preset, you may have to close and reopen the settings menu for
 ## Achievements
 Ship Enhancements adds 8 new achievements to the **Achievements+** mod! Use it with Ship Enhancements if you want to create some meaning from the chaos.
 
+## Multiplayer
+This mod is fully compatible with Quantum Space Buddies! Whoever hosts the game will control what settings are enabled or disabled.
+
+If you run into any bugs, feel free to report it on GitHub or on the Outer Wilds Modding Discord server.
+
 ## API
 - **CreateTemperatureZone()** - In case you're a modder and want to add your own high/low temperature zones. Temperature zones can stack, and will just take the sum of the temperatures.
 - **GetSettingsProperty()** - Returns the value of a config setting as seen from the player. These values only update at the beginning of the loop, so changing the mod settings doesn't affect them.
 - **SetSettingsProperty()** - Lets you change the value of a config setting in the middle of the loop. Note that this change will be reverted on the next loop.
-
-## Multiplayer
-Currently there is no support for multiplayer (Quantum Space Buddies), but I do plan on adding it in the future. You can still technically do multiplayer with this mod enabled, but things will definitely break.
 
 # Credits
 Thanks to Ditzy and JohnCorby for helping with some of the code, especially the physics stuff.
