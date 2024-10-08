@@ -195,7 +195,11 @@ public class CockpitButtonPanel : MonoBehaviour
         }
         else if (!PlayerState.AtFlightConsole())
         {
-            _cockpitInteractVolume.EnableInteraction();
+            if (ShipEnhancements.QSBInteraction == null || !ShipEnhancements.QSBInteraction.FlightConsoleOccupied())
+            {
+                ShipEnhancements.WriteDebugMessage("Enable");
+                _cockpitInteractVolume.EnableInteraction();
+            }
         }
     }
 

@@ -6,6 +6,7 @@ using System.IO;
 using System;
 using System.Collections.Generic;
 using OWML.Utils;
+using System.Reflection;
 
 namespace ShipEnhancements;
 
@@ -36,6 +37,7 @@ public class ShipEnhancements : ModBehaviour
     public static IAchievements AchievementsAPI;
     public static IQSBAPI QSBAPI;
     public static QSBCompatibility QSBCompat;
+    public static IQSBInteraction QSBInteraction;
 
     public UITextType probeLauncherName { get; private set; }
     public UITextType signalscopeName { get; private set; }
@@ -127,7 +129,7 @@ public class ShipEnhancements : ModBehaviour
     private void Awake()
     {
         Instance = this;
-        HarmonyLib.Harmony.CreateAndPatchAll(System.Reflection.Assembly.GetExecutingAssembly());
+        HarmonyLib.Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
     }
 
     private void Start()
@@ -396,10 +398,19 @@ public class ShipEnhancements : ModBehaviour
 
     private void InitializeQSB()
     {
-        QSBAPI = ModHelper.Interaction.ModExists("Raicuparta.QuantumSpaceBuddies") ?
-            ModHelper.Interaction.TryGetModApi<IQSBAPI>("Raicuparta.QuantumSpaceBuddies")
-            : null;
-        QSBCompat = new QSBCompatibility(QSBAPI);
+        bool qsbEnabled = ModHelper.Interaction.ModExists("Raicuparta.QuantumSpaceBuddies");
+        if (qsbEnabled)
+        {
+            QSBAPI = ModHelper.Interaction.TryGetModApi<IQSBAPI>("Raicuparta.QuantumSpaceBuddies");
+            QSBCompat = new QSBCompatibility(QSBAPI);
+            var qsbAssembly = Assembly.LoadFrom(Path.Combine(ModHelper.Manifest.ModFolderPath, "ShipEnhancementsQSB.dll"));
+            gameObject.AddComponent(qsbAssembly.GetType("ShipEnhancementsQSB.QSBInteraction", true));
+        }
+    }
+
+    public void AssignQSBInterface(IQSBInteraction qsbInterface)
+    {
+        QSBInteraction = qsbInterface;
     }
 
     private IEnumerator InitializeShip()
