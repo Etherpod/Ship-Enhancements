@@ -5,7 +5,7 @@ namespace ShipEnhancements;
 
 public class ShipResourceSyncManager
 {
-    private readonly int _frameDelay = 50;
+    private readonly int _frameDelay = 120;
     private int _currentFrameDelay;
     private QSBCompatibility _qsbCompat;
     private IQSBAPI _api;

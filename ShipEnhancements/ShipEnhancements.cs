@@ -258,7 +258,7 @@ public class ShipEnhancements : ModBehaviour
             }
         }
 
-        if (InMultiplayer)
+        if (InMultiplayer && QSBAPI.GetIsHost())
         {
             _shipResourceSync?.Update();
         }
