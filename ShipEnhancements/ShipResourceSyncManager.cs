@@ -21,13 +21,10 @@ public class ShipResourceSyncManager
     {
         if (_currentFrameDelay <= 0)
         {
-            foreach (uint id in _api.GetPlayerIDs())
+            foreach (uint id in _api.GetPlayerIDs().Where(id => id != ShipEnhancements.QSBAPI.GetLocalPlayerID()))
             {
-                if (id != _api.GetLocalPlayerID())
-                {
-                    _qsbCompat.SendShipOxygenValue(id, SELocator.GetShipResources()._currentOxygen);
-                    _qsbCompat.SendShipFuelValue(id, SELocator.GetShipResources()._currentFuel);
-                }
+                _qsbCompat.SendShipOxygenValue(id, SELocator.GetShipResources()._currentOxygen);
+                _qsbCompat.SendShipFuelValue(id, SELocator.GetShipResources()._currentFuel);
             }
             _currentFrameDelay = _frameDelay;
         }

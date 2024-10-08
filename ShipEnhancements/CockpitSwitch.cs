@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace ShipEnhancements;
@@ -86,12 +87,9 @@ public abstract class CockpitSwitch : ElectricalComponent
 
         if (ShipEnhancements.InMultiplayer)
         {
-            foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs())
+            foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs().Where(id => id != ShipEnhancements.QSBAPI.GetLocalPlayerID()))
             {
-                if (id != ShipEnhancements.QSBAPI.GetLocalPlayerID())
-                {
-                    ShipEnhancements.QSBCompat.SendSwitchState(id, (this.GetType().Name, _on));
-                }
+                ShipEnhancements.QSBCompat.SendSwitchState(id, (GetType().Name, _on));
             }
         }
     }

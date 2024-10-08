@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
@@ -66,12 +67,9 @@ public class ShipFuelTransfer : MonoBehaviour
 
                 if (ShipEnhancements.InMultiplayer)
                 {
-                    foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs())
+                    foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs().Where(id => id != ShipEnhancements.QSBAPI.GetLocalPlayerID()))
                     {
-                        if (id != ShipEnhancements.QSBAPI.GetLocalPlayerID())
-                        {
-                            ShipEnhancements.QSBCompat.SendShipFuelDrain(id, -amountToAdd, false);
-                        }
+                        ShipEnhancements.QSBCompat.SendShipFuelDrain(id, -amountToAdd, false);
                     }
                 }
 

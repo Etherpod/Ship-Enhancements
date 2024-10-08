@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using OWML.Utils;
 using System.Reflection;
+using System.Linq;
 
 namespace ShipEnhancements;
 
@@ -217,12 +218,9 @@ public class ShipEnhancements : ModBehaviour
 
                 if (QSBAPI != null && QSBAPI.GetIsInMultiplayer() && QSBAPI.GetIsHost())
                 {
-                    foreach (uint id in QSBAPI.GetPlayerIDs())
+                    foreach (uint id in QSBAPI.GetPlayerIDs().Where(id => id != QSBAPI.GetLocalPlayerID()))
                     {
-                        if (id != QSBAPI.GetLocalPlayerID())
-                        {
-                            QSBCompat.SendSettingsData(id);
-                        }
+                        QSBCompat.SendSettingsData(id);
                     }
                 }
             }
@@ -788,12 +786,9 @@ public class ShipEnhancements : ModBehaviour
 
         if (QSBAPI != null && !QSBAPI.GetIsHost())
         {
-            foreach (uint id in QSBAPI.GetPlayerIDs())
+            foreach (uint id in QSBAPI.GetPlayerIDs().Where(id => id != QSBAPI.GetLocalPlayerID()))
             {
-                if (id != QSBAPI.GetLocalPlayerID())
-                {
-                    QSBCompat.SendInitializedShip(id);
-                }
+                QSBCompat.SendInitializedShip(id);
             }
         }
 

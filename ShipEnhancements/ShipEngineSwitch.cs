@@ -1,6 +1,7 @@
 ﻿using static ShipEnhancements.ShipEnhancements.Settings;
 using UnityEngine;
 using System.Collections;
+using System.Linq;
 
 namespace ShipEnhancements;
 
@@ -214,12 +215,9 @@ public class ShipEngineSwitch : MonoBehaviour
 
         if (ShipEnhancements.InMultiplayer)
         {
-            foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs())
+            foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs().Where(id => id != ShipEnhancements.QSBAPI.GetLocalPlayerID()))
             {
-                if (id != ShipEnhancements.QSBAPI.GetLocalPlayerID())
-                {
-                    ShipEnhancements.QSBCompat.SendEngineSwitchState(id, true);
-                }
+                ShipEnhancements.QSBCompat.SendEngineSwitchState(id, true);
             }
         }
     }
@@ -287,12 +285,9 @@ public class ShipEngineSwitch : MonoBehaviour
 
         if (ShipEnhancements.InMultiplayer)
         {
-            foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs())
+            foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs().Where(id => id != ShipEnhancements.QSBAPI.GetLocalPlayerID()))
             {
-                if (id != ShipEnhancements.QSBAPI.GetLocalPlayerID())
-                {
-                    ShipEnhancements.QSBCompat.SendEngineSwitchState(id, false);
-                }
+                ShipEnhancements.QSBCompat.SendEngineSwitchState(id, false);
             }
         }
     }
