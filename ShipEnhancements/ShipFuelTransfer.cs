@@ -61,7 +61,20 @@ public class ShipFuelTransfer : MonoBehaviour
             else
             {
                 SELocator.GetPlayerResources()._currentFuel -= (PlayerResources._maxFuel * Time.deltaTime) / 3f;
-                SELocator.GetShipResources().AddFuel(PlayerResources._maxFuel * Time.deltaTime * 5f * (float)fuelTransferMultiplier.GetProperty());
+                float amountToAdd = PlayerResources._maxFuel * Time.deltaTime * 5f * (float)fuelTransferMultiplier.GetProperty();
+                SELocator.GetShipResources().AddFuel(amountToAdd);
+
+                if (ShipEnhancements.QSBAPI != null)
+                {
+                    foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs())
+                    {
+                        if (id != ShipEnhancements.QSBAPI.GetLocalPlayerID())
+                        {
+                            ShipEnhancements.QSBCompat.SendShipFuelDrain(id, -amountToAdd, false);
+                        }
+                    }
+                }
+
                 if (SELocator.GetPlayerResources()._currentFuel <= 0)
                 {
                     OnReleaseInteract();

@@ -31,8 +31,19 @@ public class ShipRecoveryPoint : MonoBehaviour
 
         if (_recoveryPoint._recovering && PlayerState.IsWearingSuit())
         {
-            SELocator.GetShipResources()._currentFuel = Mathf.Max(SELocator.GetShipResources()._currentFuel 
-                - (PlayerResources._maxFuel * 5f * Time.deltaTime * 3f * (float)fuelTransferMultiplier.GetProperty()), 0f);
+            float amountToDrain = PlayerResources._maxFuel * 5f * Time.deltaTime * 3f * (float)fuelTransferMultiplier.GetProperty();
+            SELocator.GetShipResources()._currentFuel = Mathf.Max(SELocator.GetShipResources()._currentFuel  - amountToDrain, 0f);
+
+            if (ShipEnhancements.QSBAPI != null)
+            {
+                foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs())
+                {
+                    if (id != ShipEnhancements.QSBAPI.GetLocalPlayerID())
+                    {
+                        ShipEnhancements.QSBCompat.SendShipFuelDrain(id, amountToDrain, false);
+                    }
+                }
+            }
         }
     }
 }

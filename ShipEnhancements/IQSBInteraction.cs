@@ -1,6 +1,8 @@
-﻿using System;
+﻿using UnityEngine;
 
 public interface IQSBInteraction
 {
     bool FlightConsoleOccupied();
+
+    Vector3 GetShipAcceleration();
 }

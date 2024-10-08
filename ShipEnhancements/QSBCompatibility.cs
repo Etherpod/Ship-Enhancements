@@ -9,6 +9,7 @@ public class QSBCompatibility
     private List<CockpitSwitch> _activeSwitches = [];
     private ShipEngineSwitch _engineSwitch;
 
+    [Serializable]
     private struct NoData { }
 
     public QSBCompatibility(IQSBAPI api)
@@ -20,6 +21,8 @@ public class QSBCompatibility
         _api.RegisterHandler<NoData>("ship-initialized", ReceiveInitializedShip);
         _api.RegisterHandler<bool>("engine-switch-state", ReceiveEngineSwitchState);
         _api.RegisterHandler<bool>("initialize-engine-switch", InitializeEngineSwitch);
+        _api.RegisterHandler<(float, bool)>("ship-oxygen-drain", ReceiveShipOxygenDrain);
+        _api.RegisterHandler<(float, bool)>("ship-fuel-drain", ReceiveShipFuelDrain);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -131,5 +134,53 @@ public class QSBCompatibility
     private void InitializeEngineSwitch(uint id, bool completedIgnition)
     {
         _engineSwitch.InitializeEngineSwitch(completedIgnition);
+    }
+
+    public void SendShipOxygenDrain(uint id, float drainAmount, bool applyMultipliers)
+    {
+        _api.SendMessage("ship-oxygen-drain", (drainAmount, applyMultipliers), id, false);
+    }
+
+    private void ReceiveShipOxygenDrain(uint id, (float, bool) data)
+    {
+        if (data.Item1 >= 0)
+        {
+            if (data.Item2)
+            {
+                SELocator.GetShipResources().DrainOxygen(data.Item1);
+            }
+            else
+            {
+                SELocator.GetShipResources()._currentOxygen -= data.Item1;
+            }
+        }
+        else
+        {
+            SELocator.GetShipResources().AddOxygen(-data.Item1);
+        }
+    }
+
+    public void SendShipFuelDrain(uint id, float drainAmount, bool applyMultipliers)
+    {
+        _api.SendMessage("ship-fuel-drain", (drainAmount, applyMultipliers), id, false);
+    }
+
+    private void ReceiveShipFuelDrain(uint id, (float, bool) data)
+    {
+        if (data.Item1 >= 0)
+        {
+            if (data.Item2)
+            {
+                SELocator.GetShipResources().DrainFuel(data.Item1);
+            }
+            else
+            {
+                SELocator.GetShipResources()._currentFuel -= data.Item1;
+            }
+        }
+        else
+        {
+            SELocator.GetShipResources().AddFuel(-data.Item1);
+        }
     }
 }

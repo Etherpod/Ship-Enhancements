@@ -101,7 +101,22 @@ public class ShipEngineSwitch : MonoBehaviour
     {
         if (_completedIgnition)
         {
-            SELocator.GetShipResources().DrainFuel(0.5f * (float)idleFuelConsumptionMultiplier.GetProperty() * Time.deltaTime);
+            if ((float)idleFuelConsumptionMultiplier.GetProperty() > 0f)
+            {
+                float fuelDrain = 0.5f * (float)idleFuelConsumptionMultiplier.GetProperty() * Time.deltaTime;
+                SELocator.GetShipResources().DrainFuel(fuelDrain);
+
+                /*if (ShipEnhancements.QSBAPI != null)
+                {
+                    foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs())
+                    {
+                        if (id != ShipEnhancements.QSBAPI.GetLocalPlayerID())
+                        {
+                            ShipEnhancements.QSBCompat.SendShipFuelDrain(id, fuelDrain, true);
+                        }
+                    }
+                }*/
+            }
 
             bool electricalFailed = SELocator.GetShipDamageController().IsElectricalFailed();
             if (electricalFailed != _lastShipPowerState)

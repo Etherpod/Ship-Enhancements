@@ -525,17 +525,28 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipResources), nameof(ShipResources.Update))]
     public static bool RefillShipOxygen(ShipResources __instance)
     {
-        if ((bool)disableShipOxygen.GetProperty() || !(bool)shipOxygenRefill.GetProperty()) return true;
+        if (((bool)disableShipOxygen.GetProperty() || !(bool)shipOxygenRefill.GetProperty()) && ShipEnhancements.QSBAPI == null) return true;
 
         if (__instance._killingResources)
         {
             __instance.DebugKillResources();
             return false;
         }
-        float magnitude = __instance._shipThruster.GetLocalAcceleration().magnitude;
-        if (magnitude > 0f)
+        if (ShipEnhancements.QSBAPI != null)
         {
-            __instance.DrainFuel(magnitude * 0.1f * Time.deltaTime);
+            float magnitude = ShipEnhancements.QSBInteraction.GetShipAcceleration().magnitude;
+            if (magnitude > 0f)
+            {
+                __instance.DrainFuel(magnitude * 0.1f * Time.deltaTime);
+            }
+        }
+        else
+        {
+            float magnitude = __instance._shipThruster.GetLocalAcceleration().magnitude;
+            if (magnitude > 0f)
+            {
+                __instance.DrainFuel(magnitude * 0.1f * Time.deltaTime);
+            }
         }
         if (__instance._currentFuel <= 0f && !NotificationManager.SharedInstance.IsPinnedNotification(__instance._fuelDepletedNotification))
         {
@@ -551,7 +562,7 @@ public static class PatchClass
         }
         else
         {
-            if (ShipEnhancements.Instance.IsShipInOxygen())
+            if ((bool)shipOxygenRefill.GetProperty() && ShipEnhancements.Instance.IsShipInOxygen())
             {
                 __instance.AddOxygen(100f * Time.deltaTime * (float)oxygenRefillMultiplier.GetProperty());
             }
