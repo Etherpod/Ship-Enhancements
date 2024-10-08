@@ -6,5 +6,8 @@
   "uniqueName": "Etherpod.ShipEnhancements",
   "version": "0.2.0",
   "owmlVersion": "2.9.8",
-  "dependencies": []
+  "dependencies": [],
+  "conflicts": [
+    "_nebula.QSBMultipleShips"
+  ]
 }
