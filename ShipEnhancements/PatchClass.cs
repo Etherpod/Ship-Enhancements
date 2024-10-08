@@ -532,7 +532,7 @@ public static class PatchClass
             __instance.DebugKillResources();
             return false;
         }
-        if (ShipEnhancements.QSBAPI != null)
+        if (ShipEnhancements.InMultiplayer)
         {
             float magnitude = ShipEnhancements.QSBInteraction.GetShipAcceleration().magnitude;
             if (magnitude > 0f)
@@ -566,9 +566,16 @@ public static class PatchClass
             {
                 __instance.AddOxygen(100f * Time.deltaTime * (float)oxygenRefillMultiplier.GetProperty());
             }
-            else if (PlayerState.IsInsideShip())
+            else
             {
-                __instance.DrainOxygen(0.13f * Time.deltaTime);
+                if (ShipEnhancements.InMultiplayer)
+                {
+                    __instance.DrainOxygen(0.13f * Time.deltaTime * ShipEnhancements.QSBInteraction.GetPlayersInShip());
+                }
+                else if (PlayerState.IsInsideShip())
+                {
+                    __instance.DrainOxygen(0.13f * Time.deltaTime);
+                }
             }
         }
         return false;

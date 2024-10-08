@@ -34,7 +34,7 @@ public class ShipRecoveryPoint : MonoBehaviour
             float amountToDrain = PlayerResources._maxFuel * 5f * Time.deltaTime * 3f * (float)fuelTransferMultiplier.GetProperty();
             SELocator.GetShipResources()._currentFuel = Mathf.Max(SELocator.GetShipResources()._currentFuel  - amountToDrain, 0f);
 
-            if (ShipEnhancements.QSBAPI != null)
+            if (ShipEnhancements.InMultiplayer)
             {
                 foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs())
                 {

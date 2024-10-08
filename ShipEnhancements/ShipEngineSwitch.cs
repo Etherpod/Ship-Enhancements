@@ -79,6 +79,11 @@ public class ShipEngineSwitch : MonoBehaviour
             _switchTransform.localRotation.eulerAngles.z);
         _ignitionDuration = _thrusterController._ignitionDuration;
         _thrusterController._requireIgnition = false;
+
+        if (ShipEnhancements.InMultiplayer)
+        {
+            ShipEnhancements.QSBCompat.SetEngineSwitch(this);
+        }
     }
 
     private void Start()
@@ -90,11 +95,6 @@ public class ShipEngineSwitch : MonoBehaviour
         _baseIndicatorLightIntensity = _powerIndicatorLight.intensity;
         _thrustersIndicatorLight.intensity = 0f;
         _powerIndicatorLight.intensity = 0f;
-        
-        if (ShipEnhancements.QSBAPI != null)
-        {
-            ShipEnhancements.QSBCompat.SetEngineSwitch(this);
-        }
     }
     
     private void Update()
@@ -105,17 +105,6 @@ public class ShipEngineSwitch : MonoBehaviour
             {
                 float fuelDrain = 0.5f * (float)idleFuelConsumptionMultiplier.GetProperty() * Time.deltaTime;
                 SELocator.GetShipResources().DrainFuel(fuelDrain);
-
-                /*if (ShipEnhancements.QSBAPI != null)
-                {
-                    foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs())
-                    {
-                        if (id != ShipEnhancements.QSBAPI.GetLocalPlayerID())
-                        {
-                            ShipEnhancements.QSBCompat.SendShipFuelDrain(id, fuelDrain, true);
-                        }
-                    }
-                }*/
             }
 
             bool electricalFailed = SELocator.GetShipDamageController().IsElectricalFailed();
@@ -223,7 +212,7 @@ public class ShipEngineSwitch : MonoBehaviour
     {
         OnStartPress();
 
-        if (ShipEnhancements.QSBAPI != null)
+        if (ShipEnhancements.InMultiplayer)
         {
             foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs())
             {
@@ -296,7 +285,7 @@ public class ShipEngineSwitch : MonoBehaviour
 
         OnStopPress();
 
-        if (ShipEnhancements.QSBAPI != null)
+        if (ShipEnhancements.InMultiplayer)
         {
             foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs())
             {
@@ -404,7 +393,7 @@ public class ShipEngineSwitch : MonoBehaviour
         ShipEnhancements.Instance.OnFuelDepleted -= OnFuelDepleted;
         ShipEnhancements.Instance.OnFuelRestored -= OnFuelRestored;
 
-        if (ShipEnhancements.QSBAPI != null)
+        if (ShipEnhancements.InMultiplayer)
         {
             ShipEnhancements.QSBCompat.RemoveEngineSwitch();
         }

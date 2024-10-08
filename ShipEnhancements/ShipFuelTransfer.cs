@@ -64,7 +64,7 @@ public class ShipFuelTransfer : MonoBehaviour
                 float amountToAdd = PlayerResources._maxFuel * Time.deltaTime * 5f * (float)fuelTransferMultiplier.GetProperty();
                 SELocator.GetShipResources().AddFuel(amountToAdd);
 
-                if (ShipEnhancements.QSBAPI != null)
+                if (ShipEnhancements.InMultiplayer)
                 {
                     foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs())
                     {

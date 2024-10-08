@@ -39,6 +39,16 @@ public class ShipEnhancements : ModBehaviour
     public static QSBCompatibility QSBCompat;
     public static IQSBInteraction QSBInteraction;
 
+    private ShipResourceSyncManager _shipResourceSync;
+
+    public static bool InMultiplayer
+    {
+        get
+        {
+            return QSBAPI != null && QSBAPI.GetIsInMultiplayer();
+        }
+    }
+
     public UITextType probeLauncherName { get; private set; }
     public UITextType signalscopeName { get; private set; }
     public ItemType portableCampfireType { get; private set; }
@@ -250,6 +260,11 @@ public class ShipEnhancements : ModBehaviour
             }
         }
 
+        if (InMultiplayer)
+        {
+            _shipResourceSync?.Update();
+        }
+
         if ((float)Settings.idleFuelConsumptionMultiplier.GetProperty() > 0f && !(bool)Settings.addEngineSwitch.GetProperty())
         {
             SELocator.GetShipResources().DrainFuel(0.5f * (float)Settings.idleFuelConsumptionMultiplier.GetProperty() * Time.deltaTime);
@@ -326,7 +341,7 @@ public class ShipEnhancements : ModBehaviour
         }
 
         if (!SEAchievementTracker.DeadInTheWater && AchievementsAPI != null
-            && fuelDepleted && !(bool)Settings.enableShipFuelTransfer.GetProperty() 
+            && fuelDepleted && !(bool)Settings.enableShipFuelTransfer.GetProperty()
             && ((oxygenDepleted && !(bool)Settings.shipOxygenRefill.GetProperty()) || (bool)Settings.disableShipOxygen.GetProperty()))
         {
             SEAchievementTracker.DeadInTheWater = true;
@@ -405,6 +420,7 @@ public class ShipEnhancements : ModBehaviour
             QSBCompat = new QSBCompatibility(QSBAPI);
             var qsbAssembly = Assembly.LoadFrom(Path.Combine(ModHelper.Manifest.ModFolderPath, "ShipEnhancementsQSB.dll"));
             gameObject.AddComponent(qsbAssembly.GetType("ShipEnhancementsQSB.QSBInteraction", true));
+            _shipResourceSync = new ShipResourceSyncManager(QSBAPI, QSBCompat);
         }
     }
 
@@ -593,7 +609,7 @@ public class ShipEnhancements : ModBehaviour
                     direction = Vector3.back;
                     break;
                 case "Random":
-                    direction = new Vector3(UnityEngine.Random.Range(-1f, 1f), 
+                    direction = new Vector3(UnityEngine.Random.Range(-1f, 1f),
                         UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f)).normalized;
                     break;
             }

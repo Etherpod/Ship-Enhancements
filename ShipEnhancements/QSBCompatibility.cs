@@ -23,6 +23,8 @@ public class QSBCompatibility
         _api.RegisterHandler<bool>("initialize-engine-switch", InitializeEngineSwitch);
         _api.RegisterHandler<(float, bool)>("ship-oxygen-drain", ReceiveShipOxygenDrain);
         _api.RegisterHandler<(float, bool)>("ship-fuel-drain", ReceiveShipFuelDrain);
+        _api.RegisterHandler<float>("set-ship-oxygen", ReceiveShipOxygenValue);
+        _api.RegisterHandler<float>("set-ship-fuel", ReceiveShipFuelValue);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -40,14 +42,12 @@ public class QSBCompatibility
         var allSettings = Enum.GetValues(typeof(ShipEnhancements.Settings)) as ShipEnhancements.Settings[];
         foreach (var setting in allSettings)
         {
-            //ShipEnhancements.WriteDebugMessage("Sending");
             _api.SendMessage("settings-data", (setting.GetName(), setting.GetProperty()), id, false);
         }
     }
 
     private void ReceiveSettingsData(uint id, (string, object) data)
     {
-        //ShipEnhancements.WriteDebugMessage("Received");
         var allSettings = Enum.GetValues(typeof(ShipEnhancements.Settings)) as ShipEnhancements.Settings[];
         foreach (var setting in allSettings)
         {
@@ -128,7 +128,7 @@ public class QSBCompatibility
 
     private void ReceiveEngineSwitchState(uint id, bool wasPressed)
     {
-        _engineSwitch.UpdateWasPressed(wasPressed);
+        _engineSwitch?.UpdateWasPressed(wasPressed);
     }
 
     private void InitializeEngineSwitch(uint id, bool completedIgnition)
@@ -143,6 +143,8 @@ public class QSBCompatibility
 
     private void ReceiveShipOxygenDrain(uint id, (float, bool) data)
     {
+        if (SELocator.GetShipResources() == null) return;
+
         if (data.Item1 >= 0)
         {
             if (data.Item2)
@@ -167,6 +169,8 @@ public class QSBCompatibility
 
     private void ReceiveShipFuelDrain(uint id, (float, bool) data)
     {
+        if (SELocator.GetShipResources() == null) return;
+
         if (data.Item1 >= 0)
         {
             if (data.Item2)
@@ -182,5 +186,25 @@ public class QSBCompatibility
         {
             SELocator.GetShipResources().AddFuel(-data.Item1);
         }
+    }
+
+    public void SendShipOxygenValue(uint id, float newValue)
+    {
+        _api.SendMessage("set-ship-oxygen", newValue, id, false);
+    }
+
+    public void ReceiveShipOxygenValue(uint id, float newValue)
+    {
+        SELocator.GetShipResources()?.SetOxygen(newValue);
+    }
+
+    public void SendShipFuelValue(uint id, float newValue)
+    {
+        _api.SendMessage("set-ship-fuel", newValue, id, false);
+    }
+
+    public void ReceiveShipFuelValue(uint id, float newValue)
+    {
+        SELocator.GetShipResources()?.SetFuel(newValue);
     }
 }

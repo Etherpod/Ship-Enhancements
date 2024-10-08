@@ -39,17 +39,6 @@ public class PortableCampfire : Campfire
             float oxygenDrain = 10f * Time.deltaTime;
             SELocator.GetShipResources().DrainOxygen(oxygenDrain);
 
-            /*if (ShipEnhancements.QSBAPI != null)
-            {
-                foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs())
-                {
-                    if (id != ShipEnhancements.QSBAPI.GetLocalPlayerID())
-                    {
-                        ShipEnhancements.QSBCompat.SendShipOxygenDrain(id, oxygenDrain, true);
-                    }
-                }
-            }*/
-
             _reactorHeatMeter += Time.deltaTime;
             if (_reactorHeatMeter >= _reactorHeatMeterLength)
             {

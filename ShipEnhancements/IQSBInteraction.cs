@@ -5,4 +5,6 @@ public interface IQSBInteraction
     bool FlightConsoleOccupied();
 
     Vector3 GetShipAcceleration();
+
+    int GetPlayersInShip();
 }

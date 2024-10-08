@@ -37,6 +37,11 @@ public abstract class CockpitSwitch : ElectricalComponent
         _interactReceiver.OnLoseFocus += OnLoseFocus;
 
         _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
+
+        if (ShipEnhancements.InMultiplayer)
+        {
+            ShipEnhancements.QSBCompat.AddActiveSwitch(this);
+        }
     }
 
     protected virtual void Start()
@@ -64,11 +69,6 @@ public abstract class CockpitSwitch : ElectricalComponent
         List<ElectricalComponent> componentList = [.. _electricalSystem._connectedComponents];
         componentList.Add(this);
         _electricalSystem._connectedComponents = [.. componentList];
-
-        if (ShipEnhancements.QSBAPI != null)
-        {
-            ShipEnhancements.QSBCompat.AddActiveSwitch(this);
-        }
     }
 
     protected void Update()
@@ -84,7 +84,7 @@ public abstract class CockpitSwitch : ElectricalComponent
     {
         ChangeSwitchState(!_on);
 
-        if (ShipEnhancements.QSBAPI != null)
+        if (ShipEnhancements.InMultiplayer)
         {
             foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs())
             {
@@ -202,7 +202,7 @@ public abstract class CockpitSwitch : ElectricalComponent
         _interactReceiver.OnLoseFocus -= OnLoseFocus;
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
 
-        if (ShipEnhancements.QSBAPI != null)
+        if (ShipEnhancements.InMultiplayer)
         {
             ShipEnhancements.QSBCompat.RemoveActiveSwitch(this);
         }
