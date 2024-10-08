@@ -13,6 +13,7 @@ public static class SELocator
     private static ShipDamageController _shipDamageController;
     private static ShipOverdriveController _shipOverdriveController;
     private static SignalscopeComponent _signalscopeComponent;
+    private static CockpitButtonPanel _buttonPanel;
 
     public static void Initalize()
     {
@@ -33,6 +34,8 @@ public static class SELocator
 
     public static void LateInitialize()
     {
+        _buttonPanel = Locator.GetShipTransform().GetComponentInChildren<CockpitButtonPanel>();
+
         if ((bool)enableThrustModulator.GetProperty())
         {
             _shipOverdriveController = Locator.GetShipTransform().GetComponentInChildren<ShipOverdriveController>();
@@ -92,5 +95,10 @@ public static class SELocator
     public static ShipOverdriveController GetShipOverdriveController()
     {
         return _shipOverdriveController;
+    }
+
+    public static CockpitButtonPanel GetButtonPanel()
+    {
+        return _buttonPanel;
     }
 }

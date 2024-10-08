@@ -25,6 +25,7 @@ public class QSBCompatibility
         _api.RegisterHandler<(float, bool)>("ship-fuel-drain", ReceiveShipFuelDrain);
         _api.RegisterHandler<float>("set-ship-oxygen", ReceiveShipOxygenValue);
         _api.RegisterHandler<float>("set-ship-fuel", ReceiveShipFuelValue);
+        _api.RegisterHandler<bool>("panel-state", ReceivePanelExtended);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -193,7 +194,7 @@ public class QSBCompatibility
         _api.SendMessage("set-ship-oxygen", newValue, id, false);
     }
 
-    public void ReceiveShipOxygenValue(uint id, float newValue)
+    private void ReceiveShipOxygenValue(uint id, float newValue)
     {
         SELocator.GetShipResources()?.SetOxygen(newValue);
     }
@@ -203,8 +204,18 @@ public class QSBCompatibility
         _api.SendMessage("set-ship-fuel", newValue, id, false);
     }
 
-    public void ReceiveShipFuelValue(uint id, float newValue)
+    private void ReceiveShipFuelValue(uint id, float newValue)
     {
         SELocator.GetShipResources()?.SetFuel(newValue);
+    }
+
+    public void SendPanelExtended(uint id, bool extended)
+    {
+        _api.SendMessage("panel-state", extended, id, false);
+    }
+
+    private void ReceivePanelExtended(uint id, bool extended)
+    {
+        SELocator.GetButtonPanel()?.UpdateExtended(extended);
     }
 }

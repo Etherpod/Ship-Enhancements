@@ -215,7 +215,7 @@ public class ShipEngineSwitch : MonoBehaviour
 
         if (ShipEnhancements.InMultiplayer)
         {
-            foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs().Where(id => id != ShipEnhancements.QSBAPI.GetLocalPlayerID()))
+            foreach (uint id in ShipEnhancements.PlayerIDs)
             {
                 ShipEnhancements.QSBCompat.SendEngineSwitchState(id, true);
             }
@@ -285,7 +285,7 @@ public class ShipEngineSwitch : MonoBehaviour
 
         if (ShipEnhancements.InMultiplayer)
         {
-            foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs().Where(id => id != ShipEnhancements.QSBAPI.GetLocalPlayerID()))
+            foreach (uint id in ShipEnhancements.PlayerIDs)
             {
                 ShipEnhancements.QSBCompat.SendEngineSwitchState(id, false);
             }

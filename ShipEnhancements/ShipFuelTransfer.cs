@@ -67,7 +67,7 @@ public class ShipFuelTransfer : MonoBehaviour
 
                 if (ShipEnhancements.InMultiplayer)
                 {
-                    foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs().Where(id => id != ShipEnhancements.QSBAPI.GetLocalPlayerID()))
+                    foreach (uint id in ShipEnhancements.PlayerIDs)
                     {
                         ShipEnhancements.QSBCompat.SendShipFuelDrain(id, -amountToAdd, false);
                     }

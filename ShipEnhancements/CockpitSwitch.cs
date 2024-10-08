@@ -87,7 +87,7 @@ public abstract class CockpitSwitch : ElectricalComponent
 
         if (ShipEnhancements.InMultiplayer)
         {
-            foreach (uint id in ShipEnhancements.QSBAPI.GetPlayerIDs().Where(id => id != ShipEnhancements.QSBAPI.GetLocalPlayerID()))
+            foreach (uint id in ShipEnhancements.PlayerIDs)
             {
                 ShipEnhancements.QSBCompat.SendSwitchState(id, (GetType().Name, _on));
             }

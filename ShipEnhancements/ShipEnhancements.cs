@@ -39,6 +39,13 @@ public class ShipEnhancements : ModBehaviour
     public static IQSBAPI QSBAPI;
     public static QSBCompatibility QSBCompat;
     public static IQSBInteraction QSBInteraction;
+    public static uint[] PlayerIDs
+    {
+        get
+        {
+            return QSBAPI.GetPlayerIDs().Where(id => id != QSBAPI.GetLocalPlayerID()).ToArray();
+        }
+    }
 
     private ShipResourceSyncManager _shipResourceSync;
 
@@ -218,7 +225,7 @@ public class ShipEnhancements : ModBehaviour
 
                 if (QSBAPI != null && QSBAPI.GetIsInMultiplayer() && QSBAPI.GetIsHost())
                 {
-                    foreach (uint id in QSBAPI.GetPlayerIDs().Where(id => id != QSBAPI.GetLocalPlayerID()))
+                    foreach (uint id in PlayerIDs)
                     {
                         QSBCompat.SendSettingsData(id);
                     }
@@ -418,7 +425,7 @@ public class ShipEnhancements : ModBehaviour
             QSBCompat = new QSBCompatibility(QSBAPI);
             var qsbAssembly = Assembly.LoadFrom(Path.Combine(ModHelper.Manifest.ModFolderPath, "ShipEnhancementsQSB.dll"));
             gameObject.AddComponent(qsbAssembly.GetType("ShipEnhancementsQSB.QSBInteraction", true));
-            _shipResourceSync = new ShipResourceSyncManager(QSBAPI, QSBCompat);
+            _shipResourceSync = new ShipResourceSyncManager(QSBCompat);
         }
     }
 
@@ -786,7 +793,7 @@ public class ShipEnhancements : ModBehaviour
 
         if (QSBAPI != null && !QSBAPI.GetIsHost())
         {
-            foreach (uint id in QSBAPI.GetPlayerIDs().Where(id => id != QSBAPI.GetLocalPlayerID()))
+            foreach (uint id in PlayerIDs)
             {
                 QSBCompat.SendInitializedShip(id);
             }
