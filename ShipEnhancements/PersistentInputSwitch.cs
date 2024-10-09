@@ -8,9 +8,9 @@ public class PersistentInputSwitch : CockpitSwitch
 
     public override void Awake()
     {
+        _enabledInShip = (bool)enablePersistentInput.GetProperty();
         base.Awake();
         _buttonPanel.SetPersistentInputActive((bool)enablePersistentInput.GetProperty());
-        _enabledInShip = (bool)enablePersistentInput.GetProperty();
     }
 
     protected override void Start()

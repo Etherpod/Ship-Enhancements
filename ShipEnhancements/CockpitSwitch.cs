@@ -38,8 +38,9 @@ public abstract class CockpitSwitch : ElectricalComponent
         _interactReceiver.OnLoseFocus += OnLoseFocus;
 
         _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
+        _renderer = GetComponent<OWRenderer>();
 
-        if (ShipEnhancements.InMultiplayer)
+        if (ShipEnhancements.InMultiplayer && _enabledInShip)
         {
             ShipEnhancements.QSBCompat.AddActiveSwitch(this);
         }
@@ -54,8 +55,6 @@ public abstract class CockpitSwitch : ElectricalComponent
         }
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
-
-        _renderer = GetComponent<OWRenderer>();
 
         _interactReceiver.ChangePrompt("Turn on " + _label);
         transform.localRotation = Quaternion.Euler(_initialRotation.eulerAngles.x + _rotationOffset,

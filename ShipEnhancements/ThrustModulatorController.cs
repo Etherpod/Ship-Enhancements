@@ -205,6 +205,20 @@ public class ThrustModulatorController : ElectricalComponent
         }
     }
 
+    public ThrustModulatorButton GetModulatorButton(int level)
+    {
+        foreach (ThrustModulatorButton button in _modulatorButtons)
+        {
+            if (button.GetModulatorLevel() == level)
+            {
+                return button;
+            }
+        }
+
+        ShipEnhancements.WriteDebugMessage("Could not find modulator button of level " + level);
+        return null;
+    }
+
     private void OnDestroy()
     {
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);

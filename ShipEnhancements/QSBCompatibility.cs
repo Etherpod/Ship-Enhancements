@@ -26,6 +26,8 @@ public class QSBCompatibility
         _api.RegisterHandler<float>("set-ship-oxygen", ReceiveShipOxygenValue);
         _api.RegisterHandler<float>("set-ship-fuel", ReceiveShipFuelValue);
         _api.RegisterHandler<bool>("panel-state", ReceivePanelExtended);
+        _api.RegisterHandler<(int, bool)>("modulator-button-state", ReceiveModulatorButtonState);
+        _api.RegisterHandler<(bool, bool, bool)>("overdrive-button-state", ReceiveOverdriveButtonState);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -107,7 +109,10 @@ public class QSBCompatibility
         {
             if (cockpitSwitch.GetType().Name == data.Item1)
             {
-                cockpitSwitch.ChangeSwitchState(data.Item2);
+                if (cockpitSwitch.transform != null)
+                {
+                    cockpitSwitch.ChangeSwitchState(data.Item2);
+                }
             }
         }
     }
@@ -217,5 +222,63 @@ public class QSBCompatibility
     private void ReceivePanelExtended(uint id, bool extended)
     {
         SELocator.GetButtonPanel()?.UpdateExtended(extended);
+    }
+
+    public void SendModulatorButtonState(uint id, int level, bool pressed)
+    {
+        _api.SendMessage("modulator-button-state", (level, pressed), id, false);
+    }
+
+    private void ReceiveModulatorButtonState(uint id, (int, bool) data)
+    {
+        ThrustModulatorButton button = SELocator.GetThrustModulatorController().GetModulatorButton(data.Item1);
+
+        if (!button) return;
+
+        if (data.Item2)
+        {
+            button.PressButton();
+        }
+        else
+        {
+            button.ReleaseButton();
+        }
+    }
+
+    public void SendOverdriveButtonState(uint id, bool isPrimeButton, bool pressed, bool reset = false)
+    {
+        _api.SendMessage("overdrive-button-state", (isPrimeButton, pressed, reset), id, false);
+    }
+
+    private void ReceiveOverdriveButtonState(uint id, (bool, bool, bool) data)
+    {
+        OverdriveButton button = SELocator.GetShipOverdriveController().GetButton(data.Item1);
+
+        if (data.Item3)
+        {
+            if (!SELocator.GetShipDamageController().IsElectricalFailed()
+                && !ShipEnhancements.Instance.fuelDepleted)
+            {
+                if (data.Item1)
+                {
+                    button.SetButtonOn(false);
+                }
+                else
+                {
+                    button.SetButtonActive(false);
+                }
+            }
+
+            return;
+        }
+
+        if (data.Item2)
+        {
+            button.PressButton();
+        }
+        else
+        {
+            button.ReleaseButton();
+        }
     }
 }

@@ -126,14 +126,23 @@ public class ShipOverdriveController : ElectricalComponent
             _primeButton.OnDisruptedEvent(_wasDisrupted);
             _activateButton.OnDisruptedEvent(_wasDisrupted);
         }
-        if (OWInput.IsPressed(InputLibrary.freeLook) != _wasInFreeLook)
+        if (OWInput.IsPressed(InputLibrary.freeLook, InputMode.ShipCockpit) != _wasInFreeLook)
         {
-            _wasInFreeLook = OWInput.IsPressed(InputLibrary.freeLook);
+            _wasInFreeLook = OWInput.IsPressed(InputLibrary.freeLook, InputMode.ShipCockpit);
             if (!_wasInFreeLook && !_charging)
             {
                 StopAllCoroutines();
                 _primeButton.SetButtonOn(false);
                 _activateButton.SetButtonActive(false);
+
+                if (ShipEnhancements.InMultiplayer)
+                {
+                    foreach (uint id in ShipEnhancements.PlayerIDs)
+                    {
+                        ShipEnhancements.QSBCompat.SendOverdriveButtonState(id, true, false, true);
+                        ShipEnhancements.QSBCompat.SendOverdriveButtonState(id, false, false, true);
+                    }
+                }
             }
         }
         if (_onResetTimer && !_charging)
@@ -149,25 +158,36 @@ public class ShipOverdriveController : ElectricalComponent
 
     private void Overdrive()
     {
+        bool host = !ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost();
+
         if (!_reactor.isDamaged)
         {
             _shipAudioSource.PlayOneShot(AudioType.EyeBigBang);
-            _reactor.SetDamaged(true);
             if ((bool)extraNoise.GetProperty())
             {
                 Locator.GetShipDetector().GetComponent<ShipNoiseMaker>()._noiseRadius = 800f;
             }
+
+            if (host)
+            {
+                _reactor.SetDamaged(true);
+            }
         }
-        else
+        else if (host)
         {
             SELocator.GetShipDamageController().Explode();
             return;
         }
-        Locator.GetShipBody().AddImpulse(Locator.GetShipTransform().forward * 500f);
-        SELocator.GetShipResources().DrainFuel(150f);
+
+        if (host)
+        {
+            Locator.GetShipBody().AddImpulse(Locator.GetShipTransform().forward * 500f);
+            SELocator.GetShipResources().DrainFuel(150f);
+            ShipElectricalComponent electrical = SELocator.GetShipDamageController()._shipElectricalComponent;
+            electrical._electricalSystem.Disrupt(electrical._disruptionLength);
+        }
+
         _defaultColor = _thrusterRenderers[0].material.GetColor("_Color");
-        ShipElectricalComponent electrical = SELocator.GetShipDamageController()._shipElectricalComponent;
-        electrical._electricalSystem.Disrupt(electrical._disruptionLength);
         _primeButton.SetButtonOn(false);
         _activateButton.SetButtonActive(false);
         _cooldownT = 1f;
@@ -258,7 +278,8 @@ public class ShipOverdriveController : ElectricalComponent
     private void OnFuelRestored()
     {
         _fuelDepleted = false;
-        if (!_powered && !SELocator.GetShipDamageController().IsElectricalFailed())
+        if (!_powered && !SELocator.GetShipDamageController().IsElectricalFailed()
+            && ShipEnhancements.Instance.engineOn)
         {
             SetPowered(true);
         }
@@ -274,6 +295,7 @@ public class ShipOverdriveController : ElectricalComponent
             _primeButton.SetButtonOn(false);
             _activateButton.SetButtonActive(false);
         }
+
         _primeButton.SetPowered(powered, _electricalSystem.IsDisrupted());
         _activateButton.SetPowered(powered, _electricalSystem.IsDisrupted());
     }
@@ -302,6 +324,11 @@ public class ShipOverdriveController : ElectricalComponent
     public bool IsCooldown()
     {
         return _onCooldown;
+    }
+
+    public OverdriveButton GetButton(bool isPrimeButton)
+    {
+        return isPrimeButton ? _primeButton : _activateButton;
     }
 
     private void OnDestroy()
