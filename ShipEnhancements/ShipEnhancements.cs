@@ -326,6 +326,12 @@ public class ShipEnhancements : ModBehaviour
                 fuelTank._damageEffect._particleSystem.Stop();
                 fuelTank._damageEffect._particleAudioSource.Stop();
             }
+            PlayerResources playerResources = SELocator.GetPlayerResources();
+            if (playerResources.IsRefueling())
+            {
+                playerResources._isRefueling = false;
+                NotificationManager.SharedInstance.UnpinNotification(playerResources._refuellingAndHealingNotification);
+            }
             OnFuelDepleted?.Invoke();
         }
         else if (fuelDepleted && SELocator.GetShipResources()._currentFuel > 0f)
@@ -572,7 +578,14 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((bool)Settings.enableJetpackRefuelDrain.GetProperty())
         {
-            Locator.GetShipBody().GetComponentInChildren<PlayerRecoveryPoint>().gameObject.AddComponent<ShipRecoveryPoint>();
+            if (InMultiplayer)
+            {
+                QSBInteraction.GetShipRecoveryPoint().AddComponent<ShipRefuelDrain>();
+            }
+            else
+            {
+                Locator.GetShipBody().GetComponentInChildren<PlayerRecoveryPoint>().gameObject.AddComponent<ShipRefuelDrain>();
+            }
         }
         if ((float)Settings.gravityMultiplier.GetProperty() != 1f && !(bool)Settings.disableGravityCrystal.GetProperty())
         {
@@ -1110,15 +1123,15 @@ public class ShipEnhancements : ModBehaviour
     {
         if (warning)
         {
-            Instance.ModHelper.Console.WriteLine(msg.ToString(), MessageType.Warning);
+            Instance?.ModHelper?.Console?.WriteLine(msg.ToString(), MessageType.Warning);
         }
         else if (error)
         {
-            Instance.ModHelper.Console.WriteLine(msg.ToString(), MessageType.Error);
+            Instance?.ModHelper?.Console?.WriteLine(msg.ToString(), MessageType.Error);
         }
         else
         {
-            Instance.ModHelper.Console.WriteLine(msg.ToString());
+            Instance?.ModHelper?.Console?.WriteLine(msg.ToString());
         }
     }
 

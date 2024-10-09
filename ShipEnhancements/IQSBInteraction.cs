@@ -7,4 +7,8 @@ public interface IQSBInteraction
     Vector3 GetShipAcceleration();
 
     int GetPlayersInShip();
+
+    GameObject GetShipRecoveryPoint();
+
+    bool IsRecoveringAtShip();
 }

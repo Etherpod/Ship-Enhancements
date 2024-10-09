@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Security.Policy;
 using HarmonyLib;
 using UnityEngine;
-using XGamingRuntime;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
