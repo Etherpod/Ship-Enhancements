@@ -28,6 +28,9 @@ public class QSBCompatibility
         _api.RegisterHandler<bool>("panel-state", ReceivePanelExtended);
         _api.RegisterHandler<(int, bool)>("modulator-button-state", ReceiveModulatorButtonState);
         _api.RegisterHandler<(bool, bool, bool)>("overdrive-button-state", ReceiveOverdriveButtonState);
+        _api.RegisterHandler<float>("campfire-reactor-delay", ReceiveCampfireReactorDelay);
+        _api.RegisterHandler<NoData>("campfire-extinguished", ReceiveCampfireExtinguished);
+        _api.RegisterHandler<(bool, bool, bool)>("campfire-initial-state", ReceiveCampfireInitialState);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -85,6 +88,27 @@ public class QSBCompatibility
         if (_engineSwitch != null)
         {
             _api.SendMessage("initialize-engine-switch", ShipEnhancements.Instance.engineOn, id, false);
+        }
+        if ((bool)ShipEnhancements.Settings.addPortableCampfire.GetProperty())
+        {
+            bool dropped = false;
+            bool unpacked = false;
+            bool lit = false;
+            PortableCampfireItem item = SELocator.GetPortableCampfire().GetComponentInParent<PortableCampfireItem>();
+            if (item.IsDropped())
+            {
+                dropped = true;
+                if (item.IsUnpacked())
+                {
+                    unpacked = true;
+                    if (!SELocator.GetPortableCampfire().IsExtinguished())
+                    {
+                        lit = true;
+                    }
+                }
+            }
+            ShipEnhancements.WriteDebugMessage("sending. unpacked: " + unpacked + ", lit: " + lit);
+            SendCampfireInitialState(id, dropped, unpacked, lit);
         }
     }
 
@@ -279,6 +303,52 @@ public class QSBCompatibility
         else
         {
             button.ReleaseButton();
+        }
+    }
+
+    public void SendCampfireReactorDelay(uint id, float delay)
+    {
+        _api.SendMessage("campfire-reactor-delay", delay, id, false);
+    }
+
+    private void ReceiveCampfireReactorDelay(uint id, float delay)
+    {
+        SELocator.GetPortableCampfire().SetReactorDamageDelay(delay);
+    }
+
+    public void SendCampfireExtinguishState(uint id)
+    {
+        _api.SendMessage("campfire-extinguished", new NoData(), id, false);
+    }
+
+    private void ReceiveCampfireExtinguished(uint id, NoData noData)
+    {
+        SELocator.GetPortableCampfire().OnExtinguishInteract();
+    }
+
+    public void SendCampfireInitialState(uint id, bool dropped, bool unpacked, bool lit)
+    {
+        _api.SendMessage("campfire-initial-state", (dropped, unpacked, lit), id, false);
+    }
+
+    private void ReceiveCampfireInitialState(uint id, (bool, bool, bool) data)
+    {
+        PortableCampfireItem item = SELocator.GetPortableCampfire().GetComponentInParent<PortableCampfireItem>();
+        ShipEnhancements.WriteDebugMessage("check dropped");
+        if (!item.IsDropped()) return;
+
+        ShipEnhancements.WriteDebugMessage("dropped");
+        if (data.Item1)
+        {
+            ShipEnhancements.WriteDebugMessage("unpack");
+            item.TogglePackUp(false);
+
+            if (data.Item2)
+            {
+                ShipEnhancements.WriteDebugMessage("Receive state");
+                SELocator.GetPortableCampfire().SetInitialState(Campfire.State.LIT);
+                SELocator.GetPortableCampfire().SetState(Campfire.State.LIT);
+            }
         }
     }
 }

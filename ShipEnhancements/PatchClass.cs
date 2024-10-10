@@ -1615,14 +1615,13 @@ public static class PatchClass
                 campfire.UpdatePrompt();
                 if (OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.All))
                 {
-                    if (campfire.IsExtinguished())
+                    campfire.OnExtinguishInteract();
+                    if (ShipEnhancements.InMultiplayer)
                     {
-                        Locator.GetPromptManager().RemoveScreenPrompt(campfire.GetPrompt(), PromptPosition.Center);
-                        campfire.PackUp();
-                    }
-                    else
-                    {
-                        campfire.SetState(Campfire.State.UNLIT);
+                        foreach (uint id in ShipEnhancements.PlayerIDs)
+                        {
+                            ShipEnhancements.QSBCompat.SendCampfireExtinguishState(id);
+                        }
                     }
                 }
             }
@@ -2339,4 +2338,14 @@ public static class PatchClass
         }
     }
     #endregion
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Campfire), nameof(Campfire.Start))]
+    public static void Test(Campfire __instance)
+    {
+        if (__instance is PortableCampfire)
+        {
+            ShipEnhancements.WriteDebugMessage("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH");
+        }
+    }
 }

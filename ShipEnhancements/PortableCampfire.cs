@@ -39,17 +39,34 @@ public class PortableCampfire : Campfire
             float oxygenDrain = 10f * Time.deltaTime;
             SELocator.GetShipResources().DrainOxygen(oxygenDrain);
 
-            _reactorHeatMeter += Time.deltaTime;
-            if (_reactorHeatMeter >= _reactorHeatMeterLength)
+            if (_reactorHeatMeter > 0)
             {
-                _reactorHeatMeter = 0f;
-                _reactorHeatMeterLength = Random.Range(10f, 30f);
-                SELocator.GetShipBody().GetComponentInChildren<ShipReactorComponent>().SetDamaged(true);
-
-                if (!SEAchievementTracker.FireHazard && ShipEnhancements.AchievementsAPI != null)
+                _reactorHeatMeter -= Time.deltaTime;
+                if (_reactorHeatMeter <= 0)
                 {
-                    SEAchievementTracker.FireHazard = true;
-                    ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.FIRE_HAZARD");
+                    if (ShipEnhancements.InMultiplayer && ShipEnhancements.QSBAPI.GetIsHost())
+                    {
+                        _reactorHeatMeter = _reactorHeatMeterLength;
+                        _reactorHeatMeterLength = Random.Range(10f, 30f);
+                        SELocator.GetShipBody().GetComponentInChildren<ShipReactorComponent>().SetDamaged(true);
+
+                        foreach (uint id in ShipEnhancements.PlayerIDs)
+                        {
+                            ShipEnhancements.QSBCompat.SendCampfireReactorDelay(id, _reactorHeatMeterLength);
+                        }
+                    }
+                    else if (!ShipEnhancements.InMultiplayer)
+                    {
+                        _reactorHeatMeter = _reactorHeatMeterLength;
+                        _reactorHeatMeterLength = Random.Range(10f, 30f);
+                        SELocator.GetShipBody().GetComponentInChildren<ShipReactorComponent>().SetDamaged(true);
+                    }
+
+                    if (!SEAchievementTracker.FireHazard && ShipEnhancements.AchievementsAPI != null)
+                    {
+                        SEAchievementTracker.FireHazard = true;
+                        ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.FIRE_HAZARD");
+                    }
                 }
             }
         }
@@ -82,6 +99,14 @@ public class PortableCampfire : Campfire
         UpdateInsideShip(false);
         SetState(State.UNLIT, true);
         _lastOutsideWaterState = true;
+        if (_isPlayerRoasting)
+        {
+            StopRoasting();
+        }
+        else if (_isPlayerSleeping)
+        {
+            StopSleeping();
+        }
         GetComponentInParent<PortableCampfireItem>().TogglePackUp(true);
     }
 
@@ -101,10 +126,31 @@ public class PortableCampfire : Campfire
     public void UpdateInsideShip(bool insideShip)
     {
         _insideShip = insideShip;
-        if (!insideShip)
+        if (!insideShip && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
         {
             _reactorHeatMeter = 0f;
             _reactorHeatMeterLength = Random.Range(10f, 30f);
+
+            if (ShipEnhancements.InMultiplayer)
+            {
+                foreach (uint id in ShipEnhancements.PlayerIDs)
+                {
+                    ShipEnhancements.QSBCompat.SendCampfireReactorDelay(id, _reactorHeatMeterLength);
+                }
+            }
+        }
+    }
+
+    public void OnExtinguishInteract()
+    {
+        if (IsExtinguished())
+        {
+            Locator.GetPromptManager().RemoveScreenPrompt(GetPrompt(), PromptPosition.Center);
+            PackUp();
+        }
+        else
+        {
+            SetState(State.UNLIT);
         }
     }
 
@@ -136,6 +182,12 @@ public class PortableCampfire : Campfire
     public void SetPromptVisibility(bool value)
     {
         _cancelPrompt.SetVisibility(value);
+    }
+
+    public void SetReactorDamageDelay(float delay)
+    {
+        _reactorHeatMeterLength = delay;
+        _reactorHeatMeter = _reactorHeatMeterLength;
     }
 
     private void OnShipSystemFailure()

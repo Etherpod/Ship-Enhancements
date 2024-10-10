@@ -7,6 +7,7 @@ using QSB.RespawnSync;
 using ShipEnhancements;
 using System.Reflection;
 using QSB.WorldSync;
+using QSB.TimeSync;
 
 namespace ShipEnhancementsQSB;
 
@@ -70,6 +71,11 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
     public bool IsRecoveringAtShip()
     {
         return QSBInteractionPatches.RecoveringAtShip;
+    }
+
+    public bool IsTimeFlowing()
+    {
+        return WakeUpSync.LocalInstance.HasWokenUp;
     }
 }
 

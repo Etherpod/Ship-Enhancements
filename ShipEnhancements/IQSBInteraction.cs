@@ -11,4 +11,6 @@ public interface IQSBInteraction
     GameObject GetShipRecoveryPoint();
 
     bool IsRecoveringAtShip();
+
+    bool IsTimeFlowing();
 }

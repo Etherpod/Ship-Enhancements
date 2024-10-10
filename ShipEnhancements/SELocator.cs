@@ -22,6 +22,7 @@ public static class SELocator
     private static SignalscopeComponent _signalscopeComponent;
     private static CockpitButtonPanel _buttonPanel;
     private static ThrustModulatorController _modulatorController;
+    private static PortableCampfire _portableCampfire;
 
     public static void Initalize()
     {
@@ -53,6 +54,10 @@ public static class SELocator
         {
             _modulatorController = _shipTransform.GetComponentInChildren<ThrustModulatorController>();
             _shipOverdriveController = _shipTransform.GetComponentInChildren<ShipOverdriveController>();
+        }
+        if ((bool)addPortableCampfire.GetProperty())
+        {
+            _portableCampfire = _shipTransform.GetComponentInChildren<PortableCampfire>(true);
         }
     }
 
@@ -144,5 +149,10 @@ public static class SELocator
     public static ThrustModulatorController GetThrustModulatorController()
     {
         return _modulatorController;
+    }
+
+    public static PortableCampfire GetPortableCampfire()
+    {
+        return _portableCampfire;
     }
 }
