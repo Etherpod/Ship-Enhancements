@@ -6,7 +6,9 @@ using HarmonyLib;
 using QSB.RespawnSync;
 using ShipEnhancements;
 using System.Reflection;
-using static ShipEnhancements.ShipEnhancements.Settings;
+using QSB.WorldSync;
+using QSB.ItemSync.WorldObjects.Sockets;
+using QSB.CampfireSync.WorldObjects;
 
 namespace ShipEnhancementsQSB;
 
@@ -16,8 +18,25 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
     {
         ShipEnhancements.ShipEnhancements.Instance.AssignQSBInterface(this);
         Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
+
+        LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
+        {
+            if (loadScene != OWScene.SolarSystem)
+            {
+                return;
+            }
+
+            if ((bool)ShipEnhancements.ShipEnhancements.Settings.addPortableCampfire.GetProperty())
+            {
+                Transform shipTransform = FindObjectOfType<ShipBody>().transform;
+                QSBWorldSync.Init<QSBPortableCampfireItem, PortableCampfireItem>();
+                PortableCampfireSocket socket = shipTransform.GetComponentInChildren<PortableCampfireSocket>();
+                QSBWorldSync.Init<QSBItemSocket, OWItemSocket>([socket]);
+                QSBWorldSync.Init<QSBCampfire, Campfire>([socket.GetSocketedItem().GetComponentInChildren<Campfire>(true)]);
+            }
+        };
     }
-    
+
     public bool FlightConsoleOccupied()
     {
         return ShipManager.Instance.CurrentFlyer != uint.MaxValue;
