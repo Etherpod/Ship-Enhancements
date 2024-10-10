@@ -19,8 +19,8 @@ public class ShipPersistentInput : ThrusterController
     private void Start()
     {
         _thrustDisplay = GetComponentInChildren<ThrustAndAttitudeIndicator>(true);
-        _rulesetDetector = Locator.GetShipDetector().GetComponent<RulesetDetector>();
-        _shipAutopilot = Locator.GetShipBody().GetComponent<Autopilot>();
+        _rulesetDetector = SELocator.GetShipDetector().GetComponent<RulesetDetector>();
+        _shipAutopilot = SELocator.GetShipBody().GetComponent<Autopilot>();
         _thrustController = GetComponent<ShipThrusterController>();
         _displayRenderers =
         [

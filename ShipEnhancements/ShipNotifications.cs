@@ -116,22 +116,22 @@ public static class ShipNotifications
 
         if ((bool)disableRotationSpeedLimit.GetProperty())
         {
-            if (!_hullIntegrityCritical && Locator.GetShipBody().GetAngularVelocity().sqrMagnitude > ShipEnhancements.Instance.levelTwoSpinSpeed * ShipEnhancements.Instance.levelTwoSpinSpeed)
+            if (!_hullIntegrityCritical && SELocator.GetShipBody().GetAngularVelocity().sqrMagnitude > ShipEnhancements.Instance.levelTwoSpinSpeed * ShipEnhancements.Instance.levelTwoSpinSpeed)
             {
                 _hullIntegrityCritical = true;
                 NotificationManager.SharedInstance.PostNotification(_spinSpeedCriticalNotification, false);
             }
-            else if (_hullIntegrityCritical && Locator.GetShipBody().GetAngularVelocity().sqrMagnitude < ShipEnhancements.Instance.levelTwoSpinSpeed * ShipEnhancements.Instance.levelTwoSpinSpeed)
+            else if (_hullIntegrityCritical && SELocator.GetShipBody().GetAngularVelocity().sqrMagnitude < ShipEnhancements.Instance.levelTwoSpinSpeed * ShipEnhancements.Instance.levelTwoSpinSpeed)
             {
                 _hullIntegrityCritical = false;
             }
 
-            if (!_hullIntegrityLow && Locator.GetShipBody().GetAngularVelocity().sqrMagnitude > ShipEnhancements.Instance.levelOneSpinSpeed * ShipEnhancements.Instance.levelOneSpinSpeed)
+            if (!_hullIntegrityLow && SELocator.GetShipBody().GetAngularVelocity().sqrMagnitude > ShipEnhancements.Instance.levelOneSpinSpeed * ShipEnhancements.Instance.levelOneSpinSpeed)
             {
                 _hullIntegrityLow = true;
                 NotificationManager.SharedInstance.PostNotification(_spinSpeedHighNotification, false);
             }
-            else if (_hullIntegrityLow && Locator.GetShipBody().GetAngularVelocity().sqrMagnitude < ShipEnhancements.Instance.levelOneSpinSpeed * ShipEnhancements.Instance.levelOneSpinSpeed)
+            else if (_hullIntegrityLow && SELocator.GetShipBody().GetAngularVelocity().sqrMagnitude < ShipEnhancements.Instance.levelOneSpinSpeed * ShipEnhancements.Instance.levelOneSpinSpeed)
             {
                 _hullIntegrityLow = false;
             }

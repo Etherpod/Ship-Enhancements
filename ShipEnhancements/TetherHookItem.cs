@@ -56,7 +56,7 @@ public class TetherHookItem : OWItem
             // if player is not tethered to anything
             if (!ShipEnhancements.Instance.playerTether)
             {
-                _activeTether.CreateTether(Locator.GetPlayerBody(), _anchorPos.localPosition, Vector3.zero);
+                _activeTether.CreateTether(SELocator.GetPlayerBody(), _anchorPos.localPosition, Vector3.zero);
                 ShipEnhancements.Instance.playerTether = _activeTether;
                 _connectionMesh.SetActive(true);
                 _tetherPrompt.SetText("Detach Tether");

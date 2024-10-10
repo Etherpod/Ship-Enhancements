@@ -18,7 +18,7 @@ public class ShipTemperatureGauge : MonoBehaviour
     {
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
 
-        _needleTransform = Locator.GetShipBody().transform.Find("Module_Cockpit/Geo_Cockpit/Cockpit_Tech/Cockpit_Tech_Interior/TemperaturePointerPivot/TemperaturePointer_Geo");
+        _needleTransform = SELocator.GetShipBody().transform.Find("Module_Cockpit/Geo_Cockpit/Cockpit_Tech/Cockpit_Tech_Interior/TemperaturePointerPivot/TemperaturePointer_Geo");
         _currentNeedleRotation = _needleTransform.localRotation;
         _warningLightColor = new Color(1.3f, 0.55f, 0.55f);
     }
@@ -27,7 +27,7 @@ public class ShipTemperatureGauge : MonoBehaviour
     {
         GameObject indicatorLight = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/IndicatorLight_TemperatureGauge.prefab");
         AssetBundleUtilities.ReplaceShaders(indicatorLight);
-        _indicatorLight = Instantiate(indicatorLight, Locator.GetShipBody().transform).GetComponent<OWRenderer>();
+        _indicatorLight = Instantiate(indicatorLight, SELocator.GetShipBody().transform).GetComponent<OWRenderer>();
     }
 
     private void Update()

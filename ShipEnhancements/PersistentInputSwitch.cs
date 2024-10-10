@@ -18,7 +18,7 @@ public class PersistentInputSwitch : CockpitSwitch
         base.Start();
         if (_enabledInShip)
         {
-            _persistentInput = Locator.GetShipBody().GetComponent<ShipPersistentInput>();
+            _persistentInput = SELocator.GetShipBody().GetComponent<ShipPersistentInput>();
             _persistentInput.SetInputEnabled(_on && !SELocator.GetShipDamageController().IsElectricalFailed());
         }
     }

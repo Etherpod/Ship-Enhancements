@@ -21,7 +21,7 @@ public class GravityLandingGear : MonoBehaviour
         _audioSource = Instantiate(audioObject, transform).GetComponent<OWAudioSource>();
         GameObject effectsObject = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/Effects_GravityLandingGear_WarpParticles.prefab");
         _gravityEffects = Instantiate(effectsObject, transform).GetComponent<ParticleSystem>();
-        _thrusterModel = Locator.GetShipBody().GetComponent<ShipThrusterModel>();
+        _thrusterModel = SELocator.GetShipBody().GetComponent<ShipThrusterModel>();
 
         ShipEnhancements.Instance.OnGravityLandingGearSwitch += SetGravityEnabled;
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
@@ -73,11 +73,11 @@ public class GravityLandingGear : MonoBehaviour
         {
             if (hitCollider.attachedRigidbody.isKinematic)
             {
-                Locator.GetShipBody().AddAcceleration(-transform.up * _gravityMagnitude);
+                SELocator.GetShipBody().AddAcceleration(-transform.up * _gravityMagnitude);
             }
             else
             {
-                Locator.GetShipBody().AddAcceleration(-transform.up * (_gravityMagnitude / 10) * (1 / Locator.GetShipBody().GetMass()));
+                SELocator.GetShipBody().AddAcceleration(-transform.up * (_gravityMagnitude / 10) * (1 / SELocator.GetShipBody().GetMass()));
                 hitCollider.attachedRigidbody.GetAttachedOWRigidbody().AddAcceleration(transform.up * (_gravityMagnitude / 10) * (1 / hitCollider.attachedRigidbody.mass));
             }
         }

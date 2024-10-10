@@ -489,7 +489,7 @@ public static class PatchClass
         }
         if (impact.speed >= 300f * explosionMultiplier && !__instance._exploded)
         {
-            if (impact.otherBody == Locator.GetPlayerBody())
+            if (impact.otherBody == SELocator.GetPlayerBody())
             {
                 SEAchievementTracker.PlayerCausedExplosion = true;
             }
@@ -942,7 +942,7 @@ public static class PatchClass
 
         if (!__instance.IsPlayerInShip())
         {
-            Locator.GetShipBody().GetComponentInChildren<ShipTractorBeamSwitch>().ActivateTractorBeam();
+            SELocator.GetShipBody().GetComponentInChildren<ShipTractorBeamSwitch>().ActivateTractorBeam();
         }
     }
 
@@ -952,7 +952,7 @@ public static class PatchClass
     {
         if (!(bool)enableAutoHatch.GetProperty()) return true;
 
-        HatchController hatch = Locator.GetShipBody().GetComponentInChildren<HatchController>();
+        HatchController hatch = SELocator.GetShipBody().GetComponentInChildren<HatchController>();
         if (!hatch._hatchObject.activeInHierarchy)
         {
             hatch.CloseHatch();
@@ -1211,7 +1211,7 @@ public static class PatchClass
         // This recalls to the player launcher
         if (__instance.GetName() == ProbeLauncher.Name.Player && flag)
         {
-            __instance._activeProbe = Locator.GetProbe();
+            __instance._activeProbe = SELocator.GetProbe();
         }
 
         return true;
@@ -1246,7 +1246,7 @@ public static class PatchClass
         // This recalls to the player launcher
         if (__instance.GetName() == ProbeLauncher.Name.Player && flag)
         {
-            __instance._activeProbe = Locator.GetProbe();
+            __instance._activeProbe = SELocator.GetProbe();
         }
 
         return true;
@@ -1439,7 +1439,7 @@ public static class PatchClass
             bool flag = InputLibrary.toolActionPrimary.HasSameBinding(InputLibrary.probeRetrieve, OWInput.UsingGamepad());
             if ((flag && OWInput.IsPressed(InputLibrary.probeRetrieve, 0.5f)) || (!flag && OWInput.IsNewlyPressed(InputLibrary.probeRetrieve, InputMode.All)))
             {
-                Locator.GetShipTransform().GetComponentInChildren<ShipProbePickupVolume>().RecallProbeFromShip();
+                SELocator.GetShipTransform().GetComponentInChildren<ShipProbePickupVolume>().RecallProbeFromShip();
                 return;
             }
         }
@@ -1775,7 +1775,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.OnExitFlightConsole))]
     public static bool KeepThrustIndicatorOn(ThrustAndAttitudeIndicator __instance)
     {
-        if (!(bool)enablePersistentInput.GetProperty() || !Locator.GetShipBody().GetComponent<ShipPersistentInput>().InputEnabled()) return true;
+        if (!(bool)enablePersistentInput.GetProperty() || !SELocator.GetShipBody().GetComponent<ShipPersistentInput>().InputEnabled()) return true;
 
         __instance._activeThrusterModel = __instance._jetpackThrusterModel;
         __instance._activeThrusterController = __instance._jetpackThrusterController;
@@ -1797,7 +1797,7 @@ public static class PatchClass
     {
         if ((bool)enablePersistentInput.GetProperty())
         {
-            Locator.GetShipBody().GetComponent<ShipPersistentInput>().UpdateLastAutopilotState();
+            SELocator.GetShipBody().GetComponent<ShipPersistentInput>().UpdateLastAutopilotState();
         }
     }
     #endregion
@@ -1881,14 +1881,14 @@ public static class PatchClass
     {
         /*if ((bool)shipIgnitionCancelFix.GetProperty())
         {
-            ShipThrusterController thrustController = Locator.GetShipBody().GetComponent<ShipThrusterController>();
+            ShipThrusterController thrustController = SELocator.GetShipBody().GetComponent<ShipThrusterController>();
             if (thrustController && thrustController._isIgniting)
             {
                 thrustController._isIgniting = false;
                 GlobalMessenger.FireEvent("CancelShipIgnition");
             }
         }*/
-        ShipThrusterController thrustController = Locator.GetShipBody().GetComponent<ShipThrusterController>();
+        ShipThrusterController thrustController = SELocator.GetShipBody().GetComponent<ShipThrusterController>();
         if (thrustController && thrustController._isIgniting)
         {
             thrustController._isIgniting = false;
@@ -1924,9 +1924,9 @@ public static class PatchClass
         }
 
         float thrusterNoiseRadius = Mathf.Lerp(0f, 400f, Mathf.InverseLerp(0f, 20f, __instance._thrusterModel.GetLocalAcceleration().magnitude));
-        MasterAlarm masterAlarm = Locator.GetShipTransform().GetComponentInChildren<MasterAlarm>();
+        MasterAlarm masterAlarm = SELocator.GetShipTransform().GetComponentInChildren<MasterAlarm>();
         float alarmNoiseRadius = masterAlarm._isAlarmOn ? 350f : 0f;
-        ShipThrusterController thrusterController = Locator.GetShipTransform().GetComponent<ShipThrusterController>();
+        ShipThrusterController thrusterController = SELocator.GetShipTransform().GetComponent<ShipThrusterController>();
         float ignitionNoiseRadius = thrusterController._isIgniting ? 500f : 0f;
         float overdriveNoiseRadius = (bool)enableThrustModulator.GetProperty() && SELocator.GetShipOverdriveController() != null 
             && SELocator.GetShipOverdriveController().IsCharging() ? 300f : 0f;
@@ -2241,14 +2241,14 @@ public static class PatchClass
         if ((bool)disableSeatbelt.GetProperty() && PlayerState.AtFlightConsole() && impact.speed > 25f)
         {
             _lastImpactVelocity = impact.velocity.normalized * -impact.speed / 40f;
-            ShipCockpitController cockpit = Locator.GetShipTransform().GetComponentInChildren<ShipCockpitController>();
+            ShipCockpitController cockpit = SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitController>();
             cockpit.ExitFlightConsole();
             cockpit._exitFlightConsoleTime -= 0.2f;
         }
         if (ShipEnhancements.AchievementsAPI != null)
         {
             if ((float)shipInputLatency.GetProperty() >= 3f && !SEAchievementTracker.BadInternet
-                && impact.otherBody.IsKinematic() && impact.otherBody != Locator.GetShipBody().GetOrigParentBody())
+                && impact.otherBody.IsKinematic() && impact.otherBody != SELocator.GetShipBody().GetOrigParentBody())
             {
                 SEAchievementTracker.BadInternet = true;
                 ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.BAD_INTERNET");
@@ -2269,7 +2269,7 @@ public static class PatchClass
             if (impactVelocity.magnitude > 10f)
             {
                 _lastImpactVelocity = -impactVelocity / 25f;
-                ShipCockpitController cockpit = Locator.GetShipTransform().GetComponentInChildren<ShipCockpitController>();
+                ShipCockpitController cockpit = SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitController>();
                 cockpit.ExitFlightConsole();
                 cockpit._exitFlightConsoleTime -= 0.2f;
             }
@@ -2282,7 +2282,7 @@ public static class PatchClass
     {
         if ((bool)disableSeatbelt.GetProperty() && _lastImpactVelocity != Vector3.zero)
         {
-            Locator.GetPlayerBody().AddForce(_lastImpactVelocity);
+            SELocator.GetPlayerBody().AddForce(_lastImpactVelocity);
             _lastImpactVelocity = Vector3.zero;
         }
     }
@@ -2311,7 +2311,7 @@ public static class PatchClass
             && ShipEnhancements.AchievementsAPI != null && !SEAchievementTracker.HulkSmash
             && (!SEAchievementTracker.ShipExploded || SEAchievementTracker.PlayerCausedExplosion)
             && !SEAchievementTracker.PlayerEjectedCockpit
-            && SEAchievementTracker.LastHitBody == Locator.GetPlayerBody())
+            && SEAchievementTracker.LastHitBody == SELocator.GetPlayerBody())
         {
             SEAchievementTracker.HulkSmash = true;
             ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.HULK_SMASH");

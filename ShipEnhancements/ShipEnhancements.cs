@@ -184,7 +184,7 @@ public class ShipEnhancements : ModBehaviour
                 SEAchievementTracker.Reset();
             }
 
-            StartCoroutine(InitializeShip());
+            InitializeShip();
         };
 
         LoadManager.OnStartSceneLoad += (scene, loadScene) =>
@@ -205,7 +205,7 @@ public class ShipEnhancements : ModBehaviour
             GlobalMessenger.RemoveListener("WakeUp", OnWakeUp);
             if ((float)Settings.spaceAngularDragMultiplier.GetProperty() > 0 || (float)Settings.atmosphereAngularDragMultiplier.GetProperty() > 0)
             {
-                ShipFluidDetector detector = Locator.GetShipDetector().GetComponent<ShipFluidDetector>();
+                ShipFluidDetector detector = SELocator.GetShipDetector().GetComponent<ShipFluidDetector>();
                 detector.OnEnterFluid -= OnEnterFluid;
                 detector.OnExitFluid -= OnExitFluid;
             }
@@ -242,21 +242,21 @@ public class ShipEnhancements : ModBehaviour
     {
         if (!_shipLoaded || LoadManager.GetCurrentScene() != OWScene.SolarSystem || _shipDestroyed) return;
 
-        if (Locator.GetShipBody().GetAngularVelocity().sqrMagnitude > maxSpinSpeed * maxSpinSpeed)
+        if (SELocator.GetShipBody().GetAngularVelocity().sqrMagnitude > maxSpinSpeed * maxSpinSpeed)
         {
-            ShipOxygenTankComponent oxygenTank = Locator.GetShipBody().GetComponentInChildren<ShipOxygenTankComponent>();
+            ShipOxygenTankComponent oxygenTank = SELocator.GetShipBody().GetComponentInChildren<ShipOxygenTankComponent>();
             if (oxygenTank.isDamaged)
             {
                 oxygenTank._damageEffect._particleSystem.Stop();
                 oxygenTank._damageEffect._particleAudioSource.Stop();
             }
-            ShipFuelTankComponent fuelTank = Locator.GetShipBody().GetComponentInChildren<ShipFuelTankComponent>();
+            ShipFuelTankComponent fuelTank = SELocator.GetShipBody().GetComponentInChildren<ShipFuelTankComponent>();
             if (fuelTank.isDamaged)
             {
                 fuelTank._damageEffect._particleSystem.Stop();
                 fuelTank._damageEffect._particleAudioSource.Stop();
             }
-            Locator.GetShipBody().GetComponent<ShipDamageController>().Explode();
+            SELocator.GetShipBody().GetComponent<ShipDamageController>().Explode();
 
             if (!SEAchievementTracker.TorqueExplosion && AchievementsAPI != null)
             {
@@ -290,7 +290,7 @@ public class ShipEnhancements : ModBehaviour
                 SELocator.GetShipOxygenVolume().OnEffectVolumeExit(Locator.GetPlayerDetector());
             }
 
-            ShipOxygenTankComponent oxygenTank = Locator.GetShipBody().GetComponentInChildren<ShipOxygenTankComponent>();
+            ShipOxygenTankComponent oxygenTank = SELocator.GetShipBody().GetComponentInChildren<ShipOxygenTankComponent>();
             if (oxygenTank.isDamaged)
             {
                 oxygenTank._damageEffect._particleSystem.Stop();
@@ -309,7 +309,7 @@ public class ShipEnhancements : ModBehaviour
                 SELocator.GetShipOxygenVolume().OnEffectVolumeEnter(Locator.GetPlayerDetector());
             }
 
-            ShipOxygenTankComponent oxygenTank = Locator.GetShipBody().GetComponentInChildren<ShipOxygenTankComponent>();
+            ShipOxygenTankComponent oxygenTank = SELocator.GetShipBody().GetComponentInChildren<ShipOxygenTankComponent>();
             if (oxygenTank.isDamaged)
             {
                 oxygenTank._damageEffect._particleSystem.Play();
@@ -320,7 +320,7 @@ public class ShipEnhancements : ModBehaviour
         if (!fuelDepleted && SELocator.GetShipResources()._currentFuel <= 0f)
         {
             fuelDepleted = true;
-            ShipFuelTankComponent fuelTank = Locator.GetShipBody().GetComponentInChildren<ShipFuelTankComponent>();
+            ShipFuelTankComponent fuelTank = SELocator.GetShipBody().GetComponentInChildren<ShipFuelTankComponent>();
             if (fuelTank.isDamaged)
             {
                 fuelTank._damageEffect._particleSystem.Stop();
@@ -337,7 +337,7 @@ public class ShipEnhancements : ModBehaviour
         else if (fuelDepleted && SELocator.GetShipResources()._currentFuel > 0f)
         {
             fuelDepleted = false;
-            ShipFuelTankComponent fuelTank = Locator.GetShipBody().GetComponentInChildren<ShipFuelTankComponent>();
+            ShipFuelTankComponent fuelTank = SELocator.GetShipBody().GetComponentInChildren<ShipFuelTankComponent>();
             if (fuelTank.isDamaged)
             {
                 fuelTank._damageEffect._particleSystem.Play();
@@ -440,10 +440,8 @@ public class ShipEnhancements : ModBehaviour
         QSBInteraction = qsbInterface;
     }
 
-    private IEnumerator InitializeShip()
+    private void InitializeShip()
     {
-        yield return new WaitUntil(() => Locator._shipBody != null);
-
         WriteDebugMessage("Initialize Ship");
 
         SELocator.Initalize();
@@ -451,13 +449,13 @@ public class ShipEnhancements : ModBehaviour
 
         GameObject buttonConsole = LoadPrefab("Assets/ShipEnhancements/ButtonConsole.prefab");
         AssetBundleUtilities.ReplaceShaders(buttonConsole);
-        Instantiate(buttonConsole, Locator.GetShipBody().transform.Find("Module_Cockpit"));
+        Instantiate(buttonConsole, SELocator.GetShipBody().transform.Find("Module_Cockpit"));
 
         Material material1 = (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillageCabin_Recolored_mat.mat");
         Material material2 = (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillageMetal_Recolored_mat.mat");
         Material material3 = (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillagePlanks_Recolored_mat.mat");
         Material material4 = (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_CampsiteProps_Recolored_mat.mat");
-        Transform cockpitLight = Locator.GetShipTransform().Find("Module_Cockpit/Lights_Cockpit/Pointlight_HEA_ShipCockpit");
+        Transform cockpitLight = SELocator.GetShipTransform().Find("Module_Cockpit/Lights_Cockpit/Pointlight_HEA_ShipCockpit");
         List<Material> materials = [.. cockpitLight.GetComponent<LightmapController>()._materials];
         materials.Add(material1);
         materials.Add(material2);
@@ -481,10 +479,10 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((bool)Settings.disableEjectButton.GetProperty())
         {
-            Locator.GetShipBody().GetComponentInChildren<ShipEjectionSystem>().GetComponent<InteractReceiver>().DisableInteraction();
+            SELocator.GetShipBody().GetComponentInChildren<ShipEjectionSystem>().GetComponent<InteractReceiver>().DisableInteraction();
             GameObject ejectButtonTape = LoadPrefab("Assets/ShipEnhancements/EjectButtonTape.prefab");
             AssetBundleUtilities.ReplaceShaders(ejectButtonTape);
-            Instantiate(ejectButtonTape, Locator.GetShipBody().transform.Find("Module_Cockpit/Geo_Cockpit"));
+            Instantiate(ejectButtonTape, SELocator.GetShipBody().transform.Find("Module_Cockpit/Geo_Cockpit"));
         }
         if ((bool)Settings.disableHeadlights.GetProperty())
         {
@@ -498,7 +496,7 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)Settings.disableShipLights.GetProperty() || coloredLights)
         {
             Color lightColor = SettingsColors.GetLightingColor((string)Settings.shipLightColor.GetProperty());
-            foreach (ElectricalSystem system in Locator.GetShipBody().GetComponentsInChildren<ElectricalSystem>())
+            foreach (ElectricalSystem system in SELocator.GetShipBody().GetComponentsInChildren<ElectricalSystem>())
             {
                 foreach (ElectricalComponent component in system._connectedComponents)
                 {
@@ -526,7 +524,7 @@ public class ShipEnhancements : ModBehaviour
                     }
                 }
             }
-            foreach (PulsingLight beacon in Locator.GetShipBody().transform.Find("Module_Cabin/Lights_Cabin/ShipBeacon_Proxy").GetComponentsInChildren<PulsingLight>())
+            foreach (PulsingLight beacon in SELocator.GetShipBody().transform.Find("Module_Cabin/Lights_Cabin/ShipBeacon_Proxy").GetComponentsInChildren<PulsingLight>())
             {
                 if ((bool)Settings.disableShipLights.GetProperty())
                 {
@@ -549,13 +547,13 @@ public class ShipEnhancements : ModBehaviour
         {
             SELocator.GetShipResources().SetOxygen(0f);
             oxygenDepleted = true;
-            Locator.GetShipTransform().Find("Module_Cockpit/Props_Cockpit/Props_HEA_ShipFoliage").gameObject.SetActive(false);
+            SELocator.GetShipTransform().Find("Module_Cockpit/Props_Cockpit/Props_HEA_ShipFoliage").gameObject.SetActive(false);
         }
         if (Settings.temperatureZonesAmount.GetProperty().ToString() != "None")
         {
-            Locator.GetShipBody().GetComponentInChildren<ShipFuelGauge>().gameObject.AddComponent<ShipTemperatureGauge>();
+            SELocator.GetShipBody().GetComponentInChildren<ShipFuelGauge>().gameObject.AddComponent<ShipTemperatureGauge>();
             GameObject hullTempDial = LoadPrefab("Assets/ShipEnhancements/ShipTempDial.prefab");
-            Instantiate(hullTempDial, Locator.GetShipTransform().Find("Module_Cockpit"));
+            Instantiate(hullTempDial, SELocator.GetShipTransform().Find("Module_Cockpit"));
 
             if (Settings.temperatureZonesAmount.GetProperty().ToString() == "Sun")
             {
@@ -574,22 +572,11 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)Settings.enableShipFuelTransfer.GetProperty())
         {
             GameObject transferVolume = LoadPrefab("Assets/ShipEnhancements/FuelTransferVolume.prefab");
-            Instantiate(transferVolume, Locator.GetShipBody().GetComponentInChildren<ShipFuelTankComponent>().transform);
-        }
-        if ((bool)Settings.enableJetpackRefuelDrain.GetProperty())
-        {
-            if (InMultiplayer)
-            {
-                QSBInteraction.GetShipRecoveryPoint().AddComponent<ShipRefuelDrain>();
-            }
-            else
-            {
-                Locator.GetShipBody().GetComponentInChildren<PlayerRecoveryPoint>().gameObject.AddComponent<ShipRefuelDrain>();
-            }
+            Instantiate(transferVolume, SELocator.GetShipBody().GetComponentInChildren<ShipFuelTankComponent>().transform);
         }
         if ((float)Settings.gravityMultiplier.GetProperty() != 1f && !(bool)Settings.disableGravityCrystal.GetProperty())
         {
-            ShipDirectionalForceVolume shipGravity = Locator.GetShipBody().GetComponentInChildren<ShipDirectionalForceVolume>();
+            ShipDirectionalForceVolume shipGravity = SELocator.GetShipBody().GetComponentInChildren<ShipDirectionalForceVolume>();
             shipGravity._fieldMagnitude *= (float)Settings.gravityMultiplier.GetProperty();
         }
         if ((bool)Settings.enableAutoHatch.GetProperty())
@@ -597,17 +584,17 @@ public class ShipEnhancements : ModBehaviour
             GlobalMessenger.AddListener("EnterShip", OnEnterShip);
             GlobalMessenger.AddListener("ExitShip", OnExitShip);
             GameObject autoHatchController = LoadPrefab("Assets/ShipEnhancements/ExteriorHatchControls.prefab");
-            Instantiate(autoHatchController, Locator.GetShipBody().GetComponentInChildren<HatchController>().transform.parent);
+            Instantiate(autoHatchController, SELocator.GetShipBody().GetComponentInChildren<HatchController>().transform.parent);
         }
         if ((float)Settings.spaceAngularDragMultiplier.GetProperty() > 0 || (float)Settings.atmosphereAngularDragMultiplier.GetProperty() > 0)
         {
-            ShipFluidDetector detector = Locator.GetShipDetector().GetComponent<ShipFluidDetector>();
+            ShipFluidDetector detector = SELocator.GetShipDetector().GetComponent<ShipFluidDetector>();
             detector.OnEnterFluid += OnEnterFluid;
             detector.OnExitFluid += OnExitFluid;
         }
         if ((string)Settings.gravityDirection.GetProperty() != "Down" && !(bool)Settings.disableGravityCrystal.GetProperty())
         {
-            ShipDirectionalForceVolume shipGravity = Locator.GetShipBody().GetComponentInChildren<ShipDirectionalForceVolume>();
+            ShipDirectionalForceVolume shipGravity = SELocator.GetShipBody().GetComponentInChildren<ShipDirectionalForceVolume>();
             Vector3 direction = Vector3.down;
             switch ((string)Settings.gravityDirection.GetProperty())
             {
@@ -635,19 +622,19 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((bool)Settings.enableManualScoutRecall.GetProperty() || (bool)Settings.disableScoutRecall.GetProperty() || (bool)Settings.disableScoutLaunching.GetProperty())
         {
-            ShipProbeLauncherEffects launcherEffects = Locator.GetShipBody().GetComponentInChildren<PlayerProbeLauncher>()
+            ShipProbeLauncherEffects launcherEffects = SELocator.GetShipBody().GetComponentInChildren<PlayerProbeLauncher>()
                 .gameObject.AddComponent<ShipProbeLauncherEffects>();
             if ((bool)Settings.enableManualScoutRecall.GetProperty())
             {
                 GameObject probePickupVolume = LoadPrefab("Assets/ShipEnhancements/PlayerProbePickupVolume.prefab");
-                Instantiate(probePickupVolume, Locator.GetProbe().transform);
+                Instantiate(probePickupVolume, SELocator.GetProbe().transform);
             }
             GameObject shipProbePickupVolume = LoadPrefab("Assets/ShipEnhancements/ShipProbePickupVolume.prefab");
             GameObject shipProbeVolume = Instantiate(shipProbePickupVolume, launcherEffects.transform);
 
             if ((bool)Settings.enableScoutLauncherComponent.GetProperty())
             {
-                Locator.GetShipBody().GetComponentInChildren<ProbeLauncherComponent>().SetProbeLauncherEffects(launcherEffects);
+                SELocator.GetShipBody().GetComponentInChildren<ProbeLauncherComponent>().SetProbeLauncherEffects(launcherEffects);
             }
         }
         if ((bool)Settings.disableScoutRecall.GetProperty() && (bool)Settings.disableScoutLaunching.GetProperty() && (bool)Settings.enableScoutLauncherComponent.GetProperty())
@@ -659,7 +646,7 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((bool)Settings.addPortableCampfire.GetProperty())
         {
-            Transform suppliesParent = Locator.GetShipTransform().Find("Module_Supplies");
+            Transform suppliesParent = SELocator.GetShipTransform().Find("Module_Supplies");
             GameObject portableCampfireSocket = LoadPrefab("Assets/ShipEnhancements/PortableCampfireSocket.prefab");
             PortableCampfireSocket campfireSocket = Instantiate(portableCampfireSocket, suppliesParent).GetComponent<PortableCampfireSocket>();
             GameObject portableCampfireItem = LoadPrefab("assets/ShipEnhancements/PortableCampfireItem.prefab");
@@ -669,7 +656,7 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((float)Settings.shipExplosionMultiplier.GetProperty() != 1f)
         {
-            Transform effectsTransform = Locator.GetShipTransform().Find("Effects");
+            Transform effectsTransform = SELocator.GetShipTransform().Find("Effects");
             ExplosionController explosion = effectsTransform.GetComponentInChildren<ExplosionController>();
             explosion._length *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.75f) + 0.25f;
             explosion._forceVolume._acceleration *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.25f) + 0.75f;
@@ -693,11 +680,11 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((float)Settings.shipBounciness.GetProperty() > 0f)
         {
-            Locator.GetShipTransform().gameObject.AddComponent<ShipBouncyHull>();
+            SELocator.GetShipTransform().gameObject.AddComponent<ShipBouncyHull>();
         }
         if ((bool)Settings.enablePersistentInput.GetProperty())
         {
-            Locator.GetShipBody().gameObject.AddComponent<ShipPersistentInput>();
+            SELocator.GetShipBody().gameObject.AddComponent<ShipPersistentInput>();
         }
         if ((float)Settings.shipInputLatency.GetProperty() > 0f)
         {
@@ -706,7 +693,7 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)Settings.hotThrusters.GetProperty() || (string)Settings.thrusterColor.GetProperty() != "Default")
         {
             GameObject flameHazardVolume = LoadPrefab("Assets/ShipEnhancements/FlameHeatVolume.prefab");
-            foreach (ThrusterFlameController flame in Locator.GetShipTransform().GetComponentsInChildren<ThrusterFlameController>())
+            foreach (ThrusterFlameController flame in SELocator.GetShipTransform().GetComponentsInChildren<ThrusterFlameController>())
             {
                 GameObject volume = Instantiate(flameHazardVolume, Vector3.zero, Quaternion.identity, flame.transform);
                 volume.transform.localPosition = Vector3.zero;
@@ -741,7 +728,7 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((float)Settings.reactorLifetimeMultiplier.GetProperty() != 1f)
         {
-            ShipReactorComponent reactor = Locator.GetShipTransform().GetComponentInChildren<ShipReactorComponent>();
+            ShipReactorComponent reactor = SELocator.GetShipTransform().GetComponentInChildren<ShipReactorComponent>();
             float multiplier = (float)Settings.reactorLifetimeMultiplier.GetProperty();
             reactor._minCountdown *= multiplier;
             reactor._maxCountdown *= multiplier;
@@ -754,7 +741,7 @@ public class ShipEnhancements : ModBehaviour
             GameObject hook = LoadPrefab("Assets/ShipEnhancements/TetherHook.prefab");
             AssetBundleUtilities.ReplaceShaders(hook);
 
-            GameObject socketParent = Instantiate(LoadPrefab("Assets/ShipEnhancements/HookSocketParent.prefab"), Locator.GetShipTransform());
+            GameObject socketParent = Instantiate(LoadPrefab("Assets/ShipEnhancements/HookSocketParent.prefab"), SELocator.GetShipTransform());
             socketParent.transform.localPosition = Vector3.zero;
             foreach (TetherHookSocket socket in socketParent.GetComponentsInChildren<TetherHookSocket>())
             {
@@ -766,21 +753,21 @@ public class ShipEnhancements : ModBehaviour
                 });
             }
 
-            Locator.GetPlayerBody().gameObject.AddComponent<TetherPromptController>();
+            SELocator.GetPlayerBody().gameObject.AddComponent<TetherPromptController>();
         }
         if ((bool)Settings.addShipSignal.GetProperty())
         {
             GameObject signal = LoadPrefab("Assets/ShipEnhancements/ShipSignal.prefab");
-            AudioSignal shipSignal = Instantiate(signal, Locator.GetShipTransform()
+            AudioSignal shipSignal = Instantiate(signal, SELocator.GetShipTransform()
                 .GetComponentInChildren<ShipCockpitUI>()._sigScopeDish).GetComponent<AudioSignal>();
-            shipSignal.SetSector(Locator.GetShipTransform().GetComponentInChildren<Sector>());
+            shipSignal.SetSector(SELocator.GetShipTransform().GetComponentInChildren<Sector>());
             shipSignal._name = shipSignalName;
             shipSignal._frequency = SignalFrequency.Traveler;
         }
         if ((bool)Settings.disableShipFriction.GetProperty())
         {
             PhysicMaterial mat = (PhysicMaterial)LoadAsset("Assets/ShipEnhancements/FrictionlessShip.physicMaterial");
-            foreach (Collider collider in Locator.GetShipTransform().GetComponentsInChildren<Collider>(true))
+            foreach (Collider collider in SELocator.GetShipTransform().GetComponentsInChildren<Collider>(true))
             {
                 collider.material = mat;
             }
@@ -789,7 +776,7 @@ public class ShipEnhancements : ModBehaviour
         {
             GameObject rustController = LoadPrefab("Assets/ShipEnhancements/RustController.prefab");
             AssetBundleUtilities.ReplaceShaders(rustController);
-            Instantiate(rustController, Locator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry"));
+            Instantiate(rustController, SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry"));
         }
         if ((bool)Settings.addPortableTractorBeam.GetProperty())
         {
@@ -798,7 +785,7 @@ public class ShipEnhancements : ModBehaviour
             GameObject tractorObj = Instantiate(tractor);
             GameObject tractorSocket = LoadPrefab("Assets/ShipEnhancements/PortableTractorBeamSocket.prefab");
             AssetBundleUtilities.ReplaceShaders(tractorSocket);
-            GameObject tractorSocketObj = Instantiate(tractorSocket, Locator.GetShipTransform().Find("Module_Cabin"));
+            GameObject tractorSocketObj = Instantiate(tractorSocket, SELocator.GetShipTransform().Find("Module_Cabin"));
             tractorSocketObj.GetComponent<PortableTractorBeamSocket>().SetTractorBeamItem(tractorObj.GetComponent<PortableTractorBeamItem>());
         }
 
@@ -814,6 +801,22 @@ public class ShipEnhancements : ModBehaviour
 
         ShipNotifications.Initialize();
         SELocator.LateInitialize();
+
+        ModHelper.Events.Unity.RunWhen(() => Locator._shipBody != null, () =>
+        {
+            _shipLoaded = true;
+            if ((bool)Settings.enableJetpackRefuelDrain.GetProperty())
+            {
+                if (InMultiplayer)
+                {
+                    QSBInteraction.GetShipRecoveryPoint().AddComponent<ShipRefuelDrain>();
+                }
+                else
+                {
+                    SELocator.GetShipBody().GetComponentInChildren<PlayerRecoveryPoint>().gameObject.AddComponent<ShipRefuelDrain>();
+                }
+            }
+        });
     }
 
     private void AddTemperatureZones()
@@ -889,7 +892,7 @@ public class ShipEnhancements : ModBehaviour
 
     private void DisableHeadlights()
     {
-        ShipHeadlightComponent headlightComponent = Locator.GetShipBody().GetComponentInChildren<ShipHeadlightComponent>();
+        ShipHeadlightComponent headlightComponent = SELocator.GetShipBody().GetComponentInChildren<ShipHeadlightComponent>();
         headlightComponent._repairReceiver.repairDistance = 0f;
         headlightComponent._damaged = true;
         headlightComponent._repairFraction = 0f;
@@ -898,7 +901,7 @@ public class ShipEnhancements : ModBehaviour
 
     private void DisableGravityCrystal()
     {
-        ShipGravityComponent gravityComponent = Locator.GetShipBody().GetComponentInChildren<ShipGravityComponent>();
+        ShipGravityComponent gravityComponent = SELocator.GetShipBody().GetComponentInChildren<ShipGravityComponent>();
         gravityComponent._repairReceiver.repairDistance = 0f;
         gravityComponent._damaged = true;
         gravityComponent._repairFraction = 0f;
@@ -910,7 +913,7 @@ public class ShipEnhancements : ModBehaviour
 
     private void DisableLandingCamera()
     {
-        ShipCameraComponent cameraComponent = Locator.GetShipBody().GetComponentInChildren<ShipCameraComponent>();
+        ShipCameraComponent cameraComponent = SELocator.GetShipBody().GetComponentInChildren<ShipCameraComponent>();
         cameraComponent._repairReceiver.repairDistance = 0f;
         cameraComponent._damaged = true;
         cameraComponent._repairFraction = 0f;
@@ -919,11 +922,11 @@ public class ShipEnhancements : ModBehaviour
 
     private void SetHullColor()
     {
-        MeshRenderer suppliesRenderer = Locator.GetShipTransform().
+        MeshRenderer suppliesRenderer = SELocator.GetShipTransform().
             Find("Module_Supplies/Geo_Supplies/Supplies_Geometry/Supplies_Interior").GetComponent<MeshRenderer>();
         Material inSharedMat = suppliesRenderer.sharedMaterials[0];
 
-        Transform buttonPanel = Locator.GetShipTransform().GetComponentInChildren<CockpitButtonPanel>().transform;
+        Transform buttonPanel = SELocator.GetShipTransform().GetComponentInChildren<CockpitButtonPanel>().transform;
         MeshRenderer buttonPanelRenderer = buttonPanel.Find("Panel/PanelBody.001").GetComponent<MeshRenderer>();
         Material inSharedMat2 = buttonPanelRenderer.sharedMaterials[0];
         if ((string)Settings.interiorHullColor.GetProperty() != "Default")
@@ -931,14 +934,14 @@ public class ShipEnhancements : ModBehaviour
 
             if ((string)Settings.interiorHullColor.GetProperty() == "Rainbow")
             {
-                if (Locator.GetShipTransform().TryGetComponent(out RainbowShipHull rainbowHull))
+                if (SELocator.GetShipTransform().TryGetComponent(out RainbowShipHull rainbowHull))
                 {
                     rainbowHull.AddSharedMaterial(inSharedMat);
                     rainbowHull.AddSharedMaterial(inSharedMat2);
                 }
                 else
                 {
-                    rainbowHull = Locator.GetShipTransform().gameObject.AddComponent<RainbowShipHull>();
+                    rainbowHull = SELocator.GetShipTransform().gameObject.AddComponent<RainbowShipHull>();
                     rainbowHull.AddSharedMaterial(inSharedMat);
                     rainbowHull.AddSharedMaterial(inSharedMat2);
                 }
@@ -957,20 +960,20 @@ public class ShipEnhancements : ModBehaviour
             inSharedMat2.SetColor("_Color", Color.white);
         }
 
-        MeshRenderer cabinRenderer = Locator.GetShipTransform().
+        MeshRenderer cabinRenderer = SELocator.GetShipTransform().
             Find("Module_Cabin/Geo_Cabin/Cabin_Geometry/Cabin_Exterior").GetComponent<MeshRenderer>();
         Material outSharedMat = cabinRenderer.sharedMaterials[3];
         if ((string)Settings.exteriorHullColor.GetProperty() != "Default")
         {
             if ((string)Settings.exteriorHullColor.GetProperty() == "Rainbow")
             {
-                if (Locator.GetShipTransform().TryGetComponent(out RainbowShipHull rainbowHull))
+                if (SELocator.GetShipTransform().TryGetComponent(out RainbowShipHull rainbowHull))
                 {
                     rainbowHull.AddSharedMaterial(outSharedMat);
                 }
                 else
                 {
-                    rainbowHull = Locator.GetShipTransform().gameObject.AddComponent<RainbowShipHull>();
+                    rainbowHull = SELocator.GetShipTransform().gameObject.AddComponent<RainbowShipHull>();
                     rainbowHull.AddSharedMaterial(outSharedMat);
                 }
             }
@@ -992,9 +995,9 @@ public class ShipEnhancements : ModBehaviour
 
     private void OnPlayerSuitUp()
     {
-        if (Locator.GetPlayerBody().GetComponent<PlayerResources>()._currentOxygen < _lastSuitOxygen)
+        if (SELocator.GetPlayerBody().GetComponent<PlayerResources>()._currentOxygen < _lastSuitOxygen)
         {
-            Locator.GetPlayerBody().GetComponent<PlayerResources>()._currentOxygen = _lastSuitOxygen;
+            SELocator.GetPlayerBody().GetComponent<PlayerResources>()._currentOxygen = _lastSuitOxygen;
         }
     }
 
@@ -1006,23 +1009,23 @@ public class ShipEnhancements : ModBehaviour
     private void OnEnterFluid(FluidVolume fluid)
     {
         angularDragEnabled = true;
-        Locator.GetShipBody()._rigidbody.angularDrag = 0.94f * (float)Settings.atmosphereAngularDragMultiplier.GetProperty();
-        Locator.GetShipBody().GetComponent<ShipThrusterModel>()._angularDrag = 0.94f * (float)Settings.atmosphereAngularDragMultiplier.GetProperty();
+        SELocator.GetShipBody()._rigidbody.angularDrag = 0.94f * (float)Settings.atmosphereAngularDragMultiplier.GetProperty();
+        SELocator.GetShipBody().GetComponent<ShipThrusterModel>()._angularDrag = 0.94f * (float)Settings.atmosphereAngularDragMultiplier.GetProperty();
     }
 
     private void OnExitFluid(FluidVolume fluid)
     {
-        if (Locator.GetShipDetector().GetComponent<ShipFluidDetector>()._activeVolumes.Count == 0)
+        if (SELocator.GetShipDetector().GetComponent<ShipFluidDetector>()._activeVolumes.Count == 0)
         {
             angularDragEnabled = false;
-            Locator.GetShipBody()._rigidbody.angularDrag = 0.94f * (float)Settings.spaceAngularDragMultiplier.GetProperty();
-            Locator.GetShipBody().GetComponent<ShipThrusterModel>()._angularDrag = 0.94f * (float)Settings.spaceAngularDragMultiplier.GetProperty();
+            SELocator.GetShipBody()._rigidbody.angularDrag = 0.94f * (float)Settings.spaceAngularDragMultiplier.GetProperty();
+            SELocator.GetShipBody().GetComponent<ShipThrusterModel>()._angularDrag = 0.94f * (float)Settings.spaceAngularDragMultiplier.GetProperty();
         }
     }
 
     private void OnEnterShip()
     {
-        HatchController hatchController = Locator.GetShipBody().GetComponentInChildren<HatchController>();
+        HatchController hatchController = SELocator.GetShipBody().GetComponentInChildren<HatchController>();
         hatchController._interactVolume.EnableInteraction();
         hatchController.GetComponent<SphereShape>().radius = 1f;
         hatchController.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
@@ -1031,7 +1034,7 @@ public class ShipEnhancements : ModBehaviour
 
     private void OnExitShip()
     {
-        HatchController hatchController = Locator.GetShipBody().GetComponentInChildren<HatchController>();
+        HatchController hatchController = SELocator.GetShipBody().GetComponentInChildren<HatchController>();
         hatchController._interactVolume.DisableInteraction();
         hatchController.GetComponent<SphereShape>().radius = 3.5f;
         hatchController.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
@@ -1040,7 +1043,7 @@ public class ShipEnhancements : ModBehaviour
     private void OnShipSystemFailure()
     {
         _shipDestroyed = true;
-        Locator.GetShipBody().SetCenterOfMass(Locator.GetShipBody().GetWorldCenterOfMass());
+        SELocator.GetShipBody().SetCenterOfMass(SELocator.GetShipBody().GetWorldCenterOfMass());
     }
 
     private void OnWakeUp()
@@ -1092,13 +1095,13 @@ public class ShipEnhancements : ModBehaviour
 
     public void UpdateSuitOxygen()
     {
-        _lastSuitOxygen = Locator.GetPlayerBody().GetComponent<PlayerResources>()._currentOxygen;
+        _lastSuitOxygen = SELocator.GetPlayerBody().GetComponent<PlayerResources>()._currentOxygen;
     }
 
     public bool IsShipInOxygen()
     {
         return !_shipDestroyed && SELocator.GetShipOxygenDetector() != null && SELocator.GetShipOxygenDetector().GetDetectOxygen()
-            && !Locator.GetShipDetector().GetComponent<ShipFluidDetector>().InFluidType(FluidVolume.Type.WATER);
+            && !SELocator.GetShipDetector().GetComponent<ShipFluidDetector>().InFluidType(FluidVolume.Type.WATER);
     }
 
     public void SetGravityLandingGearEnabled(bool enabled)

@@ -13,8 +13,8 @@ public static class InputLatencyController
 
     public static void Initialize()
     {
-        _shipThrusterModel = Locator.GetShipBody().GetComponent<ShipThrusterModel>();
-        _shipThrusterController = Locator.GetShipBody().GetComponent<ShipThrusterController>();
+        _shipThrusterModel = SELocator.GetShipBody().GetComponent<ShipThrusterModel>();
+        _shipThrusterController = SELocator.GetShipBody().GetComponent<ShipThrusterController>();
     }
 
     public static void FixedUpdate()

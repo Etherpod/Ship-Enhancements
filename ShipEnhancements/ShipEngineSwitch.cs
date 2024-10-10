@@ -63,9 +63,9 @@ public class ShipEngineSwitch : MonoBehaviour
             return;
         }
 
-        _thrusterController = Locator.GetShipBody().GetComponent<ShipThrusterController>();
-        _audioController = Locator.GetShipBody().GetComponentInChildren<ShipAudioController>();
-        _alarm = Locator.GetShipTransform().GetComponentInChildren<MasterAlarm>();
+        _thrusterController = SELocator.GetShipBody().GetComponent<ShipThrusterController>();
+        _audioController = SELocator.GetShipBody().GetComponentInChildren<ShipAudioController>();
+        _alarm = SELocator.GetShipTransform().GetComponentInChildren<MasterAlarm>();
 
         _interactReceiver.OnGainFocus += OnGainFocus;
         _interactReceiver.OnLoseFocus += OnLoseFocus;
@@ -239,7 +239,7 @@ public class ShipEngineSwitch : MonoBehaviour
             }
             if ((bool)enablePersistentInput.GetProperty())
             {
-                Locator.GetShipBody().GetComponent<ShipPersistentInput>().OnDisableEngine();
+                SELocator.GetShipBody().GetComponent<ShipPersistentInput>().OnDisableEngine();
             }
             if (OWInput.IsInputMode(InputMode.ShipCockpit) && Locator.GetToolModeSwapper().IsInToolMode(ToolMode.Probe)
                 || Locator.GetToolModeSwapper().IsInToolMode(ToolMode.SignalScope))

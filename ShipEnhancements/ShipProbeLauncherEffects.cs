@@ -15,7 +15,7 @@ public class ShipProbeLauncherEffects : MonoBehaviour
 
     private void Start()
     {
-        _probe = Locator.GetProbe();
+        _probe = SELocator.GetProbe();
         _playerProbeLauncher = Locator.GetPlayerTransform().GetComponentInChildren<PlayerProbeLauncher>();
         _shipProbeLauncher = GetComponent<PlayerProbeLauncher>();
 

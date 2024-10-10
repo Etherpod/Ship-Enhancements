@@ -40,7 +40,7 @@ public class Tether : MonoBehaviour
                 return;
             }
 
-            if (_connectedRigidbody == Locator.GetPlayerBody())
+            if (_connectedRigidbody == SELocator.GetPlayerBody())
             {
                 float tetherDist = (_connectedRigidbody.transform.TransformPoint(_connectedAnchor) - transform.TransformPoint(_anchor)).sqrMagnitude;
                 if (OWInput.IsPressed(InputLibrary.toolOptionDown) && _joint.minDistance < _maxTetherDistance)
@@ -80,7 +80,7 @@ public class Tether : MonoBehaviour
             _joint = _rigidbody.gameObject.AddComponent<SpringJoint>();
             _joint.connectedBody = connectedBody.GetRigidbody();
 
-            if (connectedBody == Locator.GetPlayerBody())
+            if (connectedBody == SELocator.GetPlayerBody())
             {
                 attachedToPlayer = true;
                 connectedBody.MoveToPosition(connectedBody.transform.position);
@@ -97,7 +97,7 @@ public class Tether : MonoBehaviour
             _joint.connectedAnchor = _connectedAnchor;
             _joint.enableCollision = true;
             _joint.maxDistance = 0f;
-            _joint.minDistance = connectedBody == Locator.GetPlayerBody() ? 15f : Mathf.Min(100f, Vector3.Distance(transform.TransformPoint(_anchor), 
+            _joint.minDistance = connectedBody == SELocator.GetPlayerBody() ? 15f : Mathf.Min(100f, Vector3.Distance(transform.TransformPoint(_anchor), 
                 _connectedRigidbody.transform.TransformPoint(_connectedAnchor)));
             _joint.spring = 0.2f;
             _joint.damper = 0f;
@@ -117,7 +117,7 @@ public class Tether : MonoBehaviour
         foreach (RaycastHit hit in hits)
         {
             Rigidbody rb = hit.collider.attachedRigidbody;
-            if (!(rb.isKinematic || rb == GetComponentInParent<Rigidbody>() || rb == Locator.GetPlayerBody().GetRigidbody()))
+            if (!(rb.isKinematic || rb == GetComponentInParent<Rigidbody>() || rb == SELocator.GetPlayerBody().GetRigidbody()))
             {
                 intersectingBody = true;
                 break;
@@ -142,16 +142,16 @@ public class Tether : MonoBehaviour
         if (!_tethered) return;
 
         _tethered = false;
-        bool attachedToPlayer = _connectedRigidbody == Locator.GetPlayerBody();
+        bool attachedToPlayer = _connectedRigidbody == SELocator.GetPlayerBody();
         if (!_tetheredToSelf)
         {
             DestroyImmediate(_joint);
         }
         _tetheredToSelf = false;
 
-        if (_collider && !ShipEnhancements.Instance.probeDestroyed && Locator.GetProbe().transform.parent == _collider.transform)
+        if (_collider && !ShipEnhancements.Instance.probeDestroyed && SELocator.GetProbe().transform.parent == _collider.transform)
         {
-            Locator.GetProbe().Unanchor();
+            SELocator.GetProbe().Unanchor();
         }
         Destroy(_tetherMesh.gameObject);
 

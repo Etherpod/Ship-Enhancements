@@ -63,7 +63,7 @@ public abstract class CockpitSwitch : ElectricalComponent
         _baseLightIntensity = _light.intensity;
         _light.intensity = 0f;
 
-        _electricalSystem = Locator.GetShipBody().transform
+        _electricalSystem = SELocator.GetShipBody().transform
             .Find("Module_Cockpit/Systems_Cockpit/FlightControlsElectricalSystem")
             .GetComponent<ElectricalSystem>();
         List<ElectricalComponent> componentList = [.. _electricalSystem._connectedComponents];

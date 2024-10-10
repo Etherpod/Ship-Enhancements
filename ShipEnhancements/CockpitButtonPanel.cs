@@ -58,7 +58,7 @@ public class CockpitButtonPanel : MonoBehaviour
         {
             _bottomPanel.SetActive(false);
         }
-        _cockpitInteractVolume = (InteractZone)Locator.GetShipBody().GetComponentInChildren<ShipCockpitController>()._interactVolume;
+        _cockpitInteractVolume = (InteractZone)SELocator.GetShipBody().GetComponentInChildren<ShipCockpitController>()._interactVolume;
         GlobalMessenger.AddListener("ExitFlightConsole", OnExitFlightConsole);
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
     }

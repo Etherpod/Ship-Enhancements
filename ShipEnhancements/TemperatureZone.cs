@@ -50,7 +50,7 @@ public class TemperatureZone : MonoBehaviour
 
     public float GetTemperature()
     {
-        float distSqr = (Locator.GetShipDetector().transform.position - (transform.position + _shape.center)).sqrMagnitude;
+        float distSqr = (SELocator.GetShipDetector().transform.position - (transform.position + _shape.center)).sqrMagnitude;
         float multiplier;
         if (_isShell)
         {

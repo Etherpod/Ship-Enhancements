@@ -7,7 +7,7 @@ public class PortableCampfireSocket : OWItemSocket
     public override void Awake()
     {
         Reset();
-        _sector = Locator.GetShipBody().GetComponent<Sector>();
+        _sector = SELocator.GetShipBody().GetComponent<Sector>();
         base.Awake();
         _acceptableType = PortableCampfireItem.ItemType;
     }

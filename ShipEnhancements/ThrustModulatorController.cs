@@ -46,7 +46,7 @@ public class ThrustModulatorController : ElectricalComponent
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
 
-        _electricalSystem = Locator.GetShipTransform()
+        _electricalSystem = SELocator.GetShipTransform()
             .Find("Module_Cockpit/Systems_Cockpit/FlightControlsElectricalSystem")
             .GetComponent<ElectricalSystem>();
         List<ElectricalComponent> componentList = [.. _electricalSystem._connectedComponents];

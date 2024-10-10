@@ -7,8 +7,6 @@ using QSB.RespawnSync;
 using ShipEnhancements;
 using System.Reflection;
 using QSB.WorldSync;
-using QSB.ItemSync.WorldObjects.Sockets;
-using QSB.CampfireSync.WorldObjects;
 
 namespace ShipEnhancementsQSB;
 
@@ -26,14 +24,15 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
                 return;
             }
 
-            if ((bool)ShipEnhancements.ShipEnhancements.Settings.addPortableCampfire.GetProperty())
+            ShipEnhancements.ShipEnhancements.WriteDebugMessage("ah");
+
+            ShipEnhancements.ShipEnhancements.Instance.ModHelper.Events.Unity.FireInNUpdates(() =>
             {
-                Transform shipTransform = FindObjectOfType<ShipBody>().transform;
-                QSBWorldSync.Init<QSBPortableCampfireItem, PortableCampfireItem>();
-                PortableCampfireSocket socket = shipTransform.GetComponentInChildren<PortableCampfireSocket>();
-                QSBWorldSync.Init<QSBItemSocket, OWItemSocket>([socket]);
-                QSBWorldSync.Init<QSBCampfire, Campfire>([socket.GetSocketedItem().GetComponentInChildren<Campfire>(true)]);
-            }
+                if ((bool)ShipEnhancements.ShipEnhancements.Settings.addPortableCampfire.GetProperty())
+                {
+                    QSBWorldSync.Init<QSBPortableCampfireItem, PortableCampfireItem>();
+                }
+            }, 2);
         };
     }
 
@@ -65,7 +64,7 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
 
     public GameObject GetShipRecoveryPoint()
     {
-        return Locator.GetShipTransform().GetComponentInChildren<ShipRecoveryPoint>().gameObject;
+        return SELocator.GetShipTransform().GetComponentInChildren<ShipRecoveryPoint>().gameObject;
     }
 
     public bool IsRecoveringAtShip()

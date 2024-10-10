@@ -25,7 +25,7 @@ public class RainbowShipThrusters : MonoBehaviour
         _rend = GetComponent<MeshRenderer>();
         _thrustMat = _rend?.material;
         _light = GetComponentInChildren<Light>();
-        _indicator = Locator.GetShipTransform().GetComponentInChildren<ThrustAndAttitudeIndicator>(true);
+        _indicator = SELocator.GetShipTransform().GetComponentInChildren<ThrustAndAttitudeIndicator>(true);
         _red = 1f;
         _green = 0f;
         _blue = 0f;

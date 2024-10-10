@@ -58,13 +58,13 @@ public class ShipOverdriveController : ElectricalComponent
 
         base.Awake();
         _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
-        _reactor = Locator.GetShipTransform().GetComponentInChildren<ShipReactorComponent>();
+        _reactor = SELocator.GetShipTransform().GetComponentInChildren<ShipReactorComponent>();
         _modulatorController = GetComponent<ThrustModulatorController>();
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
         ShipEnhancements.Instance.OnFuelDepleted += OnFuelDepleted;
         ShipEnhancements.Instance.OnFuelRestored += OnFuelRestored;
 
-        _electricalSystem = Locator.GetShipTransform()
+        _electricalSystem = SELocator.GetShipTransform()
             .Find("Module_Cockpit/Systems_Cockpit/FlightControlsElectricalSystem")
             .GetComponent<ElectricalSystem>();
         List<ElectricalComponent> componentList = [.. _electricalSystem._connectedComponents];
@@ -76,7 +76,7 @@ public class ShipOverdriveController : ElectricalComponent
     {
         List<Renderer> renderers = [];
         List<Light> lights = [];
-        foreach (ThrusterFlameController flame in Locator.GetShipTransform().GetComponentsInChildren<ThrusterFlameController>())
+        foreach (ThrusterFlameController flame in SELocator.GetShipTransform().GetComponentsInChildren<ThrusterFlameController>())
         {
             renderers.Add(flame.GetComponentInChildren<MeshRenderer>());
             lights.Add(flame.GetComponentInChildren<Light>());
@@ -165,7 +165,7 @@ public class ShipOverdriveController : ElectricalComponent
             _shipAudioSource.PlayOneShot(AudioType.EyeBigBang);
             if ((bool)extraNoise.GetProperty())
             {
-                Locator.GetShipDetector().GetComponent<ShipNoiseMaker>()._noiseRadius = 800f;
+                SELocator.GetShipDetector().GetComponent<ShipNoiseMaker>()._noiseRadius = 800f;
             }
 
             if (host)
@@ -181,7 +181,7 @@ public class ShipOverdriveController : ElectricalComponent
 
         if (host)
         {
-            Locator.GetShipBody().AddImpulse(Locator.GetShipTransform().forward * 500f);
+            SELocator.GetShipBody().AddImpulse(SELocator.GetShipTransform().forward * 500f);
             SELocator.GetShipResources().DrainFuel(150f);
             ShipElectricalComponent electrical = SELocator.GetShipDamageController()._shipElectricalComponent;
             electrical._electricalSystem.Disrupt(electrical._disruptionLength);

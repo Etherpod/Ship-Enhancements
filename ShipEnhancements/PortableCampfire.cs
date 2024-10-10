@@ -44,7 +44,7 @@ public class PortableCampfire : Campfire
             {
                 _reactorHeatMeter = 0f;
                 _reactorHeatMeterLength = Random.Range(10f, 30f);
-                Locator.GetShipBody().GetComponentInChildren<ShipReactorComponent>().SetDamaged(true);
+                SELocator.GetShipBody().GetComponentInChildren<ShipReactorComponent>().SetDamaged(true);
 
                 if (!SEAchievementTracker.FireHazard && ShipEnhancements.AchievementsAPI != null)
                 {
