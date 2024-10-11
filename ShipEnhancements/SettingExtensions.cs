@@ -97,6 +97,10 @@ public static class SettingExtensions
         {
             return float.Parse(value.ToString());
         }
+        else if (value.Type == JTokenType.Integer)
+        {
+            return (float)int.Parse(value.ToString());
+        }
         else if (value.Type == JTokenType.String)
         {
             return value.ToString();
@@ -121,6 +125,10 @@ public static class SettingExtensions
             else if (value.Type == JTokenType.Float)
             {
                 return float.Parse(value.ToString());
+            }
+            else if (value.Type == JTokenType.Integer)
+            {
+                return (float)int.Parse(value.ToString());
             }
             else if (value.Type == JTokenType.String)
             {
