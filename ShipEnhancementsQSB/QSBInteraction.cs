@@ -35,6 +35,10 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
                 {
                     QSBWorldSync.Init<QSBPortableCampfireItem, PortableCampfireItem>();
                 }
+                if ((bool)ShipEnhancements.ShipEnhancements.Settings.addPortableTractorBeam.GetProperty())
+                {
+                    QSBWorldSync.Init<QSBPortableTractorBeamItem, PortableTractorBeamItem>();
+                }
             }, 2);
         };
     }
