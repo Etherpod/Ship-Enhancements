@@ -8,6 +8,10 @@ using ShipEnhancements;
 using System.Reflection;
 using QSB.WorldSync;
 using QSB.TimeSync;
+using QSB.ShipSync.WorldObjects;
+using QSB.Messaging;
+using QSB.ShipSync.Messages.Component;
+using QSB.ShipSync.Messages.Hull;
 
 namespace ShipEnhancementsQSB;
 
@@ -24,8 +28,6 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
             {
                 return;
             }
-
-            ShipEnhancements.ShipEnhancements.WriteDebugMessage("ah");
 
             ShipEnhancements.ShipEnhancements.Instance.ModHelper.Events.Unity.FireInNUpdates(() =>
             {
@@ -73,9 +75,11 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
         return QSBInteractionPatches.RecoveringAtShip;
     }
 
-    public bool IsTimeFlowing()
+    public void SetHullDamaged(ShipHull shipHull)
     {
-        return WakeUpSync.LocalInstance.HasWokenUp;
+        var hull = shipHull.GetWorldObject<QSBShipHull>();
+        hull.SendMessage(new HullDamagedMessage());
+        hull.SendMessage(new HullChangeIntegrityMessage(shipHull._integrity));
     }
 }
 
@@ -95,9 +99,6 @@ public static class QSBInteractionPatches
         var canRefuel = SELocator.GetShipResources().GetFuel() > 0f;
         UITextType uiTextType;
         bool keyCommandVisible;
-
-        ShipEnhancements.ShipEnhancements.WriteDebugMessage("Can refuel: " + canRefuel);
-        ShipEnhancements.ShipEnhancements.WriteDebugMessage("Needs healing: " + needsHealing);
 
         if (needsHealing && needsRefueling && canRefuel)
         {

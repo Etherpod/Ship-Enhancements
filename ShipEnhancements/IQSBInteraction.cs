@@ -12,5 +12,5 @@ public interface IQSBInteraction
 
     bool IsRecoveringAtShip();
 
-    bool IsTimeFlowing();
+    void SetHullDamaged(ShipHull shipHull);
 }

@@ -31,6 +31,7 @@ public class QSBCompatibility
         _api.RegisterHandler<float>("campfire-reactor-delay", ReceiveCampfireReactorDelay);
         _api.RegisterHandler<NoData>("campfire-extinguished", ReceiveCampfireExtinguished);
         _api.RegisterHandler<(bool, bool, bool)>("campfire-initial-state", ReceiveCampfireInitialState);
+        _api.RegisterHandler<float>("ship-temp-meter", ReceiveShipHullTemp);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -350,5 +351,15 @@ public class QSBCompatibility
                 SELocator.GetPortableCampfire().SetState(Campfire.State.LIT);
             }
         }
+    }
+
+    public void SendShipHullTemp(uint id, float temperature)
+    {
+        _api.SendMessage("ship-temp-meter", temperature, id, false);
+    }
+
+    private void ReceiveShipHullTemp(uint id, float temperature)
+    {
+        SELocator.GetShipTemperatureDetector()?.SetShipTempMeter(temperature);
     }
 }

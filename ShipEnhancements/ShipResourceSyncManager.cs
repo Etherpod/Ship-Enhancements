@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-
-namespace ShipEnhancements;
+﻿namespace ShipEnhancements;
 
 public class ShipResourceSyncManager
 {
@@ -23,6 +20,10 @@ public class ShipResourceSyncManager
             {
                 _qsbCompat.SendShipOxygenValue(id, SELocator.GetShipResources()._currentOxygen);
                 _qsbCompat.SendShipFuelValue(id, SELocator.GetShipResources()._currentFuel);
+                if ((string)ShipEnhancements.Settings.temperatureZonesAmount.GetProperty() != "None")
+                {
+                    _qsbCompat.SendShipHullTemp(id, SELocator.GetShipTemperatureDetector().GetShipTempMeter());
+                }
             }
             _currentFrameDelay = _frameDelay;
         }
