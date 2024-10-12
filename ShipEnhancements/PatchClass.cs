@@ -1692,6 +1692,22 @@ public static class PatchClass
         }
     }
 
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Campfire), nameof(Campfire.SetState))]
+    public static bool FixPortableCampfireNRE(Campfire __instance, Campfire.State newState, bool forceStateUpdate)
+    {
+        if (__instance is PortableCampfire)
+        {
+            if (__instance._hazardVolume._triggerVolume == null)
+            {
+                ShipEnhancements.Instance.ModHelper.Events.Unity.FireOnNextUpdate(() => __instance.SetState(newState, forceStateUpdate));
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.SetState))]
     public static void UpdateExtinguished(Campfire __instance, Campfire.State newState)
@@ -2338,14 +2354,4 @@ public static class PatchClass
         }
     }
     #endregion
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(Campfire), nameof(Campfire.Start))]
-    public static void Test(Campfire __instance)
-    {
-        if (__instance is PortableCampfire)
-        {
-            ShipEnhancements.WriteDebugMessage("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH");
-        }
-    }
 }
