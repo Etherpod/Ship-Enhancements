@@ -33,7 +33,7 @@ public class TetherHookItem : OWItem
         _type = ItemType;
         _tether = GetComponent<Tether>();
         _activeTether = _tether;
-        _cameraManipulator = Locator.GetPlayerCamera().GetComponent<FirstPersonManipulator>();
+        _cameraManipulator = FindObjectOfType<FirstPersonManipulator>();
         _tetherPrompt = new ScreenPrompt(InputLibrary.interactSecondary, "Attach Tether", 0, ScreenPrompt.DisplayState.Normal, false);
         _connectionMesh.SetActive(false);
     }
@@ -61,6 +61,14 @@ public class TetherHookItem : OWItem
                 _connectionMesh.SetActive(true);
                 _tetherPrompt.SetText("Detach Tether");
                 PlayOneShotAudio(_attachTetherAudio, 0.6f);
+
+                if (ShipEnhancements.InMultiplayer)
+                {
+                    foreach (uint id in ShipEnhancements.PlayerIDs)
+                    {
+                        ShipEnhancements.QSBCompat.SendAttachTether(id, this);
+                    }
+                }
             }
             // if player is tethered to a hook already
             else
@@ -69,6 +77,14 @@ public class TetherHookItem : OWItem
                 _activeTether.TransferTether(GetComponentInParent<OWRigidbody>(), transform.parent.InverseTransformPoint(_anchorPos.position), this);
                 ShipEnhancements.Instance.playerTether = null;
                 PlayOneShotAudio(_attachTetherAudio, 0.6f);
+
+                if (ShipEnhancements.InMultiplayer)
+                {
+                    foreach (uint id in ShipEnhancements.PlayerIDs)
+                    {
+                        ShipEnhancements.QSBCompat.SendTransferTether(id, this, _activeTether.GetHook());
+                    }
+                }
             }
         }
         // if tethered
@@ -78,7 +94,29 @@ public class TetherHookItem : OWItem
         }
     }
 
+    public void OnConnectTetherRemote(uint id)
+    {
+        var playerRemote = ShipEnhancements.QSBAPI.GetPlayerBody(id);
+        _activeTether.CreateStaticTether(playerRemote.transform, _anchorPos.localPosition, Vector3.zero);
+        _connectionMesh.SetActive(true);
+        _tetherPrompt.SetText("Detach Tether");
+        PlayOneShotAudio(_attachTetherAudio, 0.6f);
+    }
+
     public void DisconnectTether()
+    {
+        RunDisconnectTether();
+
+        if (ShipEnhancements.InMultiplayer)
+        {
+            foreach (uint id in ShipEnhancements.PlayerIDs)
+            {
+                ShipEnhancements.QSBCompat.SendDisconnectTether(id, this);
+            }
+        }
+    }
+
+    private void RunDisconnectTether()
     {
         _activeTether.DisconnectTether();
         _activeTether = _tether;
@@ -97,10 +135,29 @@ public class TetherHookItem : OWItem
         _tetherPrompt.SetText("Attach Tether");
     }
 
+    public void OnDisconnectTetherRemote()
+    {
+        RunDisconnectTether();
+    }
+
     public void TransferToHook()
     {
         _connectionMesh.SetActive(true);
         _tetherPrompt.SetText("Detach Tether");
+    }
+
+    public void OnTransferRemote(Tether newTether)
+    {
+        ShipEnhancements.WriteDebugMessage("remote received");
+        ShipEnhancements.WriteDebugMessage("new tether tethered: " + newTether.IsTethered());
+        _activeTether = newTether;
+        _activeTether.TransferTether(GetComponentInParent<OWRigidbody>(), transform.parent.InverseTransformPoint(_anchorPos.position), this);
+        PlayOneShotAudio(_attachTetherAudio, 0.6f);
+    }
+
+    public Tether GetTether()
+    {
+        return _tether;
     }
 
     public override void DropItem(Vector3 position, Vector3 normal, Transform parent, Sector sector, IItemDropTarget customDropTarget)

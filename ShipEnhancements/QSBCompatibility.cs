@@ -32,6 +32,9 @@ public class QSBCompatibility
         _api.RegisterHandler<NoData>("campfire-extinguished", ReceiveCampfireExtinguished);
         _api.RegisterHandler<(bool, bool, bool)>("campfire-initial-state", ReceiveCampfireInitialState);
         _api.RegisterHandler<float>("ship-temp-meter", ReceiveShipHullTemp);
+        _api.RegisterHandler<int>("attach-tether", ReceiveAttachTether);
+        _api.RegisterHandler<int>("disconnect-tether", ReceiveDisconnectTether);
+        _api.RegisterHandler<(int, int)>("transfer-tether", ReceiveTransferTether);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -361,5 +364,38 @@ public class QSBCompatibility
     private void ReceiveShipHullTemp(uint id, float temperature)
     {
         SELocator.GetShipTemperatureDetector()?.SetShipTempMeter(temperature);
+    }
+
+    public void SendAttachTether(uint id, TetherHookItem hook)
+    {
+        _api.SendMessage("attach-tether", ShipEnhancements.QSBInteraction.GetIDFromTetherHook(hook), id, false);
+    }
+
+    private void ReceiveAttachTether(uint id, int hookID)
+    {
+        ShipEnhancements.QSBInteraction.GetTetherHookFromID(hookID).OnConnectTetherRemote(id);
+    }
+
+    public void SendDisconnectTether(uint id, TetherHookItem hook)
+    {
+        _api.SendMessage("disconnect-tether", ShipEnhancements.QSBInteraction.GetIDFromTetherHook(hook), id, false);
+    }
+
+    private void ReceiveDisconnectTether(uint id, int hookID)
+    {
+        ShipEnhancements.QSBInteraction.GetTetherHookFromID(hookID).OnDisconnectTetherRemote();
+    }
+
+    public void SendTransferTether(uint id, TetherHookItem newHook, TetherHookItem lastHook)
+    {
+        int newID = ShipEnhancements.QSBInteraction.GetIDFromTetherHook(newHook);
+        int lastID = ShipEnhancements.QSBInteraction.GetIDFromTetherHook(lastHook);
+        _api.SendMessage("transfer-tether", (newID, lastID), id, false);
+    }
+
+    private void ReceiveTransferTether(uint id, (int newID, int lastID) data)
+    {
+        Tether newTether = ShipEnhancements.QSBInteraction.GetTetherHookFromID(data.lastID).GetTether();
+        ShipEnhancements.QSBInteraction.GetTetherHookFromID(data.newID).OnTransferRemote(newTether);
     }
 }
