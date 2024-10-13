@@ -97,7 +97,7 @@ public class TetherHookItem : OWItem
     public void OnConnectTetherRemote(uint id)
     {
         var playerRemote = ShipEnhancements.QSBAPI.GetPlayerBody(id);
-        _activeTether.CreateStaticTether(playerRemote.transform, _anchorPos.localPosition, Vector3.zero);
+        _activeTether.CreateRemoteTether(playerRemote.transform, _anchorPos.localPosition, Vector3.zero);
         _connectionMesh.SetActive(true);
         _tetherPrompt.SetText("Detach Tether");
         PlayOneShotAudio(_attachTetherAudio, 0.6f);

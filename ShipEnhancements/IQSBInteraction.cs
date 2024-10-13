@@ -18,5 +18,4 @@ public interface IQSBInteraction
     int GetIDFromTetherHook(TetherHookItem hookItem);
 
     TetherHookItem GetTetherHookFromID(int hookID);
-
 }
