@@ -348,7 +348,8 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipHull), nameof(ShipHull.FixedUpdate))]
     public static bool ApplyHullDamageMultiplier(ShipHull __instance)
     {
-        if ((float)shipDamageMultiplier.GetProperty() == 1 && (float)shipDamageSpeedMultiplier.GetProperty() == 1)
+        if (((float)shipDamageMultiplier.GetProperty() == 1 && (float)shipDamageSpeedMultiplier.GetProperty() == 1)
+            || ShipEnhancements.InMultiplayer)
         {
             return true;
         }

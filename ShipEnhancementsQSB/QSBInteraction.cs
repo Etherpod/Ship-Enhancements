@@ -16,6 +16,8 @@ using QSB.ItemSync.WorldObjects;
 using QSB.SectorSync.WorldObjects;
 using QSB.ItemSync;
 using QSB.ItemSync.WorldObjects.Items;
+using QSB.ShipSync.Patches;
+using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancementsQSB;
 
@@ -35,15 +37,15 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
 
             ShipEnhancements.ShipEnhancements.Instance.ModHelper.Events.Unity.FireInNUpdates(() =>
             {
-                if ((bool)ShipEnhancements.ShipEnhancements.Settings.addPortableCampfire.GetProperty())
+                if ((bool)addPortableCampfire.GetProperty())
                 {
                     QSBWorldSync.Init<QSBPortableCampfireItem, PortableCampfireItem>();
                 }
-                if ((bool)ShipEnhancements.ShipEnhancements.Settings.addPortableTractorBeam.GetProperty())
+                if ((bool)addPortableTractorBeam.GetProperty())
                 {
                     QSBWorldSync.Init<QSBPortableTractorBeamItem, PortableTractorBeamItem>();
                 }
-                if ((bool)ShipEnhancements.ShipEnhancements.Settings.addTether.GetProperty())
+                if ((bool)addTether.GetProperty())
                 {
                     QSBWorldSync.Init<QSBTetherHookItem, TetherHookItem>();
                 }
@@ -116,6 +118,7 @@ public static class QSBInteractionPatches
 {
     public static bool RecoveringAtShip;
 
+    #region Ship Refuel Drain
     [HarmonyPostfix]
     [HarmonyPatch(typeof(ShipRecoveryPoint), "OnGainFocus")]
     public static void DisableRefuelPrompt(ShipRecoveryPoint __instance)
@@ -266,7 +269,9 @@ public static class QSBInteractionPatches
 
         return false;
     }
+    #endregion
 
+    #region Ship Item Placement
     [HarmonyPrefix]
     [HarmonyPatch(typeof(DropItemMessage), "ProcessInputs")]
     public static bool CheckForShipBodyDrop(
@@ -365,4 +370,91 @@ public static class QSBInteractionPatches
 
         return false;
     }
+    #endregion
+
+    #region Ship Damage Multiplier
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipPatches), nameof(ShipPatches.ShipHull_FixedUpdate))]
+    public static bool ApplyHullDamageMultiplier(ShipHull __0)
+    {
+        if ((float)shipDamageMultiplier.GetProperty() == 1 && (float)shipDamageSpeedMultiplier.GetProperty() == 1)
+        {
+            return true;
+        }
+
+        if (__0._dominantImpact != null)
+        {
+            var damage = Mathf.InverseLerp(30f * (float)shipDamageSpeedMultiplier.GetProperty(),
+                200f * (float)shipDamageSpeedMultiplier.GetProperty(), __0._dominantImpact.speed);
+            if (damage > 0f)
+            {
+                var num2 = 0.15f;
+                if (damage < num2 && __0._integrity > 1f - num2)
+                {
+                    damage = num2;
+                }
+
+                damage *= (float)shipDamageMultiplier.GetProperty();
+
+                __0._integrity = Mathf.Max(__0._integrity - damage, 0f);
+                var qsbShipHull = __0.GetWorldObject<QSBShipHull>();
+                if (!__0._damaged)
+                {
+                    __0._damaged = true;
+
+                    //__instance.RaiseEvent(nameof(__instance.OnDamaged), __instance);
+
+                    var eventDelegate1 = (MulticastDelegate)typeof(ShipHull).GetField("OnDamaged", BindingFlags.Instance 
+                        | BindingFlags.NonPublic | BindingFlags.Public).GetValue(__0);
+                    if (eventDelegate1 != null)
+                    {
+                        foreach (var handler in eventDelegate1.GetInvocationList())
+                        {
+                            handler.Method.Invoke(handler.Target, [__0]);
+                        }
+                    }
+
+                    qsbShipHull
+                        .SendMessage(new HullDamagedMessage());
+                }
+
+                if (__0._damageEffect != null)
+                {
+                    __0._damageEffect.SetEffectBlend(1f - __0._integrity);
+                }
+
+                qsbShipHull
+                    .SendMessage(new HullChangeIntegrityMessage(__0._integrity));
+            }
+
+            foreach (var component in __0._components)
+            {
+                if (!(component == null) && !component.isDamaged)
+                {
+                    if (component.ApplyImpact(__0._dominantImpact))
+                    {
+                        break;
+                    }
+                }
+            }
+
+            //__instance.RaiseEvent(nameof(__instance.OnImpact), __instance._dominantImpact, damage);
+
+            var eventDelegate2 = (MulticastDelegate)typeof(ShipHull).GetField("OnImpact", BindingFlags.Instance 
+                | BindingFlags.NonPublic | BindingFlags.Public).GetValue(__0);
+            if (eventDelegate2 != null)
+            {
+                foreach (var handler in eventDelegate2.GetInvocationList())
+                {
+                    handler.Method.Invoke(handler.Target, [__0._dominantImpact, damage]);
+                }
+            }
+
+            __0._dominantImpact = null;
+        }
+
+        __0.enabled = false;
+        return false;
+    }
+    #endregion
 }
