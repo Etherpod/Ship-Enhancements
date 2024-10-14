@@ -457,4 +457,16 @@ public static class QSBInteractionPatches
         return false;
     }
     #endregion
+
+    #region Disable Map Markers
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(PlayerMapMarker), "ShouldBeVisible")]
+    public static void DisablePlayerMapMarker(ref bool __result)
+    {
+        if ((bool)disableMapMarkers.GetProperty())
+        {
+            __result = false;
+        }
+    }
+    #endregion
 }
