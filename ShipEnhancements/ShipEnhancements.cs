@@ -791,7 +791,7 @@ public class ShipEnhancements : ModBehaviour
 
         engineOn = !(bool)Settings.addEngineSwitch.GetProperty();
 
-        if (QSBAPI != null && !QSBAPI.GetIsHost())
+        if (QSBAPI != null && !QSBAPI.GetIsHost() && QSBCompat.NeverInitialized())
         {
             foreach (uint id in PlayerIDs)
             {

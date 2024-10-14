@@ -11,6 +11,7 @@ public class QSBCompatibility
     private List<CockpitSwitch> _activeSwitches = [];
     private ShipEngineSwitch _engineSwitch;
     private List<TetherHookItem> _activeTetherHooks = [];
+    private bool _neverInitialized = true;
 
     [Serializable]
     private struct NoData { }
@@ -48,6 +49,8 @@ public class QSBCompatibility
             return;
         }
 
+        _neverInitialized = true;
+
         SendSettingsData(playerID);
     }
 
@@ -78,6 +81,7 @@ public class QSBCompatibility
 
     public void SendInitializedShip(uint id)
     {
+        _neverInitialized = false;
         _api.SendMessage("ship-initialized", new NoData(), id, false);
         ShipEnhancements.Instance.ModHelper.Events.Unity.RunWhen(
             ShipEnhancements.QSBInteraction.WorldObjectsLoaded, () =>
@@ -156,6 +160,11 @@ public class QSBCompatibility
                 }
             }
         }, 2);
+    }
+
+    public bool NeverInitialized()
+    {
+        return _neverInitialized;
     }
 
     #region Switches
