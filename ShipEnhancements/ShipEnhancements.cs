@@ -579,7 +579,7 @@ public class ShipEnhancements : ModBehaviour
             ShipDirectionalForceVolume shipGravity = SELocator.GetShipBody().GetComponentInChildren<ShipDirectionalForceVolume>();
             shipGravity._fieldMagnitude *= (float)Settings.gravityMultiplier.GetProperty();
         }
-        if ((bool)Settings.enableAutoHatch.GetProperty())
+        if ((bool)Settings.enableAutoHatch.GetProperty() && !InMultiplayer)
         {
             GlobalMessenger.AddListener("EnterShip", OnEnterShip);
             GlobalMessenger.AddListener("ExitShip", OnExitShip);
