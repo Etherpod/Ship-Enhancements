@@ -29,7 +29,7 @@ public static class ShipNotifications
     private static bool _hullTemperatureHigh = false;
     private static bool _hullTemperatureCritical = false;
 
-    private static bool _startOxygenRefill = false;
+    private static bool _refillingShipOxygen = false;
     private static float _lastShipOxygen;
     private static float _lastShipFuel;
 
@@ -43,8 +43,8 @@ public static class ShipNotifications
         _hullIntegrityCritical = false;
         _hullTemperatureHigh = false;
         _hullTemperatureCritical = false;
-        _startOxygenRefill = false;
-        _lastShipOxygen = SELocator.GetShipResources()._currentOxygen;
+        _refillingShipOxygen = false;
+        _lastShipOxygen = SELocator.GetShipResources().GetFractionalOxygen();
         _lastShipFuel = SELocator.GetShipResources()._currentFuel;
     }
 
@@ -52,19 +52,19 @@ public static class ShipNotifications
     {
         if ((bool)shipOxygenRefill.GetProperty())
         {
-            if (!_startOxygenRefill && SELocator.GetShipResources()._currentOxygen > _lastShipOxygen)
+            if (!_refillingShipOxygen && ShipEnhancements.Instance.IsShipInOxygen())
             {
-                _startOxygenRefill = true;
+                _refillingShipOxygen = true;
                 NotificationManager.SharedInstance.PostNotification(_oxygenRefillingNotification, false);
             }
-            else if (_startOxygenRefill && SELocator.GetShipResources()._currentOxygen < _lastShipOxygen 
-                && SELocator.GetShipResources()._currentOxygen / SELocator.GetShipResources()._maxOxygen < 0.99f)
+            else if (_refillingShipOxygen && !ShipEnhancements.Instance.IsShipInOxygen() 
+                && SELocator.GetShipResources().GetFractionalOxygen() < 0.99f)
             {
-                _startOxygenRefill = false;
+                _refillingShipOxygen = false;
             }
         }
 
-        if (SELocator.GetShipResources()._currentOxygen < _lastShipOxygen)
+        if (SELocator.GetShipResources().GetFractionalOxygen() < _lastShipOxygen)
         {
             if (!_oxygenCritical && SELocator.GetShipResources().GetFractionalOxygen() < 0.15f)
             {
@@ -168,7 +168,7 @@ public static class ShipNotifications
             }
         }
 
-        _lastShipOxygen = SELocator.GetShipResources()._currentOxygen;
+        _lastShipOxygen = SELocator.GetShipResources().GetFractionalOxygen();
         _lastShipFuel = SELocator.GetShipResources()._currentFuel;
     }
 
