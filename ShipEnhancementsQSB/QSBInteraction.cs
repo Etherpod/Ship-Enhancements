@@ -104,6 +104,11 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
     {
         return hookID.GetWorldObject<QSBTetherHookItem>().AttachedObject;
     }
+
+    public bool WorldObjectsLoaded()
+    {
+        return QSBWorldSync.AllObjectsReady;
+    }
 }
 
 [HarmonyPatch]

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,6 +10,7 @@ public class QSBCompatibility
     private readonly IQSBAPI _api;
     private List<CockpitSwitch> _activeSwitches = [];
     private ShipEngineSwitch _engineSwitch;
+    private List<TetherHookItem> _activeTetherHooks = [];
 
     [Serializable]
     private struct NoData { }
@@ -20,6 +22,7 @@ public class QSBCompatibility
         _api.RegisterHandler<(string, object)>("settings-data", ReceiveSettingsData);
         _api.RegisterHandler<(string, bool)>("switch-state", ReceiveSwitchState);
         _api.RegisterHandler<NoData>("ship-initialized", ReceiveInitializedShip);
+        _api.RegisterHandler<NoData>("world-objects-ready", ReceiveWorldObjectsInitialized);
         _api.RegisterHandler<bool>("engine-switch-state", ReceiveEngineSwitchState);
         _api.RegisterHandler<bool>("initialize-engine-switch", InitializeEngineSwitch);
         _api.RegisterHandler<(float, bool)>("ship-oxygen-drain", ReceiveShipOxygenDrain);
@@ -48,6 +51,7 @@ public class QSBCompatibility
         SendSettingsData(playerID);
     }
 
+    #region Settings
     public void SendSettingsData(uint id)
     {
         var allSettings = Enum.GetValues(typeof(ShipEnhancements.Settings)) as ShipEnhancements.Settings[];
@@ -70,10 +74,16 @@ public class QSBCompatibility
         }
         ShipEnhancements.WriteDebugMessage($"Setting {data.Item1} not found", error: true);
     }
+    #endregion
 
     public void SendInitializedShip(uint id)
     {
         _api.SendMessage("ship-initialized", new NoData(), id, false);
+        ShipEnhancements.Instance.ModHelper.Events.Unity.RunWhen(
+            ShipEnhancements.QSBInteraction.WorldObjectsLoaded, () =>
+            {
+                _api.SendMessage("world-objects-ready", new NoData(), id, false);
+            });
     }
 
     private void ReceiveInitializedShip(uint id, NoData noData)
@@ -112,11 +122,43 @@ public class QSBCompatibility
                     }
                 }
             }
-            ShipEnhancements.WriteDebugMessage("sending. unpacked: " + unpacked + ", lit: " + lit);
             SendCampfireInitialState(id, dropped, unpacked, lit);
         }
     }
 
+    private void ReceiveWorldObjectsInitialized(uint joiningID, NoData noData)
+    {
+        ShipEnhancements.Instance.ModHelper.Events.Unity.FireInNUpdates(() =>
+        {
+            foreach (var hook in _activeTetherHooks)
+            {
+                var tether = hook.GetTether();
+                if (tether.IsTethered())
+                {
+                    if (tether.GetConnectedBody() == Locator.GetPlayerBody())
+                    {
+                        SendAttachTether(joiningID, hook);
+                    }
+                }
+            }
+
+            if (!_api.GetIsHost())
+            {
+                return;
+            }
+
+            foreach (var hook in _activeTetherHooks)
+            {
+                ShipEnhancements.WriteDebugMessage("same: " + (hook.GetTether() == hook.GetActiveTether()));
+                if (hook.GetTether() != hook.GetActiveTether())
+                {
+                    SendTransferTether(joiningID, hook, hook.GetActiveTether().GetHook());
+                }
+            }
+        }, 2);
+    }
+
+    #region Switches
     public void AddActiveSwitch(CockpitSwitch switchToAdd)
     {
         _activeSwitches.Add(switchToAdd);
@@ -124,7 +166,10 @@ public class QSBCompatibility
 
     public void RemoveActiveSwitch(CockpitSwitch switchToRemove)
     {
-        _activeSwitches.Remove(switchToRemove);
+        if (_activeSwitches.Contains(switchToRemove))
+        {
+            _activeSwitches.Remove(switchToRemove);
+        }
     }
 
     public void SendSwitchState(uint id, (string, bool) data)
@@ -138,14 +183,16 @@ public class QSBCompatibility
         {
             if (cockpitSwitch.GetType().Name == data.Item1)
             {
-                if (cockpitSwitch.transform != null)
+                if (cockpitSwitch.GetComponent<Transform>() != null)
                 {
                     cockpitSwitch.ChangeSwitchState(data.Item2);
                 }
             }
         }
     }
+    #endregion
 
+    #region Engine Switch
     public void SetEngineSwitch(ShipEngineSwitch engineSwitch)
     {
         _engineSwitch = engineSwitch;
@@ -170,7 +217,9 @@ public class QSBCompatibility
     {
         _engineSwitch.InitializeEngineSwitch(completedIgnition);
     }
+    #endregion
 
+    #region Resource Sync
     public void SendShipOxygenDrain(uint id, float drainAmount, bool applyMultipliers)
     {
         _api.SendMessage("ship-oxygen-drain", (drainAmount, applyMultipliers), id, false);
@@ -242,7 +291,9 @@ public class QSBCompatibility
     {
         SELocator.GetShipResources()?.SetFuel(newValue);
     }
+    #endregion
 
+    #region Button Panel
     public void SendPanelExtended(uint id, bool extended)
     {
         _api.SendMessage("panel-state", extended, id, false);
@@ -252,7 +303,9 @@ public class QSBCompatibility
     {
         SELocator.GetButtonPanel()?.UpdateExtended(extended);
     }
+    #endregion
 
+    #region Thrust Modulator
     public void SendModulatorButtonState(uint id, int level, bool pressed)
     {
         _api.SendMessage("modulator-button-state", (level, pressed), id, false);
@@ -310,7 +363,9 @@ public class QSBCompatibility
             button.ReleaseButton();
         }
     }
+    #endregion
 
+    #region Portable Campfire
     public void SendCampfireReactorDelay(uint id, float delay)
     {
         _api.SendMessage("campfire-reactor-delay", delay, id, false);
@@ -339,24 +394,22 @@ public class QSBCompatibility
     private void ReceiveCampfireInitialState(uint id, (bool, bool, bool) data)
     {
         PortableCampfireItem item = SELocator.GetPortableCampfire().GetComponentInParent<PortableCampfireItem>();
-        ShipEnhancements.WriteDebugMessage("check dropped");
         if (!item.IsDropped()) return;
 
-        ShipEnhancements.WriteDebugMessage("dropped");
         if (data.Item1)
         {
-            ShipEnhancements.WriteDebugMessage("unpack");
             item.TogglePackUp(false);
 
             if (data.Item2)
             {
-                ShipEnhancements.WriteDebugMessage("Receive state");
                 SELocator.GetPortableCampfire().SetInitialState(Campfire.State.LIT);
                 SELocator.GetPortableCampfire().SetState(Campfire.State.LIT);
             }
         }
     }
+    #endregion
 
+    #region Temperature
     public void SendShipHullTemp(uint id, float temperature)
     {
         _api.SendMessage("ship-temp-meter", temperature, id, false);
@@ -366,7 +419,9 @@ public class QSBCompatibility
     {
         SELocator.GetShipTemperatureDetector()?.SetShipTempMeter(temperature);
     }
+    #endregion
 
+    #region Tether
     public void SendAttachTether(uint id, TetherHookItem hook)
     {
         _api.SendMessage("attach-tether", ShipEnhancements.QSBInteraction.GetIDFromTetherHook(hook), id, false);
@@ -374,6 +429,7 @@ public class QSBCompatibility
 
     private void ReceiveAttachTether(uint id, int hookID)
     {
+        if (!ShipEnhancements.QSBInteraction.WorldObjectsLoaded()) return;
         ShipEnhancements.QSBInteraction.GetTetherHookFromID(hookID).OnConnectTetherRemote(id);
     }
 
@@ -384,6 +440,7 @@ public class QSBCompatibility
 
     private void ReceiveDisconnectTether(uint id, int hookID)
     {
+        if (!ShipEnhancements.QSBInteraction.WorldObjectsLoaded()) return;
         ShipEnhancements.QSBInteraction.GetTetherHookFromID(hookID).OnDisconnectTetherRemote();
     }
 
@@ -396,7 +453,22 @@ public class QSBCompatibility
 
     private void ReceiveTransferTether(uint id, (int newID, int lastID) data)
     {
+        if (!ShipEnhancements.QSBInteraction.WorldObjectsLoaded()) return;
         Tether newTether = ShipEnhancements.QSBInteraction.GetTetherHookFromID(data.lastID).GetTether();
         ShipEnhancements.QSBInteraction.GetTetherHookFromID(data.newID).OnTransferRemote(newTether);
     }
+
+    public void AddTetherHook(TetherHookItem hook)
+    {
+        _activeTetherHooks.Add(hook);
+    }
+
+    public void RemoveTetherHook(TetherHookItem hook)
+    {
+        if (_activeTetherHooks.Contains(hook))
+        {
+            _activeTetherHooks.Remove(hook);
+        }
+    }
+    #endregion
 }

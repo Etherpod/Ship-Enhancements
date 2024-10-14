@@ -30,6 +30,12 @@ public class Tether : MonoBehaviour
 
     private void Update()
     {
+        if (_remoteTether && _connectedTransform == null)
+        {
+            DisconnectTether();
+            return;
+        }
+
         if (_joint || _remoteTether || _tetheredToSelf)
         {
             UpdateTetherLine();
@@ -128,6 +134,7 @@ public class Tether : MonoBehaviour
         foreach (RaycastHit hit in hits)
         {
             Rigidbody rb = hit.collider.attachedRigidbody;
+            ShipEnhancements.WriteDebugMessage("hit: " + rb.gameObject.name);
             if (!(rb.isKinematic || rb == GetComponentInParent<Rigidbody>() || rb == SELocator.GetPlayerBody().GetRigidbody()))
             {
                 intersectingBody = true;
@@ -187,9 +194,15 @@ public class Tether : MonoBehaviour
 
     public void TransferTether(OWRigidbody newBody, Vector3 offset, TetherHookItem hook)
     {
-        if (!_tethered) return;
+        if (_tethered)
+        {
+            DisconnectTether();
+        }
+        else
+        {
+            _anchor = _hook.GetAttachPointOffset();
+        }
 
-        DisconnectTether();
         CreateTether(newBody, _anchor, offset);
         _connectedHook = hook;
         _hook.TransferToHook();
@@ -308,5 +321,10 @@ public class Tether : MonoBehaviour
     public TetherHookItem GetHook()
     {
         return _hook;
+    }
+
+    public OWRigidbody GetConnectedBody()
+    {
+        return _connectedRigidbody;
     }
 }

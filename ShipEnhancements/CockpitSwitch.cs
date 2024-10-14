@@ -42,6 +42,7 @@ public abstract class CockpitSwitch : ElectricalComponent
 
         if (ShipEnhancements.InMultiplayer && _enabledInShip)
         {
+            ShipEnhancements.WriteDebugMessage("Add switch");
             ShipEnhancements.QSBCompat.AddActiveSwitch(this);
         }
     }
