@@ -44,7 +44,7 @@ public class CockpitButtonPanel : MonoBehaviour
     private bool _completedSlide = false;
     private float _buttonPanelT = 0f;
     private float _extensionTime = 0.4f;
-    private int _focusedButtons;
+    private int _focusedButtons = 0;
     private InteractZone _cockpitInteractVolume;
 
     private void Start()
@@ -227,9 +227,8 @@ public class CockpitButtonPanel : MonoBehaviour
         }
         else if (!PlayerState.AtFlightConsole())
         {
-            if (ShipEnhancements.QSBInteraction == null || !ShipEnhancements.QSBInteraction.FlightConsoleOccupied())
+            if (!ShipEnhancements.InMultiplayer || !ShipEnhancements.QSBInteraction.FlightConsoleOccupied())
             {
-                ShipEnhancements.WriteDebugMessage("Enable");
                 _cockpitInteractVolume.EnableInteraction();
             }
         }

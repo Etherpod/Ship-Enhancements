@@ -192,10 +192,7 @@ public class QSBCompatibility
         {
             if (cockpitSwitch.GetType().Name == data.Item1)
             {
-                if (cockpitSwitch.GetComponent<Transform>() != null)
-                {
-                    cockpitSwitch.ChangeSwitchState(data.Item2);
-                }
+                cockpitSwitch.ChangeSwitchState(data.Item2);
             }
         }
     }

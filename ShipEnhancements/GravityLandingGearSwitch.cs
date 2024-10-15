@@ -9,11 +9,6 @@ public class GravityLandingGearSwitch : CockpitSwitch
         _enabledInShip = (bool)enableGravityLandingGear.GetProperty();
         base.Awake();
         _buttonPanel.SetGravityLandingGearActive((bool)enableGravityLandingGear.GetProperty());
-
-        if (ShipEnhancements.InMultiplayer)
-        {
-            ShipEnhancements.QSBCompat.AddActiveSwitch(this);
-        }
     }
 
     protected override void OnFlipSwitch(bool state)

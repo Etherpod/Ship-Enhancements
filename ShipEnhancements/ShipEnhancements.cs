@@ -477,13 +477,6 @@ public class ShipEnhancements : ModBehaviour
         {
             DisableGravityCrystal();
         }
-        if ((bool)Settings.disableEjectButton.GetProperty())
-        {
-            SELocator.GetShipBody().GetComponentInChildren<ShipEjectionSystem>().GetComponent<InteractReceiver>().DisableInteraction();
-            GameObject ejectButtonTape = LoadPrefab("Assets/ShipEnhancements/EjectButtonTape.prefab");
-            AssetBundleUtilities.ReplaceShaders(ejectButtonTape);
-            Instantiate(ejectButtonTape, SELocator.GetShipBody().transform.Find("Module_Cockpit/Geo_Cockpit"));
-        }
         if ((bool)Settings.disableHeadlights.GetProperty())
         {
             DisableHeadlights();
@@ -815,6 +808,13 @@ public class ShipEnhancements : ModBehaviour
                 {
                     SELocator.GetShipBody().GetComponentInChildren<PlayerRecoveryPoint>().gameObject.AddComponent<ShipRefuelDrain>();
                 }
+            }
+            if ((bool)Settings.disableEjectButton.GetProperty())
+            {
+                SELocator.GetShipBody().GetComponentInChildren<ShipEjectionSystem>().GetComponent<InteractReceiver>().DisableInteraction();
+                GameObject ejectButtonTape = LoadPrefab("Assets/ShipEnhancements/EjectButtonTape.prefab");
+                AssetBundleUtilities.ReplaceShaders(ejectButtonTape);
+                Instantiate(ejectButtonTape, SELocator.GetShipBody().transform.Find("Module_Cockpit/Geo_Cockpit"));
             }
         });
     }
