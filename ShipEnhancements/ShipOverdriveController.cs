@@ -132,6 +132,7 @@ public class ShipOverdriveController : ElectricalComponent
             if (!_wasInFreeLook && !_charging)
             {
                 StopAllCoroutines();
+                _onResetTimer = false;
                 _primeButton.SetButtonOn(false);
                 _activateButton.SetButtonActive(false);
 
@@ -139,6 +140,7 @@ public class ShipOverdriveController : ElectricalComponent
                 {
                     foreach (uint id in ShipEnhancements.PlayerIDs)
                     {
+                        ShipEnhancements.QSBCompat.SendStopOverdriveCoroutines(id);
                         ShipEnhancements.QSBCompat.SendOverdriveButtonState(id, true, false, true);
                         ShipEnhancements.QSBCompat.SendOverdriveButtonState(id, false, false, true);
                     }

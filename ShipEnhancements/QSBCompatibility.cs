@@ -33,6 +33,7 @@ public class QSBCompatibility
         _api.RegisterHandler<bool>("panel-state", ReceivePanelExtended);
         _api.RegisterHandler<(int, bool)>("modulator-button-state", ReceiveModulatorButtonState);
         _api.RegisterHandler<(bool, bool, bool)>("overdrive-button-state", ReceiveOverdriveButtonState);
+        _api.RegisterHandler<NoData>("overdrive-stop-coroutines", ReceiveStopOverdriveCoroutines);
         _api.RegisterHandler<float>("campfire-reactor-delay", ReceiveCampfireReactorDelay);
         _api.RegisterHandler<NoData>("campfire-extinguished", ReceiveCampfireExtinguished);
         _api.RegisterHandler<(bool, bool, bool)>("campfire-initial-state", ReceiveCampfireInitialState);
@@ -368,6 +369,16 @@ public class QSBCompatibility
         {
             button.ReleaseButton();
         }
+    }
+
+    public void SendStopOverdriveCoroutines(uint id)
+    {
+        _api.SendMessage("overdrive-stop-coroutines", new NoData(), id, false);
+    }
+
+    private void ReceiveStopOverdriveCoroutines(uint id, NoData noData)
+    {
+        SELocator.GetShipOverdriveController()?.StopAllCoroutines();
     }
     #endregion
 
