@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace ShipEnhancements;
 
@@ -41,6 +39,7 @@ public class QSBCompatibility
         _api.RegisterHandler<int>("attach-tether", ReceiveAttachTether);
         _api.RegisterHandler<int>("disconnect-tether", ReceiveDisconnectTether);
         _api.RegisterHandler<(int, int)>("transfer-tether", ReceiveTransferTether);
+        _api.RegisterHandler<NoData>("ship-fuel-max", ReceiveShipFuelMax);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -297,6 +296,16 @@ public class QSBCompatibility
     private void ReceiveShipFuelValue(uint id, float newValue)
     {
         SELocator.GetShipResources()?.SetFuel(newValue);
+    }
+
+    public void SendShipFuelMax(uint id)
+    {
+        _api.SendMessage("ship-fuel-max", new NoData(), id, false);
+    }
+
+    private void ReceiveShipFuelMax(uint id, NoData noData)
+    {
+        SELocator.GetShipTransform().GetComponentInChildren<ShipFuelTransfer>()?.UpdateInteractable();
     }
     #endregion
 
