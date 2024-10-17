@@ -90,6 +90,12 @@
       "value": false,
       "tooltip": "Removes the seatbelt in your ship that keeps you from killing yourself. If you crash into something too quickly you'll fly out of your chair."
     },
+    "disableShipSuit": {
+      "title": "Disable Ship Suit",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Removes the suit from the ship. How long can you hold your breath in space?"
+    },
     "disableAirAutoRoll": {
       "title": "Disable Air Auto Roll",
       "type": "toggle",

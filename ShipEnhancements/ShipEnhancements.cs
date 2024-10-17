@@ -142,6 +142,7 @@ public class ShipEnhancements : ModBehaviour
         thrusterColor,
         disableSeatbelt,
         addPortableTractorBeam,
+        disableShipSuit,
     }
 
     private void Awake()
@@ -815,6 +816,19 @@ public class ShipEnhancements : ModBehaviour
                 GameObject ejectButtonTape = LoadPrefab("Assets/ShipEnhancements/EjectButtonTape.prefab");
                 AssetBundleUtilities.ReplaceShaders(ejectButtonTape);
                 Instantiate(ejectButtonTape, SELocator.GetShipBody().transform.Find("Module_Cockpit/Geo_Cockpit"));
+            }
+            if ((bool)Settings.disableShipSuit.GetProperty())
+            {
+                SuitPickupVolume pickupVolume = SELocator.GetShipTransform().GetComponentInChildren<SuitPickupVolume>();
+                pickupVolume._containsSuit = false;
+                pickupVolume._allowSuitReturn = false;
+                pickupVolume._interactVolume.EnableSingleInteraction(false, pickupVolume._pickupSuitCommandIndex);
+                pickupVolume._suitGeometry.SetActive(false);
+                pickupVolume._suitOWCollider.SetActivation(false);
+                foreach (GameObject tool in pickupVolume._toolGeometry)
+                {
+                    tool.SetActive(false);
+                }
             }
         });
     }

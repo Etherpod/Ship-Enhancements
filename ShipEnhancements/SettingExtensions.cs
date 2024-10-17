@@ -74,6 +74,7 @@ public static class SettingExtensions
         { Settings.thrusterColor, ("Default", "Default") },
         { Settings.disableSeatbelt, (false, false) },
         { Settings.addPortableTractorBeam, (false, false) },
+        { Settings.disableShipSuit, (false, false) },
     };
 
     public static string GetName(this Settings setting)
