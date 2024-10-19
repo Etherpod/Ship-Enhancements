@@ -18,6 +18,7 @@ using QSB.ItemSync;
 using QSB.ItemSync.WorldObjects.Items;
 using QSB.ShipSync.Patches;
 using static ShipEnhancements.ShipEnhancements.Settings;
+using QSB.Tools.ProbeLauncherTool.Patches;
 
 namespace ShipEnhancementsQSB;
 
@@ -467,6 +468,15 @@ public static class QSBInteractionPatches
         {
             __result = false;
         }
+    }
+    #endregion
+
+    #region Scout
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(LauncherPatches), nameof(LauncherPatches.ProbeLauncher_RetrieveProbe))]
+    public static bool CancelRetrieveProbe(ProbeLauncher __0, bool forcedRetrieval)
+    {
+        return PatchClass.CanRetrieveProbe(__0, forcedRetrieval);
     }
     #endregion
 }

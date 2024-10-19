@@ -554,9 +554,6 @@ public class ShipEnhancements : ModBehaviour
                 GameObject sun = GameObject.Find("Sun_Body");
                 if (sun != null)
                 {
-                    //GameObject sunTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Sun.prefab");
-                    //Instantiate(sunTempZone, sun.transform.Find("Sector_SUN/Volumes_SUN"));
-
                     GameObject sunTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Sun.prefab");
                     Instantiate(sunTempZone, sun.transform.Find("Sector_SUN/Volumes_SUN"));
                     GameObject supernovaTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Supernova.prefab");

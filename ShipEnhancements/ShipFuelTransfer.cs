@@ -41,17 +41,17 @@ public class ShipFuelTransfer : MonoBehaviour
         if (_shipFuelFull && !IsShipFuelFull())
         {
             _shipFuelFull = false;
-            if (!_jetpackFuelDepleted)
+            if (!_jetpackFuelDepleted && (!_fuelTankComponent.isDamaged || (bool)disableShipRepair.GetProperty()))
             {
                 _interactReceiver.EnableInteraction();
             }
         }
 
-        if (_jetpackFuelDepleted)
+        if (_jetpackFuelDepleted && SELocator.GetPlayerResources()._currentFuel > 0)
         {
-            if (SELocator.GetPlayerResources()._currentFuel > 0)
+            _jetpackFuelDepleted = false;
+            if (!_fuelTankComponent.isDamaged || (bool)disableShipRepair.GetProperty())
             {
-                _jetpackFuelDepleted = false;
                 _interactReceiver.EnableInteraction();
             }
         }

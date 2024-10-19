@@ -1078,6 +1078,16 @@ public static class PatchClass
     [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.RetrieveProbe))]
     public static bool DisableProbeRetrieve(ProbeLauncher __instance, bool forcedRetrieval)
     {
+        if (ShipEnhancements.InMultiplayer)
+        {
+            return true;
+        }
+
+        return CanRetrieveProbe(__instance, forcedRetrieval);
+    }
+
+    public static bool CanRetrieveProbe(ProbeLauncher __instance, bool forcedRetrieval)
+    {
         bool manualScoutRecall = (bool)enableManualScoutRecall.GetProperty();
         bool scoutLauncherComponent = (bool)enableScoutLauncherComponent.GetProperty();
         bool recallDisabled = (bool)disableScoutRecall.GetProperty();
