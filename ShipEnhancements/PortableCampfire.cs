@@ -28,8 +28,8 @@ public class PortableCampfire : Campfire
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
 
         _cancelPrompt = new ScreenPrompt(InputLibrary.cancel, "Pack up", 0, ScreenPrompt.DisplayState.Normal, false);
-        _reactorHeatMeter = 0f;
         _reactorHeatMeterLength = Random.Range(10f, 30f);
+        _reactorHeatMeter = _reactorHeatMeterLength;
     }
 
     public void UpdateCampfire()
@@ -39,27 +39,24 @@ public class PortableCampfire : Campfire
             float oxygenDrain = 10f * Time.deltaTime;
             SELocator.GetShipResources().DrainOxygen(oxygenDrain);
 
-            if (_reactorHeatMeter > 0)
+            if (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost())
             {
-                _reactorHeatMeter -= Time.deltaTime;
-                if (_reactorHeatMeter <= 0)
+                if (_reactorHeatMeter > 0)
                 {
-                    if (ShipEnhancements.InMultiplayer && ShipEnhancements.QSBAPI.GetIsHost())
-                    {
-                        _reactorHeatMeter = _reactorHeatMeterLength;
-                        _reactorHeatMeterLength = Random.Range(10f, 30f);
-                        SELocator.GetShipBody().GetComponentInChildren<ShipReactorComponent>().SetDamaged(true);
+                    _reactorHeatMeter -= Time.deltaTime;
+                }
+                else
+                {
+                    _reactorHeatMeter = _reactorHeatMeterLength;
+                    _reactorHeatMeterLength = Random.Range(10f, 30f);
+                    SELocator.GetShipBody().GetComponentInChildren<ShipReactorComponent>().SetDamaged(true);
 
+                    if (ShipEnhancements.InMultiplayer)
+                    {
                         foreach (uint id in ShipEnhancements.PlayerIDs)
                         {
-                            ShipEnhancements.QSBCompat.SendCampfireReactorDelay(id, _reactorHeatMeterLength);
+                            ShipEnhancements.QSBCompat.SendCampfireReactorDamaged(id);
                         }
-                    }
-                    else if (!ShipEnhancements.InMultiplayer)
-                    {
-                        _reactorHeatMeter = _reactorHeatMeterLength;
-                        _reactorHeatMeterLength = Random.Range(10f, 30f);
-                        SELocator.GetShipBody().GetComponentInChildren<ShipReactorComponent>().SetDamaged(true);
                     }
 
                     if (!SEAchievementTracker.FireHazard && ShipEnhancements.AchievementsAPI != null)
@@ -128,16 +125,8 @@ public class PortableCampfire : Campfire
         _insideShip = insideShip;
         if (!insideShip && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
         {
-            _reactorHeatMeter = 0f;
             _reactorHeatMeterLength = Random.Range(10f, 30f);
-
-            if (ShipEnhancements.InMultiplayer)
-            {
-                foreach (uint id in ShipEnhancements.PlayerIDs)
-                {
-                    ShipEnhancements.QSBCompat.SendCampfireReactorDelay(id, _reactorHeatMeterLength);
-                }
-            }
+            _reactorHeatMeter = _reactorHeatMeterLength;
         }
     }
 
@@ -151,6 +140,15 @@ public class PortableCampfire : Campfire
         else
         {
             SetState(State.UNLIT);
+        }
+    }
+
+    public void OnRemoteReactorDamaged()
+    {
+        if (!SEAchievementTracker.FireHazard && ShipEnhancements.AchievementsAPI != null)
+        {
+            SEAchievementTracker.FireHazard = true;
+            ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.FIRE_HAZARD");
         }
     }
 
@@ -182,12 +180,6 @@ public class PortableCampfire : Campfire
     public void SetPromptVisibility(bool value)
     {
         _cancelPrompt.SetVisibility(value);
-    }
-
-    public void SetReactorDamageDelay(float delay)
-    {
-        _reactorHeatMeterLength = delay;
-        _reactorHeatMeter = _reactorHeatMeterLength;
     }
 
     private void OnShipSystemFailure()

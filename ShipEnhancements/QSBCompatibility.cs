@@ -32,7 +32,7 @@ public class QSBCompatibility
         _api.RegisterHandler<(int, bool)>("modulator-button-state", ReceiveModulatorButtonState);
         _api.RegisterHandler<(bool, bool, bool)>("overdrive-button-state", ReceiveOverdriveButtonState);
         _api.RegisterHandler<NoData>("overdrive-stop-coroutines", ReceiveStopOverdriveCoroutines);
-        _api.RegisterHandler<float>("campfire-reactor-delay", ReceiveCampfireReactorDelay);
+        _api.RegisterHandler<NoData>("campfire-reactor-damage", ReceiveCampfireReactorDamaged);
         _api.RegisterHandler<NoData>("campfire-extinguished", ReceiveCampfireExtinguished);
         _api.RegisterHandler<(bool, bool, bool)>("campfire-initial-state", ReceiveCampfireInitialState);
         _api.RegisterHandler<float>("ship-temp-meter", ReceiveShipHullTemp);
@@ -392,14 +392,14 @@ public class QSBCompatibility
     #endregion
 
     #region Portable Campfire
-    public void SendCampfireReactorDelay(uint id, float delay)
+    public void SendCampfireReactorDamaged(uint id)
     {
-        _api.SendMessage("campfire-reactor-delay", delay, id, false);
+        _api.SendMessage("campfire-reactor-delay", new NoData(), id, false);
     }
 
-    private void ReceiveCampfireReactorDelay(uint id, float delay)
+    private void ReceiveCampfireReactorDamaged(uint id, NoData noData)
     {
-        SELocator.GetPortableCampfire().SetReactorDamageDelay(delay);
+        SELocator.GetPortableCampfire()?.OnRemoteReactorDamaged();
     }
 
     public void SendCampfireExtinguishState(uint id)
