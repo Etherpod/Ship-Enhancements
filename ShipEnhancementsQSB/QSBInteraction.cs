@@ -19,6 +19,7 @@ using QSB.ItemSync.WorldObjects.Items;
 using QSB.ShipSync.Patches;
 using static ShipEnhancements.ShipEnhancements.Settings;
 using QSB.Tools.ProbeLauncherTool.Patches;
+using QSB.ShipSync.Messages;
 
 namespace ShipEnhancementsQSB;
 
@@ -112,14 +113,19 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
     {
         return QSBWorldSync.AllObjectsReady;
     }
+
+    public void OnDetachAllPlayers(Vector3 velocity)
+    {
+        QSBInteractionPatches.NextImpactVelocity = velocity;
+    }
 }
 
 [HarmonyPatch]
 public static class QSBInteractionPatches
 {
+    #region Ship Refuel Drain
     public static bool RecoveringAtShip;
 
-    #region Ship Refuel Drain
     [HarmonyPostfix]
     [HarmonyPatch(typeof(ShipRecoveryPoint), "OnGainFocus")]
     public static void DisableRefuelPrompt(ShipRecoveryPoint __instance)
@@ -477,6 +483,61 @@ public static class QSBInteractionPatches
     public static bool CancelRetrieveProbe(ProbeLauncher __0, bool forcedRetrieval)
     {
         return PatchClass.CanRetrieveProbe(__0, forcedRetrieval);
+    }
+    #endregion
+
+    #region DisableSeatbelt
+    public static Vector3 NextImpactVelocity;
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipCustomAttach), "Update")]
+    public static void UnbuckleAllPlayers(PlayerAttachPoint ____playerAttachPoint)
+    {
+        if (NextImpactVelocity != Vector3.zero)
+        {
+            if (____playerAttachPoint.enabled)
+            {
+                ____playerAttachPoint.DetachPlayer();
+                SELocator.GetPlayerBody().AddForce(NextImpactVelocity);
+            }
+
+            NextImpactVelocity = Vector3.zero;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(FlyShipMessage), nameof(FlyShipMessage.OnReceiveRemote))]
+    public static bool RemoveBuckleAudio(FlyShipMessage __instance)
+    {
+        if (!(bool)disableSeatbelt.GetProperty())
+        {
+            return true;
+        }
+
+        //__instance.SetCurrentFlyer(__instance.From, __instance.Data);
+
+        typeof(FlyShipMessage).GetMethod("SetCurrentFlyer", BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic)
+            .Invoke(__instance, [__instance.From, __instance.Data]);
+
+        var shipCockpitController = ShipManager.Instance.CockpitController;
+
+        if (shipCockpitController == null)
+        {
+            return false;
+        }
+
+        if (__instance.Data)
+        {
+            //QSBPlayerManager.GetPlayer(__instance.From)?.AudioController?.PlayOneShot(AudioType.ShipCockpitBuckleUp);
+            shipCockpitController._interactVolume?.DisableInteraction();
+        }
+        else
+        {
+            //QSBPlayerManager.GetPlayer(__instance.From)?.AudioController?.PlayOneShot(AudioType.ShipCockpitUnbuckle);
+            shipCockpitController._interactVolume?.EnableInteraction();
+        }
+
+        return false;
     }
     #endregion
 }

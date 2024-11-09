@@ -44,6 +44,7 @@ public class QSBCompatibility
         _api.RegisterHandler<(int, float, float)>("rust-state", ReceiveInitialRustState);
         _api.RegisterHandler<(float, float, float)>("initial-dirt-state", ReceiveInitialDirtState);
         _api.RegisterHandler<float>("dirt-state", ReceiveDirtState);
+        _api.RegisterHandler<(float, float, float)>("detach-all-players", ReceiveDetachAllPlayers);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -542,5 +543,17 @@ public class QSBCompatibility
         SELocator.GetCockpitFilthController()?.UpdateDirtState(progression);
     }
 
+    #endregion
+
+    #region DisableSeatbelt
+    public void SendDetachAllPlayers(uint id, Vector3 velocity)
+    {
+        _api.SendMessage("detach-all-players", (velocity.x, velocity.y, velocity.z), id, false);
+    }
+
+    private void ReceiveDetachAllPlayers(uint id, (float x, float y, float z) velocity)
+    {
+        ShipEnhancements.QSBInteraction.OnDetachAllPlayers(new Vector3(velocity.x, velocity.y, velocity.z));
+    }
     #endregion
 }

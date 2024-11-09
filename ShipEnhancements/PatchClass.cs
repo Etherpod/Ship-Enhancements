@@ -10,8 +10,6 @@ namespace ShipEnhancements;
 [HarmonyPatch]
 public static class PatchClass
 {
-    public static float baseRoastingStickMaxZ = 0f;
-
     #region DisableHeadlights
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.UpdateShipLightInput))]
@@ -1608,6 +1606,8 @@ public static class PatchClass
     #endregion
 
     #region PortableCampfire
+    public static float baseRoastingStickMaxZ = 0f;
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.Update))]
     public static void SetExtinguishPromptVisibility(Campfire __instance)
@@ -2270,6 +2270,14 @@ public static class PatchClass
             ShipCockpitController cockpit = SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitController>();
             cockpit.ExitFlightConsole();
             cockpit._exitFlightConsoleTime -= 0.2f;
+
+            if (ShipEnhancements.InMultiplayer)
+            {
+                foreach (uint id in ShipEnhancements.PlayerIDs)
+                {
+                    ShipEnhancements.QSBCompat.SendDetachAllPlayers(id, _lastImpactVelocity);
+                }
+            }
         }
         if (ShipEnhancements.AchievementsAPI != null)
         {
@@ -2298,6 +2306,14 @@ public static class PatchClass
                 ShipCockpitController cockpit = SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitController>();
                 cockpit.ExitFlightConsole();
                 cockpit._exitFlightConsoleTime -= 0.2f;
+
+                if (ShipEnhancements.InMultiplayer)
+                {
+                    foreach (uint id in ShipEnhancements.PlayerIDs)
+                    {
+                        ShipEnhancements.QSBCompat.SendDetachAllPlayers(id, _lastImpactVelocity);
+                    }
+                }
             }
         }
     }
