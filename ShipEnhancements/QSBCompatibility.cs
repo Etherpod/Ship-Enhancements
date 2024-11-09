@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace ShipEnhancements;
 
@@ -40,6 +41,9 @@ public class QSBCompatibility
         _api.RegisterHandler<int>("disconnect-tether", ReceiveDisconnectTether);
         _api.RegisterHandler<(int, int)>("transfer-tether", ReceiveTransferTether);
         _api.RegisterHandler<NoData>("ship-fuel-max", ReceiveShipFuelMax);
+        _api.RegisterHandler<(int, float, float)>("rust-state", ReceiveInitialRustState);
+        _api.RegisterHandler<(float, float, float)>("initial-dirt-state", ReceiveInitialDirtState);
+        _api.RegisterHandler<float>("dirt-state", ReceiveDirtState);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -127,6 +131,14 @@ public class QSBCompatibility
                 }
             }
             SendCampfireInitialState(id, dropped, unpacked, lit);
+        }
+        if ((float)ShipEnhancements.Settings.rustLevel.GetProperty() > 0)
+        {
+            SELocator.GetCockpitFilthController()?.BroadcastInitialRustState();
+        }
+        if ((float)ShipEnhancements.Settings.dirtAccumulationTime.GetProperty() > 0f)
+        {
+            SELocator.GetCockpitFilthController()?.BroadcastInitialDirtState();
         }
     }
 
@@ -496,5 +508,39 @@ public class QSBCompatibility
             _activeTetherHooks.Remove(hook);
         }
     }
+    #endregion
+
+    #region CockpitFlith
+
+    public void SendInitialRustState(uint id, int textureIndex, Vector2 textureOffset)
+    {
+        _api.SendMessage("rust-state", (textureIndex, textureOffset.x, textureOffset.y), id, false);
+    }
+
+    private void ReceiveInitialRustState(uint id, (int textureIndex, float offsetX, float offsetY) data)
+    {
+        SELocator.GetCockpitFilthController()?.SetInitialRustState(data.textureIndex, new Vector2(data.offsetX, data.offsetY));
+    }
+
+    public void SendInitialDirtState(uint id, Vector2 textureOffset, float currentProgression)
+    {
+        _api.SendMessage("initial-dirt-state", (textureOffset.x, textureOffset.y, currentProgression), id, false);
+    }
+
+    private void ReceiveInitialDirtState(uint id, (float offsetX, float offsetY, float currentProgression) data)
+    {
+        SELocator.GetCockpitFilthController()?.SetInitialDirtState(new Vector2(data.offsetX, data.offsetY), data.currentProgression);
+    }
+
+    public void SendDirtState(uint id, float progression)
+    {
+        _api.SendMessage("dirt-state", progression, id, false);
+    }
+
+    private void ReceiveDirtState(uint id, float progression)
+    {
+        SELocator.GetCockpitFilthController()?.UpdateDirtState(progression);
+    }
+
     #endregion
 }

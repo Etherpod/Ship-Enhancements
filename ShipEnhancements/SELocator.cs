@@ -23,6 +23,7 @@ public static class SELocator
     private static CockpitButtonPanel _buttonPanel;
     private static ThrustModulatorController _modulatorController;
     private static PortableCampfire _portableCampfire;
+    private static CockpitFilthController _cockpitFilthController;
 
     public static void Initalize()
     {
@@ -58,6 +59,10 @@ public static class SELocator
         if ((bool)addPortableCampfire.GetProperty())
         {
             _portableCampfire = _shipTransform.GetComponentInChildren<PortableCampfire>(true);
+        }
+        if ((float)rustLevel.GetProperty() > 0 || (float)dirtAccumulationTime.GetProperty() > 0f)
+        {
+            _cockpitFilthController = _shipTransform.GetComponentInChildren<CockpitFilthController>();
         }
     }
 
@@ -154,5 +159,10 @@ public static class SELocator
     public static PortableCampfire GetPortableCampfire()
     {
         return _portableCampfire;
+    }
+
+    public static CockpitFilthController GetCockpitFilthController()
+    {
+        return _cockpitFilthController;
     }
 }

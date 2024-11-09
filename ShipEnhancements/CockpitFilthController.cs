@@ -18,6 +18,7 @@ public class CockpitFilthController : MonoBehaviour
     GameObject _dirtParent;
 
     private Material _rustMat;
+    private int _rustTexIndex;
     private float _rustProgression;
     private Material _dirtMat;
     private string _dirtLowerClipPropID = "_LowerClip";
@@ -57,8 +58,12 @@ public class CockpitFilthController : MonoBehaviour
         {
             _rustMat = _rustRenderer.sharedMaterial;
             _rustMat.SetFloat("_Cutoff", _rustProgression);
-            _rustMat.SetTexture("_MainTex", _rustTextures[Random.Range(0, _rustTextures.Length)]);
-            _rustMat.SetTextureOffset("_MainTex", new Vector2(Random.Range(0f, 1f), Random.Range(0f, 1f)));
+            if (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost())
+            {
+                _rustTexIndex = Random.Range(0, _rustTextures.Length);
+                _rustMat.SetTexture("_MainTex", _rustTextures[_rustTexIndex]);
+                _rustMat.SetTextureOffset("_MainTex", new Vector2(Random.Range(0f, 1f), Random.Range(0f, 1f)));
+            }
         }
         else
         {
@@ -68,9 +73,12 @@ public class CockpitFilthController : MonoBehaviour
         if (_dirtBuildupTime > 0f)
         {
             _dirtMat = _dirtRenderer.sharedMaterial;
-            _dirtMat.SetTextureOffset("_MainTex", new Vector2(Random.Range(0f, 1f), Random.Range(0f, 1f)));
-            _dirtMat.SetFloat(_dirtLowerClipPropID, 1f);
-            _dirtMat.SetFloat(_dirtUpperClipPropID, 1f);
+            if (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost())
+            {
+                _dirtMat.SetTextureOffset("_MainTex", new Vector2(Random.Range(0f, 1f), Random.Range(0f, 1f)));
+                _dirtMat.SetFloat(_dirtLowerClipPropID, 1f);
+                _dirtMat.SetFloat(_dirtUpperClipPropID, 1f);
+            }
         }
         else
         {
@@ -139,6 +147,63 @@ public class CockpitFilthController : MonoBehaviour
             }
             _clearDirt = false;
         }
+    }
+
+    public void BroadcastInitialRustState()
+    {
+        if (ShipEnhancements.InMultiplayer)
+        {
+            foreach (uint id in ShipEnhancements.PlayerIDs)
+            {
+                ShipEnhancements.QSBCompat.SendInitialRustState(id, _rustTexIndex, _rustMat.GetTextureOffset("_MainTex"));
+            }
+        }
+    }
+
+    public void SetInitialRustState(int textureIndex, Vector2 textureOffset)
+    {
+        //_rustMat = _rustRenderer.sharedMaterial;
+        //_rustMat.SetFloat("_Cutoff", _rustProgression);
+        _rustMat.SetTexture("_MainTex", _rustTextures[textureIndex]);
+        _rustMat.SetTextureOffset("_MainTex", textureOffset);
+    }
+
+    public void BroadcastInitialDirtState()
+    {
+        if (ShipEnhancements.InMultiplayer)
+        {
+            foreach (uint id in ShipEnhancements.PlayerIDs)
+            {
+                ShipEnhancements.QSBCompat.SendInitialDirtState(id, _dirtMat.GetTextureOffset("_MainTex"), _dirtBuildupProgression);
+            }
+        }
+    }
+
+    public void BroadcastDirtState()
+    {
+        if (ShipEnhancements.InMultiplayer && ShipEnhancements.QSBAPI.GetIsHost())
+        {
+            foreach (uint id in ShipEnhancements.PlayerIDs)
+            {
+                ShipEnhancements.QSBCompat.SendDirtState(id, _dirtBuildupProgression);
+            }
+        }
+    }
+
+    public void SetInitialDirtState(Vector2 textureOffset, float currentProgression)
+    {
+        _dirtMat = _dirtRenderer.sharedMaterial;
+        _dirtMat.SetTextureOffset("_MainTex", textureOffset);
+        _dirtBuildupProgression = currentProgression;
+        _dirtMat.SetFloat(_dirtLowerClipPropID, Mathf.Lerp(1f, 0f, _dirtBuildupProgression * 2));
+        _dirtMat.SetFloat(_dirtUpperClipPropID, Mathf.Lerp(1f, 0.5f, (_dirtBuildupProgression - 0.5f) * 2));
+    }
+
+    public void UpdateDirtState(float progression)
+    {
+        _dirtBuildupProgression = progression;
+        _dirtMat.SetFloat(_dirtLowerClipPropID, Mathf.Lerp(1f, 0f, _dirtBuildupProgression * 2));
+        _dirtMat.SetFloat(_dirtUpperClipPropID, Mathf.Lerp(1f, 0.5f, (_dirtBuildupProgression - 0.5f) * 2));
     }
     
     private void OnDestroy()
