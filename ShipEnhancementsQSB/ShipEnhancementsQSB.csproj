@@ -30,5 +30,9 @@
       <HintPath>$(OuterWildsModsDirectory)\Raicuparta.QuantumSpaceBuddies\QSB.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="QSB">
+      <HintPath>$(OuterWildsModsDirectory)\Raicuparta.QuantumSpaceBuddies\Mirror.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
 </Project>

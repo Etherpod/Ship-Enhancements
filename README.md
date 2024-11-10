@@ -59,7 +59,7 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Dirt Accumulation Time**: Larger numbers increase the time (in seconds) it takes for dirt to build up on your cockpit glass, which you can wash off by finding a source of water. Set this to 0 to disable it.
 - **Scout Launcher Component**: Turns the ship's scout launcher into a fully functioning ship component. If you damage it, you won't be able to launch or recall your scout from the ship until you repair it.
 - **Signalscope Component**: Turns the ship's signalscope into a fully functioning ship component. If you damage it, you won't be able to receive or broadcast signals from the ship until you repair it.
-- **Ship Signal**: Adds a signal for the ship on the Deep Space Radio frequency. The signal will stop if the ship's signalscope is damaged.
+- **Ship Signal**: Adds a signal for the ship on the Outer Wilds Ventures frequency. The signal will stop if the ship's signalscope is damaged.
 - **Add Portable Campfire**: Adds a portable campfire to the ship next to your suit. Place this anywhere you'd like and roast a marshmallow. Recommended to use with **Keep Helmet On** so that you don't suffocate yourself.
 - **Add Ship Tether**: Adds a few hooks to the ship cabin. You can attach these hooks to pretty much any surface- including the ship- and tether yourself to them. If you want to get even crazier, grab a second hook after tethering to one and tether to the new one; it will connect the two hooks together.
 - **Gravity Landing Gear**: Equips your ship's landing gear with the latest gravity-powered technology, letting you stick to surfaces if your landing gear is intact. You can toggle it on or off with a switch in the cockpit.
@@ -89,7 +89,7 @@ When you select a preset, you may have to close and reopen the settings menu for
 - **Hardcore** - A much more difficult and punishing experience. Resources are lower and damage is permanent.
 - **Wanderer** - Makes the possibility of getting lost very, very likely. Your ship's lock-on system is broken and you can no longer see the markers for your ship and scout.
 - **Pandemonium** - I basically just went through and turned everything on.
-- **Random** - Randomizes all of the options each loop. Preserves the settings you had previously selected so that you can switch back anytime.\
+- **Random** - Randomizes all of the options each loop. Preserves the settings you had previously selected so that you can switch back anytime.
 
 ## Achievements
 Ship Enhancements adds 8 new achievements to the **Achievements+** mod! Use it with Ship Enhancements if you want to create some meaning from the chaos.
@@ -103,6 +103,9 @@ If you run into any bugs, feel free to report it on GitHub or on the Outer Wilds
 - **CreateTemperatureZone()** - In case you're a modder and want to add your own high/low temperature zones. Temperature zones can stack, and will just take the sum of the temperatures.
 - **GetSettingsProperty()** - Returns the value of a config setting as seen from the player. These values only update at the beginning of the loop, so changing the mod settings doesn't affect them.
 - **SetSettingsProperty()** - Lets you change the value of a config setting in the middle of the loop. Note that this change will be reverted on the next loop.
+
+## Known Bugs
+- When playing in multiplayer and using Input Latency, the delayed inputs of the non-hosts will not work once they leave the flight console
 
 # Credits
 Thanks to Ditzy and JohnCorby for helping with some of the code, especially the physics stuff.

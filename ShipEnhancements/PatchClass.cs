@@ -1835,8 +1835,11 @@ public static class PatchClass
     {
         if ((float)shipInputLatency.GetProperty() > 0f)
         {
-            InputLatencyController.AddTranslationalInput(__result);
-            __result = __instance._translationalInput;
+            if (__result != Vector3.zero)
+            {
+                InputLatencyController.AddTranslationalInput(__result);
+            }
+            __result = InputLatencyController.IsTranslationalInputQueued ? __instance._translationalInput : Vector3.zero;
         }
     }
 
@@ -1846,8 +1849,11 @@ public static class PatchClass
     {
         if ((float)shipInputLatency.GetProperty() > 0f)
         {
-            InputLatencyController.AddRotationalInput(__result);
-            __result = __instance._rotationalInput;
+            if (__result != Vector3.zero)
+            {
+                InputLatencyController.AddRotationalInput(__result);
+            }
+            __result = InputLatencyController.IsRotationalInputQueued ? __instance._rotationalInput : Vector3.zero;
         }
     }
     #endregion

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using static ShipEnhancements.ShipEnhancements.Settings;
+using System.Linq;
 
 namespace ShipEnhancements;
 
@@ -10,6 +11,10 @@ public static class InputLatencyController
     private static readonly Queue<(float, Vector3)> _rotationalInputs = new();
     private static ShipThrusterModel _shipThrusterModel;
     private static ShipThrusterController _shipThrusterController;
+
+    public static bool IsTranslationalInputQueued => _translationalInputs.Count > 0;
+    public static bool IsRotationalInputQueued => _rotationalInputs.Count > 0;
+    public static bool IsInputQueued => IsTranslationalInputQueued || IsRotationalInputQueued;
 
     public static void Initialize()
     {
@@ -32,7 +37,7 @@ public static class InputLatencyController
         }
         if (_rotationalInputs.Count > 0)
         {
-            run = !_shipThrusterController.enabled;
+            run = !_shipThrusterController.enabled || run;
             var nextInput = _rotationalInputs.Peek();
             if (Time.time > nextInput.Item1 + (float)shipInputLatency.GetProperty())
             {

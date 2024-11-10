@@ -20,6 +20,8 @@ using QSB.ShipSync.Patches;
 using static ShipEnhancements.ShipEnhancements.Settings;
 using QSB.Tools.ProbeLauncherTool.Patches;
 using QSB.ShipSync.Messages;
+using QSB.Player.TransformSync;
+using QSB;
 
 namespace ShipEnhancementsQSB;
 
@@ -117,6 +119,16 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
     public void OnDetachAllPlayers(Vector3 velocity)
     {
         QSBInteractionPatches.NextImpactVelocity = velocity;
+    }
+
+    public void UpdateShipThrusterSync()
+    {
+        if (!QSBPlayerManager.LocalPlayer.FlyingShip)
+        {
+            var sync = ShipTransformSync.LocalInstance.ThrusterVariableSyncer.AccelerationSyncer;
+            //ShipEnhancements.ShipEnhancements.WriteDebugMessage(sync.Value);
+            sync.Value = SELocator.GetShipBody().GetComponent<ShipThrusterModel>().GetLocalAcceleration();
+        }
     }
 }
 
@@ -535,6 +547,75 @@ public static class QSBInteractionPatches
         {
             //QSBPlayerManager.GetPlayer(__instance.From)?.AudioController?.PlayOneShot(AudioType.ShipCockpitUnbuckle);
             shipCockpitController._interactVolume?.EnableInteraction();
+        }
+
+        return false;
+    }
+    #endregion
+
+    #region InputLatency
+    public static bool test = false;
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipThrusterVariableSyncer), nameof(ShipThrusterVariableSyncer.Update))]
+    public static bool KeepReadingInputLatency(ShipThrusterVariableSyncer __instance, ShipThrusterModel ____thrusterModel, ShipThrusterAudio ____thrusterAudio)
+    {
+        if ((float)shipInputLatency.GetProperty() == 0f)
+        {
+            return true;
+        }
+
+        /*if (InputLatencyController.IsInputQueued != test)
+        {
+            test = InputLatencyController.IsInputQueued;
+            ShipEnhancements.ShipEnhancements.WriteDebugMessage(QSBCore.IsHost + " Input: " + test);
+        }*/
+
+        // bug : this doesn't account for autopilot
+        // fixes #590
+        if (ShipManager.Instance.CurrentFlyer == uint.MaxValue)
+        {
+            if (____thrusterModel && !InputLatencyController.IsInputQueued)
+            {
+                __instance.AccelerationSyncer.Value = Vector3.zero;
+            }
+
+            return false;
+        }
+        else
+        {
+            test = false;
+        }
+
+        if (PlayerTransformSync.LocalInstance && (QSBPlayerManager.LocalPlayer.FlyingShip || InputLatencyController.IsInputQueued))
+        {
+            ShipEnhancements.ShipEnhancements.QSBInteraction.UpdateShipThrusterSync();
+            return false;
+        }
+
+        if (__instance.AccelerationSyncer.public_HasChanged())
+        {
+            if (__instance.AccelerationSyncer.Value == Vector3.zero)
+            {
+                foreach (var item in ShipThrusterManager.ShipFlameControllers)
+                {
+                    item.OnStopTranslationalThrust();
+                }
+
+                ____thrusterAudio.OnStopTranslationalThrust();
+
+                ShipThrusterManager.ShipWashController.OnStopTranslationalThrust();
+            }
+            else
+            {
+                foreach (var item in ShipThrusterManager.ShipFlameControllers)
+                {
+                    item.OnStartTranslationalThrust();
+                }
+
+                ____thrusterAudio.OnStartTranslationalThrust();
+
+                ShipThrusterManager.ShipWashController.OnStartTranslationalThrust();
+            }
         }
 
         return false;

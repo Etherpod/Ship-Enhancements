@@ -22,4 +22,6 @@ public interface IQSBInteraction
     bool WorldObjectsLoaded();
 
     void OnDetachAllPlayers(Vector3 velocity);
+
+    void UpdateShipThrusterSync();
 }
