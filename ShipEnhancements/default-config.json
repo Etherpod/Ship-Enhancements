@@ -365,7 +365,7 @@
       "title": "Add Ship Signal",
       "type": "toggle",
       "value": false,
-      "tooltip": "Allows you to track your ship with the signalscope on the Deep Space Radio frequency. Useful when map markers are disabled."
+      "tooltip": "Allows you to track your ship with the signalscope on the Outer Wilds Ventures frequency. Useful when map markers are disabled."
     },
     "addPortableCampfire": {
       "title": "Add Portable Campfire",

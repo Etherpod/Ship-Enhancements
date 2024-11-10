@@ -67,7 +67,18 @@ public class ShipPersistentInput : ThrusterController
         _currentInput = GetComponent<ShipThrusterController>()._lastTranslationalInput;
         if (_currentInput != Vector3.zero && !IsAutopilotEnabled() && !_thrustController.RequiresIgnition())
         {
-            enabled = true;
+            if (ShipEnhancements.InMultiplayer && !ShipEnhancements.QSBAPI.GetIsHost())
+            {
+                foreach (uint id in ShipEnhancements.PlayerIDs)
+                {
+                    ShipEnhancements.QSBCompat.SendInitialPersistentInput(id, _currentInput);
+                }
+                _currentInput = Vector3.zero;
+            }
+            else
+            {
+                enabled = true;
+            }
         }
     }
 
@@ -137,6 +148,16 @@ public class ShipPersistentInput : ThrusterController
     public bool InputEnabled()
     {
         return _inputEnabled && !_lastAutopilotState && ShipEnhancements.Instance.engineOn;
+    }
+
+    public void SetInputRemote(Vector3 newInput)
+    {
+        if (!_inputEnabled || _fuelDepleted) return;
+        _currentInput = newInput;
+        if (_currentInput != Vector3.zero && !IsAutopilotEnabled() && !_thrustController.RequiresIgnition())
+        {
+            enabled = true;
+        }
     }
 
     private void OnFuelDepleted()

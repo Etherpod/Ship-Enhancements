@@ -45,6 +45,7 @@ public class QSBCompatibility
         _api.RegisterHandler<(float, float, float)>("initial-dirt-state", ReceiveInitialDirtState);
         _api.RegisterHandler<float>("dirt-state", ReceiveDirtState);
         _api.RegisterHandler<(float, float, float)>("detach-all-players", ReceiveDetachAllPlayers);
+        _api.RegisterHandler<(float, float, float)>("initial-persistent-input", ReceiveInitialPersistentInput);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -554,6 +555,22 @@ public class QSBCompatibility
     private void ReceiveDetachAllPlayers(uint id, (float x, float y, float z) velocity)
     {
         ShipEnhancements.QSBInteraction.OnDetachAllPlayers(new Vector3(velocity.x, velocity.y, velocity.z));
+    }
+    #endregion
+
+    #region PersistentInput
+    public void SendInitialPersistentInput(uint id, Vector3 input)
+    {
+        _api.SendMessage("initial-persistent-input", (input.x, input.y, input.z), id, false);
+    }
+
+    private void ReceiveInitialPersistentInput(uint id, (float x, float y, float z) input)
+    {
+        ShipPersistentInput persistentInput = SELocator.GetShipTransform().GetComponentInChildren<ShipPersistentInput>();
+        if (persistentInput)
+        {
+            persistentInput.SetInputRemote(new Vector3(input.x, input.y, input.z));
+        }
     }
     #endregion
 }
