@@ -1,5 +1,7 @@
 ![Ship Enhancements banner](banner.png)
+
 Ship Enhancements adds way too many options for changing the ship and things relating to the ship. Experiment and have fun!
+
 # Feature Overview
 
 ## Disable Ship Parts
