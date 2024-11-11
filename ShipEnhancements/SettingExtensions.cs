@@ -75,6 +75,7 @@ public static class SettingExtensions
         { Settings.disableSeatbelt, (false, false) },
         { Settings.addPortableTractorBeam, (false, false) },
         { Settings.disableShipSuit, (false, false) },
+        { Settings.damageIndicatorColor, ("Default", "Default") },
     };
 
     public static string GetName(this Settings setting)

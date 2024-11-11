@@ -74,6 +74,7 @@ Haven't you ever wished your ship had a little more color?
 - **Ship Light Color**: Changes the color of the ship's interior and exterior lights from a wide variety of options. Set this to Divine at your own risk, for mere Hearthians were never meant to see creations blessed by a god.
 - **Interior/Exterior Hull Color**: Select from a variety of colors to change the inside or outside color of your ship. Just don't pick Rainbow.
 - **Ship Thruster Flame Color**: Changes the color of the ship's thruster flames as well as the color of the thruster indicator inside of the ship.
+- **Damage Indicator Color**: Changes the color of the ship damage display, the master alarm, and the damage indicator lights.
 
 ## Quality of Life
 These are all enabled by default.

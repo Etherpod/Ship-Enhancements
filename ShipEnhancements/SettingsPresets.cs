@@ -74,6 +74,7 @@ public static class SettingsPresets
         { "disableSeatbelt", false },
         { "addPortableTractorBeam", false },
         { "disableShipSuit", false },
+        { "damageIndicatorColor", "Default" },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -144,6 +145,7 @@ public static class SettingsPresets
         { "disableSeatbelt", true },
         { "addPortableTractorBeam", false },
         { "disableShipSuit", false },
+        { "damageIndicatorColor", "Default" },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -214,6 +216,7 @@ public static class SettingsPresets
         { "disableSeatbelt", false },
         { "addPortableTractorBeam", false },
         { "disableShipSuit", false },
+        { "damageIndicatorColor", "Default" },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -284,6 +287,7 @@ public static class SettingsPresets
         { "disableSeatbelt", false },
         { "addPortableTractorBeam", false },
         { "disableShipSuit", false },
+        { "damageIndicatorColor", "Default" },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -354,6 +358,7 @@ public static class SettingsPresets
         { "disableSeatbelt", false },
         { "addPortableTractorBeam", false },
         { "disableShipSuit", false },
+        { "damageIndicatorColor", "Default" },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -420,10 +425,11 @@ public static class SettingsPresets
         { "enableSignalscopeComponent", true },
         { "rustLevel", 0.5f },
         { "dirtAccumulationTime", 350f },
-        { "thrusterColor", "Default" },
+        { "thrusterColor", "Rainbow" },
         { "disableSeatbelt", true },
         { "addPortableTractorBeam", true },
         { "disableShipSuit", false },
+        { "damageIndicatorColor", "Rainbow" },
     };
 
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()
@@ -649,7 +655,23 @@ public static class SettingsPresets
             ], 0.5f, "Default") },
         { "disableSeatbelt", new RandomSettingValue(0.1f) },
         { "addPortableTractorBeam", new RandomSettingValue(0.3f) },
-        { "disableShipSuit", new RandomSettingValue(0.1f) }
+        { "disableShipSuit", new RandomSettingValue(0.1f) },
+        { "damageIndicatorColor", new RandomSettingValue([
+            "Default",
+            "Orange",
+            "Yellow",
+            "Green",
+            "Outer Wilds Beta",
+            "Ghostly Green",
+            "Turquoise",
+            "Blue",
+            "Dark Blue",
+            "Nomaian Blue",
+            "Purple",
+            "Lavender",
+            "Pink",
+            "Rainbow"
+            ], 0.5f, "Default") },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

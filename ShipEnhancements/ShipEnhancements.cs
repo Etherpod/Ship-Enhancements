@@ -143,6 +143,7 @@ public class ShipEnhancements : ModBehaviour
         disableSeatbelt,
         addPortableTractorBeam,
         disableShipSuit,
+        damageIndicatorColor,
     }
 
     private void Awake()
@@ -711,7 +712,7 @@ public class ShipEnhancements : ModBehaviour
                     Color baseColor = rend.material.GetColor("_Color");
                     float alpha = baseColor.a;
                     (Color, float, Color) emissiveColor = SettingsColors.GetThrusterColor(color);
-                    Color newColor = emissiveColor.Item1 * Mathf.Pow(emissiveColor.Item2, 2);
+                    Color newColor = emissiveColor.Item1 * Mathf.Pow(2, emissiveColor.Item2);
                     newColor.a = alpha;
                     rend.material.SetColor("_Color", newColor);
 
@@ -784,6 +785,8 @@ public class ShipEnhancements : ModBehaviour
             GameObject tractorSocketObj = Instantiate(tractorSocket, SELocator.GetShipTransform().Find("Module_Cabin"));
             tractorSocketObj.GetComponent<PortableTractorBeamSocket>().SetTractorBeamItem(tractorObj.GetComponent<PortableTractorBeamItem>());
         }
+
+        SetDamageColors();
 
         engineOn = !(bool)Settings.addEngineSwitch.GetProperty();
 
@@ -1005,6 +1008,50 @@ public class ShipEnhancements : ModBehaviour
         }
     }
 
+    private void SetDamageColors()
+    {
+        string color = (string)Settings.damageIndicatorColor.GetProperty();
+        if (color != "Default")
+        {
+            if (color == "Rainbow")
+            {
+                SELocator.GetShipTransform().gameObject.AddComponent<RainbowShipDamage>();
+                return;
+            }
+
+            var damageScreenMat = SELocator.GetShipTransform().Find("Module_Cockpit/Systems_Cockpit/ShipCockpitUI/DamageScreen/HUD_ShipDamageDisplay")
+                .GetComponent<MeshRenderer>().material;
+            var masterAlarmMat = SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry/Cockpit_Interior/Cockpit_Interior_Chassis")
+                .GetComponent<MeshRenderer>().sharedMaterials[6];
+            var masterAlarmLight = SELocator.GetShipTransform().Find("Module_Cabin/Lights_Cabin/PointLight_HEA_MasterAlarm").GetComponent<Light>();
+
+            var (newHull, newComponent, newAlarm, newAlarmLit, newLight) = SettingsColors.GetDamageColor(color);
+
+            damageScreenMat.SetColor("_DamagedHullFill", newHull);
+            damageScreenMat.SetColor("_DamagedComponentFill", newComponent);
+
+            if (color != "Outer Wilds Beta")
+            {
+                masterAlarmMat.SetColor("_Color", newAlarm);
+                SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitUI>()._damageLightColor = newAlarmLit;
+                masterAlarmLight.color = newLight;
+
+                foreach (DamageEffect effect in SELocator.GetShipTransform().GetComponentsInChildren<DamageEffect>())
+                {
+                    if (effect._damageLight)
+                    {
+                        effect._damageLight.GetLight().color = newLight;
+                    }
+                    if (effect._damageLightRenderer)
+                    {
+                        effect._damageLightRenderer.SetColor(newAlarm);
+                        effect._damageLightRendererColor = newAlarmLit;
+                    }
+                }
+            }
+        }
+    }
+
     #endregion
 
     #region Events
@@ -1067,7 +1114,8 @@ public class ShipEnhancements : ModBehaviour
         bool allRainbow = (string)Settings.interiorHullColor.GetProperty() == "Rainbow"
             && (string)Settings.exteriorHullColor.GetProperty() == "Rainbow"
             && (string)Settings.shipLightColor.GetProperty() == "Rainbow"
-            && (string)Settings.thrusterColor.GetProperty() == "Rainbow";
+            && (string)Settings.thrusterColor.GetProperty() == "Rainbow"
+            && (string)Settings.damageIndicatorColor.GetProperty() == "Rainbow";
         if (AchievementsAPI != null && !AchievementsAPI.HasAchievement("SHIPENHANCEMENTS.RGB_SETUP") && allRainbow)
         {
             AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.RGB_SETUP");

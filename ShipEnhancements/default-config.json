@@ -496,6 +496,27 @@
       ],
       "tooltip": "Changes the color of the thruster flames produced by the ship."
     },
+    "damageIndicatorColor": {
+      "title": "Damage Indicator Color",
+      "type": "selector",
+      "value": "Default",
+      "options": [
+        "Default",
+        "Orange",
+        "Yellow",
+        "Green",
+        "Outer Wilds Beta",
+        "Ghostly Green",
+        "Turquoise",
+        "Blue",
+        "Dark Blue",
+        "Nomaian Blue",
+        "Purple",
+        "Lavender",
+        "Pink",
+        "Rainbow"
+      ]
+    },
 
     "Quality of Life": {
       "type": "separator"
