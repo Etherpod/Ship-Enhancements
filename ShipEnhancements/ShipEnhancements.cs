@@ -380,6 +380,8 @@ public class ShipEnhancements : ModBehaviour
 
     private void FixedUpdate()
     {
+        if (!_shipLoaded || _shipDestroyed) return;
+
         if (InputLatencyController.ReadingSavedInputs)
         {
             InputLatencyController.ProcessSavedInputs();
