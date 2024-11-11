@@ -221,6 +221,7 @@ public class ShipEnhancements : ModBehaviour
                 SELocator.GetShipDamageController().OnShipComponentDamaged -= ctx => CheckAllPartsDamaged();
                 SELocator.GetShipDamageController().OnShipHullDamaged -= ctx => CheckAllPartsDamaged();
             }
+
             if (QSBAPI == null || !QSBAPI.GetIsInMultiplayer() || QSBAPI.GetIsHost())
             {
                 UpdateProperties();
@@ -237,6 +238,7 @@ public class ShipEnhancements : ModBehaviour
             _lastSuitOxygen = 0f;
             _shipLoaded = false;
             playerTether = null;
+            InputLatencyController.OnUnloadScene();
         };
     }
 
@@ -377,9 +379,13 @@ public class ShipEnhancements : ModBehaviour
 
     private void FixedUpdate()
     {
-        if ((float)Settings.shipInputLatency.GetProperty() > 0f)
+        if (InputLatencyController.ReadingSavedInputs)
         {
-            InputLatencyController.FixedUpdate();
+            InputLatencyController.ProcessSavedInputs();
+        }
+        else if ((float)Settings.shipInputLatency.GetProperty() > 0f)
+        {
+            InputLatencyController.ProcessInputs();
         }
     }
 
@@ -683,7 +689,7 @@ public class ShipEnhancements : ModBehaviour
         {
             SELocator.GetShipBody().gameObject.AddComponent<ShipPersistentInput>();
         }
-        if ((float)Settings.shipInputLatency.GetProperty() > 0f)
+        if ((float)Settings.shipInputLatency.GetProperty() != 0f)
         {
             InputLatencyController.Initialize();
         }

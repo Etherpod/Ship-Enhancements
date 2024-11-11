@@ -7,16 +7,23 @@ namespace ShipEnhancements;
 public static class ShipNotifications
 {
     private static NotificationData _oxygenDepletedNotification = new NotificationData(NotificationTarget.Ship, "SHIP OXYGEN DEPLETED", 5f, true);
+
     private static NotificationData _oxygenLowNotification = new NotificationData(NotificationTarget.Ship, "SHIP OXYGEN LOW", 5f, true);
     private static NotificationData _oxygenCriticalNotification = new NotificationData(NotificationTarget.Ship, "SHIP OXYGEN CRITICAL", 5f, true);
+
     private static NotificationData _oxygenRefillingNotification = new NotificationData(NotificationTarget.Ship, "REFILLING OXYGEN TANK", 5f, true);
+    private static NotificationData _oxygenNotRefillingNotification = new NotificationData(NotificationTarget.Ship, "DRAINING OXYGEN TANK >:)", 5F, true);
+
     private static NotificationData _fuelLowNotification = new NotificationData(NotificationTarget.Ship, "SHIP FUEL LOW", 5f, true);
     private static NotificationData _fuelCriticalNotification = new NotificationData(NotificationTarget.Ship, "SHIP FUEL CRITICAL", 5f, true);
+
     private static NotificationData _spinSpeedHighNotification = new NotificationData(NotificationTarget.Ship, "HULL INTEGRITY LOW", 5f, true);
     private static NotificationData _spinSpeedCriticalNotification = new NotificationData(NotificationTarget.Ship, "HULL INTEGRITY CRITICAL", 5f, true);
+
     private static NotificationData _temperatureHighNotification = new NotificationData(NotificationTarget.Ship, "HULL TEMPERATURE INCREASING", 5f, true);
     private static NotificationData _temperatureLowNotification = new NotificationData(NotificationTarget.Ship, "HULL TEMPERATURE DECREASING", 5f, true);
     private static NotificationData _temperatureCriticalNotification = new NotificationData(NotificationTarget.Ship, "HULL TEMPERATURE CRITICAL", 5f, true);
+
     private static NotificationData _scoutInShipNotification = new NotificationData(NotificationTarget.Player, "SCOUT DOCKED IN SHIP", 5f, true);
     private static NotificationData _noScoutInShipNotification = new NotificationData(NotificationTarget.Ship, "SCOUT LAUNCHER EMPTY", 5f, true);
 
@@ -52,13 +59,22 @@ public static class ShipNotifications
     {
         if ((bool)shipOxygenRefill.GetProperty())
         {
+            bool negativeRefill = (float)oxygenRefillMultiplier.GetProperty() < 0f;
             if (!_refillingShipOxygen && ShipEnhancements.Instance.IsShipInOxygen())
             {
                 _refillingShipOxygen = true;
-                NotificationManager.SharedInstance.PostNotification(_oxygenRefillingNotification, false);
+                if (negativeRefill)
+                {
+                    NotificationManager.SharedInstance.PostNotification(_oxygenNotRefillingNotification, false);
+                }
+                else
+                {
+                    NotificationManager.SharedInstance.PostNotification(_oxygenRefillingNotification, false);
+                }
             }
             else if (_refillingShipOxygen && !ShipEnhancements.Instance.IsShipInOxygen() 
-                && SELocator.GetShipResources().GetFractionalOxygen() < 0.99f)
+                && (negativeRefill ? SELocator.GetShipResources().GetFractionalOxygen() > 0.01f
+                : SELocator.GetShipResources().GetFractionalOxygen() < 0.99f))
             {
                 _refillingShipOxygen = false;
             }
@@ -116,22 +132,26 @@ public static class ShipNotifications
 
         if ((bool)disableRotationSpeedLimit.GetProperty())
         {
-            if (!_hullIntegrityCritical && SELocator.GetShipBody().GetAngularVelocity().sqrMagnitude > ShipEnhancements.Instance.levelTwoSpinSpeed * ShipEnhancements.Instance.levelTwoSpinSpeed)
+            if (!_hullIntegrityCritical && SELocator.GetShipBody().GetAngularVelocity().sqrMagnitude 
+                > ShipEnhancements.Instance.levelTwoSpinSpeed * ShipEnhancements.Instance.levelTwoSpinSpeed)
             {
                 _hullIntegrityCritical = true;
                 NotificationManager.SharedInstance.PostNotification(_spinSpeedCriticalNotification, false);
             }
-            else if (_hullIntegrityCritical && SELocator.GetShipBody().GetAngularVelocity().sqrMagnitude < ShipEnhancements.Instance.levelTwoSpinSpeed * ShipEnhancements.Instance.levelTwoSpinSpeed)
+            else if (_hullIntegrityCritical && SELocator.GetShipBody().GetAngularVelocity().sqrMagnitude 
+                < ShipEnhancements.Instance.levelTwoSpinSpeed * ShipEnhancements.Instance.levelTwoSpinSpeed)
             {
                 _hullIntegrityCritical = false;
             }
 
-            if (!_hullIntegrityLow && SELocator.GetShipBody().GetAngularVelocity().sqrMagnitude > ShipEnhancements.Instance.levelOneSpinSpeed * ShipEnhancements.Instance.levelOneSpinSpeed)
+            if (!_hullIntegrityLow && SELocator.GetShipBody().GetAngularVelocity().sqrMagnitude 
+                > ShipEnhancements.Instance.levelOneSpinSpeed * ShipEnhancements.Instance.levelOneSpinSpeed)
             {
                 _hullIntegrityLow = true;
                 NotificationManager.SharedInstance.PostNotification(_spinSpeedHighNotification, false);
             }
-            else if (_hullIntegrityLow && SELocator.GetShipBody().GetAngularVelocity().sqrMagnitude < ShipEnhancements.Instance.levelOneSpinSpeed * ShipEnhancements.Instance.levelOneSpinSpeed)
+            else if (_hullIntegrityLow && SELocator.GetShipBody().GetAngularVelocity().sqrMagnitude 
+                < ShipEnhancements.Instance.levelOneSpinSpeed * ShipEnhancements.Instance.levelOneSpinSpeed)
             {
                 _hullIntegrityLow = false;
             }

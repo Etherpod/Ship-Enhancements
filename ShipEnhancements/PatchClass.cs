@@ -1833,7 +1833,11 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipThrusterController), nameof(ShipThrusterController.ReadTranslationalInput))]
     public static void DelayTranslational(ShipThrusterController __instance, ref Vector3 __result)
     {
-        if ((float)shipInputLatency.GetProperty() > 0f)
+        if (InputLatencyController.ReadingSavedInputs && InputLatencyController.IsInputQueued)
+        {
+            __result = __instance._translationalInput;
+        }
+        else if ((float)shipInputLatency.GetProperty() > 0f)
         {
             if (__result != Vector3.zero)
             {
@@ -1841,19 +1845,39 @@ public static class PatchClass
             }
             __result = InputLatencyController.IsTranslationalInputQueued ? __instance._translationalInput : Vector3.zero;
         }
+        else if ((float)shipInputLatency.GetProperty() < 0f)
+        {
+            if (__result != Vector3.zero)
+            {
+                InputLatencyController.SaveTranslationalInput(__result);
+            }
+            //__result = InputLatencyController.IsTranslationalInputQueued ? __instance._translationalInput : Vector3.zero;
+        }
     }
 
     [HarmonyPostfix]
     [HarmonyPatch(typeof(ShipThrusterController), nameof(ShipThrusterController.ReadRotationalInput))]
     public static void DelayRotational(ShipThrusterController __instance, ref Vector3 __result)
     {
-        if ((float)shipInputLatency.GetProperty() > 0f)
+        if (InputLatencyController.ReadingSavedInputs && InputLatencyController.IsInputQueued)
+        {
+            __result = __instance._rotationalInput;
+        }
+        else if ((float)shipInputLatency.GetProperty() > 0f)
         {
             if (__result != Vector3.zero)
             {
                 InputLatencyController.AddRotationalInput(__result);
             }
             __result = InputLatencyController.IsRotationalInputQueued ? __instance._rotationalInput : Vector3.zero;
+        }
+        else if ((float)shipInputLatency.GetProperty() < 0f)
+        {
+            if (__result != Vector3.zero)
+            {
+                InputLatencyController.SaveRotationalInput(__result);
+            }
+            //__result = InputLatencyController.IsTranslationalInputQueued ? __instance._translationalInput : Vector3.zero;
         }
     }
     #endregion
