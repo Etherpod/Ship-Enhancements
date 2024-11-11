@@ -425,7 +425,7 @@ public static class SettingsPresets
         { "enableSignalscopeComponent", true },
         { "rustLevel", 0.5f },
         { "dirtAccumulationTime", 350f },
-        { "thrusterColor", "Rainbow" },
+        { "thrusterColor", "Default" },
         { "disableSeatbelt", true },
         { "addPortableTractorBeam", true },
         { "disableShipSuit", false },
