@@ -76,10 +76,11 @@ public class ShipTemperatureDetector : MonoBehaviour
                         _randDamageDelay = _damageDelay + UnityEngine.Random.Range(-1f, 1f);
 
                         float timeMultiplier = Mathf.InverseLerp(0f, _tempMeterChargeLength, Mathf.Abs(_tempMeter));
+                        float tempDamage = Mathf.Max((float)temperatureDamageMultiplier.GetProperty(), 0f);
 
                         float damageChance = 0.05f * Mathf.Lerp(0f, 1f + (Mathf.InverseLerp(_highTempCutoff, 100f, Mathf.Abs(_currentTemperature)) * 2f), Mathf.Pow(timeMultiplier, 2));
                         if ((bool)componentTemperatureDamage.GetProperty() && UnityEngine.Random.value
-                            < damageChance * (float)temperatureDamageMultiplier.GetProperty() / 8)
+                            < damageChance * tempDamage / 8)
                         {
                             _componentDamageNextTime = true;
                         }
@@ -139,7 +140,8 @@ public class ShipTemperatureDetector : MonoBehaviour
         }
 
         ShipHull targetHull = validHulls[UnityEngine.Random.Range(0, validHulls.Length)];
-        float damage = UnityEngine.Random.Range(0.03f, 0.15f) * (float)temperatureDamageMultiplier.GetProperty();
+        float tempDamage = Mathf.Max((float)temperatureDamageMultiplier.GetProperty(), 0f);
+        float damage = UnityEngine.Random.Range(0.03f, 0.15f) * tempDamage;
         ApplyHullTempDamage(targetHull, damage);
 
         if (ShipEnhancements.InMultiplayer && ShipEnhancements.QSBAPI.GetIsHost())

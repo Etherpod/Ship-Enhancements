@@ -352,6 +352,9 @@ public static class PatchClass
             return true;
         }
 
+        float damageMultiplier = Mathf.Max((float)shipDamageMultiplier.GetProperty(), 0f);
+        float damageSpeedMultiplier = Mathf.Max((float)shipDamageSpeedMultiplier.GetProperty(), 0f);
+
         if (__instance._debugImpact)
         {
             __instance._integrity = 0.5f;
@@ -375,8 +378,8 @@ public static class PatchClass
         }
         if (__instance._dominantImpact != null)
         {
-            float num = Mathf.InverseLerp(30f * (float)shipDamageSpeedMultiplier.GetProperty(),
-                200f * (float)shipDamageSpeedMultiplier.GetProperty(), __instance._dominantImpact.speed);
+            float num = Mathf.InverseLerp(30f * damageSpeedMultiplier,
+                200f * damageSpeedMultiplier, __instance._dominantImpact.speed);
             if (num > 0f)
             {
                 float num2 = 0.15f;
@@ -384,13 +387,14 @@ public static class PatchClass
                 {
                     num = num2;
                 }
-                num *= (float)shipDamageMultiplier.GetProperty();
+                num *= damageMultiplier;
                 __instance._integrity = Mathf.Max(__instance._integrity - num, 0f);
                 if (!__instance._damaged)
                 {
                     __instance._damaged = true;
 
-                    var eventDelegate2 = (MulticastDelegate)typeof(ShipHull).GetField("OnDamaged", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).GetValue(__instance);
+                    var eventDelegate2 = (MulticastDelegate)typeof(ShipHull).GetField("OnDamaged", BindingFlags.Instance 
+                        | BindingFlags.NonPublic | BindingFlags.Public).GetValue(__instance);
                     if (eventDelegate2 != null)
                     {
                         foreach (var handler in eventDelegate2.GetInvocationList())
@@ -405,12 +409,14 @@ public static class PatchClass
                 }
             }
             int num3 = 0;
-            while (num3 < __instance._components.Length && (__instance._components[num3] == null || __instance._components[num3].isDamaged || !__instance._components[num3].ApplyImpact(__instance._dominantImpact)))
+            while (num3 < __instance._components.Length && (__instance._components[num3] == null 
+                || __instance._components[num3].isDamaged || !__instance._components[num3].ApplyImpact(__instance._dominantImpact)))
             {
                 num3++;
             }
 
-            var eventDelegate3 = (MulticastDelegate)typeof(ShipHull).GetField("OnImpact", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).GetValue(__instance);
+            var eventDelegate3 = (MulticastDelegate)typeof(ShipHull).GetField("OnImpact", BindingFlags.Instance 
+                | BindingFlags.NonPublic | BindingFlags.Public).GetValue(__instance);
             if (eventDelegate3 != null)
             {
                 foreach (var handler in eventDelegate3.GetInvocationList())
@@ -435,12 +441,15 @@ public static class PatchClass
             return true;
         }
 
+        float damageMultiplier = Mathf.Max((float)shipDamageMultiplier.GetProperty(), 0f);
+        float damageSpeedMultiplier = Mathf.Max((float)shipDamageSpeedMultiplier.GetProperty(), 0f);
+
         if (__instance._damaged)
         {
             return false;
         }
-        if (UnityEngine.Random.value / (float)shipDamageMultiplier.GetProperty()
-            < __instance._damageProbabilityCurve.Evaluate(impact.speed / (float)shipDamageSpeedMultiplier.GetProperty()))
+        if (UnityEngine.Random.value / damageMultiplier
+            < __instance._damageProbabilityCurve.Evaluate(impact.speed / damageSpeedMultiplier))
         {
             __instance.SetDamaged(true);
             return true;
@@ -478,9 +487,11 @@ public static class PatchClass
             SEAchievementTracker.LastHitBody = impact.otherBody;
         }
 
-        float explosionMultiplier = (float)shipDamageSpeedMultiplier.GetProperty()
-                / ((float)shipDamageMultiplier.GetProperty() != 1f ? Mathf.Lerp((float)shipDamageMultiplier.GetProperty(), 1f, 0.5f) : 1f);
+        float damageMultiplier = Mathf.Max((float)shipDamageMultiplier.GetProperty(), 0f);
+        float damageSpeedMultiplier = Mathf.Max((float)shipDamageSpeedMultiplier.GetProperty(), 0f);
 
+        float explosionMultiplier = damageSpeedMultiplier
+                / (damageMultiplier != 1f ? Mathf.Lerp(damageMultiplier, 1f, 0.5f) : 1f);
 
         if (impact.otherCollider.attachedRigidbody != null && impact.otherCollider.attachedRigidbody.CompareTag("Player") && PlayerState.IsInsideShip())
         {
@@ -1767,7 +1778,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ExplosionController), nameof(ExplosionController.Update))]
     public static bool FixExplosionHeatVolume(ExplosionController __instance)
     {
-        if ((float)shipExplosionMultiplier.GetProperty() == 1f) return true;
+        if ((float)shipExplosionMultiplier.GetProperty() == 1f || (float)shipExplosionMultiplier.GetProperty() < 0f) return true;
 
         if (!__instance._playing)
         {
@@ -1793,6 +1804,20 @@ public static class PatchClass
         }
 
         return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ExplosionController), nameof(ExplosionController.Play))]
+    public static bool PlayBlackHoleExplosion(ExplosionController __instance)
+    {
+        if (__instance is BlackHoleExplosionController)
+        {
+            BlackHoleExplosionController controller = __instance as BlackHoleExplosionController;
+            controller.OpenBlackHole();
+            return false;
+        }
+
+        return true;
     }
     #endregion
 

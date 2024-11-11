@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using OWML.Utils;
 using System.Reflection;
 using System.Linq;
+using Newtonsoft.Json.Serialization;
 
 namespace ShipEnhancements;
 
@@ -661,25 +662,37 @@ public class ShipEnhancements : ModBehaviour
         {
             Transform effectsTransform = SELocator.GetShipTransform().Find("Effects");
             ExplosionController explosion = effectsTransform.GetComponentInChildren<ExplosionController>();
-            explosion._length *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.75f) + 0.25f;
-            explosion._forceVolume._acceleration *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.25f) + 0.75f;
-            explosion.transform.localScale *= (float)Settings.shipExplosionMultiplier.GetProperty();
-            explosion.GetComponent<SphereCollider>().radius = 0.1f;
-            OWAudioSource audio = effectsTransform.Find("ExplosionAudioSource").GetComponent<OWAudioSource>();
-            audio.maxDistance *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.1f) + 0.9f;
-            AnimationCurve curve = audio.GetCustomCurve(AudioSourceCurveType.CustomRolloff);
-            Keyframe[] newKeys = new Keyframe[curve.keys.Length];
-            for (int i = 0; i < curve.keys.Length; i++)
+
+            if ((float)Settings.shipExplosionMultiplier.GetProperty() < 0f)
             {
-                newKeys[i] = curve.keys[i];
-                newKeys[i].value *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.1f) + 0.9f;
+                GameObject newExplosion = LoadPrefab("Assets/ShipEnhancements/BlackHoleExplosion.prefab");
+                AssetBundleUtilities.ReplaceShaders(newExplosion);
+                GameObject newExplosionObj = Instantiate(newExplosion, effectsTransform);
+                SELocator.GetShipDamageController()._explosion = newExplosionObj.GetComponent<ExplosionController>();
+                Destroy(explosion.gameObject);
             }
-            AnimationCurve newCurve = new();
-            foreach (Keyframe key in newKeys)
+            else
             {
-                newCurve.AddKey(key);
+                explosion._length *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.75f) + 0.25f;
+                explosion._forceVolume._acceleration *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.25f) + 0.75f;
+                explosion.transform.localScale *= (float)Settings.shipExplosionMultiplier.GetProperty();
+                explosion.GetComponent<SphereCollider>().radius = 0.1f;
+                OWAudioSource audio = effectsTransform.Find("ExplosionAudioSource").GetComponent<OWAudioSource>();
+                audio.maxDistance *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.1f) + 0.9f;
+                AnimationCurve curve = audio.GetCustomCurve(AudioSourceCurveType.CustomRolloff);
+                Keyframe[] newKeys = new Keyframe[curve.keys.Length];
+                for (int i = 0; i < curve.keys.Length; i++)
+                {
+                    newKeys[i] = curve.keys[i];
+                    newKeys[i].value *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.1f) + 0.9f;
+                }
+                AnimationCurve newCurve = new();
+                foreach (Keyframe key in newKeys)
+                {
+                    newCurve.AddKey(key);
+                }
+                audio.SetCustomCurve(AudioSourceCurveType.CustomRolloff, newCurve);
             }
-            audio.SetCustomCurve(AudioSourceCurveType.CustomRolloff, newCurve);
         }
         if ((float)Settings.shipBounciness.GetProperty() > 0f)
         {
@@ -1078,8 +1091,9 @@ public class ShipEnhancements : ModBehaviour
     private void OnEnterFluid(FluidVolume fluid)
     {
         angularDragEnabled = true;
-        SELocator.GetShipBody()._rigidbody.angularDrag = 0.94f * (float)Settings.atmosphereAngularDragMultiplier.GetProperty();
-        SELocator.GetShipBody().GetComponent<ShipThrusterModel>()._angularDrag = 0.94f * (float)Settings.atmosphereAngularDragMultiplier.GetProperty();
+        float dragMultiplier = Mathf.Max((float)Settings.atmosphereAngularDragMultiplier.GetProperty(), 0f);
+        SELocator.GetShipBody()._rigidbody.angularDrag = 0.94f * dragMultiplier;
+        SELocator.GetShipBody().GetComponent<ShipThrusterModel>()._angularDrag = 0.94f * dragMultiplier;
     }
 
     private void OnExitFluid(FluidVolume fluid)
@@ -1087,8 +1101,9 @@ public class ShipEnhancements : ModBehaviour
         if (SELocator.GetShipDetector().GetComponent<ShipFluidDetector>()._activeVolumes.Count == 0)
         {
             angularDragEnabled = false;
-            SELocator.GetShipBody()._rigidbody.angularDrag = 0.94f * (float)Settings.spaceAngularDragMultiplier.GetProperty();
-            SELocator.GetShipBody().GetComponent<ShipThrusterModel>()._angularDrag = 0.94f * (float)Settings.spaceAngularDragMultiplier.GetProperty();
+            float dragMultiplier = Mathf.Max((float)Settings.spaceAngularDragMultiplier.GetProperty(), 0f);
+            SELocator.GetShipBody()._rigidbody.angularDrag = 0.94f * dragMultiplier;
+            SELocator.GetShipBody().GetComponent<ShipThrusterModel>()._angularDrag = 0.94f * dragMultiplier;
         }
     }
 
