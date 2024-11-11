@@ -356,12 +356,23 @@ public class ShipEnhancements : ModBehaviour
             ShipNotifications.UpdateNotifications();
         }
 
-        if (!SEAchievementTracker.DeadInTheWater && AchievementsAPI != null
-            && fuelDepleted && !(bool)Settings.enableShipFuelTransfer.GetProperty()
-            && ((oxygenDepleted && !(bool)Settings.shipOxygenRefill.GetProperty()) || (bool)Settings.disableShipOxygen.GetProperty()))
+
+        if (!SEAchievementTracker.DeadInTheWater && AchievementsAPI != null)
         {
-            SEAchievementTracker.DeadInTheWater = true;
-            AchievementsAPI?.EarnAchievement("SHIPENHANCEMENTS.DEAD_IN_THE_WATER");
+            bool noFuel = !(!fuelDepleted || (bool)Settings.enableShipFuelTransfer.GetProperty()
+                || (float)Settings.fuelDrainMultiplier.GetProperty() < 0f
+                || (float)Settings.fuelTankDrainMultiplier.GetProperty() < 0f
+                || (float)Settings.idleFuelConsumptionMultiplier.GetProperty() < 0f);
+            bool noOxygen = (bool)Settings.disableShipOxygen.GetProperty() 
+                || !(!oxygenDepleted || (bool)Settings.shipOxygenRefill.GetProperty()
+                || (float)Settings.oxygenDrainMultiplier.GetProperty() < 0f
+                || (float)Settings.oxygenTankDrainMultiplier.GetProperty() < 0f);
+
+            if (noFuel && noOxygen)
+            {
+                SEAchievementTracker.DeadInTheWater = true;
+                AchievementsAPI?.EarnAchievement("SHIPENHANCEMENTS.DEAD_IN_THE_WATER");
+            }
         }
 
         _lastShipOxygen = SELocator.GetShipResources()._currentOxygen;
@@ -396,7 +407,6 @@ public class ShipEnhancements : ModBehaviour
 
     private void UpdateProperties()
     {
-        WriteDebugMessage("Updating properties");
         var allSettings = Enum.GetValues(typeof(Settings)) as Settings[];
 
         foreach (Settings setting in allSettings)
