@@ -10,12 +10,14 @@ public class BlackHoleExplosionController : ExplosionController
     [SerializeField] private float _growAcceleration;
     [SerializeField] private DestructionVolume _destructionVolume;
     [SerializeField] private ForceVolume _gravityVolume;
+    [SerializeField] private OWAudioSource _closeAudio;
+    [SerializeField] private OWAudioSource _farAudio;
+    [SerializeField] private OWAudioSource _oneShotAudio;
 
     private int _propID_Radius;
     private int _propID_DistortRadius;
     private SingularityController _singularity;
     private float _growSpeed;
-    private OWAudioSource[] _audioSources;
 
     private new void Awake()
     {
@@ -31,7 +33,6 @@ public class BlackHoleExplosionController : ExplosionController
 
         _audioController = SELocator.GetShipTransform().GetComponentInChildren<ShipAudioController>();
         _singularity = _renderer.GetComponent<SingularityController>();
-        _audioSources = GetComponentsInChildren<OWAudioSource>();
 
         _playing = false;
         _timer = 0f;
@@ -63,11 +64,10 @@ public class BlackHoleExplosionController : ExplosionController
             _matPropBlock.SetFloat(_propID_DistortRadius, transform.localScale.x);
             _renderer.SetPropertyBlock(_matPropBlock);
 
-            foreach (var source in _audioSources)
-            {
-                source.minDistance = transform.localScale.x;
-                source.maxDistance = transform.localScale.x * 20f;
-            }
+            _closeAudio.minDistance = transform.localScale.x;
+            _closeAudio.maxDistance = transform.localScale.x * 5f;
+            _farAudio.minDistance = transform.localScale.x;
+            _farAudio.maxDistance = transform.localScale.x * 10f;
 
             _growSpeed += Time.deltaTime * _growAcceleration;
         }
@@ -84,9 +84,12 @@ public class BlackHoleExplosionController : ExplosionController
         _gravityVolume.SetVolumeActivation(true);
         _destructionVolume._collider.enabled = true;
         transform.localScale = Vector3.one * 1.25f;
+        _oneShotAudio.minDistance = transform.localScale.x;
+        _oneShotAudio.maxDistance = transform.localScale.x * 20f;
+        _closeAudio.FadeIn(5f);
         _singularity.Create();
 
-        if (Vector3.Distance(transform.position, Locator.GetPlayerTransform().position) < transform.localScale.x)
+        if (Vector3.Distance(transform.position, Locator.GetPlayerTransform().position) < transform.localScale.x * 10f)
         {
             RumbleManager.PulseShipExplode();
         }
