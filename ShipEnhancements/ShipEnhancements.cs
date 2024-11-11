@@ -745,7 +745,8 @@ public class ShipEnhancements : ModBehaviour
         if ((float)Settings.reactorLifetimeMultiplier.GetProperty() != 1f)
         {
             ShipReactorComponent reactor = SELocator.GetShipTransform().GetComponentInChildren<ShipReactorComponent>();
-            float multiplier = (float)Settings.reactorLifetimeMultiplier.GetProperty();
+
+            float multiplier = Mathf.Max((float)Settings.reactorLifetimeMultiplier.GetProperty(), 0f);
             reactor._minCountdown *= multiplier;
             reactor._maxCountdown *= multiplier;
         }
