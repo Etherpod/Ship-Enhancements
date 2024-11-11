@@ -5,7 +5,15 @@ namespace ShipEnhancements;
 
 public class ShipRefuelDrain : MonoBehaviour
 {
-    PlayerRecoveryPoint _recoveryPoint;
+    private PlayerRecoveryPoint _recoveryPoint;
+    private ShipResources _shipResources;
+    private bool _reverse;
+
+    private void Awake()
+    {
+        _shipResources = SELocator.GetShipResources();
+        _reverse = (float)fuelTransferMultiplier.GetProperty() < 0f;
+    }
 
     private void Start()
     {
@@ -27,7 +35,7 @@ public class ShipRefuelDrain : MonoBehaviour
             if (ShipEnhancements.QSBInteraction.IsRecoveringAtShip() && PlayerState.IsWearingSuit())
             {
                 float amountToDrain = PlayerResources._maxFuel * 5f * Time.deltaTime * 3f * (float)fuelTransferMultiplier.GetProperty();
-                SELocator.GetShipResources()._currentFuel = Mathf.Max(SELocator.GetShipResources()._currentFuel - amountToDrain, 0f);
+                _shipResources._currentFuel = Mathf.Clamp(_shipResources._currentFuel - amountToDrain, 0f, _shipResources._maxFuel);
 
                 foreach (uint id in ShipEnhancements.PlayerIDs)
                 {
@@ -37,12 +45,12 @@ public class ShipRefuelDrain : MonoBehaviour
         }
         else
         {
-            if (_recoveryPoint._refuelsPlayer && SELocator.GetShipResources()._currentFuel == 0f)
+            if (_recoveryPoint._refuelsPlayer && (_reverse ? _shipResources.GetFractionalFuel() == 1f : _shipResources.GetFractionalFuel() == 0f))
             {
                 _recoveryPoint._refuelsPlayer = false;
                 return;
             }
-            else if (!_recoveryPoint._refuelsPlayer && SELocator.GetShipResources()._currentFuel > 0f)
+            else if (!_recoveryPoint._refuelsPlayer && (_reverse ? _shipResources.GetFractionalFuel() < 1f : _shipResources.GetFractionalFuel() > 0f))
             {
                 _recoveryPoint._refuelsPlayer = true;
             }
@@ -50,7 +58,7 @@ public class ShipRefuelDrain : MonoBehaviour
             if (_recoveryPoint._recovering && PlayerState.IsWearingSuit())
             {
                 float amountToDrain = PlayerResources._maxFuel * 5f * Time.deltaTime * 3f * (float)fuelTransferMultiplier.GetProperty();
-                SELocator.GetShipResources()._currentFuel = Mathf.Max(SELocator.GetShipResources()._currentFuel - amountToDrain, 0f);
+                _shipResources._currentFuel = Mathf.Clamp(_shipResources._currentFuel - amountToDrain, 0f, _shipResources._maxFuel);
             }
         }
     }

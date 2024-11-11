@@ -10,14 +10,19 @@ public class ShipFuelTransfer : MonoBehaviour
     private InteractReceiver _interactReceiver;
 
     private ShipFuelTankComponent _fuelTankComponent;
+    private ShipResources _shipResources;
     private bool _transferring = false;
     private bool _jetpackFuelDepleted = false;
     private bool _shipFuelFull = false;
     private bool _shipDestroyed = false;
+    private bool _reverse;
 
     private void Start()
     {
         _fuelTankComponent = GetComponentInParent<ShipFuelTankComponent>();
+        _shipResources = SELocator.GetShipResources();
+
+        _reverse = (float)fuelTransferMultiplier.GetProperty() < 0f;
         _shipFuelFull = IsShipFuelFull();
 
         _fuelTankComponent.OnRepaired += ctx => OnComponentRepaired();
@@ -65,7 +70,7 @@ public class ShipFuelTransfer : MonoBehaviour
             {
                 SELocator.GetPlayerResources()._currentFuel -= (PlayerResources._maxFuel * Time.deltaTime) / 3f;
                 float amountToAdd = PlayerResources._maxFuel * Time.deltaTime * 5f * (float)fuelTransferMultiplier.GetProperty();
-                SELocator.GetShipResources().AddFuel(amountToAdd);
+                _shipResources._currentFuel = Mathf.Clamp(_shipResources._currentFuel + amountToAdd, 0f, _shipResources._maxFuel);
 
                 if (ShipEnhancements.InMultiplayer)
                 {
@@ -101,7 +106,8 @@ public class ShipFuelTransfer : MonoBehaviour
 
     private bool IsShipFuelFull()
     {
-        return SELocator.GetShipResources()._currentFuel >= SELocator.GetShipResources()._maxFuel;
+        return _reverse ? _shipResources._currentFuel <= 0f 
+            : _shipResources._currentFuel >= _shipResources._maxFuel;
     }
 
     public void UpdateInteractable()
