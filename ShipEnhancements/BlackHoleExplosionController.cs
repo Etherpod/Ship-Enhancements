@@ -101,6 +101,12 @@ public class BlackHoleExplosionController : ExplosionController
         transform.parent = parentTransform;
         ShipEnhancements.Instance.ModHelper.Events.Unity.FireOnNextUpdate(() => parentTransform.GetComponent<OWRigidbody>().SetVelocity(Vector3.zero));
 
+        if (!SEAchievementTracker.BlackHole && ShipEnhancements.AchievementsAPI != null)
+        {
+            SEAchievementTracker.BlackHole = true;
+            ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.BLACK_HOLE");
+        }
+
         _playing = true;
         enabled = true;
     }

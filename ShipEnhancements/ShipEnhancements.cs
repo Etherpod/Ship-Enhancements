@@ -1,6 +1,5 @@
 ﻿using OWML.Common;
 using OWML.ModHelper;
-using System.Collections;
 using UnityEngine;
 using System.IO;
 using System;
@@ -8,7 +7,6 @@ using System.Collections.Generic;
 using OWML.Utils;
 using System.Reflection;
 using System.Linq;
-using Newtonsoft.Json.Serialization;
 
 namespace ShipEnhancements;
 
@@ -371,7 +369,7 @@ public class ShipEnhancements : ModBehaviour
             if (noFuel && noOxygen)
             {
                 SEAchievementTracker.DeadInTheWater = true;
-                AchievementsAPI?.EarnAchievement("SHIPENHANCEMENTS.DEAD_IN_THE_WATER");
+                AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.DEAD_IN_THE_WATER");
             }
         }
 
@@ -436,6 +434,7 @@ public class ShipEnhancements : ModBehaviour
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.HOW_DID_WE_GET_HERE", false, this);
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.HULK_SMASH", false, this);
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.RGB_SETUP", false, this);
+            AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.BLACK_HOLE", true, this);
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.BAD_INTERNET", false, this);
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.SCOUT_LOST_CONNECTION", true, this);
 
