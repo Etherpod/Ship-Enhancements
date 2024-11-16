@@ -10,6 +10,8 @@ public class PortableCampfire : Campfire
     private FluidDetector _fluidDetector;
     [SerializeField]
     private AudioClip _waterExtinguishAudio;
+    [SerializeField]
+    private GameObject _itemParent;
 
     private ScreenPrompt _cancelPrompt;
     private bool _extinguished = true;
@@ -104,7 +106,7 @@ public class PortableCampfire : Campfire
         {
             StopSleeping();
         }
-        GetComponentInParent<PortableCampfireItem>().TogglePackUp(true);
+        _itemParent.GetComponent<PortableCampfireItem>().TogglePackUp(true);
     }
 
     public void UpdateProperties()

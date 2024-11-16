@@ -391,7 +391,7 @@ public class ShipEnhancements : ModBehaviour
     {
         if (!_shipLoaded || _shipDestroyed) return;
 
-        if (InputLatencyController.ReadingSavedInputs)
+        if (InputLatencyController.ReadingSavedInputs && InputLatencyController.IsInputQueued)
         {
             InputLatencyController.ProcessSavedInputs();
         }

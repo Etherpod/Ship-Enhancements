@@ -46,6 +46,7 @@ public class QSBCompatibility
         _api.RegisterHandler<float>("dirt-state", ReceiveDirtState);
         _api.RegisterHandler<(float, float, float)>("detach-all-players", ReceiveDetachAllPlayers);
         _api.RegisterHandler<(float, float, float)>("initial-persistent-input", ReceiveInitialPersistentInput);
+        _api.RegisterHandler<float>("initial-black-hole", ReceiveInitialBlackHoleState);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -141,6 +142,14 @@ public class QSBCompatibility
         if ((float)ShipEnhancements.Settings.dirtAccumulationTime.GetProperty() > 0f)
         {
             SELocator.GetCockpitFilthController()?.BroadcastInitialDirtState();
+        }
+        if ((float)ShipEnhancements.Settings.shipExplosionMultiplier.GetProperty() < 0f)
+        {
+            BlackHoleExplosionController controller = SELocator.GetShipTransform().GetComponentInChildren<BlackHoleExplosionController>();
+            if (controller != null && controller.IsPlaying())
+            {
+                SendInitialBlackHoleState(id, controller.GetCurrentScale());
+            }
         }
     }
 
@@ -423,7 +432,7 @@ public class QSBCompatibility
 
     private void ReceiveCampfireExtinguished(uint id, NoData noData)
     {
-        SELocator.GetPortableCampfire().OnExtinguishInteract();
+        SELocator.GetPortableCampfire()?.OnExtinguishInteract();
     }
 
     public void SendCampfireInitialState(uint id, bool dropped, bool unpacked, bool lit)
@@ -571,6 +580,19 @@ public class QSBCompatibility
         {
             persistentInput.SetInputRemote(new Vector3(input.x, input.y, input.z));
         }
+    }
+    #endregion
+
+    #region BlackHoleExplosion
+    public void SendInitialBlackHoleState(uint id, float scale)
+    {
+        _api.SendMessage("initial-black-hole", scale, id, false);
+    }
+
+    private void ReceiveInitialBlackHoleState(uint id, float scale)
+    {
+        BlackHoleExplosionController controller = SELocator.GetShipTransform().GetComponentInChildren<BlackHoleExplosionController>();
+        controller?.SetInitialBlackHoleState(scale);
     }
     #endregion
 }

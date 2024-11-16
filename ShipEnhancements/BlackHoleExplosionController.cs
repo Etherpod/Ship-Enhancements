@@ -58,6 +58,11 @@ public class BlackHoleExplosionController : ExplosionController
 
         if (_singularity.GetState() == SingularityController.State.Stable)
         {
+            if (!_destructionVolume._collider.enabled)
+            {
+                _destructionVolume._collider.enabled = true;
+            }
+
             transform.localScale += Vector3.one * Time.deltaTime * _growSpeed;
 
             _matPropBlock.SetFloat(_propID_Radius, transform.localScale.x * 0.8f);
@@ -74,15 +79,26 @@ public class BlackHoleExplosionController : ExplosionController
 
         if (num >= 1f)
         {
-            _playing = false;
             enabled = false;
         }
     }
 
+    public float GetCurrentScale()
+    {
+        return transform.localScale.x;
+    }
+
+    public bool IsPlaying()
+    {
+        return _playing;
+    }
+
     public void OpenBlackHole()
     {
+        if (_playing) return;
+
         _gravityVolume.SetVolumeActivation(true);
-        _destructionVolume._collider.enabled = true;
+        //_destructionVolume._collider.enabled = true;
         transform.localScale = Vector3.one * 1.25f;
         _oneShotAudio.minDistance = transform.localScale.x;
         _oneShotAudio.maxDistance = transform.localScale.x * 20f;
@@ -95,6 +111,31 @@ public class BlackHoleExplosionController : ExplosionController
         }
 
         _audioController.PlayShipExplodeClip();
+
+        GameObject parent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ReactorBlackHoleParent.prefab");
+        Transform parentTransform = Instantiate(parent).transform;
+        transform.parent = parentTransform;
+        ShipEnhancements.Instance.ModHelper.Events.Unity.FireOnNextUpdate(() => parentTransform.GetComponent<OWRigidbody>().SetVelocity(Vector3.zero));
+
+        if (!SEAchievementTracker.BlackHole && ShipEnhancements.AchievementsAPI != null)
+        {
+            SEAchievementTracker.BlackHole = true;
+            ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.BLACK_HOLE");
+        }
+
+        _playing = true;
+        enabled = true;
+    }
+
+    public void SetInitialBlackHoleState(float scale)
+    {
+        _gravityVolume.SetVolumeActivation(true);
+        _destructionVolume._collider.enabled = true;
+        transform.localScale = Vector3.one * scale;
+        _oneShotAudio.minDistance = transform.localScale.x;
+        _oneShotAudio.maxDistance = transform.localScale.x * 20f;
+        _closeAudio.FadeIn(5f);
+        _singularity.Create();
 
         GameObject parent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ReactorBlackHoleParent.prefab");
         Transform parentTransform = Instantiate(parent).transform;

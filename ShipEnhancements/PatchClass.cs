@@ -1870,7 +1870,7 @@ public static class PatchClass
             }
             __result = InputLatencyController.IsTranslationalInputQueued ? __instance._translationalInput : Vector3.zero;
         }
-        else if ((float)shipInputLatency.GetProperty() < 0f)
+        else if ((float)shipInputLatency.GetProperty() < 0f && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
         {
             if (__result != Vector3.zero)
             {
@@ -1896,7 +1896,7 @@ public static class PatchClass
             }
             __result = InputLatencyController.IsRotationalInputQueued ? __instance._rotationalInput : Vector3.zero;
         }
-        else if ((float)shipInputLatency.GetProperty() < 0f)
+        else if ((float)shipInputLatency.GetProperty() < 0f && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
         {
             if (__result != Vector3.zero)
             {
