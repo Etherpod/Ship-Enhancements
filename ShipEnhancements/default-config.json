@@ -112,7 +112,7 @@
       "title": "Disable Rotation Speed Limit",
       "type": "toggle",
       "value": false,
-      "tooltip": "Lets you spin your ship as quickly as you want, though spinning too fast may tear your ship apart. DO NOT ENABLE IF YOU ARE PRONE TO MOTION SICKNESS."
+      "tooltip": "Lets you spin your ship as quickly as you want. DO NOT ENABLE IF YOU ARE PRONE TO MOTION SICKNESS."
     },
     "disableShipFriction": {
       "title": "Disable Ship Friction",
@@ -130,7 +130,7 @@
       "title": "Disable Map Markers",
       "type": "toggle",
       "value": false,
-      "tooltip": "Removes the markers that tell you the location of your ship, your scout, and any marked locations in the ship log. Try not to lose your ship."
+      "tooltip": "Removes the markers that tell you the location of your ship, your scout, and any marked locations in the ship log. Try not to get lost."
     },
 
     "Adjust Ship Functions": {
@@ -251,7 +251,7 @@
       "title": "Ship Bounciness",
       "type": "number",
       "value": 0,
-      "tooltip": "Adjusts how bouncy the ship is. Maximum bounciness makes the ship retain all of its speed when colliding with something."
+      "tooltip": "Adjusts how bouncy the ship is. A value of 2 should double the ship's speed when it collides with something."
     },
     "shipInputLatency": {
       "title": "Ship Input Latency",
@@ -298,7 +298,7 @@
       "title": "Enable Ship Item Placement",
       "type": "toggle",
       "value": false,
-      "tooltip": "Lets you drop items inside of the ship and live out your hoarding dreams."
+      "tooltip": "Lets you drop items inside of the ship or on top of the ship."
     },
     "enableManualScoutRecall": {
       "title": "Enable Manual Scout Recall",
@@ -377,7 +377,7 @@
       "title": "Add Portable Tractor Beam",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds a portable Nomai tractor beam to the ship next to the reactor. Grab it and place it on the ground if you need an extra boost in height."
+      "tooltip": "Adds a portable Nomai tractor beam to the ship next to the reactor. Place it on the ground if you need an extra boost in height."
     },
     "addTether": {
       "title": "Add Ship Tether",
@@ -395,19 +395,19 @@
       "title": "Add Thrust Modulator",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds an interface to the cockpit for decreasing your ship's maximum thrust."
+      "tooltip": "Adds an interface to the cockpit for decreasing your ship's maximum thrust or putting your reactor in overdrive."
     },
     "enablePersistentInput": {
       "title": "Add Persistent Input",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds a switch to the cockpit to enable persistent input, which holds your last input after you exit the flight console."
+      "tooltip": "Adds a switch to the cockpit to enable persistent input, which holds your last input after you unbuckle."
     },
     "addEngineSwitch": {
       "title": "Add Engine Switch",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds a switch to the cockpit that turns on the ship. While the ship is on it will slowly drain fuel, so make sure you turn it off before you leave!"
+      "tooltip": "Adds a switch to the cockpit that turns on the ship. If you turned on idle fuel consumption it will only drain fuel while the ship is on."
     },
 
     "Decoration": {
@@ -526,13 +526,13 @@
       "title": "Keep Helmet On",
       "type": "toggle",
       "value": true,
-      "tooltip": "Prevents the game from removing your helmet while doing specific actions if there isn't oxygen present."
+      "tooltip": "Prevents the game from automatically removing your helmet if there isn't oxygen present."
     },
     "showWarningNotifications": {
       "title": "Show Warning Notifications",
       "type": "toggle",
       "value": true,
-      "tooltip": "Notifies you in the ship about various things, such as your fuel or oxygen being low."
+      "tooltip": "Notifies you in the ship when resources are low or when the outside conditions are becoming dangerous."
     }
   }
 }
