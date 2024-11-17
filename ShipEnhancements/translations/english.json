@@ -24,6 +24,10 @@
       "Name": "Party Time",
       "Description": "Set all of your ship colors to Rainbow."
     },
+    "SHIPENHANCEMENTS.BLACK_HOLE": {
+      "Name": "The Beginning of the End",
+      "Description": "Create a very unstable black hole using your ship's reactor."
+    },
     "SHIPENHANCEMENTS.BAD_INTERNET": {
       "Name": "Thinking Ahead",
       "Description": "Land (or crash) your ship on another planet with at least 3 seconds of input latency."

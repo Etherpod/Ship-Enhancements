@@ -10,6 +10,8 @@ public class PortableCampfire : Campfire
     private FluidDetector _fluidDetector;
     [SerializeField]
     private AudioClip _waterExtinguishAudio;
+    [SerializeField]
+    private GameObject _itemParent;
 
     private ScreenPrompt _cancelPrompt;
     private bool _extinguished = true;
@@ -28,26 +30,42 @@ public class PortableCampfire : Campfire
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
 
         _cancelPrompt = new ScreenPrompt(InputLibrary.cancel, "Pack up", 0, ScreenPrompt.DisplayState.Normal, false);
-        _reactorHeatMeter = 0f;
         _reactorHeatMeterLength = Random.Range(10f, 30f);
+        _reactorHeatMeter = _reactorHeatMeterLength;
     }
 
     public void UpdateCampfire()
     {
         if (!_shipDestroyed && _insideShip && !_extinguished)
         {
-            SELocator.GetShipResources().DrainOxygen(10f * Time.deltaTime);
-            _reactorHeatMeter += Time.deltaTime;
-            if (_reactorHeatMeter >= _reactorHeatMeterLength)
-            {
-                _reactorHeatMeter = 0f;
-                _reactorHeatMeterLength = Random.Range(10f, 30f);
-                Locator.GetShipBody().GetComponentInChildren<ShipReactorComponent>().SetDamaged(true);
+            float oxygenDrain = 10f * Time.deltaTime;
+            SELocator.GetShipResources().DrainOxygen(oxygenDrain);
 
-                if (!SEAchievementTracker.FireHazard && ShipEnhancements.AchievementsAPI != null)
+            if (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost())
+            {
+                if (_reactorHeatMeter > 0)
                 {
-                    SEAchievementTracker.FireHazard = true;
-                    ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.FIRE_HAZARD");
+                    _reactorHeatMeter -= Time.deltaTime;
+                }
+                else
+                {
+                    _reactorHeatMeter = _reactorHeatMeterLength;
+                    _reactorHeatMeterLength = Random.Range(10f, 30f);
+                    SELocator.GetShipBody().GetComponentInChildren<ShipReactorComponent>().SetDamaged(true);
+
+                    if (ShipEnhancements.InMultiplayer)
+                    {
+                        foreach (uint id in ShipEnhancements.PlayerIDs)
+                        {
+                            ShipEnhancements.QSBCompat.SendCampfireReactorDamaged(id);
+                        }
+                    }
+
+                    if (!SEAchievementTracker.FireHazard && ShipEnhancements.AchievementsAPI != null)
+                    {
+                        SEAchievementTracker.FireHazard = true;
+                        ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.FIRE_HAZARD");
+                    }
                 }
             }
         }
@@ -80,7 +98,15 @@ public class PortableCampfire : Campfire
         UpdateInsideShip(false);
         SetState(State.UNLIT, true);
         _lastOutsideWaterState = true;
-        GetComponentInParent<PortableCampfireItem>().TogglePackUp(true);
+        if (_isPlayerRoasting)
+        {
+            StopRoasting();
+        }
+        else if (_isPlayerSleeping)
+        {
+            StopSleeping();
+        }
+        _itemParent.GetComponent<PortableCampfireItem>().TogglePackUp(true);
     }
 
     public void UpdateProperties()
@@ -99,10 +125,32 @@ public class PortableCampfire : Campfire
     public void UpdateInsideShip(bool insideShip)
     {
         _insideShip = insideShip;
-        if (!insideShip)
+        if (!insideShip && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
         {
-            _reactorHeatMeter = 0f;
             _reactorHeatMeterLength = Random.Range(10f, 30f);
+            _reactorHeatMeter = _reactorHeatMeterLength;
+        }
+    }
+
+    public void OnExtinguishInteract()
+    {
+        if (IsExtinguished())
+        {
+            Locator.GetPromptManager().RemoveScreenPrompt(GetPrompt(), PromptPosition.Center);
+            PackUp();
+        }
+        else
+        {
+            SetState(State.UNLIT);
+        }
+    }
+
+    public void OnRemoteReactorDamaged()
+    {
+        if (!SEAchievementTracker.FireHazard && ShipEnhancements.AchievementsAPI != null)
+        {
+            SEAchievementTracker.FireHazard = true;
+            ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.FIRE_HAZARD");
         }
     }
 

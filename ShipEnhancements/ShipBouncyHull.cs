@@ -19,21 +19,15 @@ public class ShipBouncyHull : MonoBehaviour
         }
 
         OWRigidbody body = GetComponent<ShipBody>();
-        //Vector3 velocity = impact.otherBody.GetPointVelocity(impact.point) - body.GetPointVelocity(impact.point);
-        Vector3 collisionVelocity = body.GetPointTangentialVelocity(impact.point) - impact.otherBody.GetPointTangentialVelocity(impact.point);
-        //Vector3 collisionVelocity = body.GetVelocity() - impact.otherBody.GetVelocity();
-        Vector3 directSpeed = Vector3.Project(collisionVelocity, impact.normal);
-        Vector3 direction = Vector3.Reflect(collisionVelocity, impact.normal);
+        Vector3 velocity = impact.otherBody.GetPointVelocity(impact.point) - body.GetPointVelocity(impact.point);
+        float speed = Vector3.Project(-velocity, impact.normal).magnitude * (float)shipBounciness.GetProperty();
+        Vector3 bounceDirection = Vector3.Reflect(-velocity, impact.normal).normalized;
 
-        //body.AddImpulse(direction * impact.speed * (float)shipBounciness.GetProperty());
-        //body.AddImpulse(direction.normalized * directSpeed.magnitude * (float)shipBounciness.GetProperty());
-        body.AddImpulse(direction.normalized * impact.speed * (float)shipBounciness.GetProperty());
+        body.AddImpulse(bounceDirection * speed * 0.8f);
 
-        Vector3 comDist = impact.point - body.GetWorldCenterOfMass();
+        Vector3 toImpactPoint = impact.point - body.GetWorldCenterOfMass();
 
-        //body.AddTorque(Vector3.Cross(impactDirection, direction).normalized * impact.speed * (float)shipBounciness.GetProperty() * impactDirection.magnitude);
-        //body.AddTorque(Vector3.Cross(comDist, direction).normalized * directSpeed.magnitude * (float)shipBounciness.GetProperty() * comDist.magnitude);
-        body.AddTorque(Vector3.Cross(comDist, direction).normalized * impact.speed * (float)shipBounciness.GetProperty() * comDist.magnitude);
+        body.AddTorque(Vector3.Cross(toImpactPoint, bounceDirection).normalized * speed * toImpactPoint.magnitude);
     }
 
     private void OnDestroy()

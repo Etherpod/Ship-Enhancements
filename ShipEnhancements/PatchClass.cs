@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Security.Policy;
 using HarmonyLib;
 using UnityEngine;
-using XGamingRuntime;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
@@ -12,8 +10,6 @@ namespace ShipEnhancements;
 [HarmonyPatch]
 public static class PatchClass
 {
-    public static float baseRoastingStickMaxZ = 0f;
-
     #region DisableHeadlights
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.UpdateShipLightInput))]
@@ -350,10 +346,14 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipHull), nameof(ShipHull.FixedUpdate))]
     public static bool ApplyHullDamageMultiplier(ShipHull __instance)
     {
-        if ((float)shipDamageMultiplier.GetProperty() == 1 && (float)shipDamageSpeedMultiplier.GetProperty() == 1)
+        if (((float)shipDamageMultiplier.GetProperty() == 1 && (float)shipDamageSpeedMultiplier.GetProperty() == 1)
+            || ShipEnhancements.InMultiplayer)
         {
             return true;
         }
+
+        float damageMultiplier = Mathf.Max((float)shipDamageMultiplier.GetProperty(), 0f);
+        float damageSpeedMultiplier = Mathf.Max((float)shipDamageSpeedMultiplier.GetProperty(), 0f);
 
         if (__instance._debugImpact)
         {
@@ -378,8 +378,8 @@ public static class PatchClass
         }
         if (__instance._dominantImpact != null)
         {
-            float num = Mathf.InverseLerp(30f * (float)shipDamageSpeedMultiplier.GetProperty(),
-                200f * (float)shipDamageSpeedMultiplier.GetProperty(), __instance._dominantImpact.speed);
+            float num = Mathf.InverseLerp(30f * damageSpeedMultiplier,
+                200f * damageSpeedMultiplier, __instance._dominantImpact.speed);
             if (num > 0f)
             {
                 float num2 = 0.15f;
@@ -387,13 +387,14 @@ public static class PatchClass
                 {
                     num = num2;
                 }
-                num *= (float)shipDamageMultiplier.GetProperty();
+                num *= damageMultiplier;
                 __instance._integrity = Mathf.Max(__instance._integrity - num, 0f);
                 if (!__instance._damaged)
                 {
                     __instance._damaged = true;
 
-                    var eventDelegate2 = (MulticastDelegate)typeof(ShipHull).GetField("OnDamaged", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).GetValue(__instance);
+                    var eventDelegate2 = (MulticastDelegate)typeof(ShipHull).GetField("OnDamaged", BindingFlags.Instance 
+                        | BindingFlags.NonPublic | BindingFlags.Public).GetValue(__instance);
                     if (eventDelegate2 != null)
                     {
                         foreach (var handler in eventDelegate2.GetInvocationList())
@@ -408,12 +409,14 @@ public static class PatchClass
                 }
             }
             int num3 = 0;
-            while (num3 < __instance._components.Length && (__instance._components[num3] == null || __instance._components[num3].isDamaged || !__instance._components[num3].ApplyImpact(__instance._dominantImpact)))
+            while (num3 < __instance._components.Length && (__instance._components[num3] == null 
+                || __instance._components[num3].isDamaged || !__instance._components[num3].ApplyImpact(__instance._dominantImpact)))
             {
                 num3++;
             }
 
-            var eventDelegate3 = (MulticastDelegate)typeof(ShipHull).GetField("OnImpact", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).GetValue(__instance);
+            var eventDelegate3 = (MulticastDelegate)typeof(ShipHull).GetField("OnImpact", BindingFlags.Instance 
+                | BindingFlags.NonPublic | BindingFlags.Public).GetValue(__instance);
             if (eventDelegate3 != null)
             {
                 foreach (var handler in eventDelegate3.GetInvocationList())
@@ -438,12 +441,15 @@ public static class PatchClass
             return true;
         }
 
+        float damageMultiplier = Mathf.Max((float)shipDamageMultiplier.GetProperty(), 0f);
+        float damageSpeedMultiplier = Mathf.Max((float)shipDamageSpeedMultiplier.GetProperty(), 0f);
+
         if (__instance._damaged)
         {
             return false;
         }
-        if (UnityEngine.Random.value / (float)shipDamageMultiplier.GetProperty()
-            < __instance._damageProbabilityCurve.Evaluate(impact.speed / (float)shipDamageSpeedMultiplier.GetProperty()))
+        if (UnityEngine.Random.value / damageMultiplier
+            < __instance._damageProbabilityCurve.Evaluate(impact.speed / damageSpeedMultiplier))
         {
             __instance.SetDamaged(true);
             return true;
@@ -481,9 +487,11 @@ public static class PatchClass
             SEAchievementTracker.LastHitBody = impact.otherBody;
         }
 
-        float explosionMultiplier = (float)shipDamageSpeedMultiplier.GetProperty()
-                / ((float)shipDamageMultiplier.GetProperty() != 1f ? Mathf.Lerp((float)shipDamageMultiplier.GetProperty(), 1f, 0.5f) : 1f);
+        float damageMultiplier = Mathf.Max((float)shipDamageMultiplier.GetProperty(), 0f);
+        float damageSpeedMultiplier = Mathf.Max((float)shipDamageSpeedMultiplier.GetProperty(), 0f);
 
+        float explosionMultiplier = damageSpeedMultiplier
+                / (damageMultiplier != 1f ? Mathf.Lerp(damageMultiplier, 1f, 0.5f) : 1f);
 
         if (impact.otherCollider.attachedRigidbody != null && impact.otherCollider.attachedRigidbody.CompareTag("Player") && PlayerState.IsInsideShip())
         {
@@ -491,7 +499,7 @@ public static class PatchClass
         }
         if (impact.speed >= 300f * explosionMultiplier && !__instance._exploded)
         {
-            if (impact.otherBody == Locator.GetPlayerBody())
+            if (impact.otherBody == SELocator.GetPlayerBody())
             {
                 SEAchievementTracker.PlayerCausedExplosion = true;
             }
@@ -525,17 +533,28 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipResources), nameof(ShipResources.Update))]
     public static bool RefillShipOxygen(ShipResources __instance)
     {
-        if ((bool)disableShipOxygen.GetProperty() || !(bool)shipOxygenRefill.GetProperty()) return true;
+        if (((bool)disableShipOxygen.GetProperty() || !(bool)shipOxygenRefill.GetProperty()) && ShipEnhancements.QSBAPI == null) return true;
 
         if (__instance._killingResources)
         {
             __instance.DebugKillResources();
             return false;
         }
-        float magnitude = __instance._shipThruster.GetLocalAcceleration().magnitude;
-        if (magnitude > 0f)
+        if (ShipEnhancements.InMultiplayer)
         {
-            __instance.DrainFuel(magnitude * 0.1f * Time.deltaTime);
+            float magnitude = ShipEnhancements.QSBInteraction.GetShipAcceleration().magnitude;
+            if (magnitude > 0f)
+            {
+                __instance.DrainFuel(magnitude * 0.1f * Time.deltaTime);
+            }
+        }
+        else
+        {
+            float magnitude = __instance._shipThruster.GetLocalAcceleration().magnitude;
+            if (magnitude > 0f)
+            {
+                __instance.DrainFuel(magnitude * 0.1f * Time.deltaTime);
+            }
         }
         if (__instance._currentFuel <= 0f && !NotificationManager.SharedInstance.IsPinnedNotification(__instance._fuelDepletedNotification))
         {
@@ -551,13 +570,20 @@ public static class PatchClass
         }
         else
         {
-            if (ShipEnhancements.Instance.IsShipInOxygen())
+            if ((bool)shipOxygenRefill.GetProperty() && ShipEnhancements.Instance.IsShipInOxygen())
             {
                 __instance.AddOxygen(100f * Time.deltaTime * (float)oxygenRefillMultiplier.GetProperty());
             }
-            else if (PlayerState.IsInsideShip())
+            else
             {
-                __instance.DrainOxygen(0.13f * Time.deltaTime);
+                if (ShipEnhancements.InMultiplayer)
+                {
+                    __instance.DrainOxygen(0.13f * Time.deltaTime * ShipEnhancements.QSBInteraction.GetPlayersInShip());
+                }
+                else if (PlayerState.IsInsideShip())
+                {
+                    __instance.DrainOxygen(0.13f * Time.deltaTime);
+                }
             }
         }
         return false;
@@ -926,7 +952,7 @@ public static class PatchClass
 
         if (!__instance.IsPlayerInShip())
         {
-            Locator.GetShipBody().GetComponentInChildren<ShipTractorBeamSwitch>().ActivateTractorBeam();
+            SELocator.GetShipBody().GetComponentInChildren<ShipTractorBeamSwitch>().ActivateTractorBeam();
         }
     }
 
@@ -936,7 +962,7 @@ public static class PatchClass
     {
         if (!(bool)enableAutoHatch.GetProperty()) return true;
 
-        HatchController hatch = Locator.GetShipBody().GetComponentInChildren<HatchController>();
+        HatchController hatch = SELocator.GetShipBody().GetComponentInChildren<HatchController>();
         if (!hatch._hatchObject.activeInHierarchy)
         {
             hatch.CloseHatch();
@@ -1060,6 +1086,16 @@ public static class PatchClass
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.RetrieveProbe))]
     public static bool DisableProbeRetrieve(ProbeLauncher __instance, bool forcedRetrieval)
+    {
+        if (ShipEnhancements.InMultiplayer)
+        {
+            return true;
+        }
+
+        return CanRetrieveProbe(__instance, forcedRetrieval);
+    }
+
+    public static bool CanRetrieveProbe(ProbeLauncher __instance, bool forcedRetrieval)
     {
         bool manualScoutRecall = (bool)enableManualScoutRecall.GetProperty();
         bool scoutLauncherComponent = (bool)enableScoutLauncherComponent.GetProperty();
@@ -1195,7 +1231,7 @@ public static class PatchClass
         // This recalls to the player launcher
         if (__instance.GetName() == ProbeLauncher.Name.Player && flag)
         {
-            __instance._activeProbe = Locator.GetProbe();
+            __instance._activeProbe = SELocator.GetProbe();
         }
 
         return true;
@@ -1230,7 +1266,7 @@ public static class PatchClass
         // This recalls to the player launcher
         if (__instance.GetName() == ProbeLauncher.Name.Player && flag)
         {
-            __instance._activeProbe = Locator.GetProbe();
+            __instance._activeProbe = SELocator.GetProbe();
         }
 
         return true;
@@ -1423,7 +1459,7 @@ public static class PatchClass
             bool flag = InputLibrary.toolActionPrimary.HasSameBinding(InputLibrary.probeRetrieve, OWInput.UsingGamepad());
             if ((flag && OWInput.IsPressed(InputLibrary.probeRetrieve, 0.5f)) || (!flag && OWInput.IsNewlyPressed(InputLibrary.probeRetrieve, InputMode.All)))
             {
-                Locator.GetShipTransform().GetComponentInChildren<ShipProbePickupVolume>().RecallProbeFromShip();
+                SELocator.GetShipTransform().GetComponentInChildren<ShipProbePickupVolume>().RecallProbeFromShip();
                 return;
             }
         }
@@ -1581,6 +1617,8 @@ public static class PatchClass
     #endregion
 
     #region PortableCampfire
+    public static float baseRoastingStickMaxZ = 0f;
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.Update))]
     public static void SetExtinguishPromptVisibility(Campfire __instance)
@@ -1599,14 +1637,13 @@ public static class PatchClass
                 campfire.UpdatePrompt();
                 if (OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.All))
                 {
-                    if (campfire.IsExtinguished())
+                    campfire.OnExtinguishInteract();
+                    if (ShipEnhancements.InMultiplayer)
                     {
-                        Locator.GetPromptManager().RemoveScreenPrompt(campfire.GetPrompt(), PromptPosition.Center);
-                        campfire.PackUp();
-                    }
-                    else
-                    {
-                        campfire.SetState(Campfire.State.UNLIT);
+                        foreach (uint id in ShipEnhancements.PlayerIDs)
+                        {
+                            ShipEnhancements.QSBCompat.SendCampfireExtinguishState(id);
+                        }
                     }
                 }
             }
@@ -1677,6 +1714,22 @@ public static class PatchClass
         }
     }
 
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Campfire), nameof(Campfire.SetState))]
+    public static bool FixPortableCampfireNRE(Campfire __instance, Campfire.State newState, bool forceStateUpdate)
+    {
+        if (__instance is PortableCampfire)
+        {
+            if (__instance._hazardVolume._triggerVolume == null)
+            {
+                ShipEnhancements.Instance.ModHelper.Events.Unity.FireOnNextUpdate(() => __instance.SetState(newState, forceStateUpdate));
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.SetState))]
     public static void UpdateExtinguished(Campfire __instance, Campfire.State newState)
@@ -1725,7 +1778,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ExplosionController), nameof(ExplosionController.Update))]
     public static bool FixExplosionHeatVolume(ExplosionController __instance)
     {
-        if ((float)shipExplosionMultiplier.GetProperty() == 1f) return true;
+        if ((float)shipExplosionMultiplier.GetProperty() == 1f || (float)shipExplosionMultiplier.GetProperty() < 0f) return true;
 
         if (!__instance._playing)
         {
@@ -1752,6 +1805,20 @@ public static class PatchClass
 
         return false;
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ExplosionController), nameof(ExplosionController.Play))]
+    public static bool PlayBlackHoleExplosion(ExplosionController __instance)
+    {
+        if (__instance is BlackHoleExplosionController)
+        {
+            BlackHoleExplosionController controller = __instance as BlackHoleExplosionController;
+            controller.OpenBlackHole();
+            return false;
+        }
+
+        return true;
+    }
     #endregion
 
     #region PersistentInput
@@ -1759,7 +1826,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.OnExitFlightConsole))]
     public static bool KeepThrustIndicatorOn(ThrustAndAttitudeIndicator __instance)
     {
-        if (!(bool)enablePersistentInput.GetProperty() || !Locator.GetShipBody().GetComponent<ShipPersistentInput>().InputEnabled()) return true;
+        if (!(bool)enablePersistentInput.GetProperty() || !SELocator.GetShipBody().GetComponent<ShipPersistentInput>().InputEnabled()) return true;
 
         __instance._activeThrusterModel = __instance._jetpackThrusterModel;
         __instance._activeThrusterController = __instance._jetpackThrusterController;
@@ -1781,7 +1848,7 @@ public static class PatchClass
     {
         if ((bool)enablePersistentInput.GetProperty())
         {
-            Locator.GetShipBody().GetComponent<ShipPersistentInput>().UpdateLastAutopilotState();
+            SELocator.GetShipBody().GetComponent<ShipPersistentInput>().UpdateLastAutopilotState();
         }
     }
     #endregion
@@ -1791,10 +1858,25 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipThrusterController), nameof(ShipThrusterController.ReadTranslationalInput))]
     public static void DelayTranslational(ShipThrusterController __instance, ref Vector3 __result)
     {
-        if ((float)shipInputLatency.GetProperty() > 0f)
+        if (InputLatencyController.ReadingSavedInputs && InputLatencyController.IsInputQueued)
         {
-            InputLatencyController.AddTranslationalInput(__result);
             __result = __instance._translationalInput;
+        }
+        else if ((float)shipInputLatency.GetProperty() > 0f)
+        {
+            if (__result != Vector3.zero)
+            {
+                InputLatencyController.AddTranslationalInput(__result);
+            }
+            __result = InputLatencyController.IsTranslationalInputQueued ? __instance._translationalInput : Vector3.zero;
+        }
+        else if ((float)shipInputLatency.GetProperty() < 0f && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
+        {
+            if (__result != Vector3.zero)
+            {
+                InputLatencyController.SaveTranslationalInput(__result);
+            }
+            //__result = InputLatencyController.IsTranslationalInputQueued ? __instance._translationalInput : Vector3.zero;
         }
     }
 
@@ -1802,10 +1884,25 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipThrusterController), nameof(ShipThrusterController.ReadRotationalInput))]
     public static void DelayRotational(ShipThrusterController __instance, ref Vector3 __result)
     {
-        if ((float)shipInputLatency.GetProperty() > 0f)
+        if (InputLatencyController.ReadingSavedInputs && InputLatencyController.IsInputQueued)
         {
-            InputLatencyController.AddRotationalInput(__result);
             __result = __instance._rotationalInput;
+        }
+        else if ((float)shipInputLatency.GetProperty() > 0f)
+        {
+            if (__result != Vector3.zero)
+            {
+                InputLatencyController.AddRotationalInput(__result);
+            }
+            __result = InputLatencyController.IsRotationalInputQueued ? __instance._rotationalInput : Vector3.zero;
+        }
+        else if ((float)shipInputLatency.GetProperty() < 0f && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
+        {
+            if (__result != Vector3.zero)
+            {
+                InputLatencyController.SaveRotationalInput(__result);
+            }
+            //__result = InputLatencyController.IsTranslationalInputQueued ? __instance._translationalInput : Vector3.zero;
         }
     }
     #endregion
@@ -1865,14 +1962,14 @@ public static class PatchClass
     {
         /*if ((bool)shipIgnitionCancelFix.GetProperty())
         {
-            ShipThrusterController thrustController = Locator.GetShipBody().GetComponent<ShipThrusterController>();
+            ShipThrusterController thrustController = SELocator.GetShipBody().GetComponent<ShipThrusterController>();
             if (thrustController && thrustController._isIgniting)
             {
                 thrustController._isIgniting = false;
                 GlobalMessenger.FireEvent("CancelShipIgnition");
             }
         }*/
-        ShipThrusterController thrustController = Locator.GetShipBody().GetComponent<ShipThrusterController>();
+        ShipThrusterController thrustController = SELocator.GetShipBody().GetComponent<ShipThrusterController>();
         if (thrustController && thrustController._isIgniting)
         {
             thrustController._isIgniting = false;
@@ -1908,9 +2005,9 @@ public static class PatchClass
         }
 
         float thrusterNoiseRadius = Mathf.Lerp(0f, 400f, Mathf.InverseLerp(0f, 20f, __instance._thrusterModel.GetLocalAcceleration().magnitude));
-        MasterAlarm masterAlarm = Locator.GetShipTransform().GetComponentInChildren<MasterAlarm>();
+        MasterAlarm masterAlarm = SELocator.GetShipTransform().GetComponentInChildren<MasterAlarm>();
         float alarmNoiseRadius = masterAlarm._isAlarmOn ? 350f : 0f;
-        ShipThrusterController thrusterController = Locator.GetShipTransform().GetComponent<ShipThrusterController>();
+        ShipThrusterController thrusterController = SELocator.GetShipTransform().GetComponent<ShipThrusterController>();
         float ignitionNoiseRadius = thrusterController._isIgniting ? 500f : 0f;
         float overdriveNoiseRadius = (bool)enableThrustModulator.GetProperty() && SELocator.GetShipOverdriveController() != null 
             && SELocator.GetShipOverdriveController().IsCharging() ? 300f : 0f;
@@ -2225,14 +2322,22 @@ public static class PatchClass
         if ((bool)disableSeatbelt.GetProperty() && PlayerState.AtFlightConsole() && impact.speed > 25f)
         {
             _lastImpactVelocity = impact.velocity.normalized * -impact.speed / 40f;
-            ShipCockpitController cockpit = Locator.GetShipTransform().GetComponentInChildren<ShipCockpitController>();
+            ShipCockpitController cockpit = SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitController>();
             cockpit.ExitFlightConsole();
             cockpit._exitFlightConsoleTime -= 0.2f;
+
+            if (ShipEnhancements.InMultiplayer)
+            {
+                foreach (uint id in ShipEnhancements.PlayerIDs)
+                {
+                    ShipEnhancements.QSBCompat.SendDetachAllPlayers(id, _lastImpactVelocity);
+                }
+            }
         }
         if (ShipEnhancements.AchievementsAPI != null)
         {
             if ((float)shipInputLatency.GetProperty() >= 3f && !SEAchievementTracker.BadInternet
-                && impact.otherBody.IsKinematic() && impact.otherBody != Locator.GetShipBody().GetOrigParentBody())
+                && impact.otherBody.IsKinematic() && impact.otherBody != SELocator.GetShipBody().GetOrigParentBody())
             {
                 SEAchievementTracker.BadInternet = true;
                 ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.BAD_INTERNET");
@@ -2253,9 +2358,17 @@ public static class PatchClass
             if (impactVelocity.magnitude > 10f)
             {
                 _lastImpactVelocity = -impactVelocity / 25f;
-                ShipCockpitController cockpit = Locator.GetShipTransform().GetComponentInChildren<ShipCockpitController>();
+                ShipCockpitController cockpit = SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitController>();
                 cockpit.ExitFlightConsole();
                 cockpit._exitFlightConsoleTime -= 0.2f;
+
+                if (ShipEnhancements.InMultiplayer)
+                {
+                    foreach (uint id in ShipEnhancements.PlayerIDs)
+                    {
+                        ShipEnhancements.QSBCompat.SendDetachAllPlayers(id, _lastImpactVelocity);
+                    }
+                }
             }
         }
     }
@@ -2266,7 +2379,7 @@ public static class PatchClass
     {
         if ((bool)disableSeatbelt.GetProperty() && _lastImpactVelocity != Vector3.zero)
         {
-            Locator.GetPlayerBody().AddForce(_lastImpactVelocity);
+            SELocator.GetPlayerBody().AddForce(_lastImpactVelocity);
             _lastImpactVelocity = Vector3.zero;
         }
     }
@@ -2295,7 +2408,7 @@ public static class PatchClass
             && ShipEnhancements.AchievementsAPI != null && !SEAchievementTracker.HulkSmash
             && (!SEAchievementTracker.ShipExploded || SEAchievementTracker.PlayerCausedExplosion)
             && !SEAchievementTracker.PlayerEjectedCockpit
-            && SEAchievementTracker.LastHitBody == Locator.GetPlayerBody())
+            && SEAchievementTracker.LastHitBody == SELocator.GetPlayerBody())
         {
             SEAchievementTracker.HulkSmash = true;
             ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.HULK_SMASH");

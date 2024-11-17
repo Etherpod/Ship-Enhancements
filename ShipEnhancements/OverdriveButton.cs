@@ -53,6 +53,19 @@ public class OverdriveButton : MonoBehaviour
 
     private void OnPressInteract()
     {
+        PressButton();
+
+        if (ShipEnhancements.InMultiplayer)
+        {
+            foreach (uint id in ShipEnhancements.PlayerIDs)
+            {
+                ShipEnhancements.QSBCompat.SendOverdriveButtonState(id, _isPrimeButton, true);
+            }
+        }
+    }
+
+    public void PressButton()
+    {
         _pressed = true;
         if (!_active || !_powered) return;
 
@@ -68,6 +81,19 @@ public class OverdriveButton : MonoBehaviour
     }
 
     private void OnReleaseInteract()
+    {
+        ReleaseButton();
+
+        if (ShipEnhancements.InMultiplayer)
+        {
+            foreach (uint id in ShipEnhancements.PlayerIDs)
+            {
+                ShipEnhancements.QSBCompat.SendOverdriveButtonState(id, _isPrimeButton, false);
+            }
+        }
+    }
+
+    public void ReleaseButton()
     {
         _pressed = false;
         _buttonTransform.localPosition += new Vector3(0f, _depressionDistance, 0f);

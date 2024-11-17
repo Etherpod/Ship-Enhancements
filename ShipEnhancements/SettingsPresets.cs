@@ -73,6 +73,8 @@ public static class SettingsPresets
         { "thrusterColor", "Default" },
         { "disableSeatbelt", false },
         { "addPortableTractorBeam", false },
+        { "disableShipSuit", false },
+        { "damageIndicatorColor", "Default" },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -142,6 +144,8 @@ public static class SettingsPresets
         { "thrusterColor", "Default" },
         { "disableSeatbelt", true },
         { "addPortableTractorBeam", false },
+        { "disableShipSuit", false },
+        { "damageIndicatorColor", "Default" },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -211,6 +215,8 @@ public static class SettingsPresets
         { "thrusterColor", "Default" },
         { "disableSeatbelt", false },
         { "addPortableTractorBeam", false },
+        { "disableShipSuit", false },
+        { "damageIndicatorColor", "Default" },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -280,6 +286,8 @@ public static class SettingsPresets
         { "thrusterColor", "Default" },
         { "disableSeatbelt", false },
         { "addPortableTractorBeam", false },
+        { "disableShipSuit", false },
+        { "damageIndicatorColor", "Default" },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -349,6 +357,8 @@ public static class SettingsPresets
         { "thrusterColor", "Default" },
         { "disableSeatbelt", false },
         { "addPortableTractorBeam", false },
+        { "disableShipSuit", false },
+        { "damageIndicatorColor", "Default" },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -418,138 +428,9 @@ public static class SettingsPresets
         { "thrusterColor", "Default" },
         { "disableSeatbelt", true },
         { "addPortableTractorBeam", true },
+        { "disableShipSuit", false },
+        { "damageIndicatorColor", "Rainbow" },
     };
-
-    /*public static readonly Dictionary<string, object[]> RandomSettings = new Dictionary<string, object[]>()
-    {
-        { "disableGravityCrystal", [false, false, true] },
-        { "disableEjectButton", [false, false, true] },
-        { "disableHeadlights", [false, true] },
-        { "disableLandingCamera", [false, true] },
-        { "disableShipLights", [false, false, true] },
-        { "disableShipOxygen", [false, false, true] },
-        { "oxygenDrainMultiplier", [1f, 10f, 100f, 500f, 1f, 2000f] },
-        { "fuelDrainMultiplier", [1f, 2f, 5f, 10f, 0.5f, 100f] },
-        { "shipDamageMultiplier", [1f, 2f, 3f, 0.1f, 20f] },
-        { "shipDamageSpeedMultiplier", [1f, 0.8f, 1.2f, 0.1f, 5f] },
-        { "shipOxygenRefill", [false, true, true, true] },
-        { "disableShipRepair", [false, false, false, false, true] },
-        { "enableGravityLandingGear", [false, false, true] },
-        { "disableAirAutoRoll", [false, true] },
-        { "disableWaterAutoRoll", [false, true] },
-        { "enableThrustModulator", [false, false, true] },
-        { "temperatureZonesAmount", ["None", "None", "Sun", "All"] },
-        { "hullTemperatureDamage", [false, true] },
-        { "enableShipFuelTransfer", [false, true, true, true] },
-        { "enableJetpackRefuelDrain", [false, true, true, true] },
-        { "disableReferenceFrame", [false, false, true] },
-        { "disableMapMarkers", [false, true] },
-        { "gravityMultiplier", [1f, 1f, 0.1f, 3f] },
-        { "fuelTransferMultiplier", [0.2f, 10f] },
-        { "oxygenRefillMultiplier", [0.1f, 3f] },
-        { "temperatureDamageMultiplier", [0.2f, 20f] },
-        { "temperatureResistanceMultiplier", [0.05f, 2.5f] },
-        { "enableAutoHatch", [false, false, true] },
-        { "oxygenTankDrainMultiplier", [0.01f, 10f] },
-        { "fuelTankDrainMultiplier", [0.01f, 10f] },
-        { "componentTemperatureDamage", [false, false, true] },
-        { "atmosphereAngularDragMultiplier", [1f, 1f, 0f, 2f] },
-        { "spaceAngularDragMultiplier", [1f, 1f, 0f, 2f] },
-        { "disableRotationSpeedLimit", [false, false, false, true] },
-        { "gravityDirection", ["Down", "Down", "Random"] },
-        { "disableScoutRecall", [false, false, true] },
-        { "disableScoutLaunching", [false, false, true] },
-        { "enableScoutLauncherComponent", [false, true] },
-        { "enableManualScoutRecall", [false, false, true] },
-        { "enableShipItemPlacement", [false, true] },
-        { "addPortableCampfire", [false, false, true] },
-        { "keepHelmetOn", [true] },
-        { "showWarningNotifications", [true] },
-        { "shipExplosionMultiplier", [0.1f, 50f] },
-        { "shipBounciness", [0f, 0f, 0f, 2f] },
-        { "enablePersistentInput", [false, false, true] },
-        { "shipInputLatency", [0f, 0f, 0f, 0f, 0.2f, 1f, 0f, 0.5f] },
-        { "addEngineSwitch", [false, false, true] },
-        { "idleFuelConsumptionMultiplier", [0f, 0f, 0f, 0f, 0f, 3f] },
-        { "shipLightColor", [
-            "Default",
-            "Default",
-            "Default",
-            "Red",
-            "Hearthian Orange",
-            "Orange",
-            "Yellow",
-            "Green",
-            "Ghostly Green",
-            "Turquoise",
-            "Blue",
-            "Nomaian Blue",
-            "Blacklight",
-            "Purple",
-            "Magenta",
-            "White",
-            "Divine",
-            "Rainbow"
-            ] },
-        { "hotThrusters", [false, true] },
-        { "extraNoise", [false, true] },
-        { "interiorHullColor", [
-            "Default",
-            "Default",
-            "Default",
-            "Red",
-            "Orange",
-            "Golden",
-            "Green",
-            "Turquoise",
-            "Blue",
-            "Lavender",
-            "Pink",
-            "Gray",
-            "Rainbow"
-            ] },
-        { "exteriorHullColor", [
-            "Default",
-            "Default",
-            "Default",
-            "Red",
-            "Orange",
-            "Golden",
-            "Green",
-            "Turquoise",
-            "Blue",
-            "Lavender",
-            "Pink",
-            "Gray",
-            "Rainbow"
-            ] },
-        { "addTether", [false, false, true] },
-        { "disableDamageIndicators", [false, false, true] },
-        { "addShipSignal", [false, true] },
-        { "reactorLifetimeMultiplier", [1f, 0.1f, 3f] },
-        { "disableShipFriction", [false, false, false, true] },
-        { "enableSignalscopeComponent", [false, true] },
-        { "rustLevel", [0f, 0f, 0f, 0.1f, 0.2f, 0.5f, 0f, 1f] },
-        { "dirtAccumulationTime", [0f, 0f, 0f, 0f, 800f, 100f, 500f] },
-        { "thrusterColor", [
-            "Default",
-            "Default",
-            "Default",
-            "Red",
-            "White-Orange",
-            "Lime-Orange",
-            "Lime",
-            "Ghostly Green",
-            "Turquoise",
-            "Blue",
-            "Purple",
-            "Rose",
-            "Pink",
-            "Rainbow"
-            ] },
-        { "disableSeatbelt", [false, false, false, true] },
-        { "addPortableTractorBeam", [false, false, true] },
-    };*/
 
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()
     {
@@ -774,6 +655,23 @@ public static class SettingsPresets
             ], 0.5f, "Default") },
         { "disableSeatbelt", new RandomSettingValue(0.1f) },
         { "addPortableTractorBeam", new RandomSettingValue(0.3f) },
+        { "disableShipSuit", new RandomSettingValue(0.1f) },
+        { "damageIndicatorColor", new RandomSettingValue([
+            "Default",
+            "Orange",
+            "Yellow",
+            "Green",
+            "Outer Wilds Beta",
+            "Ghostly Green",
+            "Turquoise",
+            "Blue",
+            "Dark Blue",
+            "Nomaian Blue",
+            "Purple",
+            "Lavender",
+            "Pink",
+            "Rainbow"
+            ], 0.5f, "Default") },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

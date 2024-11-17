@@ -11,7 +11,7 @@ public static class ThrustIndicatorManager
 
     public static void Initialize()
     {
-        _indicator = Locator.GetShipTransform().GetComponentInChildren<ThrustAndAttitudeIndicator>(true);
+        _indicator = SELocator.GetShipTransform().GetComponentInChildren<ThrustAndAttitudeIndicator>(true);
 
         _barLights = _indicator.GetComponentsInChildren<Light>();
         _barRenderers = new MeshRenderer[6];

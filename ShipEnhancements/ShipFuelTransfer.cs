@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
@@ -9,13 +10,19 @@ public class ShipFuelTransfer : MonoBehaviour
     private InteractReceiver _interactReceiver;
 
     private ShipFuelTankComponent _fuelTankComponent;
+    private ShipResources _shipResources;
     private bool _transferring = false;
     private bool _jetpackFuelDepleted = false;
     private bool _shipFuelFull = false;
+    private bool _shipDestroyed = false;
+    private bool _reverse;
 
     private void Start()
     {
         _fuelTankComponent = GetComponentInParent<ShipFuelTankComponent>();
+        _shipResources = SELocator.GetShipResources();
+
+        _reverse = (float)fuelTransferMultiplier.GetProperty() < 0f;
         _shipFuelFull = IsShipFuelFull();
 
         _fuelTankComponent.OnRepaired += ctx => OnComponentRepaired();
@@ -24,6 +31,7 @@ public class ShipFuelTransfer : MonoBehaviour
         _interactReceiver.OnReleaseInteract += OnReleaseInteract;
         GlobalMessenger.AddListener("SuitUp", OnSuitUp);
         GlobalMessenger.AddListener("RemoveSuit", OnRemoveSuit);
+        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
 
         _fuelTankComponent._damageEffect._particleSystem.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
         _interactReceiver.SetPromptText(UITextType.HoldPrompt, "Transfer jetpack fuel");
@@ -38,17 +46,17 @@ public class ShipFuelTransfer : MonoBehaviour
         if (_shipFuelFull && !IsShipFuelFull())
         {
             _shipFuelFull = false;
-            if (!_jetpackFuelDepleted)
+            if (!_jetpackFuelDepleted && (!_fuelTankComponent.isDamaged || (bool)disableShipRepair.GetProperty()))
             {
                 _interactReceiver.EnableInteraction();
             }
         }
 
-        if (_jetpackFuelDepleted)
+        if (_jetpackFuelDepleted && SELocator.GetPlayerResources()._currentFuel > 0)
         {
-            if (SELocator.GetPlayerResources()._currentFuel > 0)
+            _jetpackFuelDepleted = false;
+            if (!_fuelTankComponent.isDamaged || (bool)disableShipRepair.GetProperty())
             {
-                _jetpackFuelDepleted = false;
                 _interactReceiver.EnableInteraction();
             }
         }
@@ -61,7 +69,17 @@ public class ShipFuelTransfer : MonoBehaviour
             else
             {
                 SELocator.GetPlayerResources()._currentFuel -= (PlayerResources._maxFuel * Time.deltaTime) / 3f;
-                SELocator.GetShipResources().AddFuel(PlayerResources._maxFuel * Time.deltaTime * 5f * (float)fuelTransferMultiplier.GetProperty());
+                float amountToAdd = PlayerResources._maxFuel * Time.deltaTime * 5f * (float)fuelTransferMultiplier.GetProperty();
+                _shipResources._currentFuel = Mathf.Clamp(_shipResources._currentFuel + amountToAdd, 0f, _shipResources._maxFuel);
+
+                if (ShipEnhancements.InMultiplayer)
+                {
+                    foreach (uint id in ShipEnhancements.PlayerIDs)
+                    {
+                        ShipEnhancements.QSBCompat.SendShipFuelDrain(id, -amountToAdd, false);
+                    }
+                }
+
                 if (SELocator.GetPlayerResources()._currentFuel <= 0)
                 {
                     OnReleaseInteract();
@@ -73,6 +91,14 @@ public class ShipFuelTransfer : MonoBehaviour
                     OnReleaseInteract();
                     _shipFuelFull = true;
                     _interactReceiver.DisableInteraction();
+                    
+                    if (ShipEnhancements.InMultiplayer)
+                    {
+                        foreach (uint id in ShipEnhancements.PlayerIDs)
+                        {
+                            ShipEnhancements.QSBCompat.SendShipFuelMax(id);
+                        }
+                    }
                 }
             }
         }
@@ -80,7 +106,25 @@ public class ShipFuelTransfer : MonoBehaviour
 
     private bool IsShipFuelFull()
     {
-        return SELocator.GetShipResources()._currentFuel >= SELocator.GetShipResources()._maxFuel;
+        return _reverse ? _shipResources._currentFuel <= 0f 
+            : _shipResources._currentFuel >= _shipResources._maxFuel;
+    }
+
+    public void UpdateInteractable()
+    {
+        _shipFuelFull = IsShipFuelFull();
+        _jetpackFuelDepleted = SELocator.GetPlayerResources()._currentFuel <= 0;
+
+        if (_shipDestroyed) return;
+
+        if (_shipFuelFull || _jetpackFuelDepleted)
+        {
+            _interactReceiver.DisableInteraction();
+        }
+        else if (PlayerState.IsWearingSuit() && !_fuelTankComponent.isDamaged)
+        {
+            _interactReceiver.EnableInteraction();
+        }
     }
 
     private void OnPressInteract()
@@ -116,18 +160,20 @@ public class ShipFuelTransfer : MonoBehaviour
 
     private void OnComponentRepaired()
     {
-        if ((bool)disableShipRepair.GetProperty()) return;
+        if (_shipDestroyed || (bool)disableShipRepair.GetProperty()) return;
         _interactReceiver.EnableInteraction();
     }
 
     private void OnComponentDamaged()
     {
-        if ((bool)disableShipRepair.GetProperty()) return;
+        if (_shipDestroyed || (bool)disableShipRepair.GetProperty()) return;
         _interactReceiver.DisableInteraction();
     }
 
     private void OnSuitUp()
     {
+        if (_shipDestroyed) return;
+
         if (!_shipFuelFull && !_jetpackFuelDepleted)
         {
             _interactReceiver.EnableInteraction();
@@ -136,7 +182,16 @@ public class ShipFuelTransfer : MonoBehaviour
 
     private void OnRemoveSuit()
     {
+        if (_shipDestroyed) return;
+
         _interactReceiver.DisableInteraction();
+    }
+
+    private void OnShipSystemFailure()
+    {
+        _shipDestroyed = true;
+        _interactReceiver.DisableInteraction();
+        enabled = false;
     }
 
     private void OnDestroy()
@@ -147,5 +202,6 @@ public class ShipFuelTransfer : MonoBehaviour
         _interactReceiver.OnReleaseInteract -= OnReleaseInteract;
         GlobalMessenger.RemoveListener("SuitUp", OnSuitUp);
         GlobalMessenger.RemoveListener("RemoveSuit", OnRemoveSuit);
+        GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
     }
 }

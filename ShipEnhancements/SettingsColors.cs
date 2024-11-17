@@ -72,6 +72,108 @@ public static class SettingsColors
         { "Rainbow", Color.white },
     };
 
+    private static Dictionary<string, ((Color, float) hull, (Color, float) component, Color alarm, (Color, float) alarmLit, Color light)> _nameToDamageColor = new()
+    {
+        { "Default", ((Color.white, 1f), (Color.white, 1f), Color.white, (Color.white, 1f), Color.white) },
+        {
+            "Orange",
+            ((new Color(191, 24, 2), 1.2f),
+            (new Color(191, 35, 0), 1.4f),
+            new Color(190, 113, 71),
+            (new Color(191, 99, 57), 0.89f),
+            new Color(255, 140, 0))
+        },
+        {
+            "Yellow",
+            ((new Color(191, 99, 0), 0.82f),
+            (new Color(191, 108, 0), 1.4f),
+            new Color(48, 54, 77),
+            (new Color(191, 154, 59), 0.87f),
+            new Color(255, 238, 0))
+        },
+        {
+            "Green",
+            ((new Color(37, 149, 0), 0f),
+            (new Color(111, 235, 0), 0f),
+            new Color(141, 195, 106),
+            (new Color(77, 191, 28), 0.8f),
+            new Color(163, 255, 30))
+        },
+        {
+            "Outer Wilds Beta",
+            ((new Color(0, 29, 4), 0f),
+            (new Color(0, 29, 4), 0f),
+            new Color(1, 58, 74),
+            (new Color(191, 82, 81), 0.8f),
+            new Color(255, 0, 0))
+        },
+        {
+            "Ghostly Green",
+            ((new Color(0, 212, 42), 0f),
+            (new Color(0, 222, 85), 0f),
+            new Color(99, 204, 138),
+            (new Color(39, 191, 84), 0.72f),
+            new Color(30, 255, 115))
+        },
+        {
+            "Turquoise",
+            ((new Color(0, 197, 191), 0f),
+            (new Color(0, 172, 226), 0f),
+            new Color(130, 200, 204),
+            (new Color(55, 191, 182), 0.73f),
+            new Color(0, 255, 253))
+        },
+        {
+            "Blue",
+            ((new Color(20, 105, 244), 0f),
+            (new Color(16, 49, 191), 1.33f),
+            new Color(79, 137, 192),
+            (new Color(55, 99, 191), 0.95f),
+            new Color(0, 163, 255))
+        },
+        {
+            "Dark Blue",
+            ((new Color(0, 14, 79), 0f),
+            (new Color(10, 33, 135), 0f),
+            new Color(74, 103, 192),
+            (new Color(32, 61, 191), 1.05f),
+            new Color(0, 90, 255))
+        },
+        {
+            "Nomaian Blue",
+            ((new Color(28, 38, 204), 0f),
+            (new Color(21, 18, 191), 1.37f),
+            new Color(120, 133, 221),
+            (new Color(54, 58, 191), 1.2f),
+            new Color(88, 0, 255))
+        },
+        {
+            "Purple",
+            ((new Color(72, 0, 255), 0f),
+            (new Color(28, 0, 191), 1.6f),
+            new Color(124, 81, 178),
+            (new Color(74, 54, 191), 1.16f),
+            new Color(110, 0, 255))
+        },
+        {
+            "Lavender",
+            ((new Color(134, 39, 191), 0.5f),
+            (new Color(74, 30, 191), 1.5f),
+            new Color(168, 120, 195),
+            (new Color(108, 88, 191), 1.08f),
+            new Color(214, 160, 255))
+        },
+        {
+            "Pink",
+            ((new Color(191, 18, 94), 1.11f),
+            (new Color(191, 16, 111), 1.75f),
+            new Color(209, 84, 201),
+            (new Color(191, 81, 185), 0.82f),
+            new Color(255, 83, 216))
+        },
+        { "Rainbow", ((Color.white, 1f), (Color.white, 1f), Color.white, (Color.white, 1f), Color.white) },
+    };
+
     public static Color GetLightingColor(string name)
     {
         if (name == "Divine")
@@ -95,5 +197,39 @@ public static class SettingsColors
     public static Color GetIndicatorColor(string name)
     {
         return _nameToIndicatorColor.ContainsKey(name) ? _nameToIndicatorColor[name] / 255f : _nameToIndicatorColor["Default"];
+    }
+
+    public static (Color hull, Color component, Color alarm, Color alarmLit, Color light) GetDamageColor(string name)
+    {
+        if (_nameToDamageColor.ContainsKey(name))
+        {
+            ((Color, float) hull, (Color, float) component, Color alarm, (Color, float) alarmLit, Color light) = _nameToDamageColor[name];
+            (Color hull, Color component, Color alarm, Color alarmLit, Color light) color;
+            color.hull = GetUnitColor(hull);
+            ShipEnhancements.WriteDebugMessage(color.hull);
+            color.component = GetUnitColor(component);
+            color.alarm = GetUnitColor((alarm, 0f));
+            color.alarmLit = GetUnitColor(alarmLit);
+            color.light = GetUnitColor((light, 0f));
+
+            return color;
+        }
+
+        return (Color.white, Color.white, Color.white, Color.white, Color.white);
+    }
+
+    private static Color GetUnitColor((Color, float) color)
+    {
+        Color newColor;
+        if (color.Item2 > 0f)
+        {
+            newColor = color.Item1 / 191f * Mathf.Pow(2, color.Item2);
+        }
+        else
+        {
+            newColor = color.Item1 / 255f;
+        }
+        newColor.a = 1f;
+        return newColor;
     }
 }

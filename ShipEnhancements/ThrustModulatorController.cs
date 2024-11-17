@@ -46,7 +46,7 @@ public class ThrustModulatorController : ElectricalComponent
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
 
-        _electricalSystem = Locator.GetShipTransform()
+        _electricalSystem = SELocator.GetShipTransform()
             .Find("Module_Cockpit/Systems_Cockpit/FlightControlsElectricalSystem")
             .GetComponent<ElectricalSystem>();
         List<ElectricalComponent> componentList = [.. _electricalSystem._connectedComponents];
@@ -203,6 +203,20 @@ public class ThrustModulatorController : ElectricalComponent
             _focused = _focusedButtons > 0;
             _buttonPanel.UpdateFocusedButtons(_focused);
         }
+    }
+
+    public ThrustModulatorButton GetModulatorButton(int level)
+    {
+        foreach (ThrustModulatorButton button in _modulatorButtons)
+        {
+            if (button.GetModulatorLevel() == level)
+            {
+                return button;
+            }
+        }
+
+        ShipEnhancements.WriteDebugMessage("Could not find modulator button of level " + level);
+        return null;
     }
 
     private void OnDestroy()

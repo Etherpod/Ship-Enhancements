@@ -15,7 +15,7 @@ public abstract class ProbePickupVolume : MonoBehaviour
 
     protected virtual void Awake()
     {
-        _probe = Locator.GetProbe();
+        _probe = SELocator.GetProbe();
         _probeLauncher = FindObjectOfType<PlayerBody>().GetComponentInChildren<PlayerProbeLauncher>();
 
         _interactReceiver.OnPressInteract += OnPressInteract;

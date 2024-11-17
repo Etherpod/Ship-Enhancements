@@ -58,13 +58,13 @@ public class ShipOverdriveController : ElectricalComponent
 
         base.Awake();
         _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
-        _reactor = Locator.GetShipTransform().GetComponentInChildren<ShipReactorComponent>();
+        _reactor = SELocator.GetShipTransform().GetComponentInChildren<ShipReactorComponent>();
         _modulatorController = GetComponent<ThrustModulatorController>();
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
         ShipEnhancements.Instance.OnFuelDepleted += OnFuelDepleted;
         ShipEnhancements.Instance.OnFuelRestored += OnFuelRestored;
 
-        _electricalSystem = Locator.GetShipTransform()
+        _electricalSystem = SELocator.GetShipTransform()
             .Find("Module_Cockpit/Systems_Cockpit/FlightControlsElectricalSystem")
             .GetComponent<ElectricalSystem>();
         List<ElectricalComponent> componentList = [.. _electricalSystem._connectedComponents];
@@ -76,7 +76,7 @@ public class ShipOverdriveController : ElectricalComponent
     {
         List<Renderer> renderers = [];
         List<Light> lights = [];
-        foreach (ThrusterFlameController flame in Locator.GetShipTransform().GetComponentsInChildren<ThrusterFlameController>())
+        foreach (ThrusterFlameController flame in SELocator.GetShipTransform().GetComponentsInChildren<ThrusterFlameController>())
         {
             renderers.Add(flame.GetComponentInChildren<MeshRenderer>());
             lights.Add(flame.GetComponentInChildren<Light>());
@@ -126,14 +126,25 @@ public class ShipOverdriveController : ElectricalComponent
             _primeButton.OnDisruptedEvent(_wasDisrupted);
             _activateButton.OnDisruptedEvent(_wasDisrupted);
         }
-        if (OWInput.IsPressed(InputLibrary.freeLook) != _wasInFreeLook)
+        if (OWInput.IsPressed(InputLibrary.freeLook, InputMode.ShipCockpit) != _wasInFreeLook)
         {
-            _wasInFreeLook = OWInput.IsPressed(InputLibrary.freeLook);
+            _wasInFreeLook = OWInput.IsPressed(InputLibrary.freeLook, InputMode.ShipCockpit);
             if (!_wasInFreeLook && !_charging)
             {
                 StopAllCoroutines();
+                _onResetTimer = false;
                 _primeButton.SetButtonOn(false);
                 _activateButton.SetButtonActive(false);
+
+                if (ShipEnhancements.InMultiplayer)
+                {
+                    foreach (uint id in ShipEnhancements.PlayerIDs)
+                    {
+                        ShipEnhancements.QSBCompat.SendStopOverdriveCoroutines(id);
+                        ShipEnhancements.QSBCompat.SendOverdriveButtonState(id, true, false, true);
+                        ShipEnhancements.QSBCompat.SendOverdriveButtonState(id, false, false, true);
+                    }
+                }
             }
         }
         if (_onResetTimer && !_charging)
@@ -149,25 +160,36 @@ public class ShipOverdriveController : ElectricalComponent
 
     private void Overdrive()
     {
+        bool host = !ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost();
+
         if (!_reactor.isDamaged)
         {
             _shipAudioSource.PlayOneShot(AudioType.EyeBigBang);
-            _reactor.SetDamaged(true);
             if ((bool)extraNoise.GetProperty())
             {
-                Locator.GetShipDetector().GetComponent<ShipNoiseMaker>()._noiseRadius = 800f;
+                SELocator.GetShipDetector().GetComponent<ShipNoiseMaker>()._noiseRadius = 800f;
+            }
+
+            if (host)
+            {
+                _reactor.SetDamaged(true);
             }
         }
-        else
+        else if (host)
         {
             SELocator.GetShipDamageController().Explode();
             return;
         }
-        Locator.GetShipBody().AddImpulse(Locator.GetShipTransform().forward * 500f);
-        SELocator.GetShipResources().DrainFuel(150f);
+
+        if (host)
+        {
+            SELocator.GetShipBody().AddImpulse(SELocator.GetShipTransform().forward * 500f);
+            SELocator.GetShipResources().DrainFuel(150f);
+            ShipElectricalComponent electrical = SELocator.GetShipDamageController()._shipElectricalComponent;
+            electrical._electricalSystem.Disrupt(electrical._disruptionLength);
+        }
+
         _defaultColor = _thrusterRenderers[0].material.GetColor("_Color");
-        ShipElectricalComponent electrical = SELocator.GetShipDamageController()._shipElectricalComponent;
-        electrical._electricalSystem.Disrupt(electrical._disruptionLength);
         _primeButton.SetButtonOn(false);
         _activateButton.SetButtonActive(false);
         _cooldownT = 1f;
@@ -258,7 +280,8 @@ public class ShipOverdriveController : ElectricalComponent
     private void OnFuelRestored()
     {
         _fuelDepleted = false;
-        if (!_powered && !SELocator.GetShipDamageController().IsElectricalFailed())
+        if (!_powered && !SELocator.GetShipDamageController().IsElectricalFailed()
+            && ShipEnhancements.Instance.engineOn)
         {
             SetPowered(true);
         }
@@ -274,6 +297,7 @@ public class ShipOverdriveController : ElectricalComponent
             _primeButton.SetButtonOn(false);
             _activateButton.SetButtonActive(false);
         }
+
         _primeButton.SetPowered(powered, _electricalSystem.IsDisrupted());
         _activateButton.SetPowered(powered, _electricalSystem.IsDisrupted());
     }
@@ -302,6 +326,11 @@ public class ShipOverdriveController : ElectricalComponent
     public bool IsCooldown()
     {
         return _onCooldown;
+    }
+
+    public OverdriveButton GetButton(bool isPrimeButton)
+    {
+        return isPrimeButton ? _primeButton : _activateButton;
     }
 
     private void OnDestroy()

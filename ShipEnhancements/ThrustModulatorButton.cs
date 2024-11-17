@@ -78,6 +78,19 @@ public class ThrustModulatorButton : MonoBehaviour
 
     private void OnPressInteract()
     {
+        PressButton();
+
+        if (ShipEnhancements.InMultiplayer)
+        {
+            foreach (uint id in ShipEnhancements.PlayerIDs)
+            {
+                ShipEnhancements.QSBCompat.SendModulatorButtonState(id, _modulatorLevel, true);
+            }
+        }
+    }
+
+    public void PressButton()
+    {
         _pressed = true;
         if (_buttonPressedAudio)
         {
@@ -89,6 +102,19 @@ public class ThrustModulatorButton : MonoBehaviour
     }
 
     private void OnReleaseInteract()
+    {
+        ReleaseButton();
+
+        if (ShipEnhancements.InMultiplayer)
+        {
+            foreach (uint id in ShipEnhancements.PlayerIDs)
+            {
+                ShipEnhancements.QSBCompat.SendModulatorButtonState(id, _modulatorLevel, false);
+            }
+        }
+    }
+
+    public void ReleaseButton()
     {
         _pressed = false;
         if (_buttonReleasedAudio)

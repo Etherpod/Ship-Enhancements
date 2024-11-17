@@ -1,20 +1,23 @@
 ![Ship Enhancements banner](banner.png)
+
 Ship Enhancements adds way too many options for changing the ship and things relating to the ship. Experiment and have fun!
+
 # Feature Overview
 
 ## Disable Ship Parts
 Permanently remove useless or very important parts of the ship.
-- **Gravity Crystal**: Turns your ship into a Zero-G environment.
+- **Gravity Crystal**: You are now only affected by outside sources of gravity. If you're in space you'll just float.
 - **Headlights**: Disables your ship's headlights and landing camera light. You may need to rely on your scout for light.
 - **Landing Camera**: Good luck.
-- **Eject Button**: Intended for multiplayer, which this mod does not currently have support for.
-- **Interior/Exterior Lights**: Basically enables dark mode.
+- **Eject Button**: Covers the eject button with tape so that your friend can't keep ejecting the cockpit while you're trying to fly.
+- **Interior/Exterior Lights**: Makes your ship very dark.
 - **Oxygen**: Literally removes all of the oxygen in the ship unless you're near trees or in an oxygen-filled atmosphere. This takes priority over all of the other oxygen modifications.
 - **Ship Scout Recall**: Removes your ability to recall the scout from the ship. You'll have to get up and do it yourself.
 - **Ship Scout Launching**: Removes your ability to launch the scout from the ship. You'll have to do this yourself outside of the ship.
 - **Ship Repair**: Be careful not to damage your ship.
 - **Damage Indicators**: Turns off all of those pesky notifications about parts of your ship being damaged, including the master alarm. Keep an eye or four on the reactor, please.
 - **Seatbelt**: Breaks a number of state laws by removing your seatbelt. If you crash into something too quickly you'll fly out of the chair.
+- **Ship Suit**: Removes your spacesuit from the ship. Space exploration just got a whole lot more dangerous.
 - **Air/Water Auto Roll**: Lets you fly around upside down in air and water, which is really confusing when paired with no ship gravity. Also makes it easier to land on walls, if you wanted to do that.
 - **Disable Rotation Speed Limit**: Lets you spin your ship as quickly as you want, though spinning too fast may tear your ship apart. Enabling this may quickly lead to motion sickness.
 - **Ship Friction**: Essentially makes your ship a block of ice that will slide anywhere on anything.
@@ -39,7 +42,7 @@ Change some of the values that control how the ship works or how the added featu
 - **Atmosphere/Space Angular Drag Multiplier**: Larger numbers make it harder to turn your ship. Setting this to 0 lets you spin your ship forever.
 - **Ship Explosion Multiplier**: Larger numbers increase the size of the explosion that is created when your ship blows up. Set this to something between 10 and 30 to simulate an atomic bomb.
 - **Reactor Lifetime Multiplier**: Larger numbers increase the time it takes for the reactor to blow up when it has been damaged. Set this to something small to give yourself a panic attack every time the master alarm goes off.
-- **Ship Bounciness**: Larger numbers increase the bounciness of the ship. A value of 0.5 means the ship will retain half of its speed when hitting something, and a value of 2 means the ship will double its speed every time it hits something.
+- **Ship Bounciness**: Larger numbers increase the bounciness of the ship. A value of 2 should make the ship double its speed when it hits something, but the results of this setting aren't entirely accurate.
 - **Ship Input Latency**: This basically simulates internet lag, where larger numbers increase the time it takes for the ship to process your inputs. A value of 1 means it takes 1 second for your "upwards thrust" input to register.
 
 ## Add Ship Functions
@@ -54,15 +57,15 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Temperature Zones**: Implements a temperature mechanic for the unused temperature dial in the ship. High and low temperature zones are added around the solar system that increase or decrease your ship's hull temperature. The longer you allow your hull's temperature to fluctuate, the more likely it is for your ship to take damage.
 - **Hull Temperature Damage**: Damages your ship over time in extreme temperatures, like near the Sun or on the dark side of the Interloper. Your temperature dial will start flashing if it's hot or cold enough to start taking damage.
 - **Component Temperature Damage**: Similar to hull temperature damage, but it damages random components instead.
-- **Hazardous Thrusters**: Makes your ship's thruster flames actually damage you. Good luck finding out how to get near them in the first place.
+- **Hazardous Thrusters**: Makes your ship's thruster flames actually damage you. Good luck figuring out how to get near them in the first place.
 - **Cockpit Rust Level**: Controls how much rust is applied to the ship cockpit. Moving the slider all the way to the right completely covers the cockpit in rust.
 - **Dirt Accumulation Time**: Larger numbers increase the time (in seconds) it takes for dirt to build up on your cockpit glass, which you can wash off by finding a source of water. Set this to 0 to disable it.
 - **Scout Launcher Component**: Turns the ship's scout launcher into a fully functioning ship component. If you damage it, you won't be able to launch or recall your scout from the ship until you repair it.
 - **Signalscope Component**: Turns the ship's signalscope into a fully functioning ship component. If you damage it, you won't be able to receive or broadcast signals from the ship until you repair it.
-- **Ship Signal**: Adds a signal for the ship on the Deep Space Radio frequency. The signal will stop if the ship's signalscope is damaged.
-- **Add Portable Campfire**: Adds a portable campfire to the ship next to your suit. Place this anywhere you'd like and roast a marshmallow. Recommended to use with **Keep Helmet On** so that you don't suffocate yourself.
+- **Ship Signal**: Adds a signal for the ship on the Outer Wilds Ventures frequency. The signal will stop if the ship's signalscope is damaged.
+- **Add Portable Campfire**: Adds a portable campfire to the ship next to your suit. Set it up wherever you want and roast a marshmallow.
 - **Add Ship Tether**: Adds a few hooks to the ship cabin. You can attach these hooks to pretty much any surface- including the ship- and tether yourself to them. If you want to get even crazier, grab a second hook after tethering to one and tether to the new one; it will connect the two hooks together.
-- **Gravity Landing Gear**: Equips your ship's landing gear with the latest gravity-powered technology, letting you stick to surfaces if your landing gear is intact. You can toggle it on or off with a switch in the cockpit.
+- **Gravity Landing Gear**: Adds a switch to the cockpit that powers your landing gear with gravitational force, letting you stick to surfaces. It's a bit fragile though, and only works if your landing gear isn't damaged.
 - **Thrust Modulator**: Adds an interface to the cockpit that lets you lower or disproportionately raise the maximum thrust your ship can use. Stacks with the smooth thrust option from General Enhancements.
 - **Persistent Input**: Adds a switch to the cockpit that, when enabled, lets you continue your last input when you unbuckle from the ship. Useful when you want to hold forward for 10 minutes and don't feel like actually holding it the entire time.
 - **Engine Switch**: Controls your ship's power and engine. The switch needs to be on if you want to use your ship. If the **Idle Fuel Consumption Multiplier** is above 0, it will only consume fuel when the ship is on.
@@ -72,6 +75,7 @@ Haven't you ever wished your ship had a little more color?
 - **Ship Light Color**: Changes the color of the ship's interior and exterior lights from a wide variety of options. Set this to Divine at your own risk, for mere Hearthians were never meant to see creations blessed by a god.
 - **Interior/Exterior Hull Color**: Select from a variety of colors to change the inside or outside color of your ship. Just don't pick Rainbow.
 - **Ship Thruster Flame Color**: Changes the color of the ship's thruster flames as well as the color of the thruster indicator inside of the ship.
+- **Damage Indicator Color**: Changes the color of the ship damage display, the master alarm, and the damage indicator lights.
 
 ## Quality of Life
 These are all enabled by default.
@@ -83,24 +87,29 @@ In case there are too many settings to deal with, there are some pre-made preset
 
 When you select a preset, you may have to close and reopen the settings menu for the changes to be visible. The mod manager has a few bugs currently.
 
-- **Vanilla Plus** - The classic Outer Wilds experience wtih a few quality of life changes.
+- **Vanilla Plus** - Turns everything off except for the Quality of Life changes.
 - **Minimal** - What if Slate didn't add all those extra things to your ship? This is that reality.
 - **Relaxed** - Gives you more resources and less damage.
-- **Hardcore** - A much more difficult and punishing experience. Resources are lower and damage is permanent.
-- **Wanderer** - Makes the possibility of getting lost very, very likely. Your ship's lock-on system is broken and you can no longer see the markers for your ship and scout.
-- **Pandemonium** - I basically just went through and turned everything on.
-- **Random** - Randomizes all of the options each loop. Preserves the settings you had previously selected so that you can switch back anytime.\
+- **Hardcore** - Resources are lower and damage is permanent.
+- **Wanderer** - Makes the possibility of getting lost very, very likely.
+- **Pandemonium** - I just turned everything on for this one. Good luck.
+- **Random** - Randomizes all of the options each loop. Preserves the settings you had previously selected so that you can switch back anytime.
 
 ## Achievements
-Ship Enhancements adds 8 new achievements to the **Achievements+** mod! Use it with Ship Enhancements if you want to create some meaning from the chaos.
+Ship Enhancements adds 9 new achievements to the **Achievements+** mod! Use it with Ship Enhancements if you want to create some meaning from the chaos.
+
+## Multiplayer
+This mod is fully compatible with Quantum Space Buddies! Whoever hosts the game will control what settings are enabled or disabled.
+
+If you run into any bugs, feel free to report it on GitHub or on the Outer Wilds Modding Discord server.
 
 ## API
 - **CreateTemperatureZone()** - In case you're a modder and want to add your own high/low temperature zones. Temperature zones can stack, and will just take the sum of the temperatures.
 - **GetSettingsProperty()** - Returns the value of a config setting as seen from the player. These values only update at the beginning of the loop, so changing the mod settings doesn't affect them.
 - **SetSettingsProperty()** - Lets you change the value of a config setting in the middle of the loop. Note that this change will be reverted on the next loop.
 
-## Multiplayer
-Currently there is no support for multiplayer (Quantum Space Buddies), but I do plan on adding it in the future. You can still technically do multiplayer with this mod enabled, but things will definitely break.
+## Known Bugs
+- When playing in multiplayer and using Input Latency, the delayed inputs of the non-hosts will not work once they leave the flight console
 
 # Credits
 Thanks to Ditzy and JohnCorby for helping with some of the code, especially the physics stuff.

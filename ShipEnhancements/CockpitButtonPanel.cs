@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 namespace ShipEnhancements;
 
@@ -43,7 +44,7 @@ public class CockpitButtonPanel : MonoBehaviour
     private bool _completedSlide = false;
     private float _buttonPanelT = 0f;
     private float _extensionTime = 0.4f;
-    private int _focusedButtons;
+    private int _focusedButtons = 0;
     private InteractZone _cockpitInteractVolume;
 
     private void Start()
@@ -57,28 +58,36 @@ public class CockpitButtonPanel : MonoBehaviour
         {
             _bottomPanel.SetActive(false);
         }
-        _cockpitInteractVolume = (InteractZone)Locator.GetShipBody().GetComponentInChildren<ShipCockpitController>()._interactVolume;
+        _cockpitInteractVolume = (InteractZone)SELocator.GetShipBody().GetComponentInChildren<ShipCockpitController>()._interactVolume;
         GlobalMessenger.AddListener("ExitFlightConsole", OnExitFlightConsole);
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
     }
     
     private void Update()
     {
+        if (!PlayerState.AtFlightConsole()) return;
+
         if (!_extending && OWInput.IsNewlyPressed(InputLibrary.freeLook, InputMode.ShipCockpit))
         {
-            _extending = true;
-            _completedSlide = false;
-            _audioSource.Stop();
-            _audioSource.clip = _extendAudio;
-            _audioSource.Play();
+            UpdateExtended(true);
+            if (ShipEnhancements.InMultiplayer)
+            {
+                foreach (uint id in ShipEnhancements.PlayerIDs)
+                {
+                    ShipEnhancements.QSBCompat.SendPanelExtended(id, true);
+                }
+            }
         }
         else if (_extending && OWInput.IsNewlyReleased(InputLibrary.freeLook, InputMode.ShipCockpit))
         {
-            _extending = false;
-            _completedSlide = false;
-            _audioSource.Stop();
-            _audioSource.clip = _retractAudio;
-            _audioSource.Play();
+            UpdateExtended(false);
+            if (ShipEnhancements.InMultiplayer)
+            {
+                foreach (uint id in ShipEnhancements.PlayerIDs)
+                {
+                    ShipEnhancements.QSBCompat.SendPanelExtended(id, false);
+                }
+            }
         }
     }
 
@@ -112,15 +121,38 @@ public class CockpitButtonPanel : MonoBehaviour
         }
     }
 
-    private void OnExitFlightConsole()
+    public void UpdateExtended(bool extended)
     {
-        if (_extending)
+        if (extended)
+        {
+            _extending = true;
+            _completedSlide = false;
+            _audioSource.Stop();
+            _audioSource.clip = _extendAudio;
+            _audioSource.Play();
+        }
+        else
         {
             _extending = false;
             _completedSlide = false;
             _audioSource.Stop();
             _audioSource.clip = _retractAudio;
             _audioSource.Play();
+        }
+    }
+
+    private void OnExitFlightConsole()
+    {
+        if (_extending)
+        {
+            UpdateExtended(false);
+            if (ShipEnhancements.InMultiplayer)
+            {
+                foreach (uint id in ShipEnhancements.PlayerIDs)
+                {
+                    ShipEnhancements.QSBCompat.SendPanelExtended(id, false);
+                }
+            }
         }
     }
 
@@ -195,7 +227,10 @@ public class CockpitButtonPanel : MonoBehaviour
         }
         else if (!PlayerState.AtFlightConsole())
         {
-            _cockpitInteractVolume.EnableInteraction();
+            if (!ShipEnhancements.InMultiplayer || !ShipEnhancements.QSBInteraction.FlightConsoleOccupied())
+            {
+                _cockpitInteractVolume.EnableInteraction();
+            }
         }
     }
 

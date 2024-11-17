@@ -74,6 +74,8 @@ public static class SettingExtensions
         { Settings.thrusterColor, ("Default", "Default") },
         { Settings.disableSeatbelt, (false, false) },
         { Settings.addPortableTractorBeam, (false, false) },
+        { Settings.disableShipSuit, (false, false) },
+        { Settings.damageIndicatorColor, ("Default", "Default") },
     };
 
     public static string GetName(this Settings setting)
@@ -96,6 +98,10 @@ public static class SettingExtensions
         else if (value.Type == JTokenType.Float)
         {
             return float.Parse(value.ToString());
+        }
+        else if (value.Type == JTokenType.Integer)
+        {
+            return (float)int.Parse(value.ToString());
         }
         else if (value.Type == JTokenType.String)
         {
@@ -121,6 +127,10 @@ public static class SettingExtensions
             else if (value.Type == JTokenType.Float)
             {
                 return float.Parse(value.ToString());
+            }
+            else if (value.Type == JTokenType.Integer)
+            {
+                return (float)int.Parse(value.ToString());
             }
             else if (value.Type == JTokenType.String)
             {

@@ -1,9 +1,16 @@
-﻿using static ShipEnhancements.ShipEnhancements.Settings;
+﻿using System.Linq;
+using UnityEngine;
+using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
 public static class SELocator
 {
+    private static ShipBody _shipBody;
+    private static Transform _shipTransform;
+    private static GameObject _shipDetector;
+    private static PlayerBody _playerBody;
+    private static SurveyorProbe _probe;
     private static OxygenDetector _shipOxygenDetector;
     private static ShipResources _shipResources;
     private static OxygenVolume _shipOxygenVolume;
@@ -13,30 +20,75 @@ public static class SELocator
     private static ShipDamageController _shipDamageController;
     private static ShipOverdriveController _shipOverdriveController;
     private static SignalscopeComponent _signalscopeComponent;
+    private static CockpitButtonPanel _buttonPanel;
+    private static ThrustModulatorController _modulatorController;
+    private static PortableCampfire _portableCampfire;
+    private static CockpitFilthController _cockpitFilthController;
 
     public static void Initalize()
     {
-        _shipResources = Locator.GetShipBody().GetComponent<ShipResources>();
-        _shipOxygenVolume = Locator.GetShipBody().GetComponentInChildren<OxygenVolume>();
-        _playerResources = Locator.GetPlayerBody().GetComponent<PlayerResources>();
-        _shipDamageController = Locator.GetShipTransform().GetComponent<ShipDamageController>();
+        _shipBody = Object.FindObjectOfType<ShipBody>();
+        _shipTransform = _shipBody.transform;
+        _shipDetector = _shipBody.GetComponentInChildren<ShipFluidDetector>().gameObject;
+        _playerBody = Object.FindObjectOfType<PlayerBody>();
+        _probe = Object.FindObjectsOfType<SurveyorProbe>().Where(obj => obj.name == "Probe_Body").ToArray()[0];
+        _shipResources = _shipBody.GetComponent<ShipResources>();
+        _shipOxygenVolume = _shipBody.GetComponentInChildren<OxygenVolume>();
+        _playerResources = _playerBody.GetComponent<PlayerResources>();
+        _shipDamageController = _shipTransform.GetComponent<ShipDamageController>();
 
-        if ((bool)shipOxygenRefill.GetValue())
+        if ((bool)shipOxygenRefill.GetProperty())
         {
-            _shipOxygenDetector = Locator.GetShipDetector().gameObject.AddComponent<OxygenDetector>();
+            _shipOxygenDetector = _shipDetector.gameObject.AddComponent<OxygenDetector>();
         }
-        if (temperatureZonesAmount.GetValue().ToString() != "None")
+        if (temperatureZonesAmount.GetProperty().ToString() != "None")
         {
-            _shipTemperatureDetector = Locator.GetShipDetector().gameObject.AddComponent<ShipTemperatureDetector>();
+            _shipTemperatureDetector = _shipDetector.gameObject.AddComponent<ShipTemperatureDetector>();
         }
     }
 
     public static void LateInitialize()
     {
-        if ((bool)enableThrustModulator.GetValue())
+        _buttonPanel = _shipTransform.GetComponentInChildren<CockpitButtonPanel>();
+
+        if ((bool)enableThrustModulator.GetProperty())
         {
-            _shipOverdriveController = Locator.GetShipTransform().GetComponentInChildren<ShipOverdriveController>();
+            _modulatorController = _shipTransform.GetComponentInChildren<ThrustModulatorController>();
+            _shipOverdriveController = _shipTransform.GetComponentInChildren<ShipOverdriveController>();
         }
+        if ((bool)addPortableCampfire.GetProperty())
+        {
+            _portableCampfire = _shipTransform.GetComponentInChildren<PortableCampfire>(true);
+        }
+        if ((float)rustLevel.GetProperty() > 0 || (float)dirtAccumulationTime.GetProperty() > 0f)
+        {
+            _cockpitFilthController = _shipTransform.GetComponentInChildren<CockpitFilthController>();
+        }
+    }
+
+    public static ShipBody GetShipBody()
+    {
+        return _shipBody;
+    }
+
+    public static Transform GetShipTransform()
+    {
+        return _shipTransform;
+    }
+
+    public static GameObject GetShipDetector()
+    {
+        return _shipDetector;
+    }
+
+    public static PlayerBody GetPlayerBody()
+    {
+        return _playerBody;
+    }
+
+    public static SurveyorProbe GetProbe()
+    {
+        return _probe;
     }
 
     public static OxygenDetector GetShipOxygenDetector()
@@ -92,5 +144,25 @@ public static class SELocator
     public static ShipOverdriveController GetShipOverdriveController()
     {
         return _shipOverdriveController;
+    }
+
+    public static CockpitButtonPanel GetButtonPanel()
+    {
+        return _buttonPanel;
+    }
+
+    public static ThrustModulatorController GetThrustModulatorController()
+    {
+        return _modulatorController;
+    }
+
+    public static PortableCampfire GetPortableCampfire()
+    {
+        return _portableCampfire;
+    }
+
+    public static CockpitFilthController GetCockpitFilthController()
+    {
+        return _cockpitFilthController;
     }
 }

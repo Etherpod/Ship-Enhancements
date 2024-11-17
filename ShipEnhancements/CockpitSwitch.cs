@@ -38,6 +38,12 @@ public abstract class CockpitSwitch : ElectricalComponent
         _interactReceiver.OnLoseFocus += OnLoseFocus;
 
         _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
+        _renderer = GetComponent<OWRenderer>();
+
+        if (ShipEnhancements.InMultiplayer && _enabledInShip)
+        {
+            ShipEnhancements.QSBCompat.AddActiveSwitch(this);
+        }
     }
 
     protected virtual void Start()
@@ -50,8 +56,6 @@ public abstract class CockpitSwitch : ElectricalComponent
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
 
-        _renderer = GetComponent<OWRenderer>();
-
         _interactReceiver.ChangePrompt("Turn on " + _label);
         transform.localRotation = Quaternion.Euler(_initialRotation.eulerAngles.x + _rotationOffset,
             _initialRotation.eulerAngles.y, _initialRotation.eulerAngles.z);
@@ -59,7 +63,7 @@ public abstract class CockpitSwitch : ElectricalComponent
         _baseLightIntensity = _light.intensity;
         _light.intensity = 0f;
 
-        _electricalSystem = Locator.GetShipBody().transform
+        _electricalSystem = SELocator.GetShipBody().transform
             .Find("Module_Cockpit/Systems_Cockpit/FlightControlsElectricalSystem")
             .GetComponent<ElectricalSystem>();
         List<ElectricalComponent> componentList = [.. _electricalSystem._connectedComponents];
@@ -78,7 +82,20 @@ public abstract class CockpitSwitch : ElectricalComponent
 
     private void FlipSwitch()
     {
-        _on = !_on;
+        ChangeSwitchState(!_on);
+
+        if (ShipEnhancements.InMultiplayer)
+        {
+            foreach (uint id in ShipEnhancements.PlayerIDs)
+            {
+                ShipEnhancements.QSBCompat.SendSwitchState(id, (GetType().Name, _on));
+            }
+        }
+    }
+
+    public void ChangeSwitchState(bool state)
+    {
+        _on = state;
         if (_on)
         {
             transform.localRotation = Quaternion.Euler(_initialRotation.eulerAngles.x - _rotationOffset,
@@ -154,6 +171,11 @@ public abstract class CockpitSwitch : ElectricalComponent
 
     protected virtual void OnFlipSwitch(bool state) { }
 
+    public bool IsOn()
+    {
+        return _on;
+    }
+
     private void OnGainFocus()
     {
         _buttonPanel.UpdateFocusedButtons(true);
@@ -176,5 +198,10 @@ public abstract class CockpitSwitch : ElectricalComponent
         _interactReceiver.OnGainFocus -= OnGainFocus;
         _interactReceiver.OnLoseFocus -= OnLoseFocus;
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
+
+        if (ShipEnhancements.InMultiplayer)
+        {
+            ShipEnhancements.QSBCompat.RemoveActiveSwitch(this);
+        }
     }
 }

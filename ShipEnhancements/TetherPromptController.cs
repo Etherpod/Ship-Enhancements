@@ -19,9 +19,12 @@ public class TetherPromptController : MonoBehaviour
         GlobalMessenger.AddListener("AttachPlayerTether", OnAttachPlayerTether);
         GlobalMessenger.AddListener("DetachPlayerTether", OnDetachPlayerTether);
 
-        Locator.GetPromptManager().AddScreenPrompt(_reelInPrompt, PromptPosition.UpperLeft, false);
-        Locator.GetPromptManager().AddScreenPrompt(_reelOutPrompt, PromptPosition.UpperLeft, false);
-        Locator.GetPromptManager().AddScreenPrompt(_disconnectPrompt, PromptPosition.UpperLeft, false);
+        ShipEnhancements.Instance.ModHelper.Events.Unity.RunWhen(() => Locator.GetPromptManager() != null, () =>
+        {
+            Locator.GetPromptManager().AddScreenPrompt(_reelInPrompt, PromptPosition.UpperLeft, false);
+            Locator.GetPromptManager().AddScreenPrompt(_reelOutPrompt, PromptPosition.UpperLeft, false);
+            Locator.GetPromptManager().AddScreenPrompt(_disconnectPrompt, PromptPosition.UpperLeft, false);
+        });
     }
 
     private void OnAttachPlayerTether()

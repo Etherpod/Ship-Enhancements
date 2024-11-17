@@ -1,5 +1,4 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ShipEnhancements;
 
@@ -14,6 +13,7 @@ public class PortableCampfireItem : OWItem
 
     private float _baseInteractRange;
     private PortableCampfire _campfire;
+    private bool _dropped;
 
     public override string GetDisplayName()
     {
@@ -33,6 +33,7 @@ public class PortableCampfireItem : OWItem
         base.PickUpItem(holdTranform);
         transform.localRotation = Quaternion.Euler(0f, -40f, 0f);
         transform.localScale = Vector3.one * 0.8f;
+        _dropped = false;
     }
 
     public override void DropItem(Vector3 position, Vector3 normal, Transform parent, Sector sector, IItemDropTarget customDropTarget)
@@ -45,12 +46,14 @@ public class PortableCampfireItem : OWItem
         {
             _campfire.UpdateInsideShip(true);
         }
+        _dropped = true;
     }
 
     public override void SocketItem(Transform socketTransform, Sector sector)
     {
         base.SocketItem(socketTransform, sector);
         transform.localScale = Vector3.one;
+        _dropped = false;
     }
 
     public void TogglePackUp(bool packUp)
@@ -58,5 +61,15 @@ public class PortableCampfireItem : OWItem
         _itemObject.SetActive(packUp);
         _campfireObject.SetActive(!packUp);
         _interactRange = packUp ? _baseInteractRange : 0f;
+    }
+
+    public bool IsUnpacked()
+    {
+        return _interactRange > 0f && _campfireObject.activeInHierarchy;
+    }
+
+    public bool IsDropped()
+    {
+        return _dropped;
     }
 }
