@@ -17,6 +17,7 @@ Permanently remove useless or very important parts of the ship.
 - **Ship Repair**: Be careful not to damage your ship.
 - **Damage Indicators**: Turns off all of those pesky notifications about parts of your ship being damaged, including the master alarm. Keep an eye or four on the reactor, please.
 - **Seatbelt**: Breaks a number of state laws by removing your seatbelt. If you crash into something too quickly you'll fly out of the chair.
+- **Ship Suit**: Removes your spacesuit from the ship. Space exploration just got a whole lot more dangerous.
 - **Air/Water Auto Roll**: Lets you fly around upside down in air and water, which is really confusing when paired with no ship gravity. Also makes it easier to land on walls, if you wanted to do that.
 - **Disable Rotation Speed Limit**: Lets you spin your ship as quickly as you want, though spinning too fast may tear your ship apart. Enabling this may quickly lead to motion sickness.
 - **Ship Friction**: Essentially makes your ship a block of ice that will slide anywhere on anything.
