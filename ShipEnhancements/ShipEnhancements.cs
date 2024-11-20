@@ -192,7 +192,7 @@ public class ShipEnhancements : ModBehaviour
         {
             if (scene == OWScene.TitleScreen)
             {
-                if (QSBAPI == null || !QSBAPI.GetIsInMultiplayer() || QSBAPI.GetIsHost())
+                if (!InMultiplayer || QSBAPI.GetIsHost())
                 {
                     UpdateProperties();
                 }
@@ -221,11 +221,11 @@ public class ShipEnhancements : ModBehaviour
                 SELocator.GetShipDamageController().OnShipHullDamaged -= ctx => CheckAllPartsDamaged();
             }
 
-            if (QSBAPI == null || !QSBAPI.GetIsInMultiplayer() || QSBAPI.GetIsHost())
+            if (!InMultiplayer || QSBAPI.GetIsHost())
             {
                 UpdateProperties();
 
-                if (QSBAPI != null && QSBAPI.GetIsInMultiplayer() && QSBAPI.GetIsHost())
+                if (InMultiplayer && QSBAPI.GetIsHost())
                 {
                     foreach (uint id in PlayerIDs)
                     {
@@ -493,10 +493,6 @@ public class ShipEnhancements : ModBehaviour
             SELocator.GetShipDamageController().OnShipHullDamaged += ctx => CheckAllPartsDamaged();
         }
 
-        if ((bool)Settings.disableGravityCrystal.GetProperty())
-        {
-            DisableGravityCrystal();
-        }
         if ((bool)Settings.disableHeadlights.GetProperty())
         {
             DisableHeadlights();
@@ -835,6 +831,10 @@ public class ShipEnhancements : ModBehaviour
         ModHelper.Events.Unity.RunWhen(() => Locator._shipBody != null, () =>
         {
             _shipLoaded = true;
+            if ((bool)Settings.disableGravityCrystal.GetProperty())
+            {
+                DisableGravityCrystal();
+            }
             if ((bool)Settings.enableJetpackRefuelDrain.GetProperty())
             {
                 if (InMultiplayer)
