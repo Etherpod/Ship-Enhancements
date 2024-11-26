@@ -110,6 +110,7 @@ If you run into any bugs, feel free to report it on GitHub or on the Outer Wilds
 
 ## Known Bugs
 - When playing in multiplayer and using Input Latency, the delayed inputs of the non-hosts will not work once they leave the flight console
+- If you attach yourself to an object with a tether and the object enters a black hole, there is a chance you will be violently thrown across the solar system
 
 # Credits
 Thanks to Ditzy and JohnCorby for helping with some of the code, especially the physics stuff.
