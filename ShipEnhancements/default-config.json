@@ -52,7 +52,13 @@
       "title": "Disable Ship Lights",
       "type": "toggle",
       "value": false,
-      "tooltip": "Turns off both the interior and exterior lighting fixtures."
+      "tooltip": "Permanently turns off both the interior and exterior lighting fixtures."
+    },
+    "disableAutoLights": {
+      "title": "Disable Automatic Lights",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Keeps all of the lights on when you leave the ship instead of turning them off."
     },
     "disableShipOxygen": {
       "title": "Disable Ship Oxygen",

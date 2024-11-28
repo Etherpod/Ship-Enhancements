@@ -143,6 +143,7 @@ public class ShipEnhancements : ModBehaviour
         addPortableTractorBeam,
         disableShipSuit,
         damageIndicatorColor,
+        disableAutoLights,
     }
 
     private void Awake()
@@ -1221,8 +1222,6 @@ public class ShipEnhancements : ModBehaviour
 
     public static void WriteDebugMessage(object msg, bool warning = false, bool error = false)
     {
-        return;
-
         if (warning)
         {
             Instance?.ModHelper?.Console?.WriteLine(msg.ToString(), MessageType.Warning);

@@ -75,6 +75,7 @@ public static class SettingsPresets
         { "addPortableTractorBeam", false },
         { "disableShipSuit", false },
         { "damageIndicatorColor", "Default" },
+        { "disableAutoLights", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -146,6 +147,7 @@ public static class SettingsPresets
         { "addPortableTractorBeam", false },
         { "disableShipSuit", false },
         { "damageIndicatorColor", "Default" },
+        { "disableAutoLights", false },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -217,6 +219,7 @@ public static class SettingsPresets
         { "addPortableTractorBeam", false },
         { "disableShipSuit", false },
         { "damageIndicatorColor", "Default" },
+        { "disableAutoLights", true },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -288,6 +291,7 @@ public static class SettingsPresets
         { "addPortableTractorBeam", false },
         { "disableShipSuit", false },
         { "damageIndicatorColor", "Default" },
+        { "disableAutoLights", false },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -359,6 +363,7 @@ public static class SettingsPresets
         { "addPortableTractorBeam", false },
         { "disableShipSuit", false },
         { "damageIndicatorColor", "Default" },
+        { "disableAutoLights", true },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -430,6 +435,7 @@ public static class SettingsPresets
         { "addPortableTractorBeam", true },
         { "disableShipSuit", false },
         { "damageIndicatorColor", "Rainbow" },
+        { "disableAutoLights", true },
     };
 
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()
@@ -672,6 +678,7 @@ public static class SettingsPresets
             "Pink",
             "Rainbow"
             ], 0.5f, "Default") },
+        { "disableAutoLights", new RandomSettingValue(0.3f) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

@@ -76,6 +76,7 @@ public static class SettingExtensions
         { Settings.addPortableTractorBeam, (false, false) },
         { Settings.disableShipSuit, (false, false) },
         { Settings.damageIndicatorColor, ("Default", "Default") },
+        { Settings.disableAutoLights, (false, false) },
     };
 
     public static string GetName(this Settings setting)

@@ -2436,4 +2436,36 @@ public static class PatchClass
         }
     }
     #endregion
+
+    #region DisableAutoLights
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipElectricalComponent), nameof(ShipElectricalComponent.Start))]
+    public static bool KeepPowerOnWhenStart(ShipElectricalComponent __instance)
+    {
+        if ((bool)disableAutoLights.GetProperty())
+        {
+            __instance._electricalSystem.SetPowered(!__instance.isDamaged);
+            return false;
+        }
+
+        return true;
+    }
+
+    [HarmonyReversePatch]
+    [HarmonyPatch(typeof(ShipComponent), nameof(ShipComponent.OnExitShip))]
+    public static void ShipComponent_OnExitShip(ShipComponent __instance) { }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipElectricalComponent), nameof(ShipElectricalComponent.OnExitShip))]
+    public static bool KeepPowerOnWhenExit(ShipElectricalComponent __instance)
+    {
+        if ((bool)disableAutoLights.GetProperty())
+        {
+            ShipComponent_OnExitShip(__instance);
+            return false;
+        }
+
+        return true;
+    }
+    #endregion
 }
