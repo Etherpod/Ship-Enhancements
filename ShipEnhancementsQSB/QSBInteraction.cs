@@ -53,6 +53,10 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
                 {
                     QSBWorldSync.Init<QSBTetherHookItem, TetherHookItem>();
                 }
+                if ((bool)addExpeditionFlag.GetProperty())
+                {
+                    QSBWorldSync.Init<QSBExpeditionFlagItem, ExpeditionFlagItem>();
+                }
             }, 2);
         };
     }

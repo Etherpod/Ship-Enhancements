@@ -20,9 +20,4 @@ public class PortableTractorBeamSocket : OWItemSocket
             _socketedItem.transform.localScale = Vector3.one * 0.5f;
         }
     }
-
-    public void SetTractorBeamItem(PortableTractorBeamItem item)
-    {
-        PlaceIntoSocket(item);
-    }
 }

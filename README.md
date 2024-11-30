@@ -65,6 +65,7 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Signalscope Component**: Turns the ship's signalscope into a fully functioning ship component. If you damage it, you won't be able to receive or broadcast signals from the ship until you repair it.
 - **Ship Signal**: Adds a signal for the ship on the Outer Wilds Ventures frequency. The signal will stop if the ship's signalscope is damaged.
 - **Add Portable Campfire**: Adds a portable campfire to the ship next to your suit. Set it up wherever you want and roast a marshmallow.
+- **Add Expedition Flag**: Adds a portable flag to the ship between the cockpit and the supplies section. Place it down somewhere if you want to mark some exploratory feat or if you want to mark where you've been.
 - **Add Ship Tether**: Adds a few hooks to the ship cabin. You can attach these hooks to pretty much any surface- including the ship- and tether yourself to them. If you want to get even crazier, grab a second hook after tethering to one and tether to the new one; it will connect the two hooks together.
 - **Gravity Landing Gear**: Adds a switch to the cockpit that powers your landing gear with gravitational force, letting you stick to surfaces. It's a bit fragile though, and only works if your landing gear isn't damaged.
 - **Thrust Modulator**: Adds an interface to the cockpit that lets you lower or disproportionately raise the maximum thrust your ship can use. Stacks with the smooth thrust option from General Enhancements.
@@ -117,5 +118,7 @@ If you run into any bugs, feel free to report it on GitHub or on the Outer Wilds
 Thanks to Ditzy and JohnCorby for helping with some of the code, especially the physics stuff.
 
 Big thanks to NineMeowz for helping with most of the ideas and some sound effects.
+
+Shoutout to SpatialXX for leaving a ton of ideas on the mod page.
 
 And thanks to the Outer Wilds Modding Community, this wouldn't have been possible without them.

@@ -385,6 +385,12 @@
       "value": false,
       "tooltip": "Adds a portable Nomai tractor beam to the ship next to the reactor. Place it on the ground if you need an extra boost in height."
     },
+    "addExpeditionFlag": {
+      "title": "Add Expedition Flag",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Adds a portable flag to the ship between the cockpit and the supplies section. Place it on the ground if you want to mark where no Hearthian has gone before."
+    },
     "addTether": {
       "title": "Add Ship Tether",
       "type": "toggle",

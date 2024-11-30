@@ -61,6 +61,7 @@ public class ShipEnhancements : ModBehaviour
     public ItemType portableCampfireType { get; private set; }
     public ItemType tetherHookType { get; private set; }
     public ItemType portableTractorBeamType { get; private set; }
+    public ItemType expeditionFlagItemType { get; private set; }
     public SignalName shipSignalName { get; private set; }
     public int thrustModulatorLevel { get; private set; }
 
@@ -69,8 +70,6 @@ public class ShipEnhancements : ModBehaviour
     private AssetBundle _shipEnhancementsBundle;
     private PhysicMaterial _bouncyMaterial;
     private float _lastSuitOxygen;
-    private float _lastShipOxygen;
-    private float _lastShipFuel;
     private bool _shipLoaded = false;
     private bool _shipDestroyed;
 
@@ -144,6 +143,7 @@ public class ShipEnhancements : ModBehaviour
         disableShipSuit,
         damageIndicatorColor,
         disableAutoLights,
+        addExpeditionFlag,
     }
 
     private void Awake()
@@ -165,6 +165,7 @@ public class ShipEnhancements : ModBehaviour
         portableCampfireType = EnumUtils.Create<ItemType>("PortableCampfire");
         tetherHookType = EnumUtils.Create<ItemType>("TetherHook");
         portableTractorBeamType = EnumUtils.Create<ItemType>("PortableTractorBeam");
+        expeditionFlagItemType = EnumUtils.Create<ItemType>("ExpeditionFlag");
         shipSignalName = EnumUtils.Create<SignalName>("Ship");
 
         LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
@@ -373,9 +374,6 @@ public class ShipEnhancements : ModBehaviour
                 AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.DEAD_IN_THE_WATER");
             }
         }
-
-        _lastShipOxygen = SELocator.GetShipResources()._currentOxygen;
-        _lastShipFuel = SELocator.GetShipResources()._currentFuel;
     }
 
     private void LateUpdate()
@@ -486,7 +484,6 @@ public class ShipEnhancements : ModBehaviour
 
         _shipLoaded = true;
         UpdateSuitOxygen();
-        _lastShipOxygen = SELocator.GetShipResources()._currentOxygen;
 
         if (AchievementsAPI != null)
         {
@@ -809,9 +806,19 @@ public class ShipEnhancements : ModBehaviour
             AssetBundleUtilities.ReplaceShaders(tractor);
             GameObject tractorObj = Instantiate(tractor);
             GameObject tractorSocket = LoadPrefab("Assets/ShipEnhancements/PortableTractorBeamSocket.prefab");
-            AssetBundleUtilities.ReplaceShaders(tractorSocket);
             GameObject tractorSocketObj = Instantiate(tractorSocket, SELocator.GetShipTransform().Find("Module_Cabin"));
-            tractorSocketObj.GetComponent<PortableTractorBeamSocket>().SetTractorBeamItem(tractorObj.GetComponent<PortableTractorBeamItem>());
+            tractorSocketObj.GetComponent<PortableTractorBeamSocket>().PlaceIntoSocket(tractorObj.GetComponent<PortableTractorBeamItem>());
+        }
+        if ((bool)Settings.addExpeditionFlag.GetProperty())
+        {
+            GameObject flag = LoadPrefab("Assets/ShipEnhancements/ExpeditionFlagItem.prefab");
+            AssetBundleUtilities.ReplaceShaders(flag);
+            GameObject flagObj = Instantiate(flag);
+            GameObject flagSocket = LoadPrefab("Assets/ShipEnhancements/ExpeditionFlagSocket.prefab");
+            GameObject flagSocketObj = Instantiate(flagSocket, SELocator.GetShipTransform().Find("Module_Cabin"));
+            WriteDebugMessage(flagSocketObj.transform.parent);
+            WriteDebugMessage(flagSocketObj.transform.localPosition);
+            flagSocketObj.GetComponent<ExpeditionFlagSocket>().PlaceIntoSocket(flagObj.GetComponent<ExpeditionFlagItem>());
         }
 
         SetDamageColors();
