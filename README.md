@@ -11,6 +11,7 @@ Permanently remove useless or very important parts of the ship.
 - **Landing Camera**: Good luck.
 - **Eject Button**: Covers the eject button with tape so that your friend can't keep ejecting the cockpit while you're trying to fly.
 - **Interior/Exterior Lights**: Makes your ship very dark.
+- **Automatic Lights**: Prevents the lights from turning off when you leave the ship.
 - **Oxygen**: Literally removes all of the oxygen in the ship unless you're near trees or in an oxygen-filled atmosphere. This takes priority over all of the other oxygen modifications.
 - **Ship Scout Recall**: Removes your ability to recall the scout from the ship. You'll have to get up and do it yourself.
 - **Ship Scout Launching**: Removes your ability to launch the scout from the ship. You'll have to do this yourself outside of the ship.
