@@ -142,6 +142,7 @@ public class PortableCampfire : Campfire
         else
         {
             SetState(State.UNLIT);
+            _oneShotAudio.PlayOneShot(_waterExtinguishAudio);
         }
     }
 

@@ -168,6 +168,8 @@ public class ShipEnhancements : ModBehaviour
         expeditionFlagItemType = EnumUtils.Create<ItemType>("ExpeditionFlag");
         shipSignalName = EnumUtils.Create<SignalName>("Ship");
 
+        SEItemAudioController.Initialize();
+
         LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
         {
             if (loadScene != OWScene.SolarSystem) return;
