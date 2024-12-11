@@ -870,7 +870,7 @@ public static class PatchClass
         bool tryEnable = value;
         bool isLogMarker = ShipLogEntryHUDMarker.s_entryLocation != null && __instance._visualTarget == ShipLogEntryHUDMarker.s_entryLocation.GetTransform();
         bool logMarkerOutsideCloak = !isLogMarker || !ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField();
-        bool playerInCloak = Locator.GetCloakFieldController().isPlayerInsideCloak;
+        bool playerInCloak = Locator.GetCloakFieldController() != null && Locator.GetCloakFieldController().isPlayerInsideCloak;
         bool logMarkerInCloak = isLogMarker && ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField();
 
         if (tryEnable && (logMarkerOutsideCloak || (playerInCloak && logMarkerInCloak)))
@@ -887,7 +887,7 @@ public static class PatchClass
         if (!(bool)disableMapMarkers.GetProperty() || !__instance) return;
 
         bool isLogMarker = __instance.GetComponent<ShipLogEntryHUDMarker>() != null;
-        bool playerInCloak = Locator.GetCloakFieldController().isPlayerInsideCloak;
+        bool playerInCloak = Locator.GetCloakFieldController() != null && Locator.GetCloakFieldController().isPlayerInsideCloak;
         bool markerInCloak = ShipLogEntryHUDMarker.s_entryLocation != null && ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField();
 
         if (isLogMarker && !playerInCloak && markerInCloak)
@@ -905,7 +905,7 @@ public static class PatchClass
         if (!(bool)disableMapMarkers.GetProperty() || !__instance) return true;
 
         bool isLogMarker = __instance.GetComponent<ShipLogEntryHUDMarker>() != null;
-        bool playerInCloak = Locator.GetCloakFieldController().isPlayerInsideCloak;
+        bool playerInCloak = Locator.GetCloakFieldController() != null && Locator.GetCloakFieldController().isPlayerInsideCloak;
         bool markerInCloak = ShipLogEntryHUDMarker.s_entryLocation != null && ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField();
 
         if (isLogMarker && !playerInCloak && markerInCloak)
@@ -923,7 +923,7 @@ public static class PatchClass
         if (!(bool)disableMapMarkers.GetProperty()) return true;
 
         bool markerInCloak = ShipLogEntryHUDMarker.s_entryLocation != null && ShipLogEntryHUDMarker.s_entryLocation.IsWithinCloakField();
-        bool playerInCloak = Locator.GetCloakFieldController().isPlayerInsideCloak;
+        bool playerInCloak = Locator.GetCloakFieldController() != null && Locator.GetCloakFieldController().isPlayerInsideCloak;
 
         if (playerInCloak && markerInCloak)
         {
