@@ -184,6 +184,11 @@ public class PortableCampfire : Campfire
         _cancelPrompt.SetVisibility(value);
     }
 
+    public override bool CanSleepHereNow()
+    {
+        return base.CanSleepHereNow() && !PlayerState.OnQuantumMoon();
+    }
+
     private void OnShipSystemFailure()
     {
         if (_insideShip)
