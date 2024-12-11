@@ -876,6 +876,10 @@ public class ShipEnhancements : ModBehaviour
                     tool.SetActive(false);
                 }
             }
+            if ((!InMultiplayer || QSBAPI.GetIsHost()) && (float)Settings.shipDamageSpeedMultiplier.GetProperty() < 0f)
+            {
+                SELocator.GetShipDamageController().Explode();
+            }
         });
     }
 

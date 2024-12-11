@@ -352,6 +352,11 @@ public static class PatchClass
             return true;
         }
 
+        if ((float)shipDamageMultiplier.GetProperty() <= 0f)
+        {
+            return false;
+        }
+
         float damageMultiplier = Mathf.Max((float)shipDamageMultiplier.GetProperty(), 0f);
         float damageSpeedMultiplier = Mathf.Max((float)shipDamageSpeedMultiplier.GetProperty(), 0f);
 
@@ -441,13 +446,15 @@ public static class PatchClass
             return true;
         }
 
-        float damageMultiplier = Mathf.Max((float)shipDamageMultiplier.GetProperty(), 0f);
-        float damageSpeedMultiplier = Mathf.Max((float)shipDamageSpeedMultiplier.GetProperty(), 0f);
-
-        if (__instance._damaged)
+        if (__instance._damaged
+            || (float)shipDamageMultiplier.GetProperty() <= 0f)
         {
             return false;
         }
+
+        float damageMultiplier = Mathf.Max((float)shipDamageMultiplier.GetProperty(), 0f);
+        float damageSpeedMultiplier = Mathf.Max((float)shipDamageSpeedMultiplier.GetProperty(), 0f);
+
         if (UnityEngine.Random.value / damageMultiplier
             < __instance._damageProbabilityCurve.Evaluate(impact.speed / damageSpeedMultiplier))
         {
@@ -487,6 +494,11 @@ public static class PatchClass
             SEAchievementTracker.LastHitBody = impact.otherBody;
         }
 
+        if ((float)shipDamageMultiplier.GetProperty() <= 0f || true)
+        {
+            return false;
+        }
+
         float damageMultiplier = Mathf.Max((float)shipDamageMultiplier.GetProperty(), 0f);
         float damageSpeedMultiplier = Mathf.Max((float)shipDamageSpeedMultiplier.GetProperty(), 0f);
 
@@ -515,6 +527,17 @@ public static class PatchClass
         }
 
         return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(HighSpeedImpactSensor), nameof(HighSpeedImpactSensor.FixedUpdate))]
+    public static void DisableDamageExplode(HighSpeedImpactSensor __instance)
+    {
+        if (__instance._dieNextUpdate && (float)shipDamageMultiplier.GetProperty() <= 0f
+            && __instance.gameObject.CompareTag("Ship"))
+        {
+            __instance._dieNextUpdate = false;
+        }
     }
     #endregion
 

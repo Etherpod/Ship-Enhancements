@@ -405,6 +405,11 @@ public static class QSBInteractionPatches
             return true;
         }
 
+        if ((float)shipDamageMultiplier.GetProperty() <= 0f)
+        {
+            return false;
+        }
+
         if (__0._dominantImpact != null)
         {
             var damage = Mathf.InverseLerp(30f * (float)shipDamageSpeedMultiplier.GetProperty(),
