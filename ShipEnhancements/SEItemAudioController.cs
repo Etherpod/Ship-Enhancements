@@ -11,11 +11,15 @@ public static class SEItemAudioController
 
     private static AudioClip _tractorBeamDrop;
     private static AudioClip _tractorBeamPickUp;
+    private static AudioClip _flagDrop;
+    private static AudioClip _flagPickUp;
 
     public static void Initialize()
     {
         _tractorBeamDrop = ShipEnhancements.LoadAudio(AudioClipPath + "PutDown_BigRock_01.ogg");
         _tractorBeamPickUp = ShipEnhancements.LoadAudio(AudioClipPath + "Pickup_BigRock_01.ogg");
+        _flagDrop = ShipEnhancements.LoadAudio(AudioClipPath + "ExpeditionFlag_PutDown.ogg");
+        _flagPickUp = ShipEnhancements.LoadAudio(AudioClipPath + "ExpeditionFlag_PickUp.ogg");
     }
 
     [HarmonyPostfix]
@@ -61,6 +65,10 @@ public static class SEItemAudioController
         {
             __instance._oneShotExternalSource.PlayOneShot(_tractorBeamDrop, DefaultVolume);
         }
+        else if (itemType == ShipEnhancements.Instance.expeditionFlagItemType)
+        {
+            __instance._oneShotExternalSource.PlayOneShot(_flagDrop, DefaultVolume);
+        }
     }
 
     [HarmonyPostfix]
@@ -75,6 +83,10 @@ public static class SEItemAudioController
         if (itemType == ShipEnhancements.Instance.portableTractorBeamType)
         {
             __instance._oneShotExternalSource.PlayOneShot(_tractorBeamPickUp, DefaultVolume);
+        }
+        else if (itemType == ShipEnhancements.Instance.expeditionFlagItemType)
+        {
+            __instance._oneShotExternalSource.PlayOneShot(_flagPickUp, DefaultVolume);
         }
     }
 }
