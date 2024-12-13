@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 
 namespace ShipEnhancements;
 
@@ -8,6 +9,8 @@ public class ExpeditionFlagItem : OWItem
 
     [SerializeField] private GameObject _itemModelParent;
     [SerializeField] private GameObject _objModelParent;
+    [SerializeField] private Collider _flagCollider;
+    [SerializeField] private OWTriggerVolume _colTrigger;
 
     private readonly Vector3 _holdOffset = new(0f, -0.4f, 0f);
     private Vector3 _defaultOffset;
@@ -22,6 +25,7 @@ public class ExpeditionFlagItem : OWItem
         base.Awake();
         _type = ItemType;
         _defaultOffset = _itemModelParent.transform.localPosition;
+        _colTrigger.OnExit += OnExit;
     }
 
     private void Start()
@@ -42,6 +46,17 @@ public class ExpeditionFlagItem : OWItem
         base.DropItem(position, normal, parent, sector, customDropTarget);
 
         SetIsDropped(true);
+
+        _flagCollider.enabled = false;
+        ShipEnhancements.Instance.ModHelper.Events.Unity.FireInNUpdates(() =>
+        {
+            if (_colTrigger.getTrackedObjects()
+            .Where(obj => !obj.GetAttachedOWRigidbody()?.IsKinematic() ?? false)
+            .ToArray().Length == 0)
+            {
+                _flagCollider.enabled = true;
+            }
+        }, 5);
     }
 
     public override void SocketItem(Transform socketTransform, Sector sector)
@@ -55,5 +70,22 @@ public class ExpeditionFlagItem : OWItem
     {
         _itemModelParent.SetActive(!dropped);
         _objModelParent.SetActive(dropped);
+    }
+
+    private void OnExit(GameObject hitObj)
+    {
+        if (!_flagCollider.enabled
+            && _colTrigger.getTrackedObjects()
+            .Where(obj => !obj.GetAttachedOWRigidbody()?.IsKinematic() ?? false)
+            .ToArray().Length == 0)
+        {
+            _flagCollider.enabled = true;
+        }
+    }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+        _colTrigger.OnExit -= OnExit;
     }
 }
