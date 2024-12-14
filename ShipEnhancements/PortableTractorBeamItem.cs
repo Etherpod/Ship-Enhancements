@@ -5,7 +5,7 @@ namespace ShipEnhancements;
 
 public class PortableTractorBeamItem : OWItem
 {
-    public static readonly ItemType ItemType = ShipEnhancements.Instance.portableTractorBeamType;
+    public static readonly ItemType ItemType = ShipEnhancements.Instance.PortableTractorBeamType;
 
     [SerializeField] 
     private GameObject _tractorBeamObj;

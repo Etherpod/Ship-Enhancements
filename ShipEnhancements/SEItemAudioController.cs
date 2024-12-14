@@ -31,7 +31,7 @@ public static class SEItemAudioController
             return;
         }
 
-        if (itemType == ShipEnhancements.Instance.portableTractorBeamType)
+        if (itemType == ShipEnhancements.Instance.PortableTractorBeamType)
         {
             __instance._oneShotExternalSource.PlayOneShot(_tractorBeamDrop, DefaultVolume);
         }
@@ -46,7 +46,7 @@ public static class SEItemAudioController
             return;
         }
 
-        if (itemType == ShipEnhancements.Instance.portableTractorBeamType)
+        if (itemType == ShipEnhancements.Instance.PortableTractorBeamType)
         {
             __instance._oneShotExternalSource.PlayOneShot(_tractorBeamPickUp, DefaultVolume);
         }
@@ -61,11 +61,11 @@ public static class SEItemAudioController
             return;
         }
 
-        if (itemType == ShipEnhancements.Instance.portableTractorBeamType)
+        if (itemType == ShipEnhancements.Instance.PortableTractorBeamType)
         {
             __instance._oneShotExternalSource.PlayOneShot(_tractorBeamDrop, DefaultVolume);
         }
-        else if (itemType == ShipEnhancements.Instance.expeditionFlagItemType)
+        else if (itemType == ShipEnhancements.Instance.ExpeditionFlagItemType)
         {
             __instance._oneShotExternalSource.PlayOneShot(_flagDrop, DefaultVolume);
         }
@@ -80,11 +80,11 @@ public static class SEItemAudioController
             return;
         }
 
-        if (itemType == ShipEnhancements.Instance.portableTractorBeamType)
+        if (itemType == ShipEnhancements.Instance.PortableTractorBeamType)
         {
             __instance._oneShotExternalSource.PlayOneShot(_tractorBeamPickUp, DefaultVolume);
         }
-        else if (itemType == ShipEnhancements.Instance.expeditionFlagItemType)
+        else if (itemType == ShipEnhancements.Instance.ExpeditionFlagItemType)
         {
             __instance._oneShotExternalSource.PlayOneShot(_flagPickUp, DefaultVolume);
         }

@@ -4,7 +4,7 @@ namespace ShipEnhancements;
 
 public class TetherHookItem : OWItem
 {
-    public static readonly ItemType ItemType = ShipEnhancements.Instance.tetherHookType;
+    public static readonly ItemType ItemType = ShipEnhancements.Instance.TetherHookType;
 
     [SerializeField]
     private GameObject _connectionMesh;

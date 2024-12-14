@@ -4,7 +4,7 @@ namespace ShipEnhancements;
 
 public class PortableCampfireItem : OWItem
 {
-    public static readonly ItemType ItemType = ShipEnhancements.Instance.portableCampfireType;
+    public static readonly ItemType ItemType = ShipEnhancements.Instance.PortableCampfireType;
 
     [SerializeField]
     private GameObject _itemObject;

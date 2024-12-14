@@ -672,7 +672,7 @@ public static class PatchClass
     {
         if ((bool)enableThrustModulator.GetProperty())
         {
-            __result *= ShipEnhancements.Instance.thrustModulatorLevel / 5f
+            __result *= ShipEnhancements.Instance.ThrustModulatorLevel / 5f
                 * (SELocator.GetShipOverdriveController().OnCooldown ? SELocator.GetShipOverdriveController().ThrustMultiplier : 1f);
         }
     }
@@ -697,7 +697,7 @@ public static class PatchClass
             return false;
         }
 
-        float multiplier = ShipEnhancements.Instance.thrustModulatorLevel / 5f;
+        float multiplier = ShipEnhancements.Instance.ThrustModulatorLevel / 5f;
 
         if (__instance._isMatchingVelocity && __instance._referenceFrame != null)
         {
@@ -1582,7 +1582,7 @@ public static class PatchClass
 
         if (!(bool)enableShipItemPlacement.GetProperty() && !(bool)addTether.GetProperty()) return true;
 
-        bool isTether = (bool)addTether.GetProperty() && __instance._heldItem.GetItemType() == ShipEnhancements.Instance.tetherHookType;
+        bool isTether = (bool)addTether.GetProperty() && __instance._heldItem.GetItemType() == ShipEnhancements.Instance.TetherHookType;
         bool shipItemPlacement = (bool)enableShipItemPlacement.GetProperty();
 
         PlayerCharacterController playerController = Locator.GetPlayerController();
@@ -2154,7 +2154,7 @@ public static class PatchClass
         {
             AudioSignal strongestSignal = __instance._sigScopeTool.GetStrongestSignal();
 
-            if ((strongestSignal != null && strongestSignal.GetName() != ShipEnhancements.Instance.shipSignalName) 
+            if ((strongestSignal != null && strongestSignal.GetName() != ShipEnhancements.Instance.ShipSignalName) 
                 || (SELocator.GetShipDamageController()?.IsSystemFailed() ?? false))
             {
                 return true;
@@ -2166,7 +2166,7 @@ public static class PatchClass
                 string text2 = "m";
                 string text3 = ((distanceFromScope > 1000f) ? __instance._longDistanceHexColor : "ffffffff");
                 string text4;
-                if (strongestSignal.GetName() == ShipEnhancements.Instance.shipSignalName)
+                if (strongestSignal.GetName() == ShipEnhancements.Instance.ShipSignalName)
                 {
                     text4 = "SHIP";
                 }
@@ -2204,7 +2204,7 @@ public static class PatchClass
             __instance._degreesFromScope = 180f;
             return false;
         }
-        else if (__instance.GetName() == ShipEnhancements.Instance.shipSignalName && (OWInput.IsInputMode(InputMode.ShipCockpit) 
+        else if (__instance.GetName() == ShipEnhancements.Instance.ShipSignalName && (OWInput.IsInputMode(InputMode.ShipCockpit) 
             || (SELocator.GetShipDamageController()?.IsSystemFailed() ?? false) || PlayerState.IsInsideShip()
             || (SELocator.GetSignalscopeComponent()?.isDamaged ?? false)))
         {
@@ -2265,11 +2265,11 @@ public static class PatchClass
     [HarmonyPatch(typeof(UITextLibrary), nameof(UITextLibrary.GetString))]
     public static void InjectComponentNames(UITextType TextID, ref string __result)
     {
-        if (TextID == ShipEnhancements.Instance.probeLauncherName)
+        if (TextID == ShipEnhancements.Instance.ProbeLauncherName)
         {
             __result = "SCOUT LAUNCHER";
         }
-        else if (TextID == ShipEnhancements.Instance.signalscopeName)
+        else if (TextID == ShipEnhancements.Instance.SignalscopeName)
         {
             __result = "SIGNALSCOPE";
         }

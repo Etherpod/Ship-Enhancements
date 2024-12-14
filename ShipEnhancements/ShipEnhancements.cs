@@ -56,19 +56,19 @@ public class ShipEnhancements : ModBehaviour
         }
     }
 
-    public UITextType probeLauncherName { get; private set; }
-    public UITextType signalscopeName { get; private set; }
-    public ItemType portableCampfireType { get; private set; }
-    public ItemType tetherHookType { get; private set; }
-    public ItemType portableTractorBeamType { get; private set; }
-    public ItemType expeditionFlagItemType { get; private set; }
-    public SignalName shipSignalName { get; private set; }
-    public int thrustModulatorLevel { get; private set; }
+    public UITextType ProbeLauncherName { get; private set; }
+    public UITextType SignalscopeName { get; private set; }
+    public ItemType PortableCampfireType { get; private set; }
+    public ItemType TetherHookType { get; private set; }
+    public ItemType PortableTractorBeamType { get; private set; }
+    public ItemType ExpeditionFlagItemType { get; private set; }
+    public ItemType FuelTankItemType { get; private set; }
+    public SignalName ShipSignalName { get; private set; }
+    public int ThrustModulatorLevel { get; private set; }
 
     private SettingsPresets.PresetName _currentPreset = (SettingsPresets.PresetName)(-1);
 
     private AssetBundle _shipEnhancementsBundle;
-    private PhysicMaterial _bouncyMaterial;
     private float _lastSuitOxygen;
     private bool _shipLoaded = false;
     private bool _shipDestroyed;
@@ -160,13 +160,14 @@ public class ShipEnhancements : ModBehaviour
         InitializeQSB();
         SettingsPresets.InitializePresets();
 
-        probeLauncherName = EnumUtils.Create<UITextType>("ScoutLauncher");
-        signalscopeName = EnumUtils.Create<UITextType>("Signalscope");
-        portableCampfireType = EnumUtils.Create<ItemType>("PortableCampfire");
-        tetherHookType = EnumUtils.Create<ItemType>("TetherHook");
-        portableTractorBeamType = EnumUtils.Create<ItemType>("PortableTractorBeam");
-        expeditionFlagItemType = EnumUtils.Create<ItemType>("ExpeditionFlag");
-        shipSignalName = EnumUtils.Create<SignalName>("Ship");
+        ProbeLauncherName = EnumUtils.Create<UITextType>("ScoutLauncher");
+        SignalscopeName = EnumUtils.Create<UITextType>("Signalscope");
+        PortableCampfireType = EnumUtils.Create<ItemType>("PortableCampfire");
+        TetherHookType = EnumUtils.Create<ItemType>("TetherHook");
+        PortableTractorBeamType = EnumUtils.Create<ItemType>("PortableTractorBeam");
+        ExpeditionFlagItemType = EnumUtils.Create<ItemType>("ExpeditionFlag");
+        FuelTankItemType = EnumUtils.Create<ItemType>("PortableFuelTank");
+        ShipSignalName = EnumUtils.Create<SignalName>("Ship");
 
         SEItemAudioController.Initialize();
 
@@ -785,7 +786,7 @@ public class ShipEnhancements : ModBehaviour
             AudioSignal shipSignal = Instantiate(signal, SELocator.GetShipTransform()
                 .GetComponentInChildren<ShipCockpitUI>()._sigScopeDish).GetComponent<AudioSignal>();
             shipSignal.SetSector(SELocator.GetShipTransform().GetComponentInChildren<Sector>());
-            shipSignal._name = shipSignalName;
+            shipSignal._name = ShipSignalName;
             shipSignal._frequency = SignalFrequency.Traveler;
         }
         if ((bool)Settings.disableShipFriction.GetProperty())
@@ -818,9 +819,18 @@ public class ShipEnhancements : ModBehaviour
             GameObject flagObj = Instantiate(flag);
             GameObject flagSocket = LoadPrefab("Assets/ShipEnhancements/ExpeditionFlagSocket.prefab");
             GameObject flagSocketObj = Instantiate(flagSocket, SELocator.GetShipTransform().Find("Module_Cabin"));
-            WriteDebugMessage(flagSocketObj.transform.parent);
-            WriteDebugMessage(flagSocketObj.transform.localPosition);
             flagSocketObj.GetComponent<ExpeditionFlagSocket>().PlaceIntoSocket(flagObj.GetComponent<ExpeditionFlagItem>());
+        }
+        if (true)
+        {
+            GameObject tank = LoadPrefab("Assets/ShipEnhancements/FuelTankItem.prefab");
+            AssetBundleUtilities.ReplaceShaders(tank);
+            GameObject tankObj = Instantiate(tank);
+            tankObj.transform.parent = GameObject.Find("TimberHearth_Body").transform;
+            tankObj.transform.position = SELocator.GetShipTransform().position;
+            WriteDebugMessage(tankObj.transform.parent);
+            WriteDebugMessage(tankObj.transform.localPosition);
+            WriteDebugMessage(tankObj.transform.position);
         }
 
         SetDamageColors();
@@ -1222,7 +1232,7 @@ public class ShipEnhancements : ModBehaviour
 
     public void SetThrustModulatorLevel(int level)
     {
-        thrustModulatorLevel = level;
+        ThrustModulatorLevel = level;
     }
 
     public void SetEngineOn(bool state)

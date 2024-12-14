@@ -27,6 +27,8 @@ public static class ShipNotifications
     private static NotificationData _scoutInShipNotification = new NotificationData(NotificationTarget.Player, "SCOUT DOCKED IN SHIP", 5f, true);
     private static NotificationData _noScoutInShipNotification = new NotificationData(NotificationTarget.Ship, "SCOUT LAUNCHER EMPTY", 5f, true);
 
+    private static NotificationData _playerRefueling = new NotificationData(NotificationTarget.Player, "REFUELING", 5f, true);
+
     private static bool _oxygenLow = false;
     private static bool _oxygenCritical = false;
     private static bool _fuelLow = false;
@@ -210,5 +212,18 @@ public static class ShipNotifications
     public static void PostScoutLauncherEmptyNotification()
     {
         NotificationManager.SharedInstance.PostNotification(_noScoutInShipNotification, false);
+    }
+
+    public static void PostRefuelingNotification()
+    {
+        if (!NotificationManager.SharedInstance.IsPinnedNotification(_playerRefueling))
+        {
+            NotificationManager.SharedInstance.PostNotification(_playerRefueling, true);
+        }
+    }
+
+    public static void RemoveRefuelingNotification()
+    {
+        NotificationManager.SharedInstance.UnpinNotification(_playerRefueling);
     }
 }

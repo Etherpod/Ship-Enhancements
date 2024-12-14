@@ -9,6 +9,6 @@ public class TetherHookSocket : OWItemSocket
     public override void Awake()
     {
         base.Awake();
-        _acceptableType = ShipEnhancements.Instance.tetherHookType;
+        _acceptableType = ShipEnhancements.Instance.TetherHookType;
     }
 }

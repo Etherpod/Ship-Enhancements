@@ -9,7 +9,7 @@ public class SignalscopeComponent : ShipComponent
 
     private void Start()
     {
-        _componentName = ShipEnhancements.Instance.signalscopeName;
+        _componentName = ShipEnhancements.Instance.SignalscopeName;
     }
 
     private void FixedUpdate()
