@@ -823,14 +823,16 @@ public class ShipEnhancements : ModBehaviour
         }
         if (true)
         {
+            MeshFilter rend = LoadPrefab("Assets/ShipEnhancements/CabinFuelTankReplacement.fbx").GetComponent<MeshFilter>();
+            MeshFilter targetRend = SELocator.GetShipTransform().Find("Module_Cabin/Geo_Cabin/Cabin_Geometry/Cabin_Interior/Cabin_Interior 1/Cabin_Interior 1_MeshPart0").GetComponent<MeshFilter>();
+            targetRend.mesh = rend.mesh;
+
             GameObject tank = LoadPrefab("Assets/ShipEnhancements/FuelTankItem.prefab");
             AssetBundleUtilities.ReplaceShaders(tank);
             GameObject tankObj = Instantiate(tank);
-            tankObj.transform.parent = GameObject.Find("TimberHearth_Body").transform;
-            tankObj.transform.position = SELocator.GetShipTransform().position;
-            WriteDebugMessage(tankObj.transform.parent);
-            WriteDebugMessage(tankObj.transform.localPosition);
-            WriteDebugMessage(tankObj.transform.position);
+            GameObject tankSocket = LoadPrefab("Assets/ShipEnhancements/FuelTankSocket.prefab");
+            GameObject tankSocketObj = Instantiate(tankSocket, SELocator.GetShipTransform().Find("Module_Cabin"));
+            tankSocketObj.GetComponent<FuelTankItemSocket>().PlaceIntoSocket(tankObj.GetComponent<FuelTankItem>());
         }
 
         SetDamageColors();
