@@ -12,14 +12,14 @@ Permanently remove useless or very important parts of the ship.
 - **Eject Button**: Covers the eject button with tape so that your friend can't keep ejecting the cockpit while you're trying to fly.
 - **Interior/Exterior Lights**: Makes your ship very dark.
 - **Oxygen**: Literally removes all of the oxygen in the ship unless you're near trees or in an oxygen-filled atmosphere. This takes priority over all of the other oxygen modifications.
-- **Ship Scout Recall**: Removes your ability to recall the scout from the ship. You'll have to get up and do it yourself.
+- **Ship Scout Recall**: Removes your ability to recall the scout using the ship. The scout must be manually docked on the ship's scout launcher to fire, and can only be recalled using the handheld scout launcher.
 - **Ship Scout Launching**: Removes your ability to launch the scout from the ship. You'll have to do this yourself outside of the ship.
 - **Ship Repair**: Be careful not to damage your ship.
 - **Damage Indicators**: Turns off all of those pesky notifications about parts of your ship being damaged, including the master alarm. Keep an eye or four on the reactor, please.
-- **Seatbelt**: Breaks a number of state laws by removing your seatbelt. If you crash into something too quickly you'll fly out of the chair.
+- **Seatbelt**: Breaks a number of state laws by removing your seatbelt. If you crash into something with enough force you'll fly out of the chair.
 - **Ship Suit**: Removes your spacesuit from the ship. Space exploration just got a whole lot more dangerous.
 - **Air/Water Auto Roll**: Lets you fly around upside down in air and water, which is really confusing when paired with no ship gravity. Also makes it easier to land on walls, if you wanted to do that.
-- **Disable Rotation Speed Limit**: Lets you spin your ship as quickly as you want, though spinning too fast may tear your ship apart. Enabling this may quickly lead to motion sickness.
+- **Disable Rotation Speed Limit**: Lets you spin your ship as fast as you want. Enabling this may quickly lead to motion sickness.
 - **Ship Friction**: Essentially makes your ship a block of ice that will slide anywhere on anything.
 - **Lock-on**: Removes your ability to lock on to objects. You may find it difficult to use autopilot with this enabled.
 - **Map markers**: Hides the markers that tell you the location of your ship, your scout, and any marked ship log locations. Ship log locations inside a certain strange place are left visible so that you can actually find it. Visible until you get there, that is.
