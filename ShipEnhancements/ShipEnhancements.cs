@@ -144,6 +144,8 @@ public class ShipEnhancements : ModBehaviour
         damageIndicatorColor,
         disableAutoLights,
         addExpeditionFlag,
+        addFuelCanister,
+        chaoticCyclones,
     }
 
     private void Awake()
@@ -821,10 +823,13 @@ public class ShipEnhancements : ModBehaviour
             GameObject flagSocketObj = Instantiate(flagSocket, SELocator.GetShipTransform().Find("Module_Cabin"));
             flagSocketObj.GetComponent<ExpeditionFlagSocket>().PlaceIntoSocket(flagObj.GetComponent<ExpeditionFlagItem>());
         }
-        if (true)
+        if ((bool)Settings.addFuelCanister.GetProperty())
         {
+            // Remove marshmallows from cabin to make room for canister
             MeshFilter rend = LoadPrefab("Assets/ShipEnhancements/CabinFuelTankReplacement.fbx").GetComponent<MeshFilter>();
-            MeshFilter targetRend = SELocator.GetShipTransform().Find("Module_Cabin/Geo_Cabin/Cabin_Geometry/Cabin_Interior/Cabin_Interior 1/Cabin_Interior 1_MeshPart0").GetComponent<MeshFilter>();
+            MeshFilter targetRend = SELocator.GetShipTransform()
+                .Find("Module_Cabin/Geo_Cabin/Cabin_Geometry/Cabin_Interior/Cabin_Interior 1/Cabin_Interior 1_MeshPart0")
+                .GetComponent<MeshFilter>();
             targetRend.mesh = rend.mesh;
 
             GameObject tank = LoadPrefab("Assets/ShipEnhancements/FuelTankItem.prefab");

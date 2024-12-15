@@ -241,6 +241,12 @@
       "value": 1,
       "tooltip": "Larger numbers make your ship harder to turn while in space. Set to zero to make your ship spin forever. WARNING: Values below 1 may cause motion sickness."
     },
+    "chaoticCyclones": {
+      "title": "Chaotic Cyclones",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Changes cyclones to add an upwards spin to your ship when you enter one."
+    },
     "shipExplosionMultiplier": {
       "title": "Ship Explosion Multiplier",
       "type": "number",
@@ -378,6 +384,12 @@
       "type": "toggle",
       "value": false,
       "tooltip": "Adds a portable campfire to the ship near your suit. Unpack it anywhere you'd like and roast a marshmallow!"
+    },
+    "addFuelCanister": {
+      "title": "Add Portable Fuel Canister",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Adds a portable fuel canister to the ship by the ship log. You can bring it with you to refuel your jetpack on the go. It has enough fuel for about 3 complete refills of your jetpack."
     },
     "addPortableTractorBeam": {
       "title": "Add Portable Tractor Beam",

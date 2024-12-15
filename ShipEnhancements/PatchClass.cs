@@ -2491,4 +2491,17 @@ public static class PatchClass
         return true;
     }
     #endregion
+
+    #region ChaoticCyclones
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(TornadoFluidVolume), nameof(TornadoFluidVolume.GetPointFluidAngularVelocity))]
+    public static void ChangeTornadoShipRotation(TornadoFluidVolume __instance, FluidDetector detector, ref Vector3 __result)
+    {
+        if ((bool)chaoticCyclones.GetProperty() && detector.CompareTag("ShipDetector"))
+        {
+            __result = (__instance._tornadoPivot.transform.up -
+                __instance._tornadoPivot.transform.right * UnityEngine.Random.Range(0.4f, 0.8f)) * __instance._angularSpeed;
+        }
+    }
+    #endregion
 }

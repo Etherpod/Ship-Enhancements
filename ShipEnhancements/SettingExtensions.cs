@@ -78,6 +78,8 @@ public static class SettingExtensions
         { Settings.damageIndicatorColor, ("Default", "Default") },
         { Settings.disableAutoLights, (false, false) },
         { Settings.addExpeditionFlag, (false, false) },
+        { Settings.addFuelCanister, (false, false) },
+        { Settings.chaoticCyclones, (false, false) },
     };
 
     public static string GetName(this Settings setting)

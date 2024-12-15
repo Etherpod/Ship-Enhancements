@@ -41,6 +41,7 @@ Change some of the values that control how the ship works or how the added featu
 - **Ship Gravity Multiplier**: Larger numbers increase the strength of your ship's gravity crystal. Large numbers are advised against, however, as exiting your ship will kill you.
 - **Ship Gravity Direction**: Lets you change the direction of your ship's gravity. Set this to Random if you feel like the game isn't painful enough.
 - **Atmosphere/Space Angular Drag Multiplier**: Larger numbers make it harder to turn your ship. Setting this to 0 lets you spin your ship forever.
+- **Chaotic Cyclones**: Adjusts cyclones to apply an additional upwards spin to your ship while inside of them to make for an even more disorienting experience.
 - **Ship Explosion Multiplier**: Larger numbers increase the size of the explosion that is created when your ship blows up. Set this to something between 10 and 30 to simulate an atomic bomb.
 - **Reactor Lifetime Multiplier**: Larger numbers increase the time it takes for the reactor to blow up when it has been damaged. Set this to something small to give yourself a panic attack every time the master alarm goes off.
 - **Ship Bounciness**: Larger numbers increase the bounciness of the ship. A value of 2 should make the ship double its speed when it hits something, but the results of this setting aren't entirely accurate.
@@ -65,6 +66,7 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Signalscope Component**: Turns the ship's signalscope into a fully functioning ship component. If you damage it, you won't be able to receive or broadcast signals from the ship until you repair it.
 - **Ship Signal**: Adds a signal for the ship on the Outer Wilds Ventures frequency. The signal will stop if the ship's signalscope is damaged.
 - **Add Portable Campfire**: Adds a portable campfire to the ship next to your suit. Set it up wherever you want and roast a marshmallow.
+- **Add Portable Fuel Canister**: Adds a portable fuel tank inside the ship at the back. You can bring it around with you in case you need to refuel your jetpack while traveling. The fuel tank can completely refill your jetpack about 3 times before it runs out of fuel.
 - **Add Expedition Flag**: Adds a portable flag to the ship between the cockpit and the supplies section. Place it down somewhere if you want to mark some exploratory feat or if you want to mark where you've been.
 - **Add Ship Tether**: Adds a few hooks to the ship cabin. You can attach these hooks to pretty much any surface- including the ship- and tether yourself to them. If you want to get even crazier, grab a second hook after tethering to one and tether to the new one; it will connect the two hooks together.
 - **Gravity Landing Gear**: Adds a switch to the cockpit that powers your landing gear with gravitational force, letting you stick to surfaces. It's a bit fragile though, and only works if your landing gear isn't damaged.
