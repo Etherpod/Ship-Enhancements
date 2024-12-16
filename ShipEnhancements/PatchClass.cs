@@ -1694,6 +1694,7 @@ public static class PatchClass
         PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
         if (campfire)
         {
+            UpdateFocusedItems(true);
             Locator.GetPromptManager().AddScreenPrompt(campfire.GetPrompt(), PromptPosition.Center, false);
         }
     }
@@ -1707,6 +1708,7 @@ public static class PatchClass
         PortableCampfire campfire = (__instance is PortableCampfire) ? (PortableCampfire)__instance : null;
         if (campfire)
         {
+            UpdateFocusedItems(false);
             Locator.GetPromptManager().RemoveScreenPrompt(campfire.GetPrompt(), PromptPosition.Center);
         }
     }
@@ -2502,6 +2504,47 @@ public static class PatchClass
             __result = (__instance._tornadoPivot.transform.up -
                 __instance._tornadoPivot.transform.right * UnityEngine.Random.Range(0.4f, 0.8f)) * __instance._angularSpeed;
         }
+    }
+    #endregion
+
+    #region ToolInteractFix
+    public static int FocusedItems;
+
+    public static void UpdateFocusedItems(bool focused)
+    {
+        if (focused)
+        {
+            FocusedItems++;
+        }
+        else
+        {
+            FocusedItems--;
+        }
+
+        FirstPersonManipulator manipulator = Locator.GetPlayerCamera().GetComponent<FirstPersonManipulator>();
+        if (manipulator.GetFocusedOWItem() == null && !manipulator.HasFocusedInteractible())
+        {
+            FocusedItems = 0;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ToolModeSwapper), nameof(ToolModeSwapper.EquipToolMode))]
+    public static bool PreventToolChange(ToolMode mode)
+    {
+        bool sameBinding = false;
+        switch (mode)
+        {
+            case ToolMode.SignalScope:
+                sameBinding = InputLibrary.interactSecondary.HasSameBinding(InputLibrary.signalscope, OWInput.UsingGamepad());
+                break;
+            case ToolMode.Probe:
+                sameBinding = InputLibrary.interactSecondary.HasSameBinding(InputLibrary.probeLaunch, OWInput.UsingGamepad()
+                    || InputLibrary.interactSecondary.HasSameBinding(InputLibrary.probeRetrieve, OWInput.UsingGamepad()));
+                break;
+        }
+        ShipEnhancements.WriteDebugMessage(sameBinding);
+        return !sameBinding || mode == ToolMode.None || FocusedItems == 0;
     }
     #endregion
 }

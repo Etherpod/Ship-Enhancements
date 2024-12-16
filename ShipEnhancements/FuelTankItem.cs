@@ -123,6 +123,7 @@ public class FuelTankItem : OWItem
     private void OnGainFocus()
     {
         _focused = true;
+        PatchClass.UpdateFocusedItems(true);
         Locator.GetPromptManager().AddScreenPrompt(_refuelPrompt, PromptPosition.Center, false);
         Locator.GetPromptManager().AddScreenPrompt(_fuelDepletedPrompt, PromptPosition.Center, false);
     }
@@ -130,6 +131,7 @@ public class FuelTankItem : OWItem
     private void OnLoseFocus()
     {
         _focused = false;
+        PatchClass.UpdateFocusedItems(false);
         Locator.GetPromptManager().RemoveScreenPrompt(_refuelPrompt, PromptPosition.Center);
         Locator.GetPromptManager().RemoveScreenPrompt(_fuelDepletedPrompt, PromptPosition.Center);
 

@@ -21,6 +21,7 @@ public class TetherHookItem : OWItem
     private Tether _activeTether;
     private FirstPersonManipulator _cameraManipulator;
     private ScreenPrompt _tetherPrompt;
+    private bool _lastFocused = false;
 
     public override string GetDisplayName()
     {
@@ -47,6 +48,11 @@ public class TetherHookItem : OWItem
     {
         bool focused = _cameraManipulator.GetFocusedOWItem() == this;
         _tetherPrompt.SetVisibility(focused);
+        if (_lastFocused != focused)
+        {
+            PatchClass.UpdateFocusedItems(focused);
+            _lastFocused = focused;
+        }
         if (focused && OWInput.IsNewlyPressed(InputLibrary.interactSecondary))
         {
             OnPressInteract();
