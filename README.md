@@ -2,6 +2,14 @@
 
 Ship Enhancements adds way too many options for changing the ship and things relating to the ship. Experiment and have fun!
 
+To answer some questions you may have...
+
+## Is this mod compatible with Quantum Space Buddies?
+Yep! Whoever hosts the game will have control over the settings.
+
+## How am I supposed to carry all of these new items?
+I made a mod called **Traveler's Pack** to address this problem. Try playing with it enabled if you run into the issue of there being too many items.
+
 # Feature Overview
 
 ## Disable Ship Parts
@@ -89,19 +97,14 @@ When you select a preset, you may have to close and reopen the settings menu for
 
 - **Vanilla Plus** - Turns everything off except for the Quality of Life changes.
 - **Minimal** - What if Slate didn't add all those extra things to your ship? This is that reality.
-- **Relaxed** - Gives you more resources and less damage.
+- **Relaxed** - Gives you more resources and less damage, plus some fun items.
 - **Hardcore** - Resources are lower and damage is permanent.
 - **Wanderer** - Makes the possibility of getting lost very, very likely.
 - **Pandemonium** - I just turned everything on for this one. Good luck.
 - **Random** - Randomizes all of the options each loop. Preserves the settings you had previously selected so that you can switch back anytime.
 
 ## Achievements
-Ship Enhancements adds 9 new achievements to the **Achievements+** mod! Use it with Ship Enhancements if you want to create some meaning from the chaos.
-
-## Multiplayer
-This mod is fully compatible with Quantum Space Buddies! Whoever hosts the game will control what settings are enabled or disabled.
-
-If you run into any bugs, feel free to report it on GitHub or on the Outer Wilds Modding Discord server.
+Ship Enhancements adds 9 new achievements to the **Achievements+** mod! Play with it enabled if you want to create some semblance of meaning from the chaos that ensues.
 
 ## API
 - **CreateTemperatureZone()** - In case you're a modder and want to add your own high/low temperature zones. Temperature zones can stack, and will just take the sum of the temperatures.
