@@ -1,7 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using UnityEngine;
+using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -49,6 +48,9 @@ public class FuelTankItem : OWItem
         _interactReceiver.ChangePrompt("Pick up " + GetDisplayName());
         _fuelDepletedPrompt.SetDisplayState(ScreenPrompt.DisplayState.GrayedOut);
         _currentFuel = _maxFuel;
+
+        SetupExplosion();
+
         List<OWCollider> colliders = [.. _colliders];
         foreach (OWCollider col in _explosion.GetComponentsInChildren<OWCollider>())
         {
@@ -59,6 +61,44 @@ public class FuelTankItem : OWItem
         foreach (OWCollider col in _colliders)
         {
             ShipEnhancements.WriteDebugMessage(col.gameObject.name);
+        }
+    }
+
+    private void SetupExplosion()
+    {
+        if ((float)shipExplosionMultiplier.GetProperty() != 1 && (float)shipExplosionMultiplier.GetProperty() > 0f)
+        {
+            _explosion._length *= ((float)shipExplosionMultiplier.GetProperty() * 0.75f) + 0.25f;
+            _explosion._forceVolume._acceleration *= ((float)shipExplosionMultiplier.GetProperty() * 0.25f) + 0.75f;
+            _explosion.transform.localScale *= (float)shipExplosionMultiplier.GetProperty();
+            _explosion.GetComponent<SphereCollider>().radius = 0.1f;
+            OWAudioSource audio = SELocator.GetShipTransform().Find("Effects/ExplosionAudioSource").GetComponent<OWAudioSource>();
+            audio.maxDistance *= ((float)shipExplosionMultiplier.GetProperty() * 0.1f) + 0.9f;
+            AnimationCurve curve = audio.GetCustomCurve(AudioSourceCurveType.CustomRolloff);
+            Keyframe[] newKeys = new Keyframe[curve.keys.Length];
+            for (int i = 0; i < curve.keys.Length; i++)
+            {
+                newKeys[i] = curve.keys[i];
+                newKeys[i].value *= ((float)shipExplosionMultiplier.GetProperty() * 0.1f) + 0.9f;
+            }
+            AnimationCurve newCurve = new();
+            foreach (Keyframe key in newKeys)
+            {
+                newCurve.AddKey(key);
+            }
+            audio.SetCustomCurve(AudioSourceCurveType.CustomRolloff, newCurve);
+        }
+
+        if ((bool)moreExplosionDamage.GetProperty())
+        {
+            GameObject damage = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ExplosionDamage.prefab");
+            GameObject damageObj = Instantiate(damage, _explosion.transform);
+            damageObj.transform.localPosition = Vector3.zero;
+            damageObj.transform.localScale = Vector3.one;
+            ExplosionDamage explosionDamage = damageObj.GetComponent<ExplosionDamage>();
+            explosionDamage.damageShip = true;
+            explosionDamage.damageFragment = true;
+            explosionDamage.unparent = true;
         }
     }
 
@@ -189,7 +229,7 @@ public class FuelTankItem : OWItem
             }
             else
             {
-                _explosion.GetComponentInChildren<ExplosionDamage>().OnExplode();
+                _explosion.GetComponentInChildren<ExplosionDamage>()?.OnExplode();
             }
 
             Destroy(gameObject);

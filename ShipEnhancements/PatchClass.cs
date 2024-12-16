@@ -1803,8 +1803,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ExplosionController), nameof(ExplosionController.Update))]
     public static bool FixExplosionHeatVolume(ExplosionController __instance)
     {
-        if ((float)shipExplosionMultiplier.GetProperty() == 1f || (float)shipExplosionMultiplier.GetProperty() < 0f
-            || __instance.transform.parent.name != "Effects") return true;
+        if ((float)shipExplosionMultiplier.GetProperty() == 1f || (float)shipExplosionMultiplier.GetProperty() < 0f) return true;
 
         if (!__instance._playing)
         {
@@ -2051,6 +2050,8 @@ public static class PatchClass
         {
             __instance.GetComponentInChildren<ShipNoiseMaker>()._noiseRadius = 1000f * (float)shipExplosionMultiplier.GetProperty();
         }
+
+        __instance.GetComponentInChildren<ExplosionDamage>()?.OnExplode();
     }
     #endregion
 

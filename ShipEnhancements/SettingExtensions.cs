@@ -80,6 +80,7 @@ public static class SettingExtensions
         { Settings.addExpeditionFlag, (false, false) },
         { Settings.addFuelCanister, (false, false) },
         { Settings.chaoticCyclones, (false, false) },
+        { Settings.moreExplosionDamage, (false, false) },
     };
 
     public static string GetName(this Settings setting)

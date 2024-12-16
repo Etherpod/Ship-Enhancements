@@ -253,6 +253,12 @@
       "value": 1,
       "tooltip": "Larger numbers increase the size of the explosion that is created when your ship blows up."
     },
+    "moreExplosionDamage": {
+      "title": "Extra Explosion Damage",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Makes explosions apply damage to the ship and to fragments of Brittle Hollow."
+    },
     "reactorLifetimeMultiplier": {
       "title": "Reactor Lifetime Multiplier",
       "type": "number",

@@ -146,6 +146,7 @@ public class ShipEnhancements : ModBehaviour
         addExpeditionFlag,
         addFuelCanister,
         chaoticCyclones,
+        moreExplosionDamage,
     }
 
     private void Awake()
@@ -683,29 +684,7 @@ public class ShipEnhancements : ModBehaviour
             }
             else
             {
-                explosion._length *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.75f) + 0.25f;
-                explosion._forceVolume._acceleration *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.25f) + 0.75f;
-                explosion.transform.localScale *= (float)Settings.shipExplosionMultiplier.GetProperty();
-                explosion.GetComponent<SphereCollider>().radius = 0.1f;
-                OWAudioSource audio = effectsTransform.Find("ExplosionAudioSource").GetComponent<OWAudioSource>();
-                audio.maxDistance *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.1f) + 0.9f;
-                AnimationCurve curve = audio.GetCustomCurve(AudioSourceCurveType.CustomRolloff);
-                Keyframe[] newKeys = new Keyframe[curve.keys.Length];
-                for (int i = 0; i < curve.keys.Length; i++)
-                {
-                    newKeys[i] = curve.keys[i];
-                    newKeys[i].value *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.1f) + 0.9f;
-                }
-                AnimationCurve newCurve = new();
-                foreach (Keyframe key in newKeys)
-                {
-                    newCurve.AddKey(key);
-                }
-                audio.SetCustomCurve(AudioSourceCurveType.CustomRolloff, newCurve);
-
-                ExplosionDamage damage = explosion.gameObject.GetAddComponent<ExplosionDamage>();
-                damage._damageShip = false;
-                damage._damageFragment = true;
+                SetupExplosion(effectsTransform, explosion);
             }
         }
         if ((float)Settings.shipBounciness.GetProperty() > 0f)
@@ -902,6 +881,41 @@ public class ShipEnhancements : ModBehaviour
                 SELocator.GetShipDamageController().Explode();
             }
         });
+    }
+
+    private static void SetupExplosion(Transform effectsTransform, ExplosionController explosion)
+    {
+        explosion._length *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.75f) + 0.25f;
+        explosion._forceVolume._acceleration *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.25f) + 0.75f;
+        explosion.transform.localScale *= (float)Settings.shipExplosionMultiplier.GetProperty();
+        explosion.GetComponent<SphereCollider>().radius = 0.1f;
+        OWAudioSource audio = effectsTransform.Find("ExplosionAudioSource").GetComponent<OWAudioSource>();
+        audio.maxDistance *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.1f) + 0.9f;
+        AnimationCurve curve = audio.GetCustomCurve(AudioSourceCurveType.CustomRolloff);
+        Keyframe[] newKeys = new Keyframe[curve.keys.Length];
+        for (int i = 0; i < curve.keys.Length; i++)
+        {
+            newKeys[i] = curve.keys[i];
+            newKeys[i].value *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.1f) + 0.9f;
+        }
+        AnimationCurve newCurve = new();
+        foreach (Keyframe key in newKeys)
+        {
+            newCurve.AddKey(key);
+        }
+        audio.SetCustomCurve(AudioSourceCurveType.CustomRolloff, newCurve);
+
+        if ((bool)Settings.moreExplosionDamage.GetProperty())
+        {
+            GameObject damage = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ExplosionDamage.prefab");
+            GameObject damageObj = Instantiate(damage, explosion.transform);
+            damageObj.transform.localPosition = Vector3.zero;
+            damageObj.transform.localScale = Vector3.one;
+            ExplosionDamage explosionDamage = damageObj.GetComponent<ExplosionDamage>();
+            explosionDamage.damageShip = false;
+            explosionDamage.damageFragment = true;
+            explosionDamage.unparent = false;
+        }
     }
 
     private void AddTemperatureZones()

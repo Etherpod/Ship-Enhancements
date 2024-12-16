@@ -2,48 +2,93 @@
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
 public class ExplosionDamage : MonoBehaviour
 {
-    [SerializeField]
-    public bool _damageShip;
-    [SerializeField]
-    public bool _damageFragment;
+    public bool damageShip
+    {
+        get
+        {
+            return _damageShip;
+        }
+        set
+        {
+            _damageShip = value;
+        }
+    }
+
+    public bool damageFragment
+    {
+        get
+        {
+            return _damageFragment;
+        }
+        set
+        {
+            _damageFragment = value;
+        }
+    }
+
+    public bool unparent
+    {
+        get
+        {
+            return _unparent;
+        }
+        set
+        {
+            _unparent = value;
+        }
+    }
+
+    private bool _damageShip;
+    private bool _damageFragment;
+    private bool _unparent;
 
     private List<ShipHull> _trackedHulls = [];
-    private Collider _collider;
-    private Transform _initialParent;
+    private SphereCollider _collider;
+    private ExplosionController _explosion;
 
     private void Awake()
     {
-        _collider = GetComponent<Collider>();
+        _collider = GetComponent<SphereCollider>();
+        _explosion = GetComponentInParent<ExplosionController>();
     }
 
     private void Start()
     {
         _collider.enabled = false;
-        _initialParent = transform.parent;
         enabled = false;
     }
 
     public void OnExplode()
     {
         _collider.enabled = true;
-        //transform.parent = null;
         gameObject.layer = 0;
-        //enabled = true;
+        if (_unparent)
+        {
+            transform.parent = null;
+        }
+        enabled = true;
     }
 
-    private void FixedUpdate()
+    private void Update()
     {
-        if (_initialParent == null)
+        if (_explosion == null)
         {
             enabled = false;
+            _collider.enabled = false;
             return;
         }
-        transform.position = _initialParent.transform.position;
+        if (_unparent)
+        {
+            transform.position = _explosion.transform.position;
+        }
+        float lerp = Mathf.Clamp01(_explosion._timer / _explosion._length);
+        _collider.radius = Mathf.Lerp(0.1f, 1f, lerp * 2f);
     }
 
     private void OnTriggerEnter(Collider hitObj)
@@ -53,8 +98,22 @@ public class ExplosionDamage : MonoBehaviour
             ShipHull hull = hitObj.GetComponentInParent<ShipHull>();
             if (hull != null && !_trackedHulls.Contains(hull))
             {
-                float num = UnityEngine.Random.Range(0.4f, 0.7f);
+                _trackedHulls.Add(hull);
+
+                float multiplier = Mathf.Max(0f, (float)shipExplosionMultiplier.GetProperty());
+                if (multiplier == 0)
+                {
+                    return;
+                }
+                float num = UnityEngine.Random.Range(0.9f, 1.1f) * Mathf.Sqrt(1f/20f * (float)shipExplosionMultiplier.GetProperty());
                 hull._integrity = Mathf.Max(hull._integrity - num, 0f);
+                for (int i = 0; i < hull._components.Length; i++)
+                {
+                    if (UnityEngine.Random.value < num)
+                    {
+                        hull._components[i].SetDamaged(true);
+                    }
+                }
                 if (!hull._damaged)
                 {
                     hull._damaged = true;
@@ -73,12 +132,17 @@ public class ExplosionDamage : MonoBehaviour
                 {
                     hull._damageEffect.SetEffectBlend(1f - hull._integrity);
                 }
-                _trackedHulls.Add(hull);
+
+                ShipDetachableModule module = hull.shipModule as ShipDetachableModule;
+                if (hull.integrity <= 0f && !module.isDetached)
+                {
+                    module.Detach();
+                }
             }
         }
         if (_damageFragment)
         {
-            ShipEnhancements.WriteDebugMessage(hitObj.gameObject.name);
+            //ShipEnhancements.WriteDebugMessage(hitObj.gameObject.name);
             FragmentIntegrity fragment = hitObj.GetComponentInParent<FragmentIntegrity>();
             if (fragment != null)
             {
@@ -86,9 +150,4 @@ public class ExplosionDamage : MonoBehaviour
             }
         }
     }
-
-    /*private void OnDestroy()
-    {
-        _triggerVolume.OnEntry -= OnEntry;
-    }*/
 }
