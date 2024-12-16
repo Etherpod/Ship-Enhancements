@@ -259,6 +259,12 @@
       "value": false,
       "tooltip": "Makes explosions apply damage to the ship and to fragments of Brittle Hollow."
     },
+    "extraNoise": {
+      "title": "Extra Noise",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Makes things such as the master alarm detectable by noise-sensing things."
+    },
     "reactorLifetimeMultiplier": {
       "title": "Reactor Lifetime Multiplier",
       "type": "number",
@@ -305,12 +311,6 @@
       "type": "toggle",
       "value": false,
       "tooltip": "Automatically closes the hatch when you leave the ship."
-    },
-    "extraNoise": {
-      "title": "Enable Extra Noise",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Makes things such as the master alarm detectable by noise-sensing things."
     },
     "enableShipItemPlacement": {
       "title": "Enable Ship Item Placement",

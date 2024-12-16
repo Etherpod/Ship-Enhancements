@@ -95,17 +95,18 @@ public class ExplosionDamage : MonoBehaviour
     {
         if (_damageShip)
         {
+            if ((float)shipExplosionMultiplier.GetProperty() < 0 || (float)shipDamageMultiplier <= 0)
+            {
+                return;
+            }
+
             ShipHull hull = hitObj.GetComponentInParent<ShipHull>();
             if (hull != null && !_trackedHulls.Contains(hull))
             {
                 _trackedHulls.Add(hull);
 
-                float multiplier = Mathf.Max(0f, (float)shipExplosionMultiplier.GetProperty());
-                if (multiplier == 0)
-                {
-                    return;
-                }
-                float num = UnityEngine.Random.Range(0.9f, 1.1f) * Mathf.Sqrt(1f/20f * (float)shipExplosionMultiplier.GetProperty());
+                float num = UnityEngine.Random.Range(0.9f, 1.1f) * Mathf.Sqrt(1f/20f * (float)shipExplosionMultiplier.GetProperty())
+                    * (float)shipDamageMultiplier.GetProperty();
                 hull._integrity = Mathf.Max(hull._integrity - num, 0f);
                 for (int i = 0; i < hull._components.Length; i++)
                 {
