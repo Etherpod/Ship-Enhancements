@@ -1803,7 +1803,8 @@ public static class PatchClass
     [HarmonyPatch(typeof(ExplosionController), nameof(ExplosionController.Update))]
     public static bool FixExplosionHeatVolume(ExplosionController __instance)
     {
-        if ((float)shipExplosionMultiplier.GetProperty() == 1f || (float)shipExplosionMultiplier.GetProperty() < 0f) return true;
+        if ((float)shipExplosionMultiplier.GetProperty() == 1f || (float)shipExplosionMultiplier.GetProperty() < 0f
+            || __instance.transform.parent.name != "Effects") return true;
 
         if (!__instance._playing)
         {
@@ -2543,8 +2544,23 @@ public static class PatchClass
                     || InputLibrary.interactSecondary.HasSameBinding(InputLibrary.probeRetrieve, OWInput.UsingGamepad()));
                 break;
         }
-        ShipEnhancements.WriteDebugMessage(sameBinding);
+
         return !sameBinding || mode == ToolMode.None || FocusedItems == 0;
+    }
+    #endregion
+
+    #region FuelTankExplosion
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ImpactSensor), nameof(ImpactSensor.OnCollisionEnter))]
+    public static void ImpactFuelTank(ImpactSensor __instance, Collision collision)
+    {
+        FuelTankItem item = collision.collider.GetComponentInParent<FuelTankItem>();
+        if (collision.rigidbody != null && item != null)
+        {
+            OWRigidbody requiredComponent = collision.rigidbody.GetRequiredComponent<OWRigidbody>();
+            ImpactData impactData = new ImpactData(__instance._owRigidbody, requiredComponent, collision);
+            item.OnImpact(impactData);
+        }
     }
     #endregion
 }

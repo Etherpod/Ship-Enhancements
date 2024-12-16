@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace ShipEnhancements;
@@ -11,6 +13,8 @@ public class FuelTankItem : OWItem
     private InteractReceiver _interactReceiver;
     [SerializeField]
     private OWAudioSource _refuelSource;
+    [SerializeField]
+    private ExplosionController _explosion;
 
     private Collider _itemCollider;
     private ScreenPrompt _refuelPrompt;
@@ -20,6 +24,8 @@ public class FuelTankItem : OWItem
     private float _refillRate = 25f;
     private bool _refillingFuel;
     private bool _focused;
+
+    private float _explosionSpeed = 10f;
 
     public override string GetDisplayName()
     {
@@ -43,6 +49,9 @@ public class FuelTankItem : OWItem
         _interactReceiver.ChangePrompt("Pick up " + GetDisplayName());
         _fuelDepletedPrompt.SetDisplayState(ScreenPrompt.DisplayState.GrayedOut);
         _currentFuel = _maxFuel;
+        List<OWCollider> colliders = [.. _colliders];
+        colliders.Remove(_explosion._forceVolume._triggerVolume._owCollider);
+        _colliders = [.. colliders];
     }
 
     private void Update()
@@ -160,6 +169,20 @@ public class FuelTankItem : OWItem
         return _currentFuel / _maxFuel;
     }
 
+    public void OnImpact(ImpactData impact)
+    {
+        if (impact.speed > _explosionSpeed && _currentFuel > 0f)
+        {
+            _explosion.transform.parent = transform.parent;
+            _explosion?.Play();
+            if (GetComponentInParent<ShipBody>())
+            {
+                SELocator.GetShipDamageController().Explode();
+            }
+            Destroy(gameObject);
+        }
+    }
+
     public override void DropItem(Vector3 position, Vector3 normal, Transform parent, Sector sector, IItemDropTarget customDropTarget)
     {
         base.DropItem(position, normal, parent, sector, customDropTarget);
@@ -183,5 +206,7 @@ public class FuelTankItem : OWItem
     {
         base.OnDestroy();
         _interactReceiver.OnPressInteract -= OnPressInteract;
+        _interactReceiver.OnGainFocus -= OnGainFocus;
+        _interactReceiver.OnLoseFocus -= OnLoseFocus;
     }
 }
