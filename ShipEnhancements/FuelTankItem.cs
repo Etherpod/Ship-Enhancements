@@ -50,8 +50,16 @@ public class FuelTankItem : OWItem
         _fuelDepletedPrompt.SetDisplayState(ScreenPrompt.DisplayState.GrayedOut);
         _currentFuel = _maxFuel;
         List<OWCollider> colliders = [.. _colliders];
-        colliders.Remove(_explosion._forceVolume._triggerVolume._owCollider);
+        foreach (OWCollider col in _explosion.GetComponentsInChildren<OWCollider>())
+        {
+            colliders.Remove(col);
+        }
         _colliders = [.. colliders];
+
+        foreach (OWCollider col in _colliders)
+        {
+            ShipEnhancements.WriteDebugMessage(col.gameObject.name);
+        }
     }
 
     private void Update()
@@ -179,6 +187,11 @@ public class FuelTankItem : OWItem
             {
                 SELocator.GetShipDamageController().Explode();
             }
+            else
+            {
+                _explosion.GetComponentInChildren<ExplosionDamage>().OnExplode();
+            }
+
             Destroy(gameObject);
         }
     }

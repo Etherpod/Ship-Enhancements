@@ -702,6 +702,10 @@ public class ShipEnhancements : ModBehaviour
                     newCurve.AddKey(key);
                 }
                 audio.SetCustomCurve(AudioSourceCurveType.CustomRolloff, newCurve);
+
+                ExplosionDamage damage = explosion.gameObject.GetAddComponent<ExplosionDamage>();
+                damage._damageShip = false;
+                damage._damageFragment = true;
             }
         }
         if ((float)Settings.shipBounciness.GetProperty() > 0f)
