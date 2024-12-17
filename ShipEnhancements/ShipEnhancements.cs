@@ -562,28 +562,6 @@ public class ShipEnhancements : ModBehaviour
             oxygenDepleted = true;
             SELocator.GetShipTransform().Find("Module_Cockpit/Props_Cockpit/Props_HEA_ShipFoliage").gameObject.SetActive(false);
         }
-        if (Settings.temperatureZonesAmount.GetProperty().ToString() != "None")
-        {
-            SELocator.GetShipBody().GetComponentInChildren<ShipFuelGauge>().gameObject.AddComponent<ShipTemperatureGauge>();
-            GameObject hullTempDial = LoadPrefab("Assets/ShipEnhancements/ShipTempDial.prefab");
-            Instantiate(hullTempDial, SELocator.GetShipTransform().Find("Module_Cockpit"));
-
-            if (Settings.temperatureZonesAmount.GetProperty().ToString() == "Sun")
-            {
-                GameObject sun = GameObject.Find("Sun_Body");
-                if (sun != null)
-                {
-                    GameObject sunTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Sun.prefab");
-                    Instantiate(sunTempZone, sun.transform.Find("Sector_SUN/Volumes_SUN"));
-                    GameObject supernovaTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Supernova.prefab");
-                    Instantiate(supernovaTempZone, sun.GetComponentInChildren<SupernovaEffectController>().transform);
-                }
-            }
-            else
-            {
-                AddTemperatureZones();
-            }
-        }
         if ((bool)Settings.enableShipFuelTransfer.GetProperty())
         {
             GameObject transferVolume = LoadPrefab("Assets/ShipEnhancements/FuelTransferVolume.prefab");
@@ -668,6 +646,28 @@ public class ShipEnhancements : ModBehaviour
             AssetBundleUtilities.ReplaceShaders(portableCampfireItem);
             PortableCampfireItem campfireItem = Instantiate(portableCampfireItem, suppliesParent).GetComponent<PortableCampfireItem>();
             campfireSocket.SetCampfireItem(campfireItem);
+        }
+        if (Settings.temperatureZonesAmount.GetProperty().ToString() != "None")
+        {
+            SELocator.GetShipBody().GetComponentInChildren<ShipFuelGauge>().gameObject.AddComponent<ShipTemperatureGauge>();
+            GameObject hullTempDial = LoadPrefab("Assets/ShipEnhancements/ShipTempDial.prefab");
+            Instantiate(hullTempDial, SELocator.GetShipTransform().Find("Module_Cockpit"));
+
+            if (Settings.temperatureZonesAmount.GetProperty().ToString() == "Sun")
+            {
+                GameObject sun = GameObject.Find("Sun_Body");
+                if (sun != null)
+                {
+                    GameObject sunTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Sun.prefab");
+                    Instantiate(sunTempZone, sun.transform.Find("Sector_SUN/Volumes_SUN"));
+                    GameObject supernovaTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Supernova.prefab");
+                    Instantiate(supernovaTempZone, sun.GetComponentInChildren<SupernovaEffectController>().transform);
+                }
+            }
+            else
+            {
+                AddTemperatureZones();
+            }
         }
         if ((float)Settings.shipExplosionMultiplier.GetProperty() != 1f)
         {
@@ -986,6 +986,16 @@ public class ShipEnhancements : ModBehaviour
             Instantiate(ctTempZone1, ct.transform.Find("Sector_CaveTwin"));
             GameObject ctTempZone2 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_CaveTwinCold.prefab");
             Instantiate(ctTempZone2, ct.transform.Find("Sector_CaveTwin"));
+        }
+
+        Campfire[] campfires = FindObjectsOfType<Campfire>();
+        if (campfires.Length > 0)
+        {
+            GameObject campfireTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Campfire.prefab");
+            foreach (Campfire fire in campfires)
+            {
+                Instantiate(campfireTempZone, fire.transform.parent);
+            }
         }
     }
 

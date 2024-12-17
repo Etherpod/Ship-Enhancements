@@ -851,6 +851,21 @@ public static class PatchClass
             tempZone.SetScale(__instance._currentSupernovaScale);
         }
     }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(Campfire), nameof(Campfire.SetState))]
+    public static void UpdateCampfireTemperatureZone(Campfire __instance)
+    {
+        ShipEnhancements.WriteDebugMessage("Set state: " + __instance.transform.parent.name);
+        __instance.transform.parent.GetComponentInChildren<TemperatureZone>()?.SetVolumeActive(__instance._state == Campfire.State.LIT);
+    }
+
+    /*[HarmonyPostfix]
+    [HarmonyPatch(typeof(Campfire), nameof(Campfire.Start))]
+    public static void InitializeCampfireTemperatureZone(Campfire __instance)
+    {
+        __instance.GetComponentInChildren<TemperatureZone>()?.SetVolumeActive(__instance._state == Campfire.State.LIT);
+    }*/
     #endregion
 
     #region DisableReferenceFrame
