@@ -28,6 +28,11 @@ public class PortableCampfireItem : OWItem
         _campfire = _campfireObject.GetComponentInChildren<PortableCampfire>();
     }
 
+    private void Start()
+    {
+        TogglePackUp(true);
+    }
+
     public override void PickUpItem(Transform holdTranform)
     {
         base.PickUpItem(holdTranform);

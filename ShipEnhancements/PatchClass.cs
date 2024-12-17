@@ -856,7 +856,6 @@ public static class PatchClass
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.SetState))]
     public static void UpdateCampfireTemperatureZone(Campfire __instance)
     {
-        ShipEnhancements.WriteDebugMessage("Set state: " + __instance.transform.parent.name);
         __instance.transform.parent.GetComponentInChildren<TemperatureZone>()?.SetVolumeActive(__instance._state == Campfire.State.LIT);
     }
 
