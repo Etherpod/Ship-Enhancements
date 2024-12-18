@@ -682,7 +682,7 @@ public class ShipEnhancements : ModBehaviour
                 SELocator.GetShipDamageController()._explosion = newExplosionObj.GetComponent<ExplosionController>();
                 Destroy(explosion.gameObject);
             }
-            else
+            else if ((float)Settings.shipExplosionMultiplier.GetProperty() > 0f)
             {
                 SetupExplosion(effectsTransform, explosion);
             }

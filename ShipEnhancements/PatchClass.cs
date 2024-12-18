@@ -1817,7 +1817,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ExplosionController), nameof(ExplosionController.Update))]
     public static bool FixExplosionHeatVolume(ExplosionController __instance)
     {
-        if ((float)shipExplosionMultiplier.GetProperty() == 1f || (float)shipExplosionMultiplier.GetProperty() < 0f) return true;
+        if ((float)shipExplosionMultiplier.GetProperty() == 1f || (float)shipExplosionMultiplier.GetProperty() <= 0f) return true;
 
         if (!__instance._playing)
         {
@@ -1849,6 +1849,12 @@ public static class PatchClass
     [HarmonyPatch(typeof(ExplosionController), nameof(ExplosionController.Play))]
     public static bool PlayBlackHoleExplosion(ExplosionController __instance)
     {
+        if ((float)shipExplosionMultiplier.GetProperty() == 0
+            || (float)shipExplosionMultiplier.GetProperty() < 0f && __instance.GetComponentInParent<FuelTankItem>())
+        {
+            return false;
+        }
+
         if (__instance is BlackHoleExplosionController)
         {
             BlackHoleExplosionController controller = __instance as BlackHoleExplosionController;
@@ -1857,6 +1863,16 @@ public static class PatchClass
         }
 
         return true;
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ForceVolume), nameof(ForceVolume.CalculateForceAccelerationOnBody))]
+    public static void RemoveShipBodyFromForceVolume(ForceVolume __instance, OWRigidbody targetBody, ref Vector3 __result)
+    {
+        if (__instance.GetComponent<ExplosionController>() && targetBody is ShipBody)
+        {
+            __result = Vector3.zero;
+        }
     }
     #endregion
 

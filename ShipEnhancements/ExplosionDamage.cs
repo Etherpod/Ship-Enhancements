@@ -95,7 +95,7 @@ public class ExplosionDamage : MonoBehaviour
     {
         if (_damageShip)
         {
-            if ((float)shipExplosionMultiplier.GetProperty() < 0 || (float)shipDamageMultiplier <= 0)
+            if ((float)shipExplosionMultiplier.GetProperty() <= 0 || (float)shipDamageMultiplier <= 0)
             {
                 return;
             }
@@ -135,7 +135,7 @@ public class ExplosionDamage : MonoBehaviour
                 }
 
                 ShipDetachableModule module = hull.shipModule as ShipDetachableModule;
-                if (hull.integrity <= 0f && !module.isDetached)
+                if (module != null && hull.integrity <= 0f && !module.isDetached)
                 {
                     module.Detach();
                 }
@@ -147,7 +147,15 @@ public class ExplosionDamage : MonoBehaviour
             FragmentIntegrity fragment = hitObj.GetComponentInParent<FragmentIntegrity>();
             if (fragment != null)
             {
-                fragment.AddDamage(1000f);
+                if ((float)shipExplosionMultiplier.GetProperty() >= 1f)
+                {
+                    fragment.AddDamage(UnityEngine.Random.Range(300, 500));
+                }
+                else
+                {
+                    float lerp = Mathf.InverseLerp(0f, 1f, (float)shipExplosionMultiplier.GetProperty());
+                    fragment.AddDamage(Mathf.Lerp(0f, 100f, lerp));
+                }
             }
         }
     }

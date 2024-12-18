@@ -89,7 +89,7 @@ public class FuelTankItem : OWItem
             audio.SetCustomCurve(AudioSourceCurveType.CustomRolloff, newCurve);
         }
 
-        if ((bool)moreExplosionDamage.GetProperty())
+        if ((bool)moreExplosionDamage.GetProperty() && (float)shipExplosionMultiplier.GetProperty() > 0f)
         {
             GameObject damage = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ExplosionDamage.prefab");
             GameObject damageObj = Instantiate(damage, _explosion.transform);
@@ -221,7 +221,6 @@ public class FuelTankItem : OWItem
     {
         if (impact.speed > _explosionSpeed && _currentFuel > 0f)
         {
-            _explosion.transform.parent = transform.parent;
             _explosion?.Play();
             if (GetComponentInParent<ShipBody>())
             {
