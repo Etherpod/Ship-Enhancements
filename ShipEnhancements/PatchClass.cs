@@ -2594,4 +2594,21 @@ public static class PatchClass
         }
     }
     #endregion
+
+    #region SingleUseTractorBeam
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipTractorBeamSwitch), nameof(ShipTractorBeamSwitch.DeactivateTractorBeam))]
+    public static void DisableTractorBeamModel(ShipTractorBeamSwitch __instance)
+    {
+        if (true)
+        {
+            GameObject model = SELocator.GetShipTransform()
+                .Find("Module_Cabin/Geo_Cabin/Cabin_Tech/Cabin_Tech_Interior/Props_NOM_SmallTractorBeam_Glow").gameObject;
+            if (model != null && model.activeInHierarchy)
+            {
+                model.SetActive(false);
+            }
+        }
+    }
+    #endregion
 }

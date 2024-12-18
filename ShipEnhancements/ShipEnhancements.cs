@@ -822,6 +822,10 @@ public class ShipEnhancements : ModBehaviour
             GameObject tankSocketObj = Instantiate(tankSocket, SELocator.GetShipTransform().Find("Module_Cabin"));
             tankSocketObj.GetComponent<FuelTankItemSocket>().PlaceIntoSocket(tankObj.GetComponent<FuelTankItem>());
         }
+        if (true)
+        {
+            SELocator.GetShipTransform().GetComponentInChildren<ShipTractorBeamSwitch>()._functional = false;
+        }
 
         SetDamageColors();
 

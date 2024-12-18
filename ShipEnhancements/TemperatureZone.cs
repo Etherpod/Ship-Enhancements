@@ -96,7 +96,10 @@ public class TemperatureZone : MonoBehaviour
 
     private void OnDestroy()
     {
-        _triggerVolume.OnEntry -= OnEffectVolumeEnter;
-        _triggerVolume.OnExit -= OnEffectVolumeExit;
+        if (_triggerVolume)
+        {
+            _triggerVolume.OnEntry -= OnEffectVolumeEnter;
+            _triggerVolume.OnExit -= OnEffectVolumeExit;
+        }
     }
 }
