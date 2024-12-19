@@ -82,6 +82,7 @@ public static class SettingExtensions
         { Settings.chaoticCyclones, (false, false) },
         { Settings.moreExplosionDamage, (false, false) },
         { Settings.singleUseTractorBeam, (false, false) },
+        { Settings.disableRetroRockets, (false, false) },
     };
 
     public static string GetName(this Settings setting)

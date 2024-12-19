@@ -148,6 +148,7 @@ public class ShipEnhancements : ModBehaviour
         chaoticCyclones,
         moreExplosionDamage,
         singleUseTractorBeam,
+        disableRetroRockets,
     }
 
     private void Awake()

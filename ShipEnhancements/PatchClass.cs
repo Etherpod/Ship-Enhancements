@@ -2613,4 +2613,16 @@ public static class PatchClass
         }
     }
     #endregion
+
+    #region DisableRetroRockets
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ThrusterModel), nameof(ThrusterModel.AddTranslationalInput))]
+    public static void DisableRetroRockets(ThrusterModel __instance, ref Vector3 input)
+    {
+        if ((bool)disableRetroRockets.GetProperty() && __instance is ShipThrusterModel)
+        {
+            input = new Vector3(input.x, input.y, Mathf.Max(input.z, 0f));
+        }
+    }
+    #endregion
 }
