@@ -81,6 +81,7 @@ public static class SettingExtensions
         { Settings.addFuelCanister, (false, false) },
         { Settings.chaoticCyclones, (false, false) },
         { Settings.moreExplosionDamage, (false, false) },
+        { Settings.singleUseTractorBeam, (false, false) },
     };
 
     public static string GetName(this Settings setting)

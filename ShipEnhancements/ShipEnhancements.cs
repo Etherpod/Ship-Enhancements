@@ -147,6 +147,7 @@ public class ShipEnhancements : ModBehaviour
         addFuelCanister,
         chaoticCyclones,
         moreExplosionDamage,
+        singleUseTractorBeam,
     }
 
     private void Awake()
@@ -822,7 +823,7 @@ public class ShipEnhancements : ModBehaviour
             GameObject tankSocketObj = Instantiate(tankSocket, SELocator.GetShipTransform().Find("Module_Cabin"));
             tankSocketObj.GetComponent<FuelTankItemSocket>().PlaceIntoSocket(tankObj.GetComponent<FuelTankItem>());
         }
-        if (true)
+        if ((bool)Settings.singleUseTractorBeam.GetProperty())
         {
             SELocator.GetShipTransform().GetComponentInChildren<ShipTractorBeamSwitch>()._functional = false;
         }

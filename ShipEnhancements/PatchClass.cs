@@ -987,7 +987,9 @@ public static class PatchClass
     {
         if (!(bool)enableAutoHatch.GetProperty()) return;
 
-        if (!__instance.IsPlayerInShip())
+        ShipTractorBeamSwitch beamSwitch = SELocator.GetShipBody().GetComponentInChildren<ShipTractorBeamSwitch>();
+
+        if (!__instance.IsPlayerInShip() && beamSwitch._functional)
         {
             SELocator.GetShipBody().GetComponentInChildren<ShipTractorBeamSwitch>().ActivateTractorBeam();
         }
@@ -2600,7 +2602,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipTractorBeamSwitch), nameof(ShipTractorBeamSwitch.DeactivateTractorBeam))]
     public static void DisableTractorBeamModel(ShipTractorBeamSwitch __instance)
     {
-        if (true)
+        if ((bool)singleUseTractorBeam.GetProperty())
         {
             GameObject model = SELocator.GetShipTransform()
                 .Find("Module_Cabin/Geo_Cabin/Cabin_Tech/Cabin_Tech_Interior/Props_NOM_SmallTractorBeam_Glow").gameObject;

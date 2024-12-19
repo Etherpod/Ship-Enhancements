@@ -102,6 +102,12 @@
       "value": false,
       "tooltip": "Removes the suit from the ship. How long can you hold your breath in space?"
     },
+    "singleUseTractorBeam": {
+      "title": "Single-Use Tractor Beam",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Disables the tractor beam after you enter the ship."
+    },
     "disableAirAutoRoll": {
       "title": "Disable Air Auto Roll",
       "type": "toggle",

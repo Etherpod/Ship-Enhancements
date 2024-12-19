@@ -80,6 +80,7 @@ public static class SettingsPresets
         { "addFuelCanister", false },
         { "chaoticCyclones", false },
         { "moreExplosionDamage", false },
+        { "singleUseTractorBeam", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -156,6 +157,7 @@ public static class SettingsPresets
         { "addFuelCanister", false },
         { "chaoticCyclones", false },
         { "moreExplosionDamage", false },
+        { "singleUseTractorBeam", false },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -232,6 +234,7 @@ public static class SettingsPresets
         { "addFuelCanister", true },
         { "chaoticCyclones", false },
         { "moreExplosionDamage", false },
+        { "singleUseTractorBeam", false },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -308,6 +311,7 @@ public static class SettingsPresets
         { "addFuelCanister", false },
         { "chaoticCyclones", true },
         { "moreExplosionDamage", true },
+        { "singleUseTractorBeam", false },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -384,6 +388,7 @@ public static class SettingsPresets
         { "addFuelCanister", true },
         { "chaoticCyclones", true },
         { "moreExplosionDamage", true },
+        { "singleUseTractorBeam", false },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -460,6 +465,7 @@ public static class SettingsPresets
         { "addFuelCanister", true },
         { "chaoticCyclones", true },
         { "moreExplosionDamage", true },
+        { "singleUseTractorBeam", false },
     };
 
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()
@@ -707,6 +713,7 @@ public static class SettingsPresets
         { "addFuelCanister", new RandomSettingValue(0.3f) },
         { "chaoticCyclones", new RandomSettingValue(0.5f) },
         { "moreExplosionDamage", new RandomSettingValue(0.3f) },
+        { "singleUseTractorBeam", new RandomSettingValue(0.1f) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }
