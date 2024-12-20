@@ -83,6 +83,7 @@ public static class SettingExtensions
         { Settings.moreExplosionDamage, (false, false) },
         { Settings.singleUseTractorBeam, (false, false) },
         { Settings.disableRetroRockets, (false, false) },
+        { Settings.maxDirtAccumulation, (false, false) },
     };
 
     public static string GetName(this Settings setting)

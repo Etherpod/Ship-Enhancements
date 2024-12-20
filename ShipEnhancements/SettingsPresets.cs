@@ -82,6 +82,7 @@ public static class SettingsPresets
         { "moreExplosionDamage", false },
         { "singleUseTractorBeam", false },
         { "disableRetroRockets", false },
+        { "maxDirtAccumulation", 0.75f },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -160,6 +161,7 @@ public static class SettingsPresets
         { "moreExplosionDamage", false },
         { "singleUseTractorBeam", true },
         { "disableRetroRockets", true },
+        { "maxDirtAccumulation", 0.75f },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -238,6 +240,7 @@ public static class SettingsPresets
         { "moreExplosionDamage", false },
         { "singleUseTractorBeam", false },
         { "disableRetroRockets", false },
+        { "maxDirtAccumulation", 0.75f },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -316,6 +319,7 @@ public static class SettingsPresets
         { "moreExplosionDamage", true },
         { "singleUseTractorBeam", false },
         { "disableRetroRockets", false },
+        { "maxDirtAccumulation", 0.75f },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -394,6 +398,7 @@ public static class SettingsPresets
         { "moreExplosionDamage", true },
         { "singleUseTractorBeam", false },
         { "disableRetroRockets", false },
+        { "maxDirtAccumulation", 0.75f },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -472,6 +477,7 @@ public static class SettingsPresets
         { "moreExplosionDamage", true },
         { "singleUseTractorBeam", false },
         { "disableRetroRockets", false },
+        { "maxDirtAccumulation", 0.75f },
     };
 
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()
@@ -721,6 +727,12 @@ public static class SettingsPresets
         { "moreExplosionDamage", new RandomSettingValue(0.3f) },
         { "singleUseTractorBeam", new RandomSettingValue(0.1f) },
         { "disableRetroRockets", new RandomSettingValue(0.1f) },
+        { "maxDirtAccumulation", new RandomSettingValue(new (object, object)[]
+        {
+            (0.2f, 0.4f),
+            (0.4f, 0.8f),
+            (0.8f, 1f)
+        }, 0.5f, 0.75f) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

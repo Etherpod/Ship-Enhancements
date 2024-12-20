@@ -149,6 +149,7 @@ public class ShipEnhancements : ModBehaviour
         moreExplosionDamage,
         singleUseTractorBeam,
         disableRetroRockets,
+        maxDirtAccumulation,
     }
 
     private void Awake()

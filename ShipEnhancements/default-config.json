@@ -379,6 +379,14 @@
       "value": 0,
       "tooltip": "Specifies the time in seconds that it takes for dirt to build up on your cockpit (0 is disabled). Find some water if you want to wash it off."
     },
+    "maxDirtAccumulation": {
+      "title": "Max Dirt Accumulation",
+      "type": "slider",
+      "value": 0.75,
+      "min": 0,
+      "max": 1,
+      "tooltip": "Controls the max amount of dirt that can accumulate on your cockpit glass."
+    },
     "enableScoutLauncherComponent": {
       "title": "Add Scout Launcher Component",
       "type": "toggle",
