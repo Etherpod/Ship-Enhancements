@@ -161,7 +161,7 @@ public static class ShipNotifications
 
         if (temperatureZonesAmount.GetProperty().ToString() != "None" && SELocator.GetShipTemperatureDetector() != null)
         {
-            float hullTempRatio = Mathf.Abs(SELocator.GetShipTemperatureDetector().GetShipTemperatureRatio() - 0.5f);
+            float hullTempRatio = Mathf.Abs(SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio() - 0.5f);
             if (!_hullTemperatureCritical && hullTempRatio > 0.35f)
             {
                 _hullTemperatureCritical = true;

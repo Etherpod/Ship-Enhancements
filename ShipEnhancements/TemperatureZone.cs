@@ -35,7 +35,7 @@ public class TemperatureZone : MonoBehaviour
 
     private void OnEffectVolumeEnter(GameObject hitObj)
     {
-        if (hitObj.TryGetComponent(out ShipTemperatureDetector detector))
+        if (hitObj.TryGetComponent(out TemperatureDetector detector))
         {
             detector.AddZone(this);
         }
@@ -43,7 +43,7 @@ public class TemperatureZone : MonoBehaviour
 
     private void OnEffectVolumeExit(GameObject hitObj)
     {
-        if (hitObj.TryGetComponent(out ShipTemperatureDetector detector))
+        if (hitObj.TryGetComponent(out TemperatureDetector detector))
         {
             detector.RemoveZone(this);
         }

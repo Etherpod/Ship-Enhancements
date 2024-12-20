@@ -14,6 +14,12 @@ public class FuelTankItem : OWItem
     private OWAudioSource _refuelSource;
     [SerializeField]
     private ExplosionController _explosion;
+    [SerializeField]
+    private AudioClip[] _groanAudio;
+    [SerializeField]
+    private OWAudioSource _oneShotSource;
+    [SerializeField]
+    private OWEmissiveRenderer _emissiveRenderer;
 
     private Collider _itemCollider;
     private ScreenPrompt _refuelPrompt;
@@ -48,6 +54,7 @@ public class FuelTankItem : OWItem
         _interactReceiver.ChangePrompt("Pick up " + GetDisplayName());
         _fuelDepletedPrompt.SetDisplayState(ScreenPrompt.DisplayState.GrayedOut);
         _currentFuel = _maxFuel;
+        SetEmissiveScale(0f);
 
         SetupExplosion();
 
@@ -57,11 +64,6 @@ public class FuelTankItem : OWItem
             colliders.Remove(col);
         }
         _colliders = [.. colliders];
-
-        foreach (OWCollider col in _colliders)
-        {
-            ShipEnhancements.WriteDebugMessage(col.gameObject.name);
-        }
     }
 
     private void SetupExplosion()
@@ -221,18 +223,38 @@ public class FuelTankItem : OWItem
     {
         if (impact.speed > _explosionSpeed && _currentFuel > 0f)
         {
-            _explosion?.Play();
-            if (GetComponentInParent<ShipBody>())
-            {
-                SELocator.GetShipDamageController().Explode();
-            }
-            else
-            {
-                _explosion.GetComponentInChildren<ExplosionDamage>()?.OnExplode();
-            }
-
-            Destroy(gameObject);
+            Explode();
         }
+    }
+
+    public void Explode()
+    {
+        _explosion?.Play();
+        _explosion.transform.parent = transform.parent;
+        if (GetComponentInParent<ShipBody>())
+        {
+            SELocator.GetShipDamageController().Explode();
+        }
+        else
+        {
+            _explosion.GetComponentInChildren<ExplosionDamage>()?.OnExplode();
+        }
+
+        Destroy(gameObject);
+    }
+
+    public void PlayGroan()
+    {
+        if (_groanAudio.Length > 0 && _oneShotSource != null)
+        {
+            int i = Random.Range(0, _groanAudio.Length);
+            _oneShotSource.PlayOneShot(_groanAudio[i]);
+        }
+    }
+
+    public void SetEmissiveScale(float scale)
+    {
+        _emissiveRenderer.SetEmissiveScale(scale);
     }
 
     public override void DropItem(Vector3 position, Vector3 normal, Transform parent, Sector sector, IItemDropTarget customDropTarget)
@@ -251,7 +273,7 @@ public class FuelTankItem : OWItem
     {
         base.SocketItem(socketTransform, sector);
         transform.localPosition = Vector3.zero;
-        _itemCollider.enabled = true;
+        //_itemCollider.enabled = true;
     }
 
     public override void OnDestroy()

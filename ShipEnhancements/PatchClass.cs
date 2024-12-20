@@ -1852,10 +1852,13 @@ public static class PatchClass
     public static bool PlayBlackHoleExplosion(ExplosionController __instance)
     {
         if ((float)shipExplosionMultiplier.GetProperty() == 0
-            || (float)shipExplosionMultiplier.GetProperty() < 0f && __instance.GetComponentInParent<FuelTankItem>())
+            || ((float)shipExplosionMultiplier.GetProperty() < 0f && __instance.GetComponentInParent<FuelTankItem>()))
         {
+            ShipEnhancements.WriteDebugMessage("ah");
             return false;
         }
+
+        ShipEnhancements.WriteDebugMessage("gruh?");
 
         if (__instance is BlackHoleExplosionController)
         {
