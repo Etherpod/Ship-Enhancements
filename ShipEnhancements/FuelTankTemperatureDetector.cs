@@ -27,6 +27,11 @@ public class FuelTankTemperatureDetector : TemperatureDetector
 
     protected override void UpdateHighTemperature()
     {
+        if (_fuelTank.GetFuelRatio() <= 0f)
+        {
+            return;
+        }
+
         if (Time.time > _nextGroanTime)
         {
             _nextGroanTime = Time.time + Random.Range(_groanIntervalMin, _groanIntervalMax);
