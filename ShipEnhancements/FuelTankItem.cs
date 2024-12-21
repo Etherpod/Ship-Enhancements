@@ -240,6 +240,11 @@ public class FuelTankItem : OWItem
             _explosion.GetComponentInChildren<ExplosionDamage>()?.OnExplode();
         }
 
+        if (Locator.GetToolModeSwapper().GetItemCarryTool().GetHeldItem() == this)
+        {
+            Locator.GetDeathManager().KillPlayer(DeathType.Default);
+        }
+
         Destroy(gameObject);
     }
 
