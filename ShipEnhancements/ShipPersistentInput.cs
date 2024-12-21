@@ -89,7 +89,6 @@ public class ShipPersistentInput : ThrusterController
         {
             enabled = false;
             _thrustDisplay._thrusterArrowRoot.gameObject.SetActive(false);
-            ShipEnhancements.WriteDebugMessage("Save");
             for (int i = 0; i < _displayRenderers.Length; i++)
             {
                 _lastRendererValues[i] = _displayRenderers[i].material.GetFloat(_thrustDisplay._propID_BarPosition);
@@ -100,7 +99,6 @@ public class ShipPersistentInput : ThrusterController
         {
             enabled = true;
             _thrustDisplay._thrusterArrowRoot.gameObject.SetActive(true);
-            ShipEnhancements.WriteDebugMessage("Load: " + _lastRendererValues[0]);
             for (int i = 0; i < _displayRenderers.Length; i++)
             {
                 _displayRenderers[i].material.SetFloat(_thrustDisplay._propID_BarPosition, _lastRendererValues[i]);

@@ -84,6 +84,7 @@ public static class SettingExtensions
         { Settings.singleUseTractorBeam, (false, false) },
         { Settings.disableRetroRockets, (false, false) },
         { Settings.maxDirtAccumulation, (false, false) },
+        { Settings.addShipWarpCore, (false, false) },
     };
 
     public static string GetName(this Settings setting)

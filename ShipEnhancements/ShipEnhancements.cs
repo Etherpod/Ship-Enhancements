@@ -150,6 +150,7 @@ public class ShipEnhancements : ModBehaviour
         singleUseTractorBeam,
         disableRetroRockets,
         maxDirtAccumulation,
+        addShipWarpCore,
     }
 
     private void Awake()
@@ -886,7 +887,7 @@ public class ShipEnhancements : ModBehaviour
                     tool.SetActive(false);
                 }
             }
-            if (true)
+            if ((bool)Settings.addShipWarpCore.GetProperty())
             {
                 GameObject core = LoadPrefab("Assets/ShipEnhancements/ShipWarpCore.prefab");
                 AssetBundleUtilities.ReplaceShaders(core);

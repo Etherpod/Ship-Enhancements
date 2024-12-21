@@ -324,17 +324,17 @@
       "value": false,
       "tooltip": "Automatically closes the hatch when you leave the ship."
     },
-    "enableShipItemPlacement": {
-      "title": "Enable Ship Item Placement",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Lets you drop items inside of the ship or on top of the ship."
-    },
     "enableManualScoutRecall": {
       "title": "Enable Manual Scout Recall",
       "type": "toggle",
       "value": false,
       "tooltip": "Forces you to retrieve your scout by hand when you launch it. If you retrieve it with the ship, you need to go get it from on top of the ship before you can fire it on foot."
+    },
+    "addShipWarpCore": {
+      "title": "Add Ship Warp Core",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Attaches a Nomai warp core to the cockpit, allowing you to recall your ship to the launch pad using a button on the ceiling of the cockpit."
     },
     "temperatureZonesAmount": {
       "title": "Add Temperature Zones",
@@ -404,6 +404,12 @@
       "type": "toggle",
       "value": false,
       "tooltip": "Allows you to track your ship with the signalscope on the Outer Wilds Ventures frequency. Useful when map markers are disabled."
+    },
+    "enableShipItemPlacement": {
+      "title": "Enable Ship Item Placement",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Lets you drop items inside of the ship or on top of the ship."
     },
     "addPortableCampfire": {
       "title": "Add Portable Campfire",

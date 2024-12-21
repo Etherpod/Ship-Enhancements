@@ -2629,13 +2629,16 @@ public static class PatchClass
     }
     #endregion
 
+    #region ShipWarpCore
     [HarmonyPrefix]
     [HarmonyPatch(typeof(SingularityWarpEffect), nameof(SingularityWarpEffect.Awake))]
-    public static void AssignWarpedObj(SingularityWarpEffect __instance)
+    public static void AssignWarpedObject(SingularityWarpEffect __instance)
     {
-        if (__instance.GetComponentInParent<ShipWarpCoreController>())
+        if (__instance.GetComponentInParent<ShipWarpCoreController>()
+            || __instance.GetComponentInParent<ShipWarpCoreReceiver>())
         {
             __instance._warpedObjectGeometry = Locator.GetShipBody().gameObject;
         }
     }
+    #endregion
 }

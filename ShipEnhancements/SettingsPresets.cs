@@ -83,6 +83,7 @@ public static class SettingsPresets
         { "singleUseTractorBeam", false },
         { "disableRetroRockets", false },
         { "maxDirtAccumulation", 0.75f },
+        { "addShipWarpCore", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -162,6 +163,7 @@ public static class SettingsPresets
         { "singleUseTractorBeam", true },
         { "disableRetroRockets", true },
         { "maxDirtAccumulation", 0.75f },
+        { "addShipWarpCore", false },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -241,6 +243,7 @@ public static class SettingsPresets
         { "singleUseTractorBeam", false },
         { "disableRetroRockets", false },
         { "maxDirtAccumulation", 0.75f },
+        { "addShipWarpCore", true },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -320,6 +323,7 @@ public static class SettingsPresets
         { "singleUseTractorBeam", false },
         { "disableRetroRockets", false },
         { "maxDirtAccumulation", 0.75f },
+        { "addShipWarpCore", false },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -399,6 +403,7 @@ public static class SettingsPresets
         { "singleUseTractorBeam", false },
         { "disableRetroRockets", false },
         { "maxDirtAccumulation", 0.75f },
+        { "addShipWarpCore", false },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -478,6 +483,7 @@ public static class SettingsPresets
         { "singleUseTractorBeam", false },
         { "disableRetroRockets", false },
         { "maxDirtAccumulation", 0.75f },
+        { "addShipWarpCore", true },
     };
 
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()
@@ -721,7 +727,7 @@ public static class SettingsPresets
             "Rainbow"
             ], 0.5f, "Default") },
         { "disableAutoLights", new RandomSettingValue(0.3f) },
-        { "addExpeditionFlag", new RandomSettingValue(0.5f) },
+        { "addExpeditionFlag", new RandomSettingValue(0.3f) },
         { "addFuelCanister", new RandomSettingValue(0.3f) },
         { "chaoticCyclones", new RandomSettingValue(0.5f) },
         { "moreExplosionDamage", new RandomSettingValue(0.3f) },
@@ -733,6 +739,7 @@ public static class SettingsPresets
             (0.4f, 0.8f),
             (0.8f, 1f)
         }, 0.5f, 0.75f) },
+        { "addShipWarpCore", new RandomSettingValue(0.3f) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }
