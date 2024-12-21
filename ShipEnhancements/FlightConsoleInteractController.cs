@@ -28,7 +28,6 @@ public class FlightConsoleInteractController : MonoBehaviour
 
     public void UpdateZoneEnabled()
     {
-        ShipEnhancements.WriteDebugMessage(_numFocused);
         if (_numFocused > 0)
         {
             _interactZone.DisableInteraction();

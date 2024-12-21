@@ -298,8 +298,8 @@ public class ShipOverdriveController : ElectricalComponent
             _activateButton.SetButtonActive(false);
         }
 
-        _primeButton.SetPowered(powered, _electricalSystem.IsDisrupted());
-        _activateButton.SetPowered(powered, _electricalSystem.IsDisrupted());
+        _primeButton.SetButtonPowered(powered, _electricalSystem.IsDisrupted());
+        _activateButton.SetButtonPowered(powered, _electricalSystem.IsDisrupted());
     }
 
     public void PlayButtonAudio(AudioClip audio, float volume)

@@ -89,6 +89,7 @@ public class ShipPersistentInput : ThrusterController
         {
             enabled = false;
             _thrustDisplay._thrusterArrowRoot.gameObject.SetActive(false);
+            ShipEnhancements.WriteDebugMessage("Save");
             for (int i = 0; i < _displayRenderers.Length; i++)
             {
                 _lastRendererValues[i] = _displayRenderers[i].material.GetFloat(_thrustDisplay._propID_BarPosition);
@@ -99,6 +100,7 @@ public class ShipPersistentInput : ThrusterController
         {
             enabled = true;
             _thrustDisplay._thrusterArrowRoot.gameObject.SetActive(true);
+            ShipEnhancements.WriteDebugMessage("Load: " + _lastRendererValues[0]);
             for (int i = 0; i < _displayRenderers.Length; i++)
             {
                 _displayRenderers[i].material.SetFloat(_thrustDisplay._propID_BarPosition, _lastRendererValues[i]);
@@ -109,6 +111,11 @@ public class ShipPersistentInput : ThrusterController
 
     public void OnDisableEngine()
     {
+        for (int i = 0; i < _lastRendererValues.Length; i++)
+        {
+            _lastRendererValues[i] = 0f;
+        }
+
         if (_currentInput != Vector3.zero && enabled)
         {
             enabled = false;
@@ -117,8 +124,9 @@ public class ShipPersistentInput : ThrusterController
             {
                 _displayRenderers[i].material.SetFloat(_thrustDisplay._propID_BarPosition, 0f);
             }
-            _currentInput = Vector3.zero;
         }
+
+        _currentInput = Vector3.zero;
     }
 
     public void UpdateLastAutopilotState()

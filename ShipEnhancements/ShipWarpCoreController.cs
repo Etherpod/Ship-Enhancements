@@ -3,56 +3,32 @@ using UnityEngine;
 
 namespace ShipEnhancements;
 
-public class ShipWarpCoreController : MonoBehaviour
+public class ShipWarpCoreController : CockpitInteractible
 {
     [SerializeField]
     private Transform _buttonTransform;
-    [SerializeField]
-    private InteractReceiver _interactReceiver;
     [SerializeField]
     private SingularityWarpEffect _warpEffect;
 
     private OWRigidbody _shipBody;
     private ShipWarpCoreReceiver _receiver;
-    private int _framesToReposition;
-    private bool _focused = false;
 
-    private void Awake()
+    public override void Awake()
     {
+        base.Awake();
         _shipBody = SELocator.GetShipBody();
     }
 
     private void Start()
     {
         _interactReceiver.ChangePrompt("Activate Warp Core");
-        _interactReceiver.OnPressInteract += OnPressInteract;
-        _interactReceiver.OnGainFocus += OnGainFocus;
-        _interactReceiver.OnLoseFocus += OnLoseFocus;
     }
 
-    private void OnPressInteract()
+    protected override void OnPressInteract()
     {
         _interactReceiver.DisableInteraction();
         _warpEffect.singularityController.OnCreation += WarpShip;
         _warpEffect.singularityController.Create();
-    }
-
-    private void OnGainFocus()
-    {
-        if (!_focused)
-        {
-            _focused = true;
-            SELocator.GetFlightConsoleInteractController().AddInteractible();
-        }
-    }
-
-    private void OnLoseFocus()
-    {
-        if (_focused)
-        {
-            _focused = false;
-            SELocator.GetFlightConsoleInteractController().RemoveInteractible();
-        }
     }
 
     private void WarpShip()
@@ -73,12 +49,5 @@ public class ShipWarpCoreController : MonoBehaviour
     {
         _receiver = receiver;
         ShipEnhancements.WriteDebugMessage(_receiver.transform.parent);
-    }
-
-    private void OnDestroy()
-    {
-        _interactReceiver.OnPressInteract -= OnPressInteract;
-        _interactReceiver.OnGainFocus -= OnGainFocus;
-        _interactReceiver.OnLoseFocus -= OnLoseFocus;
     }
 }

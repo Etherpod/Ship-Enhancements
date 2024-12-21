@@ -2,7 +2,7 @@
 
 namespace ShipEnhancements;
 
-public class OverdriveButton : MonoBehaviour
+public class OverdriveButton : CockpitInteractible
 {
     [SerializeField]
     [ColorUsage(true, true)]
@@ -26,17 +26,15 @@ public class OverdriveButton : MonoBehaviour
     [SerializeField]
     private Light _light;
 
-    private InteractReceiver _interactReceiver;
     private ShipOverdriveController _overdriveController;
     private bool _active;
     private bool _on;
-    private bool _powered;
+    private bool _buttonPowered;
     private float _depressionDistance = 0.00521f;
     private bool _pressed;
 
-    private void Awake()
+    public override void Awake()
     {
-        _interactReceiver = GetComponent<InteractReceiver>();
         _overdriveController = GetComponentInParent<ShipOverdriveController>();
     }
 
@@ -51,7 +49,7 @@ public class OverdriveButton : MonoBehaviour
         _light.color = _inactiveColor;
     }
 
-    private void OnPressInteract()
+    protected override void OnPressInteract()
     {
         PressButton();
 
@@ -67,7 +65,7 @@ public class OverdriveButton : MonoBehaviour
     public void PressButton()
     {
         _pressed = true;
-        if (!_active || !_powered) return;
+        if (!_active || !_buttonPowered) return;
 
         _on = !_on;
         _emissiveRenderer.SetEmissionColor(_on ? _onColor : _offColor);
@@ -80,7 +78,7 @@ public class OverdriveButton : MonoBehaviour
         _overdriveController.OnPressInteract(_isPrimeButton, _on);
     }
 
-    private void OnReleaseInteract()
+    protected override void OnReleaseInteract()
     {
         ReleaseButton();
 
@@ -111,14 +109,9 @@ public class OverdriveButton : MonoBehaviour
         }
     }
 
-    private void OnGainFocus()
+    protected override void OnLoseFocus()
     {
-        SELocator.GetFlightConsoleInteractController().AddInteractible();
-    }
-
-    private void OnLoseFocus()
-    {
-        SELocator.GetFlightConsoleInteractController().RemoveInteractible();
+        base.OnLoseFocus();
         if (_pressed)
         {
             OnReleaseInteract();
@@ -143,7 +136,7 @@ public class OverdriveButton : MonoBehaviour
         }
         else
         {
-            if (_active && _powered && (_isPrimeButton || !_on))
+            if (_active && _buttonPowered && (_isPrimeButton || !_on))
             {
                 _interactReceiver.EnableInteraction();
             }
@@ -153,7 +146,7 @@ public class OverdriveButton : MonoBehaviour
     public void SetButtonActive(bool active)
     {
         _active = active;
-        if (!_powered) return;
+        if (!_buttonPowered) return;
         if (active)
         {
             _emissiveRenderer.SetEmissionColor(_on ? _onColor : _offColor);
@@ -185,7 +178,7 @@ public class OverdriveButton : MonoBehaviour
         {
             _interactReceiver.ChangePrompt(_on ? "Enable safeties" : "Disable safeties");
         }
-        if (!_powered) return;
+        if (!_buttonPowered) return;
         _emissiveRenderer.SetEmissionColor(_on ? _onColor : _offColor);
         _light.color = _on ? _onColor : _offColor;
         if (_pressed)
@@ -194,9 +187,9 @@ public class OverdriveButton : MonoBehaviour
         }
     }
 
-    public void SetPowered(bool powered, bool disrupted)
+    public void SetButtonPowered(bool powered, bool disrupted)
     {
-        _powered = disrupted ? _powered : powered;
+        _buttonPowered = disrupted ? _buttonPowered : powered;
         if (powered)
         {
             if (_active)
@@ -231,13 +224,5 @@ public class OverdriveButton : MonoBehaviour
                 _interactReceiver.DisableInteraction();
             }
         }
-    }
-
-    private void OnDestroy()
-    {
-        _interactReceiver.OnPressInteract -= OnPressInteract;
-        _interactReceiver.OnReleaseInteract -= OnReleaseInteract;
-        _interactReceiver.OnGainFocus -= OnGainFocus;
-        _interactReceiver.OnLoseFocus -= OnLoseFocus;
     }
 }

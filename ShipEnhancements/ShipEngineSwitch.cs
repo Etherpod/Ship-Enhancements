@@ -5,10 +5,8 @@ using System.Linq;
 
 namespace ShipEnhancements;
 
-public class ShipEngineSwitch : MonoBehaviour
+public class ShipEngineSwitch : CockpitInteractible
 {
-    [SerializeField]
-    private InteractReceiver _interactReceiver;
     [SerializeField]
     private Transform _switchTransform;
     [SerializeField]
@@ -48,8 +46,10 @@ public class ShipEngineSwitch : MonoBehaviour
 
     private bool _controlledRemote = false;
 
-    private void Awake()
+    public override void Awake()
     {
+        base.Awake();
+
         _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
 
         if ((bool)addEngineSwitch.GetProperty())
@@ -67,10 +67,6 @@ public class ShipEngineSwitch : MonoBehaviour
         _audioController = SELocator.GetShipBody().GetComponentInChildren<ShipAudioController>();
         _alarm = SELocator.GetShipTransform().GetComponentInChildren<MasterAlarm>();
 
-        _interactReceiver.OnGainFocus += OnGainFocus;
-        _interactReceiver.OnLoseFocus += OnLoseFocus;
-        _interactReceiver.OnPressInteract += OnPressInteract;
-        _interactReceiver.OnReleaseInteract += OnReleaseInteract;
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
         ShipEnhancements.Instance.OnFuelDepleted += OnFuelDepleted;
         ShipEnhancements.Instance.OnFuelRestored += OnFuelRestored;
@@ -198,18 +194,13 @@ public class ShipEngineSwitch : MonoBehaviour
         _powerIndicatorLight.intensity = 0f;
     }
 
-    private void OnGainFocus()
+    protected override void OnLoseFocus()
     {
-        SELocator.GetFlightConsoleInteractController().AddInteractible();
-    }
-
-    private void OnLoseFocus()
-    {
-        SELocator.GetFlightConsoleInteractController().RemoveInteractible();
+        base.OnLoseFocus();
         OnReleaseInteract();
     }
 
-    private void OnPressInteract()
+    protected override void OnPressInteract()
     {
         OnStartPress();
 
@@ -274,7 +265,7 @@ public class ShipEngineSwitch : MonoBehaviour
         }
     }
 
-    private void OnReleaseInteract()
+    protected override void OnReleaseInteract()
     {
         if (_controlledRemote)
         {
@@ -378,12 +369,9 @@ public class ShipEngineSwitch : MonoBehaviour
         _interactReceiver.DisableInteraction();
     }
 
-    private void OnDestroy()
+    protected override void OnDestroy()
     {
-        _interactReceiver.OnGainFocus += OnGainFocus;
-        _interactReceiver.OnLoseFocus += OnLoseFocus;
-        _interactReceiver.OnPressInteract += OnPressInteract;
-        _interactReceiver.OnReleaseInteract += OnReleaseInteract;
+        base.OnDestroy();
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
         ShipEnhancements.Instance.OnFuelDepleted -= OnFuelDepleted;
         ShipEnhancements.Instance.OnFuelRestored -= OnFuelRestored;

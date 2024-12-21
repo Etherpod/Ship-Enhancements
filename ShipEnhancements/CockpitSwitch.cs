@@ -4,12 +4,10 @@ using UnityEngine;
 
 namespace ShipEnhancements;
 
-public abstract class CockpitSwitch : ElectricalComponent
+public abstract class CockpitSwitch : CockpitInteractible
 {
     [SerializeField]
     protected float _rotationOffset;
-    [SerializeField]
-    protected InteractReceiver _interactReceiver;
     [SerializeField]
     protected string _label;
     [SerializeField]
@@ -33,9 +31,6 @@ public abstract class CockpitSwitch : ElectricalComponent
     public override void Awake()
     {
         base.Awake();
-        _interactReceiver.OnPressInteract += FlipSwitch;
-        _interactReceiver.OnGainFocus += OnGainFocus;
-        _interactReceiver.OnLoseFocus += OnLoseFocus;
 
         _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
         _renderer = GetComponent<OWRenderer>();
@@ -80,7 +75,7 @@ public abstract class CockpitSwitch : ElectricalComponent
         }
     }
 
-    private void FlipSwitch()
+    protected override void OnPressInteract()
     {
         ChangeSwitchState(!_on);
 
@@ -176,27 +171,16 @@ public abstract class CockpitSwitch : ElectricalComponent
         return _on;
     }
 
-    private void OnGainFocus()
-    {
-        SELocator.GetFlightConsoleInteractController().AddInteractible();
-    }
-
-    private void OnLoseFocus()
-    {
-        SELocator.GetFlightConsoleInteractController().RemoveInteractible();
-    }
-
     private void OnShipSystemFailure()
     {
         enabled = false;
         _interactReceiver.DisableInteraction();
     }
 
-    protected void OnDestroy()
+    protected override void OnDestroy()
     {
-        _interactReceiver.OnPressInteract -= FlipSwitch;
-        _interactReceiver.OnGainFocus -= OnGainFocus;
-        _interactReceiver.OnLoseFocus -= OnLoseFocus;
+        base.OnDestroy();
+
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
 
         if (ShipEnhancements.InMultiplayer)
