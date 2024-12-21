@@ -113,12 +113,12 @@ public class OverdriveButton : MonoBehaviour
 
     private void OnGainFocus()
     {
-        _overdriveController.UpdateFocusedButtons(true);
+        SELocator.GetFlightConsoleInteractController().AddInteractible();
     }
 
     private void OnLoseFocus()
     {
-        _overdriveController.UpdateFocusedButtons(false);
+        SELocator.GetFlightConsoleInteractController().RemoveInteractible();
         if (_pressed)
         {
             OnReleaseInteract();

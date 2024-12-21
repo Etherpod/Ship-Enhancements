@@ -475,6 +475,9 @@ public class ShipEnhancements : ModBehaviour
         SELocator.Initalize();
         ThrustIndicatorManager.Initialize();
 
+        SELocator.GetShipBody().GetComponentInChildren<ShipCockpitController>()
+            ._interactVolume.gameObject.AddComponent<FlightConsoleInteractController>();
+
         GameObject buttonConsole = LoadPrefab("Assets/ShipEnhancements/ButtonConsole.prefab");
         AssetBundleUtilities.ReplaceShaders(buttonConsole);
         Instantiate(buttonConsole, SELocator.GetShipBody().transform.Find("Module_Cockpit"));
@@ -883,6 +886,17 @@ public class ShipEnhancements : ModBehaviour
                     tool.SetActive(false);
                 }
             }
+            if (true)
+            {
+                GameObject core = LoadPrefab("Assets/ShipEnhancements/ShipWarpCore.prefab");
+                AssetBundleUtilities.ReplaceShaders(core);
+                GameObject coreObj = Instantiate(core, SELocator.GetShipTransform().Find("Module_Cockpit"));
+
+                GameObject receiver = LoadPrefab("Assets/ShipEnhancements/ShipWarpReceiver.prefab");
+                AssetBundleUtilities.ReplaceShaders(receiver);
+                GameObject receiverObj = Instantiate(receiver, Locator.GetAstroObject(AstroObject.Name.TimberHearth).transform);
+                coreObj.GetComponent<ShipWarpCoreController>().SetReceiver(receiverObj.GetComponent<ShipWarpCoreReceiver>());
+            }
             if ((!InMultiplayer || QSBAPI.GetIsHost()) && (float)Settings.shipDamageSpeedMultiplier.GetProperty() < 0f)
             {
                 SELocator.GetShipDamageController().Explode();
@@ -1287,6 +1301,8 @@ public class ShipEnhancements : ModBehaviour
 
     public static void WriteDebugMessage(object msg, bool warning = false, bool error = false)
     {
+        msg ??= "null";
+
         if (warning)
         {
             Instance?.ModHelper?.Console?.WriteLine(msg.ToString(), MessageType.Warning);

@@ -127,12 +127,12 @@ public class ThrustModulatorButton : MonoBehaviour
 
     private void OnGainFocus()
     {
-        _modulatorController.UpdateFocusedButtons(true);
+        SELocator.GetFlightConsoleInteractController().AddInteractible();
     }
 
     private void OnLoseFocus()
     {
-        _modulatorController.UpdateFocusedButtons(false);
+        SELocator.GetFlightConsoleInteractController().RemoveInteractible();
         if (_pressed)
         {
             OnReleaseInteract();

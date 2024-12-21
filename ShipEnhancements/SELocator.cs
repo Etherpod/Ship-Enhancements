@@ -24,6 +24,7 @@ public static class SELocator
     private static ThrustModulatorController _modulatorController;
     private static PortableCampfire _portableCampfire;
     private static CockpitFilthController _cockpitFilthController;
+    private static FlightConsoleInteractController _consoleInteractController;
 
     public static void Initalize()
     {
@@ -164,5 +165,15 @@ public static class SELocator
     public static CockpitFilthController GetCockpitFilthController()
     {
         return _cockpitFilthController;
+    }
+
+    public static FlightConsoleInteractController GetFlightConsoleInteractController()
+    {
+        return _consoleInteractController;
+    }
+
+    public static void SetFlightConsoleInteractController(FlightConsoleInteractController controller)
+    {
+        _consoleInteractController = controller;
     }
 }

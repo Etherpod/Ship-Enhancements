@@ -178,12 +178,12 @@ public abstract class CockpitSwitch : ElectricalComponent
 
     private void OnGainFocus()
     {
-        _buttonPanel.UpdateFocusedButtons(true);
+        SELocator.GetFlightConsoleInteractController().AddInteractible();
     }
 
     private void OnLoseFocus()
     {
-        _buttonPanel.UpdateFocusedButtons(false);
+        SELocator.GetFlightConsoleInteractController().RemoveInteractible();
     }
 
     private void OnShipSystemFailure()

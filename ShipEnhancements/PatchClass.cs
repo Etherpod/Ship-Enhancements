@@ -494,7 +494,7 @@ public static class PatchClass
             SEAchievementTracker.LastHitBody = impact.otherBody;
         }
 
-        if ((float)shipDamageMultiplier.GetProperty() <= 0f || true)
+        if ((float)shipDamageMultiplier.GetProperty() <= 0f)
         {
             return false;
         }
@@ -2628,4 +2628,14 @@ public static class PatchClass
         }
     }
     #endregion
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(SingularityWarpEffect), nameof(SingularityWarpEffect.Awake))]
+    public static void AssignWarpedObj(SingularityWarpEffect __instance)
+    {
+        if (__instance.GetComponentInParent<ShipWarpCoreController>())
+        {
+            __instance._warpedObjectGeometry = Locator.GetShipBody().gameObject;
+        }
+    }
 }
