@@ -780,6 +780,8 @@ public class ShipEnhancements : ModBehaviour
             shipSignal.SetSector(SELocator.GetShipTransform().GetComponentInChildren<Sector>());
             shipSignal._name = ShipSignalName;
             shipSignal._frequency = SignalFrequency.Traveler;
+
+            SELocator.GetPlayerBody().GetComponentInChildren<Signalscope>().gameObject.AddComponent<ShipRemoteControl>();
         }
         if ((bool)Settings.disableShipFriction.GetProperty())
         {
@@ -832,6 +834,17 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)Settings.singleUseTractorBeam.GetProperty())
         {
             SELocator.GetShipTransform().GetComponentInChildren<ShipTractorBeamSwitch>()._functional = false;
+        }
+        if ((bool)Settings.addShipWarpCore.GetProperty())
+        {
+            GameObject core = LoadPrefab("Assets/ShipEnhancements/ShipWarpCore.prefab");
+            AssetBundleUtilities.ReplaceShaders(core);
+            GameObject coreObj = Instantiate(core, SELocator.GetShipTransform().Find("Module_Cockpit"));
+
+            GameObject receiver = LoadPrefab("Assets/ShipEnhancements/ShipWarpReceiver.prefab");
+            AssetBundleUtilities.ReplaceShaders(receiver);
+            GameObject receiverObj = Instantiate(receiver, GameObject.Find("TimberHearth_Body").transform);
+            coreObj.GetComponent<ShipWarpCoreController>().SetReceiver(receiverObj.GetComponent<ShipWarpCoreReceiver>());
         }
 
         SetDamageColors();
@@ -886,17 +899,6 @@ public class ShipEnhancements : ModBehaviour
                 {
                     tool.SetActive(false);
                 }
-            }
-            if ((bool)Settings.addShipWarpCore.GetProperty())
-            {
-                GameObject core = LoadPrefab("Assets/ShipEnhancements/ShipWarpCore.prefab");
-                AssetBundleUtilities.ReplaceShaders(core);
-                GameObject coreObj = Instantiate(core, SELocator.GetShipTransform().Find("Module_Cockpit"));
-
-                GameObject receiver = LoadPrefab("Assets/ShipEnhancements/ShipWarpReceiver.prefab");
-                AssetBundleUtilities.ReplaceShaders(receiver);
-                GameObject receiverObj = Instantiate(receiver, Locator.GetAstroObject(AstroObject.Name.TimberHearth).transform);
-                coreObj.GetComponent<ShipWarpCoreController>().SetReceiver(receiverObj.GetComponent<ShipWarpCoreReceiver>());
             }
             if ((!InMultiplayer || QSBAPI.GetIsHost()) && (float)Settings.shipDamageSpeedMultiplier.GetProperty() < 0f)
             {

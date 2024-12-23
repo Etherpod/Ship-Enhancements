@@ -17,6 +17,7 @@ public class ShipWarpCoreController : CockpitInteractible
     private ShipWarpCoreReceiver _receiver;
     private bool _warpingWithPlayer = false;
     private readonly float _warpLength = 1f;
+    private bool _warping = false;
 
     public override void Awake()
     {
@@ -29,14 +30,6 @@ public class ShipWarpCoreController : CockpitInteractible
     {
         _interactReceiver.ChangePrompt("Activate Warp Core");
         _warpEffect.transform.localPosition = _shipPivot.localPosition;
-    }
-
-    private void Update()
-    {
-        if (OWInput.IsNewlyPressed(InputLibrary.interactSecondary))
-        {
-            OnPressInteract();
-        }
     }
 
     protected override void OnPressInteract()
@@ -55,6 +48,7 @@ public class ShipWarpCoreController : CockpitInteractible
             _warpEffect.OnWarpComplete += WarpShip;
             _warpEffect.WarpObjectOut(_warpLength);
         }
+        _warping = true;
     }
 
     private void WarpShip()
@@ -71,6 +65,7 @@ public class ShipWarpCoreController : CockpitInteractible
         }
         _receiver.WarpBodyToReceiver(_shipBody, _warpingWithPlayer);
         _interactReceiver.EnableInteraction();
+        _warping = false;
     }
 
     private void OnShipCockpitDetached(OWRigidbody body)
@@ -85,6 +80,16 @@ public class ShipWarpCoreController : CockpitInteractible
     {
         _receiver = receiver;
         ShipEnhancements.WriteDebugMessage(_receiver.transform.parent);
+    }
+
+    public void ActivateWarp()
+    {
+        OnPressInteract();
+    }
+
+    public bool IsWarping()
+    {
+        return _warping;
     }
 
     protected override void OnDestroy()

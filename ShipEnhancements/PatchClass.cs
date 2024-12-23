@@ -2637,7 +2637,7 @@ public static class PatchClass
         if (__instance.GetComponentInParent<ShipWarpCoreController>()
             || __instance.GetComponentInParent<ShipWarpCoreReceiver>())
         {
-            __instance._warpedObjectGeometry = Locator.GetShipBody().gameObject;
+            __instance._warpedObjectGeometry = SELocator.GetShipBody().gameObject;
         }
     }
     #endregion

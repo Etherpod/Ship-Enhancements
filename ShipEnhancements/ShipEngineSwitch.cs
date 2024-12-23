@@ -217,40 +217,7 @@ public class ShipEngineSwitch : CockpitInteractible
     {
         if (_completedTurn)
         {
-            _completedTurn = false;
-            _turnSwitch = false;
-            _completedIgnition = false;
-            _reset = false;
-            ShipEnhancements.Instance.SetEngineOn(false);
-            ShipElectricalComponent electricalComponent = SELocator.GetShipDamageController()._shipElectricalComponent;
-            if (!electricalComponent.isDamaged && electricalComponent._electricalSystem.IsPowered())
-            {
-                electricalComponent._electricalSystem.SetPowered(false);
-                electricalComponent._audioSource.PlayOneShot(AudioType.ShipDamageElectricalFailure, 0.5f);
-            }
-            if ((bool)enablePersistentInput.GetProperty())
-            {
-                SELocator.GetShipBody().GetComponent<ShipPersistentInput>().OnDisableEngine();
-            }
-            if (OWInput.IsInputMode(InputMode.ShipCockpit) && Locator.GetToolModeSwapper().IsInToolMode(ToolMode.Probe)
-                || Locator.GetToolModeSwapper().IsInToolMode(ToolMode.SignalScope))
-            {
-                Locator.GetToolModeSwapper().UnequipTool();
-            }
-            if (_releaseAudio)
-            {
-                _audioSource.clip = _releaseAudio;
-                _audioSource.pitch = Random.Range(0.9f, 1.1f);
-                _audioSource.Play();
-            }
-            if (_alarm._isAlarmOn)
-            {
-                _alarm.TurnOffAlarm();
-            }
-            _audioController.StopShipAmbient();
-            _interactReceiver.ChangePrompt("Start engine");
-            StopAllCoroutines();
-            DeactivateIndicatorLights();
+            TurnOffEngine();
         }
         else
         {
@@ -281,6 +248,44 @@ public class ShipEngineSwitch : CockpitInteractible
                 ShipEnhancements.QSBCompat.SendEngineSwitchState(id, false);
             }
         }
+    }
+    
+    public void TurnOffEngine()
+    {
+        _completedTurn = false;
+        _turnSwitch = false;
+        _completedIgnition = false;
+        _reset = false;
+        ShipEnhancements.Instance.SetEngineOn(false);
+        ShipElectricalComponent electricalComponent = SELocator.GetShipDamageController()._shipElectricalComponent;
+        if (!electricalComponent.isDamaged && electricalComponent._electricalSystem.IsPowered())
+        {
+            electricalComponent._electricalSystem.SetPowered(false);
+            electricalComponent._audioSource.PlayOneShot(AudioType.ShipDamageElectricalFailure, 0.5f);
+        }
+        if ((bool)enablePersistentInput.GetProperty())
+        {
+            SELocator.GetShipBody().GetComponent<ShipPersistentInput>().OnDisableEngine();
+        }
+        if (Locator.GetToolModeSwapper().IsInToolMode(ToolMode.Probe, ToolGroup.Ship)
+            || Locator.GetToolModeSwapper().IsInToolMode(ToolMode.SignalScope, ToolGroup.Ship))
+        {
+            Locator.GetToolModeSwapper().UnequipTool();
+        }
+        if (_releaseAudio)
+        {
+            _audioSource.clip = _releaseAudio;
+            _audioSource.pitch = Random.Range(0.9f, 1.1f);
+            _audioSource.Play();
+        }
+        if (_alarm._isAlarmOn)
+        {
+            _alarm.TurnOffAlarm();
+        }
+        _audioController.StopShipAmbient();
+        _interactReceiver.ChangePrompt("Start engine");
+        StopAllCoroutines();
+        DeactivateIndicatorLights();
     }
 
     private void OnStopPress()
