@@ -79,7 +79,6 @@ public class ShipWarpCoreController : CockpitInteractible
     public void SetReceiver(ShipWarpCoreReceiver receiver)
     {
         _receiver = receiver;
-        ShipEnhancements.WriteDebugMessage(_receiver.transform.parent);
     }
 
     public void ActivateWarp()

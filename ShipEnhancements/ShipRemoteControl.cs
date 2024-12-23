@@ -105,22 +105,12 @@ public class ShipRemoteControl : MonoBehaviour
 
                 if (OWInput.IsNewlyPressed(InputLibrary.toolOptionUp))
                 {
-                    int index = _commands.IndexOf(_currentCommand) + 1;
-                    if (index > _commands.Count - 1)
-                    {
-                        index = 0;
-                    }
-                    _currentCommand = _commands[index];
+                    CycleCommand(true);
                     changed = true;
                 }
                 else if (OWInput.IsNewlyPressed(InputLibrary.toolOptionDown))
                 {
-                    int index = _commands.IndexOf(_currentCommand) - 1;
-                    if (index < 0)
-                    {
-                        index = _commands.Count - 1;
-                    }
-                    _currentCommand = _commands[index];
+                    CycleCommand(false);
                     changed = true;
                 }
 
@@ -139,17 +129,62 @@ public class ShipRemoteControl : MonoBehaviour
         }
     }
 
+    private void CycleCommand(bool forward)
+    {
+        int cycle = 0;
+        while (cycle < _commands.Count)
+        {
+            if (forward)
+            {
+                int index = _commands.IndexOf(_currentCommand) + 1;
+                if (index > _commands.Count - 1)
+                {
+                    index = 0;
+                }
+                _currentCommand = _commands[index];
+            }
+            else
+            {
+                int index = _commands.IndexOf(_currentCommand) - 1;
+                if (index < 0)
+                {
+                    index = _commands.Count - 1;
+                }
+                _currentCommand = _commands[index];
+            }
+
+            if (!ShipCommandHidden(_currentCommand))
+            {
+                break;
+            }
+
+            cycle++;
+        }
+    }
+
     private bool ShipCommandAvailable(ShipCommand cmd)
     {
         switch (cmd)
         {
             case ShipCommand.Warp:
-                return (bool)addShipWarpCore.GetProperty() && _warpCoreController != null
-                    && !_warpCoreController.IsWarping();
+                return !_warpCoreController.IsWarping();
             case ShipCommand.TurnOff:
-                return (bool)addEngineSwitch.GetProperty() && ShipEnhancements.Instance.engineOn;
+                return ShipEnhancements.Instance.engineOn;
             default:
                 return true;
+        }
+    }
+
+    private bool ShipCommandHidden(ShipCommand cmd)
+    {
+        switch (cmd)
+        {
+            case ShipCommand.Warp:
+                return !(bool)addShipWarpCore.GetProperty() || _warpCoreController == null;
+            case ShipCommand.TurnOff:
+                return !(bool)addEngineSwitch.GetProperty();
+            default:
+                return false;
         }
     }
 }
