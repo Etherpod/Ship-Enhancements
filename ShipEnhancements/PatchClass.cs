@@ -2234,24 +2234,24 @@ public static class PatchClass
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(AudioSignal), nameof(AudioSignal.UpdateSignalStrength))]
-    public static bool RemoveSignalFromShip(AudioSignal __instance)
+    public static bool RemoveSignalFromShip(AudioSignal __instance, Signalscope scope, float distToClosestScopeObstruction)
     {
-        if ((SELocator.GetSignalscopeComponent()?.isDamaged ?? false) && OWInput.IsInputMode(InputMode.ShipCockpit))
+        if (OWInput.IsInputMode(InputMode.ShipCockpit) && SELocator.GetSignalscopeComponent() != null
+            && SELocator.GetSignalscopeComponent().isDamaged)
         {
             __instance._canBePickedUpByScope = false;
             __instance._signalStrength = 0f;
             __instance._degreesFromScope = 180f;
             return false;
         }
-        else if (__instance.GetName() == ShipEnhancements.Instance.ShipSignalName && (OWInput.IsInputMode(InputMode.ShipCockpit) 
-            || (SELocator.GetShipDamageController()?.IsSystemFailed() ?? false) || PlayerState.IsInsideShip()
-            || (SELocator.GetSignalscopeComponent()?.isDamaged ?? false)))
+
+        if (__instance is ShipAudioSignal)
         {
-            __instance._canBePickedUpByScope = false;
-            __instance._signalStrength = 0f;
-            __instance._degreesFromScope = 180f;
+            ShipEnhancements.WriteDebugMessage("update");
+            (__instance as ShipAudioSignal).UpdateShipSignalStrength(scope, distToClosestScopeObstruction);
             return false;
         }
+
         return true;
     }
     #endregion
