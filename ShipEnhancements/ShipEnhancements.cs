@@ -775,11 +775,7 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)Settings.addShipSignal.GetProperty())
         {
             GameObject signal = LoadPrefab("Assets/ShipEnhancements/ShipSignal.prefab");
-            AudioSignal shipSignal = Instantiate(signal, SELocator.GetShipTransform()
-                .GetComponentInChildren<ShipCockpitUI>()._sigScopeDish).GetComponent<AudioSignal>();
-            shipSignal.SetSector(SELocator.GetShipTransform().GetComponentInChildren<Sector>());
-            shipSignal._name = ShipSignalName;
-            shipSignal._frequency = SignalFrequency.Traveler;
+            Instantiate(signal, SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitUI>()._sigScopeDish);
 
             SELocator.GetPlayerBody().GetComponentInChildren<Signalscope>().gameObject.AddComponent<ShipRemoteControl>();
         }
