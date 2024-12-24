@@ -126,4 +126,9 @@ public class ShipTemperatureDetector : TemperatureDetector
     {
         enabled = false;
     }
+
+    private void OnDestroy()
+    {
+        GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
+    }
 }
