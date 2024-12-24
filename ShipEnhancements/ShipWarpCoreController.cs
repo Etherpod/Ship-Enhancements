@@ -18,6 +18,8 @@ public class ShipWarpCoreController : CockpitInteractible
     private bool _warpingWithPlayer = false;
     private readonly float _warpLength = 1f;
     private bool _warping = false;
+    private bool _pressed = false;
+    private float _buttonOffset = -0.121f;
 
     public override void Awake()
     {
@@ -28,13 +30,14 @@ public class ShipWarpCoreController : CockpitInteractible
 
     private void Start()
     {
-        _interactReceiver.ChangePrompt("Activate Warp Core");
+        _interactReceiver.ChangePrompt("Activate Return Warp");
         _warpEffect.transform.localPosition = _shipPivot.localPosition;
     }
 
     protected override void OnPressInteract()
     {
-        _interactReceiver.DisableInteraction();
+        _buttonTransform.localPosition = new Vector3(0, _buttonOffset, 0);
+        _pressed = true;
         if (PlayerState.IsInsideShip() || PlayerState.AtFlightConsole())
         {
             _warpingWithPlayer = true;
@@ -49,6 +52,29 @@ public class ShipWarpCoreController : CockpitInteractible
             _warpEffect.WarpObjectOut(_warpLength);
         }
         _warping = true;
+    }
+
+    protected override void OnReleaseInteract()
+    {
+        _buttonTransform.localPosition = Vector3.zero;
+        _pressed = false;
+        if (_warping)
+        {
+            _interactReceiver.DisableInteraction();
+        }
+        else
+        {
+            _interactReceiver.ResetInteraction();
+        }
+    }
+
+    protected override void OnLoseFocus()
+    {
+        base.OnLoseFocus();
+        if (_pressed)
+        {
+            OnReleaseInteract();
+        }
     }
 
     private void WarpShip()
