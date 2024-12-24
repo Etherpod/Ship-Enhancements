@@ -221,6 +221,12 @@
       "value": 1,
       "tooltip": "Larger numbers increase the time the ship can resist extreme temperatures. The default resistance gives the ship around 3 minutes before the hull reaches max temperature, meaning max damage."
     },
+    "repairTimeMultiplier": {
+      "title": "Repair Time Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers increase the time it takes to repair parts of the ship."
+    },
     "gravityMultiplier": {
       "title": "Ship Gravity Multiplier",
       "type": "number",

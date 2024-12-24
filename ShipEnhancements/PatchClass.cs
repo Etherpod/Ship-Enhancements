@@ -2640,4 +2640,134 @@ public static class PatchClass
         }
     }
     #endregion
+
+    #region RepairTimeMultiplier
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipComponent), nameof(ShipComponent.RepairTick))]
+    public static bool SpecialComponentRepairs(ShipComponent __instance)
+    {
+        if ((float)repairTimeMultiplier.GetProperty() > 0f)
+        {
+            return true;
+        }
+
+        if (!__instance._damaged)
+        {
+            return false;
+        }
+
+        if ((float)repairTimeMultiplier.GetProperty() == 0)
+        {
+            __instance._repairFraction = 1f;
+            __instance.SetDamaged(false);
+            if (__instance._damageEffect)
+            {
+                __instance._damageEffect.SetEffectBlend(0f);
+            }
+            return false;
+        }
+        else if ((float)repairTimeMultiplier.GetProperty() < 0f && __instance is ShipReactorComponent)
+        {
+            if (__instance._repairFraction <= 0f)
+            {
+                SELocator.GetShipDamageController().Explode();
+            }
+            return false;
+        }
+
+        return true;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipHull), nameof(ShipHull.RepairTick))]
+    public static bool SpecialHullRepairs(ShipHull __instance)
+    {
+        if ((float)repairTimeMultiplier.GetProperty() > 0f)
+        {
+            return true;
+        }
+
+        if (!__instance._damaged)
+        {
+            return false;
+        }
+
+        if ((float)repairTimeMultiplier.GetProperty() == 0)
+        {
+            __instance._integrity = 1f;
+            __instance._damaged = false;
+
+            var repairDelegate = (MulticastDelegate)typeof(ShipHull).GetField("OnRepaired", BindingFlags.Instance 
+                | BindingFlags.NonPublic | BindingFlags.Public).GetValue(__instance);
+            if (repairDelegate != null)
+            {
+                foreach (var handler in repairDelegate.GetInvocationList())
+                {
+                    handler.Method.Invoke(handler.Target, [__instance]);
+                }
+            }
+
+            if (__instance._damageEffect)
+            {
+                __instance._damageEffect.SetEffectBlend(0f);
+            }
+            return false;
+        }
+        else if ((float)repairTimeMultiplier.GetProperty() < 0f)
+        {
+            __instance._integrity = Mathf.Clamp01(__instance._integrity + Time.deltaTime / __instance._repairTime);
+            if (__instance._integrity >= 1f)
+            {
+                __instance._damaged = false;
+
+                var repairDelegate = (MulticastDelegate)typeof(ShipHull).GetField("OnRepaired", BindingFlags.Instance
+                | BindingFlags.NonPublic | BindingFlags.Public).GetValue(__instance);
+                if (repairDelegate != null)
+                {
+                    foreach (var handler in repairDelegate.GetInvocationList())
+                    {
+                        handler.Method.Invoke(handler.Target, [__instance]);
+                    }
+                }
+            }
+            if (__instance._damageEffect != null)
+            {
+                if (__instance._damageEffect is CockpitDamageEffect)
+                {
+                    CockpitDamageEffect effect = __instance._damageEffect as CockpitDamageEffect;
+
+                    float blend2 = effect._blend;
+                    HullDamageEffect_SetEffectBlend(effect, 1f - __instance._integrity);
+
+                    /*if (effect._shipAudioController != null && effect._blend > blend2)
+                    {
+                        effect._shipAudioController.PlayGlassCrackClip();
+                    }*/
+
+                    if (effect._cracksRenderer)
+                    {
+                        effect._matPropBlock_Cracks.SetFloat(effect._propID_Cutoff, 1f - effect._blend);
+                        effect._cracksRenderer.SetPropertyBlock(effect._matPropBlock_Cracks);
+                    }
+                }
+                else
+                {
+                    __instance._damageEffect.SetEffectBlend(1f - __instance._integrity);
+                }
+            }
+
+            if (__instance._integrity <= 0f && __instance.shipModule is ShipDetachableModule)
+            {
+                (__instance.shipModule as ShipDetachableModule).Detach();
+            }
+            return false;
+        }
+
+        return true;
+    }
+
+    [HarmonyReversePatch]
+    [HarmonyPatch(typeof(HullDamageEffect), nameof(HullDamageEffect.SetEffectBlend))]
+    public static void HullDamageEffect_SetEffectBlend(HullDamageEffect instance, float blend) { }
+    #endregion
 }

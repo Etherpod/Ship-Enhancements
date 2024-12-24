@@ -151,6 +151,7 @@ public class ShipEnhancements : ModBehaviour
         disableRetroRockets,
         maxDirtAccumulation,
         addShipWarpCore,
+        repairTimeMultiplier,
     }
 
     private void Awake()
@@ -841,6 +842,18 @@ public class ShipEnhancements : ModBehaviour
             AssetBundleUtilities.ReplaceShaders(receiver);
             GameObject receiverObj = Instantiate(receiver, GameObject.Find("TimberHearth_Body").transform);
             coreObj.GetComponent<ShipWarpCoreController>().SetReceiver(receiverObj.GetComponent<ShipWarpCoreReceiver>());
+        }
+        if ((float)Settings.repairTimeMultiplier.GetProperty() != 1f
+            && (float)Settings.repairTimeMultiplier.GetProperty() != 0f)
+        {
+            foreach (ShipComponent component in SELocator.GetShipTransform().GetComponentsInChildren<ShipComponent>())
+            {
+                component._repairTime *= (float)Settings.repairTimeMultiplier.GetProperty();
+            }
+            foreach (ShipHull hull in SELocator.GetShipTransform().GetComponentsInChildren<ShipHull>())
+            {
+                hull._repairTime *= (float)Settings.repairTimeMultiplier.GetProperty();
+            }
         }
 
         SetDamageColors();

@@ -85,6 +85,7 @@ public static class SettingExtensions
         { Settings.disableRetroRockets, (false, false) },
         { Settings.maxDirtAccumulation, (false, false) },
         { Settings.addShipWarpCore, (false, false) },
+        { Settings.repairTimeMultiplier, (1f, 1f) },
     };
 
     public static string GetName(this Settings setting)
