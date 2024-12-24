@@ -2247,7 +2247,6 @@ public static class PatchClass
 
         if (__instance is ShipAudioSignal)
         {
-            ShipEnhancements.WriteDebugMessage("update");
             (__instance as ShipAudioSignal).UpdateShipSignalStrength(scope, distToClosestScopeObstruction);
             return false;
         }

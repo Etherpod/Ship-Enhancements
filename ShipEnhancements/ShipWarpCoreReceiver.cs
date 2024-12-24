@@ -10,6 +10,12 @@ public class ShipWarpCoreReceiver : MonoBehaviour
     private SingularityWarpEffect _warpEffect;
 
     private OWRigidbody _suspendedBody;
+    private FluidDetector _shipFluidDetector;
+
+    private void Awake()
+    {
+        _shipFluidDetector = SELocator.GetShipDetector().GetComponent<FluidDetector>();
+    }
 
     public Transform GetWarpDestination()
     {
@@ -29,6 +35,22 @@ public class ShipWarpCoreReceiver : MonoBehaviour
             {
                 body.Suspend(newBody);
                 _suspendedBody = body;
+                if (body is ShipBody)
+                {
+                    if (_shipFluidDetector.GetShape())
+                    {
+                        _shipFluidDetector.GetShape().SetActivation(false);
+                    }
+                    if (_shipFluidDetector.GetCollider())
+                    {
+                        _shipFluidDetector.GetCollider().enabled = false;
+                    }
+                    EffectVolume[] volsToRemove = [.. _shipFluidDetector._activeVolumes];
+                    foreach (EffectVolume vol in volsToRemove)
+                    {
+                        vol._triggerVolume.RemoveObjectFromVolume(_shipFluidDetector.gameObject);
+                    }
+                }
             }
         }
 
@@ -62,6 +84,17 @@ public class ShipWarpCoreReceiver : MonoBehaviour
         if (_suspendedBody != null)
         {
             _suspendedBody.Unsuspend();
+            if (_suspendedBody is ShipBody)
+            {
+                if (_shipFluidDetector.GetShape())
+                {
+                    _shipFluidDetector.GetShape().SetActivation(true);
+                }
+                if (_shipFluidDetector.GetCollider())
+                {
+                    _shipFluidDetector.GetCollider().enabled = true;
+                }
+            }
             _suspendedBody = null;
         }
     }
