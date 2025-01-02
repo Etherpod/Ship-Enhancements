@@ -18,10 +18,27 @@ public class Tether : MonoBehaviour
     private CapsuleCollider _collider;
     private readonly float _minTetherDistance = 0.25f;
     private readonly float _maxTetherDistance = 50f;
+    private readonly float _transferBufferDistance = 2f;
 
     private Transform _connectedTransform;
     private bool _remoteTether;
     private bool _addedJointObj;
+
+    public OWRigidbody rigidbody
+    {
+        get
+        {
+            return _rigidbody;
+        }
+    }
+
+    public OWRigidbody connectedRigidbody
+    {
+        get
+        {
+            return _connectedRigidbody;
+        }
+    }
 
     private void Awake()
     {
@@ -46,6 +63,7 @@ public class Tether : MonoBehaviour
             if (Vector3.Distance(transform.TransformPoint(_anchor), _connectedTransform.TransformPoint(_connectedAnchor)) 
                 > _joint.minDistance + 5f)
             {
+                ShipEnhancements.WriteDebugMessage("Too far!");
                 _hook.DisconnectTether();
                 return;
             }
@@ -73,7 +91,7 @@ public class Tether : MonoBehaviour
         }
     }
 
-    public void CreateTether(OWRigidbody connectedBody, Vector3 anchorOffset, Vector3 connectedOffset)
+    public void CreateTether(OWRigidbody connectedBody, Vector3 anchorOffset, Vector3 connectedOffset, bool ignoreBuffer = false)
     {
         if (_tethered) return;
 
@@ -122,8 +140,9 @@ public class Tether : MonoBehaviour
             _joint.connectedAnchor = _connectedAnchor;
             _joint.enableCollision = true;
             _joint.maxDistance = 0f;
+            float buffer = ignoreBuffer ? 0f : _transferBufferDistance;
             _joint.minDistance = connectedBody == SELocator.GetPlayerBody() ? 15f : Mathf.Min(100f, Vector3.Distance(transform.TransformPoint(_anchor), 
-                _connectedTransform.TransformPoint(_connectedAnchor)));
+                _connectedTransform.TransformPoint(_connectedAnchor)) + buffer);
             _joint.spring = 0.2f;
             _joint.damper = 0f;
         }
@@ -319,6 +338,32 @@ public class Tether : MonoBehaviour
     public void SetAttachedRigidbody(OWRigidbody attachedBody)
     {
         _rigidbody = attachedBody;
+    }
+
+    public void UpdateTetherBody(OWRigidbody newBody, bool connectedBody)
+    {
+        if (!_tethered) return;
+
+        OWRigidbody lastBody = _connectedRigidbody;
+
+        if (connectedBody)
+        {
+            lastBody = newBody;
+        }
+        else
+        {
+            _rigidbody = newBody;
+        }
+
+        TetherHookItem lastHook = _connectedHook;
+        DisconnectTether();
+        Vector3 worldPos = lastHook.transform.TransformPoint(lastHook.GetAttachPointOffset());
+        Vector3 parentLocalPos = lastHook.transform.parent.InverseTransformPoint(worldPos);
+        CreateTether(lastBody, _hook.GetAttachPointOffset(), parentLocalPos, true);
+        _connectedHook = lastHook;
+        _hook.TransferToHook();
+        lastHook.TransferToHook();
+        lastHook.SetTether(this);
     }
 
     public bool IsTethered()
