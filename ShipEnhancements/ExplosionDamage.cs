@@ -134,10 +134,21 @@ public class ExplosionDamage : MonoBehaviour
                     hull._damageEffect.SetEffectBlend(1f - hull._integrity);
                 }
 
-                ShipDetachableModule module = hull.shipModule as ShipDetachableModule;
-                if (module != null && hull.integrity <= 0f && !module.isDetached)
+                if (hull.shipModule is ShipDetachableModule)
                 {
-                    module.Detach();
+                    ShipDetachableModule module = hull.shipModule as ShipDetachableModule;
+                    if (hull.integrity <= 0f && !module.isDetached)
+                    {
+                        module.Detach();
+                    }
+                }
+                else if (hull.shipModule is ShipLandingModule)
+                {
+                    ShipLandingModule module = hull.shipModule as ShipLandingModule;
+                    if (hull.integrity <= 0f)
+                    {
+                        module.DetachAllLegs();
+                    }
                 }
             }
         }

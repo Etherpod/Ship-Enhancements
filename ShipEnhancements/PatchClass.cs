@@ -1653,6 +1653,54 @@ public static class PatchClass
         __result = false;
         return false;
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ItemTool), nameof(ItemTool.DropItem))]
+    public static bool ParentItemsToShipModules(ItemTool __instance, 
+        RaycastHit hit, OWRigidbody targetRigidbody, IItemDropTarget customDropTarget)
+    {
+        if (customDropTarget != null) return true;
+
+        Transform module = hit.collider.GetComponentInParent<ShipDetachableModule>()?.transform;
+        if (module == null)
+        {
+            module = hit.collider.GetComponentInParent<ShipDetachableLeg>()?.transform;
+            if (module == null) return true;
+        }
+
+        Locator.GetPlayerAudioController().PlayDropItem(__instance._heldItem.GetItemType());
+        GameObject gameObject = hit.collider.gameObject;
+        ISectorGroup sectorGroup = gameObject.GetComponent<ISectorGroup>();
+        Sector sector = null;
+        while (sectorGroup == null && gameObject.transform.parent != null)
+        {
+            gameObject = gameObject.transform.parent.gameObject;
+            sectorGroup = gameObject.GetComponent<ISectorGroup>();
+        }
+        if (sectorGroup != null)
+        {
+            sector = sectorGroup.GetSector();
+            if (sector == null && sectorGroup is SectorCullGroup)
+            {
+                SectorProxy controllingProxy = (sectorGroup as SectorCullGroup).GetControllingProxy();
+                if (controllingProxy != null)
+                {
+                    sector = controllingProxy.GetSector();
+                }
+            }
+        }
+        //Transform transform = ((customDropTarget == null) ? targetRigidbody.transform : customDropTarget.GetItemDropTargetTransform(hit.collider.gameObject));
+        __instance._heldItem.DropItem(hit.point, hit.normal, module, sector, customDropTarget);
+        /*if (customDropTarget != null)
+        {
+            customDropTarget.AddDroppedItem(hit.collider.gameObject, __instance._heldItem);
+        }*/
+        __instance._heldItem = null;
+        Locator.GetToolModeSwapper().UnequipTool();
+
+        return false;
+    }
+
     #endregion
 
     #region PortableCampfire
@@ -2756,9 +2804,16 @@ public static class PatchClass
                 }
             }
 
-            if (__instance._integrity <= 0f && __instance.shipModule is ShipDetachableModule)
+            if (__instance._integrity <= 0f)
             {
-                (__instance.shipModule as ShipDetachableModule).Detach();
+                if (__instance.shipModule is ShipDetachableModule)
+                {
+                    (__instance.shipModule as ShipDetachableModule).Detach();
+                }
+                else if (__instance.shipModule is ShipLandingModule)
+                {
+                    (__instance.shipModule as ShipLandingModule).DetachAllLegs();
+                }
             }
             return false;
         }
