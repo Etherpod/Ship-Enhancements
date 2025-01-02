@@ -85,6 +85,7 @@ public static class SettingsPresets
         { "maxDirtAccumulation", 0.75f },
         { "addShipWarpCore", false },
         { "repairTimeMultiplier", 1f },
+        { "airDragMultiplier", 1f },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -166,6 +167,7 @@ public static class SettingsPresets
         { "maxDirtAccumulation", 0.75f },
         { "addShipWarpCore", false },
         { "repairTimeMultiplier", 1f },
+        { "airDragMultiplier", 1f },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -247,6 +249,7 @@ public static class SettingsPresets
         { "maxDirtAccumulation", 0.75f },
         { "addShipWarpCore", true },
         { "repairTimeMultiplier", 0.5f },
+        { "airDragMultiplier", 1f },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -328,6 +331,7 @@ public static class SettingsPresets
         { "maxDirtAccumulation", 0.75f },
         { "addShipWarpCore", false },
         { "repairTimeMultiplier", 1f },
+        { "airDragMultiplier", 1f },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -409,6 +413,7 @@ public static class SettingsPresets
         { "maxDirtAccumulation", 0.75f },
         { "addShipWarpCore", false },
         { "repairTimeMultiplier", 1.2f },
+        { "airDragMultiplier", 1f },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -490,6 +495,7 @@ public static class SettingsPresets
         { "maxDirtAccumulation", 0.75f },
         { "addShipWarpCore", true },
         { "repairTimeMultiplier", 2f },
+        { "airDragMultiplier", 0f },
     };
 
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()
@@ -752,6 +758,13 @@ public static class SettingsPresets
             (0.5f, 1.5f),
             (1.5f, 2f),
             (2.5f, 3f)
+        ], 0.75f, 1f) },
+        { "airDragMultiplier", new RandomSettingValue(
+        [
+            (0f, 0f),
+            (0f, 0.2f),
+            (0.2f, 1.5f),
+            (1.5f, 2.5f)
         ], 0.75f, 1f) },
     };
 

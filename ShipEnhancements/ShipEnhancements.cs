@@ -152,6 +152,7 @@ public class ShipEnhancements : ModBehaviour
         maxDirtAccumulation,
         addShipWarpCore,
         repairTimeMultiplier,
+        airDragMultiplier,
     }
 
     private void Awake()

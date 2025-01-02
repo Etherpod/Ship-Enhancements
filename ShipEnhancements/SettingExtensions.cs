@@ -86,6 +86,7 @@ public static class SettingExtensions
         { Settings.maxDirtAccumulation, (false, false) },
         { Settings.addShipWarpCore, (false, false) },
         { Settings.repairTimeMultiplier, (1f, 1f) },
+        { Settings.airDragMultiplier, (1f, 1f) },
     };
 
     public static string GetName(this Settings setting)

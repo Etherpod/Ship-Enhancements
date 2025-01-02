@@ -2825,4 +2825,33 @@ public static class PatchClass
     [HarmonyPatch(typeof(HullDamageEffect), nameof(HullDamageEffect.SetEffectBlend))]
     public static void HullDamageEffect_SetEffectBlend(HullDamageEffect instance, float blend) { }
     #endregion
+
+    #region DisableAirDrag
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(FluidDetector), nameof(FluidDetector.AddLinearDrag))]
+    public static bool DisableAirDrag(FluidDetector __instance, FluidVolume fluidVolume, float fluidDensity, float fractionSubmerged)
+    {
+        if (__instance is ShipFluidDetector && fluidVolume is SimpleFluidVolume && fluidVolume.GetFluidType() == FluidVolume.Type.AIR)
+        {
+            Vector3 vector = fluidVolume.GetPointFluidVelocity(__instance.transform.position, __instance) - __instance._owRigidbody.GetVelocity();
+            __instance._netRelativeFluidVelocity += vector;
+            FluidTypeData[] fluidDataByType = __instance._fluidDataByType;
+            FluidVolume.Type fluidType = fluidVolume.GetFluidType();
+            fluidDataByType[(int)fluidType].relativeVelocity = fluidDataByType[(int)fluidType].relativeVelocity + vector;
+            FluidTypeData[] fluidDataByType2 = __instance._fluidDataByType;
+            FluidVolume.Type fluidType2 = fluidVolume.GetFluidType();
+            fluidDataByType2[(int)fluidType2].density = fluidDataByType2[(int)fluidType2].density + fluidDensity;
+            if (fluidVolume.IsAlignmentFluid())
+            {
+                __instance._alignmentFluidVelocity += vector;
+            }
+            Vector3 vector2 = __instance.CalculateDragVelocityChange(vector, fluidDensity, fractionSubmerged) / Time.fixedDeltaTime;
+            __instance._netLinearAcceleration += vector2 * (float)airDragMultiplier.GetProperty();
+
+            return false;
+        }
+
+        return true;
+    }
+    #endregion
 }

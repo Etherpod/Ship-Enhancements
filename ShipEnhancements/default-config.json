@@ -259,6 +259,12 @@
       "value": 1,
       "tooltip": "Larger numbers make your ship harder to turn while in space. Set to zero to make your ship spin forever. WARNING: Values below 1 may cause motion sickness."
     },
+    "airDragMultiplier": {
+      "title": "Air Drag Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers increase how much the ship is slowed down by air. Set to zero to disable air drag."
+    },
     "chaoticCyclones": {
       "title": "Chaotic Cyclones",
       "type": "toggle",
