@@ -105,8 +105,16 @@ public class Tether : MonoBehaviour
             }
             else
             {
-                _joint.connectedMassScale = 0.001f;
-                _joint.massScale = 1000f;
+                if (!_rigidbody.IsKinematic() && _connectedRigidbody.IsKinematic())
+                {
+                    _joint.connectedMassScale = 1000f;
+                    _joint.massScale = 1000f;
+                }
+                else
+                {
+                    _joint.connectedMassScale = 1000f;
+                    _joint.massScale = 0.001f;
+                }
             }
 
             _joint.anchor = transform.localPosition + anchorOffset;
@@ -134,7 +142,7 @@ public class Tether : MonoBehaviour
         foreach (RaycastHit hit in hits)
         {
             Rigidbody rb = hit.collider.attachedRigidbody;
-            ShipEnhancements.WriteDebugMessage("hit: " + rb.gameObject.name);
+            //ShipEnhancements.WriteDebugMessage("hit: " + rb.gameObject.name);
             if (!(rb.isKinematic || rb == GetComponentInParent<Rigidbody>() || rb == SELocator.GetPlayerBody().GetRigidbody()))
             {
                 intersectingBody = true;
