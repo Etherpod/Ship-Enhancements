@@ -38,6 +38,9 @@ public class ShipWarpCoreController : CockpitInteractible
     {
         _buttonTransform.localPosition = new Vector3(0, _buttonOffset, 0);
         _pressed = true;
+
+        if (_receiver == null) return;
+
         if (PlayerState.IsInsideShip() || PlayerState.AtFlightConsole())
         {
             _warpingWithPlayer = true;
@@ -99,7 +102,7 @@ public class ShipWarpCoreController : CockpitInteractible
         _shipBody = body;
         _warpEffect._warpedObjectGeometry = body.gameObject;
         _warpEffect.transform.localPosition = _cockpitPivot.localPosition;
-        _receiver.OnCockpitDetached(body);
+        _receiver?.OnCockpitDetached(body);
     }
 
     public void SetReceiver(ShipWarpCoreReceiver receiver)

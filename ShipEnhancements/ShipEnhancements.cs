@@ -840,10 +840,14 @@ public class ShipEnhancements : ModBehaviour
             AssetBundleUtilities.ReplaceShaders(core);
             GameObject coreObj = Instantiate(core, SELocator.GetShipTransform().Find("Module_Cockpit"));
 
-            GameObject receiver = LoadPrefab("Assets/ShipEnhancements/ShipWarpReceiver.prefab");
-            AssetBundleUtilities.ReplaceShaders(receiver);
-            GameObject receiverObj = Instantiate(receiver, GameObject.Find("TimberHearth_Body").transform);
-            coreObj.GetComponent<ShipWarpCoreController>().SetReceiver(receiverObj.GetComponent<ShipWarpCoreReceiver>());
+            if (GameObject.Find("TimberHearth_Body"))
+            {
+                GameObject receiver = LoadPrefab("Assets/ShipEnhancements/ShipWarpReceiver.prefab");
+                AssetBundleUtilities.ReplaceShaders(receiver);
+                WriteDebugMessage(SELocator.GetShipTransform().parent);
+                GameObject receiverObj = Instantiate(receiver, GameObject.Find("TimberHearth_Body").transform);
+                coreObj.GetComponent<ShipWarpCoreController>().SetReceiver(receiverObj.GetComponent<ShipWarpCoreReceiver>());
+            }
         }
         if ((float)Settings.repairTimeMultiplier.GetProperty() != 1f
             && (float)Settings.repairTimeMultiplier.GetProperty() != 0f)
