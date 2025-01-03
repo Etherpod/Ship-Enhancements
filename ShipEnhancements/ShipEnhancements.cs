@@ -155,6 +155,7 @@ public class ShipEnhancements : ModBehaviour
         airDragMultiplier,
         addShipClock,
         enableStunDamage,
+        enableRepairConfirmation,
     }
 
     private void Awake()
@@ -230,6 +231,25 @@ public class ShipEnhancements : ModBehaviour
             {
                 GlobalMessenger.RemoveListener("EnterShip", OnEnterShip);
                 GlobalMessenger.RemoveListener("ExitShip", OnExitShip);
+            }
+            if ((bool)Settings.enableRepairConfirmation.GetProperty())
+            {
+                foreach (ShipHull hull in SELocator.GetShipDamageController()._shipHulls)
+                {
+                    if (hull != null)
+                    {
+                        hull.OnDamaged -= ctx => CheckNoPartsDamaged();
+                        hull.OnRepaired -= ctx => CheckNoPartsDamaged();
+                    }
+                }
+                foreach (ShipComponent component in SELocator.GetShipDamageController()._shipComponents)
+                {
+                    if (component != null && component.isDamaged)
+                    {
+                        component.OnDamaged -= ctx => CheckNoPartsDamaged();
+                        component.OnRepaired -= ctx => CheckNoPartsDamaged();
+                    }
+                }
             }
             if (AchievementsAPI != null)
             {
@@ -845,7 +865,6 @@ public class ShipEnhancements : ModBehaviour
             {
                 GameObject receiver = LoadPrefab("Assets/ShipEnhancements/ShipWarpReceiver.prefab");
                 AssetBundleUtilities.ReplaceShaders(receiver);
-                WriteDebugMessage(SELocator.GetShipTransform().parent);
                 GameObject receiverObj = Instantiate(receiver, GameObject.Find("TimberHearth_Body").transform);
                 coreObj.GetComponent<ShipWarpCoreController>().SetReceiver(receiverObj.GetComponent<ShipWarpCoreReceiver>());
             }
@@ -867,6 +886,28 @@ public class ShipEnhancements : ModBehaviour
             GameObject clock = LoadPrefab("Assets/ShipEnhancements/ShipClock.prefab");
             AssetBundleUtilities.ReplaceShaders(clock);
             Instantiate(clock, SELocator.GetShipTransform().Find("Module_Cockpit"));
+        }
+        if ((bool)Settings.enableRepairConfirmation.GetProperty())
+        {
+            GameObject audio = LoadPrefab("Assets/ShipEnhancements/SystemOnlineAudio.prefab");
+            Instantiate(audio, SELocator.GetShipTransform().Find("Audio_Ship"));
+
+            foreach (ShipHull hull in SELocator.GetShipDamageController()._shipHulls)
+            {
+                if (hull != null)
+                {
+                    hull.OnDamaged += ctx => CheckNoPartsDamaged();
+                    hull.OnRepaired += ctx => CheckNoPartsDamaged();
+                }
+            }
+            foreach (ShipComponent component in SELocator.GetShipDamageController()._shipComponents)
+            {
+                if (component != null && component.isDamaged)
+                {
+                    component.OnDamaged += ctx => CheckNoPartsDamaged();
+                    component.OnRepaired += ctx => CheckNoPartsDamaged();
+                }
+            }
         }
 
         SetDamageColors();
@@ -1289,6 +1330,28 @@ public class ShipEnhancements : ModBehaviour
             SEAchievementTracker.HowDidWeGetHere = true;
             AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.HOW_DID_WE_GET_HERE");
         }
+    }
+
+    private void CheckNoPartsDamaged()
+    {
+        if (_shipDestroyed) return;
+
+        foreach (ShipHull hull in SELocator.GetShipDamageController()._shipHulls)
+        {
+            if (hull != null && hull.isDamaged)
+            {
+                return;
+            }
+        }
+        foreach (ShipComponent component in SELocator.GetShipDamageController()._shipComponents)
+        {
+            if (component != null && component.isDamaged)
+            {
+                return;
+            }
+        }
+
+        SELocator.GetShipTransform().Find("Audio_Ship/SystemOnlineAudio(Clone)")?.GetComponent<OWAudioSource>().PlayOneShot(AudioType.TH_ZeroGTrainingAllRepaired, 1f);
     }
 
     #endregion

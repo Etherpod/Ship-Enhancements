@@ -88,6 +88,7 @@ public static class SettingsPresets
         { "airDragMultiplier", 1f },
         { "addShipClock", false },
         { "enableStunDamage", false },
+        { "enableRepairConfirmation", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -172,6 +173,7 @@ public static class SettingsPresets
         { "airDragMultiplier", 1f },
         { "addShipClock", false },
         { "enableStunDamage", false },
+        { "enableRepairConfirmation", false },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -256,6 +258,7 @@ public static class SettingsPresets
         { "airDragMultiplier", 1f },
         { "addShipClock", false },
         { "enableStunDamage", false },
+        { "enableRepairConfirmation", false },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -340,6 +343,7 @@ public static class SettingsPresets
         { "airDragMultiplier", 1f },
         { "addShipClock", false },
         { "enableStunDamage", false },
+        { "enableRepairConfirmation", false },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -424,6 +428,7 @@ public static class SettingsPresets
         { "airDragMultiplier", 1f },
         { "addShipClock", false },
         { "enableStunDamage", false },
+        { "enableRepairConfirmation", false },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -508,6 +513,7 @@ public static class SettingsPresets
         { "airDragMultiplier", 0f },
         { "addShipClock", true },
         { "enableStunDamage", true },
+        { "enableRepairConfirmation", true },
     };
 
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()
@@ -780,6 +786,7 @@ public static class SettingsPresets
         ], 0.75f, 1f) },
         { "addShipClock", new RandomSettingValue(0.5f) },
         { "enableStunDamage", new RandomSettingValue(0.75f) },
+        { "enableRepairConfirmation", new RandomSettingValue(0.75f) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

@@ -245,7 +245,8 @@
         "Forward",
         "Back",
         "Random"
-      ]
+      ],
+      "tooltip": "Changes the direction of your ship's gravity. If you set this to Random, you may find yourself standing diagonally in the ship."
     },
     "atmosphereAngularDragMultiplier": {
       "title": "Atmosphere Angular Drag Multiplier",
@@ -377,6 +378,12 @@
       "value": false,
       "tooltip": "Damages the ship components over time in extremely high or low temperatures."
     },
+    "enableRepairConfirmation": {
+      "title": "Enable Repair Confirmation",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Plays a sound when every damaged part of the ship has been repaired."
+    },
     "hotThrusters": {
       "title": "Enable Hazardous Thrusters",
       "type": "toggle",
@@ -421,7 +428,7 @@
       "title": "Add Ship Signal",
       "type": "toggle",
       "value": false,
-      "tooltip": "Allows you to track your ship with the signalscope on the Outer Wilds Ventures frequency. Useful when map markers are disabled."
+      "tooltip": "Allows you to track your ship with the signalscope on the Outer Wilds Ventures frequency. Slate also mentioned something about sending commands with your signalscope."
     },
     "addShipClock": {
       "title": "Add Ship Clock",

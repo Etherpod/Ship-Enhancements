@@ -44,6 +44,7 @@ Change some of the values that control how the ship works or how the added featu
 - **Ship Gravity Multiplier**: Larger numbers increase the strength of your ship's gravity crystal. Large numbers are advised against, however, as exiting your ship will kill you.
 - **Ship Gravity Direction**: Lets you change the direction of your ship's gravity. Set this to Random if you feel like the game isn't painful enough.
 - **Atmosphere/Space Angular Drag Multiplier**: Larger numbers make it harder to turn your ship. Setting this to 0 lets you spin your ship forever.
+- **Air Drag Multiplier**: Larger numbers make atmospheres slow you down more. Setting this to 0 lets your ship drift endlessly through the air.
 - **Chaotic Cyclones**: Adjusts cyclones to apply an additional upwards spin to your ship while inside of them to make for an even more disorienting experience.
 - **Ship Explosion Multiplier**: Larger numbers increase the size of the explosion that is created when your ship blows up. Set this to something between 10 and 30 to simulate an atomic bomb.
 - **Extra Explosion Damage**: Gives explosions the ability to damage your ship and fragments of Brittle Hollow.
@@ -51,6 +52,7 @@ Change some of the values that control how the ship works or how the added featu
 - **Reactor Lifetime Multiplier**: Larger numbers increase the time it takes for the reactor to blow up when it has been damaged. Set this to something small to give yourself a panic attack every time the master alarm goes off.
 - **Ship Bounciness**: Larger numbers increase the bounciness of the ship. A value of 2 should make the ship double its speed when it hits something, but the results of this setting aren't entirely accurate.
 - **Ship Input Latency**: This basically simulates internet lag, where larger numbers increase the time it takes for the ship to process your inputs. A value of 1 means it takes 1 second for your "upwards thrust" input to register.
+- **Enable Stun Damage**: Blocks all of your inputs for a short time after you crash. The harder you hit something, the longer you'll be frozen.
 
 ## Add Ship Functions
 Some new stuff that Slate didn't have time to include in the ship.
@@ -59,17 +61,19 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Jetpack Refuel Drain**: Drains the ship's fuel reserve when you refuel your jetpack. The amount drained is the same as the amount gained if you transfer your fuel back to the ship, meaning you can't duplicate fuel.
 - **Automatic Hatch**: Automatically closes the hatch when you leave the ship.
 - **Manual Scout Recall**: Brings you back to the days when Little Scouts didn't have warping technology. If you shoot your scout somewhere, you'll have to go over and pick it up to use it again. If you accidentally launch it into deep space, don't worry; the ship can still recall it, and you can go retrieve it from the top of the ship in the scout launcher.
-- **Ship Warp Core**: Attaches a Nomai warp core to your ship's cockpit. You can press the button on the ceiling of the cockpit to activate the warp core.
+- **Ship Warp Core**: Attaches a Nomai warp core to your ship's cockpit. You can press the button on the ceiling of the cockpit to activate the warp core, which will warp you back to Timber Hearth.
 - **Temperature Zones**: Implements a temperature mechanic for the unused temperature dial in the ship. High and low temperature zones are added around the solar system that increase or decrease your ship's hull temperature. The longer you allow your hull's temperature to fluctuate, the more likely it is for your ship to take damage.
 - **Hull Temperature Damage**: Damages your ship over time in extreme temperatures, like near the Sun or on the dark side of the Interloper. Your temperature dial will start flashing if it's hot or cold enough to start taking damage.
 - **Component Temperature Damage**: Similar to hull temperature damage, but it damages random components instead.
+- **Repair Confirmation**: Plays a sound when everything has been repaired. Now you don't need to go searching for any hulls you forgot to repair!
 - **Hazardous Thrusters**: Makes your ship's thruster flames actually damage you. Good luck figuring out how to get near them in the first place.
 - **Cockpit Rust Level**: Controls how much rust is applied to the ship cockpit. Moving the slider all the way to the right completely covers the cockpit in rust.
 - **Dirt Accumulation Time**: Larger numbers increase the time (in seconds) it takes for dirt to build up on your cockpit glass, which you can wash off by finding a source of water. Set this to 0 to disable it.
 - **Max Dirt Accumulation**: Stops dirt from building up on your cockpit when it reaches a certain level.
 - **Scout Launcher Component**: Turns the ship's scout launcher into a fully functioning ship component. If you damage it, you won't be able to launch or recall your scout from the ship until you repair it.
 - **Signalscope Component**: Turns the ship's signalscope into a fully functioning ship component. If you damage it, you won't be able to receive or broadcast signals from the ship until you repair it.
-- **Ship Signal**: Adds a signal for the ship on the Outer Wilds Ventures frequency. The signal will stop if the ship's signalscope is damaged.
+- **Ship Signal**: Adds a signal for the ship on the Outer Wilds Ventures frequency. The signal will stop if the ship's signalscope is damaged. Slate also said they added a "wireless tranceiver" to your signalscope, whatever that means.
+- **Clock**: Adds a clock to the cockpit. Why, you might ask? Why not? It makes a nice ticking sound, if you like that sort of background noise.
 - **Ship Item Placement**: Lets you place items inside or on top of your ship.
 - **Portable Campfire**: Adds a portable campfire to the ship next to your suit. Set it up wherever you want and roast a marshmallow.
 - **Portable Fuel Canister**: Adds a portable fuel tank inside the ship at the back. You can bring it around with you in case you need to refuel your jetpack while traveling. The fuel tank can completely refill your jetpack about 3 times before it runs out of fuel.
