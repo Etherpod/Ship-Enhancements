@@ -88,6 +88,7 @@ public static class SettingExtensions
         { Settings.repairTimeMultiplier, (1f, 1f) },
         { Settings.airDragMultiplier, (1f, 1f) },
         { Settings.addShipClock, (false, false) },
+        { Settings.enableStunDamage, (false, false) },
     };
 
     public static string GetName(this Settings setting)

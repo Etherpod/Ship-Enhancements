@@ -154,6 +154,7 @@ public class ShipEnhancements : ModBehaviour
         repairTimeMultiplier,
         airDragMultiplier,
         addShipClock,
+        enableStunDamage,
     }
 
     private void Awake()

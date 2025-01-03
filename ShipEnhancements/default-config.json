@@ -307,6 +307,12 @@
       "value": 0,
       "tooltip": "Adds a delay while piloting the ship between when you press the button and when the ship recieves the input. Now you can pretend you're playing online!"
     },
+    "enableStunDamage": {
+      "title": "Enable Stun Damage",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Temporarily stuns you if you hit something too hard with the ship."
+    },
 
     "Add Ship Functions": {
       "type": "separator"

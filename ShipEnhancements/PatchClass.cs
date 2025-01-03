@@ -1902,11 +1902,8 @@ public static class PatchClass
         if ((float)shipExplosionMultiplier.GetProperty() == 0
             || ((float)shipExplosionMultiplier.GetProperty() < 0f && __instance.GetComponentInParent<FuelTankItem>()))
         {
-            ShipEnhancements.WriteDebugMessage("ah");
             return false;
         }
-
-        ShipEnhancements.WriteDebugMessage("gruh?");
 
         if (__instance is BlackHoleExplosionController)
         {
@@ -2852,6 +2849,26 @@ public static class PatchClass
         }
 
         return true;
+    }
+    #endregion
+
+    #region StunDamage
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.OnHullImpact))]
+    public static void LockUpShipControls(ShipDamageController __instance, ImpactData impact, float damage)
+    {
+        if (!(bool)enableStunDamage.GetProperty() || SELocator.GetShipDamageController().IsSystemFailed()) return;
+
+        if (damage > 0.1f)
+        {
+            float lerp = Mathf.InverseLerp(0.1f, 0.8f, damage);
+            __instance.GetComponentInChildren<ShipCockpitController>().LockUpControls(Mathf.Lerp(1f, 8f, lerp));
+        }
+        else if (impact.speed > 30f * (float)shipDamageSpeedMultiplier.GetProperty())
+        {
+            float lerp = Mathf.InverseLerp(30f, 120f, impact.speed);
+            __instance.GetComponentInChildren<ShipCockpitController>().LockUpControls(Mathf.Lerp(2f, 5f, lerp));
+        }
     }
     #endregion
 }
