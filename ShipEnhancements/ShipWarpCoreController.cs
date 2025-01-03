@@ -43,6 +43,16 @@ public class ShipWarpCoreController : CockpitInteractible
 
         if (PlayerState.IsInsideShip() || PlayerState.AtFlightConsole())
         {
+            if (PlayerState.InBrambleDimension())
+            {
+                PlayerFogWarpDetector detector = Locator.GetPlayerDetector().GetComponent<PlayerFogWarpDetector>();
+                FogWarpVolume[] volumes = detector._warpVolumes.ToArray();
+                foreach (FogWarpVolume volume in volumes)
+                {
+                    detector.UntrackFogWarpVolume(volume);
+                }
+            }
+
             _warpingWithPlayer = true;
             _warpEffect.singularityController.OnCreation += WarpShip;
             _warpEffect.singularityController.Create();
