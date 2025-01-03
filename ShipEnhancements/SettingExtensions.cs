@@ -87,6 +87,7 @@ public static class SettingExtensions
         { Settings.addShipWarpCore, (false, false) },
         { Settings.repairTimeMultiplier, (1f, 1f) },
         { Settings.airDragMultiplier, (1f, 1f) },
+        { Settings.addShipClock, (false, false) },
     };
 
     public static string GetName(this Settings setting)

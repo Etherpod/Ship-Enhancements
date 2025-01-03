@@ -11,7 +11,7 @@ public class ShipAudioSignal : AudioSignal
         base.Awake();
         _shipWarpDetector = SELocator.GetShipDetector().GetComponent<FogWarpDetector>();
         _shipWarpDetector.OnOuterFogWarpVolumeChange += OnOuterFogWarpVolumeChange;
-        SetSector(SELocator.GetShipTransform().GetComponentInChildren<Sector>());
+        SetSector(SELocator.GetShipSector());
         _name = ShipEnhancements.Instance.ShipSignalName;
         _frequency = SignalFrequency.Traveler;
     }

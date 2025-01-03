@@ -153,6 +153,7 @@ public class ShipEnhancements : ModBehaviour
         addShipWarpCore,
         repairTimeMultiplier,
         airDragMultiplier,
+        addShipClock,
     }
 
     private void Awake()
@@ -855,6 +856,12 @@ public class ShipEnhancements : ModBehaviour
             {
                 hull._repairTime *= (float)Settings.repairTimeMultiplier.GetProperty();
             }
+        }
+        if ((bool)Settings.addShipClock.GetProperty())
+        {
+            GameObject clock = LoadPrefab("Assets/ShipEnhancements/ShipClock.prefab");
+            AssetBundleUtilities.ReplaceShaders(clock);
+            Instantiate(clock, SELocator.GetShipTransform().Find("Module_Cockpit"));
         }
 
         SetDamageColors();

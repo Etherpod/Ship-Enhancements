@@ -9,6 +9,7 @@ public static class SELocator
     private static ShipBody _shipBody;
     private static Transform _shipTransform;
     private static GameObject _shipDetector;
+    private static Sector _shipSector;
     private static PlayerBody _playerBody;
     private static SurveyorProbe _probe;
     private static OxygenDetector _shipOxygenDetector;
@@ -31,6 +32,7 @@ public static class SELocator
         _shipBody = Object.FindObjectOfType<ShipBody>();
         _shipTransform = _shipBody.transform;
         _shipDetector = _shipBody.GetComponentInChildren<ShipFluidDetector>().gameObject;
+        _shipSector = _shipBody.GetComponentInChildren<Sector>();
         _playerBody = Object.FindObjectOfType<PlayerBody>();
         _probe = Object.FindObjectsOfType<SurveyorProbe>().Where(obj => obj.name == "Probe_Body").ToArray()[0];
         _shipResources = _shipBody.GetComponent<ShipResources>();
@@ -80,6 +82,11 @@ public static class SELocator
     public static GameObject GetShipDetector()
     {
         return _shipDetector;
+    }
+    
+    public static Sector GetShipSector()
+    {
+        return _shipSector;
     }
 
     public static PlayerBody GetPlayerBody()
