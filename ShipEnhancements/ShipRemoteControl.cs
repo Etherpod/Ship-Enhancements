@@ -34,7 +34,7 @@ public class ShipRemoteControl : MonoBehaviour
     {
         _currentCommand = ShipCommand.Explode;
         _commandPrompt = new ScreenPrompt(InputLibrary.interact, _commandNames[_currentCommand], 0, ScreenPrompt.DisplayState.Normal, false);
-        _cyclePrompt = new ScreenPrompt(InputLibrary.toolOptionY, "Cycle Command", 0, ScreenPrompt.DisplayState.Normal, false);
+        _cyclePrompt = new PriorityScreenPrompt(InputLibrary.toolOptionY, "Cycle Command", 0, ScreenPrompt.DisplayState.Normal, false);
     }
 
     private void Start()

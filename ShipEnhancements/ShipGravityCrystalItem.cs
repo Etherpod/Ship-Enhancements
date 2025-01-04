@@ -59,7 +59,7 @@ public class ShipGravityCrystalItem : OWItem
 
         transform.localScale = Vector3.one;
 
-        if (!(bool)disableGravityCrystal.GetProperty())
+        if (!(bool)disableGravityCrystal.GetProperty() && !_gravityComponent.isDamaged)
         {
             _forceVolume.SetAttachedBody(parent.GetAttachedOWRigidbody());
             _forceVolume.SetVolumeActivation(true);
@@ -91,7 +91,7 @@ public class ShipGravityCrystalItem : OWItem
             transform.localScale = Vector3.one;
 
             _meshParent.SetActive(false);
-            if (!_gravityComponent.isDamaged)
+            if (!(bool)disableGravityCrystal.GetProperty() && !_gravityComponent.isDamaged)
             {
                 _gravityComponent.OnComponentRepaired();
             }

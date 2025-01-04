@@ -2905,4 +2905,16 @@ public static class PatchClass
         return false;
     }
     #endregion
+
+    #region PriorityScreenPrompt
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ScreenPrompt), nameof(ScreenPrompt.IsVisible))]
+    public static void PriorityScreenPrompts(ScreenPrompt __instance, ref bool __result)
+    {
+        if (__instance is PriorityScreenPrompt)
+        {
+            __result = __instance._isVisible && GUIMode.AreScreenPromptsVisible();
+        }
+    }
+    #endregion
 }

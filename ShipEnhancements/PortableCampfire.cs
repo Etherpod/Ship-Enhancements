@@ -29,7 +29,7 @@ public class PortableCampfire : Campfire
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
 
-        _cancelPrompt = new ScreenPrompt(InputLibrary.cancel, "Pack up", 0, ScreenPrompt.DisplayState.Normal, false);
+        _cancelPrompt = new PriorityScreenPrompt(InputLibrary.cancel, "Pack up", 0, ScreenPrompt.DisplayState.Normal, false);
         _reactorHeatMeterLength = Random.Range(10f, 30f);
         _reactorHeatMeter = _reactorHeatMeterLength;
     }
