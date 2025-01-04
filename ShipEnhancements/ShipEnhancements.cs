@@ -61,8 +61,9 @@ public class ShipEnhancements : ModBehaviour
     public ItemType PortableCampfireType { get; private set; }
     public ItemType TetherHookType { get; private set; }
     public ItemType PortableTractorBeamType { get; private set; }
-    public ItemType ExpeditionFlagItemType { get; private set; }
-    public ItemType FuelTankItemType { get; private set; }
+    public ItemType ExpeditionFlagType { get; private set; }
+    public ItemType FuelTankType { get; private set; }
+    public ItemType GravityCrystalType { get; private set; }
     public SignalName ShipSignalName { get; private set; }
     public int ThrustModulatorLevel { get; private set; }
 
@@ -156,6 +157,7 @@ public class ShipEnhancements : ModBehaviour
         addShipClock,
         enableStunDamage,
         enableRepairConfirmation,
+        shipGravityFix,
     }
 
     private void Awake()
@@ -177,8 +179,9 @@ public class ShipEnhancements : ModBehaviour
         PortableCampfireType = EnumUtils.Create<ItemType>("PortableCampfire");
         TetherHookType = EnumUtils.Create<ItemType>("TetherHook");
         PortableTractorBeamType = EnumUtils.Create<ItemType>("PortableTractorBeam");
-        ExpeditionFlagItemType = EnumUtils.Create<ItemType>("ExpeditionFlag");
-        FuelTankItemType = EnumUtils.Create<ItemType>("PortableFuelTank");
+        ExpeditionFlagType = EnumUtils.Create<ItemType>("ExpeditionFlag");
+        FuelTankType = EnumUtils.Create<ItemType>("PortableFuelTank");
+        GravityCrystalType = EnumUtils.Create<ItemType>("ShipGravityCrystal");
         ShipSignalName = EnumUtils.Create<SignalName>("Ship");
 
         SEItemAudioController.Initialize();
@@ -908,6 +911,23 @@ public class ShipEnhancements : ModBehaviour
                     component.OnRepaired += ctx => CheckNoPartsDamaged();
                 }
             }
+        }
+        if (true)
+        {
+            Transform crystalParent = SELocator.GetShipTransform().Find("Module_Engine/Geo_Engine/Engine_Tech_Interior");
+            GameObject obj1 = crystalParent.Find("Props_NOM_GravityCrystal").gameObject;
+            GameObject obj2 = crystalParent.Find("Props_NOM_GravityCrystal_Base").gameObject;
+
+            GameObject crystal = LoadPrefab("Assets/ShipEnhancements/GravityCrystalItem.prefab");
+            AssetBundleUtilities.ReplaceShaders(crystal);
+            ShipGravityCrystalItem item = Instantiate(crystal).GetComponent<ShipGravityCrystalItem>();
+
+            GameObject crystalSocket = LoadPrefab("Assets/ShipEnhancements/GravityCrystalSocket.prefab");
+            AssetBundleUtilities.ReplaceShaders(crystalSocket);
+            ShipGravityCrystalSocket socket = Instantiate(crystalSocket, SELocator.GetShipTransform().Find("Module_Engine")).GetComponent<ShipGravityCrystalSocket>();
+
+            socket.AddComponentMeshes([obj1, obj2]);
+            socket.PlaceIntoSocket(item);
         }
 
         SetDamageColors();

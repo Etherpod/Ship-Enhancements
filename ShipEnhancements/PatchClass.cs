@@ -1596,13 +1596,15 @@ public static class PatchClass
         targetRigidbody = null;
         dropTarget = null;
 
-        if (!(bool)enableShipItemPlacement.GetProperty() && !(bool)addTether.GetProperty()) return true;
+        if (!(bool)enableShipItemPlacement.GetProperty() && !(bool)addTether.GetProperty() && !true) return true;
 
         bool isTether = (bool)addTether.GetProperty() && __instance._heldItem.GetItemType() == ShipEnhancements.Instance.TetherHookType;
+        bool isGravityCrystal = __instance._heldItem.GetItemType() == ShipEnhancements.Instance.GravityCrystalType;
         bool shipItemPlacement = (bool)enableShipItemPlacement.GetProperty();
 
         PlayerCharacterController playerController = Locator.GetPlayerController();
-        if ((!playerController.IsGrounded() && !isTether) || PlayerState.IsAttached() || (PlayerState.IsInsideShip() && (!shipItemPlacement || isTether)))
+        if ((!playerController.IsGrounded() && !isTether && !isGravityCrystal) || PlayerState.IsAttached() 
+            || (PlayerState.IsInsideShip() && (!shipItemPlacement || isTether || isGravityCrystal)))
         {
             __result = false;
             return false;
@@ -1612,7 +1614,8 @@ public static class PatchClass
             __result = false;
             return false;
         }
-        if (playerController.GetRelativeGroundVelocity().sqrMagnitude >= playerController.GetRunSpeedMagnitude() * playerController.GetRunSpeedMagnitude() && !isTether)
+        if (playerController.GetRelativeGroundVelocity().sqrMagnitude >= playerController.GetRunSpeedMagnitude() * playerController.GetRunSpeedMagnitude() 
+            && !isTether && !isGravityCrystal)
         {
             __result = false;
             return false;
@@ -1633,7 +1636,8 @@ public static class PatchClass
                 __result = false;
                 return false;
             }
-            float maxSlopeAngle = isTether ? 360f : __instance._maxDroppableSlopeAngle;
+            float maxSlopeAngle = (isTether || isGravityCrystal) ? 360f : __instance._maxDroppableSlopeAngle;
+
             if (Vector3.Angle(Locator.GetPlayerTransform().up, hit.normal) <= maxSlopeAngle)
             {
                 IgnoreCollision component = hit.collider.GetComponent<IgnoreCollision>();
@@ -2869,6 +2873,36 @@ public static class PatchClass
             float lerp = Mathf.InverseLerp(30f, 120f, impact.speed);
             __instance.GetComponentInChildren<ShipCockpitController>().LockUpControls(Mathf.Lerp(2f, 5f, lerp));
         }
+    }
+    #endregion
+
+    #region ShipGravityFix
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipDirectionalForceVolume), nameof(ShipDirectionalForceVolume.CalculateForceAccelerationOnBody))]
+    public static bool ShipGravityFix(ShipDirectionalForceVolume __instance, OWRigidbody targetBody, ref Vector3 __result)
+    {
+        if (!(bool)shipGravityFix.GetProperty()) return true;
+
+        Vector3 vector = __instance._attachedBody.GetAcceleration();
+        if (vector.magnitude > 20f)
+        {
+            vector -= vector.normalized * 20f;
+        }
+        else
+        {
+            vector = Vector3.zero;
+        }
+        /*if (!__instance._insideSpeedLimiter)
+        {
+            targetBody.AddAcceleration(vector);
+        }*/
+        if (targetBody == __instance._playerBody && PlayerState.IsInsideShip() && !PlayerState.IsAttached())
+        {
+            Vector3 vector2 = (__instance.transform.TransformDirection(-__instance._fieldDirection.normalized * __instance._fieldMagnitude) - vector) * targetBody.GetMass();
+            __instance._attachedBody.AddForce(vector2, targetBody.GetWorldCenterOfMass());
+        }
+        __result = __instance.CalculateForceAccelerationAtPoint(targetBody.GetWorldCenterOfMass());
+        return false;
     }
     #endregion
 }

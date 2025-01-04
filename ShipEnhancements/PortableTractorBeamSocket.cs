@@ -7,7 +7,7 @@ public class PortableTractorBeamSocket : OWItemSocket
     public override void Awake()
     {
         Reset();
-        _sector = SELocator.GetShipBody().GetComponent<Sector>();
+        _sector = SELocator.GetShipSector();
         base.Awake();
         _acceptableType = PortableTractorBeamItem.ItemType;
     }

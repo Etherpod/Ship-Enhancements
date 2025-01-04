@@ -6,7 +6,7 @@ namespace ShipEnhancements;
 
 public class FuelTankItem : OWItem
 {
-    public static readonly ItemType ItemType = ShipEnhancements.Instance.FuelTankItemType;
+    public static readonly ItemType ItemType = ShipEnhancements.Instance.FuelTankType;
 
     [SerializeField]
     private InteractReceiver _interactReceiver;

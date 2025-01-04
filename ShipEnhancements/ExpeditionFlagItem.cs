@@ -5,7 +5,7 @@ namespace ShipEnhancements;
 
 public class ExpeditionFlagItem : OWItem
 {
-    public static readonly ItemType ItemType = ShipEnhancements.Instance.ExpeditionFlagItemType;
+    public static readonly ItemType ItemType = ShipEnhancements.Instance.ExpeditionFlagType;
 
     [SerializeField] private GameObject _itemModelParent;
     [SerializeField] private GameObject _objModelParent;

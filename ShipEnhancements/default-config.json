@@ -620,6 +620,12 @@
       "type": "toggle",
       "value": true,
       "tooltip": "Notifies you in the ship when resources are low or when the outside conditions are becoming dangerous."
+    },
+    "shipGravityFix": {
+      "title": "Fix Ship Gravity",
+      "type": "toggle",
+      "value": true,
+      "tooltip": "Lets you walk around your ship normally when in high-gravity areas, like near the sun."
     }
   }
 }

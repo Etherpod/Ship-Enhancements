@@ -65,7 +65,7 @@ public static class SEItemAudioController
         {
             __instance._oneShotExternalSource.PlayOneShot(_tractorBeamDrop, DefaultVolume);
         }
-        else if (itemType == ShipEnhancements.Instance.ExpeditionFlagItemType)
+        else if (itemType == ShipEnhancements.Instance.ExpeditionFlagType)
         {
             __instance._oneShotExternalSource.PlayOneShot(_flagDrop, DefaultVolume);
         }
@@ -84,7 +84,7 @@ public static class SEItemAudioController
         {
             __instance._oneShotExternalSource.PlayOneShot(_tractorBeamPickUp, DefaultVolume);
         }
-        else if (itemType == ShipEnhancements.Instance.ExpeditionFlagItemType)
+        else if (itemType == ShipEnhancements.Instance.ExpeditionFlagType)
         {
             __instance._oneShotExternalSource.PlayOneShot(_flagPickUp, DefaultVolume);
         }

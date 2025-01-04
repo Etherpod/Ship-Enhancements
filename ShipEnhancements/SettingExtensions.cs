@@ -90,6 +90,7 @@ public static class SettingExtensions
         { Settings.addShipClock, (false, false) },
         { Settings.enableStunDamage, (false, false) },
         { Settings.enableRepairConfirmation, (false, false) },
+        { Settings.shipGravityFix, (false, false) },
     };
 
     public static string GetName(this Settings setting)
