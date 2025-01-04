@@ -158,6 +158,7 @@ public class ShipEnhancements : ModBehaviour
         enableStunDamage,
         enableRepairConfirmation,
         shipGravityFix,
+        enableRemovableGravityCrystal,
     }
 
     private void Awake()
@@ -912,7 +913,7 @@ public class ShipEnhancements : ModBehaviour
                 }
             }
         }
-        if (true)
+        if ((bool)Settings.enableRemovableGravityCrystal.GetProperty())
         {
             Transform crystalParent = SELocator.GetShipTransform().Find("Module_Engine/Geo_Engine/Engine_Tech_Interior");
             GameObject obj1 = crystalParent.Find("Props_NOM_GravityCrystal").gameObject;

@@ -11,11 +11,16 @@ public class ShipGravityCrystalItem : OWItem
     [SerializeField]
     private DirectionalForceVolume _forceVolume;
     [SerializeField]
+    private Light _light;
+    [SerializeField]
+    private OWAudioSource _audioSource;
+    [SerializeField]
     private GameObject _meshParent;
     [SerializeField]
     private GameObject _brokenMesh;
 
     private ShipGravityComponent _gravityComponent;
+    private Light _gravityComponentLight;
     private bool _hasBeenSocketed = false;
 
     public override string GetDisplayName()
@@ -28,6 +33,7 @@ public class ShipGravityCrystalItem : OWItem
         base.Awake();
         _type = ItemType;
         _gravityComponent = SELocator.GetShipTransform().GetComponentInChildren<ShipGravityComponent>();
+        _gravityComponentLight = _gravityComponent.transform.Find("Light_NOM_GravityCrystal").GetComponent<Light>();
 
         if (!(bool)disableGravityCrystal.GetProperty())
         {
@@ -39,6 +45,8 @@ public class ShipGravityCrystalItem : OWItem
     private void Start()
     {
         _forceVolume.SetVolumeActivation(false);
+        _light.enabled = false;
+        _audioSource.AssignAudioLibraryClip(AudioType.NomaiGravCrystalAmbient_LP);
         _brokenMesh.SetActive((bool)disableGravityCrystal.GetProperty());
         _meshParent.SetActive(false);
     }
@@ -46,11 +54,13 @@ public class ShipGravityCrystalItem : OWItem
     private void OnGravityDamaged(ShipComponent component)
     {
         _brokenMesh.SetActive(true);
+        _audioSource.AssignAudioLibraryClip(AudioType.NomaiGravCrystalFlickerAmbient_LP);
     }
 
     private void OnGravityRepaired(ShipComponent component)
     {
         _brokenMesh.SetActive(false);
+        _audioSource.AssignAudioLibraryClip(AudioType.NomaiGravCrystalAmbient_LP);
     }
 
     public override void DropItem(Vector3 position, Vector3 normal, Transform parent, Sector sector, IItemDropTarget customDropTarget)
@@ -58,6 +68,8 @@ public class ShipGravityCrystalItem : OWItem
         base.DropItem(position, normal, parent, sector, customDropTarget);
 
         transform.localScale = Vector3.one;
+
+        _light.enabled = true;
 
         if (!(bool)disableGravityCrystal.GetProperty() && !_gravityComponent.isDamaged)
         {
@@ -75,10 +87,18 @@ public class ShipGravityCrystalItem : OWItem
 
         _meshParent.SetActive(true);
         _gravityComponent.OnComponentDamaged();
+        _light.enabled = false;
 
-        if (!(bool)disableGravityCrystal.GetProperty())
+        _gravityComponent._gravityAudio.FadeOut(0.5f);
+        _gravityComponentLight.enabled = false;
+
+        if (!(bool)disableGravityCrystal.GetProperty() && !_gravityComponent.isDamaged)
         {
             _forceVolume.SetVolumeActivation(false);
+        }      
+        else
+        {
+            _gravityComponent._damageEffect._decalRenderers[0].SetActivation(false);
         }
     }
 
@@ -91,9 +111,18 @@ public class ShipGravityCrystalItem : OWItem
             transform.localScale = Vector3.one;
 
             _meshParent.SetActive(false);
+            _light.enabled = false;
+
+            _gravityComponentLight.enabled = true;
+
             if (!(bool)disableGravityCrystal.GetProperty() && !_gravityComponent.isDamaged)
             {
                 _gravityComponent.OnComponentRepaired();
+                _gravityComponent._gravityAudio.FadeIn(0.5f);
+            }
+            else
+            {
+                _gravityComponent._damageEffect._decalRenderers[0].SetActivation(true);
             }
         }
         else

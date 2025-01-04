@@ -252,7 +252,7 @@ public static class PatchClass
     {
         Locator.GetPlayerTransform().GetComponentInChildren<RoastingStickController>()._stickMaxZ = baseRoastingStickMaxZ;
 
-        if (!(bool)keepHelmetOn.GetProperty() || (!Locator.GetPlayerSuit().IsWearingHelmet() 
+        if (!(bool)keepHelmetOn.GetProperty() || (!Locator.GetPlayerSuit().IsWearingHelmet()
             && (SELocator.GetPlayerResources().IsOxygenPresent() || !PlayerState.IsWearingSuit()))) return true;
 
         if (!__instance._isPlayerRoasting)
@@ -398,7 +398,7 @@ public static class PatchClass
                 {
                     __instance._damaged = true;
 
-                    var eventDelegate2 = (MulticastDelegate)typeof(ShipHull).GetField("OnDamaged", BindingFlags.Instance 
+                    var eventDelegate2 = (MulticastDelegate)typeof(ShipHull).GetField("OnDamaged", BindingFlags.Instance
                         | BindingFlags.NonPublic | BindingFlags.Public).GetValue(__instance);
                     if (eventDelegate2 != null)
                     {
@@ -414,13 +414,13 @@ public static class PatchClass
                 }
             }
             int num3 = 0;
-            while (num3 < __instance._components.Length && (__instance._components[num3] == null 
+            while (num3 < __instance._components.Length && (__instance._components[num3] == null
                 || __instance._components[num3].isDamaged || !__instance._components[num3].ApplyImpact(__instance._dominantImpact)))
             {
                 num3++;
             }
 
-            var eventDelegate3 = (MulticastDelegate)typeof(ShipHull).GetField("OnImpact", BindingFlags.Instance 
+            var eventDelegate3 = (MulticastDelegate)typeof(ShipHull).GetField("OnImpact", BindingFlags.Instance
                 | BindingFlags.NonPublic | BindingFlags.Public).GetValue(__instance);
             if (eventDelegate3 != null)
             {
@@ -1319,7 +1319,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.Update))]
     public static bool ShowConnectionLostNotification(ProbeLauncher __instance)
     {
-        if (!(bool)enableManualScoutRecall.GetProperty() 
+        if (!(bool)enableManualScoutRecall.GetProperty()
             || (__instance.GetName() != ProbeLauncher.Name.Player && __instance.GetName() != ProbeLauncher.Name.Ship)) return true;
 
         PlayerTool_Update(__instance);
@@ -1330,8 +1330,8 @@ public static class PatchClass
         }
         if (__instance._isEquipped && ShipEnhancements.Instance.probeDestroyed)
         {
-            if (OWInput.IsNewlyPressed(InputLibrary.probeLaunch, InputMode.All) 
-                || OWInput.IsNewlyPressed(InputLibrary.toolActionPrimary, InputMode.All) 
+            if (OWInput.IsNewlyPressed(InputLibrary.probeLaunch, InputMode.All)
+                || OWInput.IsNewlyPressed(InputLibrary.toolActionPrimary, InputMode.All)
                 || OWInput.IsNewlyPressed(InputLibrary.toolActionSecondary, InputMode.All))
             {
                 NotificationData notificationData = new NotificationData(UITextLibrary.GetString(UITextType.NotificationUnableToRetrieveProbe));
@@ -1347,7 +1347,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(SingularityWarpEffect), nameof(SingularityWarpEffect.WarpObjectIn))]
     public static bool SkipWarpInEffect(SingularityWarpEffect __instance)
     {
-        if ((!(bool)enableManualScoutRecall.GetProperty() && !(bool)disableScoutRecall.GetProperty()) 
+        if ((!(bool)enableManualScoutRecall.GetProperty() && !(bool)disableScoutRecall.GetProperty())
            || !ProbePickupVolume.canRetrieveProbe)
         {
             return true;
@@ -1393,7 +1393,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.SetActiveProbe))]
     public static bool KeepProbeHidden(ProbeLauncher __instance)
     {
-        if (!(bool)enableManualScoutRecall.GetProperty() || 
+        if (!(bool)enableManualScoutRecall.GetProperty() ||
             (__instance.GetName() != ProbeLauncher.Name.Player && __instance.GetName() != ProbeLauncher.Name.Ship)) return true;
 
         if (ShipEnhancements.Instance.probeDestroyed) return false;
@@ -1603,7 +1603,7 @@ public static class PatchClass
         bool shipItemPlacement = (bool)enableShipItemPlacement.GetProperty();
 
         PlayerCharacterController playerController = Locator.GetPlayerController();
-        if ((!playerController.IsGrounded() && !isTether && !isGravityCrystal) || PlayerState.IsAttached() 
+        if ((!playerController.IsGrounded() && !isTether && !isGravityCrystal) || PlayerState.IsAttached()
             || (PlayerState.IsInsideShip() && (!shipItemPlacement || isTether || isGravityCrystal)))
         {
             __result = false;
@@ -1614,7 +1614,7 @@ public static class PatchClass
             __result = false;
             return false;
         }
-        if (playerController.GetRelativeGroundVelocity().sqrMagnitude >= playerController.GetRunSpeedMagnitude() * playerController.GetRunSpeedMagnitude() 
+        if (playerController.GetRelativeGroundVelocity().sqrMagnitude >= playerController.GetRunSpeedMagnitude() * playerController.GetRunSpeedMagnitude()
             && !isTether && !isGravityCrystal)
         {
             __result = false;
@@ -1660,7 +1660,7 @@ public static class PatchClass
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ItemTool), nameof(ItemTool.DropItem))]
-    public static bool ParentItemsToShipModules(ItemTool __instance, 
+    public static bool ParentItemsToShipModules(ItemTool __instance,
         RaycastHit hit, OWRigidbody targetRigidbody, IItemDropTarget customDropTarget)
     {
         if (customDropTarget != null) return true;
@@ -1720,7 +1720,7 @@ public static class PatchClass
         if (campfire)
         {
             campfire.SetPromptVisibility(false);
-            if (campfire._interactVolumeFocus && !campfire._isPlayerSleeping 
+            if (campfire._interactVolumeFocus && !campfire._isPlayerSleeping
                 && !campfire._isPlayerRoasting && OWInput.IsInputMode(InputMode.Character)
                 && Locator.GetToolModeSwapper().GetToolMode() == ToolMode.None)
             {
@@ -1746,7 +1746,7 @@ public static class PatchClass
             if (campfire._canSleepHere && campfire._interactVolumeFocus && !campfire._isPlayerSleeping
                 && !campfire._isPlayerRoasting && OWInput.IsInputMode(InputMode.Character))
             {
-                campfire._sleepPrompt.SetDisplayState(campfire.CanSleepHereNow() && Locator.GetPlayerController().IsGrounded() 
+                campfire._sleepPrompt.SetDisplayState(campfire.CanSleepHereNow() && Locator.GetPlayerController().IsGrounded()
                     ? ScreenPrompt.DisplayState.Normal : ScreenPrompt.DisplayState.GrayedOut);
             }
             campfire.UpdateCampfire();
@@ -2118,7 +2118,7 @@ public static class PatchClass
         float alarmNoiseRadius = masterAlarm._isAlarmOn ? 350f : 0f;
         ShipThrusterController thrusterController = SELocator.GetShipTransform().GetComponent<ShipThrusterController>();
         float ignitionNoiseRadius = thrusterController._isIgniting ? 500f : 0f;
-        float overdriveNoiseRadius = (bool)enableThrustModulator.GetProperty() && SELocator.GetShipOverdriveController() != null 
+        float overdriveNoiseRadius = (bool)enableThrustModulator.GetProperty() && SELocator.GetShipOverdriveController() != null
             && SELocator.GetShipOverdriveController().IsCharging() ? 300f : 0f;
 
         __instance._noiseRadius = Mathf.Max(thrusterNoiseRadius, __instance._impactNoiseRadius, alarmNoiseRadius, ignitionNoiseRadius, overdriveNoiseRadius);
@@ -2242,7 +2242,7 @@ public static class PatchClass
         {
             AudioSignal strongestSignal = __instance._sigScopeTool.GetStrongestSignal();
 
-            if ((strongestSignal != null && strongestSignal.GetName() != ShipEnhancements.Instance.ShipSignalName) 
+            if ((strongestSignal != null && strongestSignal.GetName() != ShipEnhancements.Instance.ShipSignalName)
                 || (SELocator.GetShipDamageController()?.IsSystemFailed() ?? false))
             {
                 return true;
@@ -2514,7 +2514,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.TriggerSystemFailure))]
     public static void HulkSmashAchievement(ShipDamageController __instance)
     {
-        if (!__instance.IsSystemFailed() 
+        if (!__instance.IsSystemFailed()
             && ShipEnhancements.AchievementsAPI != null && !SEAchievementTracker.HulkSmash
             && (!SEAchievementTracker.ShipExploded || SEAchievementTracker.PlayerCausedExplosion)
             && !SEAchievementTracker.PlayerEjectedCockpit
@@ -2746,7 +2746,7 @@ public static class PatchClass
             __instance._integrity = 1f;
             __instance._damaged = false;
 
-            var repairDelegate = (MulticastDelegate)typeof(ShipHull).GetField("OnRepaired", BindingFlags.Instance 
+            var repairDelegate = (MulticastDelegate)typeof(ShipHull).GetField("OnRepaired", BindingFlags.Instance
                 | BindingFlags.NonPublic | BindingFlags.Public).GetValue(__instance);
             if (repairDelegate != null)
             {
@@ -2915,6 +2915,31 @@ public static class PatchClass
         {
             __result = __instance._isVisible && GUIMode.AreScreenPromptsVisible();
         }
+    }
+    #endregion
+
+    #region RemovableGravityCrystal
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipGravityComponent), nameof(ShipGravityComponent.OnEnterShip))]
+    public static void KeepGravityAudioOff(ShipGravityComponent __instance)
+    {
+        if ((bool)enableRemovableGravityCrystal.GetProperty() && !__instance.GetComponentInChildren<Light>().enabled)
+        {
+            __instance._gravityAudio.FadeOut(0f);
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipComponent), nameof(ShipComponent.SetDamaged))]
+    public static bool KeepGravityCrystalFixed(ShipComponent __instance, bool damaged)
+    {
+        if ((bool)enableRemovableGravityCrystal.GetProperty() && damaged && __instance is ShipGravityComponent
+            && !__instance.GetComponentInChildren<Light>().enabled)
+        {
+            return false;
+        }
+
+        return true;
     }
     #endregion
 }

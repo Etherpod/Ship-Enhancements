@@ -472,6 +472,12 @@
       "value": false,
       "tooltip": "Adds a few hooks inside the ship that you can place anywhere you want. Interact with it to tether yourself to it, and interact with another to create a line between them."
     },
+    "enableRemovableGravityCrystal": {
+      "title": "Enable Removable Gravity Crystal",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Lets you remove the gravity crystal from the ship. It can be placed anywhere on any surface for a portable gravity source."
+    },
     "enableGravityLandingGear": {
       "title": "Add Gravity Landing Gear",
       "type": "toggle",
