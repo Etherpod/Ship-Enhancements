@@ -44,7 +44,7 @@ public class ShipClockController : MonoBehaviour
 
             List<AudioClip> clips = [.. _tickSounds];
             AudioClip nextClip = _tickSounds.Where(clip => clips.IndexOf(clip) != _lastTickIndex).ToArray()[Random.Range(0, _tickSounds.Length - 1)];
-            _audioSource.PlayOneShot(nextClip, 0.1f);
+            _audioSource.PlayOneShot(nextClip, 0.025f);
             _lastTickIndex = clips.IndexOf(nextClip);
             _lastSeconds = seconds;
         }
