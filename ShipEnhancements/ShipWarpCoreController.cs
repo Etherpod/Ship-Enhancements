@@ -20,6 +20,12 @@ public class ShipWarpCoreController : CockpitInteractible
     private bool _warping = false;
     private bool _pressed = false;
     private float _buttonOffset = -0.121f;
+    private GravityCannonController _brittleHollowCannon;
+    private GravityCannonController _emberTwinCannon;
+    private GravityCannonController _targetCannon;
+
+    private readonly string _brittleHollowCannonEntryID = "BH_GRAVITY_CANNON";
+    private readonly string _emberTwinCannonEntryID = "CT_GRAVITY_CANNON";
 
     public override void Awake()
     {
@@ -30,6 +36,9 @@ public class ShipWarpCoreController : CockpitInteractible
 
     private void Start()
     {
+        _brittleHollowCannon = Locator.GetGravityCannon(NomaiShuttleController.ShuttleID.BrittleHollowShuttle);
+        _emberTwinCannon = Locator.GetGravityCannon(NomaiShuttleController.ShuttleID.HourglassShuttle);
+
         _interactReceiver.ChangePrompt("Activate Return Warp");
         _warpEffect.transform.localPosition = _shipPivot.localPosition;
     }
@@ -40,6 +49,20 @@ public class ShipWarpCoreController : CockpitInteractible
         _pressed = true;
 
         if (_receiver == null) return;
+
+        if (ShipLogEntryHUDMarker.s_entryLocationID == _brittleHollowCannonEntryID)
+        {
+            _targetCannon = _brittleHollowCannon;
+        }
+        else if (ShipLogEntryHUDMarker.s_entryLocationID == _emberTwinCannonEntryID)
+        {
+            _targetCannon = _emberTwinCannon;
+        }
+        else
+        {
+            _targetCannon = null;
+            _receiver.SetGravityCannonSocket(null);
+        }
 
         if (PlayerState.IsInsideShip() || PlayerState.AtFlightConsole())
         {
@@ -60,6 +83,8 @@ public class ShipWarpCoreController : CockpitInteractible
         }
         else
         {
+            _shipBody.GetComponentInChildren<ShipTractorBeamSwitch>().DeactivateTractorBeam();
+
             _warpingWithPlayer = false;
             _warpEffect.OnWarpComplete += WarpShip;
             _warpEffect.WarpObjectOut(_warpLength);
@@ -101,6 +126,11 @@ public class ShipWarpCoreController : CockpitInteractible
         {
             _warpEffect.OnWarpComplete -= WarpShip;
             _receiver.PlayRecallEffect(_warpLength, _warpingWithPlayer);
+        }
+        
+        if (_targetCannon != null)
+        {
+            _receiver.SetGravityCannonSocket(_targetCannon._shuttleSocket);
         }
         _receiver.WarpBodyToReceiver(_shipBody, _warpingWithPlayer);
         _interactReceiver.EnableInteraction();
