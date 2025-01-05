@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -143,7 +144,16 @@ public class ShipWarpCoreReceiver : MonoBehaviour
             }
             _suspendedBody = null;
 
-            SELocator.GetShipBody().GetComponentInChildren<ShipTractorBeamSwitch>().ActivateTractorBeam();
+            HatchController hatch = SELocator.GetShipBody().GetComponentInChildren<HatchController>();
+            hatch._triggerVolume.SetTriggerActivation(true);
+            if (!(bool)enableAutoHatch.GetProperty() && !ShipEnhancements.InMultiplayer)
+            {
+                hatch.OpenHatch();
+                if (!(bool)singleUseTractorBeam.GetProperty())
+                {
+                    SELocator.GetShipBody().GetComponentInChildren<ShipTractorBeamSwitch>().ActivateTractorBeam();
+                }
+            }
         }
     }
 }

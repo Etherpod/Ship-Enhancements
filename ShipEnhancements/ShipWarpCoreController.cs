@@ -83,6 +83,9 @@ public class ShipWarpCoreController : CockpitInteractible
         }
         else
         {
+            HatchController hatch = _shipBody.GetComponentInChildren<HatchController>();
+            hatch._triggerVolume.SetTriggerActivation(false);
+            hatch.CloseHatch();
             _shipBody.GetComponentInChildren<ShipTractorBeamSwitch>().DeactivateTractorBeam();
 
             _warpingWithPlayer = false;

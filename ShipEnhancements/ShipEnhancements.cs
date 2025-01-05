@@ -255,6 +255,10 @@ public class ShipEnhancements : ModBehaviour
                     }
                 }
             }
+            if ((string)Settings.temperatureZonesAmount.GetProperty() != "None")
+            {
+                GlobalMessenger.RemoveListener("StartShipIgnition", OnStartShipIgnition);
+            }
             if (AchievementsAPI != null)
             {
                 SELocator.GetShipDamageController().OnShipComponentDamaged -= ctx => CheckAllPartsDamaged();
@@ -687,6 +691,8 @@ public class ShipEnhancements : ModBehaviour
             SELocator.GetShipBody().GetComponentInChildren<ShipFuelGauge>().gameObject.AddComponent<ShipTemperatureGauge>();
             GameObject hullTempDial = LoadPrefab("Assets/ShipEnhancements/ShipTempDial.prefab");
             Instantiate(hullTempDial, SELocator.GetShipTransform().Find("Module_Cockpit"));
+
+            GlobalMessenger.AddListener("StartShipIgnition", OnStartShipIgnition);
 
             if (Settings.temperatureZonesAmount.GetProperty().ToString() == "Sun")
             {
@@ -1373,6 +1379,27 @@ public class ShipEnhancements : ModBehaviour
         }
 
         SELocator.GetShipTransform().Find("Audio_Ship/SystemOnlineAudio(Clone)")?.GetComponent<OWAudioSource>().PlayOneShot(AudioType.TH_ZeroGTrainingAllRepaired, 1f);
+    }
+
+    private void OnStartShipIgnition()
+    {
+        /*ShipTemperatureDetector detector = SELocator.GetShipTemperatureDetector();
+        if (detector == null) return;
+
+        float ratio = detector.GetInternalTemperatureRatio();
+        WriteDebugMessage("Ratio: " + ratio);
+        if (ratio < 0.25f)
+        {
+            float lerp = Mathf.InverseLerp(0.25f, 0f, ratio);
+            WriteDebugMessage("Lerp: " + lerp);
+            if (UnityEngine.Random.value < lerp)
+            {
+                WriteDebugMessage("Run code");
+                SELocator.GetShipBody().GetComponent<ShipThrusterController>()._isIgniting = false;
+                GlobalMessenger.FireEvent("CancelShipIgnition");
+                SELocator.GetShipBody().GetComponentInChildren<ShipThrusterAudio>()._ignitionSource.PlayOneShot(LoadAudio("Assets/ShipEnhancements/AudioClip/ShipEngineSputter.ogg"));
+            }
+        }*/
     }
 
     #endregion

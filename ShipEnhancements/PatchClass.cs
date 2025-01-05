@@ -830,6 +830,8 @@ public static class PatchClass
     #endregion
 
     #region TemperatureZone
+    public static bool EngineSputtering = false;
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(SunController), nameof(SunController.UpdateScale))]
     public static void UpdateSunTempZone(SunController __instance, float scale)
@@ -859,12 +861,106 @@ public static class PatchClass
         __instance.transform.parent.GetComponentInChildren<TemperatureZone>()?.SetVolumeActive(__instance._state == Campfire.State.LIT);
     }
 
-    /*[HarmonyPostfix]
-    [HarmonyPatch(typeof(Campfire), nameof(Campfire.Start))]
-    public static void InitializeCampfireTemperatureZone(Campfire __instance)
+    public static Vector3 AddIgnitionSputter(ShipThrusterController __instance)
     {
-        __instance.GetComponentInChildren<TemperatureZone>()?.SetVolumeActive(__instance._state == Campfire.State.LIT);
-    }*/
+        float value = OWInput.GetValue(InputLibrary.thrustX, InputMode.All);
+        float value2 = OWInput.GetValue(InputLibrary.thrustZ, InputMode.All);
+        float value3 = OWInput.GetValue(InputLibrary.thrustUp, InputMode.All);
+        float value4 = OWInput.GetValue(InputLibrary.thrustDown, InputMode.All);
+        if (!OWInput.IsInputMode(InputMode.ShipCockpit | InputMode.LandingCam))
+        {
+            return Vector3.zero;
+        }
+        if (!__instance._shipResources.AreThrustersUsable())
+        {
+            return Vector3.zero;
+        }
+        if (__instance._autopilot.IsFlyingToDestination())
+        {
+            return Vector3.zero;
+        }
+        Vector3 vector = new Vector3(value, 0f, value2);
+        if (vector.sqrMagnitude > 1f)
+        {
+            vector.Normalize();
+        }
+        vector.y = value3 - value4;
+
+        if (__instance._requireIgnition && __instance._landingManager.IsLanded())
+        {
+            vector.x = 0f;
+            vector.z = 0f;
+            vector.y = Mathf.Clamp01(vector.y);
+            if (!__instance._isIgniting && __instance._lastTranslationalInput.y <= 0f && vector.y > 0f)
+            {
+                __instance._isIgniting = true;
+                float ratio = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
+                if (UnityEngine.Random.value < Mathf.InverseLerp(0.25f, -0.08f, ratio))
+                {
+                    AudioClip sputterClip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/ShipEngineSputter.ogg");
+                    ShipThrusterAudio thrusterAudio = __instance.GetComponentInChildren<ShipThrusterAudio>();
+                    thrusterAudio._ignitionSource.Stop();
+                    thrusterAudio._isIgnitionPlaying = true;
+                    thrusterAudio._ignitionSource.PlayOneShot(sputterClip);
+                    EngineSputtering = true;
+                }
+                else
+                {
+                    __instance._ignitionTime = Time.time;
+                }
+            }
+            if (__instance._isIgniting)
+            {
+                if (vector.y <= 0f)
+                {
+                    __instance._isIgniting = false;
+                    EngineSputtering = false;
+                    GlobalMessenger.FireEvent("CancelShipIgnition");
+                }
+
+                if (EngineSputtering || Time.time < __instance._ignitionTime + __instance._ignitionDuration)
+                {
+                    vector.y = 0f;
+                }
+                else if (__instance._isIgniting)
+                {
+                    __instance._isIgniting = false;
+                    __instance._requireIgnition = false;
+                    GlobalMessenger.FireEvent("CompleteShipIgnition");
+                    RumbleManager.PlayShipIgnition();
+                    RumbleManager.SetShipThrottleNormal();
+                }
+            }
+        }
+
+        float num = Mathf.Min(__instance._rulesetDetector.GetThrustLimit(), __instance._thrusterModel.GetMaxTranslationalThrust()) / __instance._thrusterModel.GetMaxTranslationalThrust();
+        Vector3 vector2 = vector * num;
+        if (__instance._limitOrbitSpeed && __instance._shipAlignment.IsAligning() && vector2.magnitude > 0f)
+        {
+            Vector3 vector3 = __instance._landingRF.GetOWRigidBody().GetWorldCenterOfMass() - __instance._shipBody.GetWorldCenterOfMass();
+            Vector3 vector4 = __instance._shipBody.GetVelocity() - __instance._landingRF.GetVelocity();
+            Vector3 vector5 = vector4 - Vector3.Project(vector4, vector3);
+            Vector3 vector6 = Quaternion.FromToRotation(-__instance._shipBody.transform.up, vector3) * __instance._shipBody.transform.TransformDirection(vector2 * __instance._thrusterModel.GetMaxTranslationalThrust());
+            Vector3 vector7 = Vector3.Project(vector6, vector3);
+            Vector3 vector8 = vector6 - vector7;
+            Vector3 vector9 = vector5 + vector8 * Time.deltaTime;
+            float magnitude = vector9.magnitude;
+            float orbitSpeed = __instance._landingRF.GetOrbitSpeed(vector3.magnitude);
+            if (magnitude > orbitSpeed)
+            {
+                vector9 = vector9.normalized * orbitSpeed;
+                vector8 = (vector9 - vector5) / Time.deltaTime;
+                vector6 = vector7 + vector8;
+                vector2 = __instance._shipBody.transform.InverseTransformDirection(vector6 / __instance._thrusterModel.GetMaxTranslationalThrust());
+                if (vector2.sqrMagnitude > 1f)
+                {
+                    vector2.Normalize();
+                }
+            }
+        }
+        __instance._lastTranslationalInput = vector;
+        return vector2;
+    }
     #endregion
 
     #region DisableReferenceFrame
@@ -2069,15 +2165,6 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.ExitFlightConsole))]
     public static void IgnitionCancelFix()
     {
-        /*if ((bool)shipIgnitionCancelFix.GetProperty())
-        {
-            ShipThrusterController thrustController = SELocator.GetShipBody().GetComponent<ShipThrusterController>();
-            if (thrustController && thrustController._isIgniting)
-            {
-                thrustController._isIgniting = false;
-                GlobalMessenger.FireEvent("CancelShipIgnition");
-            }
-        }*/
         ShipThrusterController thrustController = SELocator.GetShipBody().GetComponent<ShipThrusterController>();
         if (thrustController && thrustController._isIgniting)
         {
@@ -2097,6 +2184,13 @@ public static class PatchClass
             __result = Vector3.zero;
             return false;
         }
+
+        else if (SELocator.GetShipTemperatureDetector() != null && SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio() < 0.25f)
+        {
+            __result = AddIgnitionSputter(__instance);
+            return false;
+        }
+
         return true;
     }
     #endregion
