@@ -32,7 +32,7 @@ public class FuelTankTemperatureDetector : TemperatureDetector
             return;
         }
 
-        if (Time.time > _nextGroanTime)
+        if (Time.time > _nextGroanTime && _currentTemperature > 0f)
         {
             _nextGroanTime = Time.time + Random.Range(_groanIntervalMin, _groanIntervalMax);
             _fuelTank.PlayGroan();

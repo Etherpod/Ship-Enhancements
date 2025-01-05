@@ -907,6 +907,7 @@ public static class PatchClass
                 else
                 {
                     __instance._ignitionTime = Time.time;
+                    GlobalMessenger.FireEvent("StartShipIgnition");
                 }
             }
             if (__instance._isIgniting)
@@ -917,18 +918,20 @@ public static class PatchClass
                     EngineSputtering = false;
                     GlobalMessenger.FireEvent("CancelShipIgnition");
                 }
-
-                if (EngineSputtering || Time.time < __instance._ignitionTime + __instance._ignitionDuration)
+                else
                 {
-                    vector.y = 0f;
-                }
-                else if (__instance._isIgniting)
-                {
-                    __instance._isIgniting = false;
-                    __instance._requireIgnition = false;
-                    GlobalMessenger.FireEvent("CompleteShipIgnition");
-                    RumbleManager.PlayShipIgnition();
-                    RumbleManager.SetShipThrottleNormal();
+                    if (EngineSputtering || Time.time < __instance._ignitionTime + __instance._ignitionDuration)
+                    {
+                        vector.y = 0f;
+                    }
+                    else
+                    {
+                        __instance._isIgniting = false;
+                        __instance._requireIgnition = false;
+                        GlobalMessenger.FireEvent("CompleteShipIgnition");
+                        RumbleManager.PlayShipIgnition();
+                        RumbleManager.SetShipThrottleNormal();
+                    }
                 }
             }
         }
@@ -960,6 +963,18 @@ public static class PatchClass
         }
         __instance._lastTranslationalInput = vector;
         return vector2;
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(RulesetDetector), nameof(RulesetDetector.GetThrustLimit))]
+    public static void ShipFreezingThrustDebuff(RulesetDetector __instance, ref float __result)
+    {
+        if (__instance.CompareTag("ShipDetector") && SELocator.GetShipTemperatureDetector() != null)
+        {
+            float ratio = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
+            float lerp = Mathf.InverseLerp(0.5f, 0f, ratio);
+            __result *= 1 - (0.5f * lerp);
+        }
     }
     #endregion
 

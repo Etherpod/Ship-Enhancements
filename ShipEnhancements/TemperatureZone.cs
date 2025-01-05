@@ -25,7 +25,7 @@ public class TemperatureZone : MonoBehaviour
     private void Start()
     {
         _shape = GetComponent<SphereShape>();
-        _triggerVolume = GetComponent<OWTriggerVolume>();
+        _triggerVolume = gameObject.GetAddComponent<OWTriggerVolume>();
 
         _triggerVolume.OnEntry += OnEffectVolumeEnter;
         _triggerVolume.OnExit += OnEffectVolumeExit;

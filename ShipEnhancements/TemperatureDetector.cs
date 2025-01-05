@@ -11,6 +11,7 @@ public class TemperatureDetector : MonoBehaviour
     protected bool _highTemperature = false;
     protected float _internalTempMeterLength;
     protected float _internalTempMeter;
+    protected bool _updateNextFrame = false;
 
     protected virtual void Start()
     {
@@ -21,7 +22,7 @@ public class TemperatureDetector : MonoBehaviour
 
     protected virtual void Update()
     {
-        if (_activeZones.Count > 0)
+        if (_activeZones.Count > 0 || _updateNextFrame)
         {
             float totalTemperature = 0f;
             foreach (TemperatureZone zone in _activeZones)
@@ -52,6 +53,11 @@ public class TemperatureDetector : MonoBehaviour
                 }
 
                 UpdateHighTemperature();
+            }
+            
+            if (_updateNextFrame)
+            {
+                _updateNextFrame = false;
             }
         }
 
@@ -127,6 +133,16 @@ public class TemperatureDetector : MonoBehaviour
         if (_activeZones.Contains(zone))
         {
             _activeZones.Remove(zone);
+            if (_activeZones.Count == 0)
+            {
+                _updateNextFrame = true;
+            }
         }
+    }
+
+    public virtual void RemoveAllZones()
+    {
+        _activeZones.Clear();
+        _updateNextFrame = true;
     }
 }

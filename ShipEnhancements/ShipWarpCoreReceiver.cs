@@ -36,6 +36,11 @@ public class ShipWarpCoreReceiver : MonoBehaviour
 
     public void WarpBodyToReceiver(OWRigidbody body, bool inShip)
     {
+        /*if ((string)temperatureZonesAmount.GetProperty() != "None")
+        {
+            SELocator.GetShipTemperatureDetector().RemoveAllZones();
+        }*/
+
         if (_gravityCannonSocket != null)
         {
             body.WarpToPositionRotation(_gravityCannonSocket.position + _gravityCannonSocket.up * 4f, _gravityCannonSocket.rotation);

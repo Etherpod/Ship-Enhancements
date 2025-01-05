@@ -30,6 +30,7 @@ public class ShipEngineSwitch : CockpitInteractible
     private ShipThrusterController _thrusterController;
     private ShipAudioController _audioController;
     private MasterAlarm _alarm;
+    private AudioClip _engineSputterClip;
     private bool _turnSwitch = false;
     private float _turnTime = 0.15f;
     private float _turningT;
@@ -39,6 +40,7 @@ public class ShipEngineSwitch : CockpitInteractible
     private float _ignitionTime;
     private float _ignitionDuration;
     private bool _completedIgnition = false;
+    private bool _engineStalling = false;
     private Color _indicatorLightColor = new Color(1.3f, 0.55f, 0.55f);
     private bool _lastShipPowerState = false;
     private bool _reset = true;
@@ -66,6 +68,7 @@ public class ShipEngineSwitch : CockpitInteractible
         _thrusterController = SELocator.GetShipBody().GetComponent<ShipThrusterController>();
         _audioController = SELocator.GetShipBody().GetComponentInChildren<ShipAudioController>();
         _alarm = SELocator.GetShipTransform().GetComponentInChildren<MasterAlarm>();
+        _engineSputterClip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/ShipEngineSputter.ogg");
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
         ShipEnhancements.Instance.OnFuelDepleted += OnFuelDepleted;
@@ -129,11 +132,32 @@ public class ShipEngineSwitch : CockpitInteractible
                 if (!_completedTurn)
                 {
                     _completedTurn = true;
-                    _ignitionTime = Time.time;
-                    _thrusterController._isIgniting = true;
-                    GlobalMessenger.FireEvent("StartShipIgnition");
+
+                    if (SELocator.GetShipTemperatureDetector() != null)
+                    {
+                        float ratio = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
+                        if (Random.value < Mathf.InverseLerp(0.25f, -0.08f, ratio))
+                        {
+                            AudioClip sputterClip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/ShipEngineSputter.ogg");
+                            ShipThrusterAudio thrusterAudio = _thrusterController.GetComponentInChildren<ShipThrusterAudio>();
+                            thrusterAudio._ignitionSource.Stop();
+                            thrusterAudio._isIgnitionPlaying = true;
+                            thrusterAudio._ignitionSource.PlayOneShot(sputterClip);
+                            _engineStalling = true;
+                        }
+                        else
+                        {
+                            _ignitionTime = Time.time;
+                            GlobalMessenger.FireEvent("StartShipIgnition");
+                        }
+                    }
+                    else
+                    {
+                        _ignitionTime = Time.time;
+                        GlobalMessenger.FireEvent("StartShipIgnition");
+                    }
                 }
-                if (!_completedIgnition && Time.time > _ignitionTime + _ignitionDuration)
+                if (!_completedIgnition && !_engineStalling && Time.time > _ignitionTime + _ignitionDuration)
                 {
                     _completedIgnition = true;
                     ShipEnhancements.Instance.SetEngineOn(true);
@@ -147,7 +171,7 @@ public class ShipEngineSwitch : CockpitInteractible
                     _alarm.UpdateAlarmState();
                     _audioController.PlayShipAmbient();
                     StartCoroutine(ActivateIndicatorLights(electricalComponent._electricalSystem._systemDelay));
-                    _thrusterController._isIgniting = false;
+                    //_thrusterController._isIgniting = false;
                     _interactReceiver.ChangePrompt("Turn off engine");
                     _interactReceiver.EnableInteraction();
                     GlobalMessenger.FireEvent("CompleteShipIgnition");
@@ -294,7 +318,8 @@ public class ShipEngineSwitch : CockpitInteractible
         {
             _turnSwitch = false;
             _completedTurn = false;
-            _thrusterController._isIgniting = false;
+            //_thrusterController._isIgniting = false;
+            _engineStalling = false;
             GlobalMessenger.FireEvent("CancelShipIgnition");
             if (_audioSource.isPlaying)
             {

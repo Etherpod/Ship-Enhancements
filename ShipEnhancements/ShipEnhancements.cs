@@ -255,10 +255,6 @@ public class ShipEnhancements : ModBehaviour
                     }
                 }
             }
-            if ((string)Settings.temperatureZonesAmount.GetProperty() != "None")
-            {
-                GlobalMessenger.RemoveListener("StartShipIgnition", OnStartShipIgnition);
-            }
             if (AchievementsAPI != null)
             {
                 SELocator.GetShipDamageController().OnShipComponentDamaged -= ctx => CheckAllPartsDamaged();
@@ -692,8 +688,6 @@ public class ShipEnhancements : ModBehaviour
             GameObject hullTempDial = LoadPrefab("Assets/ShipEnhancements/ShipTempDial.prefab");
             Instantiate(hullTempDial, SELocator.GetShipTransform().Find("Module_Cockpit"));
 
-            GlobalMessenger.AddListener("StartShipIgnition", OnStartShipIgnition);
-
             if (Settings.temperatureZonesAmount.GetProperty().ToString() == "Sun")
             {
                 GameObject sun = GameObject.Find("Sun_Body");
@@ -728,9 +722,9 @@ public class ShipEnhancements : ModBehaviour
                 SetupExplosion(effectsTransform, explosion);
             }
         }
-        if ((float)Settings.shipBounciness.GetProperty() > 0f)
+        if ((float)Settings.shipBounciness.GetProperty() > 0f || true)
         {
-            SELocator.GetShipTransform().gameObject.AddComponent<ShipBouncyHull>();
+            SELocator.GetShipTransform().gameObject.AddComponent<ModifiedShipHull>();
         }
         if ((bool)Settings.enablePersistentInput.GetProperty())
         {
@@ -1057,6 +1051,13 @@ public class ShipEnhancements : ModBehaviour
             Instantiate(dbTempZone, db.transform.Find("Sector_DB"));
         }
 
+        GameObject escapePodDimension = GameObject.Find("DB_EscapePodDimension_Body");
+        if (escapePodDimension != null)
+        {
+            GameObject podDimensionTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_EscapePodDimension.prefab");
+            Instantiate(podDimensionTempZone, escapePodDimension.transform.Find("Sector_EscapePodDimension"));
+        }
+
         GameObject comet = GameObject.Find("Comet_Body");
         if (comet != null)
         {
@@ -1073,6 +1074,13 @@ public class ShipEnhancements : ModBehaviour
             Instantiate(gdTempZone1, gd.transform.Find("Sector_GD/Sector_GDInterior"));
             GameObject gdTempZone2 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_GiantsDeepCore.prefab");
             Instantiate(gdTempZone2, gd.transform.Find("Sector_GD/Sector_GDInterior"));
+        }
+
+        GameObject brambleIsland = GameObject.Find("BrambleIsland_Body");
+        if (brambleIsland != null)
+        {
+            GameObject brambleIslandTempZones = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_BrambleIsland.prefab");
+            Instantiate(brambleIslandTempZones, brambleIsland.transform.Find("Sector_BrambleIsland"));
         }
 
         GameObject bh = GameObject.Find("BrittleHollow_Body");
@@ -1100,6 +1108,13 @@ public class ShipEnhancements : ModBehaviour
             Instantiate(ctTempZone1, ct.transform.Find("Sector_CaveTwin"));
             GameObject ctTempZone2 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_CaveTwinCold.prefab");
             Instantiate(ctTempZone2, ct.transform.Find("Sector_CaveTwin"));
+        }
+
+        GameObject whs = GameObject.Find("WhiteholeStationSuperstructure_Body");
+        if (whs != null)
+        {
+            GameObject whsTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_WhiteHoleStation.prefab");
+            Instantiate(whsTempZone, whs.transform);
         }
 
         Campfire[] campfires = FindObjectsOfType<Campfire>();
@@ -1379,27 +1394,6 @@ public class ShipEnhancements : ModBehaviour
         }
 
         SELocator.GetShipTransform().Find("Audio_Ship/SystemOnlineAudio(Clone)")?.GetComponent<OWAudioSource>().PlayOneShot(AudioType.TH_ZeroGTrainingAllRepaired, 1f);
-    }
-
-    private void OnStartShipIgnition()
-    {
-        /*ShipTemperatureDetector detector = SELocator.GetShipTemperatureDetector();
-        if (detector == null) return;
-
-        float ratio = detector.GetInternalTemperatureRatio();
-        WriteDebugMessage("Ratio: " + ratio);
-        if (ratio < 0.25f)
-        {
-            float lerp = Mathf.InverseLerp(0.25f, 0f, ratio);
-            WriteDebugMessage("Lerp: " + lerp);
-            if (UnityEngine.Random.value < lerp)
-            {
-                WriteDebugMessage("Run code");
-                SELocator.GetShipBody().GetComponent<ShipThrusterController>()._isIgniting = false;
-                GlobalMessenger.FireEvent("CancelShipIgnition");
-                SELocator.GetShipBody().GetComponentInChildren<ShipThrusterAudio>()._ignitionSource.PlayOneShot(LoadAudio("Assets/ShipEnhancements/AudioClip/ShipEngineSputter.ogg"));
-            }
-        }*/
     }
 
     #endregion
