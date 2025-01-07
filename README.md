@@ -35,12 +35,14 @@ Change some of the values that control how the ship works.
 - **Idle Fuel Consumption Multiplier**: Larger numbers increase how quickly your fuel drains over time. If the Engine Switch is enabled, it will not drain fuel while the ship is off.
 - **Damage Multiplier**: Larger numbers increase the damage done to the ship hull and increase the probability that components will be damaged on impact.
 - **Damage Speed Multiplier**: Larger numbers increase the speed you need to be traveling at before taking damage. Set this to something really small to blow up your ship when you touch something.
+- **Random Hull Damage**: Applies random damage to a random set of hulls on the start of the loop. The slider controls the percentage of hulls to be damaged- minimum is none, maximum is all of them- and how much damage to do to them.
+- **Random Component Damage**: Breaks a set number of random components at the start of the loop. The silder controls the percentage of components to be damaged, where the minimum is none and the maximum is all of them. The vital ship components (reactor, fuel tank, one random thruster) are excluded from being selected.
 - **Enable Stun Damage**: Blocks all of your inputs for a short time after you crash. The harder you hit something, the longer you'll be frozen.
 - **Repair Time Multiplier**: Larger numbers increase the time it takes to repair parts of your ship.
 - **Ship Gravity Multiplier**: Larger numbers increase the strength of your ship's gravity crystal. Large numbers are advised against, however, as exiting your ship will kill you.
 - **Ship Gravity Direction**: Lets you change the direction of your ship's gravity. Set this to Random if you feel like the game isn't painful enough.
 - **Atmosphere/Space Angular Drag Multiplier**: Larger numbers make it harder to turn your ship. Setting this to 0 lets you spin your ship forever.
-- **Disable Rotation Speed Limit**: Lets you spin your ship as quickly as you want, though spinning too fast may tear your ship apart. Enabling this may quickly lead to motion sickness.
+- **Disable Rotation Speed Limit**: Lets you spin your ship as quickly as you want. Enabling this may quickly lead to motion sickness.
 - **Air Drag Multiplier**: Larger numbers make atmospheres slow you down more. Setting this to 0 lets your ship drift endlessly through the air.
 - **Chaotic Cyclones**: Adjusts cyclones to apply an additional upwards spin to your ship while inside of them to make for an even more disorienting experience.
 - **Ship Explosion Multiplier**: Larger numbers increase the size of the explosion that is created when your ship blows up. Set this to something between 10 and 30 to simulate an atomic bomb.
