@@ -22,6 +22,7 @@ public class ShipGravityCrystalItem : OWItem
     private ShipGravityComponent _gravityComponent;
     private Light _gravityComponentLight;
     private bool _hasBeenSocketed = false;
+    private float _baseFieldStrength;
 
     public override string GetDisplayName()
     {
@@ -46,6 +47,8 @@ public class ShipGravityCrystalItem : OWItem
     {
         _forceVolume.SetVolumeActivation(false);
         _light.enabled = false;
+        _baseFieldStrength = _gravityComponent._gravityVolume._fieldMagnitude;
+        _forceVolume.SetFieldMagnitude(_baseFieldStrength * (float)gravityMultiplier.GetProperty());
         _audioSource.AssignAudioLibraryClip(AudioType.NomaiGravCrystalAmbient_LP);
         _brokenMesh.SetActive((bool)disableGravityCrystal.GetProperty());
         _meshParent.SetActive(false);
