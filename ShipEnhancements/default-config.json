@@ -126,12 +126,6 @@
       "value": false,
       "tooltip": "Allows your ship to rotate freely in water."
     },
-    "disableRotationSpeedLimit": {
-      "title": "Disable Rotation Speed Limit",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Lets you spin your ship as quickly as you want. DO NOT ENABLE IF YOU ARE PRONE TO MOTION SICKNESS."
-    },
     "disableShipFriction": {
       "title": "Disable Ship Friction",
       "type": "toggle",
@@ -179,18 +173,6 @@
       "value": 1,
       "tooltip": "Larger numbers increase the amount of fuel that drains when the fuel tank is damaged in addition to the regular drain rate. The default speed is about 10 times faster."
     },
-    "oxygenRefillMultiplier": {
-      "title": "Oxygen Refill Multiplier",
-      "type": "number",
-      "value": 1,
-      "tooltip": "Larger numbers increase the speed at which the ship oxygen refills. The default speed takes about a minute to completely refill."
-    },
-    "fuelTransferMultiplier": {
-      "title": "Fuel Transfer Multiplier",
-      "type": "number",
-      "value": 1,
-      "tooltip": "Larger numbers increase the amount of fuel added to the ship when transferring fuel, and also increase the amount of fuel subtracted when refueling the jetpack."
-    },
     "idleFuelConsumptionMultiplier": {
       "title": "Idle Fuel Consumption Multiplier",
       "type": "number",
@@ -209,17 +191,11 @@
       "value": 1,
       "tooltip": "Larger numbers increase the minimum speed for taking impact damage. Set this to something super small to blow up your ship when you touch something."
     },
-    "temperatureDamageMultiplier": {
-      "title": "Temperature Damage Multiplier",
-      "type": "number",
-      "value": 1,
-      "tooltip": "Larger numbers increase the damage that the ship takes from extreme temperatures."
-    },
-    "temperatureResistanceMultiplier": {
-      "title": "Temperature Resistance Multiplier",
-      "type": "number",
-      "value": 1,
-      "tooltip": "Larger numbers increase the time the ship can resist extreme temperatures. The default resistance gives the ship around 3 minutes before the hull reaches max temperature, meaning max damage."
+    "enableStunDamage": {
+      "title": "Enable Stun Damage",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Temporarily stuns you if you hit something too hard with the ship."
     },
     "repairTimeMultiplier": {
       "title": "Repair Time Multiplier",
@@ -259,6 +235,12 @@
       "type": "number",
       "value": 1,
       "tooltip": "Larger numbers make your ship harder to turn while in space. Set to zero to make your ship spin forever. WARNING: Values below 1 may cause motion sickness."
+    },
+    "disableRotationSpeedLimit": {
+      "title": "Disable Rotation Speed Limit",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Lets you spin your ship as quickly as you want. DO NOT ENABLE IF YOU ARE PRONE TO MOTION SICKNESS."
     },
     "airDragMultiplier": {
       "title": "Air Drag Multiplier",
@@ -308,12 +290,6 @@
       "value": 0,
       "tooltip": "Adds a delay while piloting the ship between when you press the button and when the ship recieves the input. Now you can pretend you're playing online!"
     },
-    "enableStunDamage": {
-      "title": "Enable Stun Damage",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Temporarily stuns you if you hit something too hard with the ship."
-    },
 
     "Add Ship Functions": {
       "type": "separator"
@@ -324,6 +300,12 @@
       "type": "toggle",
       "value": false,
       "tooltip": "Refills the ship's oxygen tank when near oxygen sources. Doesn't work when oxygen is disabled."
+    },
+    "oxygenRefillMultiplier": {
+      "title": "Oxygen Refill Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers increase the speed at which the ship oxygen refills. The default speed takes about a minute to completely refill."
     },
     "enableShipFuelTransfer": {
       "title": "Enable Ship Fuel Transfer",
@@ -336,6 +318,12 @@
       "type": "toggle",
       "value": false,
       "tooltip": "Drains the ship's fuel when you refill your jetpack in the ship."
+    },
+    "fuelTransferMultiplier": {
+      "title": "Fuel Transfer Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers increase the amount of fuel added to the ship when transferring fuel, and also increase the amount of fuel subtracted when refueling the jetpack."
     },
     "enableAutoHatch": {
       "title": "Enable Automatic Hatch",
@@ -364,7 +352,7 @@
         "Sun",
         "All"
       ],
-      "tooltip": "Determines whether to add temperature zones around the entire solar system, just around the sun, or to add none at all."
+      "tooltip": "Determines whether to add temperature zones around the entire solar system, just around the sun, or to add none at all. Check the README for more details about temperature zones."
     },
     "hullTemperatureDamage": {
       "title": "Enable Hull Temperature Damage",
@@ -377,6 +365,18 @@
       "type": "toggle",
       "value": false,
       "tooltip": "Damages the ship components over time in extremely high or low temperatures."
+    },
+    "temperatureDamageMultiplier": {
+      "title": "Temperature Damage Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers increase the damage that the ship takes from extreme temperatures."
+    },
+    "temperatureResistanceMultiplier": {
+      "title": "Temperature Resistance Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers increase the time the ship can resist extreme temperatures. The default resistance gives the ship around 3 minutes before the hull reaches max temperature, meaning max damage."
     },
     "enableRepairConfirmation": {
       "title": "Enable Repair Confirmation",
@@ -500,7 +500,7 @@
       "title": "Add Engine Switch",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds a switch to the cockpit that turns on the ship. If you turned on idle fuel consumption it will only drain fuel while the ship is on."
+      "tooltip": "Adds a switch to the cockpit that turns on the ship. If you turned on Idle Fuel Consumption, it will only drain fuel while the ship is on."
     },
 
     "Decoration": {
