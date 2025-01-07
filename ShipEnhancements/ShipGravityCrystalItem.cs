@@ -49,7 +49,14 @@ public class ShipGravityCrystalItem : OWItem
         _light.enabled = false;
         _baseFieldStrength = _gravityComponent._gravityVolume._fieldMagnitude;
         _forceVolume.SetFieldMagnitude(_baseFieldStrength * (float)gravityMultiplier.GetProperty());
-        _audioSource.AssignAudioLibraryClip(AudioType.NomaiGravCrystalAmbient_LP);
+        if (!(bool)disableGravityCrystal.GetProperty() && !_gravityComponent.isDamaged)
+        {
+            _audioSource.AssignAudioLibraryClip(AudioType.NomaiGravCrystalAmbient_LP);
+        }
+        else
+        {
+            _audioSource.AssignAudioLibraryClip(AudioType.NomaiGravCrystalFlickerAmbient_LP);
+        }
         _brokenMesh.SetActive((bool)disableGravityCrystal.GetProperty());
         _meshParent.SetActive(false);
     }
@@ -72,7 +79,7 @@ public class ShipGravityCrystalItem : OWItem
 
         transform.localScale = Vector3.one;
 
-        _light.enabled = true;
+        _light.enabled = !(bool)disableGravityCrystal.GetProperty();
 
         if (!(bool)disableGravityCrystal.GetProperty() && !_gravityComponent.isDamaged)
         {
@@ -102,6 +109,7 @@ public class ShipGravityCrystalItem : OWItem
         else
         {
             _gravityComponent._damageEffect._decalRenderers[0].SetActivation(false);
+            _gravityComponent._damageEffect._particleSystem.Stop();
         }
     }
 
@@ -116,8 +124,6 @@ public class ShipGravityCrystalItem : OWItem
             _meshParent.SetActive(false);
             _light.enabled = false;
 
-            _gravityComponentLight.enabled = true;
-
             if (!(bool)disableGravityCrystal.GetProperty() && !_gravityComponent.isDamaged)
             {
                 _gravityComponent.OnComponentRepaired();
@@ -125,6 +131,11 @@ public class ShipGravityCrystalItem : OWItem
             }
             else
             {
+                if (!(bool)disableGravityCrystal.GetProperty())
+                {
+                    _gravityComponentLight.enabled = true;
+                    _gravityComponent._damageEffect._particleSystem.Play();
+                }
                 _gravityComponent._damageEffect._decalRenderers[0].SetActivation(true);
             }
         }

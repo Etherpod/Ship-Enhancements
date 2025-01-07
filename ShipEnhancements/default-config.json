@@ -191,6 +191,22 @@
       "value": 1,
       "tooltip": "Larger numbers increase the minimum speed for taking impact damage. Set this to something super small to blow up your ship when you touch something."
     },
+    "randomHullDamage": {
+      "title": "Random Hull Damage",
+      "type": "slider",
+      "min": 0,
+      "max": 1,
+      "value": 0,
+      "tooltip": "Deals a random amount of damage to a number of hulls at the start of the loop. A minimum value means no hulls are damaged and a maximum value means every hull is damaged."
+    },
+    "randomComponentDamage": {
+      "title": "Random Component Damage",
+      "type": "slider",
+      "min": 0,
+      "max": 1,
+      "value": 0,
+      "tooltip": "Breaks a number of the ship's components excluding the important ones. A minimum value means no components are damaged and a maximum value means every component is damaged."
+    },
     "enableStunDamage": {
       "title": "Enable Stun Damage",
       "type": "toggle",

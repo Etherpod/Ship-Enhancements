@@ -159,6 +159,8 @@ public class ShipEnhancements : ModBehaviour
         enableRepairConfirmation,
         shipGravityFix,
         enableRemovableGravityCrystal,
+        randomHullDamage,
+        randomComponentDamage,
     }
 
     private void Awake()
@@ -284,6 +286,11 @@ public class ShipEnhancements : ModBehaviour
     private void Update()
     {
         if (!_shipLoaded || LoadManager.GetCurrentScene() != OWScene.SolarSystem || _shipDestroyed) return;
+
+        if (OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.Character))
+        {
+            SELocator.GetShipBody().GetComponentInChildren<HatchController>().OpenHatch();
+        }
 
         if (SELocator.GetShipBody().GetAngularVelocity().sqrMagnitude > maxSpinSpeed * maxSpinSpeed)
         {
@@ -982,6 +989,96 @@ public class ShipEnhancements : ModBehaviour
                 foreach (GameObject tool in pickupVolume._toolGeometry)
                 {
                     tool.SetActive(false);
+                }
+            }
+            if ((float)Settings.randomHullDamage.GetProperty() > 0f)
+            {
+                float lerp = (float)Settings.randomHullDamage.GetProperty();
+                List<ShipHull> hulls = [.. SELocator.GetShipDamageController()._shipHulls];
+                int iterations = Mathf.RoundToInt(Mathf.Lerp(1, hulls.Count, lerp));
+                for (int i = 0; i < iterations; i++)
+                {
+                    int index = UnityEngine.Random.Range(0, hulls.Count);
+                    float damage = UnityEngine.Random.Range(Mathf.Lerp(0f, 0.4f, lerp), Mathf.Lerp(0f, 0.8f, lerp));
+                    ShipHull hull = hulls[index];
+
+                    hull._integrity -= damage;
+                    if (!hull._damaged)
+                    {
+                        hull._damaged = true;
+
+                        var eventDelegate = (MulticastDelegate)typeof(ShipHull).GetField("OnDamaged", BindingFlags.Instance
+                            | BindingFlags.NonPublic | BindingFlags.Public).GetValue(hull);
+                        if (eventDelegate != null)
+                        {
+                            foreach (var handler in eventDelegate.GetInvocationList())
+                            {
+                                handler.Method.Invoke(handler.Target, [hull]);
+                            }
+                        }
+                    }
+                    if (hull._damageEffect != null)
+                    {
+                        hull._damageEffect.SetEffectBlend(1f - hull._integrity);
+                    }
+
+                    // Just in case it does 1 or more damage somehow
+                    if (hull.shipModule is ShipDetachableModule)
+                    {
+                        ShipDetachableModule module = hull.shipModule as ShipDetachableModule;
+                        if (hull.integrity <= 0f && !module.isDetached)
+                        {
+                            module.Detach();
+                        }
+                    }
+                    else if (hull.shipModule is ShipLandingModule)
+                    {
+                        ShipLandingModule module = hull.shipModule as ShipLandingModule;
+                        if (hull.integrity <= 0f)
+                        {
+                            module.DetachAllLegs();
+                        }
+                    }
+
+                    hulls.Remove(hull);
+                }
+            }
+            if ((float)Settings.randomComponentDamage.GetProperty() > 0f)
+            {
+                Type[] invalidTypes = [typeof(ShipReactorComponent), typeof(ShipFuelTankComponent)];
+                List<ShipComponent> components = [];
+                bool seenThruster = false;
+                bool addedThruster = false;
+                foreach (ShipComponent shipComponent in SELocator.GetShipDamageController()._shipComponents)
+                {
+                    if (invalidTypes.Contains(shipComponent.GetType()))
+                    {
+                        continue;
+                    }
+
+                    if (shipComponent is ShipThrusterComponent)
+                    {
+                        if (!addedThruster && (seenThruster || UnityEngine.Random.value < 0.5f))
+                        {
+                            addedThruster = true;
+                            seenThruster = true;
+                        }
+                        else
+                        {
+                            seenThruster = true;
+                            continue;
+                        }
+                    }
+
+                    components.Add(shipComponent);
+                }
+
+                int iterations = Mathf.RoundToInt(Mathf.Lerp(1, components.Count, (float)Settings.randomComponentDamage.GetProperty()));
+                for (int i = 0; i < iterations; i++)
+                {
+                    int index = UnityEngine.Random.Range(0, components.Count);
+                    components[index].SetDamaged(true);
+                    components.RemoveAt(index);
                 }
             }
             if ((!InMultiplayer || QSBAPI.GetIsHost()) && (float)Settings.shipDamageSpeedMultiplier.GetProperty() < 0f)

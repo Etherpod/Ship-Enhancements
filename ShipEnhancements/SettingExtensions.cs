@@ -92,6 +92,8 @@ public static class SettingExtensions
         { Settings.enableRepairConfirmation, (false, false) },
         { Settings.shipGravityFix, (false, false) },
         { Settings.enableRemovableGravityCrystal, (false, false) },
+        { Settings.randomHullDamage, (1f, 1f) },
+        { Settings.randomComponentDamage, (1f, 1f) },
     };
 
     public static string GetName(this Settings setting)

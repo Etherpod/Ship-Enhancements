@@ -91,6 +91,8 @@ public static class SettingsPresets
         { "enableRepairConfirmation", false },
         { "shipGravityFix", true },
         { "enableRemovableGravityCrystal", false },
+        { "randomHullDamage", 0f },
+        { "randomComponentDamage", 0f },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -178,6 +180,8 @@ public static class SettingsPresets
         { "enableRepairConfirmation", false },
         { "shipGravityFix", true },
         { "enableRemovableGravityCrystal", false },
+        { "randomHullDamage", 0f },
+        { "randomComponentDamage", 0f },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -265,6 +269,8 @@ public static class SettingsPresets
         { "enableRepairConfirmation", false },
         { "shipGravityFix", true },
         { "enableRemovableGravityCrystal", false },
+        { "randomHullDamage", 0f },
+        { "randomComponentDamage", 0f },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -352,6 +358,8 @@ public static class SettingsPresets
         { "enableRepairConfirmation", false },
         { "shipGravityFix", true },
         { "enableRemovableGravityCrystal", false },
+        { "randomHullDamage", 0f },
+        { "randomComponentDamage", 0f },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -439,6 +447,8 @@ public static class SettingsPresets
         { "enableRepairConfirmation", false },
         { "shipGravityFix", true },
         { "enableRemovableGravityCrystal", true },
+        { "randomHullDamage", 0f },
+        { "randomComponentDamage", 0f },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -526,6 +536,8 @@ public static class SettingsPresets
         { "enableRepairConfirmation", true },
         { "shipGravityFix", true },
         { "enableRemovableGravityCrystal", true },
+        { "randomHullDamage", 0.1f },
+        { "randomComponentDamage", 0.1f },
     };
 
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()
@@ -801,6 +813,8 @@ public static class SettingsPresets
         { "enableRepairConfirmation", new RandomSettingValue(0.75f) },
         { "shipGravityFix", new RandomSettingValue(1f) },
         { "enableRemovableGravityCrystal", new RandomSettingValue(0.5f) },
+        { "randomHullDamage", new RandomSettingValue(0f, 1f, 0.4f, 0f) },
+        { "randomComponentDamage", new RandomSettingValue(0f, 1f, 0.3f, 0f) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }
