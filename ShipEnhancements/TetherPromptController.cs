@@ -13,7 +13,7 @@ public class TetherPromptController : MonoBehaviour
     {
         _reelInPrompt = new ScreenPrompt(InputLibrary.toolOptionUp, "<CMD>" + "   " + "Reel tether in", 0, ScreenPrompt.DisplayState.Normal, false);
         _reelOutPrompt = new ScreenPrompt(InputLibrary.toolOptionDown, "<CMD>" + "   " + "Reel tether out", 0, ScreenPrompt.DisplayState.Normal, false);
-        _disconnectPrompt = new ScreenPrompt(InputLibrary.toolActionSecondary, "<CMD>" + UITextLibrary.GetString(UITextType.HoldPrompt) 
+        _disconnectPrompt = new ScreenPrompt(InputLibrary.interactSecondary, "<CMD>" + UITextLibrary.GetString(UITextType.HoldPrompt) 
             + "   " + "Disconnect tether", 0, ScreenPrompt.DisplayState.Normal, false);
 
         GlobalMessenger.AddListener("AttachPlayerTether", OnAttachPlayerTether);
