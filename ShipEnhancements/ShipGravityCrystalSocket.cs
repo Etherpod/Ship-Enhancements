@@ -50,6 +50,11 @@ public class ShipGravityCrystalSocket : OWItemSocket
 
     public override bool PlaceIntoSocket(OWItem item)
     {
+        if (item is ShipGravityCrystalItem && _socketedItem == null)
+        {
+            (item as ShipGravityCrystalItem).OnPlaceIntoShipSocket();
+        }
+
         bool result = base.PlaceIntoSocket(item);
         if (result)
         {

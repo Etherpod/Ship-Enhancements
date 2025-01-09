@@ -57,6 +57,10 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
                 {
                     QSBWorldSync.Init<QSBExpeditionFlagItem, ExpeditionFlagItem>();
                 }
+                if ((bool)enableRemovableGravityCrystal.GetProperty())
+                {
+                    QSBWorldSync.Init<QSBShipGravityCrystal, ShipGravityCrystalItem>();
+                }
             }, 2);
         };
     }

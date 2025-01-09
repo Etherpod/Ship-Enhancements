@@ -23,6 +23,7 @@ public class ShipGravityCrystalItem : OWItem
     private Light _gravityComponentLight;
     private bool _hasBeenSocketed = false;
     private float _baseFieldStrength;
+    private bool _placedInShipSocket = false;
 
     public override string GetDisplayName()
     {
@@ -117,6 +118,10 @@ public class ShipGravityCrystalItem : OWItem
     {
         base.SocketItem(socketTransform, sector);
 
+        if (!_placedInShipSocket) return;
+
+        _placedInShipSocket = false;
+
         if (_hasBeenSocketed)
         {
             transform.localScale = Vector3.one;
@@ -127,6 +132,7 @@ public class ShipGravityCrystalItem : OWItem
             if (!(bool)disableGravityCrystal.GetProperty() && !_gravityComponent.isDamaged)
             {
                 _gravityComponent.OnComponentRepaired();
+                _gravityComponentLight.enabled = true;
                 _gravityComponent._gravityAudio.FadeIn(0.5f);
             }
             else
@@ -143,6 +149,11 @@ public class ShipGravityCrystalItem : OWItem
         {
             _hasBeenSocketed = true;
         }
+    }
+
+    public void OnPlaceIntoShipSocket()
+    {
+        _placedInShipSocket = true;
     }
 
     public override void OnDestroy()
