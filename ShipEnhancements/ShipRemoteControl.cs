@@ -76,6 +76,7 @@ public class ShipRemoteControl : MonoBehaviour
 
                     if (OWInput.IsNewlyPressed(InputLibrary.interact))
                     {
+                        bool run = true;
                         if (_currentCommand == ShipCommand.Explode
                             && !SELocator.GetShipDamageController()._exploded)
                         {
@@ -93,6 +94,18 @@ public class ShipRemoteControl : MonoBehaviour
                         else if (_currentCommand == ShipCommand.TurnOff)
                         {
                             SELocator.GetShipTransform().GetComponentInChildren<ShipEngineSwitch>().TurnOffEngine();
+                        }
+                        else
+                        {
+                            run = false;
+                        }
+
+                        if (run && ShipEnhancements.InMultiplayer)
+                        {
+                            foreach (uint id in ShipEnhancements.PlayerIDs)
+                            {
+                                ShipEnhancements.QSBCompat.SendShipCommand(id, _currentCommand);
+                            }
                         }
                     }
                 }
@@ -185,6 +198,31 @@ public class ShipRemoteControl : MonoBehaviour
                 return !(bool)addEngineSwitch.GetProperty();
             default:
                 return false;
+        }
+    }
+
+    public void ReceiveCommandRemote(ShipCommand command)
+    {
+        if (ShipCommandAvailable(command))
+        {
+            if (command == ShipCommand.Explode
+                && !SELocator.GetShipDamageController()._exploded)
+            {
+                SELocator.GetShipDamageController().Explode();
+            }
+            else if (command == ShipCommand.Warp)
+            {
+                _warpCoreController.ActivateWarp();
+            }
+            else if (command == ShipCommand.Eject
+                && !SELocator.GetShipDamageController()._cockpitDetached)
+            {
+                SELocator.GetShipTransform().Find("Module_Cockpit").GetComponent<ShipDetachableModule>().Detach();
+            }
+            else if (command == ShipCommand.TurnOff)
+            {
+                SELocator.GetShipTransform().GetComponentInChildren<ShipEngineSwitch>().TurnOffEngine();
+            }
         }
     }
 }

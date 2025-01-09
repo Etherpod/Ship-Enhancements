@@ -47,6 +47,7 @@ public class QSBCompatibility
         _api.RegisterHandler<(float, float, float)>("detach-all-players", ReceiveDetachAllPlayers);
         _api.RegisterHandler<(float, float, float)>("initial-persistent-input", ReceiveInitialPersistentInput);
         _api.RegisterHandler<float>("initial-black-hole", ReceiveInitialBlackHoleState);
+        _api.RegisterHandler<ShipCommand>("send-ship-command", ReceiveShipCommand);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -86,6 +87,7 @@ public class QSBCompatibility
     }
     #endregion
 
+    #region Initialization
     public void SendInitializedShip(uint id)
     {
         _neverInitialized = false;
@@ -189,6 +191,7 @@ public class QSBCompatibility
     {
         return _neverInitialized;
     }
+    #endregion
 
     #region Switches
     public void AddActiveSwitch(CockpitSwitch switchToAdd)
@@ -593,6 +596,18 @@ public class QSBCompatibility
     {
         BlackHoleExplosionController controller = SELocator.GetShipTransform().GetComponentInChildren<BlackHoleExplosionController>();
         controller?.SetInitialBlackHoleState(scale);
+    }
+    #endregion
+
+    #region ShipCommands
+    public void SendShipCommand(uint id, ShipCommand command)
+    {
+        _api.SendMessage("send-ship-command", command, id, false);
+    }
+
+    private void ReceiveShipCommand(uint id, ShipCommand command)
+    {
+        SELocator.GetPlayerBody().GetComponentInChildren<ShipRemoteControl>()?.ReceiveCommandRemote(command);
     }
     #endregion
 }
