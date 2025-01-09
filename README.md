@@ -47,7 +47,7 @@ Change some of the values that control how the ship works.
 - **Chaotic Cyclones**: Adjusts cyclones to apply an additional upwards spin to your ship while inside of them to make for an even more disorienting experience.
 - **Ship Explosion Multiplier**: Larger numbers increase the size of the explosion that is created when your ship blows up. Set this to something between 10 and 30 to simulate an atomic bomb.
 - **Extra Explosion Damage**: Gives explosions the ability to damage your ship and fragments of Brittle Hollow.
-- **Extra Noise**: Makes noisy parts of the ship, like the master alarm, alert things that can hear you.
+- **Extra Noise**: Makes noisy parts of the ship, like the master alarm, alert noise detectors.
 - **Reactor Lifetime Multiplier**: Larger numbers increase the time it takes for the reactor to blow up when it has been damaged. Set this to something small to give yourself a panic attack every time the master alarm goes off.
 - **Ship Bounciness**: Larger numbers increase the bounciness of the ship. A value of 2 should make the ship double its speed when it hits something, but the results of this setting aren't entirely accurate.
 - **Ship Input Latency**: This basically simulates internet lag, where larger numbers increase the time it takes for the ship to process your inputs. A value of 1 means it takes 1 second for your "upwards thrust" input to register.

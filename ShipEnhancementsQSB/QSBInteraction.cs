@@ -22,6 +22,7 @@ using QSB.Tools.ProbeLauncherTool.Patches;
 using QSB.ShipSync.Messages;
 using QSB.Player.TransformSync;
 using QSB;
+using System.Collections.Generic;
 
 namespace ShipEnhancementsQSB;
 
@@ -628,6 +629,45 @@ public static class QSBInteractionPatches
                 ____thrusterAudio.OnStartTranslationalThrust();
 
                 ShipThrusterManager.ShipWashController.OnStartTranslationalThrust();
+            }
+        }
+
+        return false;
+    }
+    #endregion
+
+    #region DisableAutoLights
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipManager), "UpdateElectricalComponent")]
+    public static bool QSBDisableAutoLights(ShipManager __instance, List<PlayerInfo> ____playersInShip)
+    {
+        if (!(bool)disableAutoLights.GetProperty())
+        {
+            return true;
+        }
+
+        if (__instance.ShipElectricalComponent == null)
+        {
+            return false;
+        }
+
+        var electricalSystem = __instance.ShipElectricalComponent._electricalSystem;
+        var damaged = __instance.ShipElectricalComponent._damaged;
+
+        if (____playersInShip.Count == 0)
+        {
+            // never turn off power
+
+            /*if (!damaged)
+            {
+                electricalSystem.SetPowered(false);
+            }*/
+        }
+        else
+        {
+            if (!damaged)
+            {
+                electricalSystem.SetPowered(true);
             }
         }
 
