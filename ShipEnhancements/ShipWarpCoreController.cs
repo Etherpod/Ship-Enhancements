@@ -47,52 +47,8 @@ public class ShipWarpCoreController : CockpitInteractible
     {
         _buttonTransform.localPosition = new Vector3(0, _buttonOffset, 0);
         _pressed = true;
-
-        if (_receiver == null) return;
-
-        if (ShipLogEntryHUDMarker.s_entryLocationID == _brittleHollowCannonEntryID)
-        {
-            _targetCannon = _brittleHollowCannon;
-        }
-        else if (ShipLogEntryHUDMarker.s_entryLocationID == _emberTwinCannonEntryID)
-        {
-            _targetCannon = _emberTwinCannon;
-        }
-        else
-        {
-            _targetCannon = null;
-            _receiver.SetGravityCannonSocket(null);
-        }
-
-        if (PlayerState.IsInsideShip() || PlayerState.AtFlightConsole())
-        {
-            if (PlayerState.InBrambleDimension())
-            {
-                PlayerFogWarpDetector detector = Locator.GetPlayerDetector().GetComponent<PlayerFogWarpDetector>();
-                FogWarpVolume[] volumes = detector._warpVolumes.ToArray();
-                foreach (FogWarpVolume volume in volumes)
-                {
-                    detector.UntrackFogWarpVolume(volume);
-                }
-            }
-
-            _warpingWithPlayer = true;
-            _warpEffect.singularityController.OnCreation += WarpShip;
-            _warpEffect.singularityController.Create();
-            _receiver.PlayRecallEffect(_warpLength, _warpingWithPlayer);
-        }
-        else
-        {
-            HatchController hatch = _shipBody.GetComponentInChildren<HatchController>();
-            hatch._triggerVolume.SetTriggerActivation(false);
-            hatch.CloseHatch();
-            _shipBody.GetComponentInChildren<ShipTractorBeamSwitch>().DeactivateTractorBeam();
-
-            _warpingWithPlayer = false;
-            _warpEffect.OnWarpComplete += WarpShip;
-            _warpEffect.WarpObjectOut(_warpLength);
-        }
-        _warping = true;
+        ActivateWarp();
+        SendWarpMessage();
     }
 
     protected override void OnReleaseInteract()
@@ -115,6 +71,26 @@ public class ShipWarpCoreController : CockpitInteractible
         if (_pressed)
         {
             OnReleaseInteract();
+        }
+    }
+
+    public void SendWarpMessage()
+    {
+        if (ShipEnhancements.InMultiplayer)
+        {
+            foreach (uint id in ShipEnhancements.PlayerIDs)
+            {
+                string cannonID = "";
+                if (_targetCannon == _brittleHollowCannon)
+                {
+                    cannonID = _brittleHollowCannonEntryID;
+                }
+                else if (_targetCannon == _emberTwinCannon)
+                {
+                    cannonID = _emberTwinCannonEntryID;
+                }
+                ShipEnhancements.QSBCompat.SendActivateWarp(id, _warpingWithPlayer, cannonID);
+            }
         }
     }
 
@@ -153,14 +129,125 @@ public class ShipWarpCoreController : CockpitInteractible
         _receiver = receiver;
     }
 
+    public void ActivateWarpRemote(bool playerInShip, string targetCannonEntryID)
+    {
+        if (_receiver == null) return;
+
+        if (targetCannonEntryID == _brittleHollowCannonEntryID)
+        {
+            _targetCannon = _brittleHollowCannon;
+        }
+        else if (targetCannonEntryID == _emberTwinCannonEntryID)
+        {
+            _targetCannon = _emberTwinCannon;
+        }
+        else
+        {
+            _targetCannon = null;
+            _receiver.SetGravityCannonSocket(null);
+        }
+
+        _interactReceiver.DisableInteraction();
+
+        if (playerInShip)
+        {
+            if (PlayerState.InBrambleDimension())
+            {
+                PlayerFogWarpDetector detector = Locator.GetPlayerDetector().GetComponent<PlayerFogWarpDetector>();
+                FogWarpVolume[] volumes = detector._warpVolumes.ToArray();
+                foreach (FogWarpVolume volume in volumes)
+                {
+                    detector.UntrackFogWarpVolume(volume);
+                }
+            }
+
+            _warpingWithPlayer = true;
+            _warpEffect.singularityController.OnCreation += WarpShip;
+            _warpEffect.singularityController.Create();
+            _receiver.PlayRecallEffect(_warpLength, _warpingWithPlayer);
+        }
+        else
+        {
+            HatchController hatch = _shipBody.GetComponentInChildren<HatchController>();
+            hatch._triggerVolume.SetTriggerActivation(false);
+            hatch.CloseHatch();
+            _shipBody.GetComponentInChildren<ShipTractorBeamSwitch>().DeactivateTractorBeam();
+
+            _warpingWithPlayer = false;
+            _warpEffect.OnWarpComplete += WarpShip;
+            _warpEffect.WarpObjectOut(_warpLength);
+        }
+        _warping = true;
+    }
+
     public void ActivateWarp()
     {
-        OnPressInteract();
+        if (_receiver == null) return;
+
+        if (ShipLogEntryHUDMarker.s_entryLocationID == _brittleHollowCannonEntryID)
+        {
+            _targetCannon = _brittleHollowCannon;
+        }
+        else if (ShipLogEntryHUDMarker.s_entryLocationID == _emberTwinCannonEntryID)
+        {
+            _targetCannon = _emberTwinCannon;
+        }
+        else
+        {
+            _targetCannon = null;
+            _receiver.SetGravityCannonSocket(null);
+        }
+
+        if (IsShipOccupied())
+        {
+            if (PlayerState.InBrambleDimension())
+            {
+                PlayerFogWarpDetector detector = Locator.GetPlayerDetector().GetComponent<PlayerFogWarpDetector>();
+                FogWarpVolume[] volumes = detector._warpVolumes.ToArray();
+                foreach (FogWarpVolume volume in volumes)
+                {
+                    detector.UntrackFogWarpVolume(volume);
+                }
+            }
+
+            _warpingWithPlayer = true;
+            _warpEffect.singularityController.OnCreation += WarpShip;
+            _warpEffect.singularityController.Create();
+            _receiver.PlayRecallEffect(_warpLength, _warpingWithPlayer);
+        }
+        else
+        {
+            HatchController hatch = _shipBody.GetComponentInChildren<HatchController>();
+            hatch._triggerVolume.SetTriggerActivation(false);
+            if (hatch._hatch.localRotation == hatch._hatchOpenedQuaternion)
+            {
+                hatch.CloseHatch();
+            }
+            _shipBody.GetComponentInChildren<ShipTractorBeamSwitch>().DeactivateTractorBeam();
+
+            _warpingWithPlayer = false;
+            _warpEffect.OnWarpComplete += WarpShip;
+            _warpEffect.WarpObjectOut(_warpLength);
+        }
+        _warping = true;
     }
 
     public bool IsWarping()
     {
         return _warping;
+    }
+
+    private bool IsShipOccupied()
+    {
+        if (ShipEnhancements.InMultiplayer)
+        {
+            return ShipEnhancements.QSBInteraction.GetPlayersInShip() > 0
+                || ShipEnhancements.QSBInteraction.FlightConsoleOccupied();
+        }
+        else
+        {
+            return PlayerState.IsInsideShip() || PlayerState.AtFlightConsole();
+        }
     }
 
     protected override void OnDestroy()

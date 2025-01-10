@@ -81,10 +81,13 @@ public class ShipRemoteControl : MonoBehaviour
                             && !SELocator.GetShipDamageController()._exploded)
                         {
                             SELocator.GetShipDamageController().Explode();
+                            run = false;
                         }
                         else if (_currentCommand == ShipCommand.Warp)
                         {
                             _warpCoreController.ActivateWarp();
+                            _warpCoreController.SendWarpMessage();
+                            run = false;
                         }
                         else if (_currentCommand == ShipCommand.Eject
                             && !SELocator.GetShipDamageController()._cockpitDetached)

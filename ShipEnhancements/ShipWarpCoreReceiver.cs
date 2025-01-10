@@ -43,7 +43,7 @@ public class ShipWarpCoreReceiver : MonoBehaviour
 
         if (_gravityCannonSocket != null)
         {
-            body.WarpToPositionRotation(_gravityCannonSocket.position + _gravityCannonSocket.up * 4f, _gravityCannonSocket.rotation);
+            body.WarpToPositionRotation(_gravityCannonSocket.position + _gravityCannonSocket.up * 5f, _gravityCannonSocket.rotation);
             OWRigidbody newBody = _gravityCannonSocket.GetAttachedOWRigidbody();
             if (newBody != null)
             {

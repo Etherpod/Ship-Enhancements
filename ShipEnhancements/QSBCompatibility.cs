@@ -48,6 +48,7 @@ public class QSBCompatibility
         _api.RegisterHandler<(float, float, float)>("initial-persistent-input", ReceiveInitialPersistentInput);
         _api.RegisterHandler<float>("initial-black-hole", ReceiveInitialBlackHoleState);
         _api.RegisterHandler<ShipCommand>("send-ship-command", ReceiveShipCommand);
+        _api.RegisterHandler<(bool, string)>("activate-warp", ReceiveActivateWarp);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -608,6 +609,19 @@ public class QSBCompatibility
     private void ReceiveShipCommand(uint id, ShipCommand command)
     {
         SELocator.GetPlayerBody().GetComponentInChildren<ShipRemoteControl>()?.ReceiveCommandRemote(command);
+    }
+    #endregion
+
+    #region ShipWarpCore
+    public void SendActivateWarp(uint id, bool playerInShip, string targetCannonEntryID)
+    {
+        _api.SendMessage("activate-warp", (playerInShip, targetCannonEntryID), id, false);
+    }
+
+    private void ReceiveActivateWarp(uint id, (bool playerInShip, string targetCannonEntryID) data)
+    {
+        SELocator.GetShipTransform().GetComponentInChildren<ShipWarpCoreController>()?
+            .ActivateWarpRemote(data.playerInShip, data.targetCannonEntryID);
     }
     #endregion
 }
