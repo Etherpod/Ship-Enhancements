@@ -213,6 +213,12 @@
       "value": false,
       "tooltip": "Temporarily stuns you if you hit something too hard with the ship."
     },
+    "enableFragileShip": {
+      "title": "Enable Fragile Ship",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "You are unable to pilot your ship if anything is damaged. Please do not use this with Disable Ship Repair."
+    },
     "repairTimeMultiplier": {
       "title": "Repair Time Multiplier",
       "type": "number",

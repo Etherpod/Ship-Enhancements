@@ -33,6 +33,7 @@ public class ShipEnhancements : ModBehaviour
     public bool probeDestroyed;
     public bool engineOn;
     public Tether playerTether;
+    public bool anyPartDamaged;
 
     public static IAchievements AchievementsAPI;
     public static IQSBAPI QSBAPI;
@@ -161,6 +162,7 @@ public class ShipEnhancements : ModBehaviour
         enableRemovableGravityCrystal,
         randomHullDamage,
         randomComponentDamage,
+        enableFragileShip,
     }
 
     private void Awake()
@@ -238,7 +240,7 @@ public class ShipEnhancements : ModBehaviour
                 GlobalMessenger.RemoveListener("EnterShip", OnEnterShip);
                 GlobalMessenger.RemoveListener("ExitShip", OnExitShip);
             }
-            if ((bool)Settings.enableRepairConfirmation.GetProperty())
+            if ((bool)Settings.enableRepairConfirmation.GetProperty() || (bool)Settings.enableFragileShip.GetProperty())
             {
                 foreach (ShipHull hull in SELocator.GetShipDamageController()._shipHulls)
                 {
@@ -250,7 +252,7 @@ public class ShipEnhancements : ModBehaviour
                 }
                 foreach (ShipComponent component in SELocator.GetShipDamageController()._shipComponents)
                 {
-                    if (component != null && component.isDamaged)
+                    if (component != null)
                     {
                         component.OnDamaged -= ctx => CheckNoPartsDamaged();
                         component.OnRepaired -= ctx => CheckNoPartsDamaged();
@@ -893,7 +895,7 @@ public class ShipEnhancements : ModBehaviour
             AssetBundleUtilities.ReplaceShaders(clock);
             Instantiate(clock, SELocator.GetShipTransform().Find("Module_Cockpit"));
         }
-        if ((bool)Settings.enableRepairConfirmation.GetProperty())
+        if ((bool)Settings.enableRepairConfirmation.GetProperty() || (bool)Settings.enableFragileShip.GetProperty())
         {
             GameObject audio = LoadPrefab("Assets/ShipEnhancements/SystemOnlineAudio.prefab");
             Instantiate(audio, SELocator.GetShipTransform().Find("Audio_Ship"));
@@ -908,7 +910,7 @@ public class ShipEnhancements : ModBehaviour
             }
             foreach (ShipComponent component in SELocator.GetShipDamageController()._shipComponents)
             {
-                if (component != null && component._repairReceiver.repairDistance > 0)
+                if (component != null)
                 {
                     component.OnDamaged += ctx => CheckNoPartsDamaged();
                     component.OnRepaired += ctx => CheckNoPartsDamaged();
@@ -1470,22 +1472,34 @@ public class ShipEnhancements : ModBehaviour
     {
         if (_shipDestroyed) return;
 
+        bool anyDamaged = false;
+
         foreach (ShipHull hull in SELocator.GetShipDamageController()._shipHulls)
         {
             if (hull != null && hull.isDamaged)
             {
-                return;
+                anyDamaged = true;
             }
         }
-        foreach (ShipComponent component in SELocator.GetShipDamageController()._shipComponents)
+        if (!anyDamaged)
         {
-            if (component != null && component.isDamaged)
+            foreach (ShipComponent component in SELocator.GetShipDamageController()._shipComponents)
             {
-                return;
+                if (component != null && component.isDamaged)
+                {
+                    anyDamaged = true;
+                }
             }
         }
 
-        SELocator.GetShipTransform().Find("Audio_Ship/SystemOnlineAudio(Clone)")?.GetComponent<OWAudioSource>().PlayOneShot(AudioType.TH_ZeroGTrainingAllRepaired, 1f);
+        if ((bool)Settings.enableRepairConfirmation.GetProperty() && !anyDamaged)
+        {
+            SELocator.GetShipTransform().Find("Audio_Ship/SystemOnlineAudio(Clone)")?.GetComponent<OWAudioSource>().PlayOneShot(AudioType.TH_ZeroGTrainingAllRepaired, 1f);
+        }
+        if ((bool)Settings.enableFragileShip.GetProperty())
+        {
+            anyPartDamaged = anyDamaged;
+        }
     }
 
     #endregion

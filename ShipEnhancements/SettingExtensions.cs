@@ -94,6 +94,7 @@ public static class SettingExtensions
         { Settings.enableRemovableGravityCrystal, (false, false) },
         { Settings.randomHullDamage, (1f, 1f) },
         { Settings.randomComponentDamage, (1f, 1f) },
+        { Settings.enableFragileShip, (false, false) },
     };
 
     public static string GetName(this Settings setting)

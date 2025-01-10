@@ -2132,7 +2132,11 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipResources), nameof(ShipResources.AreThrustersUsable))]
     public static void DisableThrustersWhenEngineOff(ref bool __result)
     {
-        if ((bool)addEngineSwitch.GetProperty())
+        if ((bool)enableFragileShip.GetProperty() && ShipEnhancements.Instance.anyPartDamaged)
+        {
+            __result = false;
+        }
+        else if ((bool)addEngineSwitch.GetProperty())
         {
             __result = __result && ShipEnhancements.Instance.engineOn;
         }
