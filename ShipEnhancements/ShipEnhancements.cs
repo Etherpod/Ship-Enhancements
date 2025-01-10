@@ -287,11 +287,6 @@ public class ShipEnhancements : ModBehaviour
     {
         if (!_shipLoaded || LoadManager.GetCurrentScene() != OWScene.SolarSystem || _shipDestroyed) return;
 
-        if (OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.Character))
-        {
-            SELocator.GetShipBody().GetComponentInChildren<HatchController>().OpenHatch();
-        }
-
         if (SELocator.GetShipBody().GetAngularVelocity().sqrMagnitude > maxSpinSpeed * maxSpinSpeed)
         {
             ShipOxygenTankComponent oxygenTank = SELocator.GetShipBody().GetComponentInChildren<ShipOxygenTankComponent>();
@@ -913,7 +908,7 @@ public class ShipEnhancements : ModBehaviour
             }
             foreach (ShipComponent component in SELocator.GetShipDamageController()._shipComponents)
             {
-                if (component != null && component.isDamaged)
+                if (component != null && component._repairReceiver.repairDistance > 0)
                 {
                     component.OnDamaged += ctx => CheckNoPartsDamaged();
                     component.OnRepaired += ctx => CheckNoPartsDamaged();
