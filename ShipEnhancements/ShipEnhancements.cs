@@ -204,6 +204,7 @@ public class ShipEnhancements : ModBehaviour
             angularDragEnabled = false;
             probeDestroyed = false;
             _shipDestroyed = false;
+            anyPartDamaged = false;
 
             if (AchievementsAPI != null)
             {
@@ -1038,6 +1039,7 @@ public class ShipEnhancements : ModBehaviour
                     }
 
                     hulls.Remove(hull);
+                    anyPartDamaged = true;
                 }
             }
             if ((float)Settings.randomComponentDamage.GetProperty() > 0f)
@@ -1076,6 +1078,7 @@ public class ShipEnhancements : ModBehaviour
                     int index = UnityEngine.Random.Range(0, components.Count);
                     components[index].SetDamaged(true);
                     components.RemoveAt(index);
+                    anyPartDamaged = true;
                 }
             }
             if ((!InMultiplayer || QSBAPI.GetIsHost()) && (float)Settings.shipDamageSpeedMultiplier.GetProperty() < 0f)

@@ -1102,7 +1102,7 @@ public static class PatchClass
 
         if (!__instance.IsPlayerInShip() && beamSwitch._functional)
         {
-            SELocator.GetShipBody().GetComponentInChildren<ShipTractorBeamSwitch>().ActivateTractorBeam();
+            beamSwitch.ActivateTractorBeam();
         }
     }
 
