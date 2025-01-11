@@ -212,6 +212,16 @@ public class ShipEnhancements : ModBehaviour
             }
 
             InitializeShip();
+
+            GameObject th = GameObject.Find("TimberHearth_Body");
+            if (th != null)
+            {
+                Transform slate = th.transform.Find("Sector_TH/Sector_Village/Sector_StartingCamp/Characters_StartingCamp/Villager_HEA_Slate");
+                if (slate != null)
+                {
+                    DialogueBuilder.Make(slate.gameObject, "ConversationZone_RSci", "dialogue/Slate.xml", this);
+                }
+            }
         };
 
         LoadManager.OnStartSceneLoad += (scene, loadScene) =>

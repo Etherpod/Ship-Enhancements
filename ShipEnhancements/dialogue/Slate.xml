@@ -1,0 +1,129 @@
+﻿<DialogueTree xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Outer-Wilds-New-Horizons/new-horizons/main/NewHorizons/Schemas/dialogue_schema.xsd">
+  <NameField>Scientist</NameField>
+
+  <DialogueNode>
+    <Name>Scientist5</Name>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>I have a question about the ship.</Text>
+        <DialogueTarget>SE_ShipQuestion_1</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ShipQuestion_1</Name>
+    <Dialogue>
+      <Page>Yeah, sure. What's up?</Page>
+    </Dialogue>
+
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>How come you didn't improve the autopilot instead of adding all these other features?</Text>
+        <DialogueTarget>SE_Autopilot_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>What happened to my Little Scout's recall?</Text>
+        <DialogueTarget>SE_ManualRecall_1</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_Autopilot_1</Name>
+    <Dialogue>
+      <Page>What, you can't pilot the ship yourself? I added a flight stick for a reason, you know.</Page>
+      <Page>The autopilot barely works as it is. I didn't want to mess around with it and accidentally break it.</Page>
+      <Page>And those other features are just as important as the autopilot.</Page>
+    </Dialogue>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_ManualRecall_1</Name>
+    <Dialogue>
+      <Page>I was going to integrate the new Nomai technology into it, but I figured it would be too heavy for you to carry around out there.</Page>
+    </Dialogue>
+
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>You thought one extra pound would be too heavy?</Text>
+        <DialogueTarget>SE_ManualRecall_11</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>How am I supposed to get my scout back?!</Text>
+        <DialogueTarget>SE_ManualRecall_12</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_ManualRecall_11</Name>
+    <Dialogue>
+      <Page>Look, weight adds up when you decide to bring five cans of jumbo marshmallows.</Page>
+      <Page>You can still use your scout without that fancy technology. You just need to go pick it up by hand.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_ManualRecall_2</DialogueTarget>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_ManualRecall_12</Name>
+    <Dialogue>
+      <Page>Calm down! Is picking your scout up by hand really that big of a deal?</Page>
+      <Page>I hope not. You're gonna be doing a lot of stuff by hand out there.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_ManualRecall_2</DialogueTarget>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_ManualRecall_2</Name>
+    <Dialogue>
+      <Page>And don't worry, you can still recall it with the ship. Just make sure that you get the scout from the top of the ship after.</Page>
+    </Dialogue>
+
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Why's that?</Text>
+        <DialogueTarget>SE_ManualRecall_21</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Okay.</Text>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_ManualRecall_21</Name>
+    <Dialogue>
+      <Page>You share your scout with the ship. When you fire your ship's scout launcher, it moves the scout to the top of the ship.</Page>
+      <Page>But when you call it back to the ship's launcher, your handheld launcher can't get it back, so it gets stuck on top of the ship.</Page>
+    </Dialogue>
+
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>That's annoying.</Text>
+        <DialogueTarget>SE_ManualRecall_211</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Couldn't you just fix that by adding the Nomai technology to the scout?</Text>
+        <DialogueTarget>SE_ManualRecall_212</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_ManualRecall_211</Name>
+    <Dialogue>
+      <Page>You'll get used to it. I don't feel like trying to put the Nomai technology back in the scout.</Page>
+    </Dialogue>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_ManualRecall_212</Name>
+    <Dialogue>
+      <Page>Yeah, but I don't feel like trying to put the Nomai technology back in the scout.</Page>
+      <Page>You'll get used to it.</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+</DialogueTree>
