@@ -1095,6 +1095,8 @@ public class ShipEnhancements : ModBehaviour
             {
                 SELocator.GetShipDamageController().Explode();
             }
+
+            InitializeConditions();
         });
     }
 
@@ -1374,6 +1376,22 @@ public class ShipEnhancements : ModBehaviour
                         effect._damageLightRendererColor = newAlarmLit;
                     }
                 }
+            }
+        }
+    }
+
+    private void InitializeConditions()
+    {
+        if ((bool)Settings.enableManualScoutRecall.GetProperty())
+        {
+            DialogueConditionManager.SharedInstance.SetConditionState("SE_MANUAL_RECALL_ENALBED", true);
+        }
+        if ((float)Settings.rustLevel.GetProperty() > 0f)
+        {
+            DialogueConditionManager.SharedInstance.SetConditionState("SE_COCKPIT_RUST", true);
+            if ((float)Settings.rustLevel.GetProperty() > 0.75f)
+            {
+                DialogueConditionManager.SharedInstance.SetConditionState("SE_MAX_COCKPIT_RUST", true);
             }
         }
     }

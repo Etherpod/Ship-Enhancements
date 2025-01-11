@@ -20,16 +20,27 @@
 
     <DialogueOptionsList>
       <DialogueOption>
+        <RequiredCondition>SE_MANUAL_RECALL_ENALBED</RequiredCondition>
+        <Text>What happened to my Little Scout's recall?</Text>
+        <DialogueTarget>SE_ManualRecall_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_COCKPIT_RUST</RequiredCondition>
+        <Text>Why is my cockpit covered in rust?</Text>
+        <DialogueTarget>SE_CockpitRust_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
         <Text>How come you didn't improve the autopilot instead of adding all these other features?</Text>
         <DialogueTarget>SE_Autopilot_1</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
-        <Text>What happened to my Little Scout's recall?</Text>
-        <DialogueTarget>SE_ManualRecall_1</DialogueTarget>
+        <Text>Nevermind.</Text>
       </DialogueOption>
     </DialogueOptionsList>
   </DialogueNode>
 
+  <!--Autopilot-->
+  
   <DialogueNode>
     <Name>SE_Autopilot_1</Name>
     <Dialogue>
@@ -39,6 +50,8 @@
     </Dialogue>
   </DialogueNode>
 
+  <!--Manual Scout Recall-->
+  
   <DialogueNode>
     <Name>SE_ManualRecall_1</Name>
     <Dialogue>
@@ -122,7 +135,48 @@
     <Name>SE_ManualRecall_212</Name>
     <Dialogue>
       <Page>Yeah, but I don't feel like trying to put the Nomai technology back in the scout.</Page>
-      <Page>You'll get used to it.</Page>
+      <Page>If you think it's that important to have, you can try integrating it yourself.</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <!--Cockpit Rust-->
+
+  <DialogueNode>
+    <Name>SE_CockpitRust_1</Name>
+    <Dialogue>
+      <Page>Oh, that? I used the wrong metal coating for the glass. Could have easily been avoided, now that I think about it.</Page>
+      <Page>It should be fine, as long as the rust isn't covering the entire cockpit.</Page>
+    </Dialogue>
+
+    <DialogueOptionsList>
+      <DialogueOption>
+        <RequiredCondition>SE_MAX_COCKPIT_RUST</RequiredCondition>
+        <Text>It is.</Text>
+        <DialogueTarget>SE_CockpitRust_11</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>That ship is definitely a death trap.</Text>
+        <DialogueTarget>SE_CockpitRust_12</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>If you say so...</Text>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_CockpitRust_11</Name>
+    <Dialogue>
+      <Page>It is? Stars above, that coating oxidized fast.</Page>
+      <Page>Look, Gossan's got an eye missing, and they could still fly a ship as well as any other Hearthian. You should have no problem piloting it with all four eyes and a cockpit coated in rust.</Page>
+      <Page>Just... try to think transparent thoughts.</Page>
+    </Dialogue>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_CockpitRust_12</Name>
+    <Dialogue>
+      <Page>At least it's a death trap that can fly! When was the last time you got to go in a death trap that could fly?</Page>
     </Dialogue>
   </DialogueNode>
   
