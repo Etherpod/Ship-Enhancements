@@ -114,10 +114,11 @@ Ship Enhancements adds 9 new achievements to the **Achievements+** mod! Play wit
 ## Known Bugs
 - When playing in multiplayer and using Input Latency, the delayed inputs of the non-hosts will not work once they leave the flight console
 - If you attach yourself to an object with a tether and the object enters a black hole, there is a chance you will be violently thrown across the solar system
+- The Portable Campfire can be lit inside the core of Giant's Deep
 
 # Credits
-Thanks to Ditzy and JohnCorby for helping with some of the code, especially the physics stuff.
-
 Big thanks to NineMeowz for helping with most of the ideas and some sound effects.
+
+Thanks to Ditzy and JohnCorby for helping with some of the code, especially the physics stuff.
 
 And thanks to the Outer Wilds Modding Community, this wouldn't have been possible without them.
