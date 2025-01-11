@@ -75,8 +75,6 @@ public class ShipEnhancements : ModBehaviour
     private bool _shipLoaded = false;
     private bool _shipDestroyed;
 
-    private Dictionary<Material, Material> _exteriorToInteriorMat;
-
     public enum Settings
     {
         disableGravityCrystal,
@@ -191,9 +189,6 @@ public class ShipEnhancements : ModBehaviour
         GravityCrystalType = EnumUtils.Create<ItemType>("ShipGravityCrystal");
         ShipSignalName = EnumUtils.Create<SignalName>("Ship");
 
-        GameObject index = LoadPrefab("Assets/ShipEnhancements/ShipMaterialIndex.prefab");
-        _exteriorToInteriorMat = index.GetComponent<ShipMaterialIndex>().GetMaterialDictionary();
-
         SEItemAudioController.Initialize();
 
         LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
@@ -209,7 +204,6 @@ public class ShipEnhancements : ModBehaviour
             angularDragEnabled = false;
             probeDestroyed = false;
             _shipDestroyed = false;
-            anyPartDamaged = false;
             anyPartDamaged = false;
 
             if (AchievementsAPI != null)
@@ -1540,30 +1534,6 @@ public class ShipEnhancements : ModBehaviour
     {
         engineOn = state;
         OnEngineStateChanged?.Invoke(state);
-    }
-
-    public Material GetInteriorMaterial(Material exteriorMat)
-    {
-        if (_exteriorToInteriorMat.ContainsKey(exteriorMat))
-        {
-            return _exteriorToInteriorMat[exteriorMat];
-        }
-        return exteriorMat;
-    }
-
-    public Material GetExteriorMaterial(Material interiorMat)
-    {
-        if (_exteriorToInteriorMat.ContainsValue(interiorMat))
-        {
-            foreach (KeyValuePair<Material, Material> pair in _exteriorToInteriorMat)
-            {
-                if (pair.Value == interiorMat)
-                {
-                    return pair.Key;
-                }
-            }
-        }
-        return interiorMat;
     }
 
     #endregion
