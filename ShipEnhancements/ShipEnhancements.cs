@@ -1394,6 +1394,10 @@ public class ShipEnhancements : ModBehaviour
                 DialogueConditionManager.SharedInstance.SetConditionState("SE_MAX_COCKPIT_RUST", true);
             }
         }
+        if ((string)Settings.temperatureZonesAmount.GetProperty() != "None")
+        {
+            DialogueConditionManager.SharedInstance.SetConditionState("SE_TEMPERATURE_ENABLED", true);
+        }
     }
 
     #endregion

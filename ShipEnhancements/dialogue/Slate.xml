@@ -30,6 +30,16 @@
         <DialogueTarget>SE_CockpitRust_1</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
+        <RequiredCondition>SE_TEMPERATURE_ENABLED</RequiredCondition>
+        <Text>What happens if the ship gets too hot?</Text>
+        <DialogueTarget>SE_Temperature_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_RETRO_ROCKETS_DISABLED</RequiredCondition>
+        <Text>The retro rockets don't work.</Text>
+        <DialogueTarget>SE_RetroRockets_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
         <Text>How come you didn't improve the autopilot instead of adding all these other features?</Text>
         <DialogueTarget>SE_Autopilot_1</DialogueTarget>
       </DialogueOption>
@@ -60,7 +70,7 @@
 
     <DialogueOptionsList>
       <DialogueOption>
-        <Text>You thought one extra pound would be too heavy?</Text>
+        <Text>You thought <![CDATA[<i>]]>one<![CDATA[</i>]]> extra pound would be too heavy?</Text>
         <DialogueTarget>SE_ManualRecall_11</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
@@ -83,7 +93,7 @@
     <Name>SE_ManualRecall_12</Name>
     <Dialogue>
       <Page>Calm down! Is picking your scout up by hand really that big of a deal?</Page>
-      <Page>I hope not. You're gonna be doing a lot of stuff by hand out there.</Page>
+      <Page>I hope not. You're gonna be doing a <![CDATA[<i>]]>lot<![CDATA[</i>]]> of stuff by hand out there.</Page>
     </Dialogue>
     <DialogueTarget>SE_ManualRecall_2</DialogueTarget>
   </DialogueNode>
@@ -151,11 +161,11 @@
     <DialogueOptionsList>
       <DialogueOption>
         <RequiredCondition>SE_MAX_COCKPIT_RUST</RequiredCondition>
-        <Text>It is.</Text>
+        <Text>...It is.</Text>
         <DialogueTarget>SE_CockpitRust_11</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
-        <Text>That ship is definitely a death trap.</Text>
+        <Text>That ship is definitely a death-trap.</Text>
         <DialogueTarget>SE_CockpitRust_12</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
@@ -168,7 +178,7 @@
     <Name>SE_CockpitRust_11</Name>
     <Dialogue>
       <Page>It is? Stars above, that coating oxidized fast.</Page>
-      <Page>Look, Gossan's got an eye missing, and they could still fly a ship as well as any other Hearthian. You should have no problem piloting it with all four eyes and a cockpit coated in rust.</Page>
+      <Page>Look, Gossan's got an eye missing, and they could still fly a ship as well as any other Hearthian! You should have no problem piloting it with all four eyes and a cockpit coated in rust.</Page>
       <Page>Just... try to think transparent thoughts.</Page>
     </Dialogue>
   </DialogueNode>
@@ -178,6 +188,92 @@
     <Dialogue>
       <Page>At least it's a death trap that can fly! When was the last time you got to go in a death trap that could fly?</Page>
     </Dialogue>
+  </DialogueNode>
+  
+  <!--TemperatureZones-->
+
+  <DialogueNode>
+    <Name>SE_Temperature_1</Name>
+    <Dialogue>
+      <Page>You keep away from the ship's hull if that happens. You don't want a superheated sheet of metal coming into contact with you.</Page>
+      <Page>There's also a chance the fuel tanks might explode, but that only happens if the ship gets <![CDATA[<i>]]>really<![CDATA[</i>]]> hot.</Page>
+      <Page>Don't worry, you'll be fine! Just don't leave the ship somewhere warm.</Page>
+    </Dialogue>
+
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>What about if it gets super cold?</Text>
+        <DialogueTarget>SE_Temperature_11</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>I guess I'd better stay away from the Hourglass Twins, then.</Text>
+        <DialogueTarget>SE_Temperature_12</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_Temperature_11</Name>
+    <Dialogue>
+      <Page>The engines don't do very well in cold temperatures. They would lock up here in the Village if it weren't for the heat from the ship's reactor.</Page>
+      <Page>I would stay out of cold areas, if I were you. You might have trouble leaving if you stay too long.</Page>
+    </Dialogue>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_Temperature_12</Name>
+    <Dialogue>
+      <Page>I'm sure the heat is tolerable on those planets. It's a good thing they aren't any closer to the sun, though.</Page>
+    </Dialogue>
+
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>What happens if the sun expands?</Text>
+        <DialogueTarget>SE_Temperature_121</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>What if the ship gets super cold?</Text>
+        <DialogueTarget>SE_Temperature_11</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_Temperature_121</Name>
+    <Dialogue>
+      <Page>My guess would be it gets hotter, but it's not like that'll happen in either of our lifetimes.</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <!--Disable Retro Rockets-->
+
+  <DialogueNode>
+    <Name>SE_RetroRockets_1</Name>
+    <Dialogue>
+      <Page>Again? ...You're sure?</Page>
+    </Dialogue>
+
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Completely broken.</Text>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>This is starting to become a recurring theme.</Text>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_RetroRockets_11</Name>
+    <Dialogue>
+      <Page>But I just fixed them yesterday! You saw them working, right?</Page>
+    </Dialogue>
+
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>All I saw yesterday was </Text>
+      </DialogueOption>
+    </DialogueOptionsList>
   </DialogueNode>
   
 </DialogueTree>
