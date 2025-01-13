@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
@@ -72,6 +73,13 @@ public static class SELocator
         {
             _fuelTankItem = _shipTransform.GetComponentInChildren<FuelTankItem>(true);
         }
+
+        AssignShipModules();
+    }
+
+    public static void AssignShipModules()
+    {
+        
     }
 
     public static ShipBody GetShipBody()

@@ -127,6 +127,21 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
         return hookID.GetWorldObject<QSBTetherHookItem>().AttachedObject;
     }
 
+    public int GetIDFromItem(OWItem item)
+    {
+        return item.GetWorldObject<IQSBItem>().ObjectId;
+    }
+
+    public OWItem GetItemFromID(int itemID)
+    {
+        var obj = itemID.GetWorldObject<IQSBItem>().AttachedObject;
+        if (obj is OWItem)
+        {
+            return (OWItem)obj;
+        }
+        return null;
+    }
+
     public bool WorldObjectsLoaded()
     {
         return QSBWorldSync.AllObjectsReady;
@@ -447,6 +462,7 @@ public static class QSBInteractionPatches
             ? targetRigidbody.transform
             : customDropTarget.GetItemDropTargetTransform(hit.collider.gameObject);*/
         var parent = module.transform;
+        var item = __0._heldItem;
         var qsbItem = __0._heldItem.GetWorldObject<IQSBItem>();
         __0._heldItem.DropItem(hit.point, hit.normal, parent, sector, customDropTarget);
         //customDropTarget?.AddDroppedItem(hit.collider.gameObject, __0._heldItem);
@@ -457,6 +473,13 @@ public static class QSBInteractionPatches
         Locator.GetToolModeSwapper().UnequipTool();
 
         qsbItem.SendMessage(new DropItemMessage(hit.point, hit.normal, parent, sector, customDropTarget, targetRigidbody));
+
+        List<ShipModule> moduleList = [.. SELocator.GetShipDamageController()._shipModules];
+        int index = moduleList.IndexOf(module.GetComponent<ShipModule>());
+        foreach (uint id in ShipEnhancements.ShipEnhancements.PlayerIDs)
+        {
+            ShipEnhancements.ShipEnhancements.QSBCompat.SendItemModuleParent(id, item, index);
+        }
 
         qsbItem.ItemState.State = ItemStateType.OnGround;
         qsbItem.ItemState.Parent = parent;

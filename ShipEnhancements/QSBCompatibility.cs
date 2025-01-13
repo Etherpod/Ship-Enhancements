@@ -52,6 +52,7 @@ public class QSBCompatibility
         _api.RegisterHandler<bool>("toggle-fuel-tank-drain", ReceiveToggleFuelTankDrain);
         _api.RegisterHandler<NoData>("fuel-tank-explosion", ReceiveFuelTankExplosion);
         _api.RegisterHandler<float>("fuel-tank-capacity", ReceiveFuelTankCapacity);
+        _api.RegisterHandler<(int, int)>("item-module-parent", ReceiveItemModuleParent);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -657,6 +658,20 @@ public class QSBCompatibility
     private void ReceiveFuelTankCapacity(uint id, float fuel)
     {
         SELocator.GetFuelTankItem()?.UpdateFuelRemote(fuel);
+    }
+    #endregion
+
+    #region ShipItemPlacement
+    public void SendItemModuleParent(uint id, OWItem item, int shipModulesIndex)
+    {
+        _api.SendMessage("item-module-parent", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), shipModulesIndex), id, false);
+    }
+
+    private void ReceiveItemModuleParent(uint id, (int itemID, int shipModulesIndex) data)
+    {
+        ShipModule module = SELocator.GetShipDamageController()._shipModules[data.shipModulesIndex];
+        OWItem item = ShipEnhancements.QSBInteraction.GetItemFromID(data.itemID);
+        item.transform.parent = module.transform;
     }
     #endregion
 }

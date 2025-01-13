@@ -19,6 +19,10 @@ public interface IQSBInteraction
 
     TetherHookItem GetTetherHookFromID(int hookID);
 
+    int GetIDFromItem(OWItem item);
+
+    OWItem GetItemFromID(int itemID);
+
     bool WorldObjectsLoaded();
 
     void OnDetachAllPlayers(Vector3 velocity);
