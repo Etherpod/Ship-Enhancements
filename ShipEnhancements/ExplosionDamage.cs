@@ -93,6 +93,11 @@ public class ExplosionDamage : MonoBehaviour
 
     private void OnTriggerEnter(Collider hitObj)
     {
+        if (ShipEnhancements.InMultiplayer && !ShipEnhancements.QSBAPI.GetIsHost())
+        {
+            return;
+        }
+
         if (_damageShip)
         {
             if ((float)shipExplosionMultiplier.GetProperty() <= 0 || (float)shipDamageMultiplier <= 0)
@@ -104,6 +109,7 @@ public class ExplosionDamage : MonoBehaviour
             if (hull != null && !_trackedHulls.Contains(hull))
             {
                 _trackedHulls.Add(hull);
+                bool newlyDamaged = false;
 
                 float num = UnityEngine.Random.Range(0.9f, 1.1f) * Mathf.Sqrt(1f/20f * (float)shipExplosionMultiplier.GetProperty())
                     * (float)shipDamageMultiplier.GetProperty();
@@ -118,6 +124,7 @@ public class ExplosionDamage : MonoBehaviour
                 if (!hull._damaged)
                 {
                     hull._damaged = true;
+                    newlyDamaged = true;
 
                     var eventDelegate = (MulticastDelegate)typeof(ShipHull).GetField("OnDamaged", BindingFlags.Instance
                         | BindingFlags.NonPublic | BindingFlags.Public).GetValue(hull);
@@ -132,6 +139,11 @@ public class ExplosionDamage : MonoBehaviour
                 if (hull._damageEffect != null)
                 {
                     hull._damageEffect.SetEffectBlend(1f - hull._integrity);
+                }
+
+                if (ShipEnhancements.InMultiplayer)
+                {
+                    ShipEnhancements.QSBInteraction.SetHullDamaged(hull, newlyDamaged);
                 }
 
                 if (hull.shipModule is ShipDetachableModule)

@@ -26,6 +26,7 @@ public static class SELocator
     private static PortableCampfire _portableCampfire;
     private static CockpitFilthController _cockpitFilthController;
     private static FlightConsoleInteractController _consoleInteractController;
+    private static FuelTankItem _fuelTankItem;
 
     public static void Initalize()
     {
@@ -66,6 +67,10 @@ public static class SELocator
         if ((float)rustLevel.GetProperty() > 0 || (float)dirtAccumulationTime.GetProperty() > 0f)
         {
             _cockpitFilthController = _shipTransform.GetComponentInChildren<CockpitFilthController>();
+        }
+        if ((bool)addFuelCanister.GetProperty())
+        {
+            _fuelTankItem = _shipTransform.GetComponentInChildren<FuelTankItem>(true);
         }
     }
 
@@ -182,5 +187,10 @@ public static class SELocator
     public static void SetFlightConsoleInteractController(FlightConsoleInteractController controller)
     {
         _consoleInteractController = controller;
+    }
+
+    public static FuelTankItem GetFuelTankItem()
+    {
+        return _fuelTankItem;
     }
 }

@@ -1096,7 +1096,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(HatchController), nameof(HatchController.OpenHatch))]
     public static void ActivateHatchTractorBeam(HatchController __instance)
     {
-        if (!(bool)enableAutoHatch.GetProperty()) return;
+        if (!(bool)enableAutoHatch.GetProperty() || ShipEnhancements.InMultiplayer) return;
 
         ShipTractorBeamSwitch beamSwitch = SELocator.GetShipBody().GetComponentInChildren<ShipTractorBeamSwitch>();
 
@@ -1110,7 +1110,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipTractorBeamSwitch), nameof(ShipTractorBeamSwitch.OnTriggerExit))]
     public static bool CloseHatchOutsideShip(ShipTractorBeamSwitch __instance)
     {
-        if (!(bool)enableAutoHatch.GetProperty()) return true;
+        if (!(bool)enableAutoHatch.GetProperty() || ShipEnhancements.InMultiplayer) return true;
 
         HatchController hatch = SELocator.GetShipBody().GetComponentInChildren<HatchController>();
         if (!hatch._hatchObject.activeInHierarchy)
@@ -1774,8 +1774,9 @@ public static class PatchClass
     public static bool ParentItemsToShipModules(ItemTool __instance,
         RaycastHit hit, OWRigidbody targetRigidbody, IItemDropTarget customDropTarget)
     {
-        if (customDropTarget != null) return true;
+        if (customDropTarget != null || ShipEnhancements.InMultiplayer) return true;
 
+        // Get module to parent
         Transform module = hit.collider.GetComponentInParent<ShipDetachableModule>()?.transform;
         if (module == null)
         {
@@ -1783,6 +1784,7 @@ public static class PatchClass
             if (module == null) return true;
         }
 
+        // Regular code
         Locator.GetPlayerAudioController().PlayDropItem(__instance._heldItem.GetItemType());
         GameObject gameObject = hit.collider.gameObject;
         ISectorGroup sectorGroup = gameObject.GetComponent<ISectorGroup>();
@@ -1804,12 +1806,20 @@ public static class PatchClass
                 }
             }
         }
+        
+        // Cancel normal parenting
         //Transform transform = ((customDropTarget == null) ? targetRigidbody.transform : customDropTarget.GetItemDropTargetTransform(hit.collider.gameObject));
+
+        // Normal code
         __instance._heldItem.DropItem(hit.point, hit.normal, module, sector, customDropTarget);
+
+        // Never custom dropped target in ship
         /*if (customDropTarget != null)
         {
             customDropTarget.AddDroppedItem(hit.collider.gameObject, __instance._heldItem);
         }*/
+
+        // Normal code
         __instance._heldItem = null;
         Locator.GetToolModeSwapper().UnequipTool();
 

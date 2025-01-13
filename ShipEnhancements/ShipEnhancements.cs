@@ -1017,7 +1017,7 @@ public class ShipEnhancements : ModBehaviour
                     tool.SetActive(false);
                 }
             }
-            if ((float)Settings.randomHullDamage.GetProperty() > 0f)
+            if ((float)Settings.randomHullDamage.GetProperty() > 0f && (!InMultiplayer || QSBAPI.GetIsHost()))
             {
                 float lerp = (float)Settings.randomHullDamage.GetProperty();
                 List<ShipHull> hulls = [.. SELocator.GetShipDamageController()._shipHulls];
@@ -1070,7 +1070,7 @@ public class ShipEnhancements : ModBehaviour
                     anyPartDamaged = true;
                 }
             }
-            if ((float)Settings.randomComponentDamage.GetProperty() > 0f)
+            if ((float)Settings.randomComponentDamage.GetProperty() > 0f && (!InMultiplayer || QSBAPI.GetIsHost()))
             {
                 Type[] invalidTypes = [typeof(ShipReactorComponent), typeof(ShipFuelTankComponent)];
                 List<ShipComponent> components = [];

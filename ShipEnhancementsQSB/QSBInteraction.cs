@@ -21,8 +21,8 @@ using static ShipEnhancements.ShipEnhancements.Settings;
 using QSB.Tools.ProbeLauncherTool.Patches;
 using QSB.ShipSync.Messages;
 using QSB.Player.TransformSync;
-using QSB;
 using System.Collections.Generic;
+using QSB.ItemSync.Patches;
 
 namespace ShipEnhancementsQSB;
 
@@ -61,6 +61,10 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
                 if ((bool)enableRemovableGravityCrystal.GetProperty())
                 {
                     QSBWorldSync.Init<QSBShipGravityCrystal, ShipGravityCrystalItem>();
+                }
+                if ((bool)addFuelCanister.GetProperty())
+                {
+                    QSBWorldSync.Init<QSBFuelTankItem, FuelTankItem>();
                 }
             }, 2);
         };
@@ -102,10 +106,13 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
         return QSBInteractionPatches.RecoveringAtShip;
     }
 
-    public void SetHullDamaged(ShipHull shipHull)
+    public void SetHullDamaged(ShipHull shipHull, bool newlyDamaged)
     {
         var hull = shipHull.GetWorldObject<QSBShipHull>();
-        hull.SendMessage(new HullDamagedMessage());
+        if (newlyDamaged)
+        {
+            hull.SendMessage(new HullDamagedMessage());
+        }
         hull.SendMessage(new HullChangeIntegrityMessage(shipHull._integrity));
     }
 
@@ -396,6 +403,70 @@ public static class QSBInteractionPatches
         player.HeldItem = null;
         player.AnimationSync.VisibleAnimator.SetTrigger("DropHeldItem");
 
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ItemToolPatches), nameof(ItemToolPatches.DropItem))]
+    public static bool ParentItemToShip(ItemTool __0, RaycastHit hit, OWRigidbody targetRigidbody, IItemDropTarget customDropTarget, ref bool __result)
+    {
+        if (customDropTarget != null) return true;
+
+        Transform module = hit.collider.GetComponentInParent<ShipDetachableModule>()?.transform;
+        if (module == null)
+        {
+            module = hit.collider.GetComponentInParent<ShipDetachableLeg>()?.transform;
+            if (module == null) return true;
+        }
+
+        Locator.GetPlayerAudioController().PlayDropItem(__0._heldItem.GetItemType());
+        var gameObject = hit.collider.gameObject;
+        var component = gameObject.GetComponent<ISectorGroup>();
+        Sector sector = null;
+
+        while (component == null && gameObject.transform.parent != null)
+        {
+            gameObject = gameObject.transform.parent.gameObject;
+            component = gameObject.GetComponent<ISectorGroup>();
+        }
+
+        if (component != null)
+        {
+            sector = component.GetSector();
+            if (sector == null && component is SectorCullGroup sectorCullGroup)
+            {
+                var controllingProxy = sectorCullGroup.GetControllingProxy();
+                if (controllingProxy != null)
+                {
+                    sector = controllingProxy.GetSector();
+                }
+            }
+        }
+
+        /*var parent = customDropTarget == null
+            ? targetRigidbody.transform
+            : customDropTarget.GetItemDropTargetTransform(hit.collider.gameObject);*/
+        var parent = module.transform;
+        var qsbItem = __0._heldItem.GetWorldObject<IQSBItem>();
+        __0._heldItem.DropItem(hit.point, hit.normal, parent, sector, customDropTarget);
+        //customDropTarget?.AddDroppedItem(hit.collider.gameObject, __0._heldItem);
+
+        __0._heldItem = null;
+        QSBPlayerManager.LocalPlayer.HeldItem = null;
+
+        Locator.GetToolModeSwapper().UnequipTool();
+
+        qsbItem.SendMessage(new DropItemMessage(hit.point, hit.normal, parent, sector, customDropTarget, targetRigidbody));
+
+        qsbItem.ItemState.State = ItemStateType.OnGround;
+        qsbItem.ItemState.Parent = parent;
+        qsbItem.ItemState.LocalPosition = parent.InverseTransformPoint(hit.point);
+        qsbItem.ItemState.LocalNormal = parent.InverseTransformDirection(hit.normal);
+        qsbItem.ItemState.Sector = sector;
+        qsbItem.ItemState.CustomDropTarget = customDropTarget;
+        qsbItem.ItemState.Rigidbody = targetRigidbody;
+
+        __result = false;
         return false;
     }
     #endregion

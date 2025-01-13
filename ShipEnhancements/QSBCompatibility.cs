@@ -49,6 +49,9 @@ public class QSBCompatibility
         _api.RegisterHandler<float>("initial-black-hole", ReceiveInitialBlackHoleState);
         _api.RegisterHandler<ShipCommand>("send-ship-command", ReceiveShipCommand);
         _api.RegisterHandler<(bool, string)>("activate-warp", ReceiveActivateWarp);
+        _api.RegisterHandler<bool>("toggle-fuel-tank-drain", ReceiveToggleFuelTankDrain);
+        _api.RegisterHandler<NoData>("fuel-tank-explosion", ReceiveFuelTankExplosion);
+        _api.RegisterHandler<float>("fuel-tank-capacity", ReceiveFuelTankCapacity);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -622,6 +625,38 @@ public class QSBCompatibility
     {
         SELocator.GetShipTransform().GetComponentInChildren<ShipWarpCoreController>()?
             .ActivateWarpRemote(data.playerInShip, data.targetCannonEntryID);
+    }
+    #endregion
+
+    #region FuelTankItem
+    public void SendToggleFuelTankDrain(uint id, bool started)
+    {
+        _api.SendMessage("toggle-fuel-tank-drain", started, id, false);
+    }
+
+    private void ReceiveToggleFuelTankDrain(uint id, bool started)
+    {
+        SELocator.GetFuelTankItem()?.ToggleDrainRemote(started);
+    }
+
+    public void SendFuelTankExplosion(uint id)
+    {
+        _api.SendMessage("fuel-tank-explosion", new NoData(), id, false);
+    }
+
+    private void ReceiveFuelTankExplosion(uint id, NoData noData)
+    {
+        SELocator.GetFuelTankItem()?.ExplodeRemote();
+    }
+
+    public void SendFuelTankCapacity(uint id, float fuel)
+    {
+        _api.SendMessage("fuel-tank-capacity", fuel, id, false);
+    }
+
+    private void ReceiveFuelTankCapacity(uint id, float fuel)
+    {
+        SELocator.GetFuelTankItem()?.UpdateFuelRemote(fuel);
     }
     #endregion
 }

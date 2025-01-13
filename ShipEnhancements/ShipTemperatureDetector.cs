@@ -80,11 +80,12 @@ public class ShipTemperatureDetector : TemperatureDetector
         ShipHull targetHull = validHulls[UnityEngine.Random.Range(0, validHulls.Length)];
         float tempDamage = Mathf.Max((float)temperatureDamageMultiplier.GetProperty(), 0f);
         float damage = UnityEngine.Random.Range(0.03f, 0.15f) * tempDamage;
+        bool wasDamaged = targetHull.isDamaged;
         ApplyHullTempDamage(targetHull, damage);
 
         if (ShipEnhancements.InMultiplayer && ShipEnhancements.QSBAPI.GetIsHost())
         {
-            ShipEnhancements.QSBInteraction.SetHullDamaged(targetHull);
+            ShipEnhancements.QSBInteraction.SetHullDamaged(targetHull, !wasDamaged);
         }
     }
 

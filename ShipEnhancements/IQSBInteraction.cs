@@ -13,7 +13,7 @@ public interface IQSBInteraction
 
     bool IsRecoveringAtShip();
 
-    void SetHullDamaged(ShipHull shipHull);
+    void SetHullDamaged(ShipHull shipHull, bool newlyDamaged);
 
     int GetIDFromTetherHook(TetherHookItem hookItem);
 

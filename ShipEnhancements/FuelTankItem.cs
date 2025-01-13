@@ -29,6 +29,7 @@ public class FuelTankItem : OWItem
     private float _refillRate = 25f;
     private bool _refillingFuel;
     private bool _focused;
+    private int _numberDraining = 1;
 
     private float _explosionSpeed = 10f;
 
@@ -146,6 +147,14 @@ public class FuelTankItem : OWItem
                             ShipNotifications.PostRefuelingNotification();
                             _interactReceiver._hasInteracted = true;
                             _refillingFuel = true;
+
+                            if (ShipEnhancements.InMultiplayer)
+                            {
+                                foreach (uint id in ShipEnhancements.PlayerIDs)
+                                {
+                                    ShipEnhancements.QSBCompat.SendToggleFuelTankDrain(id, true);
+                                }
+                            }
                         }
                         else if (OWInput.IsNewlyReleased(InputLibrary.interactSecondary))
                         {
@@ -159,11 +168,15 @@ public class FuelTankItem : OWItem
         if (_refillingFuel)
         {
             SELocator.GetPlayerResources()._currentFuel += _refillRate * Time.deltaTime;
-            _currentFuel = Mathf.Max(_currentFuel - _refillRate * Time.deltaTime, 0f);
+            _currentFuel = Mathf.Max(_currentFuel - _refillRate * Time.deltaTime * _numberDraining, 0f);
             if (PlayerMaxFuel() || _currentFuel <= 0f)
             {
                 StopRefuel();
             }
+        }
+        else if (_numberDraining > 1)
+        {
+            _currentFuel = Mathf.Max(_currentFuel - _refillRate * Time.deltaTime * (_numberDraining - 1), 0f);
         }
     }
 
@@ -207,6 +220,14 @@ public class FuelTankItem : OWItem
         ShipNotifications.RemoveRefuelingNotification();
         _interactReceiver._hasInteracted = false;
         _refillingFuel = false;
+
+        if (ShipEnhancements.InMultiplayer)
+        {
+            foreach (uint id in ShipEnhancements.PlayerIDs)
+            {
+                ShipEnhancements.QSBCompat.SendToggleFuelTankDrain(id, false);
+            }
+        }
     }
 
     private bool PlayerMaxFuel()
@@ -231,7 +252,7 @@ public class FuelTankItem : OWItem
     {
         _explosion?.Play();
         _explosion.transform.parent = transform.parent;
-        if (GetComponentInParent<ShipBody>())
+        if (GetComponentInParent<ShipBody>() && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
         {
             SELocator.GetShipDamageController().Explode();
         }
@@ -245,6 +266,37 @@ public class FuelTankItem : OWItem
             Locator.GetDeathManager().KillPlayer(DeathType.Default);
         }
 
+        if (ShipEnhancements.InMultiplayer)
+        {
+            foreach (uint id in ShipEnhancements.PlayerIDs)
+            {
+                ShipEnhancements.QSBCompat.SendFuelTankExplosion(id);
+            }
+        }
+
+        OnLoseFocus();
+        Destroy(gameObject);
+    }
+
+    public void ExplodeRemote()
+    {
+        _explosion?.Play();
+        _explosion.transform.parent = transform.parent;
+        if (GetComponentInParent<ShipBody>() && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
+        {
+            SELocator.GetShipDamageController().Explode();
+        }
+        else
+        {
+            _explosion.GetComponentInChildren<ExplosionDamage>()?.OnExplode();
+        }
+
+        if (Locator.GetToolModeSwapper().GetItemCarryTool().GetHeldItem() == this)
+        {
+            Locator.GetDeathManager().KillPlayer(DeathType.Default);
+        }
+
+        OnLoseFocus();
         Destroy(gameObject);
     }
 
@@ -260,6 +312,24 @@ public class FuelTankItem : OWItem
     public void SetEmissiveScale(float scale)
     {
         _emissiveRenderer.SetEmissiveScale(scale);
+    }
+
+    public void ToggleDrainRemote(bool draining)
+    {
+        _numberDraining = Mathf.Clamp(_numberDraining + (draining ? 1 : -1), 1, ShipEnhancements.QSBAPI.GetPlayerIDs().Length);
+
+        if (ShipEnhancements.QSBAPI.GetIsHost())
+        {
+            foreach (uint id in ShipEnhancements.PlayerIDs)
+            {
+                ShipEnhancements.QSBCompat.SendFuelTankCapacity(id, _currentFuel);
+            }
+        }
+    }
+
+    public void UpdateFuelRemote(float newFuel)
+    {
+        _currentFuel = newFuel;
     }
 
     public override void DropItem(Vector3 position, Vector3 normal, Transform parent, Sector sector, IItemDropTarget customDropTarget)
