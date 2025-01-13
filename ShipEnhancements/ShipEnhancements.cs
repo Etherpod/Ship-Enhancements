@@ -1546,7 +1546,7 @@ public class ShipEnhancements : ModBehaviour
         {
             foreach (ShipComponent component in SELocator.GetShipDamageController()._shipComponents)
             {
-                if (component != null && component.isDamaged)
+                if (component != null && component.isDamaged && component._repairReceiver.repairDistance > 0)
                 {
                     anyDamaged = true;
                 }

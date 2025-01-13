@@ -43,6 +43,7 @@ public class ShipEngineSwitch : CockpitInteractible
     private bool _engineStalling = false;
     private Color _indicatorLightColor = new Color(1.3f, 0.55f, 0.55f);
     private bool _lastShipPowerState = false;
+    private bool _lastShipThrusterState = false;
     private bool _reset = true;
     private float _baseIndicatorLightIntensity;
 
@@ -113,6 +114,14 @@ public class ShipEngineSwitch : CockpitInteractible
                 _lastShipPowerState = electricalFailed;
                 _powerIndicator.SetEmissionColor(electricalFailed ? Color.black : _indicatorLightColor);
                 _powerIndicatorLight.intensity = electricalFailed ? 0f : _baseIndicatorLightIntensity;
+            }
+
+            bool thrustersUsable = SELocator.GetShipResources().AreThrustersUsable();
+            if (thrustersUsable != _lastShipThrusterState)
+            {
+                _lastShipThrusterState = thrustersUsable;
+                _thrustersIndicator.SetEmissionColor(!thrustersUsable ? Color.black : _indicatorLightColor);
+                _thrustersIndicatorLight.intensity = !thrustersUsable ? 0f : _baseIndicatorLightIntensity;
             }
         }
     }

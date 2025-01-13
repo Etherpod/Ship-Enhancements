@@ -2546,8 +2546,11 @@ public static class PatchClass
         {
             _lastImpactVelocity = impact.velocity.normalized * -impact.speed / 40f;
             ShipCockpitController cockpit = SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitController>();
-            cockpit.ExitFlightConsole();
-            cockpit._exitFlightConsoleTime -= 0.2f;
+            if (cockpit != null)
+            {
+                cockpit.ExitFlightConsole();
+                cockpit._exitFlightConsoleTime -= 0.2f;
+            }
 
             if (ShipEnhancements.InMultiplayer)
             {
@@ -2582,8 +2585,11 @@ public static class PatchClass
             {
                 _lastImpactVelocity = -impactVelocity / 25f;
                 ShipCockpitController cockpit = SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitController>();
-                cockpit.ExitFlightConsole();
-                cockpit._exitFlightConsoleTime -= 0.2f;
+                if (cockpit != null)
+                {
+                    cockpit.ExitFlightConsole();
+                    cockpit._exitFlightConsoleTime -= 0.2f;
+                }
 
                 if (ShipEnhancements.InMultiplayer)
                 {
@@ -2667,7 +2673,7 @@ public static class PatchClass
     {
         if ((bool)disableAutoLights.GetProperty())
         {
-            __instance._electricalSystem.SetPowered(!__instance.isDamaged);
+            __instance._electricalSystem.SetPowered(!__instance.isDamaged && !(bool)addEngineSwitch.GetProperty());
             return false;
         }
 
@@ -2940,12 +2946,13 @@ public static class PatchClass
     public static void HullDamageEffect_SetEffectBlend(HullDamageEffect instance, float blend) { }
     #endregion
 
-    #region DisableAirDrag
+    #region Air drag multiplier
     [HarmonyPrefix]
     [HarmonyPatch(typeof(FluidDetector), nameof(FluidDetector.AddLinearDrag))]
-    public static bool DisableAirDrag(FluidDetector __instance, FluidVolume fluidVolume, float fluidDensity, float fractionSubmerged)
+    public static bool AirDragMultiplier(FluidDetector __instance, FluidVolume fluidVolume, float fluidDensity, float fractionSubmerged)
     {
-        if (__instance is ShipFluidDetector && fluidVolume is SimpleFluidVolume && fluidVolume.GetFluidType() == FluidVolume.Type.AIR)
+        List<FluidVolume.Type> acceptableTypes = [FluidVolume.Type.AIR, FluidVolume.Type.FOG];
+        if (__instance is ShipFluidDetector && fluidVolume is SimpleFluidVolume && acceptableTypes.Contains(fluidVolume.GetFluidType()))
         {
             Vector3 vector = fluidVolume.GetPointFluidVelocity(__instance.transform.position, __instance) - __instance._owRigidbody.GetVelocity();
             __instance._netRelativeFluidVelocity += vector;
