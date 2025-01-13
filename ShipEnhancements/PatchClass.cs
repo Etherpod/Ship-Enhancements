@@ -3055,4 +3055,30 @@ public static class PatchClass
         return true;
     }
     #endregion
+
+    #region HornfelsGroundedYou
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(LaunchElevatorController), nameof(LaunchElevatorController.OnPressInteract))]
+    public static bool CancelLaunchCodesInput()
+    {
+        if (ShipEnhancements.Instance.groundedByHornfels)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(LaunchElevatorController), nameof(LaunchElevatorController.OnLearnLaunchCodes))]
+    public static bool CancelLearnLaunchCodes(LaunchElevatorController __instance)
+    {
+        if (ShipEnhancements.Instance.groundedByHornfels)
+        {
+            __instance._launchElevator._interactVolume.ChangePrompt("Grounded by Hornfels");
+            __instance._launchElevator._interactVolume.SetKeyCommandVisible(false);
+            return false;
+        }
+        return true;
+    }
+    #endregion
 }

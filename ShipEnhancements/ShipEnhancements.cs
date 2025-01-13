@@ -34,6 +34,7 @@ public class ShipEnhancements : ModBehaviour
     public bool engineOn;
     public Tether playerTether;
     public bool anyPartDamaged;
+    public bool groundedByHornfels;
 
     public static IAchievements AchievementsAPI;
     public static IQSBAPI QSBAPI;
@@ -74,6 +75,7 @@ public class ShipEnhancements : ModBehaviour
     private float _lastSuitOxygen;
     private bool _shipLoaded = false;
     private bool _shipDestroyed;
+    private bool _checkEndConversation = false;
 
     public enum Settings
     {
@@ -205,6 +207,7 @@ public class ShipEnhancements : ModBehaviour
             probeDestroyed = false;
             _shipDestroyed = false;
             anyPartDamaged = false;
+            groundedByHornfels = false;
 
             if (AchievementsAPI != null)
             {
@@ -220,6 +223,11 @@ public class ShipEnhancements : ModBehaviour
                 if (slate != null)
                 {
                     DialogueBuilder.Make(slate.gameObject, "ConversationZone_RSci", "dialogue/Slate.xml", this);
+                    if (_currentPreset == SettingsPresets.PresetName.Random)
+                    {
+                        slate.Find("ConversationZone_RSci").GetComponent<CharacterDialogueTree>().OnEndConversation += OnEndConversation;
+                        _checkEndConversation = true;
+                    }
                 }
             }
         };
@@ -269,6 +277,16 @@ public class ShipEnhancements : ModBehaviour
                         component.OnRepaired -= ctx => CheckNoPartsDamaged();
                     }
                 }
+            }
+            if (_checkEndConversation)
+            {
+                Transform dialogue = GameObject.Find("TimberHearth_Body").transform
+                .Find("Sector_TH/Sector_Village/Sector_StartingCamp/Characters_StartingCamp/Villager_HEA_Slate/ConversationZone_RSci");
+                if (dialogue != null)
+                {
+                    dialogue.GetComponent<CharacterDialogueTree>().OnEndConversation -= OnEndConversation;
+                }
+                _checkEndConversation = false;
             }
             if (AchievementsAPI != null)
             {
@@ -1398,6 +1416,14 @@ public class ShipEnhancements : ModBehaviour
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_TEMPERATURE_ENABLED", true);
         }
+        if ((bool)Settings.disableRetroRockets.GetProperty())
+        {
+            DialogueConditionManager.SharedInstance.SetConditionState("SE_RETRO_ROCKETS_DISABLED", true);
+        }
+        if (_currentPreset == SettingsPresets.PresetName.Random)
+        {
+            DialogueConditionManager.SharedInstance.SetConditionState("SE_USING_RANDOM_PRESET", true);
+        }
     }
 
     #endregion
@@ -1534,6 +1560,21 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)Settings.enableFragileShip.GetProperty())
         {
             anyPartDamaged = anyDamaged;
+        }
+    }
+
+    private void OnEndConversation()
+    {
+        if (DialogueConditionManager.SharedInstance.GetConditionState("SE_GROUNDED_BY_HORNFELS"))
+        {
+            groundedByHornfels = true;
+            GameObject th = GameObject.Find("TimberHearth_Body");
+            if (th != null)
+            {
+                LaunchElevatorController elevator = th.GetComponentInChildren<LaunchElevatorController>();
+                elevator._launchElevator._interactVolume.ChangePrompt("Grounded by Hornfels");
+                elevator._launchElevator._interactVolume.SetKeyCommandVisible(false);
+            }
         }
     }
 

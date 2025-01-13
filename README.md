@@ -2,8 +2,6 @@
 
 Ship Enhancements adds way too many options for changing the ship and things relating to the ship. Experiment and have fun!
 
-If you have more questions about a particular feature, try enabling it and asking Slate about it.
-
 # Feature Overview
 
 ## Disable Ship Parts

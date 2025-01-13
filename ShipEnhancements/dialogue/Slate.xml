@@ -40,6 +40,11 @@
         <DialogueTarget>SE_RetroRockets_1</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
+        <RequiredCondition>SE_USING_RANDOM_PRESET</RequiredCondition>
+        <Text>Is it just me or does the ship keep changing every time I wake up?</Text>
+        <DialogueTarget>SE_RandomPreset_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
         <Text>How come you didn't improve the autopilot instead of adding all these other features?</Text>
         <DialogueTarget>SE_Autopilot_1</DialogueTarget>
       </DialogueOption>
@@ -228,21 +233,10 @@
 
     <DialogueOptionsList>
       <DialogueOption>
-        <Text>What happens if the sun expands?</Text>
-        <DialogueTarget>SE_Temperature_121</DialogueTarget>
-      </DialogueOption>
-      <DialogueOption>
         <Text>What if the ship gets super cold?</Text>
         <DialogueTarget>SE_Temperature_11</DialogueTarget>
       </DialogueOption>
     </DialogueOptionsList>
-  </DialogueNode>
-
-  <DialogueNode>
-    <Name>SE_Temperature_121</Name>
-    <Dialogue>
-      <Page>My guess would be it gets hotter, but it's not like that'll happen in either of our lifetimes.</Page>
-    </Dialogue>
   </DialogueNode>
   
   <!--Disable Retro Rockets-->
@@ -256,9 +250,11 @@
     <DialogueOptionsList>
       <DialogueOption>
         <Text>Completely broken.</Text>
+        <DialogueTarget>SE_RetroRockets_11</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
-        <Text>This is starting to become a recurring theme.</Text>
+        <Text>Were they ever working in the first place?</Text>
+      <DialogueTarget>SE_RetroRockets_12</DialogueTarget>
       </DialogueOption>
     </DialogueOptionsList>
   </DialogueNode>
@@ -266,14 +262,161 @@
   <DialogueNode>
     <Name>SE_RetroRockets_11</Name>
     <Dialogue>
-      <Page>But I just fixed them yesterday! You saw them working, right?</Page>
+      <Page>Stars above, it's like those rockets have a mind of their own. You saw them working yesterday, right?</Page>
     </Dialogue>
 
     <DialogueOptionsList>
       <DialogueOption>
-        <Text>All I saw yesterday was </Text>
+        <Text>I wouldn't call what I saw "working".</Text>
+        <DialogueTarget>SE_RetroRockets_111</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Yeah. Can you fix them again?</Text>
+      <DialogueTarget>SE_RetroRockets_2</DialogueTarget>
       </DialogueOption>
     </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_RetroRockets_111</Name>
+    <Dialogue>
+      <Page>Okay fine, they weren't exactly <![CDATA[<i>]]>working<![CDATA[</i>]]>. But they were at least firing, which is more than I can say for them right now.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_RetroRockets_2</DialogueTarget>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_RetroRockets_12</Name>
+    <Dialogue>
+      <Page>Of course they were! They're just a little stubborn, that's all.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_RetroRockets_2</DialogueTarget>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_RetroRockets_2</Name>
+    <Dialogue>
+      <Page>Give me 30 minutes, then I'll come and look at them.</Page>
+    </Dialogue>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <RequiredPersistentCondition>KILLED_BY_SUPERNOVA_AND_KNOWS_IT</RequiredPersistentCondition>
+        <Text>But the sun's going to explode in 30 minutes!</Text>
+        <DialogueTarget>SE_RetroRockets_21</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Can you look at them now? I don't have time to wait for you.</Text>
+        <DialogueTarget>SE_RetroRockets_22</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Sounds good.</Text>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_RetroRockets_21</Name>
+    <Dialogue>
+      <Page>I'll come help after the sun "explodes". Aren't you a little old to be playing those games?</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_RetroRockets_22</Name>
+    <Dialogue>
+      <Page>Woah, why the sudden rush? It's not like the ship is going anywhere.</Page>
+      <Page>Well... that's not true. I never checked if the autopilot could turn itself on.</Page>
+      <Page>Let me enjoy my marshmallows, then if the ship is still there I'll come fix it.</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <!--Random Preset-->
+  
+  <DialogueNode>
+    <Name>SE_RandomPreset_1</Name>
+    <Dialogue>
+      <Page>Had a weird dream, did you? The ship is the same as it's always been.</Page>
+    </Dialogue>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Yeah, must have just been a dream.</Text>
+        <DialogueTarget>SE_RandomPreset_End1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>No, I'm serious. The ship never used to look like that.</Text>
+      <DialogueTarget>SE_RandomPreset_2</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_RandomPreset_End1</Name>
+    <Dialogue>
+      <Page>Glad you're finally coming to your senses. Now hurry up and go launch the ship!</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_RandomPreset_2</Name>
+    <Dialogue>
+      <Page>You okay, hatchling? Did you inhale some of those fumes by accident?</Page>
+    </Dialogue>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Yeah, must have.</Text>
+      <DialogueTarget>SE_RandomPreset_End2</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>I'm telling you, that ship keeps changing and it's creeping me out.</Text>
+      <DialogueTarget>SE_RandomPreset_3</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_RandomPreset_End2</Name>
+    <Dialogue>
+      <Page>Well, be more careful next time. You're lucky I'm not having Hornfels ground you for medical reasons right now.</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_RandomPreset_3</Name>
+    <Dialogue>
+      <Page>You're the one who's creeping me out, because I have no idea what you're talking about.</Page>
+      <Page>I'm radioing Hornfels. You're definitely not flying that ship today.</Page>
+    </Dialogue>
+    <SetCondition>SE_GROUNDED_BY_HORNFELS</SetCondition> 
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Wait, what? You're grounding me!?</Text>
+      <DialogueTarget>SE_RandomPreset_31</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Not like I would fly that ship anyways.</Text>
+      <DialogueTarget>SE_RandomPreset_32</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_RandomPreset_31</Name>
+    <Dialogue>
+      <Page>Of course I am! You're talking nonsense!</Page>
+      <Page>Now go get some rest. You can try launching again next week.</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_RandomPreset_32</Name>
+    <Dialogue>
+      <Page>Stars above, what is wrong with you today? I've never seen pilots get this jumpy before launching.</Page>
+      <Page>Go get some rest. You can try launching again next week.</Page>
+    </Dialogue>
   </DialogueNode>
   
 </DialogueTree>
