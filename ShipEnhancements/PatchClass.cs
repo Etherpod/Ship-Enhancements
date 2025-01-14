@@ -556,7 +556,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipResources), nameof(ShipResources.Update))]
     public static bool RefillShipOxygen(ShipResources __instance)
     {
-        if (((bool)disableShipOxygen.GetProperty() || !(bool)shipOxygenRefill.GetProperty()) && ShipEnhancements.QSBAPI == null) return true;
+        if (((bool)disableShipOxygen.GetProperty() || !(bool)shipOxygenRefill.GetProperty()) && !ShipEnhancements.InMultiplayer) return true;
 
         if (__instance._killingResources)
         {

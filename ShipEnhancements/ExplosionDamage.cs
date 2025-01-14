@@ -98,13 +98,8 @@ public class ExplosionDamage : MonoBehaviour
             return;
         }
 
-        if (_damageShip)
+        if (_damageShip && (float)shipExplosionMultiplier.GetProperty() > 0 && (float)shipDamageMultiplier > 0)
         {
-            if ((float)shipExplosionMultiplier.GetProperty() <= 0 || (float)shipDamageMultiplier <= 0)
-            {
-                return;
-            }
-
             ShipHull hull = hitObj.GetComponentInParent<ShipHull>();
             if (hull != null && !_trackedHulls.Contains(hull))
             {

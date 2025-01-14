@@ -76,6 +76,7 @@ public class ShipEnhancements : ModBehaviour
     private bool _shipLoaded = false;
     private bool _shipDestroyed;
     private bool _checkEndConversation = false;
+    private bool _setupQSB = false;
 
     public enum Settings
     {
@@ -280,11 +281,14 @@ public class ShipEnhancements : ModBehaviour
             }
             if (_checkEndConversation)
             {
-                Transform dialogue = GameObject.Find("TimberHearth_Body").transform
-                .Find("Sector_TH/Sector_Village/Sector_StartingCamp/Characters_StartingCamp/Villager_HEA_Slate/ConversationZone_RSci");
-                if (dialogue != null)
+                GameObject th = GameObject.Find("TimberHearth_Body");
+                if (th != null)
                 {
-                    dialogue.GetComponent<CharacterDialogueTree>().OnEndConversation -= OnEndConversation;
+                    Transform dialogue = th.transform.Find("Sector_TH/Sector_Village/Sector_StartingCamp/Characters_StartingCamp/Villager_HEA_Slate/ConversationZone_RSci");
+                    if (dialogue != null)
+                    {
+                        dialogue.GetComponent<CharacterDialogueTree>().OnEndConversation -= OnEndConversation;
+                    }
                 }
                 _checkEndConversation = false;
             }
@@ -968,7 +972,7 @@ public class ShipEnhancements : ModBehaviour
 
         engineOn = !(bool)Settings.addEngineSwitch.GetProperty();
 
-        if (QSBAPI != null && !QSBAPI.GetIsHost() && QSBCompat.NeverInitialized())
+        if (InMultiplayer && !QSBAPI.GetIsHost() && QSBCompat.NeverInitialized())
         {
             foreach (uint id in PlayerIDs)
             {
