@@ -134,10 +134,10 @@ If you run into any bugs, feel free to report it on GitHub or on the Outer Wilds
 - If you attach yourself to an object with a tether and the object enters a black hole, there is a chance you will be violently thrown across the solar system
 
 # Credits
-Thanks to Ditzy and JohnCorby for helping with some of the code, especially the physics stuff.
+Big thanks to ColumbidaeCafe for helping develop most of the ideas and sound effects.
 
-Big thanks to NineMeowz for helping with most of the ideas and some sound effects.
+Thanks to Ditzy and JohnCorby for helping with some of the code, especially with the physics stuff and multiplayer compatibility.
 
-Shoutout to SpatialXX for leaving a ton of ideas on the mod page.
+Shoutout to SpatialX for leaving a ton of ideas on the mod page.
 
 And thanks to the Outer Wilds Modding Community, this wouldn't have been possible without them.
