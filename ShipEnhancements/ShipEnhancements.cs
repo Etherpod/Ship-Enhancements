@@ -166,6 +166,7 @@ public class ShipEnhancements : ModBehaviour
         randomHullDamage,
         randomComponentDamage,
         enableFragileShip,
+        faultyHeatRegulators,
     }
 
     private void Awake()

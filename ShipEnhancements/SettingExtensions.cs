@@ -95,6 +95,7 @@ public static class SettingExtensions
         { Settings.randomHullDamage, (1f, 1f) },
         { Settings.randomComponentDamage, (1f, 1f) },
         { Settings.enableFragileShip, (false, false) },
+        { Settings.faultyHeatRegulators, (false, false) },
     };
 
     public static string GetName(this Settings setting)

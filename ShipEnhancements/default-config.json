@@ -377,13 +377,13 @@
       "tooltip": "Determines whether to add temperature zones around the entire solar system, just around the sun, or to add none at all. Check the README for more details about temperature zones."
     },
     "hullTemperatureDamage": {
-      "title": "Enable Hull Temperature Damage",
+      "title": "Hull Temperature Damage",
       "type": "toggle",
       "value": false,
       "tooltip": "Damages the ship hull over time in extremely high or low temperatures."
     },
     "componentTemperatureDamage": {
-      "title": "Enable Component Temperature Damage",
+      "title": "Component Temperature Damage",
       "type": "toggle",
       "value": false,
       "tooltip": "Damages the ship components over time in extremely high or low temperatures."
@@ -398,7 +398,13 @@
       "title": "Temperature Resistance Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the time the ship can resist extreme temperatures. The default resistance gives the ship around 3 minutes before the hull reaches max temperature, meaning max damage."
+      "tooltip": "Larger numbers increase the time the ship can resist extreme temperatures. The default resistance gives the ship around 3 minutes before the hull reaches max temperature."
+    },
+    "faultyHeatRegulators": {
+      "title": "Faulty Heat Regulators",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Your reactor constantly heats up your ship, making anywhere that isn't cold a potential danger. You can cool off your ship by finding somewhere cold."
     },
     "enableRepairConfirmation": {
       "title": "Enable Repair Confirmation",
@@ -407,7 +413,7 @@
       "tooltip": "Plays a sound when every damaged part of the ship has been repaired."
     },
     "hotThrusters": {
-      "title": "Enable Hazardous Thrusters",
+      "title": "Hazardous Thrusters",
       "type": "toggle",
       "value": false,
       "tooltip": "Makes the ship thruster flames do damage when you stand in them."
@@ -459,7 +465,7 @@
       "tooltip": "Adds a clock to the ship cockpit. It uses the standard Hearthian units of time: seconds and minutes."
     },
     "enableShipItemPlacement": {
-      "title": "Enable Ship Item Placement",
+      "title": "Ship Item Placement",
       "type": "toggle",
       "value": false,
       "tooltip": "Lets you drop items inside of the ship or on top of the ship."
@@ -495,7 +501,7 @@
       "tooltip": "Adds a few hooks inside the ship that you can place anywhere you want. Interact with it to tether yourself to it, and interact with another to create a line between them."
     },
     "enableRemovableGravityCrystal": {
-      "title": "Enable Removable Gravity Crystal",
+      "title": "Removable Gravity Crystal",
       "type": "toggle",
       "value": false,
       "tooltip": "Lets you remove the gravity crystal from the ship. It can be placed anywhere on any surface for a portable gravity source."

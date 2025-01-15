@@ -15,7 +15,7 @@ public class FuelTankTemperatureDetector : TemperatureDetector
     {
         _currentTemperature = 0f;
         _highTempCutoff = 50f;
-        _internalTempMeterLength = 45f;
+        _internalTempMeterLength = 75f;
     }
 
     protected override void Update()

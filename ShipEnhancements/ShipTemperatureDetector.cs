@@ -65,9 +65,16 @@ public class ShipTemperatureDetector : TemperatureDetector
     {
         base.Update();
 
-        if (true)
+        if ((bool)faultyHeatRegulators.GetProperty())
         {
-            _internalTempMeter = Mathf.Clamp(_internalTempMeter + Time.deltaTime / 5f, -_internalTempMeterLength, _internalTempMeterLength);
+            float multiplier = Mathf.InverseLerp(-_highTempCutoff / 4f, 0f, _currentTemperature);
+            float scalar = 1 + (1f * Mathf.InverseLerp(_highTempCutoff, 0f, Mathf.Abs(_currentTemperature)));
+            _internalTempMeter = Mathf.Clamp(_internalTempMeter + (Time.deltaTime * multiplier * scalar), -_internalTempMeterLength, _internalTempMeterLength);
+
+            if (!_highTemperature)
+            {
+                UpdateHighTemperature();
+            }
         }
     }
 
@@ -126,6 +133,11 @@ public class ShipTemperatureDetector : TemperatureDetector
         }).ToArray();
         ShipComponent targetComponent = enabledComponents[UnityEngine.Random.Range(0, enabledComponents.Length)];
         ApplyComponentTempDamage(targetComponent);
+    }
+
+    protected override bool RoundInternalTemperature()
+    {
+        return (bool)faultyHeatRegulators.GetProperty();
     }
 
     public void ApplyComponentTempDamage(ShipComponent component)

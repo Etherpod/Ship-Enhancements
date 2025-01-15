@@ -59,7 +59,7 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Fuel Transfer**: Lets you transfer your jetpack fuel to the ship's fuel tank to refill it.
 - **Jetpack Refuel Drain**: Drains the ship's fuel reserve when you refuel your jetpack. You cannot duplicate fuel by transferring it back into the ship.
 - **Fuel Transfer Multiplier**: Larger numbers increase the amount of fuel that is drained when refueling your jetpack, and increase the amount of fuel that is added when transferring fuel to the ship.
-- **Automatic Hatch**: Automatically closes the hatch when you leave the ship.
+- **Automatic Hatch**: Automatically closes the hatch when you leave the ship. **Quantum Space Buddies** has this feature by default.
 - **Manual Scout Recall**: Brings you back to the days when Little Scouts didn't have warping technology. If you shoot your scout somewhere, you'll have to go over and pick it up to use it again. If you accidentally launch it into deep space, don't worry; the ship can still recall it, and you can go retrieve it from the top of the ship in the scout launcher.
 - **Ship Warp Core**: Attaches a Nomai warp core to your ship's cockpit. You can press the button on the ceiling of the cockpit to activate the warp core, which will warp you back to Timber Hearth. The warp core also has the ability to pair with gravity cannons that are marked in the ship log.
 - **Temperature Zones**: Implements a temperature mechanic for the ship using the "TEMP" (temperature) dial and a new "SHIP TEMP" (ship temperature) dial. Subjecting your ship to extreme temperatures will increase the ship temperature, making it more likely for your ship to sustain damage or bad side effects.
@@ -70,6 +70,7 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Component Temperature Damage**: Makes it possible for extreme temperatures to damage any of your ship's components, like the headlights or artificial gravity.
 - **Temperature Damage Multiplier**: Larger numbers increase the damage done to your ship by extreme temperatures.
 - **Temperature Resistance Multiplier**: Larger numbers make the ship temperature change slower, giving you more time in extreme temperatures but requiring more time to recover.
+- **Faulty Heat Regulators**: Makes your ship unable to dump the reactor heat, leaving it to build up in the ship. Unless you find someplace cold, your ship is going to constantly rise in temeprature.
 - **Repair Confirmation**: Plays a sound when everything has been repaired. Now you don't need to go searching for any hulls you forgot to repair!
 - **Hazardous Thrusters**: Makes your ship's thruster flames actually damage you. Try figuring out how to get near them in the first place.
 - **Cockpit Rust Level**: Controls how much rust is applied to the ship cockpit. Moving the slider all the way to the right completely covers the cockpit in rust.

@@ -65,7 +65,7 @@ public class TemperatureDetector : MonoBehaviour
         }
         if (!_highTemperature)
         {
-            if (Mathf.Abs(_internalTempMeter) / _internalTempMeterLength < 0.01f)
+            if (RoundInternalTemperature() && Mathf.Abs(_internalTempMeter) / _internalTempMeterLength < 0.01f)
             {
                 _internalTempMeter = 0f;
             }
@@ -85,6 +85,11 @@ public class TemperatureDetector : MonoBehaviour
     }
 
     protected virtual void UpdateHighTemperature() { }
+
+    protected virtual bool RoundInternalTemperature()
+    {
+        return true;
+    }
 
     public float GetTemperatureRatio()
     {
