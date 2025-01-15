@@ -61,6 +61,16 @@ public class ShipTemperatureDetector : TemperatureDetector
         }
     }
 
+    protected override void Update()
+    {
+        base.Update();
+
+        if (true)
+        {
+            _internalTempMeter = Mathf.Clamp(_internalTempMeter + Time.deltaTime / 5f, -_internalTempMeterLength, _internalTempMeterLength);
+        }
+    }
+
     private void HullTemperatureDamage()
     {
         ShipHull[] validHulls;

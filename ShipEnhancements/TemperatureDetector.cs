@@ -47,12 +47,10 @@ public class TemperatureDetector : MonoBehaviour
                 }
 
                 // Check if internal temp is on the same side as temp
-                if ((GetInternalTemperatureRatio() - 0.5f < 0) != (GetTemperatureRatio() < 0))
+                if ((GetInternalTemperatureRatio() - 0.5f < 0) == (GetTemperatureRatio() < 0))
                 {
-                    return;
+                    UpdateHighTemperature();
                 }
-
-                UpdateHighTemperature();
             }
             
             if (_updateNextFrame)
