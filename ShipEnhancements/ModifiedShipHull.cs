@@ -11,7 +11,7 @@ public class ModifiedShipHull : MonoBehaviour
 
     private void Start()
     {
-        if ((float)shipBounciness > 0f)
+        if ((float)shipBounciness.GetProperty() > 1f)
         {
             SELocator.GetShipDamageController()._impactSensor.OnImpact += OnImpact;
         }
@@ -68,7 +68,7 @@ public class ModifiedShipHull : MonoBehaviour
 
     private void OnDestroy()
     {
-        if ((float)shipBounciness > 0f)
+        if ((float)shipBounciness.GetProperty() > 1f)
         {
             SELocator.GetShipDamageController()._impactSensor.OnImpact -= OnImpact;
         }

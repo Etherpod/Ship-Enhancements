@@ -760,7 +760,7 @@ public class ShipEnhancements : ModBehaviour
                 SetupExplosion(effectsTransform, explosion);
             }
         }
-        if ((float)Settings.shipBounciness.GetProperty() > 0f || true)
+        if ((float)Settings.shipBounciness.GetProperty() > 1f || (string)Settings.temperatureZonesAmount.GetProperty() != "None")
         {
             SELocator.GetShipTransform().gameObject.AddComponent<ModifiedShipHull>();
         }
@@ -845,9 +845,24 @@ public class ShipEnhancements : ModBehaviour
 
             SELocator.GetPlayerBody().GetComponentInChildren<Signalscope>().gameObject.AddComponent<ShipRemoteControl>();
         }
-        if ((bool)Settings.disableShipFriction.GetProperty())
+        bool physicsBounce = (float)Settings.shipBounciness.GetProperty() > 0f && (float)Settings.shipBounciness.GetProperty() <= 1f;
+        if ((bool)Settings.disableShipFriction.GetProperty() || physicsBounce)
         {
-            PhysicMaterial mat = (PhysicMaterial)LoadAsset("Assets/ShipEnhancements/FrictionlessShip.physicMaterial");
+            bool both = (bool)Settings.disableShipFriction.GetProperty() && physicsBounce;
+            PhysicMaterial mat;
+            if (both)
+            {
+                mat = (PhysicMaterial)LoadAsset("Assets/ShipEnhancements/FrictionlessBouncyShip.physicMaterial");
+            }
+            else if (physicsBounce)
+            {
+                mat = (PhysicMaterial)LoadAsset("Assets/ShipEnhancements/BouncyShip.physicMaterial");
+            }
+            else
+            {
+                mat = (PhysicMaterial)LoadAsset("Assets/ShipEnhancements/FrictionlessShip.physicMaterial");
+            }
+
             foreach (Collider collider in SELocator.GetShipTransform().GetComponentsInChildren<Collider>(true))
             {
                 collider.material = mat;

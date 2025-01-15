@@ -304,7 +304,7 @@
       "title": "Ship Bounciness",
       "type": "number",
       "value": 0,
-      "tooltip": "Adjusts how bouncy the ship is. A value of 2 should double the ship's speed when it collides with something."
+      "tooltip": "Adjusts how bouncy the ship is. Values above 1 will be less accurate and will no longer affect players."
     },
     "shipInputLatency": {
       "title": "Ship Input Latency",

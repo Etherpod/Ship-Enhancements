@@ -49,7 +49,7 @@ Change some of the values that control how the ship works.
 - **Extra Explosion Damage**: Gives explosions the ability to damage your ship and fragments of Brittle Hollow.
 - **Extra Noise**: Makes noisy parts of the ship, like the master alarm, alert noise detectors.
 - **Reactor Lifetime Multiplier**: Larger numbers increase the time it takes for the reactor to blow up when it has been damaged. Set this to something small to give yourself a panic attack every time the master alarm goes off.
-- **Ship Bounciness**: Larger numbers increase the bounciness of the ship. A value of 2 should make the ship double its speed when it hits something, but the results of this setting aren't entirely accurate.
+- **Ship Bounciness**: Larger numbers increase the bounciness of the ship. Values above 1 will be less accurate and will no longer affect players.
 - **Ship Input Latency**: This basically simulates internet lag, where larger numbers increase the time it takes for the ship to process your inputs. A value of 1 means it takes 1 second for your "upwards thrust" input to register.
 
 ## Add Ship Features
