@@ -30,7 +30,7 @@ public class ShipTemperatureDetector : TemperatureDetector
         _internalTempMeterLength *= (float)temperatureResistanceMultiplier.GetProperty();
     }
 
-    protected override void UpdateHighTemperature()
+    private void UpdateTemperatureDamage()
     {
         if (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost())
         {
@@ -70,12 +70,9 @@ public class ShipTemperatureDetector : TemperatureDetector
             float multiplier = Mathf.InverseLerp(-_highTempCutoff / 4f, 0f, _currentTemperature);
             float scalar = 1 + (1f * Mathf.InverseLerp(_highTempCutoff, 0f, Mathf.Abs(_currentTemperature)));
             _internalTempMeter = Mathf.Clamp(_internalTempMeter + (Time.deltaTime * multiplier * scalar), -_internalTempMeterLength, _internalTempMeterLength);
-
-            if (!_highTemperature)
-            {
-                UpdateHighTemperature();
-            }
         }
+
+        UpdateTemperatureDamage();
     }
 
     private void HullTemperatureDamage()
