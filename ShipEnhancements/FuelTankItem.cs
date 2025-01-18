@@ -264,7 +264,7 @@ public class FuelTankItem : OWItem
 
         if ((bool)extraNoise.GetProperty())
         {
-            SELocator.GetShipTemperatureDetector().GetComponentInChildren<ShipNoiseMaker>()._noiseRadius = 800f * (float)shipExplosionMultiplier.GetProperty();
+            SELocator.GetShipTransform().GetComponentInChildren<ShipNoiseMaker>()._noiseRadius = 800f * (float)shipExplosionMultiplier.GetProperty();
         }
 
         if (Locator.GetToolModeSwapper().GetItemCarryTool().GetHeldItem() == this)

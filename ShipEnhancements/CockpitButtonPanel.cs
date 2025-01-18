@@ -125,7 +125,10 @@ public class CockpitButtonPanel : MonoBehaviour
         {
             _extending = true;
             _completedSlide = false;
-            _audioSource.Stop();
+            if (_audioSource.isPlaying)
+            {
+                _audioSource.Stop();
+            }
             _audioSource.clip = _extendAudio;
             _audioSource.Play();
         }
@@ -133,7 +136,10 @@ public class CockpitButtonPanel : MonoBehaviour
         {
             _extending = false;
             _completedSlide = false;
-            _audioSource.Stop();
+            if (_audioSource.isPlaying)
+            {
+                _audioSource.Stop();
+            }
             _audioSource.clip = _retractAudio;
             _audioSource.Play();
         }

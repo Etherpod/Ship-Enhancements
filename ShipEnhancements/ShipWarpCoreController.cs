@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -177,6 +178,12 @@ public class ShipWarpCoreController : CockpitInteractible
             _warpEffect.OnWarpComplete += WarpShip;
             _warpEffect.WarpObjectOut(_warpLength);
         }
+
+        if ((bool)extraNoise.GetProperty())
+        {
+            SELocator.GetShipTransform().GetComponentInChildren<ShipNoiseMaker>()._noiseRadius = 600f;
+        }
+
         _warping = true;
     }
 
@@ -229,6 +236,12 @@ public class ShipWarpCoreController : CockpitInteractible
             _warpEffect.OnWarpComplete += WarpShip;
             _warpEffect.WarpObjectOut(_warpLength);
         }
+
+        if ((bool)extraNoise.GetProperty())
+        {
+            SELocator.GetShipTransform().GetComponentInChildren<ShipNoiseMaker>()._noiseRadius = 600f;
+        }
+
         _warping = true;
     }
 

@@ -1096,6 +1096,11 @@ public static class PatchClass
     [HarmonyPatch(typeof(HatchController), nameof(HatchController.OpenHatch))]
     public static void ActivateHatchTractorBeam(HatchController __instance)
     {
+        if ((bool)extraNoise.GetProperty())
+        {
+            SELocator.GetShipTransform().GetComponentInChildren<ShipNoiseMaker>()._noiseRadius += 100f;
+        }
+
         if (!(bool)enableAutoHatch.GetProperty() || ShipEnhancements.InMultiplayer) return;
 
         ShipTractorBeamSwitch beamSwitch = SELocator.GetShipBody().GetComponentInChildren<ShipTractorBeamSwitch>();
@@ -2240,7 +2245,9 @@ public static class PatchClass
         MasterAlarm masterAlarm = SELocator.GetShipTransform().GetComponentInChildren<MasterAlarm>();
         float alarmNoiseRadius = masterAlarm._isAlarmOn ? 350f : 0f;
         ShipThrusterController thrusterController = SELocator.GetShipTransform().GetComponent<ShipThrusterController>();
-        float ignitionNoiseRadius = thrusterController._isIgniting ? 500f : 0f;
+        bool shipIgniting = ShipEnhancements.Instance.shipIgniting || EngineSputtering || 
+            (SELocator.GetButtonPanel()?.GetComponentInChildren<ShipEngineSwitch>()?.IsEngineStalling() ?? false);
+        float ignitionNoiseRadius = shipIgniting ? 500f : 0f;
         float overdriveNoiseRadius = (bool)enableThrustModulator.GetProperty() && SELocator.GetShipOverdriveController() != null
             && SELocator.GetShipOverdriveController().IsCharging() ? 300f : 0f;
 
@@ -2259,6 +2266,16 @@ public static class PatchClass
         }
 
         __instance.GetComponentInChildren<ExplosionDamage>()?.OnExplode();
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(HatchController), nameof(HatchController.CloseHatch))]
+    public static void ExtraNoiseOnCloseHatch()
+    {
+        if ((bool)extraNoise.GetProperty())
+        {
+            SELocator.GetShipTransform().GetComponentInChildren<ShipNoiseMaker>()._noiseRadius += 100f;
+        }
     }
     #endregion
 

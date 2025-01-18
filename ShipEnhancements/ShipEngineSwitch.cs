@@ -380,6 +380,11 @@ public class ShipEngineSwitch : CockpitInteractible
         }
     }
 
+    public bool IsEngineStalling()
+    {
+        return _engineStalling;
+    }
+
     private void OnFuelDepleted()
     {
         _thrustersIndicator.SetEmissionColor(Color.black);

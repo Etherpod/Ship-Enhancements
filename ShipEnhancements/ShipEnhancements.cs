@@ -35,6 +35,7 @@ public class ShipEnhancements : ModBehaviour
     public Tether playerTether;
     public bool anyPartDamaged;
     public bool groundedByHornfels;
+    public bool shipIgniting;
 
     public static IAchievements AchievementsAPI;
     public static IQSBAPI QSBAPI;
@@ -210,6 +211,7 @@ public class ShipEnhancements : ModBehaviour
             _shipDestroyed = false;
             anyPartDamaged = false;
             groundedByHornfels = false;
+            shipIgniting = false;
 
             if (AchievementsAPI != null)
             {
@@ -304,6 +306,12 @@ public class ShipEnhancements : ModBehaviour
                     }
                 }
                 _checkEndConversation = false;
+            }
+            if ((bool)Settings.extraNoise.GetProperty())
+            {
+                GlobalMessenger.RemoveListener("StartShipIgnition", OnStartShipIgnition);
+                GlobalMessenger.RemoveListener("CancelShipIgnition", OnStopShipIgnition);
+                GlobalMessenger.RemoveListener("CompleteShipIgnition", OnStopShipIgnition);
             }
             if (AchievementsAPI != null)
             {
@@ -995,6 +1003,12 @@ public class ShipEnhancements : ModBehaviour
             socket.AddComponentMeshes([obj1, obj2]);
             socket.PlaceIntoSocket(item);
         }
+        if ((bool)Settings.extraNoise.GetProperty())
+        {
+            GlobalMessenger.AddListener("StartShipIgnition", OnStartShipIgnition);
+            GlobalMessenger.AddListener("CancelShipIgnition", OnStopShipIgnition);
+            GlobalMessenger.AddListener("CompleteShipIgnition", OnStopShipIgnition);
+        }
 
         SetDamageColors();
 
@@ -1608,6 +1622,16 @@ public class ShipEnhancements : ModBehaviour
                 elevator._launchElevator._interactVolume.SetKeyCommandVisible(false);
             }
         }
+    }
+
+    private void OnStartShipIgnition()
+    {
+        shipIgniting = true;
+    }
+
+    private void OnStopShipIgnition()
+    {
+        shipIgniting = false;
     }
 
     #endregion
