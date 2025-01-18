@@ -1272,6 +1272,15 @@ public class ShipEnhancements : ModBehaviour
             Instantiate(thTempZone1, th.transform.Find("Sector_TH"));
             GameObject thTempZone2 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_TimberHearthCore.prefab");
             Instantiate(thTempZone2, th.transform.Find("Sector_TH"));
+            GameObject thTempZone3 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_TimberHearthSurface.prefab");
+            Instantiate(thTempZone3, th.transform.Find("Sector_TH"));
+        }
+
+        GameObject moon = GameObject.Find("Moon_Body");
+        if (moon != null)
+        {
+            GameObject moonTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_AttlerockCrater.prefab");
+            Instantiate(moonTempZone, moon.transform.Find("Sector_THM"));
         }
 
         GameObject ct = GameObject.Find("CaveTwin_Body");
