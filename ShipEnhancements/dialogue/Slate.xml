@@ -387,9 +387,9 @@
     <Name>SE_RandomPreset_3</Name>
     <Dialogue>
       <Page>You're the one who's creeping me out, because I have no idea what you're talking about.</Page>
-      <Page>I'm radioing Hornfels. You're definitely not flying that ship today.</Page>
+      <Page>I'm radioing Hornfels. You're <![CDATA[<i>]]>definitely<![CDATA[</i>]]> not flying that ship today.</Page>
     </Dialogue>
-    <SetCondition>SE_GROUNDED_BY_HORNFELS</SetCondition> 
+    <SetCondition>SE_GROUNDED_BY_HORNFELS</SetCondition>
   
     <DialogueOptionsList>
       <DialogueOption>
@@ -397,7 +397,7 @@
       <DialogueTarget>SE_RandomPreset_31</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
-        <Text>Not like I would fly that ship anyways.</Text>
+        <Text>With the way the ship is acting, I wouldn't have flown it anyways.</Text>
       <DialogueTarget>SE_RandomPreset_32</DialogueTarget>
       </DialogueOption>
     </DialogueOptionsList>
@@ -414,8 +414,8 @@
   <DialogueNode>
     <Name>SE_RandomPreset_32</Name>
     <Dialogue>
-      <Page>Stars above, what is wrong with you today? I've never seen pilots get this jumpy before launching.</Page>
-      <Page>Go get some rest. You can try launching again next week.</Page>
+      <Page>Stars above, what is wrong with you today? I've never seen pilots get this nervous before launching, and I've seen some pretty nervous pilots.</Page>
+      <Page>Go get some rest, hatchling. You can try launching again next week.</Page>
     </Dialogue>
   </DialogueNode>
   

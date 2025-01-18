@@ -262,6 +262,11 @@ public class FuelTankItem : OWItem
             _explosion.GetComponentInChildren<ExplosionDamage>()?.OnExplode();
         }
 
+        if ((bool)extraNoise.GetProperty())
+        {
+            SELocator.GetShipTemperatureDetector().GetComponentInChildren<ShipNoiseMaker>()._noiseRadius = 800f * (float)shipExplosionMultiplier.GetProperty();
+        }
+
         if (Locator.GetToolModeSwapper().GetItemCarryTool().GetHeldItem() == this)
         {
             Locator.GetDeathManager().KillPlayer(DeathType.Default);
@@ -291,6 +296,11 @@ public class FuelTankItem : OWItem
         else
         {
             _explosion.GetComponentInChildren<ExplosionDamage>()?.OnExplode();
+        }
+
+        if ((bool)extraNoise.GetProperty())
+        {
+            SELocator.GetShipTemperatureDetector().GetComponentInChildren<ShipNoiseMaker>()._noiseRadius = 800f * (float)shipExplosionMultiplier.GetProperty();
         }
 
         if (Locator.GetToolModeSwapper().GetItemCarryTool().GetHeldItem() == this)

@@ -839,14 +839,14 @@ public static class SettingsPresets
 
     public enum PresetName
     {
-        VanillaPlus,
-        Minimal,
-        Relaxed,
-        Hardcore,
-        Wanderer,
-        Pandemonium,
-        Random,
-        Custom
+        VanillaPlus = 1,
+        Minimal = 2,
+        Relaxed = 4,
+        Hardcore = 8,
+        Wanderer = 16,
+        Pandemonium = 32,
+        Random = 64,
+        Custom = 0
     }
 
     public static void InitializePresets()

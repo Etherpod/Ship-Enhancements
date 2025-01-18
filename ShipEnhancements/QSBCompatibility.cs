@@ -10,6 +10,7 @@ public class QSBCompatibility
     private List<CockpitSwitch> _activeSwitches = [];
     private ShipEngineSwitch _engineSwitch;
     private List<TetherHookItem> _activeTetherHooks = [];
+    private SettingsPresets.PresetName _hostPreset = SettingsPresets.PresetName.Custom;
     private bool _neverInitialized = true;
 
     [Serializable]
@@ -20,6 +21,7 @@ public class QSBCompatibility
         _api = api;
         _api.OnPlayerJoin().AddListener(OnPlayerJoin);
         _api.RegisterHandler<(string, object)>("settings-data", ReceiveSettingsData);
+        _api.RegisterHandler<int>("host-preset", ReceiveHostPreset);
         _api.RegisterHandler<(string, bool)>("switch-state", ReceiveSwitchState);
         _api.RegisterHandler<NoData>("ship-initialized", ReceiveInitializedShip);
         _api.RegisterHandler<NoData>("world-objects-ready", ReceiveWorldObjectsInitialized);
@@ -65,6 +67,7 @@ public class QSBCompatibility
         _neverInitialized = true;
 
         SendSettingsData(playerID);
+        SendHostPreset(playerID);
     }
 
     #region Settings
@@ -77,18 +80,33 @@ public class QSBCompatibility
         }
     }
 
-    private void ReceiveSettingsData(uint id, (string, object) data)
+    private void ReceiveSettingsData(uint id, (string settingName, object settingValue) data)
     {
         var allSettings = Enum.GetValues(typeof(ShipEnhancements.Settings)) as ShipEnhancements.Settings[];
         foreach (var setting in allSettings)
         {
-            if (setting.GetName() == data.Item1)
+            if (setting.GetName() == data.settingName)
             {
-                setting.SetProperty(data.Item2);
+                setting.SetProperty(data.settingValue);
                 return;
             }
         }
-        ShipEnhancements.WriteDebugMessage($"Setting {data.Item1} not found", error: true);
+        ShipEnhancements.WriteDebugMessage($"Setting {data.settingName} not found", error: true);
+    }
+
+    public void SendHostPreset(uint id)
+    {
+        _api.SendMessage("host-preset", (int)ShipEnhancements.Instance.GetCurrentPreset(), id, false);
+    }
+
+    private void ReceiveHostPreset(uint id, int preset)
+    {
+        _hostPreset = (SettingsPresets.PresetName)preset;
+    }
+
+    public SettingsPresets.PresetName GetHostPreset()
+    {
+        return _hostPreset;
     }
     #endregion
 

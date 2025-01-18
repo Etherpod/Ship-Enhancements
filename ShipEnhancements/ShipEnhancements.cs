@@ -225,10 +225,22 @@ public class ShipEnhancements : ModBehaviour
                 if (slate != null)
                 {
                     DialogueBuilder.Make(slate.gameObject, "ConversationZone_RSci", "dialogue/Slate.xml", this);
-                    if (_currentPreset == SettingsPresets.PresetName.Random)
+                    if (!InMultiplayer || QSBAPI.GetIsHost())
                     {
-                        slate.Find("ConversationZone_RSci").GetComponent<CharacterDialogueTree>().OnEndConversation += OnEndConversation;
-                        _checkEndConversation = true;
+                        if (_currentPreset == SettingsPresets.PresetName.Random)
+                        {
+                            slate.Find("ConversationZone_RSci").GetComponent<CharacterDialogueTree>().OnEndConversation += OnEndConversation;
+                            _checkEndConversation = true;
+                        }
+                    }
+                    else
+                    {
+                        WriteDebugMessage(QSBCompat.GetHostPreset());
+                        if (QSBCompat.GetHostPreset() == SettingsPresets.PresetName.Random)
+                        {
+                            slate.Find("ConversationZone_RSci").GetComponent<CharacterDialogueTree>().OnEndConversation += OnEndConversation;
+                            _checkEndConversation = true;
+                        }
                     }
                 }
             }
@@ -1627,6 +1639,11 @@ public class ShipEnhancements : ModBehaviour
     {
         engineOn = state;
         OnEngineStateChanged?.Invoke(state);
+    }
+
+    public SettingsPresets.PresetName GetCurrentPreset()
+    {
+        return _currentPreset;
     }
 
     #endregion
