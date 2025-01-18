@@ -6,6 +6,8 @@ public class ShipProbePickupVolume : ProbePickupVolume
 {
     private PlayerProbeLauncher _shipProbeLauncher;
     private ShipProbeLauncherEffects _probeLauncherEffects;
+    private readonly string _pickUpPrompt = "Pick up Scout";
+    private readonly string _insertPrompt = "Insert Scout";
 
     public static bool probeInShip;
     public static bool canTransferProbe;
@@ -22,7 +24,7 @@ public class ShipProbePickupVolume : ProbePickupVolume
         }
         else if ((bool)disableScoutRecall.GetProperty())
         {
-            _interactReceiver.ChangePrompt("Insert Scout");
+            _interactReceiver.ChangePrompt(_insertPrompt);
         }
         _shipProbeLauncher._preLaunchProbeProxy.SetActive(false);
         probeInShip = false;
@@ -35,7 +37,7 @@ public class ShipProbePickupVolume : ProbePickupVolume
         if ((bool)disableScoutRecall.GetProperty() && !(bool)disableScoutLaunching.GetProperty() && !PlayerState.AtFlightConsole())
         {
             probeInShip = false;
-            _interactReceiver.ChangePrompt("Insert Scout");
+            _interactReceiver.ChangePrompt(_insertPrompt);
             _interactReceiver.EnableInteraction();
         }
         else if (PlayerState.AtFlightConsole() && (bool)enableManualScoutRecall.GetProperty())
@@ -59,7 +61,7 @@ public class ShipProbePickupVolume : ProbePickupVolume
         {
             probeInShip = true;
             canTransferProbe = true;
-            _interactReceiver.ChangePrompt("Pick up Scout");
+            _interactReceiver.ChangePrompt(_pickUpPrompt);
             _interactReceiver.ResetInteraction();
             _probeLauncher.ExitPhotoMode();
             _probeLauncherEffects.OnPressInteract();
@@ -73,6 +75,7 @@ public class ShipProbePickupVolume : ProbePickupVolume
 
         if ((bool)disableScoutRecall.GetProperty())
         {
+            _interactReceiver.ChangePrompt(_insertPrompt);
             _interactReceiver.ResetInteraction();
         }
         else
