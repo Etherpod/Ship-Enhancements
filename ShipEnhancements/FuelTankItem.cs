@@ -252,6 +252,7 @@ public class FuelTankItem : OWItem
     {
         _explosion?.Play();
         _explosion.transform.parent = transform.parent;
+        _explosion.GetComponent<SphereCollider>().enabled = true;
         if (GetComponentInParent<ShipBody>() && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
         {
             SELocator.GetShipDamageController().Explode();
@@ -282,6 +283,7 @@ public class FuelTankItem : OWItem
     {
         _explosion?.Play();
         _explosion.transform.parent = transform.parent;
+        _explosion.GetComponent<SphereCollider>().enabled = true;
         if (GetComponentInParent<ShipBody>() && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
         {
             SELocator.GetShipDamageController().Explode();
