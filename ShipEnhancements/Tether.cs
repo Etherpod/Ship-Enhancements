@@ -82,7 +82,7 @@ public class Tether : MonoBehaviour
                     // Play reel noise
                 }
 
-                if (OWInput.IsPressed(InputLibrary.interactSecondary, 0.8f))
+                if (OWInput.IsPressed(InputLibrary.freeLook) && OWInput.IsNewlyPressed(InputLibrary.interact))
                 {
                     _hook.DisconnectTether();
                     // Play untether noise

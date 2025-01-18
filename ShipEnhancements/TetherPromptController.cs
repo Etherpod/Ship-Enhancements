@@ -13,17 +13,16 @@ public class TetherPromptController : MonoBehaviour
     {
         _reelInPrompt = new ScreenPrompt(InputLibrary.toolOptionUp, "<CMD>" + "   " + "Reel tether in", 0, ScreenPrompt.DisplayState.Normal, false);
         _reelOutPrompt = new ScreenPrompt(InputLibrary.toolOptionDown, "<CMD>" + "   " + "Reel tether out", 0, ScreenPrompt.DisplayState.Normal, false);
-        _disconnectPrompt = new ScreenPrompt(InputLibrary.interactSecondary, "<CMD>" + UITextLibrary.GetString(UITextType.HoldPrompt) 
-            + "   " + "Disconnect tether", 0, ScreenPrompt.DisplayState.Normal, false);
+        _disconnectPrompt = new ScreenPrompt(InputLibrary.freeLook, InputLibrary.interact, "<CMD>   Disconnect Tether", ScreenPrompt.MultiCommandType.HOLD_ONE_AND_PRESS_2ND);
 
         GlobalMessenger.AddListener("AttachPlayerTether", OnAttachPlayerTether);
         GlobalMessenger.AddListener("DetachPlayerTether", OnDetachPlayerTether);
 
         ShipEnhancements.Instance.ModHelper.Events.Unity.RunWhen(() => Locator.GetPromptManager() != null, () =>
         {
-            Locator.GetPromptManager().AddScreenPrompt(_reelInPrompt, PromptPosition.UpperLeft, false);
-            Locator.GetPromptManager().AddScreenPrompt(_reelOutPrompt, PromptPosition.UpperLeft, false);
-            Locator.GetPromptManager().AddScreenPrompt(_disconnectPrompt, PromptPosition.UpperLeft, false);
+            Locator.GetPromptManager().AddScreenPrompt(_reelInPrompt, PromptPosition.LowerLeft, false);
+            Locator.GetPromptManager().AddScreenPrompt(_reelOutPrompt, PromptPosition.LowerLeft, false);
+            Locator.GetPromptManager().AddScreenPrompt(_disconnectPrompt, PromptPosition.LowerLeft, false);
         });
     }
 
