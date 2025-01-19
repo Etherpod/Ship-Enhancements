@@ -697,19 +697,39 @@
     <Dialogue>
       <Page>That old thing? Yeah, it doesn't have much use to it. It sure brings back memories, though.</Page>
       <Page>A long time ago, before the space program was even a thing, Feldspar was always talking about those other planets up there. Said they would fly to each and every one of them.</Page>
-      <Page>So the other hatchlings and I made a white flagpost for Feldspar, so that when they finally made it to another planet they could set it up there.</Page>
-      <Page>That's the flag Feldspar used when they landed on the Attlerock. Plan was to put one on every planet, but I guess that never happened, with Feldspar going missing.</Page>
-      <Page>We had a few more that we made in storage, so I thought, you know, since you're going into space, maybe you could bring one with you. Just to put down somewhere out there.</Page>
+      <Page>So the other hatchlings and I made a white flag for Feldspar. That way when they finally made it to another planet, they could set it up there for everyone to see.</Page>
+      <Page>When the space program was founded, we put the Outer Wilds Ventures sticker on that flag, so it looks a little different. But that's still the same flag Feldspar used when they landed on the Attlerock for the first time.</Page>
+      <Page>Plan was to put one on every planet, but I guess that never happened, with Feldspar going missing and all that.</Page>
+      <Page>Anyway, we had a few more that we made in storage, so I thought, you know, since you're going into space, maybe you could bring one with you. Just to put down somewhere out there.</Page>
     </Dialogue>
   
     <DialogueOptionsList>
       <DialogueOption>
         <Text>Yeah. I can do that.</Text>
+        <DialogueTarget>SE_ExpeditionFlag_11</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
-        <Text></Text>
+        <RequiredPersistentCondition>MetFeldspar</RequiredPersistentCondition>
+        <Text>Maybe I'll pay Feldspar a visit and bring them a flag.</Text>
+        <DialogueTarget>SE_ExpeditionFlag_12</DialogueTarget>
       </DialogueOption>
     </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ExpeditionFlag_11</Name>
+    <Dialogue>
+      <Page>Heh, maybe you can finish the job and set one up on each planet.</Page>
+      <Page>If you do that, take some photos to show me when you get back, will you?</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ExpeditionFlag_12</Name>
+    <Dialogue>
+      <Page>Wish I could visit Feldspar too, hatchling, but until someone finds them, they won't be getting their flag.</Page>
+      <Page>You know what, though? If you somehow find Feldspar out there, be sure to come back here and tell me.</Page>
+    </Dialogue>
   </DialogueNode>
   
   <!--Ship Warp Core-->
