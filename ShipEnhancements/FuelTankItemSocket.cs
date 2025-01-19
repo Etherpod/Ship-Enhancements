@@ -8,5 +8,18 @@ public class FuelTankItemSocket : OWItemSocket
         _sector = SELocator.GetShipSector();
         base.Awake();
         _acceptableType = FuelTankItem.ItemType;
+
+        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+    }
+
+    private void OnShipSystemFailure()
+    {
+        _sector = null;
+        _socketedItem?.SetSector(null);
+    }
+
+    private void OnDestroy()
+    {
+        GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
     }
 }

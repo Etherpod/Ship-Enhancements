@@ -140,7 +140,10 @@ public class ShipGravityCrystalItem : OWItem
                 if (!(bool)disableGravityCrystal.GetProperty())
                 {
                     _gravityComponentLight.enabled = true;
-                    _gravityComponent._damageEffect._particleSystem.Play();
+                    if (!SELocator.GetShipDamageController().IsSystemFailed())
+                    {
+                        _gravityComponent._damageEffect._particleSystem.Play();
+                    }
                 }
                 _gravityComponent._damageEffect._decalRenderers[0].SetActivation(true);
             }
