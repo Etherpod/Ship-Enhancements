@@ -1479,6 +1479,18 @@ public class ShipEnhancements : ModBehaviour
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_USING_RANDOM_PRESET", true);
         }
+        if ((bool)Settings.enableThrustModulator.GetProperty())
+        {
+            DialogueConditionManager.SharedInstance.SetConditionState("SE_THRUST_MODULATOR_ENABLED", true);
+        }
+        if ((bool)Settings.enablePersistentInput.GetProperty())
+        {
+            DialogueConditionManager.SharedInstance.SetConditionState("SE_PERSISTENT_INPUT_ENABLED", true);
+        }
+        if ((bool)Settings.addShipSignal.GetProperty())
+        {
+            DialogueConditionManager.SharedInstance.SetConditionState("SE_SHIP_SIGNAL_ENABLED", true);
+        }
     }
 
     #endregion

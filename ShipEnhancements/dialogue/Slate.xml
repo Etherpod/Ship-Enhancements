@@ -25,19 +25,46 @@
         <DialogueTarget>SE_ManualRecall_1</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
-        <RequiredCondition>SE_COCKPIT_RUST</RequiredCondition>
-        <Text>Why is my cockpit covered in rust?</Text>
-        <DialogueTarget>SE_CockpitRust_1</DialogueTarget>
-      </DialogueOption>
-      <DialogueOption>
         <RequiredCondition>SE_TEMPERATURE_ENABLED</RequiredCondition>
         <Text>What happens if the ship gets too hot?</Text>
         <DialogueTarget>SE_Temperature_1</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
+        <RequiredCondition>SE_THRUST_MODULATOR_ENABLED</RequiredCondition>
+        <Text>How does the Thrust Modulator work?</Text>
+        <DialogueTarget>SE_ThrustModulator_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_PERSISTENT_INPUT_ENABLED</RequiredCondition>
+        <Text>How does Persistent Input work?</Text>
+        <DialogueTarget>SE_PersistentInput_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_SHIP_SIGNAL_ENABLED</RequiredCondition>
+        <Text>Why does the ship have a signal?</Text>
+        <DialogueTarget>SE_ShipSignal_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_TETHER_HOOKS_ENABLED</RequiredCondition>
+        <Text>What should I use the tether hooks for?</Text>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_EXPEDITION_FLAG_ENABLED</RequiredCondition>
+        <Text>Why did you put a flag in my ship? It seems kind of useless.</Text>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_WARP_CORE_ENABLED</RequiredCondition>
+        <Text>Can my ship warp to anywhere other than Timber Hearth?</Text>
+      </DialogueOption>
+      <DialogueOption>
         <RequiredCondition>SE_RETRO_ROCKETS_DISABLED</RequiredCondition>
         <Text>The retro rockets don't work.</Text>
         <DialogueTarget>SE_RetroRockets_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_COCKPIT_RUST</RequiredCondition>
+        <Text>Why is the cockpit covered in rust?</Text>
+        <DialogueTarget>SE_CockpitRust_1</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
         <RequiredCondition>SE_USING_RANDOM_PRESET</RequiredCondition>
@@ -220,7 +247,7 @@
   <DialogueNode>
     <Name>SE_Temperature_11</Name>
     <Dialogue>
-      <Page>The engines don't do very well in cold temperatures. They would lock up here in the Village if it weren't for the heat from the ship's reactor.</Page>
+      <Page>The engines don't do well in cold temperatures. They would lock up here in the village if it weren't for the reactor's heat.</Page>
       <Page>I would stay out of cold areas, if I were you. You might have trouble leaving if you stay too long.</Page>
     </Dialogue>
   </DialogueNode>
@@ -302,7 +329,7 @@
     <DialogueOptionsList>
       <DialogueOption>
         <RequiredPersistentCondition>KILLED_BY_SUPERNOVA_AND_KNOWS_IT</RequiredPersistentCondition>
-        <Text>But the sun's going to explode in 30 minutes!</Text>
+        <Text>But the Sun's going to explode in 30 minutes!</Text>
         <DialogueTarget>SE_RetroRockets_21</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
@@ -318,7 +345,8 @@
   <DialogueNode>
     <Name>SE_RetroRockets_21</Name>
     <Dialogue>
-      <Page>I'll come help after the sun "explodes". Aren't you a little old to be playing those games?</Page>
+      <Page>What? I'm no astrophysicist, but I know it takes a lot longer than 30 minutes for the Sun to explode.</Page>
+      <Page>Let me enjoy these marshmallows, I'll come look at it soon.</Page>
     </Dialogue>
   </DialogueNode>
   
@@ -416,6 +444,211 @@
     <Dialogue>
       <Page>Stars above, what is wrong with you today? I've never seen pilots get this nervous before launching, and I've seen some pretty nervous pilots.</Page>
       <Page>Go get some rest, hatchling. You can try launching again next week.</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <!--Thrust Modulator-->
+  
+  <DialogueNode>
+    <Name>SE_ThrustModulator_1</Name>
+    <Dialogue>
+      <Page>It lets you modulate your thrust! What did you think it did?</Page>
+      <Page>You can press those orange buttons to set a limit on your thruster output and go slower.</Page>
+    </Dialogue>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>What if I want to go faster?</Text>
+        <DialogueTarget>SE_ThrustModulator_11</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Alright, thanks.</Text>
+        <DialogueTarget>SE_ThrustModulator_2</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ThrustModulator_11</Name>
+    <Dialogue>
+      <Page>That's where the Overdrive comes in. It sends an explosion through the engines and launches you forward.</Page>
+      <Page>You'd think an explosion like that would make the thrusters worse, but they actually work better for a little while. Isn't that weird?</Page>
+      <Page>You can activate the Overdrive with the two buttons next to the Thrust Modulator. Just make sure you disable the safeties first.</Page>
+    </Dialogue>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Is this safe..?</Text>
+        <DialogueTarget>SE_ThrustModulator_111</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Got it, thanks.</Text>
+        <DialogueTarget>SE_ThrustModulator_2</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ThrustModulator_111</Name>
+    <Dialogue>
+      <Page>Of course not! In what world would sending an explosion through the engines be safe?</Page>
+      <Page>It causes the reactor to overheat, but it's not like it'll blow up the ship or anything. Probably.</Page>
+      <Page>Now stop worrying the ship and go launch it already!</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ThrustModulator_2</Name>
+    <Dialogue>
+      <Page>No problem. Now let me get back to my marshmallows.</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <!--Persistent Input-->
+  
+  <DialogueNode>
+    <Name>SE_PersistentInput_1</Name>
+    <Dialogue>
+      <Page>It isn't too complicated. If it's turned on when you leave the flight console, it'll lock the flight stick into whatever position it's in.</Page>
+    </Dialogue>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>How do I unlock it?</Text>
+        <DialogueTarget>SE_PersistentInput_11</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Doesn't that mean the ship can fly away without me?</Text>
+        <DialogueTarget>SE_PersistentInput_12</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_PersistentInput_11</Name>
+    <Dialogue>
+      <Page>Just sit back down at the flight console and it'll automatically turn off. And don't ask how I detect when you sit down.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_PersistentInput_2</DialogueTarget>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_PersistentInput_12</Name>
+    <Dialogue>
+      <Page>Uh, yeah? Just don't get out of the ship when Persistent Input is on.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_PersistentInput_2</DialogueTarget>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_PersistentInput_2</Name>
+    <Dialogue>
+      <Page>Anyway, good luck out there. Don't let the ship fly itself into any big objects.</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <!--Ship Signal-->
+  
+  <DialogueNode>
+    <Name>SE_ShipSignal_1</Name>
+    <Dialogue>
+      <Page>Oh, that's just a byproduct of the ship's signalscope.</Page>
+      <Page>Seemed like a waste of a signal though, so I made some modifications to that signalscope of yours.</Page>
+    </Dialogue>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>What sort of modifications..?</Text>
+        <DialogueTarget>SE_ShipSignal_11</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>I never said you could do that!</Text>
+        <DialogueTarget>SE_ShipSignal_12</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ShipSignal_11</Name>
+    <Dialogue>
+      <Page>Nothing necessarily <![CDATA[<i>]]>dangerous<![CDATA[</i>]]>. There's a small chance it causes a short circuit, but it's nothing to worry about.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_ShipSignal_2</DialogueTarget>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ShipSignal_12</Name>
+    <Dialogue>
+      <Page>Then maybe you shouldn't leave your signalscope laying around next time! You were practically asking for me to make improvements to it.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_ShipSignal_2</DialogueTarget>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ShipSignal_2</Name>
+    <Dialogue>
+      <Page>All I did was adjust your signalscope to transmit signals. If you aim it at the ship, you should be able to send it commands.</Page>
+    </Dialogue>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Woah, that's cool.</Text>
+        <DialogueTarget>SE_ShipSignal_21</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Does it make the ship explode or something?</Text>
+        <DialogueTarget>SE_ShipSignal_22</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ShipSignal_21</Name>
+    <Dialogue>
+      <Page>Yeah, it's one of my better ideas. Just make sure you don't send the wrong command.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_ShipSignal_3</DialogueTarget>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ShipSignal_22</Name>
+    <Dialogue>
+      <Page>Uh... among other things, yeah.</Page>
+    </Dialogue>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Awesome.</Text>
+        <DialogueTarget>SE_ShipSignal_22a</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Why would anyone want to blow up their ship!?</Text>
+        <DialogueTarget>SE_ShipSignal_22b</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ShipSignal_22a</Name>
+    <Dialogue>
+      <Page>It's not as useful as the other commands, like ejecting the cockpit. I think you'll find more use out of those.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_ShipSignal_3</DialogueTarget>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ShipSignal_22b</Name>
+    <Dialogue>
+      <Page>Hey, you never know what situations you'll find yourself in out there. Maybe your ship got stuck in a tunnel you really need to use.</Page>
+      <Page>And in case it wasn't clear, that command is only for emergencies. No blowing up the ship for fun.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_ShipSignal_3</DialogueTarget>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ShipSignal_3</Name>
+    <Dialogue>
+      <Page>Anyway, I've got a fire to enjoy and you've got a ship to launch. Good luck out there!</Page>
     </Dialogue>
   </DialogueNode>
   
