@@ -16,6 +16,7 @@ public class PersistentInputSwitch : CockpitSwitch
     protected override void Start()
     {
         base.Start();
+
         if (_enabledInShip)
         {
             _persistentInput = SELocator.GetShipBody().GetComponent<ShipPersistentInput>();

@@ -29,7 +29,7 @@ public class PortableCampfire : Campfire
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
 
-        _cancelPrompt = new ScreenPrompt(InputLibrary.cancel, "Pack up", 0, ScreenPrompt.DisplayState.Normal, false);
+        _cancelPrompt = new PriorityScreenPrompt(InputLibrary.cancel, "Pack up", 0, ScreenPrompt.DisplayState.Normal, false);
         _reactorHeatMeterLength = Random.Range(10f, 30f);
         _reactorHeatMeter = _reactorHeatMeterLength;
     }
@@ -142,6 +142,7 @@ public class PortableCampfire : Campfire
         else
         {
             SetState(State.UNLIT);
+            _oneShotAudio.PlayOneShot(_waterExtinguishAudio);
         }
     }
 
@@ -182,6 +183,11 @@ public class PortableCampfire : Campfire
     public void SetPromptVisibility(bool value)
     {
         _cancelPrompt.SetVisibility(value);
+    }
+
+    public override bool CanSleepHereNow()
+    {
+        return base.CanSleepHereNow() && !PlayerState.OnQuantumMoon();
     }
 
     private void OnShipSystemFailure()

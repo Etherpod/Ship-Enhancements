@@ -5,10 +5,8 @@ using System.Linq;
 
 namespace ShipEnhancements;
 
-public class ShipEngineSwitch : MonoBehaviour
+public class ShipEngineSwitch : CockpitInteractible
 {
-    [SerializeField]
-    private InteractReceiver _interactReceiver;
     [SerializeField]
     private Transform _switchTransform;
     [SerializeField]
@@ -32,6 +30,7 @@ public class ShipEngineSwitch : MonoBehaviour
     private ShipThrusterController _thrusterController;
     private ShipAudioController _audioController;
     private MasterAlarm _alarm;
+    private AudioClip _engineSputterClip;
     private bool _turnSwitch = false;
     private float _turnTime = 0.15f;
     private float _turningT;
@@ -41,15 +40,19 @@ public class ShipEngineSwitch : MonoBehaviour
     private float _ignitionTime;
     private float _ignitionDuration;
     private bool _completedIgnition = false;
+    private bool _engineStalling = false;
     private Color _indicatorLightColor = new Color(1.3f, 0.55f, 0.55f);
     private bool _lastShipPowerState = false;
+    private bool _lastShipThrusterState = false;
     private bool _reset = true;
     private float _baseIndicatorLightIntensity;
 
     private bool _controlledRemote = false;
 
-    private void Awake()
+    public override void Awake()
     {
+        base.Awake();
+
         _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
 
         if ((bool)addEngineSwitch.GetProperty())
@@ -66,11 +69,8 @@ public class ShipEngineSwitch : MonoBehaviour
         _thrusterController = SELocator.GetShipBody().GetComponent<ShipThrusterController>();
         _audioController = SELocator.GetShipBody().GetComponentInChildren<ShipAudioController>();
         _alarm = SELocator.GetShipTransform().GetComponentInChildren<MasterAlarm>();
+        _engineSputterClip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/ShipEngineSputter.ogg");
 
-        _interactReceiver.OnGainFocus += OnGainFocus;
-        _interactReceiver.OnLoseFocus += OnLoseFocus;
-        _interactReceiver.OnPressInteract += OnPressInteract;
-        _interactReceiver.OnReleaseInteract += OnReleaseInteract;
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
         ShipEnhancements.Instance.OnFuelDepleted += OnFuelDepleted;
         ShipEnhancements.Instance.OnFuelRestored += OnFuelRestored;
@@ -115,6 +115,14 @@ public class ShipEngineSwitch : MonoBehaviour
                 _powerIndicator.SetEmissionColor(electricalFailed ? Color.black : _indicatorLightColor);
                 _powerIndicatorLight.intensity = electricalFailed ? 0f : _baseIndicatorLightIntensity;
             }
+
+            bool thrustersUsable = SELocator.GetShipResources().AreThrustersUsable();
+            if (thrustersUsable != _lastShipThrusterState)
+            {
+                _lastShipThrusterState = thrustersUsable;
+                _thrustersIndicator.SetEmissionColor(!thrustersUsable ? Color.black : _indicatorLightColor);
+                _thrustersIndicatorLight.intensity = !thrustersUsable ? 0f : _baseIndicatorLightIntensity;
+            }
         }
     }
 
@@ -133,11 +141,32 @@ public class ShipEngineSwitch : MonoBehaviour
                 if (!_completedTurn)
                 {
                     _completedTurn = true;
-                    _ignitionTime = Time.time;
-                    _thrusterController._isIgniting = true;
-                    GlobalMessenger.FireEvent("StartShipIgnition");
+
+                    if (SELocator.GetShipTemperatureDetector() != null)
+                    {
+                        float ratio = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
+                        if (Random.value < Mathf.InverseLerp(0.25f, -0.08f, ratio))
+                        {
+                            AudioClip sputterClip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/ShipEngineSputter.ogg");
+                            ShipThrusterAudio thrusterAudio = _thrusterController.GetComponentInChildren<ShipThrusterAudio>();
+                            thrusterAudio._ignitionSource.Stop();
+                            thrusterAudio._isIgnitionPlaying = true;
+                            thrusterAudio._ignitionSource.PlayOneShot(sputterClip);
+                            _engineStalling = true;
+                        }
+                        else
+                        {
+                            _ignitionTime = Time.time;
+                            GlobalMessenger.FireEvent("StartShipIgnition");
+                        }
+                    }
+                    else
+                    {
+                        _ignitionTime = Time.time;
+                        GlobalMessenger.FireEvent("StartShipIgnition");
+                    }
                 }
-                if (!_completedIgnition && Time.time > _ignitionTime + _ignitionDuration)
+                if (!_completedIgnition && !_engineStalling && Time.time > _ignitionTime + _ignitionDuration)
                 {
                     _completedIgnition = true;
                     ShipEnhancements.Instance.SetEngineOn(true);
@@ -151,7 +180,7 @@ public class ShipEngineSwitch : MonoBehaviour
                     _alarm.UpdateAlarmState();
                     _audioController.PlayShipAmbient();
                     StartCoroutine(ActivateIndicatorLights(electricalComponent._electricalSystem._systemDelay));
-                    _thrusterController._isIgniting = false;
+                    //_thrusterController._isIgniting = false;
                     _interactReceiver.ChangePrompt("Turn off engine");
                     _interactReceiver.EnableInteraction();
                     GlobalMessenger.FireEvent("CompleteShipIgnition");
@@ -198,18 +227,13 @@ public class ShipEngineSwitch : MonoBehaviour
         _powerIndicatorLight.intensity = 0f;
     }
 
-    private void OnGainFocus()
+    protected override void OnLoseFocus()
     {
-        _buttonPanel.UpdateFocusedButtons(true);
-    }
-
-    private void OnLoseFocus()
-    {
-        _buttonPanel.UpdateFocusedButtons(false);
+        base.OnLoseFocus();
         OnReleaseInteract();
     }
 
-    private void OnPressInteract()
+    protected override void OnPressInteract()
     {
         OnStartPress();
 
@@ -226,40 +250,7 @@ public class ShipEngineSwitch : MonoBehaviour
     {
         if (_completedTurn)
         {
-            _completedTurn = false;
-            _turnSwitch = false;
-            _completedIgnition = false;
-            _reset = false;
-            ShipEnhancements.Instance.SetEngineOn(false);
-            ShipElectricalComponent electricalComponent = SELocator.GetShipDamageController()._shipElectricalComponent;
-            if (!electricalComponent.isDamaged && electricalComponent._electricalSystem.IsPowered())
-            {
-                electricalComponent._electricalSystem.SetPowered(false);
-                electricalComponent._audioSource.PlayOneShot(AudioType.ShipDamageElectricalFailure, 0.5f);
-            }
-            if ((bool)enablePersistentInput.GetProperty())
-            {
-                SELocator.GetShipBody().GetComponent<ShipPersistentInput>().OnDisableEngine();
-            }
-            if (OWInput.IsInputMode(InputMode.ShipCockpit) && Locator.GetToolModeSwapper().IsInToolMode(ToolMode.Probe)
-                || Locator.GetToolModeSwapper().IsInToolMode(ToolMode.SignalScope))
-            {
-                Locator.GetToolModeSwapper().UnequipTool();
-            }
-            if (_releaseAudio)
-            {
-                _audioSource.clip = _releaseAudio;
-                _audioSource.pitch = Random.Range(0.9f, 1.1f);
-                _audioSource.Play();
-            }
-            if (_alarm._isAlarmOn)
-            {
-                _alarm.TurnOffAlarm();
-            }
-            _audioController.StopShipAmbient();
-            _interactReceiver.ChangePrompt("Start engine");
-            StopAllCoroutines();
-            DeactivateIndicatorLights();
+            TurnOffEngine();
         }
         else
         {
@@ -274,7 +265,7 @@ public class ShipEngineSwitch : MonoBehaviour
         }
     }
 
-    private void OnReleaseInteract()
+    protected override void OnReleaseInteract()
     {
         if (_controlledRemote)
         {
@@ -291,6 +282,44 @@ public class ShipEngineSwitch : MonoBehaviour
             }
         }
     }
+    
+    public void TurnOffEngine()
+    {
+        _completedTurn = false;
+        _turnSwitch = false;
+        _completedIgnition = false;
+        _reset = false;
+        ShipEnhancements.Instance.SetEngineOn(false);
+        ShipElectricalComponent electricalComponent = SELocator.GetShipDamageController()._shipElectricalComponent;
+        if (!electricalComponent.isDamaged && electricalComponent._electricalSystem.IsPowered())
+        {
+            electricalComponent._electricalSystem.SetPowered(false);
+            electricalComponent._audioSource.PlayOneShot(AudioType.ShipDamageElectricalFailure, 0.5f);
+        }
+        if ((bool)enablePersistentInput.GetProperty())
+        {
+            SELocator.GetShipBody().GetComponent<ShipPersistentInput>().OnDisableEngine();
+        }
+        if (Locator.GetToolModeSwapper().IsInToolMode(ToolMode.Probe, ToolGroup.Ship)
+            || Locator.GetToolModeSwapper().IsInToolMode(ToolMode.SignalScope, ToolGroup.Ship))
+        {
+            Locator.GetToolModeSwapper().UnequipTool();
+        }
+        if (_releaseAudio)
+        {
+            _audioSource.clip = _releaseAudio;
+            _audioSource.pitch = Random.Range(0.9f, 1.1f);
+            _audioSource.Play();
+        }
+        if (_alarm._isAlarmOn)
+        {
+            _alarm.TurnOffAlarm();
+        }
+        _audioController.StopShipAmbient();
+        _interactReceiver.ChangePrompt("Start engine");
+        StopAllCoroutines();
+        DeactivateIndicatorLights();
+    }
 
     private void OnStopPress()
     {
@@ -298,7 +327,8 @@ public class ShipEngineSwitch : MonoBehaviour
         {
             _turnSwitch = false;
             _completedTurn = false;
-            _thrusterController._isIgniting = false;
+            //_thrusterController._isIgniting = false;
+            _engineStalling = false;
             GlobalMessenger.FireEvent("CancelShipIgnition");
             if (_audioSource.isPlaying)
             {
@@ -350,6 +380,11 @@ public class ShipEngineSwitch : MonoBehaviour
         }
     }
 
+    public bool IsEngineStalling()
+    {
+        return _engineStalling;
+    }
+
     private void OnFuelDepleted()
     {
         _thrustersIndicator.SetEmissionColor(Color.black);
@@ -378,12 +413,9 @@ public class ShipEngineSwitch : MonoBehaviour
         _interactReceiver.DisableInteraction();
     }
 
-    private void OnDestroy()
+    protected override void OnDestroy()
     {
-        _interactReceiver.OnGainFocus += OnGainFocus;
-        _interactReceiver.OnLoseFocus += OnLoseFocus;
-        _interactReceiver.OnPressInteract += OnPressInteract;
-        _interactReceiver.OnReleaseInteract += OnReleaseInteract;
+        base.OnDestroy();
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
         ShipEnhancements.Instance.OnFuelDepleted -= OnFuelDepleted;
         ShipEnhancements.Instance.OnFuelRestored -= OnFuelRestored;

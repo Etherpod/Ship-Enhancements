@@ -45,7 +45,6 @@ public class CockpitButtonPanel : MonoBehaviour
     private float _buttonPanelT = 0f;
     private float _extensionTime = 0.4f;
     private int _focusedButtons = 0;
-    private InteractZone _cockpitInteractVolume;
 
     private void Start()
     {
@@ -58,7 +57,6 @@ public class CockpitButtonPanel : MonoBehaviour
         {
             _bottomPanel.SetActive(false);
         }
-        _cockpitInteractVolume = (InteractZone)SELocator.GetShipBody().GetComponentInChildren<ShipCockpitController>()._interactVolume;
         GlobalMessenger.AddListener("ExitFlightConsole", OnExitFlightConsole);
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
     }
@@ -127,7 +125,10 @@ public class CockpitButtonPanel : MonoBehaviour
         {
             _extending = true;
             _completedSlide = false;
-            _audioSource.Stop();
+            if (_audioSource.isPlaying)
+            {
+                _audioSource.Stop();
+            }
             _audioSource.clip = _extendAudio;
             _audioSource.Play();
         }
@@ -135,7 +136,10 @@ public class CockpitButtonPanel : MonoBehaviour
         {
             _extending = false;
             _completedSlide = false;
-            _audioSource.Stop();
+            if (_audioSource.isPlaying)
+            {
+                _audioSource.Stop();
+            }
             _audioSource.clip = _retractAudio;
             _audioSource.Play();
         }
@@ -215,22 +219,6 @@ public class CockpitButtonPanel : MonoBehaviour
         {
             _engineSwitchObject.SetActive(false);
             _engineSwitchReplacement.SetActive(true);
-        }
-    }
-
-    public void UpdateFocusedButtons(bool add)
-    {
-        _focusedButtons = Mathf.Max(_focusedButtons + (add ? 1 : -1), 0);
-        if (_focusedButtons > 0)
-        {
-            _cockpitInteractVolume.DisableInteraction();
-        }
-        else if (!PlayerState.AtFlightConsole())
-        {
-            if (!ShipEnhancements.InMultiplayer || !ShipEnhancements.QSBInteraction.FlightConsoleOccupied())
-            {
-                _cockpitInteractVolume.EnableInteraction();
-            }
         }
     }
 

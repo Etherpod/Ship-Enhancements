@@ -7,9 +7,11 @@ public class PortableTractorBeamSocket : OWItemSocket
     public override void Awake()
     {
         Reset();
-        _sector = SELocator.GetShipBody().GetComponent<Sector>();
+        _sector = SELocator.GetShipSector();
         base.Awake();
         _acceptableType = PortableTractorBeamItem.ItemType;
+
+        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
     }
 
     public override void Start()
@@ -21,8 +23,14 @@ public class PortableTractorBeamSocket : OWItemSocket
         }
     }
 
-    public void SetTractorBeamItem(PortableTractorBeamItem item)
+    private void OnShipSystemFailure()
     {
-        PlaceIntoSocket(item);
+        _sector = null;
+        _socketedItem?.SetSector(null);
+    }
+
+    private void OnDestroy()
+    {
+        GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
     }
 }

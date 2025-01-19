@@ -9,6 +9,7 @@ public static class SELocator
     private static ShipBody _shipBody;
     private static Transform _shipTransform;
     private static GameObject _shipDetector;
+    private static Sector _shipSector;
     private static PlayerBody _playerBody;
     private static SurveyorProbe _probe;
     private static OxygenDetector _shipOxygenDetector;
@@ -24,12 +25,16 @@ public static class SELocator
     private static ThrustModulatorController _modulatorController;
     private static PortableCampfire _portableCampfire;
     private static CockpitFilthController _cockpitFilthController;
+    private static FlightConsoleInteractController _consoleInteractController;
+    private static FuelTankItem _fuelTankItem;
+    private static PortableTractorBeamItem _tractorBeamItem;
 
     public static void Initalize()
     {
         _shipBody = Object.FindObjectOfType<ShipBody>();
         _shipTransform = _shipBody.transform;
         _shipDetector = _shipBody.GetComponentInChildren<ShipFluidDetector>().gameObject;
+        _shipSector = _shipBody.GetComponentInChildren<Sector>();
         _playerBody = Object.FindObjectOfType<PlayerBody>();
         _probe = Object.FindObjectsOfType<SurveyorProbe>().Where(obj => obj.name == "Probe_Body").ToArray()[0];
         _shipResources = _shipBody.GetComponent<ShipResources>();
@@ -49,12 +54,12 @@ public static class SELocator
 
     public static void LateInitialize()
     {
-        _buttonPanel = _shipTransform.GetComponentInChildren<CockpitButtonPanel>();
+        _buttonPanel = _shipTransform.GetComponentInChildren<CockpitButtonPanel>(true);
 
         if ((bool)enableThrustModulator.GetProperty())
         {
-            _modulatorController = _shipTransform.GetComponentInChildren<ThrustModulatorController>();
-            _shipOverdriveController = _shipTransform.GetComponentInChildren<ShipOverdriveController>();
+            _modulatorController = _shipTransform.GetComponentInChildren<ThrustModulatorController>(true);
+            _shipOverdriveController = _shipTransform.GetComponentInChildren<ShipOverdriveController>(true);
         }
         if ((bool)addPortableCampfire.GetProperty())
         {
@@ -62,7 +67,15 @@ public static class SELocator
         }
         if ((float)rustLevel.GetProperty() > 0 || (float)dirtAccumulationTime.GetProperty() > 0f)
         {
-            _cockpitFilthController = _shipTransform.GetComponentInChildren<CockpitFilthController>();
+            _cockpitFilthController = _shipTransform.GetComponentInChildren<CockpitFilthController>(true);
+        }
+        if ((bool)addFuelCanister.GetProperty())
+        {
+            _fuelTankItem = _shipTransform.GetComponentInChildren<FuelTankItem>(true);
+        }
+        if ((bool)addPortableTractorBeam.GetProperty())
+        {
+            _tractorBeamItem = _shipTransform.GetComponentInChildren<PortableTractorBeamItem>(true);
         }
     }
 
@@ -79,6 +92,11 @@ public static class SELocator
     public static GameObject GetShipDetector()
     {
         return _shipDetector;
+    }
+    
+    public static Sector GetShipSector()
+    {
+        return _shipSector;
     }
 
     public static PlayerBody GetPlayerBody()
@@ -164,5 +182,25 @@ public static class SELocator
     public static CockpitFilthController GetCockpitFilthController()
     {
         return _cockpitFilthController;
+    }
+
+    public static FlightConsoleInteractController GetFlightConsoleInteractController()
+    {
+        return _consoleInteractController;
+    }
+
+    public static void SetFlightConsoleInteractController(FlightConsoleInteractController controller)
+    {
+        _consoleInteractController = controller;
+    }
+
+    public static FuelTankItem GetFuelTankItem()
+    {
+        return _fuelTankItem;
+    }
+
+    public static PortableTractorBeamItem GetTractorBeamItem()
+    {
+        return _tractorBeamItem;
     }
 }

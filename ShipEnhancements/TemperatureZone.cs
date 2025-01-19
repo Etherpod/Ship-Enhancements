@@ -20,11 +20,12 @@ public class TemperatureZone : MonoBehaviour
     private SphereShape _shape;
     private float _outerRadius;
     private float _scale = 1f;
+    private bool _active = true;
 
     private void Start()
     {
         _shape = GetComponent<SphereShape>();
-        _triggerVolume = GetComponent<OWTriggerVolume>();
+        _triggerVolume = gameObject.GetAddComponent<OWTriggerVolume>();
 
         _triggerVolume.OnEntry += OnEffectVolumeEnter;
         _triggerVolume.OnExit += OnEffectVolumeExit;
@@ -34,7 +35,7 @@ public class TemperatureZone : MonoBehaviour
 
     private void OnEffectVolumeEnter(GameObject hitObj)
     {
-        if (hitObj.TryGetComponent(out ShipTemperatureDetector detector))
+        if (hitObj.TryGetComponent(out TemperatureDetector detector))
         {
             detector.AddZone(this);
         }
@@ -42,7 +43,7 @@ public class TemperatureZone : MonoBehaviour
 
     private void OnEffectVolumeExit(GameObject hitObj)
     {
-        if (hitObj.TryGetComponent(out ShipTemperatureDetector detector))
+        if (hitObj.TryGetComponent(out TemperatureDetector detector))
         {
             detector.RemoveZone(this);
         }
@@ -50,6 +51,11 @@ public class TemperatureZone : MonoBehaviour
 
     public float GetTemperature()
     {
+        if (!_active)
+        {
+            return 0;
+        }
+
         float distSqr = (SELocator.GetShipDetector().transform.position - (transform.position + _shape.center)).sqrMagnitude;
         float multiplier;
         if (_isShell)
@@ -83,9 +89,17 @@ public class TemperatureZone : MonoBehaviour
         _shellCenterThickness = shellCenterThickness;
     }
 
+    public void SetVolumeActive(bool active)
+    {
+        _active = active;
+    }
+
     private void OnDestroy()
     {
-        _triggerVolume.OnEntry -= OnEffectVolumeEnter;
-        _triggerVolume.OnExit -= OnEffectVolumeExit;
+        if (_triggerVolume)
+        {
+            _triggerVolume.OnEntry -= OnEffectVolumeEnter;
+            _triggerVolume.OnExit -= OnEffectVolumeExit;
+        }
     }
 }

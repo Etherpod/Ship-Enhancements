@@ -298,24 +298,14 @@ public class ShipOverdriveController : ElectricalComponent
             _activateButton.SetButtonActive(false);
         }
 
-        _primeButton.SetPowered(powered, _electricalSystem.IsDisrupted());
-        _activateButton.SetPowered(powered, _electricalSystem.IsDisrupted());
+        _primeButton.SetButtonPowered(powered, _electricalSystem.IsDisrupted());
+        _activateButton.SetButtonPowered(powered, _electricalSystem.IsDisrupted());
     }
 
     public void PlayButtonAudio(AudioClip audio, float volume)
     {
         _panelAudioSource.pitch = Random.Range(0.9f, 1.1f);
         _panelAudioSource.PlayOneShot(audio, volume);
-    }
-
-    public void UpdateFocusedButtons(bool add)
-    {
-        _focusedButtons = Mathf.Max(_focusedButtons + (add ? 1 : -1), 0);
-        if (_focused != _focusedButtons > 0)
-        {
-            _focused = _focusedButtons > 0;
-            _buttonPanel.UpdateFocusedButtons(_focused);
-        }
     }
 
     public bool IsCharging()

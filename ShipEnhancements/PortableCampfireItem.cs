@@ -4,7 +4,7 @@ namespace ShipEnhancements;
 
 public class PortableCampfireItem : OWItem
 {
-    public static readonly ItemType ItemType = ShipEnhancements.Instance.portableCampfireType;
+    public static readonly ItemType ItemType = ShipEnhancements.Instance.PortableCampfireType;
 
     [SerializeField]
     private GameObject _itemObject;
@@ -26,6 +26,11 @@ public class PortableCampfireItem : OWItem
         _type = ItemType;
         _baseInteractRange = _interactRange;
         _campfire = _campfireObject.GetComponentInChildren<PortableCampfire>();
+    }
+
+    private void Start()
+    {
+        TogglePackUp(true);
     }
 
     public override void PickUpItem(Transform holdTranform)

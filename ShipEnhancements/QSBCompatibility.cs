@@ -10,6 +10,7 @@ public class QSBCompatibility
     private List<CockpitSwitch> _activeSwitches = [];
     private ShipEngineSwitch _engineSwitch;
     private List<TetherHookItem> _activeTetherHooks = [];
+    private SettingsPresets.PresetName _hostPreset = SettingsPresets.PresetName.Custom;
     private bool _neverInitialized = true;
 
     [Serializable]
@@ -20,6 +21,7 @@ public class QSBCompatibility
         _api = api;
         _api.OnPlayerJoin().AddListener(OnPlayerJoin);
         _api.RegisterHandler<(string, object)>("settings-data", ReceiveSettingsData);
+        _api.RegisterHandler<int>("host-preset", ReceiveHostPreset);
         _api.RegisterHandler<(string, bool)>("switch-state", ReceiveSwitchState);
         _api.RegisterHandler<NoData>("ship-initialized", ReceiveInitializedShip);
         _api.RegisterHandler<NoData>("world-objects-ready", ReceiveWorldObjectsInitialized);
@@ -47,6 +49,13 @@ public class QSBCompatibility
         _api.RegisterHandler<(float, float, float)>("detach-all-players", ReceiveDetachAllPlayers);
         _api.RegisterHandler<(float, float, float)>("initial-persistent-input", ReceiveInitialPersistentInput);
         _api.RegisterHandler<float>("initial-black-hole", ReceiveInitialBlackHoleState);
+        _api.RegisterHandler<ShipCommand>("send-ship-command", ReceiveShipCommand);
+        _api.RegisterHandler<(bool, string)>("activate-warp", ReceiveActivateWarp);
+        _api.RegisterHandler<bool>("toggle-fuel-tank-drain", ReceiveToggleFuelTankDrain);
+        _api.RegisterHandler<NoData>("fuel-tank-explosion", ReceiveFuelTankExplosion);
+        _api.RegisterHandler<float>("fuel-tank-capacity", ReceiveFuelTankCapacity);
+        _api.RegisterHandler<(int, int)>("item-module-parent", ReceiveItemModuleParent);
+        _api.RegisterHandler<bool>("tractor-beam-turbo", ReceiveTractorBeamTurbo);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -59,6 +68,7 @@ public class QSBCompatibility
         _neverInitialized = true;
 
         SendSettingsData(playerID);
+        SendHostPreset(playerID);
     }
 
     #region Settings
@@ -71,21 +81,37 @@ public class QSBCompatibility
         }
     }
 
-    private void ReceiveSettingsData(uint id, (string, object) data)
+    private void ReceiveSettingsData(uint id, (string settingName, object settingValue) data)
     {
         var allSettings = Enum.GetValues(typeof(ShipEnhancements.Settings)) as ShipEnhancements.Settings[];
         foreach (var setting in allSettings)
         {
-            if (setting.GetName() == data.Item1)
+            if (setting.GetName() == data.settingName)
             {
-                setting.SetProperty(data.Item2);
+                setting.SetProperty(data.settingValue);
                 return;
             }
         }
-        ShipEnhancements.WriteDebugMessage($"Setting {data.Item1} not found", error: true);
+        ShipEnhancements.WriteDebugMessage($"Setting {data.settingName} not found", error: true);
+    }
+
+    public void SendHostPreset(uint id)
+    {
+        _api.SendMessage("host-preset", (int)ShipEnhancements.Instance.GetCurrentPreset(), id, false);
+    }
+
+    private void ReceiveHostPreset(uint id, int preset)
+    {
+        _hostPreset = (SettingsPresets.PresetName)preset;
+    }
+
+    public SettingsPresets.PresetName GetHostPreset()
+    {
+        return _hostPreset;
     }
     #endregion
 
+    #region Initialization
     public void SendInitializedShip(uint id)
     {
         _neverInitialized = false;
@@ -189,6 +215,7 @@ public class QSBCompatibility
     {
         return _neverInitialized;
     }
+    #endregion
 
     #region Switches
     public void AddActiveSwitch(CockpitSwitch switchToAdd)
@@ -593,6 +620,89 @@ public class QSBCompatibility
     {
         BlackHoleExplosionController controller = SELocator.GetShipTransform().GetComponentInChildren<BlackHoleExplosionController>();
         controller?.SetInitialBlackHoleState(scale);
+    }
+    #endregion
+
+    #region ShipCommands
+    public void SendShipCommand(uint id, ShipCommand command)
+    {
+        _api.SendMessage("send-ship-command", command, id, false);
+    }
+
+    private void ReceiveShipCommand(uint id, ShipCommand command)
+    {
+        SELocator.GetPlayerBody().GetComponentInChildren<ShipRemoteControl>()?.ReceiveCommandRemote(command);
+    }
+    #endregion
+
+    #region ShipWarpCore
+    public void SendActivateWarp(uint id, bool playerInShip, string targetCannonEntryID)
+    {
+        _api.SendMessage("activate-warp", (playerInShip, targetCannonEntryID), id, false);
+    }
+
+    private void ReceiveActivateWarp(uint id, (bool playerInShip, string targetCannonEntryID) data)
+    {
+        SELocator.GetShipTransform().GetComponentInChildren<ShipWarpCoreController>()?
+            .ActivateWarpRemote(data.playerInShip, data.targetCannonEntryID);
+    }
+    #endregion
+
+    #region FuelTankItem
+    public void SendToggleFuelTankDrain(uint id, bool started)
+    {
+        _api.SendMessage("toggle-fuel-tank-drain", started, id, false);
+    }
+
+    private void ReceiveToggleFuelTankDrain(uint id, bool started)
+    {
+        SELocator.GetFuelTankItem()?.ToggleDrainRemote(started);
+    }
+
+    public void SendFuelTankExplosion(uint id)
+    {
+        _api.SendMessage("fuel-tank-explosion", new NoData(), id, false);
+    }
+
+    private void ReceiveFuelTankExplosion(uint id, NoData noData)
+    {
+        SELocator.GetFuelTankItem()?.ExplodeRemote();
+    }
+
+    public void SendFuelTankCapacity(uint id, float fuel)
+    {
+        _api.SendMessage("fuel-tank-capacity", fuel, id, false);
+    }
+
+    private void ReceiveFuelTankCapacity(uint id, float fuel)
+    {
+        SELocator.GetFuelTankItem()?.UpdateFuelRemote(fuel);
+    }
+    #endregion
+
+    #region ShipItemPlacement
+    public void SendItemModuleParent(uint id, OWItem item, int shipModulesIndex)
+    {
+        _api.SendMessage("item-module-parent", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), shipModulesIndex), id, false);
+    }
+
+    private void ReceiveItemModuleParent(uint id, (int itemID, int shipModulesIndex) data)
+    {
+        ShipModule module = SELocator.GetShipDamageController()._shipModules[data.shipModulesIndex];
+        OWItem item = ShipEnhancements.QSBInteraction.GetItemFromID(data.itemID);
+        item.transform.parent = module.transform;
+    }
+    #endregion
+
+    #region PortableTractorBeam
+    public void SendTractorBeamTurbo(uint id, bool enableTurbo)
+    {
+        _api.SendMessage("tractor-beam-turbo", enableTurbo, id, false);
+    }
+
+    private void ReceiveTractorBeamTurbo(uint id, bool enableTurbo)
+    {
+        SELocator.GetTractorBeamItem()?.ToggleTurbo(enableTurbo);
     }
     #endregion
 }

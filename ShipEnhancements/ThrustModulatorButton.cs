@@ -2,7 +2,7 @@
 
 namespace ShipEnhancements;
 
-public class ThrustModulatorButton : MonoBehaviour
+public class ThrustModulatorButton : CockpitInteractible
 {
     [SerializeField]
     private int _modulatorLevel;
@@ -13,7 +13,6 @@ public class ThrustModulatorButton : MonoBehaviour
     [SerializeField]
     private Light _light;
 
-    private InteractReceiver _interactReceiver;
     private ThrustModulatorController _modulatorController;
     private OWEmissiveRenderer _emissiveRenderer;
     private bool _active;
@@ -27,20 +26,15 @@ public class ThrustModulatorButton : MonoBehaviour
     private Color _baseLightColor;
     private bool _resetWhenOff = false;
 
-    private void Awake()
+    public override void Awake()
     {
-        _interactReceiver = GetComponent<InteractReceiver>();
+        base.Awake();
         _modulatorController = GetComponentInParent<ThrustModulatorController>();
         _emissiveRenderer = GetComponent<OWEmissiveRenderer>();
     }
 
     private void Start()
     {
-        _interactReceiver.OnPressInteract += OnPressInteract;
-        _interactReceiver.OnReleaseInteract += OnReleaseInteract;
-        _interactReceiver.OnGainFocus += OnGainFocus;
-        _interactReceiver.OnLoseFocus += OnLoseFocus;
-
         _interactReceiver._screenPrompt._text = "Set Modulator to level " + _modulatorLevel;
         _baseLightIntensity = _light.intensity;
         _baseLightColor = _light.color;
@@ -76,7 +70,7 @@ public class ThrustModulatorButton : MonoBehaviour
         }
     }
 
-    private void OnPressInteract()
+    protected override void OnPressInteract()
     {
         PressButton();
 
@@ -101,7 +95,7 @@ public class ThrustModulatorButton : MonoBehaviour
         transform.localPosition -= new Vector3(0f, _depressionDistance, 0f);
     }
 
-    private void OnReleaseInteract()
+    protected override void OnReleaseInteract()
     {
         ReleaseButton();
 
@@ -125,14 +119,9 @@ public class ThrustModulatorButton : MonoBehaviour
         _interactReceiver.DisableInteraction();
     }
 
-    private void OnGainFocus()
+    protected override void OnLoseFocus()
     {
-        _modulatorController.UpdateFocusedButtons(true);
-    }
-
-    private void OnLoseFocus()
-    {
-        _modulatorController.UpdateFocusedButtons(false);
+        base.OnLoseFocus();
         if (_pressed)
         {
             OnReleaseInteract();
@@ -182,13 +171,5 @@ public class ThrustModulatorButton : MonoBehaviour
         _emissiveRenderer.SetEmissionColor(_emissiveRenderer.GetOriginalEmissionColor());
         _emissiveRenderer.SetEmissiveScale(_active ? 1f : 0f);
         _light.color = _baseLightColor;
-    }
-
-    private void OnDestroy()
-    {
-        _interactReceiver.OnPressInteract -= OnPressInteract;
-        _interactReceiver.OnReleaseInteract -= OnReleaseInteract;
-        _interactReceiver.OnGainFocus -= OnGainFocus;
-        _interactReceiver.OnLoseFocus -= OnLoseFocus;
     }
 }

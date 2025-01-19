@@ -1,0 +1,746 @@
+﻿<DialogueTree xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Outer-Wilds-New-Horizons/new-horizons/main/NewHorizons/Schemas/dialogue_schema.xsd">
+  <NameField>Scientist</NameField>
+
+  <DialogueNode>
+    <Name>Scientist5</Name>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>I have a question about the ship.</Text>
+        <DialogueTarget>SE_ShipQuestion_1</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ShipQuestion_1</Name>
+    <Dialogue>
+      <Page>Yeah, sure. What's up?</Page>
+    </Dialogue>
+
+    <DialogueOptionsList>
+      <DialogueOption>
+        <RequiredCondition>SE_MANUAL_RECALL_ENALBED</RequiredCondition>
+        <Text>What happened to my Little Scout's recall?</Text>
+        <DialogueTarget>SE_ManualRecall_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_TEMPERATURE_ENABLED</RequiredCondition>
+        <Text>What happens if the ship gets too hot?</Text>
+        <DialogueTarget>SE_Temperature_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_THRUST_MODULATOR_ENABLED</RequiredCondition>
+        <Text>How does the thrust modulator work?</Text>
+        <DialogueTarget>SE_ThrustModulator_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_PERSISTENT_INPUT_ENABLED</RequiredCondition>
+        <Text>How does persistent input work?</Text>
+        <DialogueTarget>SE_PersistentInput_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_SHIP_SIGNAL_ENABLED</RequiredCondition>
+        <Text>Why does the ship have a signal?</Text>
+        <DialogueTarget>SE_ShipSignal_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_TETHER_HOOKS_ENABLED</RequiredCondition>
+        <Text>How do I use the tether hooks?</Text>
+        <DialogueTarget>SE_TetherHook_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_EXPEDITION_FLAG_ENABLED</RequiredCondition>
+        <Text>Why did you put a flag in my ship? It seems kind of useless.</Text>
+        <DialogueTarget>SE_ExpeditionFlag_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_WARP_CORE_ENABLED</RequiredCondition>
+        <Text>Can my ship warp to anywhere other than Timber Hearth?</Text>
+        <DialogueTarget>SE_ShipWarpCore_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_RETRO_ROCKETS_DISABLED</RequiredCondition>
+        <Text>The retro rockets don't work.</Text>
+        <DialogueTarget>SE_RetroRockets_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_COCKPIT_RUST</RequiredCondition>
+        <Text>Why is the cockpit covered in rust?</Text>
+        <DialogueTarget>SE_CockpitRust_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_USING_RANDOM_PRESET</RequiredCondition>
+        <Text>Is it just me or does the ship keep changing every time I wake up?</Text>
+        <DialogueTarget>SE_RandomPreset_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>How come you didn't improve the autopilot instead of adding all these other features?</Text>
+        <DialogueTarget>SE_Autopilot_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Nevermind.</Text>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+
+  <!--Autopilot-->
+  
+  <DialogueNode>
+    <Name>SE_Autopilot_1</Name>
+    <Dialogue>
+      <Page>What, you can't pilot the ship yourself? I added a flight stick for a reason, you know.</Page>
+      <Page>The autopilot barely works as it is. I didn't want to mess around with it and accidentally break it.</Page>
+      <Page>And those other features are just as important as the autopilot.</Page>
+    </Dialogue>
+  </DialogueNode>
+
+  <!--Manual Scout Recall-->
+  
+  <DialogueNode>
+    <Name>SE_ManualRecall_1</Name>
+    <Dialogue>
+      <Page>I was going to integrate the new Nomai technology into it, but I figured it would be too heavy for you to carry around out there.</Page>
+    </Dialogue>
+
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>You thought <![CDATA[<i>]]>one<![CDATA[</i>]]> extra pound would be too heavy?</Text>
+        <DialogueTarget>SE_ManualRecall_11</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>How am I supposed to get my scout back?!</Text>
+        <DialogueTarget>SE_ManualRecall_12</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_ManualRecall_11</Name>
+    <Dialogue>
+      <Page>Look, weight adds up when you decide to bring five cans of jumbo marshmallows.</Page>
+      <Page>You can still use your scout without that fancy technology. You just need to go pick it up by hand.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_ManualRecall_2</DialogueTarget>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_ManualRecall_12</Name>
+    <Dialogue>
+      <Page>Calm down! Is picking your scout up by hand really that big of a deal?</Page>
+      <Page>I hope not. You're gonna be doing a <![CDATA[<i>]]>lot<![CDATA[</i>]]> of stuff by hand out there.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_ManualRecall_2</DialogueTarget>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_ManualRecall_2</Name>
+    <Dialogue>
+      <Page>And don't worry, you can still recall it with the ship. Just make sure that you get the scout from the top of the ship after.</Page>
+    </Dialogue>
+
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Why's that?</Text>
+        <DialogueTarget>SE_ManualRecall_21</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Okay.</Text>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_ManualRecall_21</Name>
+    <Dialogue>
+      <Page>You share your scout with the ship. When you fire your ship's scout launcher, it moves the scout to the top of the ship.</Page>
+      <Page>But when you call it back to the ship's launcher, your handheld launcher can't get it back, so it gets stuck on top of the ship.</Page>
+    </Dialogue>
+
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>That's annoying.</Text>
+        <DialogueTarget>SE_ManualRecall_211</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Couldn't you just fix that by adding the Nomai technology to the scout?</Text>
+        <DialogueTarget>SE_ManualRecall_212</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_ManualRecall_211</Name>
+    <Dialogue>
+      <Page>You'll get used to it. I don't feel like trying to put the Nomai technology back in the scout.</Page>
+    </Dialogue>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_ManualRecall_212</Name>
+    <Dialogue>
+      <Page>Yeah, but I don't feel like trying to put the Nomai technology back in the scout.</Page>
+      <Page>If you think it's that important to have, you can try integrating it yourself.</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <!--Cockpit Rust-->
+
+  <DialogueNode>
+    <Name>SE_CockpitRust_1</Name>
+    <Dialogue>
+      <Page>Oh, that? I used the wrong metal coating for the glass. Could have easily been avoided, now that I think about it.</Page>
+      <Page>It should be fine, as long as the rust isn't covering the entire cockpit.</Page>
+    </Dialogue>
+
+    <DialogueOptionsList>
+      <DialogueOption>
+        <RequiredCondition>SE_MAX_COCKPIT_RUST</RequiredCondition>
+        <Text>...It is.</Text>
+        <DialogueTarget>SE_CockpitRust_11</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>That ship is definitely a death-trap.</Text>
+        <DialogueTarget>SE_CockpitRust_12</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>If you say so...</Text>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_CockpitRust_11</Name>
+    <Dialogue>
+      <Page>It is? Stars above, that coating oxidized fast.</Page>
+      <Page>Look, Gossan's got an eye missing, and they could still fly a ship as well as any other Hearthian! You should have no problem piloting it with all four eyes and a cockpit coated in rust.</Page>
+      <Page>Just... try to think transparent thoughts.</Page>
+    </Dialogue>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_CockpitRust_12</Name>
+    <Dialogue>
+      <Page>At least it's a death trap that can fly! When was the last time you got to go in a death trap that could fly?</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <!--TemperatureZones-->
+
+  <DialogueNode>
+    <Name>SE_Temperature_1</Name>
+    <Dialogue>
+      <Page>You keep away from the ship's hull if that happens. You don't want a superheated sheet of metal coming into contact with you.</Page>
+      <Page>There's also a chance the fuel tanks might explode, but that only happens if the ship gets <![CDATA[<i>]]>really<![CDATA[</i>]]> hot.</Page>
+      <Page>Don't worry, you'll be fine! Just don't leave the ship somewhere warm.</Page>
+    </Dialogue>
+
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>What about if it gets super cold?</Text>
+        <DialogueTarget>SE_Temperature_11</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>I guess I'd better stay away from the Hourglass Twins, then.</Text>
+        <DialogueTarget>SE_Temperature_12</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_Temperature_11</Name>
+    <Dialogue>
+      <Page>The engines don't do well in cold temperatures. They would lock up here in the village if it weren't for the reactor's heat.</Page>
+      <Page>I would stay out of cold areas, if I were you. You might have trouble leaving if you stay too long.</Page>
+    </Dialogue>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_Temperature_12</Name>
+    <Dialogue>
+      <Page>I'm sure the heat is tolerable on those planets. It's a good thing they aren't any closer to the sun, though.</Page>
+    </Dialogue>
+
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>What if the ship gets super cold?</Text>
+        <DialogueTarget>SE_Temperature_11</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <!--Disable Retro Rockets-->
+
+  <DialogueNode>
+    <Name>SE_RetroRockets_1</Name>
+    <Dialogue>
+      <Page>Again? ...You're sure?</Page>
+    </Dialogue>
+
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Completely broken.</Text>
+        <DialogueTarget>SE_RetroRockets_11</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Were they ever working in the first place?</Text>
+      <DialogueTarget>SE_RetroRockets_12</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_RetroRockets_11</Name>
+    <Dialogue>
+      <Page>Stars above, it's like those rockets have a mind of their own. You saw them working yesterday, right?</Page>
+    </Dialogue>
+
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>I wouldn't call what I saw "working".</Text>
+        <DialogueTarget>SE_RetroRockets_111</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Yeah. Can you fix them again?</Text>
+      <DialogueTarget>SE_RetroRockets_2</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_RetroRockets_111</Name>
+    <Dialogue>
+      <Page>Okay fine, they weren't exactly <![CDATA[<i>]]>working<![CDATA[</i>]]>. But they were at least firing, which is more than I can say for them right now.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_RetroRockets_2</DialogueTarget>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_RetroRockets_12</Name>
+    <Dialogue>
+      <Page>Of course they were! They're just a little stubborn, that's all.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_RetroRockets_2</DialogueTarget>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_RetroRockets_2</Name>
+    <Dialogue>
+      <Page>Give me 30 minutes, then I'll come and look at them.</Page>
+    </Dialogue>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <RequiredPersistentCondition>KILLED_BY_SUPERNOVA_AND_KNOWS_IT</RequiredPersistentCondition>
+        <Text>But the Sun's going to explode in 30 minutes!</Text>
+        <DialogueTarget>SE_RetroRockets_21</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Can you look at them now? I don't have time to wait for you.</Text>
+        <DialogueTarget>SE_RetroRockets_22</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Sounds good.</Text>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_RetroRockets_21</Name>
+    <Dialogue>
+      <Page>What? I'm no astrophysicist, but I know it takes a lot longer than 30 minutes for the Sun to explode.</Page>
+      <Page>Let me enjoy these marshmallows, I'll come look at it soon.</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_RetroRockets_22</Name>
+    <Dialogue>
+      <Page>Woah, why the sudden rush? It's not like the ship is going anywhere.</Page>
+      <Page>Well... that's not true. I never checked if the autopilot could turn itself on.</Page>
+      <Page>Let me enjoy my marshmallows, then if the ship is still there I'll come fix it.</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <!--Random Preset-->
+  
+  <DialogueNode>
+    <Name>SE_RandomPreset_1</Name>
+    <Dialogue>
+      <Page>Had a weird dream, did you? The ship is the same as it's always been.</Page>
+    </Dialogue>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Yeah, must have just been a dream.</Text>
+        <DialogueTarget>SE_RandomPreset_End1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>No, I'm serious. The ship never used to look like that.</Text>
+      <DialogueTarget>SE_RandomPreset_2</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_RandomPreset_End1</Name>
+    <Dialogue>
+      <Page>Glad you're finally coming to your senses. Now hurry up and go launch the ship!</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_RandomPreset_2</Name>
+    <Dialogue>
+      <Page>You okay, hatchling? Did you inhale some of those fumes by accident?</Page>
+    </Dialogue>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Yeah, must have.</Text>
+      <DialogueTarget>SE_RandomPreset_End2</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>I'm telling you, that ship keeps changing and it's creeping me out.</Text>
+      <DialogueTarget>SE_RandomPreset_3</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_RandomPreset_End2</Name>
+    <Dialogue>
+      <Page>Well, be more careful next time. You're lucky I'm not having Hornfels ground you for medical reasons right now.</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_RandomPreset_3</Name>
+    <Dialogue>
+      <Page>You're the one who's creeping me out, because I have no idea what you're talking about.</Page>
+      <Page>I'm radioing Hornfels. You're <![CDATA[<i>]]>definitely<![CDATA[</i>]]> not flying that ship today.</Page>
+    </Dialogue>
+    <SetCondition>SE_GROUNDED_BY_HORNFELS</SetCondition>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Wait, what? You're grounding me!?</Text>
+      <DialogueTarget>SE_RandomPreset_31</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>With the way the ship is acting, I wouldn't have flown it anyways.</Text>
+      <DialogueTarget>SE_RandomPreset_32</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_RandomPreset_31</Name>
+    <Dialogue>
+      <Page>Of course I am! You're talking nonsense!</Page>
+      <Page>Now go get some rest. You can try launching again next week.</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_RandomPreset_32</Name>
+    <Dialogue>
+      <Page>Stars above, what is wrong with you today? I've never seen pilots get this nervous before launching, and I've seen some pretty nervous pilots.</Page>
+      <Page>Go get some rest, hatchling. You can try launching again next week.</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <!--Thrust Modulator-->
+  
+  <DialogueNode>
+    <Name>SE_ThrustModulator_1</Name>
+    <Dialogue>
+      <Page>It lets you modulate your thrust! What did you think it did?</Page>
+      <Page>You can press those orange buttons to set a limit on your thruster output and go slower.</Page>
+    </Dialogue>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>What if I want to go faster?</Text>
+        <DialogueTarget>SE_ThrustModulator_11</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Alright, thanks.</Text>
+        <DialogueTarget>SE_ThrustModulator_2</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ThrustModulator_11</Name>
+    <Dialogue>
+      <Page>That's where the overdrive comes in. It sends an explosion through the engines and launches you forward.</Page>
+      <Page>You'd think an explosion like that would make the thrusters worse, but they actually work better for a little while. Isn't that weird?</Page>
+      <Page>You can activate the overdrive with the two buttons next to the thrust modulator. Just make sure you disable the safeties first.</Page>
+    </Dialogue>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Is this safe..?</Text>
+        <DialogueTarget>SE_ThrustModulator_111</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Got it, thanks.</Text>
+        <DialogueTarget>SE_ThrustModulator_2</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ThrustModulator_111</Name>
+    <Dialogue>
+      <Page>Of course not! In what world would sending an explosion through the engines be safe?</Page>
+      <Page>It causes the reactor to overheat, but it's not like it'll blow up the ship or anything. Probably.</Page>
+      <Page>Now stop worrying the ship and go launch it already!</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ThrustModulator_2</Name>
+    <Dialogue>
+      <Page>No problem. Now let me get back to my marshmallows.</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <!--Persistent Input-->
+  
+  <DialogueNode>
+    <Name>SE_PersistentInput_1</Name>
+    <Dialogue>
+      <Page>It isn't too complicated. If it's turned on when you leave the flight console, it'll lock the flight stick into whatever position it's in.</Page>
+    </Dialogue>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>How do I unlock it?</Text>
+        <DialogueTarget>SE_PersistentInput_11</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Doesn't that mean the ship can fly away without me?</Text>
+        <DialogueTarget>SE_PersistentInput_12</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_PersistentInput_11</Name>
+    <Dialogue>
+      <Page>Just sit back down at the flight console and it'll automatically turn off. And don't ask how I detect when you sit down.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_PersistentInput_2</DialogueTarget>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_PersistentInput_12</Name>
+    <Dialogue>
+      <Page>Uh, yeah? Just don't get out of the ship when persistent input is on.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_PersistentInput_2</DialogueTarget>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_PersistentInput_2</Name>
+    <Dialogue>
+      <Page>Anyway, good luck out there. Don't let the ship fly itself into any big objects.</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <!--Ship Signal-->
+  
+  <DialogueNode>
+    <Name>SE_ShipSignal_1</Name>
+    <Dialogue>
+      <Page>Oh, that's just a byproduct of the ship's signalscope.</Page>
+      <Page>Seemed like a waste of a signal though, so I made some modifications to that signalscope of yours.</Page>
+    </Dialogue>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>What sort of modifications..?</Text>
+        <DialogueTarget>SE_ShipSignal_11</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>I never said you could do that!</Text>
+        <DialogueTarget>SE_ShipSignal_12</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ShipSignal_11</Name>
+    <Dialogue>
+      <Page>Nothing necessarily <![CDATA[<i>]]>dangerous<![CDATA[</i>]]>. There's a small chance it causes a short circuit, but it's nothing to worry about.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_ShipSignal_2</DialogueTarget>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ShipSignal_12</Name>
+    <Dialogue>
+      <Page>Then maybe you shouldn't leave your signalscope laying around next time! You were practically asking for me to make improvements to it.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_ShipSignal_2</DialogueTarget>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ShipSignal_2</Name>
+    <Dialogue>
+      <Page>All I did was adjust your signalscope to transmit signals. If you aim it at the ship, you should be able to send it commands.</Page>
+    </Dialogue>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Woah, that's cool.</Text>
+        <DialogueTarget>SE_ShipSignal_21</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Does it make the ship explode or something?</Text>
+        <DialogueTarget>SE_ShipSignal_22</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ShipSignal_21</Name>
+    <Dialogue>
+      <Page>Yeah, it's one of my better ideas. Just make sure you don't send the wrong command.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_ShipSignal_3</DialogueTarget>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ShipSignal_22</Name>
+    <Dialogue>
+      <Page>Uh... among other things, yeah.</Page>
+    </Dialogue>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Awesome.</Text>
+        <DialogueTarget>SE_ShipSignal_22a</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Why would anyone want to blow up their ship!?</Text>
+        <DialogueTarget>SE_ShipSignal_22b</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ShipSignal_22a</Name>
+    <Dialogue>
+      <Page>It's not as useful as the other commands, like ejecting the cockpit. I think you'll find more use out of those.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_ShipSignal_3</DialogueTarget>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ShipSignal_22b</Name>
+    <Dialogue>
+      <Page>Hey, you never know what situations you'll find yourself in out there. Maybe your ship got stuck in a tunnel you really need to use.</Page>
+      <Page>And in case it wasn't clear, that command is only for emergencies. No blowing up the ship for fun.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_ShipSignal_3</DialogueTarget>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ShipSignal_3</Name>
+    <Dialogue>
+      <Page>Anyway, I've got a fire to enjoy and you've got a ship to launch. Good luck out there!</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <!--Tether Hook-->
+  
+  <DialogueNode>
+    <Name>SE_TetherHook_1</Name>
+    <Dialogue>
+      <Page>Once you attach a hook to something, you can tether yourself to it, and it'll stop you from moving too far away. You can adjust the length of the tether too if you want.</Page>
+      <Page>If you tether yourself to a hook and manage to reach a second one, you can connect the two hooks together. It's pretty straightforward, isn't it?</Page>
+    </Dialogue>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>What do I use them for?</Text>
+        <DialogueTarget>SE_TetherHook_11</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Yep. Thanks.</Text>
+        <DialogueTarget>SE_TetherHook_12</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_TetherHook_11</Name>
+    <Dialogue>
+      <Page>Whatever you want! Personally, I would use them to hold the ship together better. It's a miracle it hasn't fallen apart already.</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_TetherHook_12</Name>
+    <Dialogue>
+      <Page>Anytime, hatchling.</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <!--Expedition Flag-->
+  
+  <DialogueNode>
+    <Name>SE_ExpeditionFlag_1</Name>
+    <Dialogue>
+      <Page>That old thing? Yeah, it doesn't have much use to it. It sure brings back memories, though.</Page>
+      <Page>A long time ago, before the space program was even a thing, Feldspar was always talking about those other planets up there. Said they would fly to each and every one of them.</Page>
+      <Page>So the other hatchlings and I made a white flag for Feldspar. That way when they finally made it to another planet, they could set it up there for everyone to see.</Page>
+      <Page>When the space program was founded, we put the Outer Wilds Ventures sticker on that flag, so it looks a little different. But that's still the same flag Feldspar used when they landed on the Attlerock for the first time.</Page>
+      <Page>Plan was to put one on every planet, but I guess that never happened, with Feldspar going missing and all that.</Page>
+      <Page>Anyway, we had a few more that we made in storage, so I thought, you know, since you're going into space, maybe you could bring one with you. Just to put down somewhere out there.</Page>
+    </Dialogue>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Yeah. I can do that.</Text>
+        <DialogueTarget>SE_ExpeditionFlag_11</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredPersistentCondition>MetFeldspar</RequiredPersistentCondition>
+        <Text>Maybe I'll pay Feldspar a visit and bring them a flag.</Text>
+        <DialogueTarget>SE_ExpeditionFlag_12</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ExpeditionFlag_11</Name>
+    <Dialogue>
+      <Page>Heh, maybe you can finish the job and set one up on each planet.</Page>
+      <Page>If you do that, take some photos to show me when you get back, will you?</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_ExpeditionFlag_12</Name>
+    <Dialogue>
+      <Page>Wish I could visit Feldspar too, hatchling, but until someone finds them, they won't be getting their flag.</Page>
+      <Page>You know what, though? If you somehow find Feldspar out there, be sure to come back here and tell me.</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <!--Ship Warp Core-->
+  
+  <DialogueNode>
+    <Name>SE_ShipWarpCore_1</Name>
+    <Dialogue>
+      <Page>What, you think I flew around the Solar System and set up warp receivers on each planet? No, it can't warp to other planets. Not normally, at least.</Page>
+      <Page>Since the ship log uses Nomai parts in the computer, it might be possible for it to connect to other Nomaian technology and warp to them.</Page>
+      <Page>If you find something out there that can warp objects back to it, try marking its location in the ship log. That should be enough to coax them into interfacing.</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+</DialogueTree>

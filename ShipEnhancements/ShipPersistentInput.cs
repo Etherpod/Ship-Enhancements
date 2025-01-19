@@ -48,7 +48,7 @@ public class ShipPersistentInput : ThrusterController
     {
         float num = Mathf.Min(_rulesetDetector.GetThrustLimit(), _thrustController._thrusterModel.GetMaxTranslationalThrust()) 
             / _thrustController._thrusterModel.GetMaxTranslationalThrust();
-        return _currentInput * ((bool)enableThrustModulator.GetProperty() ? ShipEnhancements.Instance.thrustModulatorLevel / 5f : 1f) * num;
+        return _currentInput * ((bool)enableThrustModulator.GetProperty() ? ShipEnhancements.Instance.ThrustModulatorLevel / 5f : 1f) * num;
     }
 
     private void OnEnterFlightConsole(OWRigidbody shipBody)
@@ -109,6 +109,11 @@ public class ShipPersistentInput : ThrusterController
 
     public void OnDisableEngine()
     {
+        for (int i = 0; i < _lastRendererValues.Length; i++)
+        {
+            _lastRendererValues[i] = 0f;
+        }
+
         if (_currentInput != Vector3.zero && enabled)
         {
             enabled = false;
@@ -117,8 +122,9 @@ public class ShipPersistentInput : ThrusterController
             {
                 _displayRenderers[i].material.SetFloat(_thrustDisplay._propID_BarPosition, 0f);
             }
-            _currentInput = Vector3.zero;
         }
+
+        _currentInput = Vector3.zero;
     }
 
     public void UpdateLastAutopilotState()

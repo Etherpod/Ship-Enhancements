@@ -102,7 +102,7 @@ public class CockpitFilthController : MonoBehaviour
 
             _dirtBuildupProgression = Mathf.Clamp01(_dirtBuildupProgression - Time.deltaTime / _dirtClearTime);
         }
-        else if (_addDirtBuildup)
+        else if (_addDirtBuildup && _dirtBuildupProgression < (float)maxDirtAccumulation.GetProperty())
         {
             if (_dirtMat.GetFloat(_dirtLowerClipPropID) > 0f)
             {
@@ -113,7 +113,7 @@ public class CockpitFilthController : MonoBehaviour
                 _dirtMat.SetFloat(_dirtUpperClipPropID, Mathf.Lerp(1f, 0.5f, (_dirtBuildupProgression - 0.5f) * 2));
             }
 
-            _dirtBuildupProgression = Mathf.Clamp01(_dirtBuildupProgression + Time.deltaTime / _dirtBuildupTime);
+            _dirtBuildupProgression = Mathf.Clamp01(_dirtBuildupProgression + (Time.deltaTime * (float)maxDirtAccumulation.GetProperty()) / _dirtBuildupTime);
         }
     }
 

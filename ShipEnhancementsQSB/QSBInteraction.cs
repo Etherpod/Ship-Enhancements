@@ -21,7 +21,8 @@ using static ShipEnhancements.ShipEnhancements.Settings;
 using QSB.Tools.ProbeLauncherTool.Patches;
 using QSB.ShipSync.Messages;
 using QSB.Player.TransformSync;
-using QSB;
+using System.Collections.Generic;
+using QSB.ItemSync.Patches;
 
 namespace ShipEnhancementsQSB;
 
@@ -34,7 +35,7 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
 
         LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
         {
-            if (loadScene != OWScene.SolarSystem)
+            if (loadScene != OWScene.SolarSystem || !ShipEnhancements.ShipEnhancements.InMultiplayer)
             {
                 return;
             }
@@ -52,6 +53,18 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
                 if ((bool)addTether.GetProperty())
                 {
                     QSBWorldSync.Init<QSBTetherHookItem, TetherHookItem>();
+                }
+                if ((bool)addExpeditionFlag.GetProperty())
+                {
+                    QSBWorldSync.Init<QSBExpeditionFlagItem, ExpeditionFlagItem>();
+                }
+                if ((bool)enableRemovableGravityCrystal.GetProperty())
+                {
+                    QSBWorldSync.Init<QSBShipGravityCrystal, ShipGravityCrystalItem>();
+                }
+                if ((bool)addFuelCanister.GetProperty())
+                {
+                    QSBWorldSync.Init<QSBFuelTankItem, FuelTankItem>();
                 }
             }, 2);
         };
@@ -93,10 +106,13 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
         return QSBInteractionPatches.RecoveringAtShip;
     }
 
-    public void SetHullDamaged(ShipHull shipHull)
+    public void SetHullDamaged(ShipHull shipHull, bool newlyDamaged)
     {
         var hull = shipHull.GetWorldObject<QSBShipHull>();
-        hull.SendMessage(new HullDamagedMessage());
+        if (newlyDamaged)
+        {
+            hull.SendMessage(new HullDamagedMessage());
+        }
         hull.SendMessage(new HullChangeIntegrityMessage(shipHull._integrity));
     }
 
@@ -109,6 +125,21 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
     public TetherHookItem GetTetherHookFromID(int hookID)
     {
         return hookID.GetWorldObject<QSBTetherHookItem>().AttachedObject;
+    }
+
+    public int GetIDFromItem(OWItem item)
+    {
+        return item.GetWorldObject<IQSBItem>().ObjectId;
+    }
+
+    public OWItem GetItemFromID(int itemID)
+    {
+        var obj = itemID.GetWorldObject<IQSBItem>().AttachedObject;
+        if (obj is OWItem)
+        {
+            return (OWItem)obj;
+        }
+        return null;
     }
 
     public bool WorldObjectsLoaded()
@@ -389,6 +420,78 @@ public static class QSBInteractionPatches
 
         return false;
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ItemToolPatches), nameof(ItemToolPatches.DropItem))]
+    public static bool ParentItemToShip(ItemTool __0, RaycastHit hit, OWRigidbody targetRigidbody, IItemDropTarget customDropTarget, ref bool __result)
+    {
+        if (customDropTarget != null) return true;
+
+        Transform module = hit.collider.GetComponentInParent<ShipDetachableModule>()?.transform;
+        if (module == null)
+        {
+            module = hit.collider.GetComponentInParent<ShipDetachableLeg>()?.transform;
+            if (module == null) return true;
+        }
+
+        Locator.GetPlayerAudioController().PlayDropItem(__0._heldItem.GetItemType());
+        var gameObject = hit.collider.gameObject;
+        var component = gameObject.GetComponent<ISectorGroup>();
+        Sector sector = null;
+
+        while (component == null && gameObject.transform.parent != null)
+        {
+            gameObject = gameObject.transform.parent.gameObject;
+            component = gameObject.GetComponent<ISectorGroup>();
+        }
+
+        if (component != null)
+        {
+            sector = component.GetSector();
+            if (sector == null && component is SectorCullGroup sectorCullGroup)
+            {
+                var controllingProxy = sectorCullGroup.GetControllingProxy();
+                if (controllingProxy != null)
+                {
+                    sector = controllingProxy.GetSector();
+                }
+            }
+        }
+
+        /*var parent = customDropTarget == null
+            ? targetRigidbody.transform
+            : customDropTarget.GetItemDropTargetTransform(hit.collider.gameObject);*/
+        var parent = module.transform;
+        var item = __0._heldItem;
+        var qsbItem = __0._heldItem.GetWorldObject<IQSBItem>();
+        __0._heldItem.DropItem(hit.point, hit.normal, parent, sector, customDropTarget);
+        //customDropTarget?.AddDroppedItem(hit.collider.gameObject, __0._heldItem);
+
+        __0._heldItem = null;
+        QSBPlayerManager.LocalPlayer.HeldItem = null;
+
+        Locator.GetToolModeSwapper().UnequipTool();
+
+        qsbItem.SendMessage(new DropItemMessage(hit.point, hit.normal, parent, sector, customDropTarget, targetRigidbody));
+
+        List<ShipModule> moduleList = [.. SELocator.GetShipDamageController()._shipModules];
+        int index = moduleList.IndexOf(module.GetComponent<ShipModule>());
+        foreach (uint id in ShipEnhancements.ShipEnhancements.PlayerIDs)
+        {
+            ShipEnhancements.ShipEnhancements.QSBCompat.SendItemModuleParent(id, item, index);
+        }
+
+        qsbItem.ItemState.State = ItemStateType.OnGround;
+        qsbItem.ItemState.Parent = parent;
+        qsbItem.ItemState.LocalPosition = parent.InverseTransformPoint(hit.point);
+        qsbItem.ItemState.LocalNormal = parent.InverseTransformDirection(hit.normal);
+        qsbItem.ItemState.Sector = sector;
+        qsbItem.ItemState.CustomDropTarget = customDropTarget;
+        qsbItem.ItemState.Rigidbody = targetRigidbody;
+
+        __result = false;
+        return false;
+    }
     #endregion
 
     #region Ship Damage Multiplier
@@ -399,6 +502,11 @@ public static class QSBInteractionPatches
         if ((float)shipDamageMultiplier.GetProperty() == 1 && (float)shipDamageSpeedMultiplier.GetProperty() == 1)
         {
             return true;
+        }
+
+        if ((float)shipDamageMultiplier.GetProperty() <= 0f)
+        {
+            return false;
         }
 
         if (__0._dominantImpact != null)
@@ -615,6 +723,45 @@ public static class QSBInteractionPatches
                 ____thrusterAudio.OnStartTranslationalThrust();
 
                 ShipThrusterManager.ShipWashController.OnStartTranslationalThrust();
+            }
+        }
+
+        return false;
+    }
+    #endregion
+
+    #region DisableAutoLights
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipManager), "UpdateElectricalComponent")]
+    public static bool QSBDisableAutoLights(ShipManager __instance, List<PlayerInfo> ____playersInShip)
+    {
+        if (!(bool)disableAutoLights.GetProperty())
+        {
+            return true;
+        }
+
+        if (__instance.ShipElectricalComponent == null)
+        {
+            return false;
+        }
+
+        var electricalSystem = __instance.ShipElectricalComponent._electricalSystem;
+        var damaged = __instance.ShipElectricalComponent._damaged;
+
+        if (____playersInShip.Count == 0)
+        {
+            // never turn off power
+
+            /*if (!damaged)
+            {
+                electricalSystem.SetPowered(false);
+            }*/
+        }
+        else
+        {
+            if (!damaged)
+            {
+                electricalSystem.SetPowered(true);
             }
         }
 

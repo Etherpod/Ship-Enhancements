@@ -52,7 +52,13 @@
       "title": "Disable Ship Lights",
       "type": "toggle",
       "value": false,
-      "tooltip": "Turns off both the interior and exterior lighting fixtures."
+      "tooltip": "Permanently turns off both the interior and exterior lighting fixtures."
+    },
+    "disableAutoLights": {
+      "title": "Disable Automatic Lights",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Keeps all of the lights on when you leave the ship instead of turning them off."
     },
     "disableShipOxygen": {
       "title": "Disable Ship Oxygen",
@@ -71,6 +77,12 @@
       "type": "toggle",
       "value": false,
       "tooltip": "Removes your ability to launch the scout with the ship."
+    },
+    "disableRetroRockets": {
+      "title": "Disable Retro Rockets",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Disables your backwards thrusters. You may want to avoid using autopilot."
     },
     "disableShipRepair": {
       "title": "Disable Ship Repairing",
@@ -96,6 +108,12 @@
       "value": false,
       "tooltip": "Removes the suit from the ship. How long can you hold your breath in space?"
     },
+    "singleUseTractorBeam": {
+      "title": "Single-Use Tractor Beam",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Disables the tractor beam after you enter the ship."
+    },
     "disableAirAutoRoll": {
       "title": "Disable Air Auto Roll",
       "type": "toggle",
@@ -107,12 +125,6 @@
       "type": "toggle",
       "value": false,
       "tooltip": "Allows your ship to rotate freely in water."
-    },
-    "disableRotationSpeedLimit": {
-      "title": "Disable Rotation Speed Limit",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Lets you spin your ship as quickly as you want. DO NOT ENABLE IF YOU ARE PRONE TO MOTION SICKNESS."
     },
     "disableShipFriction": {
       "title": "Disable Ship Friction",
@@ -161,18 +173,6 @@
       "value": 1,
       "tooltip": "Larger numbers increase the amount of fuel that drains when the fuel tank is damaged in addition to the regular drain rate. The default speed is about 10 times faster."
     },
-    "oxygenRefillMultiplier": {
-      "title": "Oxygen Refill Multiplier",
-      "type": "number",
-      "value": 1,
-      "tooltip": "Larger numbers increase the speed at which the ship oxygen refills. The default speed takes about a minute to completely refill."
-    },
-    "fuelTransferMultiplier": {
-      "title": "Fuel Transfer Multiplier",
-      "type": "number",
-      "value": 1,
-      "tooltip": "Larger numbers increase the amount of fuel added to the ship when transferring fuel, and also increase the amount of fuel subtracted when refueling the jetpack."
-    },
     "idleFuelConsumptionMultiplier": {
       "title": "Idle Fuel Consumption Multiplier",
       "type": "number",
@@ -191,17 +191,39 @@
       "value": 1,
       "tooltip": "Larger numbers increase the minimum speed for taking impact damage. Set this to something super small to blow up your ship when you touch something."
     },
-    "temperatureDamageMultiplier": {
-      "title": "Temperature Damage Multiplier",
-      "type": "number",
-      "value": 1,
-      "tooltip": "Larger numbers increase the damage that the ship takes from extreme temperatures."
+    "randomHullDamage": {
+      "title": "Random Hull Damage",
+      "type": "slider",
+      "min": 0,
+      "max": 1,
+      "value": 0,
+      "tooltip": "Deals a random amount of damage to a number of hulls at the start of the loop. A minimum value means no hulls are damaged and a maximum value means every hull is damaged."
     },
-    "temperatureResistanceMultiplier": {
-      "title": "Temperature Resistance Multiplier",
+    "randomComponentDamage": {
+      "title": "Random Component Damage",
+      "type": "slider",
+      "min": 0,
+      "max": 1,
+      "value": 0,
+      "tooltip": "Breaks a number of the ship's components excluding the important ones. A minimum value means no components are damaged and a maximum value means every component is damaged."
+    },
+    "enableStunDamage": {
+      "title": "Enable Stun Damage",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Temporarily stuns you if you hit something too hard with the ship."
+    },
+    "enableFragileShip": {
+      "title": "Enable Fragile Ship",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "You are unable to pilot your ship if anything is damaged. Please do not use this with Disable Ship Repair."
+    },
+    "repairTimeMultiplier": {
+      "title": "Repair Time Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the time the ship can resist extreme temperatures. The default resistance gives the ship around 3 minutes before the hull reaches max temperature, meaning max damage."
+      "tooltip": "Larger numbers increase the time it takes to repair parts of the ship."
     },
     "gravityMultiplier": {
       "title": "Ship Gravity Multiplier",
@@ -221,7 +243,8 @@
         "Forward",
         "Back",
         "Random"
-      ]
+      ],
+      "tooltip": "Changes the direction of your ship's gravity. If you set this to Random, you may find yourself standing diagonally in the ship."
     },
     "atmosphereAngularDragMultiplier": {
       "title": "Atmosphere Angular Drag Multiplier",
@@ -235,11 +258,41 @@
       "value": 1,
       "tooltip": "Larger numbers make your ship harder to turn while in space. Set to zero to make your ship spin forever. WARNING: Values below 1 may cause motion sickness."
     },
+    "disableRotationSpeedLimit": {
+      "title": "Disable Rotation Speed Limit",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Lets you spin your ship as quickly as you want. DO NOT ENABLE IF YOU ARE PRONE TO MOTION SICKNESS."
+    },
+    "airDragMultiplier": {
+      "title": "Air Drag Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers increase how much the ship is slowed down by air. Set to zero to disable air drag."
+    },
+    "chaoticCyclones": {
+      "title": "Chaotic Cyclones",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Changes cyclones to add an upwards spin to your ship when you enter one."
+    },
     "shipExplosionMultiplier": {
       "title": "Ship Explosion Multiplier",
       "type": "number",
       "value": 1,
       "tooltip": "Larger numbers increase the size of the explosion that is created when your ship blows up."
+    },
+    "moreExplosionDamage": {
+      "title": "Extra Explosion Damage",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Makes explosions apply damage to the ship and to fragments of Brittle Hollow."
+    },
+    "extraNoise": {
+      "title": "Extra Noise",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Makes things such as the master alarm detectable by noise-sensing things."
     },
     "reactorLifetimeMultiplier": {
       "title": "Reactor Lifetime Multiplier",
@@ -251,7 +304,7 @@
       "title": "Ship Bounciness",
       "type": "number",
       "value": 0,
-      "tooltip": "Adjusts how bouncy the ship is. A value of 2 should double the ship's speed when it collides with something."
+      "tooltip": "Adjusts how bouncy the ship is. Values above 1 will be less accurate and will no longer affect players."
     },
     "shipInputLatency": {
       "title": "Ship Input Latency",
@@ -270,6 +323,12 @@
       "value": false,
       "tooltip": "Refills the ship's oxygen tank when near oxygen sources. Doesn't work when oxygen is disabled."
     },
+    "oxygenRefillMultiplier": {
+      "title": "Oxygen Refill Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers increase the speed at which the ship oxygen refills. The default speed takes about a minute to completely refill."
+    },
     "enableShipFuelTransfer": {
       "title": "Enable Ship Fuel Transfer",
       "type": "toggle",
@@ -282,29 +341,29 @@
       "value": false,
       "tooltip": "Drains the ship's fuel when you refill your jetpack in the ship."
     },
+    "fuelTransferMultiplier": {
+      "title": "Fuel Transfer Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers increase the amount of fuel added to the ship when transferring fuel, and also increase the amount of fuel subtracted when refueling the jetpack."
+    },
     "enableAutoHatch": {
       "title": "Enable Automatic Hatch",
       "type": "toggle",
       "value": false,
       "tooltip": "Automatically closes the hatch when you leave the ship."
     },
-    "extraNoise": {
-      "title": "Enable Extra Noise",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Makes things such as the master alarm detectable by noise-sensing things."
-    },
-    "enableShipItemPlacement": {
-      "title": "Enable Ship Item Placement",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Lets you drop items inside of the ship or on top of the ship."
-    },
     "enableManualScoutRecall": {
       "title": "Enable Manual Scout Recall",
       "type": "toggle",
       "value": false,
       "tooltip": "Forces you to retrieve your scout by hand when you launch it. If you retrieve it with the ship, you need to go get it from on top of the ship before you can fire it on foot."
+    },
+    "addShipWarpCore": {
+      "title": "Add Ship Warp Core",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Attaches a Nomai warp core to the cockpit, allowing you to recall your ship to the launch pad using a button on the ceiling of the cockpit."
     },
     "temperatureZonesAmount": {
       "title": "Add Temperature Zones",
@@ -315,22 +374,46 @@
         "Sun",
         "All"
       ],
-      "tooltip": "Determines whether to add temperature zones around the entire solar system, just around the sun, or to add none at all."
+      "tooltip": "Determines whether to add temperature zones around the entire solar system, just around the sun, or to add none at all. Check the README for more details about temperature zones."
     },
     "hullTemperatureDamage": {
-      "title": "Enable Hull Temperature Damage",
+      "title": "Hull Temperature Damage",
       "type": "toggle",
       "value": false,
       "tooltip": "Damages the ship hull over time in extremely high or low temperatures."
     },
     "componentTemperatureDamage": {
-      "title": "Enable Component Temperature Damage",
+      "title": "Component Temperature Damage",
       "type": "toggle",
       "value": false,
       "tooltip": "Damages the ship components over time in extremely high or low temperatures."
     },
+    "temperatureDamageMultiplier": {
+      "title": "Temperature Damage Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers increase the damage that the ship takes from extreme temperatures."
+    },
+    "temperatureResistanceMultiplier": {
+      "title": "Temperature Resistance Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers increase the time the ship can resist extreme temperatures. The default resistance gives the ship around 3 minutes before the hull reaches max temperature."
+    },
+    "faultyHeatRegulators": {
+      "title": "Faulty Heat Regulators",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Your reactor constantly heats up your ship, making anywhere that isn't cold a potential danger. You can cool off your ship by finding somewhere cold."
+    },
+    "enableRepairConfirmation": {
+      "title": "Enable Repair Confirmation",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Plays a sound when every damaged part of the ship has been repaired."
+    },
     "hotThrusters": {
-      "title": "Enable Hazardous Thrusters",
+      "title": "Hazardous Thrusters",
       "type": "toggle",
       "value": false,
       "tooltip": "Makes the ship thruster flames do damage when you stand in them."
@@ -349,6 +432,14 @@
       "value": 0,
       "tooltip": "Specifies the time in seconds that it takes for dirt to build up on your cockpit (0 is disabled). Find some water if you want to wash it off."
     },
+    "maxDirtAccumulation": {
+      "title": "Max Dirt Accumulation",
+      "type": "slider",
+      "value": 0.75,
+      "min": 0,
+      "max": 1,
+      "tooltip": "Controls the max amount of dirt that can accumulate on your cockpit glass."
+    },
     "enableScoutLauncherComponent": {
       "title": "Add Scout Launcher Component",
       "type": "toggle",
@@ -365,7 +456,19 @@
       "title": "Add Ship Signal",
       "type": "toggle",
       "value": false,
-      "tooltip": "Allows you to track your ship with the signalscope on the Outer Wilds Ventures frequency. Useful when map markers are disabled."
+      "tooltip": "Allows you to track your ship with the signalscope on the Outer Wilds Ventures frequency. Slate also mentioned something about sending commands with your signalscope."
+    },
+    "addShipClock": {
+      "title": "Add Ship Clock",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Adds a clock to the ship cockpit. It uses the standard Hearthian units of time: seconds and minutes."
+    },
+    "enableShipItemPlacement": {
+      "title": "Ship Item Placement",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Lets you drop items inside of the ship or on top of the ship."
     },
     "addPortableCampfire": {
       "title": "Add Portable Campfire",
@@ -373,17 +476,35 @@
       "value": false,
       "tooltip": "Adds a portable campfire to the ship near your suit. Unpack it anywhere you'd like and roast a marshmallow!"
     },
+    "addFuelCanister": {
+      "title": "Add Portable Fuel Canister",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Adds a portable fuel canister to the ship by the ship log. You can bring it with you to refuel your jetpack on the go. It has enough fuel for about 3 complete refills of your jetpack."
+    },
     "addPortableTractorBeam": {
       "title": "Add Portable Tractor Beam",
       "type": "toggle",
       "value": false,
       "tooltip": "Adds a portable Nomai tractor beam to the ship next to the reactor. Place it on the ground if you need an extra boost in height."
     },
+    "addExpeditionFlag": {
+      "title": "Add Expedition Flag",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Adds a portable flag to the ship between the cockpit and the supplies section. Place it on the ground if you want to mark where no Hearthian has gone before."
+    },
     "addTether": {
       "title": "Add Ship Tether",
       "type": "toggle",
       "value": false,
       "tooltip": "Adds a few hooks inside the ship that you can place anywhere you want. Interact with it to tether yourself to it, and interact with another to create a line between them."
+    },
+    "enableRemovableGravityCrystal": {
+      "title": "Removable Gravity Crystal",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Lets you remove the gravity crystal from the ship. It can be placed anywhere on any surface for a portable gravity source."
     },
     "enableGravityLandingGear": {
       "title": "Add Gravity Landing Gear",
@@ -407,7 +528,7 @@
       "title": "Add Engine Switch",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds a switch to the cockpit that turns on the ship. If you turned on idle fuel consumption it will only drain fuel while the ship is on."
+      "tooltip": "Adds a switch to the cockpit that turns on the ship. If you turned on Idle Fuel Consumption, it will only drain fuel while the ship is on."
     },
 
     "Decoration": {
@@ -533,6 +654,12 @@
       "type": "toggle",
       "value": true,
       "tooltip": "Notifies you in the ship when resources are low or when the outside conditions are becoming dangerous."
+    },
+    "shipGravityFix": {
+      "title": "Fix Ship Gravity",
+      "type": "toggle",
+      "value": true,
+      "tooltip": "Lets you walk around your ship normally when in high-gravity areas, like near the sun."
     }
   }
 }

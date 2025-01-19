@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 
 namespace ShipEnhancements;
 
@@ -31,4 +32,16 @@ public interface IShipEnhancements
     /// <param name="configName"></param>
     /// <param name="value"></param>
     public void SetSettingsProperty(string configName, object value);
+
+    /// <summary>
+    /// Gets the event that is invoked before Ship Enhancements makes any changes to the ship.
+    /// </summary>
+    /// <returns>The UnityEvent event that will be invoked.</returns>
+    public UnityEvent GetPreShipInitializeEvent();
+
+    /// <summary>
+    /// Gets the event that is invoked after Ship Enhancements finishes making changes to the ship.
+    /// </summary>
+    /// <returns>The UnityEvent event that will be invoked</returns>
+    public UnityEvent GetPostShipInitializeEvent();
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Events;
 using static ShipEnhancements.ShipEnhancements;
 
 namespace ShipEnhancements;
@@ -63,4 +64,8 @@ public class ShipEnhancementsAPI : IShipEnhancements
         }
         WriteDebugMessage($"Could not find a Ship Enhancements setting named {configName}! From: IShipEnhancements.SetSettingsProperty()", error: true);
     }
+
+    public UnityEvent GetPreShipInitializeEvent() => Instance.PreShipInitialize;
+
+    public UnityEvent GetPostShipInitializeEvent() => Instance.PostShipInitialize;
 }

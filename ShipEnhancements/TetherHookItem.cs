@@ -4,7 +4,7 @@ namespace ShipEnhancements;
 
 public class TetherHookItem : OWItem
 {
-    public static readonly ItemType ItemType = ShipEnhancements.Instance.tetherHookType;
+    public static readonly ItemType ItemType = ShipEnhancements.Instance.TetherHookType;
 
     [SerializeField]
     private GameObject _connectionMesh;
@@ -21,6 +21,7 @@ public class TetherHookItem : OWItem
     private Tether _activeTether;
     private FirstPersonManipulator _cameraManipulator;
     private ScreenPrompt _tetherPrompt;
+    private bool _lastFocused = false;
 
     public override string GetDisplayName()
     {
@@ -37,6 +38,8 @@ public class TetherHookItem : OWItem
         _tetherPrompt = new ScreenPrompt(InputLibrary.interactSecondary, "Attach Tether", 0, ScreenPrompt.DisplayState.Normal, false);
         _connectionMesh.SetActive(false);
 
+        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+
         if (ShipEnhancements.InMultiplayer)
         {
             ShipEnhancements.QSBCompat.AddTetherHook(this);
@@ -47,6 +50,11 @@ public class TetherHookItem : OWItem
     {
         bool focused = _cameraManipulator.GetFocusedOWItem() == this;
         _tetherPrompt.SetVisibility(focused);
+        if (_lastFocused != focused)
+        {
+            PatchClass.UpdateFocusedItems(focused);
+            _lastFocused = focused;
+        }
         if (focused && OWInput.IsNewlyPressed(InputLibrary.interactSecondary))
         {
             OnPressInteract();
@@ -158,6 +166,11 @@ public class TetherHookItem : OWItem
         PlayOneShotAudio(_attachTetherAudio, 0.6f);
     }
 
+    public void SetTether(Tether newTether)
+    {
+        _activeTether = newTether;
+    }
+
     public Tether GetTether()
     {
         return _tether;
@@ -176,7 +189,7 @@ public class TetherHookItem : OWItem
     public override void DropItem(Vector3 position, Vector3 normal, Transform parent, Sector sector, IItemDropTarget customDropTarget)
     {
         base.DropItem(position, normal, parent, sector, customDropTarget);
-        _tether.SetAttachedRigidbody(GetComponentInParent<OWRigidbody>());
+        _tether.SetAttachedRigidbody(gameObject.GetAttachedOWRigidbody());
         Locator.GetPromptManager().AddScreenPrompt(_tetherPrompt, PromptPosition.Center, false);
         transform.localScale = Vector3.one;
         _audioSource.clip = _dropAudio;
@@ -216,9 +229,27 @@ public class TetherHookItem : OWItem
         _audioSource.PlayOneShot(clip, volume);
     }
 
+    private void OnShipSystemFailure()
+    {
+        if (!_activeTether.IsTethered()) return;
+
+        ShipEnhancements.Instance.ModHelper.Events.Unity.FireOnNextUpdate(() =>
+        {
+            ShipEnhancements.WriteDebugMessage(gameObject.GetAttachedOWRigidbody().name);
+
+            if (GetComponentInParent<ShipDetachableModule>()
+                || GetComponentInParent<ShipDetachableLeg>())
+            {
+                _activeTether.UpdateTetherBody(gameObject.GetAttachedOWRigidbody(), _activeTether.GetHook() != this);
+            }
+        });
+    }
+
     public override void OnDestroy()
     {
         base.OnDestroy();
+
+        GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
 
         if (ShipEnhancements.InMultiplayer)
         {

@@ -8,7 +8,22 @@ public class TetherHookSocket : OWItemSocket
 
     public override void Awake()
     {
+        Reset();
+        _sector = SELocator.GetShipSector();
         base.Awake();
-        _acceptableType = ShipEnhancements.Instance.tetherHookType;
+        _acceptableType = ShipEnhancements.Instance.TetherHookType;
+
+        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+    }
+
+    private void OnShipSystemFailure()
+    {
+        _sector = null;
+        _socketedItem?.SetSector(null);
+    }
+
+    private void OnDestroy()
+    {
+        GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
     }
 }

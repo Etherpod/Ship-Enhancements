@@ -6,7 +6,7 @@ public class ProbeLauncherComponent : ShipComponent
 
     private void Start()
     {
-        _componentName = ShipEnhancements.Instance.probeLauncherName;
+        _componentName = ShipEnhancements.Instance.ProbeLauncherName;
     }
 
     public override void OnComponentDamaged()

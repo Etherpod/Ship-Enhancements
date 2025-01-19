@@ -19,60 +19,83 @@ Permanently remove useless or very important parts of the ship.
 - **Landing Camera**: Good luck.
 - **Eject Button**: Covers the eject button with tape so that your friend can't keep ejecting the cockpit while you're trying to fly.
 - **Interior/Exterior Lights**: Makes your ship very dark.
+- **Automatic Lights**: Prevents the lights from turning off when you leave the ship.
 - **Oxygen**: Literally removes all of the oxygen in the ship unless you're near trees or in an oxygen-filled atmosphere. This takes priority over all of the other oxygen modifications.
 - **Ship Scout Recall**: Removes your ability to recall the scout using the ship. The scout must be manually docked on the ship's scout launcher to fire, and can only be recalled using the handheld scout launcher.
 - **Ship Scout Launching**: Removes your ability to launch the scout from the ship. You'll have to do this yourself outside of the ship.
+- **Retro Rockets**: Turns off your backwards thrusters. Now you don't have to worry about slowing down!
 - **Ship Repair**: Be careful not to damage your ship.
 - **Damage Indicators**: Turns off all of those pesky notifications about parts of your ship being damaged, including the master alarm. Keep an eye or four on the reactor, please.
 - **Seatbelt**: Breaks a number of state laws by removing your seatbelt. If you crash into something with enough force you'll fly out of the chair.
 - **Ship Suit**: Removes your spacesuit from the ship. Space exploration just got a whole lot more dangerous.
+- **Single-Use Tractor Beam**: Turns off the ship's tractor beam after you enter the ship for the first time. If you leave without your suit, you might have trouble getting back in again.
 - **Air/Water Auto Roll**: Lets you fly around upside down in air and water, which is really confusing when paired with no ship gravity. Also makes it easier to land on walls, if you wanted to do that.
 - **Disable Rotation Speed Limit**: Lets you spin your ship as fast as you want. Enabling this may quickly lead to motion sickness.
 - **Ship Friction**: Essentially makes your ship a block of ice that will slide anywhere on anything.
 - **Lock-on**: Removes your ability to lock on to objects. You may find it difficult to use autopilot with this enabled.
-- **Map markers**: Hides the markers that tell you the location of your ship, your scout, and any marked ship log locations. Ship log locations inside a certain strange place are left visible so that you can actually find it. Visible until you get there, that is.
+- **Map markers**: Hides the markers that tell you the location of your ship, your scout, and any marked ship log locations. Ship log locations inside The Stranger are left visible until you arrive.
 
 ## Adjust Ship Functions
-Change some of the values that control how the ship works or how the added features work.
+Change some of the values that control how the ship works.
 - **Oxygen Drain Multiplier**: Larger numbers make your ship's oxygen drain faster. Set it to something like 100 for it to completely drain after being in the ship for half the loop or so.
 - **Fuel Drain Multiplier**: Larger numbers make your ship's fuel drain faster.
 - **Oxygen Tank Drain Multiplier**: Larger numbers increase the amount of oxygen that drains when the ship's oxygen tank is damaged.
 - **Fuel Tank Drain Multiplier**: Larger numbers increase the amount of fuel that drains when the ship's fuel tank is damaged.
-- **Oxygen Refill Multiplier**: Larger numbers increase the speed at which your ship's oxygen tank refills when near an oxygen source.
-- **Fuel Transfer Multiplier**: Larger numbers increase the amount of fuel that is subtracted when refueling your jetpack, and increase the amount of fuel that is added when transferring fuel to the ship.
-- **Idle Fuel Consumption Multiplier**: Larger numbers increase how quickly your fuel drains over time. If the Engine Switch is enabled, it will not drain fuel while the ship is off.
+- **Idle Fuel Consumption Multiplier**: Larger numbers increase how quickly your fuel drains over time. If the **Engine Switch** is enabled, it will not drain fuel while the ship is off.
 - **Damage Multiplier**: Larger numbers increase the damage done to the ship hull and increase the probability that components will be damaged on impact.
 - **Damage Speed Multiplier**: Larger numbers increase the speed you need to be traveling at before taking damage. Set this to something really small to blow up your ship when you touch something.
-- **Temperature Damage Multiplier**: Larger numbers increase the damage done to your ship inside high or low temperature areas.
-- **Temperature Resistance Multiplier**: Larger numbers increase the time it takes for your ship to start taking damage in high or low temperature areas.
+- **Random Hull Damage**: Applies random damage to a random set of hulls on the start of the loop. The slider controls the percentage of hulls to be damaged- minimum is none, maximum is all of them- and how much damage to do to them.
+- **Random Component Damage**: Breaks a set number of random components at the start of the loop. The silder controls the percentage of components to be damaged, where the minimum is none and the maximum is all of them. The vital ship components (reactor, fuel tank, one random thruster) are excluded from being selected.
+- **Enable Stun Damage**: Blocks all of your inputs for a short time after you crash. The harder you hit something, the longer you'll be frozen.
+- **Repair Time Multiplier**: Larger numbers increase the time it takes to repair parts of your ship.
 - **Ship Gravity Multiplier**: Larger numbers increase the strength of your ship's gravity crystal. Large numbers are advised against, however, as exiting your ship will kill you.
 - **Ship Gravity Direction**: Lets you change the direction of your ship's gravity. Set this to Random if you feel like the game isn't painful enough.
 - **Atmosphere/Space Angular Drag Multiplier**: Larger numbers make it harder to turn your ship. Setting this to 0 lets you spin your ship forever.
+- **Disable Rotation Speed Limit**: Lets you spin your ship as quickly as you want. Enabling this may quickly lead to motion sickness.
+- **Air Drag Multiplier**: Larger numbers make atmospheres slow you down more. Setting this to 0 lets your ship drift endlessly through the air.
+- **Chaotic Cyclones**: Adjusts cyclones to apply an additional upwards spin to your ship while inside of them to make for an even more disorienting experience.
 - **Ship Explosion Multiplier**: Larger numbers increase the size of the explosion that is created when your ship blows up. Set this to something between 10 and 30 to simulate an atomic bomb.
+- **Extra Explosion Damage**: Gives explosions the ability to damage your ship and fragments of Brittle Hollow.
+- **Extra Noise**: Makes noisy parts of the ship, like the master alarm, alert noise detectors.
 - **Reactor Lifetime Multiplier**: Larger numbers increase the time it takes for the reactor to blow up when it has been damaged. Set this to something small to give yourself a panic attack every time the master alarm goes off.
-- **Ship Bounciness**: Larger numbers increase the bounciness of the ship. A value of 2 should make the ship double its speed when it hits something, but the results of this setting aren't entirely accurate.
+- **Ship Bounciness**: Larger numbers increase the bounciness of the ship. Values above 1 will be less accurate and will no longer affect players.
 - **Ship Input Latency**: This basically simulates internet lag, where larger numbers increase the time it takes for the ship to process your inputs. A value of 1 means it takes 1 second for your "upwards thrust" input to register.
 
-## Add Ship Functions
+## Add Ship Features
 Some new stuff that Slate didn't have time to include in the ship.
 - **Oxygen Refill**: Refills the ship's oxygen tank when it gets close to trees or enters an oxygen-filled atmosphere.
+- **Oxygen Refill Multiplier**: Larger numbers increase the speed at which your ship's oxygen tank refills when near an oxygen source.
 - **Fuel Transfer**: Lets you transfer your jetpack fuel to the ship's fuel tank to refill it.
-- **Jetpack Refuel Drain**: Drains the ship's fuel reserve when you refuel your jetpack. The amount drained is the same as the amount gained if you transfer your fuel back to the ship, meaning you can't duplicate fuel.
-- **Automatic Hatch**: Automatically closes the hatch when you leave the ship.
-- **Extra Noise**: Makes noisy parts of the ship, like the master alarm, alert things that can hear you.
-- **Ship Item Placement**: Lets you place items inside or on top of your ship.
+- **Jetpack Refuel Drain**: Drains the ship's fuel reserve when you refuel your jetpack. You cannot duplicate fuel by transferring it back into the ship.
+- **Fuel Transfer Multiplier**: Larger numbers increase the amount of fuel that is drained when refueling your jetpack, and increase the amount of fuel that is added when transferring fuel to the ship.
+- **Automatic Hatch**: Automatically closes the hatch when you leave the ship. **Quantum Space Buddies** has this feature by default.
 - **Manual Scout Recall**: Brings you back to the days when Little Scouts didn't have warping technology. If you shoot your scout somewhere, you'll have to go over and pick it up to use it again. If you accidentally launch it into deep space, don't worry; the ship can still recall it, and you can go retrieve it from the top of the ship in the scout launcher.
-- **Temperature Zones**: Implements a temperature mechanic for the unused temperature dial in the ship. High and low temperature zones are added around the solar system that increase or decrease your ship's hull temperature. The longer you allow your hull's temperature to fluctuate, the more likely it is for your ship to take damage.
-- **Hull Temperature Damage**: Damages your ship over time in extreme temperatures, like near the Sun or on the dark side of the Interloper. Your temperature dial will start flashing if it's hot or cold enough to start taking damage.
-- **Component Temperature Damage**: Similar to hull temperature damage, but it damages random components instead.
-- **Hazardous Thrusters**: Makes your ship's thruster flames actually damage you. Good luck figuring out how to get near them in the first place.
+- **Ship Warp Core**: Attaches a Nomai warp core to your ship's cockpit. You can press the button on the ceiling of the cockpit to activate the warp core, which will warp you back to Timber Hearth. The warp core also has the ability to pair with gravity cannons that are marked in the ship log.
+- **Temperature Zones**: Implements a temperature mechanic for the ship using the "TEMP" (temperature) dial and a new "SHIP TEMP" (ship temperature) dial. Subjecting your ship to extreme temperatures will increase the ship temperature, making it more likely for your ship to sustain damage or bad side effects.
+  - Any extreme temperatures can damage your ship if temperature damage is enabled. The temperature dial will start flashing if the temperature reaches a dangerous level.
+  - High temperatures (very hot) will make your ship hull hot to the touch and can blow up the Portable Fuel Tank.
+  - Low temperatures (very cold) will lower the strength of your ship's thrusters and make it possible for your ship ignition to fail.
+- **Hull Temperature Damage**: Makes it possible for extreme temperatures to damage the hull of your ship.
+- **Component Temperature Damage**: Makes it possible for extreme temperatures to damage any of your ship's components, like the headlights or artificial gravity.
+- **Temperature Damage Multiplier**: Larger numbers increase the damage done to your ship by extreme temperatures.
+- **Temperature Resistance Multiplier**: Larger numbers make the ship temperature change slower, giving you more time in extreme temperatures but requiring more time to recover.
+- **Faulty Heat Regulators**: Makes your ship unable to dump the reactor heat, leaving it to build up in the ship. Unless you find someplace cold, your ship is going to constantly rise in temeprature.
+- **Repair Confirmation**: Plays a sound when everything has been repaired. Now you don't need to go searching for any hulls you forgot to fix!
+- **Hazardous Thrusters**: Makes your ship's thruster flames actually damage you. Try figuring out how to get near them in the first place.
 - **Cockpit Rust Level**: Controls how much rust is applied to the ship cockpit. Moving the slider all the way to the right completely covers the cockpit in rust.
 - **Dirt Accumulation Time**: Larger numbers increase the time (in seconds) it takes for dirt to build up on your cockpit glass, which you can wash off by finding a source of water. Set this to 0 to disable it.
+- **Max Dirt Accumulation**: Stops dirt from building up on your cockpit when it reaches a certain level.
 - **Scout Launcher Component**: Turns the ship's scout launcher into a fully functioning ship component. If you damage it, you won't be able to launch or recall your scout from the ship until you repair it.
 - **Signalscope Component**: Turns the ship's signalscope into a fully functioning ship component. If you damage it, you won't be able to receive or broadcast signals from the ship until you repair it.
-- **Ship Signal**: Adds a signal for the ship on the Outer Wilds Ventures frequency. The signal will stop if the ship's signalscope is damaged.
-- **Add Portable Campfire**: Adds a portable campfire to the ship next to your suit. Set it up wherever you want and roast a marshmallow.
-- **Add Ship Tether**: Adds a few hooks to the ship cabin. You can attach these hooks to pretty much any surface- including the ship- and tether yourself to them. If you want to get even crazier, grab a second hook after tethering to one and tether to the new one; it will connect the two hooks together.
+- **Ship Signal**: Adds a signal for the ship on the Outer Wilds Ventures frequency. The signal will stop if the ship's signalscope is damaged. Slate also said they added a "command transmitter" to your signalscope, whatever that means.
+- **Clock**: Adds a clock to the cockpit that tells the time in minutes and seconds. Why, you might ask? Why not? It makes a nice ticking sound, if you like that sort of background noise.
+- **Ship Item Placement**: Lets you place items inside or on top of your ship.
+- **Portable Campfire**: Adds a portable campfire to the ship next to your suit. Set it up wherever you want and roast a marshmallow.
+- **Portable Tractor Beam**: Adds a portable Nomai tractor beam to the ship near the ship log. Place it down somewhere if you need an extra boost in height.
+- **Portable Fuel Canister**: Adds a portable fuel tank inside the ship at the back. You can bring it around with you in case you need to refuel your jetpack while traveling. The fuel tank can completely refill your jetpack about 3 times before it runs out of fuel.
+- **Expedition Flag**: Adds a portable flag to the ship between the cockpit and the supplies section. Place it down somewhere if you want to mark some exploratory feat or if you want to mark where you've been.
+- **Ship Tether**: Adds a few hooks to the ship cabin. You can attach these hooks to pretty much any surface- including the ship- and tether yourself to them. If you want to get even crazier, grab a second hook after tethering to one and tether to the new one; it will connect the two hooks together.
+- **Removable Gravity Crystal**: Lets you detach the ship's gravity crystal and place it somewhere else to create a localized gravity field. The removed gravity crystal will have the same strength as it did in the ship.
 - **Gravity Landing Gear**: Adds a switch to the cockpit that powers your landing gear with gravitational force, letting you stick to surfaces. It's a bit fragile though, and only works if your landing gear isn't damaged.
 - **Thrust Modulator**: Adds an interface to the cockpit that lets you lower or disproportionately raise the maximum thrust your ship can use. Stacks with the smooth thrust option from General Enhancements.
 - **Persistent Input**: Adds a switch to the cockpit that, when enabled, lets you continue your last input when you unbuckle from the ship. Useful when you want to hold forward for 10 minutes and don't feel like actually holding it the entire time.
@@ -89,6 +112,7 @@ Haven't you ever wished your ship had a little more color?
 These are all enabled by default.
 - **Keep Helmet On**: When there is no oxygen present, this prevents the game from removing your helmet when doing things such as piloting the ship or roasting a marshmallow at a campfire.
 - **Show Warning Notifications**: Notifies you in the ship when resources are low or when the outside conditions are becoming dangerous.
+- **Fix Ship Gravity**: Gets rid of that annoying bug where you're trying to land on the Sun Station and you can't move around in your ship because it's holding you against the wall.
 
 ## Presets
 In case there are too many settings to deal with, there are some pre-made presets for you to use. The settings can still be meddled with after choosing one.
@@ -117,8 +141,10 @@ Ship Enhancements adds 9 new achievements to the **Achievements+** mod! Play wit
 - The Portable Campfire can be lit inside the core of Giant's Deep
 
 # Credits
-Big thanks to NineMeowz for helping with most of the ideas and some sound effects.
+Big thanks to ColumbidaeCafe for helping develop most of the ideas and sound effects.
 
-Thanks to Ditzy and JohnCorby for helping with some of the code, especially the physics stuff.
+Thanks to Ditzy and JohnCorby for helping with some of the code, especially with the physics stuff and multiplayer compatibility.
+
+Shoutout to SpatialX for leaving a ton of ideas on the mod page.
 
 And thanks to the Outer Wilds Modding Community, this wouldn't have been possible without them.

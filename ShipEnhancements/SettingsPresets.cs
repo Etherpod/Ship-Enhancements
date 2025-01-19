@@ -75,6 +75,26 @@ public static class SettingsPresets
         { "addPortableTractorBeam", false },
         { "disableShipSuit", false },
         { "damageIndicatorColor", "Default" },
+        { "disableAutoLights", false },
+        { "addExpeditionFlag", false },
+        { "addFuelCanister", false },
+        { "chaoticCyclones", false },
+        { "moreExplosionDamage", false },
+        { "singleUseTractorBeam", false },
+        { "disableRetroRockets", false },
+        { "maxDirtAccumulation", 0.75f },
+        { "addShipWarpCore", false },
+        { "repairTimeMultiplier", 1f },
+        { "airDragMultiplier", 1f },
+        { "addShipClock", false },
+        { "enableStunDamage", false },
+        { "enableRepairConfirmation", false },
+        { "shipGravityFix", true },
+        { "enableRemovableGravityCrystal", false },
+        { "randomHullDamage", 0f },
+        { "randomComponentDamage", 0f },
+        { "enableFragileShip", false },
+        { "faultyHeatRegulators", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -146,6 +166,26 @@ public static class SettingsPresets
         { "addPortableTractorBeam", false },
         { "disableShipSuit", false },
         { "damageIndicatorColor", "Default" },
+        { "disableAutoLights", false },
+        { "addExpeditionFlag", false },
+        { "addFuelCanister", false },
+        { "chaoticCyclones", false },
+        { "moreExplosionDamage", false },
+        { "singleUseTractorBeam", true },
+        { "disableRetroRockets", true },
+        { "maxDirtAccumulation", 0.75f },
+        { "addShipWarpCore", false },
+        { "repairTimeMultiplier", 1f },
+        { "airDragMultiplier", 1f },
+        { "addShipClock", false },
+        { "enableStunDamage", false },
+        { "enableRepairConfirmation", false },
+        { "shipGravityFix", true },
+        { "enableRemovableGravityCrystal", false },
+        { "randomHullDamage", 0f },
+        { "randomComponentDamage", 0f },
+        { "enableFragileShip", false },
+        { "faultyHeatRegulators", false },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -217,6 +257,26 @@ public static class SettingsPresets
         { "addPortableTractorBeam", false },
         { "disableShipSuit", false },
         { "damageIndicatorColor", "Default" },
+        { "disableAutoLights", true },
+        { "addExpeditionFlag", true },
+        { "addFuelCanister", true },
+        { "chaoticCyclones", false },
+        { "moreExplosionDamage", false },
+        { "singleUseTractorBeam", false },
+        { "disableRetroRockets", false },
+        { "maxDirtAccumulation", 0.75f },
+        { "addShipWarpCore", true },
+        { "repairTimeMultiplier", 0.5f },
+        { "airDragMultiplier", 1f },
+        { "addShipClock", false },
+        { "enableStunDamage", false },
+        { "enableRepairConfirmation", false },
+        { "shipGravityFix", true },
+        { "enableRemovableGravityCrystal", false },
+        { "randomHullDamage", 0f },
+        { "randomComponentDamage", 0f },
+        { "enableFragileShip", false },
+        { "faultyHeatRegulators", false },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -288,6 +348,26 @@ public static class SettingsPresets
         { "addPortableTractorBeam", false },
         { "disableShipSuit", false },
         { "damageIndicatorColor", "Default" },
+        { "disableAutoLights", false },
+        { "addExpeditionFlag", false },
+        { "addFuelCanister", false },
+        { "chaoticCyclones", true },
+        { "moreExplosionDamage", true },
+        { "singleUseTractorBeam", false },
+        { "disableRetroRockets", false },
+        { "maxDirtAccumulation", 0.75f },
+        { "addShipWarpCore", false },
+        { "repairTimeMultiplier", 1f },
+        { "airDragMultiplier", 1f },
+        { "addShipClock", false },
+        { "enableStunDamage", false },
+        { "enableRepairConfirmation", false },
+        { "shipGravityFix", true },
+        { "enableRemovableGravityCrystal", false },
+        { "randomHullDamage", 0f },
+        { "randomComponentDamage", 0f },
+        { "enableFragileShip", false },
+        { "faultyHeatRegulators", false },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -359,6 +439,26 @@ public static class SettingsPresets
         { "addPortableTractorBeam", false },
         { "disableShipSuit", false },
         { "damageIndicatorColor", "Default" },
+        { "disableAutoLights", true },
+        { "addExpeditionFlag", true },
+        { "addFuelCanister", true },
+        { "chaoticCyclones", true },
+        { "moreExplosionDamage", true },
+        { "singleUseTractorBeam", false },
+        { "disableRetroRockets", false },
+        { "maxDirtAccumulation", 0.75f },
+        { "addShipWarpCore", false },
+        { "repairTimeMultiplier", 1.2f },
+        { "airDragMultiplier", 1f },
+        { "addShipClock", false },
+        { "enableStunDamage", false },
+        { "enableRepairConfirmation", false },
+        { "shipGravityFix", true },
+        { "enableRemovableGravityCrystal", true },
+        { "randomHullDamage", 0f },
+        { "randomComponentDamage", 0f },
+        { "enableFragileShip", false },
+        { "faultyHeatRegulators", false },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -369,16 +469,16 @@ public static class SettingsPresets
         { "disableLandingCamera", true },
         { "disableShipLights", false },
         { "disableShipOxygen", false },
-        { "oxygenDrainMultiplier", 600f },
+        { "oxygenDrainMultiplier", 400f },
         { "fuelDrainMultiplier", 12f },
-        { "shipDamageMultiplier", 12f },
+        { "shipDamageMultiplier", 2f },
         { "shipDamageSpeedMultiplier", 0.4f },
         { "shipOxygenRefill", true },
         { "disableShipRepair", false },
-        { "enableGravityLandingGear", false },
+        { "enableGravityLandingGear", true },
         { "disableAirAutoRoll", true },
         { "disableWaterAutoRoll", true },
-        { "enableThrustModulator", false },
+        { "enableThrustModulator", true },
         { "temperatureZonesAmount", "All" },
         { "hullTemperatureDamage", true },
         { "enableShipFuelTransfer", true },
@@ -389,27 +489,27 @@ public static class SettingsPresets
         { "fuelTransferMultiplier", 2f },
         { "oxygenRefillMultiplier", 0.4f },
         { "temperatureDamageMultiplier", 8f },
-        { "temperatureResistanceMultiplier", 0.4f },
+        { "temperatureResistanceMultiplier", 2f },
         { "enableAutoHatch", true },
         { "oxygenTankDrainMultiplier", 10f },
         { "fuelTankDrainMultiplier", 10f },
         { "componentTemperatureDamage", true },
         { "atmosphereAngularDragMultiplier", 1.5f },
-        { "spaceAngularDragMultiplier", 1f },
+        { "spaceAngularDragMultiplier", 0.5f },
         { "disableRotationSpeedLimit", false },
         { "gravityDirection", "Random" },
         { "disableScoutRecall", false },
         { "disableScoutLaunching", false },
         { "enableScoutLauncherComponent", true },
         { "enableManualScoutRecall", true },
-        { "enableShipItemPlacement", false },
-        { "addPortableCampfire", false },
+        { "enableShipItemPlacement", true },
+        { "addPortableCampfire", true },
         { "keepHelmetOn", true },
         { "showWarningNotifications", true },
-        { "shipExplosionMultiplier", 50f },
-        { "shipBounciness", 1f },
-        { "enablePersistentInput", false },
-        { "shipInputLatency", 0.1f },
+        { "shipExplosionMultiplier", 25f },
+        { "shipBounciness", 0.2f },
+        { "enablePersistentInput", true },
+        { "shipInputLatency", 0f },
         { "addEngineSwitch", true },
         { "idleFuelConsumptionMultiplier", 1f },
         { "shipLightColor", "Rainbow" },
@@ -430,16 +530,36 @@ public static class SettingsPresets
         { "addPortableTractorBeam", true },
         { "disableShipSuit", false },
         { "damageIndicatorColor", "Rainbow" },
+        { "disableAutoLights", true },
+        { "addExpeditionFlag", true },
+        { "addFuelCanister", true },
+        { "chaoticCyclones", true },
+        { "moreExplosionDamage", true },
+        { "singleUseTractorBeam", true },
+        { "disableRetroRockets", false },
+        { "maxDirtAccumulation", 0.75f },
+        { "addShipWarpCore", true },
+        { "repairTimeMultiplier", 2f },
+        { "airDragMultiplier", 0f },
+        { "addShipClock", true },
+        { "enableStunDamage", true },
+        { "enableRepairConfirmation", true },
+        { "shipGravityFix", true },
+        { "enableRemovableGravityCrystal", true },
+        { "randomHullDamage", 0.1f },
+        { "randomComponentDamage", 0.1f },
+        { "enableFragileShip", false },
+        { "faultyHeatRegulators", false },
     };
 
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()
     {
-        { "disableGravityCrystal", new RandomSettingValue(0.3f) },
-        { "disableEjectButton", new RandomSettingValue(0.3f) },
+        { "disableGravityCrystal", new RandomSettingValue(0.5f) },
+        { "disableEjectButton", new RandomSettingValue(0.5f) },
         { "disableHeadlights", new RandomSettingValue(0.5f) },
         { "disableLandingCamera", new RandomSettingValue(0.5f) },
-        { "disableShipLights", new RandomSettingValue(0.3f) },
-        { "disableShipOxygen", new RandomSettingValue(0.3f) },
+        { "disableShipLights", new RandomSettingValue(0.5f) },
+        { "disableShipOxygen", new RandomSettingValue(0.2f) },
         { "oxygenDrainMultiplier", new RandomSettingValue(new (object, object)[]
         {
             (1f, 10f),
@@ -447,7 +567,7 @@ public static class SettingsPresets
             (50f, 100f),
             (100f, 200f),
             (200f, 800f)
-        }, 0.6f, 1f) },
+        }, 0.75f, 1f) },
         { "fuelDrainMultiplier", new RandomSettingValue(new (object, object)[]
         {
             (0.5f, 2f),
@@ -461,7 +581,7 @@ public static class SettingsPresets
             (0.8f, 1.5f),
             (1.5f, 3f),
             (3f, 6f)
-        }, 0.4f, 1f) },
+        }, 0.75f, 1f) },
         { "shipDamageSpeedMultiplier", new RandomSettingValue(new (object, object)[]
         {
             (0.5f, 1f),
@@ -469,32 +589,32 @@ public static class SettingsPresets
             (1.5f, 2.5f),
             (2.5f, 3.5f),
             (3.5f, 5f)
-        }, 0.6f, 1f)},
+        }, 0.75f, 1f)},
         { "shipOxygenRefill", new RandomSettingValue(0.8f) },
         { "disableShipRepair", new RandomSettingValue(0.1f) },
-        { "enableGravityLandingGear", new RandomSettingValue(0.3f) },
+        { "enableGravityLandingGear", new RandomSettingValue(0.5f) },
         { "disableAirAutoRoll", new RandomSettingValue(0.5f) },
         { "disableWaterAutoRoll", new RandomSettingValue(0.5f) },
-        { "enableThrustModulator", new RandomSettingValue(0.3f) },
-        { "temperatureZonesAmount", new RandomSettingValue(["Sun", "All"], 0.5f, "None") },
-        { "hullTemperatureDamage", new RandomSettingValue(0.5f) },
+        { "enableThrustModulator", new RandomSettingValue(0.5f) },
+        { "temperatureZonesAmount", new RandomSettingValue(["All"], 0.5f, "None") },
+        { "hullTemperatureDamage", new RandomSettingValue(0.75f) },
         { "enableShipFuelTransfer", new RandomSettingValue(0.8f) },
         { "enableJetpackRefuelDrain", new RandomSettingValue(0.8f) },
-        { "disableReferenceFrame", new RandomSettingValue(0.3f) },
-        { "disableMapMarkers", new RandomSettingValue(0.5f) },
+        { "disableReferenceFrame", new RandomSettingValue(0.25f) },
+        { "disableMapMarkers", new RandomSettingValue(0.25f) },
         { "gravityMultiplier", new RandomSettingValue(new (object, object)[]
         {
             (0.5f, 0.9f),
             (0.9f, 1.2f),
             (1.2f, 1.8f)
-        }, 0.2f, 1f) },
+        }, 0.5f, 1f) },
         { "fuelTransferMultiplier", new RandomSettingValue(new (object, object)[]
         {
             (0.2f, 1f),
             (1f, 1.5f),
             (1.5f, 2f),
             (2f, 5f)
-        }, 0.3f, 1f) },
+        }, 0.5f, 1f) },
         { "oxygenRefillMultiplier", new RandomSettingValue(new (object, object)[]
         {
             (0.5f, 0.9f),
@@ -502,7 +622,7 @@ public static class SettingsPresets
             (1.2f, 1.8f),
             (1.8f, 2.5f),
             (2.5f, 5f)
-        }, 0.3f, 1f) },
+        }, 0.5f, 1f) },
         { "temperatureDamageMultiplier", new RandomSettingValue(new (object, object)[]
         {
             (0.1f, 0.5f),
@@ -511,7 +631,7 @@ public static class SettingsPresets
             (1.2f, 1.8f),
             (1.8f, 2.5f),
             (2.5f, 5f)
-        }, 0.3f, 1f) },
+        }, 0.8f, 1f) },
         { "temperatureResistanceMultiplier", new RandomSettingValue(new (object, object)[]
         {
             (0.1f, 0.4f),
@@ -519,59 +639,59 @@ public static class SettingsPresets
             (0.75f, 1f),
             (1f, 1.5f),
             (1.5f, 3f),
-        }, 0.3f, 1f) },
-        { "enableAutoHatch", new RandomSettingValue(0.3f) },
+        }, 0.8f, 1f) },
+        { "enableAutoHatch", new RandomSettingValue(0.5f) },
         { "oxygenTankDrainMultiplier", new RandomSettingValue(new (object, object)[]
         {
             (0.5f, 1f),
             (1f, 2.5f),
             (2.5f, 4f),
             (4f, 10f),
-        }, 0.3f, 1f) },
+        }, 0.8f, 1f) },
         { "fuelTankDrainMultiplier", new RandomSettingValue(new (object, object)[]
         {
             (0.05f, 0.5f),
             (0.5f, 1.2f),
             (1.2f, 2f),
             (2f, 5f),
-        }, 0.3f, 1f) },
-        { "componentTemperatureDamage", new RandomSettingValue(0.3f) },
-        { "atmosphereAngularDragMultiplier", new RandomSettingValue(0f, 2f, 0.1f, 1f) },
-        { "spaceAngularDragMultiplier", new RandomSettingValue(0f, 2f, 0.1f, 1f) },
-        { "disableRotationSpeedLimit", new RandomSettingValue(0.1f) },
-        { "gravityDirection", new RandomSettingValue(["Random"], 0.1f, "Default") },
-        { "disableScoutRecall", new RandomSettingValue(0.3f) },
-        { "disableScoutLaunching", new RandomSettingValue(0.2f) },
+        }, 0.8f, 1f) },
+        { "componentTemperatureDamage", new RandomSettingValue(0.5f) },
+        { "atmosphereAngularDragMultiplier", new RandomSettingValue(0f, 2f, 0.5f, 1f) },
+        { "spaceAngularDragMultiplier", new RandomSettingValue(0f, 2f, 0.5f, 1f) },
+        { "disableRotationSpeedLimit", new RandomSettingValue(0.2f) },
+        { "gravityDirection", new RandomSettingValue(["Up", "Left", "Right", "Forward", "Back", "Random"], 0.1f, "Down") },
+        { "disableScoutRecall", new RandomSettingValue(0.5f) },
+        { "disableScoutLaunching", new RandomSettingValue(0.5f) },
         { "enableScoutLauncherComponent", new RandomSettingValue(0.5f) },
-        { "enableManualScoutRecall", new RandomSettingValue(0.4f) },
+        { "enableManualScoutRecall", new RandomSettingValue(0.25f) },
         { "enableShipItemPlacement", new RandomSettingValue(0.5f) },
-        { "addPortableCampfire", new RandomSettingValue(0.4f) },
+        { "addPortableCampfire", new RandomSettingValue(0.5f) },
         { "keepHelmetOn", new RandomSettingValue(1f) },
-        { "showWarningNotifications", new RandomSettingValue(0.7f) },
-        { "shipExplosionMultiplier", new RandomSettingValue(0.5f, 50f, 0.5f, 1f) },
+        { "showWarningNotifications", new RandomSettingValue(1f) },
+        { "shipExplosionMultiplier", new RandomSettingValue(0.5f, 50f, 0.75f, 1f) },
         { "shipBounciness", new RandomSettingValue(new (object, object)[]
         {
-            (0f, 0.5f),
-            (0f, 1f),
-            (1f, 2f),
-            (0f, 3f)
-        }, 0.2f, 0f) },
-        { "enablePersistentInput", new RandomSettingValue(0.3f) },
+            (0f, 0.2f),
+            (0.2f, 0.5f),
+            (0.5f, 1f),
+            (1f, 3f)
+        }, 0.5f, 0f) },
+        { "enablePersistentInput", new RandomSettingValue(0.5f) },
         { "shipInputLatency", new RandomSettingValue(new (object, object)[]
+        {
+            (0f, 0.2f),
+            (0.2f, 0.5f),
+            (0.5f, 1f),
+            (1f, 2f)
+        }, 0.1f, 0f) },
+        { "addEngineSwitch", new RandomSettingValue(0.5f) },
+        { "idleFuelConsumptionMultiplier", new RandomSettingValue(new (object, object)[]
         {
             (0f, 0.5f),
             (0.5f, 1.5f),
-            (0f, 1f),
-            (0.8f, 2f)
-        }, 0.2f, 0f) },
-        { "addEngineSwitch", new RandomSettingValue(0.3f) },
-        { "idleFuelConsumptionMultiplier", new RandomSettingValue(new (object, object)[]
-        {
-            (0f, 0.8f),
-            (0f, 1f),
-            (0f, 5f),
-            (0f, 8f)
-        }, 0.1f, 0f) },
+            (1.5f, 3f),
+            (3f, 8f)
+        }, 0.5f, 0f) },
         { "shipLightColor", new RandomSettingValue([
             "Default",
             "Red",
@@ -589,7 +709,7 @@ public static class SettingsPresets
             "White",
             "Divine",
             "Rainbow"
-            ], 0.5f, "Default") },
+            ], 0.25f, "Default") },
         { "hotThrusters", new RandomSettingValue(0.8f) },
         { "extraNoise", new RandomSettingValue(0.8f) },
         { "interiorHullColor", new RandomSettingValue([
@@ -604,7 +724,7 @@ public static class SettingsPresets
             "Pink",
             "Gray",
             "Rainbow"
-            ], 0.5f, "Default") },
+            ], 0.25f, "Default") },
         { "exteriorHullColor", new RandomSettingValue([
             "Default",
             "Red",
@@ -617,12 +737,12 @@ public static class SettingsPresets
             "Pink",
             "Gray",
             "Rainbow"
-            ], 0.5f, "Default") },
-        { "addTether", new RandomSettingValue(0.3f) },
+            ], 0.25f, "Default") },
+        { "addTether", new RandomSettingValue(0.5f) },
         { "disableDamageIndicators", new RandomSettingValue(0.3f) },
         { "addShipSignal", new RandomSettingValue(0.5f) },
-        { "reactorLifetimeMultiplier", new RandomSettingValue(0.1f, 3f, 0.3f, 1f) },
-        { "disableShipFriction", new RandomSettingValue(0.1f) },
+        { "reactorLifetimeMultiplier", new RandomSettingValue(0.1f, 3f, 0.5f, 1f) },
+        { "disableShipFriction", new RandomSettingValue(0.25f) },
         { "enableSignalscopeComponent", new RandomSettingValue(0.5f) },
         { "rustLevel", new RandomSettingValue(new (object, object)[]
         {
@@ -630,7 +750,7 @@ public static class SettingsPresets
             (0.2f, 0.25f),
             (0.25f, 0.4f),
             (0.4f, 1f),
-        }, 0.15f, 0f) },
+        }, 0.25f, 0f) },
         { "dirtAccumulationTime", new RandomSettingValue(new (object, object)[]
         {
             (60f, 110f),
@@ -638,7 +758,7 @@ public static class SettingsPresets
             (140f, 200f),
             (200f, 350f),
             (350f, 600f),
-        }, 0.15f, 0f) },
+        }, 0.25f, 0f) },
         { "thrusterColor", new RandomSettingValue([
             "Default",
             "Red",
@@ -652,9 +772,9 @@ public static class SettingsPresets
             "Rose",
             "Pink",
             "Rainbow"
-            ], 0.5f, "Default") },
-        { "disableSeatbelt", new RandomSettingValue(0.1f) },
-        { "addPortableTractorBeam", new RandomSettingValue(0.3f) },
+            ], 0.25f, "Default") },
+        { "disableSeatbelt", new RandomSettingValue(0.25f) },
+        { "addPortableTractorBeam", new RandomSettingValue(0.5f) },
         { "disableShipSuit", new RandomSettingValue(0.1f) },
         { "damageIndicatorColor", new RandomSettingValue([
             "Default",
@@ -671,7 +791,44 @@ public static class SettingsPresets
             "Lavender",
             "Pink",
             "Rainbow"
-            ], 0.5f, "Default") },
+            ], 0.25f, "Default") },
+        { "disableAutoLights", new RandomSettingValue(0.5f) },
+        { "addExpeditionFlag", new RandomSettingValue(0.5f) },
+        { "addFuelCanister", new RandomSettingValue(0.5f) },
+        { "chaoticCyclones", new RandomSettingValue(0.75f) },
+        { "moreExplosionDamage", new RandomSettingValue(0.75f) },
+        { "singleUseTractorBeam", new RandomSettingValue(0.25f) },
+        { "disableRetroRockets", new RandomSettingValue(0.25f) },
+        { "maxDirtAccumulation", new RandomSettingValue(new (object, object)[]
+        {
+            (0.2f, 0.4f),
+            (0.4f, 0.8f),
+            (0.8f, 1f)
+        }, 0.75f, 0.75f) },
+        { "addShipWarpCore", new RandomSettingValue(0.5f) },
+        { "repairTimeMultiplier", new RandomSettingValue(new (object, object)[]
+        {
+            (0.3f, 0.5f),
+            (0.5f, 1.5f),
+            (1.5f, 2f),
+            (2.5f, 3f)
+        }, 0.75f, 1f) },
+        { "airDragMultiplier", new RandomSettingValue(new (object, object)[]
+        {
+            (0f, 0f),
+            (0f, 0.2f),
+            (0.2f, 1.5f),
+            (1.5f, 2.5f)
+        }, 0.75f, 1f) },
+        { "addShipClock", new RandomSettingValue(0.5f) },
+        { "enableStunDamage", new RandomSettingValue(0.75f) },
+        { "enableRepairConfirmation", new RandomSettingValue(0.75f) },
+        { "shipGravityFix", new RandomSettingValue(1f) },
+        { "enableRemovableGravityCrystal", new RandomSettingValue(0.5f) },
+        { "randomHullDamage", new RandomSettingValue(0f, 1f, 0.4f, 0f) },
+        { "randomComponentDamage", new RandomSettingValue(0f, 1f, 0.3f, 0f) },
+        { "enableFragileShip", new RandomSettingValue(0.1f) },
+        { "faultyHeatRegulators", new RandomSettingValue(0.4f) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }
@@ -682,14 +839,14 @@ public static class SettingsPresets
 
     public enum PresetName
     {
-        VanillaPlus,
-        Minimal,
-        Relaxed,
-        Hardcore,
-        Wanderer,
-        Pandemonium,
-        Random,
-        Custom
+        VanillaPlus = 1,
+        Minimal = 2,
+        Relaxed = 4,
+        Hardcore = 8,
+        Wanderer = 16,
+        Pandemonium = 32,
+        Random = 64,
+        Custom = 0
     }
 
     public static void InitializePresets()

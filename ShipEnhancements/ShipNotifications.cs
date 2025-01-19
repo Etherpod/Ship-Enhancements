@@ -27,6 +27,8 @@ public static class ShipNotifications
     private static NotificationData _scoutInShipNotification = new NotificationData(NotificationTarget.Player, "SCOUT DOCKED IN SHIP", 5f, true);
     private static NotificationData _noScoutInShipNotification = new NotificationData(NotificationTarget.Ship, "SCOUT LAUNCHER EMPTY", 5f, true);
 
+    private static NotificationData _playerRefueling = new NotificationData(NotificationTarget.Player, "REFUELING", 5f, true);
+
     private static bool _oxygenLow = false;
     private static bool _oxygenCritical = false;
     private static bool _fuelLow = false;
@@ -159,21 +161,22 @@ public static class ShipNotifications
 
         if (temperatureZonesAmount.GetProperty().ToString() != "None" && SELocator.GetShipTemperatureDetector() != null)
         {
-            float hullTempRatio = Mathf.Abs(SELocator.GetShipTemperatureDetector().GetShipTemperatureRatio() - 0.5f);
-            if (!_hullTemperatureCritical && hullTempRatio > 0.35f)
+            float hullTempRatio = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio() - 0.5f;
+            float hullTempAbs = Mathf.Abs(hullTempRatio);
+            if (!_hullTemperatureCritical && hullTempAbs > 0.35f)
             {
                 _hullTemperatureCritical = true;
                 NotificationManager.SharedInstance.PostNotification(_temperatureCriticalNotification, false);
             }
-            else if (_hullTemperatureCritical && hullTempRatio < 0.35f)
+            else if (_hullTemperatureCritical && hullTempAbs < 0.35f)
             {
                 _hullTemperatureCritical = false;
             }
 
-            if (!_hullTemperatureHigh && hullTempRatio > 0.15f)
+            if (!_hullTemperatureHigh && hullTempAbs > 0.15f)
             {
                 _hullTemperatureHigh = true;
-                if (SELocator.GetShipTemperatureDetector().GetTemperatureRatio() > 0)
+                if (hullTempRatio > 0)
                 {
                     NotificationManager.SharedInstance.PostNotification(_temperatureHighNotification, false);
                 }
@@ -182,7 +185,7 @@ public static class ShipNotifications
                     NotificationManager.SharedInstance.PostNotification(_temperatureLowNotification, false);
                 }
             }
-            else if (_hullTemperatureHigh && hullTempRatio < 0.15f)
+            else if (_hullTemperatureHigh && hullTempAbs < 0.15f)
             {
                 _hullTemperatureHigh = false;
             }
@@ -210,5 +213,18 @@ public static class ShipNotifications
     public static void PostScoutLauncherEmptyNotification()
     {
         NotificationManager.SharedInstance.PostNotification(_noScoutInShipNotification, false);
+    }
+
+    public static void PostRefuelingNotification()
+    {
+        if (!NotificationManager.SharedInstance.IsPinnedNotification(_playerRefueling))
+        {
+            NotificationManager.SharedInstance.PostNotification(_playerRefueling, true);
+        }
+    }
+
+    public static void RemoveRefuelingNotification()
+    {
+        NotificationManager.SharedInstance.UnpinNotification(_playerRefueling);
     }
 }
