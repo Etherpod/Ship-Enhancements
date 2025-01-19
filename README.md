@@ -130,9 +130,12 @@ When you select a preset, you may have to close and reopen the settings menu for
 Ship Enhancements adds 9 new achievements to the **Achievements+** mod! Play with it enabled if you want to create some semblance of meaning from the chaos that ensues.
 
 ## API
+To use the API, copy the **IShipEnhancements** script from this mod's GitHub repository into your own project, then follow [these instructions](https://owml.outerwildsmods.com/guides/apis.html#consuming-apis) on the OWML docs.
+
 - **CreateTemperatureZone()** - In case you're a modder and want to add your own high/low temperature zones. Temperature zones can stack, and will just take the sum of the temperatures.
 - **GetSettingsProperty()** - Returns the value of a config setting as seen from the player. These values only update at the beginning of the loop, so changing the mod settings doesn't affect them.
 - **SetSettingsProperty()** - Lets you change the value of a config setting in the middle of the loop. Note that this change will be reverted on the next loop.
+- **GetPreShipInitializeEvent()** and **GetPostShipInitializeEvent()** - Subscribe to these events to run code before and after Ship Enhancements makes any changes to the ship.
 
 ## Known Bugs
 - When playing in multiplayer and using Input Latency, the delayed inputs of the non-hosts will not work once they leave the flight console
