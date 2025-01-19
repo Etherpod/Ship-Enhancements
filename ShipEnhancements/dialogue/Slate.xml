@@ -31,12 +31,12 @@
       </DialogueOption>
       <DialogueOption>
         <RequiredCondition>SE_THRUST_MODULATOR_ENABLED</RequiredCondition>
-        <Text>How does the Thrust Modulator work?</Text>
+        <Text>How does the thrust modulator work?</Text>
         <DialogueTarget>SE_ThrustModulator_1</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
         <RequiredCondition>SE_PERSISTENT_INPUT_ENABLED</RequiredCondition>
-        <Text>How does Persistent Input work?</Text>
+        <Text>How does persistent input work?</Text>
         <DialogueTarget>SE_PersistentInput_1</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
@@ -46,15 +46,18 @@
       </DialogueOption>
       <DialogueOption>
         <RequiredCondition>SE_TETHER_HOOKS_ENABLED</RequiredCondition>
-        <Text>What should I use the tether hooks for?</Text>
+        <Text>How do I use the tether hooks?</Text>
+        <DialogueTarget>SE_TetherHook_1</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
         <RequiredCondition>SE_EXPEDITION_FLAG_ENABLED</RequiredCondition>
         <Text>Why did you put a flag in my ship? It seems kind of useless.</Text>
+        <DialogueTarget>SE_ExpeditionFlag_1</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
         <RequiredCondition>SE_WARP_CORE_ENABLED</RequiredCondition>
         <Text>Can my ship warp to anywhere other than Timber Hearth?</Text>
+        <DialogueTarget>SE_ShipWarpCore_1</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
         <RequiredCondition>SE_RETRO_ROCKETS_DISABLED</RequiredCondition>
@@ -471,9 +474,9 @@
   <DialogueNode>
     <Name>SE_ThrustModulator_11</Name>
     <Dialogue>
-      <Page>That's where the Overdrive comes in. It sends an explosion through the engines and launches you forward.</Page>
+      <Page>That's where the overdrive comes in. It sends an explosion through the engines and launches you forward.</Page>
       <Page>You'd think an explosion like that would make the thrusters worse, but they actually work better for a little while. Isn't that weird?</Page>
-      <Page>You can activate the Overdrive with the two buttons next to the Thrust Modulator. Just make sure you disable the safeties first.</Page>
+      <Page>You can activate the overdrive with the two buttons next to the thrust modulator. Just make sure you disable the safeties first.</Page>
     </Dialogue>
   
     <DialogueOptionsList>
@@ -535,7 +538,7 @@
   <DialogueNode>
     <Name>SE_PersistentInput_12</Name>
     <Dialogue>
-      <Page>Uh, yeah? Just don't get out of the ship when Persistent Input is on.</Page>
+      <Page>Uh, yeah? Just don't get out of the ship when persistent input is on.</Page>
     </Dialogue>
     <DialogueTarget>SE_PersistentInput_2</DialogueTarget>
   </DialogueNode>
@@ -649,6 +652,74 @@
     <Name>SE_ShipSignal_3</Name>
     <Dialogue>
       <Page>Anyway, I've got a fire to enjoy and you've got a ship to launch. Good luck out there!</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <!--Tether Hook-->
+  
+  <DialogueNode>
+    <Name>SE_TetherHook_1</Name>
+    <Dialogue>
+      <Page>Once you attach a hook to something, you can tether yourself to it, and it'll stop you from moving too far away. You can adjust the length of the tether too if you want.</Page>
+      <Page>If you tether yourself to a hook and manage to reach a second one, you can connect the two hooks together. It's pretty straightforward, isn't it?</Page>
+    </Dialogue>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>What do I use them for?</Text>
+        <DialogueTarget>SE_TetherHook_11</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Yep. Thanks.</Text>
+        <DialogueTarget>SE_TetherHook_12</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_TetherHook_11</Name>
+    <Dialogue>
+      <Page>Whatever you want! Personally, I would use them to hold the ship together better. It's a miracle it hasn't fallen apart already.</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_TetherHook_12</Name>
+    <Dialogue>
+      <Page>Anytime, hatchling.</Page>
+    </Dialogue>
+  </DialogueNode>
+  
+  <!--Expedition Flag-->
+  
+  <DialogueNode>
+    <Name>SE_ExpeditionFlag_1</Name>
+    <Dialogue>
+      <Page>That old thing? Yeah, it doesn't have much use to it. It sure brings back memories, though.</Page>
+      <Page>A long time ago, before the space program was even a thing, Feldspar was always talking about those other planets up there. Said they would fly to each and every one of them.</Page>
+      <Page>So the other hatchlings and I made a white flagpost for Feldspar, so that when they finally made it to another planet they could set it up there.</Page>
+      <Page>That's the flag Feldspar used when they landed on the Attlerock. Plan was to put one on every planet, but I guess that never happened, with Feldspar going missing.</Page>
+      <Page>We had a few more that we made in storage, so I thought, you know, since you're going into space, maybe you could bring one with you. Just to put down somewhere out there.</Page>
+    </Dialogue>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Yeah. I can do that.</Text>
+      </DialogueOption>
+      <DialogueOption>
+        <Text></Text>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <!--Ship Warp Core-->
+  
+  <DialogueNode>
+    <Name>SE_ShipWarpCore_1</Name>
+    <Dialogue>
+      <Page>What, you think I flew around the Solar System and set up warp receivers on each planet? No, it can't warp to other planets. Not normally, at least.</Page>
+      <Page>Since the ship log uses Nomai parts in the computer, it might be possible for it to connect to other Nomaian technology and warp to them.</Page>
+      <Page>If you find something out there that can warp objects back to it, try marking its location in the ship log. That should be enough to coax them into interfacing.</Page>
     </Dialogue>
   </DialogueNode>
   

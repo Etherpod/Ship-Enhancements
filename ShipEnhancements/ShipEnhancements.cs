@@ -1489,6 +1489,18 @@ public class ShipEnhancements : ModBehaviour
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_SHIP_SIGNAL_ENABLED", true);
         }
+        if ((bool)Settings.addTether.GetProperty())
+        {
+            DialogueConditionManager.SharedInstance.SetConditionState("SE_TETHER_HOOKS_ENABLED", true);
+        }
+        if ((bool)Settings.addExpeditionFlag.GetProperty())
+        {
+            DialogueConditionManager.SharedInstance.SetConditionState("SE_EXPEDITION_FLAG_ENABLED", true);
+        }
+        if ((bool)Settings.addShipWarpCore.GetProperty())
+        {
+            DialogueConditionManager.SharedInstance.SetConditionState("SE_WARP_CORE_ENABLED", true);
+        }
     }
 
     #endregion

@@ -1715,8 +1715,8 @@ public static class PatchClass
 
         if (!(bool)enableShipItemPlacement.GetProperty() && !(bool)addTether.GetProperty() && !true) return true;
 
-        bool isTether = (bool)addTether.GetProperty() && __instance._heldItem.GetItemType() == ShipEnhancements.Instance.TetherHookType;
-        bool isGravityCrystal = __instance._heldItem.GetItemType() == ShipEnhancements.Instance.GravityCrystalType;
+        bool isTether = (bool)addTether.GetProperty() && __instance.GetHeldItemType() == ShipEnhancements.Instance.TetherHookType;
+        bool isGravityCrystal = __instance.GetHeldItemType() == ShipEnhancements.Instance.GravityCrystalType;
         bool shipItemPlacement = (bool)enableShipItemPlacement.GetProperty();
 
         PlayerCharacterController playerController = Locator.GetPlayerController();
