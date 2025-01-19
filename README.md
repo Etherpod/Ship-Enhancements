@@ -30,7 +30,6 @@ Permanently remove useless or very important parts of the ship.
 - **Ship Suit**: Removes your spacesuit from the ship. Space exploration just got a whole lot more dangerous.
 - **Single-Use Tractor Beam**: Turns off the ship's tractor beam after you enter the ship for the first time. If you leave without your suit, you might have trouble getting back in again.
 - **Air/Water Auto Roll**: Lets you fly around upside down in air and water, which is really confusing when paired with no ship gravity. Also makes it easier to land on walls, if you wanted to do that.
-- **Disable Rotation Speed Limit**: Lets you spin your ship as fast as you want. Enabling this may quickly lead to motion sickness.
 - **Ship Friction**: Essentially makes your ship a block of ice that will slide anywhere on anything.
 - **Lock-on**: Removes your ability to lock on to objects. You may find it difficult to use autopilot with this enabled.
 - **Map markers**: Hides the markers that tell you the location of your ship, your scout, and any marked ship log locations. Ship log locations inside The Stranger are left visible until you arrive.
@@ -88,7 +87,7 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Scout Launcher Component**: Turns the ship's scout launcher into a fully functioning ship component. If you damage it, you won't be able to launch or recall your scout from the ship until you repair it.
 - **Signalscope Component**: Turns the ship's signalscope into a fully functioning ship component. If you damage it, you won't be able to receive or broadcast signals from the ship until you repair it.
 - **Ship Signal**: Adds a signal for the ship on the Outer Wilds Ventures frequency. The signal will stop if the ship's signalscope is damaged. Slate also said they added a "command transmitter" to your signalscope, whatever that means.
-- **Clock**: Adds a clock to the cockpit that tells the time in minutes and seconds. Why, you might ask? Why not? It makes a nice ticking sound, if you like that sort of background noise.
+- **Clock**: Adds a clock to the cockpit that tells the time in minutes and seconds. It makes a nice ticking sound, if you like that sort of background noise.
 - **Ship Item Placement**: Lets you place items inside or on top of your ship.
 - **Portable Campfire**: Adds a portable campfire to the ship next to your suit. Set it up wherever you want and roast a marshmallow.
 - **Portable Tractor Beam**: Adds a portable Nomai tractor beam to the ship near the ship log. Place it down somewhere if you need an extra boost in height.
