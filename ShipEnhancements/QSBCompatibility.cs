@@ -55,6 +55,7 @@ public class QSBCompatibility
         _api.RegisterHandler<NoData>("fuel-tank-explosion", ReceiveFuelTankExplosion);
         _api.RegisterHandler<float>("fuel-tank-capacity", ReceiveFuelTankCapacity);
         _api.RegisterHandler<(int, int)>("item-module-parent", ReceiveItemModuleParent);
+        _api.RegisterHandler<bool>("tractor-beam-turbo", ReceiveTractorBeamTurbo);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -690,6 +691,18 @@ public class QSBCompatibility
         ShipModule module = SELocator.GetShipDamageController()._shipModules[data.shipModulesIndex];
         OWItem item = ShipEnhancements.QSBInteraction.GetItemFromID(data.itemID);
         item.transform.parent = module.transform;
+    }
+    #endregion
+
+    #region PortableTractorBeam
+    public void SendTractorBeamTurbo(uint id, bool enableTurbo)
+    {
+        _api.SendMessage("tractor-beam-turbo", enableTurbo, id, false);
+    }
+
+    private void ReceiveTractorBeamTurbo(uint id, bool enableTurbo)
+    {
+        SELocator.GetTractorBeamItem()?.ToggleTurbo(enableTurbo);
     }
     #endregion
 }

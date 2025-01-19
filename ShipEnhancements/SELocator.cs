@@ -27,6 +27,7 @@ public static class SELocator
     private static CockpitFilthController _cockpitFilthController;
     private static FlightConsoleInteractController _consoleInteractController;
     private static FuelTankItem _fuelTankItem;
+    private static PortableTractorBeamItem _tractorBeamItem;
 
     public static void Initalize()
     {
@@ -53,12 +54,12 @@ public static class SELocator
 
     public static void LateInitialize()
     {
-        _buttonPanel = _shipTransform.GetComponentInChildren<CockpitButtonPanel>();
+        _buttonPanel = _shipTransform.GetComponentInChildren<CockpitButtonPanel>(true);
 
         if ((bool)enableThrustModulator.GetProperty())
         {
-            _modulatorController = _shipTransform.GetComponentInChildren<ThrustModulatorController>();
-            _shipOverdriveController = _shipTransform.GetComponentInChildren<ShipOverdriveController>();
+            _modulatorController = _shipTransform.GetComponentInChildren<ThrustModulatorController>(true);
+            _shipOverdriveController = _shipTransform.GetComponentInChildren<ShipOverdriveController>(true);
         }
         if ((bool)addPortableCampfire.GetProperty())
         {
@@ -66,11 +67,15 @@ public static class SELocator
         }
         if ((float)rustLevel.GetProperty() > 0 || (float)dirtAccumulationTime.GetProperty() > 0f)
         {
-            _cockpitFilthController = _shipTransform.GetComponentInChildren<CockpitFilthController>();
+            _cockpitFilthController = _shipTransform.GetComponentInChildren<CockpitFilthController>(true);
         }
         if ((bool)addFuelCanister.GetProperty())
         {
             _fuelTankItem = _shipTransform.GetComponentInChildren<FuelTankItem>(true);
+        }
+        if ((bool)addPortableTractorBeam.GetProperty())
+        {
+            _tractorBeamItem = _shipTransform.GetComponentInChildren<PortableTractorBeamItem>(true);
         }
     }
 
@@ -192,5 +197,10 @@ public static class SELocator
     public static FuelTankItem GetFuelTankItem()
     {
         return _fuelTankItem;
+    }
+
+    public static PortableTractorBeamItem GetTractorBeamItem()
+    {
+        return _tractorBeamItem;
     }
 }

@@ -32,7 +32,7 @@ Change some of the values that control how the ship works.
 - **Fuel Drain Multiplier**: Larger numbers make your ship's fuel drain faster.
 - **Oxygen Tank Drain Multiplier**: Larger numbers increase the amount of oxygen that drains when the ship's oxygen tank is damaged.
 - **Fuel Tank Drain Multiplier**: Larger numbers increase the amount of fuel that drains when the ship's fuel tank is damaged.
-- **Idle Fuel Consumption Multiplier**: Larger numbers increase how quickly your fuel drains over time. If the Engine Switch is enabled, it will not drain fuel while the ship is off.
+- **Idle Fuel Consumption Multiplier**: Larger numbers increase how quickly your fuel drains over time. If the **Engine Switch** is enabled, it will not drain fuel while the ship is off.
 - **Damage Multiplier**: Larger numbers increase the damage done to the ship hull and increase the probability that components will be damaged on impact.
 - **Damage Speed Multiplier**: Larger numbers increase the speed you need to be traveling at before taking damage. Set this to something really small to blow up your ship when you touch something.
 - **Random Hull Damage**: Applies random damage to a random set of hulls on the start of the loop. The slider controls the percentage of hulls to be damaged- minimum is none, maximum is all of them- and how much damage to do to them.
@@ -65,13 +65,13 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Temperature Zones**: Implements a temperature mechanic for the ship using the "TEMP" (temperature) dial and a new "SHIP TEMP" (ship temperature) dial. Subjecting your ship to extreme temperatures will increase the ship temperature, making it more likely for your ship to sustain damage or bad side effects.
   - Any extreme temperatures can damage your ship if temperature damage is enabled. The temperature dial will start flashing if the temperature reaches a dangerous level.
   - High temperatures (very hot) will make your ship hull hot to the touch and can blow up the Portable Fuel Tank.
-  - Low ship temperatures (very cold) will lower the strength of your ship's thrusters and make it possible for your ship ignition to fail.
+  - Low temperatures (very cold) will lower the strength of your ship's thrusters and make it possible for your ship ignition to fail.
 - **Hull Temperature Damage**: Makes it possible for extreme temperatures to damage the hull of your ship.
 - **Component Temperature Damage**: Makes it possible for extreme temperatures to damage any of your ship's components, like the headlights or artificial gravity.
 - **Temperature Damage Multiplier**: Larger numbers increase the damage done to your ship by extreme temperatures.
 - **Temperature Resistance Multiplier**: Larger numbers make the ship temperature change slower, giving you more time in extreme temperatures but requiring more time to recover.
 - **Faulty Heat Regulators**: Makes your ship unable to dump the reactor heat, leaving it to build up in the ship. Unless you find someplace cold, your ship is going to constantly rise in temeprature.
-- **Repair Confirmation**: Plays a sound when everything has been repaired. Now you don't need to go searching for any hulls you forgot to repair!
+- **Repair Confirmation**: Plays a sound when everything has been repaired. Now you don't need to go searching for any hulls you forgot to fix!
 - **Hazardous Thrusters**: Makes your ship's thruster flames actually damage you. Try figuring out how to get near them in the first place.
 - **Cockpit Rust Level**: Controls how much rust is applied to the ship cockpit. Moving the slider all the way to the right completely covers the cockpit in rust.
 - **Dirt Accumulation Time**: Larger numbers increase the time (in seconds) it takes for dirt to build up on your cockpit glass, which you can wash off by finding a source of water. Set this to 0 to disable it.
@@ -82,6 +82,7 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Clock**: Adds a clock to the cockpit that tells the time in minutes and seconds. Why, you might ask? Why not? It makes a nice ticking sound, if you like that sort of background noise.
 - **Ship Item Placement**: Lets you place items inside or on top of your ship.
 - **Portable Campfire**: Adds a portable campfire to the ship next to your suit. Set it up wherever you want and roast a marshmallow.
+- **Portable Tractor Beam**: Adds a portable Nomai tractor beam to the ship near the ship log. Place it down somewhere if you need an extra boost in height.
 - **Portable Fuel Canister**: Adds a portable fuel tank inside the ship at the back. You can bring it around with you in case you need to refuel your jetpack while traveling. The fuel tank can completely refill your jetpack about 3 times before it runs out of fuel.
 - **Expedition Flag**: Adds a portable flag to the ship between the cockpit and the supplies section. Place it down somewhere if you want to mark some exploratory feat or if you want to mark where you've been.
 - **Ship Tether**: Adds a few hooks to the ship cabin. You can attach these hooks to pretty much any surface- including the ship- and tether yourself to them. If you want to get even crazier, grab a second hook after tethering to one and tether to the new one; it will connect the two hooks together.
