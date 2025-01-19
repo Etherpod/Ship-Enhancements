@@ -1183,7 +1183,7 @@ public static class PatchClass
     #region AngularDrag
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ThrusterModel), nameof(ThrusterModel.Awake))]
-    public static void RemoveAngularDrag(ThrusterModel __instance)
+    public static void InitAngularDrag(ThrusterModel __instance)
     {
         if (!__instance.gameObject.CompareTag("Ship")) return;
 
@@ -1227,10 +1227,11 @@ public static class PatchClass
 
     [HarmonyPostfix]
     [HarmonyPatch(typeof(FluidDetector), nameof(FluidDetector.AddAngularDrag))]
-    public static void RemoveFluidAngularDrag(FluidDetector __instance)
+    public static void RemoveFluidAngularDrag(FluidDetector __instance, FluidVolume fluidVolume)
     {
         // Only runs when in fluid
-        if (__instance.CompareTag("ShipDetector"))
+        if (__instance is ShipFluidDetector && fluidVolume is SimpleFluidVolume
+            && (fluidVolume._fluidType == FluidVolume.Type.AIR || fluidVolume._fluidType == FluidVolume.Type.FOG))
         {
             __instance._netAngularAcceleration *= (float)atmosphereAngularDragMultiplier.GetProperty();
         }

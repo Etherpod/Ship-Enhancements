@@ -26,7 +26,6 @@ public class ShipEnhancements : ModBehaviour
     public bool oxygenDepleted;
     public bool refillingOxygen;
     public bool fuelDepleted;
-    public bool angularDragEnabled;
     public float levelOneSpinSpeed = 8f;
     public float levelTwoSpinSpeed = 16f;
     public float maxSpinSpeed = 24f;
@@ -206,7 +205,6 @@ public class ShipEnhancements : ModBehaviour
             GlobalMessenger.AddListener("WakeUp", OnWakeUp);
             oxygenDepleted = false;
             fuelDepleted = false;
-            angularDragEnabled = false;
             probeDestroyed = false;
             _shipDestroyed = false;
             anyPartDamaged = false;
@@ -1512,7 +1510,6 @@ public class ShipEnhancements : ModBehaviour
 
     private void OnEnterFluid(FluidVolume fluid)
     {
-        angularDragEnabled = true;
         float dragMultiplier = Mathf.Max((float)Settings.atmosphereAngularDragMultiplier.GetProperty(), 0f);
         SELocator.GetShipBody()._rigidbody.angularDrag = 0.94f * dragMultiplier;
         SELocator.GetShipBody().GetComponent<ShipThrusterModel>()._angularDrag = 0.94f * dragMultiplier;
@@ -1522,7 +1519,6 @@ public class ShipEnhancements : ModBehaviour
     {
         if (SELocator.GetShipDetector().GetComponent<ShipFluidDetector>()._activeVolumes.Count == 0)
         {
-            angularDragEnabled = false;
             float dragMultiplier = Mathf.Max((float)Settings.spaceAngularDragMultiplier.GetProperty(), 0f);
             SELocator.GetShipBody()._rigidbody.angularDrag = 0.94f * dragMultiplier;
             SELocator.GetShipBody().GetComponent<ShipThrusterModel>()._angularDrag = 0.94f * dragMultiplier;
