@@ -36,11 +36,6 @@ public class ShipWarpCoreReceiver : MonoBehaviour
 
     public void WarpBodyToReceiver(OWRigidbody body, bool inShip)
     {
-        /*if ((string)temperatureZonesAmount.GetProperty() != "None")
-        {
-            SELocator.GetShipTemperatureDetector().RemoveAllZones();
-        }*/
-
         if (_gravityCannonSocket != null)
         {
             body.WarpToPositionRotation(_gravityCannonSocket.position + _gravityCannonSocket.up * 5f, _gravityCannonSocket.rotation);
@@ -112,11 +107,6 @@ public class ShipWarpCoreReceiver : MonoBehaviour
         }
     }
 
-    public void OnCockpitDetached(OWRigidbody body)
-    {
-        _warpEffect._warpedObjectGeometry = body.gameObject;
-    }
-
     public void PlayRecallEffect(float length, bool inShip)
     {
         if (inShip)
@@ -128,6 +118,11 @@ public class ShipWarpCoreReceiver : MonoBehaviour
             _warpEffect.OnWarpComplete += OnWarpComplete;
             _warpEffect.WarpObjectIn(length);
         }
+    }
+
+    public void OnCockpitDetached(Transform cockpitPivot)
+    {
+        _warpEffect.transform.localPosition = cockpitPivot.localPosition;
     }
 
     private void OnWarpComplete()
@@ -149,14 +144,17 @@ public class ShipWarpCoreReceiver : MonoBehaviour
             }
             _suspendedBody = null;
 
-            HatchController hatch = SELocator.GetShipBody().GetComponentInChildren<HatchController>();
-            hatch._triggerVolume.SetTriggerActivation(true);
-            if (!(bool)enableAutoHatch.GetProperty() && !ShipEnhancements.InMultiplayer)
+            if (!SELocator.GetShipDamageController().IsSystemFailed())
             {
-                hatch.OpenHatch();
-                if (!(bool)singleUseTractorBeam.GetProperty())
+                HatchController hatch = SELocator.GetShipBody().GetComponentInChildren<HatchController>();
+                hatch._triggerVolume.SetTriggerActivation(true);
+                if (!(bool)enableAutoHatch.GetProperty() && !ShipEnhancements.InMultiplayer)
                 {
-                    SELocator.GetShipBody().GetComponentInChildren<ShipTractorBeamSwitch>().ActivateTractorBeam();
+                    hatch.OpenHatch();
+                    if (!(bool)singleUseTractorBeam.GetProperty())
+                    {
+                        SELocator.GetShipBody().GetComponentInChildren<ShipTractorBeamSwitch>().ActivateTractorBeam();
+                    }
                 }
             }
         }

@@ -120,9 +120,11 @@ public class ShipWarpCoreController : CockpitInteractible
     private void OnShipCockpitDetached(OWRigidbody body)
     {
         _shipBody = body;
-        _warpEffect._warpedObjectGeometry = body.gameObject;
         _warpEffect.transform.localPosition = _cockpitPivot.localPosition;
-        _receiver?.OnCockpitDetached(body);
+        if (_receiver != null)
+        {
+            _receiver.OnCockpitDetached(_cockpitPivot);
+        }
     }
 
     public void SetReceiver(ShipWarpCoreReceiver receiver)
@@ -169,10 +171,13 @@ public class ShipWarpCoreController : CockpitInteractible
         }
         else
         {
-            HatchController hatch = _shipBody.GetComponentInChildren<HatchController>();
-            hatch._triggerVolume.SetTriggerActivation(false);
-            hatch.CloseHatch();
-            _shipBody.GetComponentInChildren<ShipTractorBeamSwitch>().DeactivateTractorBeam();
+            if (!SELocator.GetShipDamageController().IsSystemFailed())
+            {
+                HatchController hatch = _shipBody.GetComponentInChildren<HatchController>();
+                hatch._triggerVolume.SetTriggerActivation(false);
+                hatch.CloseHatch();
+                _shipBody.GetComponentInChildren<ShipTractorBeamSwitch>().DeactivateTractorBeam();
+            }
 
             _warpingWithPlayer = false;
             _warpEffect.OnWarpComplete += WarpShip;
@@ -224,13 +229,16 @@ public class ShipWarpCoreController : CockpitInteractible
         }
         else
         {
-            HatchController hatch = _shipBody.GetComponentInChildren<HatchController>();
-            hatch._triggerVolume.SetTriggerActivation(false);
-            if (hatch._hatch.localRotation == hatch._hatchOpenedQuaternion)
+            if (!SELocator.GetShipDamageController().IsSystemFailed())
             {
-                hatch.CloseHatch();
+                HatchController hatch = _shipBody.GetComponentInChildren<HatchController>();
+                hatch._triggerVolume.SetTriggerActivation(false);
+                if (hatch._hatch.localRotation == hatch._hatchOpenedQuaternion)
+                {
+                    hatch.CloseHatch();
+                }
+                _shipBody.GetComponentInChildren<ShipTractorBeamSwitch>().DeactivateTractorBeam();
             }
-            _shipBody.GetComponentInChildren<ShipTractorBeamSwitch>().DeactivateTractorBeam();
 
             _warpingWithPlayer = false;
             _warpEffect.OnWarpComplete += WarpShip;
