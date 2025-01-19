@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using OWML.Utils;
 using System.Reflection;
 using System.Linq;
+using UnityEngine.Events;
 
 namespace ShipEnhancements;
 
@@ -21,6 +22,9 @@ public class ShipEnhancements : ModBehaviour
 
     public delegate void EngineEvent(bool enabled);
     public event EngineEvent OnEngineStateChanged;
+
+    public UnityEvent PreShipInitialize;
+    public UnityEvent PostShipInitialize;
 
     public static ShipEnhancements Instance;
     public bool oxygenDepleted;
@@ -216,6 +220,8 @@ public class ShipEnhancements : ModBehaviour
                 SEAchievementTracker.Reset();
             }
 
+            PreShipInitialize?.Invoke();
+
             InitializeShip();
 
             GameObject th = GameObject.Find("TimberHearth_Body");
@@ -244,6 +250,8 @@ public class ShipEnhancements : ModBehaviour
                     }
                 }
             }
+
+            PostShipInitialize.Invoke();
         };
 
         LoadManager.OnStartSceneLoad += (scene, loadScene) =>
