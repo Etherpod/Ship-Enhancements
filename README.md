@@ -23,7 +23,7 @@ Permanently remove useless or very important parts of the ship.
 - **Oxygen**: Literally removes all of the oxygen in the ship unless you're near trees or in an oxygen-filled atmosphere. This takes priority over all of the other oxygen modifications.
 - **Ship Scout Recall**: Removes your ability to recall the scout using the ship. The scout must be manually docked on the ship's scout launcher to fire, and can only be recalled using the handheld scout launcher.
 - **Ship Scout Launching**: Removes your ability to launch the scout from the ship. You'll have to do this yourself outside of the ship.
-- **Retro Rockets**: Turns off your backwards thrusters. Now you don't have to worry about slowing down!
+- **Thrusters**: Lets you turn off your backward, horizontal, or vertical thrusters, or all of them except the forward thrusters if you really want a challenge.
 - **Ship Repair**: Be careful not to damage your ship.
 - **Damage Indicators**: Turns off all of those pesky notifications about parts of your ship being damaged, including the master alarm. Keep an eye or four on the reactor, please.
 - **Seatbelt**: Breaks a number of state laws by removing your seatbelt. If you crash into something with enough force you'll fly out of the chair.

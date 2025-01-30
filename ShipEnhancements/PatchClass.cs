@@ -2817,9 +2817,23 @@ public static class PatchClass
     [HarmonyPatch(typeof(ThrusterModel), nameof(ThrusterModel.AddTranslationalInput))]
     public static void DisableRetroRockets(ThrusterModel __instance, ref Vector3 input)
     {
-        if ((bool)disableRetroRockets.GetProperty() && __instance is ShipThrusterModel)
+        string disableOption = (string)disableThrusters.GetProperty();
+        if (disableOption == "None" || __instance is not ShipThrusterModel) return;
+
+        switch (disableOption)
         {
-            input = new Vector3(input.x, input.y, Mathf.Max(input.z, 0f));
+            case "Backward":
+                input = new Vector3(input.x, input.y, Mathf.Max(input.z, 0f));
+                break;
+            case "Left-Right":
+                input = new Vector3(0f, input.y, input.z);
+                break;
+            case "Up-Down":
+                input = new Vector3(input.x, 0f, input.z);
+                break;
+            case "All Except Forward":
+                input = new Vector3(0f, 0f, Mathf.Max(input.z, 0f));
+                break;
         }
     }
     #endregion

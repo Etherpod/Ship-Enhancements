@@ -157,7 +157,7 @@ public class ShipEnhancements : ModBehaviour
         chaoticCyclones,
         moreExplosionDamage,
         singleUseTractorBeam,
-        disableRetroRockets,
+        disableThrusters,
         maxDirtAccumulation,
         addShipWarpCore,
         repairTimeMultiplier,
@@ -1477,7 +1477,8 @@ public class ShipEnhancements : ModBehaviour
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_TEMPERATURE_ENABLED", true);
         }
-        if ((bool)Settings.disableRetroRockets.GetProperty())
+        if ((string)Settings.disableThrusters.GetProperty() == "Backward" 
+            || (string)Settings.disableThrusters.GetProperty() == "All Except Forward")
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_RETRO_ROCKETS_DISABLED", true);
         }

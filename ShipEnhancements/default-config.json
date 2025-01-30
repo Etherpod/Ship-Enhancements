@@ -78,11 +78,18 @@
       "value": false,
       "tooltip": "Removes your ability to launch the scout with the ship."
     },
-    "disableRetroRockets": {
-      "title": "Disable Retro Rockets",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Disables your backwards thrusters. You may want to avoid using autopilot."
+    "disableThrusters": {
+      "title": "Disable Thrusters",
+      "type": "selector",
+      "value": "None",
+      "options": [
+        "None",
+        "Backward",
+        "Left-Right",
+        "Up-Down",
+        "All Except Forward"
+      ],
+      "tooltip": "Lets you disable some of your ship's thrusters."
     },
     "disableShipRepair": {
       "title": "Disable Ship Repairing",

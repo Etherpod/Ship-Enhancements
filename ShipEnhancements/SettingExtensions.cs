@@ -82,7 +82,7 @@ public static class SettingExtensions
         { Settings.chaoticCyclones, (false, false) },
         { Settings.moreExplosionDamage, (false, false) },
         { Settings.singleUseTractorBeam, (false, false) },
-        { Settings.disableRetroRockets, (false, false) },
+        { Settings.disableThrusters, (false, false) },
         { Settings.maxDirtAccumulation, (false, false) },
         { Settings.addShipWarpCore, (false, false) },
         { Settings.repairTimeMultiplier, (1f, 1f) },
