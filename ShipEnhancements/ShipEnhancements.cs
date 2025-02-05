@@ -1323,6 +1323,8 @@ public class ShipEnhancements : ModBehaviour
         headlightComponent._damaged = true;
         headlightComponent._repairFraction = 0f;
         headlightComponent.OnComponentDamaged();
+
+        SELocator.GetShipBody().GetComponentInChildren<ShipCockpitController>()._externalLightsOn = false;
     }
 
     private void DisableGravityCrystal()
