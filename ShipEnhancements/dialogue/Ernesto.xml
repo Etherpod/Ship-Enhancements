@@ -4,13 +4,9 @@
     <Name>SE_Ernesto_Default_1</Name>
     <EntryCondition>DEFAULT</EntryCondition>
     <Dialogue>
-      <Page>Hey, Hatchling! Long time no see, eh?</Page>
+      <Page>Hey. It's been a while.</Page>
     </Dialogue>
     <DialogueOptionsList>
-      <DialogueOption>
-        <Text>I really have to get going, can we talk later?</Text>
-        <DialogueTarget>SE_Ernesto_Default_14</DialogueTarget>
-      </DialogueOption>
       <DialogueOption>
         <Text>Who are you?</Text>
         <DialogueTarget>SE_Ernesto_Default_11</DialogueTarget>
@@ -23,12 +19,16 @@
         <Text>Ernesto? Is that you?</Text>
         <DialogueTarget>SE_Ernesto_Default_13</DialogueTarget>
       </DialogueOption>
+      <DialogueOption>
+        <Text>I really have to get going, can we talk later?</Text>
+        <DialogueTarget>SE_Ernesto_Default_14</DialogueTarget>
+      </DialogueOption>
     </DialogueOptionsList>
   </DialogueNode>
   <DialogueNode>
     <Name>SE_Ernesto_Default_11</Name>
     <Dialogue>
-      <Page>What are you talking about? It's me! Don't you remember me?</Page>
+      <Page>What do you mean? Don't you remember me?</Page>
     </Dialogue>
     <DialogueOptionsList>
       <DialogueOption>
@@ -44,8 +44,8 @@
   <DialogueNode>
     <Name>SE_Ernesto_Default_111</Name>
     <Dialogue>
-      <Page>Wow, you must have hit your head pretty hard. I'm not easy to forget.</Page>
-      <Page>Who am I, you ask? I am the one and only Ernesto, the Magic Talking Anglerfish! Or just Ernesto, if you prefer.</Page>
+      <Page>Wow. Did you hit your head or something?</Page>
+      <Page>I'm Ernesto the Magic Talking Anglerfish. Or just Ernesto, if you prefer.</Page>
     </Dialogue>
     <DialogueOptionsList>
       <DialogueOption>
@@ -53,33 +53,112 @@
         <DialogueTarget>SE_Ernesto_Default_1111</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
-        <Text>With a name like that, you must be pretty famous.</Text>
+        <Text>How are you talking?</Text>
         <DialogueTarget>SE_Ernesto_Default_1112</DialogueTarget>
-      </DialogueOption>
-      <DialogueOption>
-        <Text>Can all anglerfish talk?</Text>
-        <DialogueTarget>SE_Ernesto_Default_1113</DialogueTarget>
       </DialogueOption>
     </DialogueOptionsList>
   </DialogueNode>
   <DialogueNode>
     <Name>SE_Ernesto_Default_1111</Name>
     <Dialogue>
-      <Page>No, that's my cousin. He was always a jerk. One of the reasons I left Dark Bramble, actually.</Page>
+      <Page>No, that's my cousin. Or maybe it was my uncle, I don't remember.</Page>
     </Dialogue>
     <DialogueTarget>SE_Ernesto_Default_2</DialogueTarget>
   </DialogueNode>
   <DialogueNode>
     <Name>SE_Ernesto_Default_1112</Name>
     <Dialogue>
-      <Page>I know, right? But no, I'm not famous. Barely anyone knows about me, actually. And you forgot about me. How un-famous do I have to be for someone to completely forget I exist? It's kind of depressing, really.</Page>
+      <Page>I took speaking as an elective in college.</Page>
     </Dialogue>
     <DialogueTarget>SE_Ernesto_Default_2</DialogueTarget>
   </DialogueNode>
   <DialogueNode>
-    <Name>SE_Ernesto_Default_1113</Name>
+    <Name>SE_Ernesto_Default_112</Name>
     <Dialogue>
-      <Page>If there are other anglerfish that can talk, I've never seen one. The only reason I can talk is because I took speaking as an elective in college.</Page>
+      <Page>Glad you're finally coming to your senses. What are you gonna tell me next, that you don't remember Geswaldo?</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>I know who Geswaldo is!</Text>
+        <DialogueTarget>SE_Ernesto_Default_1121</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Who?</Text>
+        <DialogueTarget>SE_Ernesto_Default_1122</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Default_1121</Name>
+    <Dialogue>
+      <Page>Good. He's gonna be on your quiz later.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_Ernesto_Default_2</DialogueTarget>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Default_1122</Name>
+    <Dialogue>
+      <Page>Unbelievable. You gotta keep up with the Ernesto lore.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_Ernesto_Default_2</DialogueTarget>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Default_12</Name>
+    <Dialogue>
+      <Page>I was waiting for you to get here. You know who I am, right?</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Yeah, you're Ernesto.</Text>
+        <DialogueTarget>SE_Ernesto_Default_121</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>You're a talking anglerfish.</Text>
+        <DialogueTarget>SE_Ernesto_Default_122</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Default_121</Name>
+    <Dialogue>
+      <Page>Whew. I was worried you had forgotten about me.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_Ernesto_Default_2</DialogueTarget>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Default_122</Name>
+    <Dialogue>
+      <Page>Well, yeah. Close enough. I'm Ernesto the Magic Talking Anglerfish.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_Ernesto_Default_2</DialogueTarget>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Default_13</Name>
+    <Dialogue>
+      <Page>It sure is.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Did you pay your taxes?</Text>
+        <DialogueTarget>SE_Ernesto_Default_131</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Where's Geswaldo?</Text>
+        <DialogueTarget>SE_Ernesto_Default_132</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Default_131</Name>
+    <Dialogue>
+      <Page>No, of course not. Tax evasion is fun. And free.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_Ernesto_Default_2</DialogueTarget>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Default_132</Name>
+    <Dialogue>
+      <Page>That's a long story.</Page>
     </Dialogue>
     <DialogueTarget>SE_Ernesto_Default_2</DialogueTarget>
   </DialogueNode>
@@ -108,7 +187,7 @@
   <DialogueNode>
     <Name>SE_Ernesto_Default_21</Name>
     <Dialogue>
-      <Page>It's a ton of fun! But for now, I think I'll just sit back and relax.</Page>
+      <Page>Yeah, it's pretty fun. I think I'll just relax for now, though.</Page>
       <Page>You do your thing, fly the ship or whatever. Just try not to kill both of us while you're at it.</Page>
     </Dialogue>
   </DialogueNode>
@@ -117,59 +196,6 @@
     <Dialogue>
       <Page>No problem, I don't wanna do anything now either. I'm just gonna sit back and relax for now.</Page>
       <Page>You do your thing, fly the ship or whatever. Just try not to kill both of us while you're at it.</Page>
-    </Dialogue>
-  </DialogueNode>
-  <DialogueNode>
-    <Name>SE_Ernesto_Presence_1</Name>
-    <EntryCondition>SE_MULTIPLE_ERNESTOS</EntryCondition>
-    <Dialogue>
-      <Page>Hatchling... listen.<![CDATA[<Pause/>]]>Can you hear it?</Page>
-    </Dialogue>
-    <DialogueOptionsList>
-      <DialogueOption>
-        <Text>Hear what..?</Text>
-        <DialogueTarget>SE_Ernesto_Presence_2</DialogueTarget>
-      </DialogueOption>
-    </DialogueOptionsList>
-  </DialogueNode>
-  <DialogueNode>
-    <Name>SE_Ernesto_Presence_2</Name>
-    <Dialogue>
-      <Page>The ripples in the fabric of Spacetime. I hear them. Do you know what that means, Hatchling?</Page>
-      <Page>It means they're here.</Page>
-    </Dialogue>
-    <DialogueOptionsList>
-      <DialogueOption>
-        <Text>Who's here?</Text>
-        <DialogueTarget>SE_Ernesto_Presence_3</DialogueTarget>
-      </DialogueOption>
-      <DialogueOption>
-        <Text>Okay, now you're freaking me out.</Text>
-        <DialogueTarget>SE_Ernesto_Presence_3</DialogueTarget>
-      </DialogueOption>
-    </DialogueOptionsList>
-  </DialogueNode>
-  <DialogueNode>
-    <Name>SE_Ernesto_Presence_3</Name>
-    <Dialogue>
-      <Page>There are others here like me, I don't know how. But I am no longer the only Ernesto in this world.</Page>
-    </Dialogue>
-    <DialogueOptionsList>
-      <DialogueOption>
-        <Text>Woah.</Text>
-        <DialogueTarget>SE_Ernesto_Presence_31</DialogueTarget>
-      </DialogueOption>
-      <DialogueOption>
-        <Text>Should we go say hi?</Text>
-        <DialogueTarget>SE_Ernesto_Presence_31</DialogueTarget>
-      </DialogueOption>
-    </DialogueOptionsList>
-  </DialogueNode>
-  <DialogueNode>
-    <Name>SE_Ernesto_Presence_31</Name>
-    <Dialogue>
-      <Page>It's not a bad idea to go search for them, but be warned: I don't know their reasons for being here, and I don't know what their intent is.</Page>
-      <Page>It's possible they may try to bring harm to you. Be careful, Hatchling.</Page>
     </Dialogue>
   </DialogueNode>
 </DialogueTree>

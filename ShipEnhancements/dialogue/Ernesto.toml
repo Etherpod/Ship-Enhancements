@@ -7,13 +7,9 @@ name = "SE_Ernesto_Default_1"
 entry_condition = ["DEFAULT"]
 
 [[dialogue_node.dialogue]]
-page = ["Hey, Hatchling! Long time no see, eh?"]
+page = ["Hey. It's been a while."]
 
 [dialogue_node.dialogue_options_list]
-
-[[dialogue_node.dialogue_options_list.dialogue_option]]
-text = "I really have to get going, can we talk later?"
-dialogue_target = "SE_Ernesto_Default_14"
 
 [[dialogue_node.dialogue_options_list.dialogue_option]]
 text = "Who are you?"
@@ -27,13 +23,17 @@ dialogue_target = "SE_Ernesto_Default_12"
 text = "Ernesto? Is that you?"
 dialogue_target = "SE_Ernesto_Default_13"
 
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "I really have to get going, can we talk later?"
+dialogue_target = "SE_Ernesto_Default_14"
+
 
 
 [[dialogue_node]]
 name = "SE_Ernesto_Default_11"
 
 [[dialogue_node.dialogue]]
-page = ["What are you talking about? It's me! Don't you remember me?"]
+page = ["What do you mean? Don't you remember me?"]
 
 [dialogue_node.dialogue_options_list]
 
@@ -51,7 +51,7 @@ dialogue_target = "SE_Ernesto_Default_112"
 name = "SE_Ernesto_Default_111"
 
 [[dialogue_node.dialogue]]
-page = ["Wow, you must have hit your head pretty hard. I'm not easy to forget.", "Who am I, you ask? I am the one and only Ernesto, the Magic Talking Anglerfish! Or just Ernesto, if you prefer."]
+page = ["Wow. Did you hit your head or something?", "I'm Ernesto the Magic Talking Anglerfish. Or just Ernesto, if you prefer."]
 
 [dialogue_node.dialogue_options_list]
 
@@ -60,12 +60,8 @@ text = "Are you the guy who keeps attacking me in Dark Bramble?"
 dialogue_target = "SE_Ernesto_Default_1111"
 
 [[dialogue_node.dialogue_options_list.dialogue_option]]
-text = "With a name like that, you must be pretty famous."
+text = "How are you talking?"
 dialogue_target = "SE_Ernesto_Default_1112"
-
-[[dialogue_node.dialogue_options_list.dialogue_option]]
-text = "Can all anglerfish talk?"
-dialogue_target = "SE_Ernesto_Default_1113"
 
 
 
@@ -74,7 +70,7 @@ name = "SE_Ernesto_Default_1111"
 dialogue_target = "SE_Ernesto_Default_2"
 
 [[dialogue_node.dialogue]]
-page = ["No, that's my cousin. He was always a jerk. One of the reasons I left Dark Bramble, actually."]
+page = ["No, that's my cousin. Or maybe it was my uncle, I don't remember."]
 
 
 
@@ -83,17 +79,113 @@ name = "SE_Ernesto_Default_1112"
 dialogue_target = "SE_Ernesto_Default_2"
 
 [[dialogue_node.dialogue]]
-page = ["I know, right? But no, I'm not famous. Barely anyone knows about me, actually. And you forgot about me. How un-famous do I have to be for someone to completely forget I exist? It's kind of depressing, really."]
+page = ["I took speaking as an elective in college."]
 
 
 
 [[dialogue_node]]
-name = "SE_Ernesto_Default_1113"
+name = "SE_Ernesto_Default_112"
+
+[[dialogue_node.dialogue]]
+page = ["Glad you're finally coming to your senses. What are you gonna tell me next, that you don't remember Geswaldo?"]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "I know who Geswaldo is!"
+dialogue_target = "SE_Ernesto_Default_1121"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Who?"
+dialogue_target = "SE_Ernesto_Default_1122"
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_1121"
 dialogue_target = "SE_Ernesto_Default_2"
 
 [[dialogue_node.dialogue]]
-page = ["If there are other anglerfish that can talk, I've never seen one. The only reason I can talk is because I took speaking as an elective in college."]
+page = ["Good. He's gonna be on your quiz later."]
 
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_1122"
+dialogue_target = "SE_Ernesto_Default_2"
+
+[[dialogue_node.dialogue]]
+page = ["Unbelievable. You gotta keep up with the Ernesto lore."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_12"
+
+[[dialogue_node.dialogue]]
+page = ["I was waiting for you to get here. You know who I am, right?"]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Yeah, you're Ernesto."
+dialogue_target = "SE_Ernesto_Default_121"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "You're a talking anglerfish."
+dialogue_target = "SE_Ernesto_Default_122"
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_121"
+dialogue_target = "SE_Ernesto_Default_2"
+
+[[dialogue_node.dialogue]]
+page = ["Whew. I was worried you had forgotten about me."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_122"
+dialogue_target = "SE_Ernesto_Default_2"
+
+[[dialogue_node.dialogue]]
+page = ["Well, yeah. Close enough. I'm Ernesto the Magic Talking Anglerfish."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_13"
+
+[[dialogue_node.dialogue]]
+page = ["It sure is."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Did you pay your taxes?"
+dialogue_target = "SE_Ernesto_Default_131"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Where's Geswaldo?"
+dialogue_target = "SE_Ernesto_Default_132"
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_131"
+dialogue_target = "SE_Ernesto_Default_2"
+
+[[dialogue_node.dialogue]]
+page = ["No, of course not. Tax evasion is fun. And free."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_132"
+dialogue_target = "SE_Ernesto_Default_2"
+
+[[dialogue_node.dialogue]]
+page = ["That's a long story."]
 
 
 
@@ -127,7 +219,7 @@ dialogue_target = "SE_Ernesto_Default_22"
 name = "SE_Ernesto_Default_21"
 
 [[dialogue_node.dialogue]]
-page = ["It's a ton of fun! But for now, I think I'll just sit back and relax.", "You do your thing, fly the ship or whatever. Just try not to kill both of us while you're at it."]
+page = ["Yeah, it's pretty fun. I think I'll just relax for now, though.", "You do your thing, fly the ship or whatever. Just try not to kill both of us while you're at it."]
 
 
 
@@ -136,62 +228,3 @@ name = "SE_Ernesto_Default_22"
 
 [[dialogue_node.dialogue]]
 page = ["No problem, I don't wanna do anything now either. I'm just gonna sit back and relax for now.", "You do your thing, fly the ship or whatever. Just try not to kill both of us while you're at it."]
-
-
-
-[[dialogue_node]]
-name = "SE_Ernesto_Presence_1"
-entry_condition = ["SE_MULTIPLE_ERNESTOS"]
-
-[[dialogue_node.dialogue]]
-page = ["Hatchling... listen. <![CDATA[<Pause/>]]> Can you hear it?"]
-
-[dialogue_node.dialogue_options_list]
-
-[[dialogue_node.dialogue_options_list.dialogue_option]]
-text = "Hear what..?"
-dialogue_target = "SE_Ernesto_Presence_2"
-
-
-
-[[dialogue_node]]
-name = "SE_Ernesto_Presence_2"
-
-[[dialogue_node.dialogue]]
-page = ["The ripples in the fabric of Spacetime. I hear them. Do you know what that means, Hatchling?", "It means they're here."]
-
-[dialogue_node.dialogue_options_list]
-
-[[dialogue_node.dialogue_options_list.dialogue_option]]
-text = "Who's here?"
-dialogue_target = "SE_Ernesto_Presence_3"
-
-[[dialogue_node.dialogue_options_list.dialogue_option]]
-text = "Okay, now you're freaking me out."
-dialogue_target = "SE_Ernesto_Presence_3"
-
-
-
-[[dialogue_node]]
-name = "SE_Ernesto_Presence_3"
-
-[[dialogue_node.dialogue]]
-page = ["There are others here like me, I don't know how. But I am no longer the only Ernesto in this world."]
-
-[dialogue_node.dialogue_options_list]
-
-[[dialogue_node.dialogue_options_list.dialogue_option]]
-text = "Woah."
-dialogue_target = "SE_Ernesto_Presence_31"
-
-[[dialogue_node.dialogue_options_list.dialogue_option]]
-text = "Should we go say hi?"
-dialogue_target = "SE_Ernesto_Presence_31"
-
-
-
-[[dialogue_node]]
-name = "SE_Ernesto_Presence_31"
-
-[[dialogue_node.dialogue]]
-page = ["It's not a bad idea to go search for them, but be warned: I don't know their reasons for being here, and I don't know what their intent is.", "It's possible they may try to bring harm to you. Be careful, Hatchling."]
