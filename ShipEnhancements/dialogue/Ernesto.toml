@@ -1,0 +1,138 @@
+schema = "https://raw.githubusercontent.com/Outer-Wilds-New-Horizons/new-horizons/main/NewHorizons/Schemas/dialogue_schema.xsd"
+file_type = "DialogueTree"
+name_field = "Ernesto"
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_1"
+entry_condition = ["DEFAULT"]
+
+[[dialogue_node.dialogue]]
+page = ["Hey, Hatchling! Long time no see, eh?"]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "I really have to get going, can we talk later?"
+dialogue_target = "SE_Ernesto_Default_14"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Who are you?"
+dialogue_target = "SE_Ernesto_Default_11"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "What are you doing in my ship?"
+dialogue_target = "SE_Ernesto_Default_12"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Ernesto? Is that you?"
+dialogue_target = "SE_Ernesto_Default_13"
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_11"
+
+[[dialogue_node.dialogue]]
+page = ["What are you talking about? It's me! Don't you remember me?"]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Uh... no?"
+dialogue_target = "SE_Ernesto_Default_111"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Oh yeah! Ernesto!"
+dialogue_target = "SE_Ernesto_Default_112"
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_111"
+
+[[dialogue_node.dialogue]]
+page = ["Wow, you must have hit your head pretty hard. I'm not easy to forget.", "Who am I, you ask? I am the one and only Ernesto, the Magic Talking Anglerfish! Or just Ernesto, if you prefer."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Are you the guy who keeps attacking me in Dark Bramble?"
+dialogue_target = "SE_Ernesto_Default_1111"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "With a name like that, you must be pretty famous."
+dialogue_target = "SE_Ernesto_Default_1112"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Can all anglerfish talk?"
+dialogue_target = "SE_Ernesto_Default_1113"
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_1111"
+dialogue_target = "SE_Ernesto_Default_2"
+
+[[dialogue_node.dialogue]]
+page = ["No, that's my cousin. He was always a jerk. One of the reasons I left Dark Bramble, actually."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_1112"
+dialogue_target = "SE_Ernesto_Default_2"
+
+[[dialogue_node.dialogue]]
+page = ["I know, right? But no, I'm not famous. Barely anyone knows about me, actually. And you forgot about me. How un-famous do I have to be for someone to completely forget I exist? It's kind of depressing, really."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_1113"
+dialogue_target = "SE_Ernesto_Default_2"
+
+[[dialogue_node.dialogue]]
+page = ["If there are other anglerfish that can talk, I've never seen one. The only reason I can talk is because I took speaking as an elective in college."]
+
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_14"
+
+[[dialogue_node.dialogue]]
+page = ["Yeah, sure."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_2"
+
+[[dialogue_node.dialogue]]
+page = ["Anyway, since I've been gone for so long, I thought I'd pay you a visit. Maybe have a chat, roast a couple marshmallows, like we used to do back in the day."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Sounds fun!"
+dialogue_target = "SE_Ernesto_Default_21"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "I'm kind of busy right now, actually."
+dialogue_target = "SE_Ernesto_Default_22"
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_21"
+
+[[dialogue_node.dialogue]]
+page = ["It's a ton of fun! But for now, I think I'll just sit back and relax.", "You do your thing, fly the ship or whatever. Just try not to kill both of us while you're at it."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_22"
+
+[[dialogue_node.dialogue]]
+page = ["No problem, I don't wanna do anything now either. I'm just gonna sit back and relax for now.", "You do your thing, fly the ship or whatever. Just try not to kill both of us while you're at it."]

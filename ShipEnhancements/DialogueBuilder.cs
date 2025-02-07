@@ -228,6 +228,21 @@ public static class DialogueBuilder
 
     private static Dictionary<string, string> _dialogueTranslationDictionary = new();
 
+    public static void FixCustomDialogue(GameObject go, string dialoguePath)
+    {
+        var dialogueObject = go.transform.Find(dialoguePath);
+        var existingDialogue = dialogueObject != null ? dialogueObject.GetComponent<CharacterDialogueTree>() : null;
+
+        if (existingDialogue == null)
+        {
+            return;
+        }
+
+        var dialogueDoc = new XmlDocument();
+        dialogueDoc.LoadXml(existingDialogue._xmlCharacterDialogueAsset.text);
+        AddTranslation(dialogueDoc.GetChildNode("DialogueTree"));
+    }
+
     public static List<XmlNode> GetChildNodes(this XmlNode parentNode, string tagName)
     {
         return parentNode.ChildNodes.Cast<XmlNode>().Where(node => node.LocalName == tagName).ToList();

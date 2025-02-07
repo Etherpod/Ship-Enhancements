@@ -1,0 +1,124 @@
+<DialogueTree xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/Outer-Wilds-New-Horizons/new-horizons/main/NewHorizons/Schemas/dialogue_schema.xsd">
+  <NameField>Ernesto</NameField>
+  <DialogueNode>
+    <Name>SE_Ernesto_Default_1</Name>
+    <EntryCondition>DEFAULT</EntryCondition>
+    <Dialogue>
+      <Page>Hey, Hatchling! Long time no see, eh?</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>I really have to get going, can we talk later?</Text>
+        <DialogueTarget>SE_Ernesto_Default_14</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Who are you?</Text>
+        <DialogueTarget>SE_Ernesto_Default_11</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>What are you doing in my ship?</Text>
+        <DialogueTarget>SE_Ernesto_Default_12</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Ernesto? Is that you?</Text>
+        <DialogueTarget>SE_Ernesto_Default_13</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_Ernesto_Default_11</Name>
+    <Dialogue>
+      <Page>What are you talking about? It's me! Don't you remember me?</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Uh... no?</Text>
+        <DialogueTarget>SE_Ernesto_Defaultt_111</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Oh yeah! Ernesto!</Text>
+        <DialogueTarget>SE_Ernesto_Default_112</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  
+  <DialogueNode>
+    <Name>SE_Ernesto_Defaultt_111</Name>
+    <Dialogue>
+      <Page>Wow, you must have hit your head pretty hard. I'm not easy to forget.</Page>
+      <Page>Who am I, you ask? I am the one and only Ernesto, the Magic Talking Anglerfish! Or just Ernesto, if you prefer.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Are you the guy who keeps attacking me in Dark Bramble?</Text>
+        <DialogueTarget>SE_Ernesto_Default_1111</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>With a name like that, you must be pretty famous.</Text>
+        <DialogueTarget>SE_Ernesto_Default_1112</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Can all anglerfish talk?</Text>
+        <DialogueTarget>SE_Ernesto_Default_1113</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Default_1111</Name>
+    <Dialogue>
+      <Page>No, that's my cousin. He was always a jerk. One of the reasons I left Dark Bramble, actually.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_Ernesto_Default_2</DialogueTarget>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Default_1112</Name>
+    <Dialogue>
+      <Page>I know, right? But no, I'm not famous. Barely anyone knows about me, actually. And you forgot about me. How un-famous do I have to be for someone to completely forget I exist? It's kind of depressing, really.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_Ernesto_Default_2</DialogueTarget>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Default_1113</Name>
+    <Dialogue>
+      <Page>If there are other anglerfish that can talk, I've never seen one. The only reason I can talk is because I took speaking as an elective in college.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_Ernesto_Default_2</DialogueTarget>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Default_14</Name>
+    <Dialogue>
+      <Page>Yeah, sure.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Default_2</Name>
+    <Dialogue>
+      <Page>Anyway, since I've been gone for so long, I thought I'd pay you a visit. Maybe have a chat, roast a couple marshmallows, like we used to do back in the day.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Sounds fun!</Text>
+        <DialogueTarget>SE_Ernesto_Default_21</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>I'm kind of busy right now, actually.</Text>
+        <DialogueTarget>SE_Ernesto_Default_22</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Default_21</Name>
+    <Dialogue>
+      <Page>It's a ton of fun! But for now, I think I'll just sit back and relax.</Page>
+      <Page>You do your thing, fly the ship or whatever. Just try not to kill both of us while you're at it.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Default_22</Name>
+    <Dialogue>
+      <Page>No problem, I don't wanna do anything now either. I'm just gonna sit back and relax for now.</Page>
+      <Page>You do your thing, fly the ship or whatever. Just try not to kill both of us while you're at it.</Page>
+    </Dialogue>
+  </DialogueNode>
+</DialogueTree>
