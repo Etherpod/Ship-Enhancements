@@ -1,8 +1,4 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Net.Http;
-using System.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace ShipEnhancements;
 
@@ -19,6 +15,14 @@ public class CockpitErnesto : MonoBehaviour
 
         GlobalMessenger<OWRigidbody>.AddListener("EnterFlightConsole", OnEnterFlightConsole);
         GlobalMessenger.AddListener("ExitFlightConsole", OnExitFlightConsole);
+    }
+
+    private void Start()
+    {
+        if (ErnestoModListHandler.ActiveModList.Count > 0)
+        {
+            DialogueConditionManager.SharedInstance.SetConditionState("SE_MULTIPLE_ERNESTOS", true);
+        }
     }
 
     private void OnEnterFlightConsole(OWRigidbody body)

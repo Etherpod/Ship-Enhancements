@@ -25,7 +25,6 @@
       </DialogueOption>
     </DialogueOptionsList>
   </DialogueNode>
-  
   <DialogueNode>
     <Name>SE_Ernesto_Default_11</Name>
     <Dialogue>
@@ -34,7 +33,7 @@
     <DialogueOptionsList>
       <DialogueOption>
         <Text>Uh... no?</Text>
-        <DialogueTarget>SE_Ernesto_Defaultt_111</DialogueTarget>
+        <DialogueTarget>SE_Ernesto_Default_111</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
         <Text>Oh yeah! Ernesto!</Text>
@@ -42,9 +41,8 @@
       </DialogueOption>
     </DialogueOptionsList>
   </DialogueNode>
-  
   <DialogueNode>
-    <Name>SE_Ernesto_Defaultt_111</Name>
+    <Name>SE_Ernesto_Default_111</Name>
     <Dialogue>
       <Page>Wow, you must have hit your head pretty hard. I'm not easy to forget.</Page>
       <Page>Who am I, you ask? I am the one and only Ernesto, the Magic Talking Anglerfish! Or just Ernesto, if you prefer.</Page>
@@ -119,6 +117,59 @@
     <Dialogue>
       <Page>No problem, I don't wanna do anything now either. I'm just gonna sit back and relax for now.</Page>
       <Page>You do your thing, fly the ship or whatever. Just try not to kill both of us while you're at it.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Presence_1</Name>
+    <EntryCondition>SE_MULTIPLE_ERNESTOS</EntryCondition>
+    <Dialogue>
+      <Page>Hatchling... listen.<![CDATA[<Pause/>]]>Can you hear it?</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Hear what..?</Text>
+        <DialogueTarget>SE_Ernesto_Presence_2</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Presence_2</Name>
+    <Dialogue>
+      <Page>The ripples in the fabric of Spacetime. I hear them. Do you know what that means, Hatchling?</Page>
+      <Page>It means they're here.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Who's here?</Text>
+        <DialogueTarget>SE_Ernesto_Presence_3</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Okay, now you're freaking me out.</Text>
+        <DialogueTarget>SE_Ernesto_Presence_3</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Presence_3</Name>
+    <Dialogue>
+      <Page>There are others here like me, I don't know how. But I am no longer the only Ernesto in this world.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Woah.</Text>
+        <DialogueTarget>SE_Ernesto_Presence_31</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Should we go say hi?</Text>
+        <DialogueTarget>SE_Ernesto_Presence_31</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Presence_31</Name>
+    <Dialogue>
+      <Page>It's not a bad idea to go search for them, but be warned: I don't know their reasons for being here, and I don't know what their intent is.</Page>
+      <Page>It's possible they may try to bring harm to you. Be careful, Hatchling.</Page>
     </Dialogue>
   </DialogueNode>
 </DialogueTree>
