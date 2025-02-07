@@ -49,14 +49,14 @@ public class TemperatureZone : MonoBehaviour
         }
     }
 
-    public float GetTemperature()
+    public float GetTemperature(TemperatureDetector detector)
     {
         if (!_active)
         {
             return 0;
         }
 
-        float distSqr = (SELocator.GetShipDetector().transform.position - (transform.position + _shape.center)).sqrMagnitude;
+        float distSqr = (detector.transform.position - (transform.position + _shape.center)).sqrMagnitude;
         float multiplier;
         if (_isShell)
         {

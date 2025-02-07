@@ -27,7 +27,7 @@ public class TemperatureDetector : MonoBehaviour
             float totalTemperature = 0f;
             foreach (TemperatureZone zone in _activeZones)
             {
-                float temp = zone.GetTemperature();
+                float temp = zone.GetTemperature(this);
                 totalTemperature += temp;
             }
             _currentTemperature = Mathf.Clamp(totalTemperature, -100f, 100f);
