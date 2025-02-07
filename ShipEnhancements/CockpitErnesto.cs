@@ -1,4 +1,8 @@
-﻿using UnityEngine;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
+using UnityEngine;
 
 namespace ShipEnhancements;
 
@@ -7,8 +11,12 @@ public class CockpitErnesto : MonoBehaviour
     [SerializeField]
     private InteractReceiver _conversationZone = null;
 
+    private CharacterDialogueTree _dialogueTree;
+
     private void Awake()
     {
+        _dialogueTree = _conversationZone.GetComponent<CharacterDialogueTree>();
+
         GlobalMessenger<OWRigidbody>.AddListener("EnterFlightConsole", OnEnterFlightConsole);
         GlobalMessenger.AddListener("ExitFlightConsole", OnExitFlightConsole);
     }

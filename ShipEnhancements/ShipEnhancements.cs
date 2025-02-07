@@ -185,6 +185,7 @@ public class ShipEnhancements : ModBehaviour
 
         InitializeAchievements();
         InitializeQSB();
+        ErnestoModListHandler.Initialize();
         SettingsPresets.InitializePresets();
 
         ProbeLauncherName = EnumUtils.Create<UITextType>("ScoutLauncher");
@@ -1719,8 +1720,6 @@ public class ShipEnhancements : ModBehaviour
 
     public static void WriteDebugMessage(object msg, bool warning = false, bool error = false)
     {
-        return;
-
         msg ??= "null";
 
         if (warning)
