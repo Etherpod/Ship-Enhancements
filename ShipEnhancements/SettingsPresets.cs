@@ -95,6 +95,7 @@ public static class SettingsPresets
         { "randomComponentDamage", 0f },
         { "enableFragileShip", false },
         { "faultyHeatRegulators", false },
+        { "addErnesto", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -186,6 +187,7 @@ public static class SettingsPresets
         { "randomComponentDamage", 0f },
         { "enableFragileShip", true },
         { "faultyHeatRegulators", false },
+        { "addErnesto", false },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -277,6 +279,7 @@ public static class SettingsPresets
         { "randomComponentDamage", 0f },
         { "enableFragileShip", false },
         { "faultyHeatRegulators", false },
+        { "addErnesto", false },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -368,6 +371,7 @@ public static class SettingsPresets
         { "randomComponentDamage", 0f },
         { "enableFragileShip", true },
         { "faultyHeatRegulators", true },
+        { "addErnesto", false },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -459,6 +463,7 @@ public static class SettingsPresets
         { "randomComponentDamage", 0f },
         { "enableFragileShip", false },
         { "faultyHeatRegulators", false },
+        { "addErnesto", false },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -550,6 +555,7 @@ public static class SettingsPresets
         { "randomComponentDamage", 0.1f },
         { "enableFragileShip", false },
         { "faultyHeatRegulators", true },
+        { "addErnesto", false },
     };
 
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()
@@ -835,6 +841,7 @@ public static class SettingsPresets
         { "randomComponentDamage", new RandomSettingValue(0f, 1f, 0.3f, 0f) },
         { "enableFragileShip", new RandomSettingValue(0.1f) },
         { "faultyHeatRegulators", new RandomSettingValue(0.4f) },
+        { "addErnesto", new RandomSettingValue(0.05f) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

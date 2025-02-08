@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using UnityEngine;
@@ -2079,6 +2080,17 @@ public static class PatchClass
     }
 
     [HarmonyPrefix]
+    [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.OnEnterConversation))]
+    public static bool KeepThrustIndicatorOnInConversation(ThrustAndAttitudeIndicator __instance)
+    {
+        if (!(bool)enablePersistentInput.GetProperty() || !__instance._shipIndicatorMode 
+            || !SELocator.GetShipBody().GetComponent<ShipPersistentInput>().InputEnabled()) return true;
+
+        __instance._inConversation = true;
+        return false;
+    }
+
+    [HarmonyPrefix]
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.ExitFlightConsole))]
     public static void UpdatePersistentInputAutopilotState()
     {
@@ -3128,6 +3140,49 @@ public static class PatchClass
             return false;
         }
         return true;
+    }
+    #endregion
+
+    #region DialogueEntryConditionFix
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(DialogueNode), nameof(DialogueNode.EntryConditionsSatisfied))]
+    public static void DialogueEntryConditionsSatisfied(DialogueNode __instance, ref bool __result)
+    {
+        if (__instance._listEntryCondition.Count == 0)
+        {
+            __result = false;
+            return;
+        }
+
+        var sharedInstance = DialogueConditionManager.SharedInstance;
+        __result = __instance._listEntryCondition
+            .All(condition =>
+            {
+                if (PlayerData.PersistentConditionExists(condition))
+                {
+                    return PlayerData.GetPersistentCondition(condition);
+                }
+
+                if (sharedInstance.ConditionExists(condition))
+                {
+                    return sharedInstance.GetConditionState(condition);
+                }
+
+                return false;
+            });
+    }
+    #endregion
+
+    #region ThrustIndicatorConversationFix
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.OnExitConversation))]
+    public static void FixThrustIndicatorLightOnExitConversation(ThrustAndAttitudeIndicator __instance)
+    {
+        if (__instance._shipIndicatorMode && !PlayerState.AtFlightConsole()
+            && (!(bool)enablePersistentInput.GetProperty() || !SELocator.GetShipBody().GetComponent<ShipPersistentInput>().InputEnabled()))
+        {
+            __instance._thrusterArrowRoot.gameObject.SetActive(false);
+        }
     }
     #endregion
 }

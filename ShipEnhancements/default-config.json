@@ -471,6 +471,12 @@
       "value": false,
       "tooltip": "Adds a clock to the ship cockpit. It uses the standard Hearthian units of time: seconds and minutes."
     },
+    "addErnesto": {
+      "title": "Add Ernesto",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Adds Ernesto to the cockpit."
+    },
     "enableShipItemPlacement": {
       "title": "Ship Item Placement",
       "type": "toggle",

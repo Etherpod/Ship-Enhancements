@@ -171,6 +171,7 @@ public class ShipEnhancements : ModBehaviour
         randomComponentDamage,
         enableFragileShip,
         faultyHeatRegulators,
+        addErnesto,
     }
 
     private void Awake()
@@ -597,11 +598,6 @@ public class ShipEnhancements : ModBehaviour
             SELocator.GetShipDamageController().OnShipHullDamaged += ctx => CheckAllPartsDamaged();
         }
 
-        GameObject ernesto = LoadPrefab("Assets/ShipEnhancements/Ernesto.prefab");
-        AssetBundleUtilities.ReplaceShaders(ernesto);
-        GameObject ernestoObj = Instantiate(ernesto, SELocator.GetShipBody().transform.Find("Module_Cockpit"));
-        DialogueBuilder.FixCustomDialogue(ernestoObj, "ConversationZone");
-
         if ((bool)Settings.disableHeadlights.GetProperty())
         {
             DisableHeadlights();
@@ -1020,6 +1016,13 @@ public class ShipEnhancements : ModBehaviour
             GlobalMessenger.AddListener("StartShipIgnition", OnStartShipIgnition);
             GlobalMessenger.AddListener("CancelShipIgnition", OnStopShipIgnition);
             GlobalMessenger.AddListener("CompleteShipIgnition", OnStopShipIgnition);
+        }
+        if ((bool)Settings.addErnesto.GetProperty())
+        {
+            GameObject ernesto = LoadPrefab("Assets/ShipEnhancements/Ernesto.prefab");
+            AssetBundleUtilities.ReplaceShaders(ernesto);
+            GameObject ernestoObj = Instantiate(ernesto, SELocator.GetShipBody().transform.Find("Module_Cockpit"));
+            DialogueBuilder.FixCustomDialogue(ernestoObj, "ConversationZone");
         }
 
         SetDamageColors();
