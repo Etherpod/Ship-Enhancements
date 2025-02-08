@@ -188,14 +188,482 @@
     <Name>SE_Ernesto_Default_21</Name>
     <Dialogue>
       <Page>Yeah, it's pretty fun. I think I'll just relax for now, though.</Page>
-      <Page>You do your thing, fly the ship or whatever. Just try not to kill both of us while you're at it.</Page>
     </Dialogue>
+    <DialogueTarget>SE_Ernesto_Default_End</DialogueTarget>
   </DialogueNode>
   <DialogueNode>
     <Name>SE_Ernesto_Default_22</Name>
     <Dialogue>
       <Page>No problem, I don't wanna do anything now either. I'm just gonna sit back and relax for now.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_Ernesto_Default_End</DialogueTarget>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Default_End</Name>
+    <Dialogue>
       <Page>You do your thing, fly the ship or whatever. Just try not to kill both of us while you're at it.</Page>
+    </Dialogue>
+    <SetPersistentCondition>SE_KNOWS_ERNESTO</SetPersistentCondition>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Return</Name>
+    <EntryCondition>SE_KNOWS_ERNESTO</EntryCondition>
+    <Randomize />
+    <Dialogue>
+      <Page>What's up?</Page>
+    </Dialogue>
+    <Dialogue>
+      <Page>What? This better be important.</Page>
+    </Dialogue>
+    <Dialogue>
+      <Page>You wanna ask me something?</Page>
+    </Dialogue>
+    <Dialogue>
+      <Page>Did you have a question?</Page>
+    </Dialogue>
+    <Dialogue>
+      <Page>What is it?</Page>
+    </Dialogue>
+    <Dialogue>
+      <Page>Yeah?</Page>
+    </Dialogue>
+    <Dialogue>
+      <Page>Hey.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_1</RequiredCondition>
+        <Text>What's the airspeed velocity of an unladen swallow?</Text>
+        <DialogueTarget>SE_Ernesto_Swallow</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_2</RequiredCondition>
+        <Text>Do you play sports?</Text>
+        <DialogueTarget>SE_Ernesto_Sports</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_3</RequiredCondition>
+        <Text>What was it like living in Dark Bramble?</Text>
+        <DialogueTarget>SE_Ernesto_DarkBramble</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_4</RequiredCondition>
+        <Text>AAAH! I forgot you were in my ship!</Text>
+        <DialogueTarget>SE_Ernesto_Jumpscare</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_5</RequiredCondition>
+        <Text>How much do you sleep?</Text>
+        <DialogueTarget>SE_Ernesto_Sleeping</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_6</RequiredCondition>
+        <Text>Have you ever broken a bone?</Text>
+        <DialogueTarget>SE_Ernesto_BrokenBone</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_7</RequiredCondition>
+        <Text>Are you breathing at all?</Text>
+        <DialogueTarget>SE_Ernesto_Breathing</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_8</RequiredCondition>
+        <Text>Do you like sap wine?</Text>
+        <DialogueTarget>SE_Ernesto_SapWine</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_9</RequiredCondition>
+        <Text>Do you have gills or lungs?</Text>
+        <DialogueTarget>SE_Ernesto_Lungs</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_10</RequiredCondition>
+        <Text>Tell me the story of how you met Geswaldo.</Text>
+        <DialogueTarget>SE_Ernesto_MeetingGeswaldo</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_11</RequiredCondition>
+        <Text>Where do you live?</Text>
+        <DialogueTarget>SE_Ernesto_House</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_12</RequiredCondition>
+        <Text>Do you ever beat people to death with rocks?</Text>
+        <DialogueTarget>SE_Ernesto_Assault</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_13</RequiredCondition>
+        <Text>Why are you so small?</Text>
+        <DialogueTarget>SE_Ernesto_Size</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_14</RequiredCondition>
+        <Text>What's your favorite planet?</Text>
+        <DialogueTarget>SE_Ernesto_FavoritePlanet</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_15</RequiredCondition>
+        <Text>test</Text>
+        <DialogueTarget>SE_Ernesto_Picnic</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_16</RequiredCondition>
+        <Text>Can you pilot the ship for me?</Text>
+        <DialogueTarget>SE_Ernesto_Pilot</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_17</RequiredCondition>
+        <Text>Do you like marshmallows?</Text>
+        <DialogueTarget>SE_Ernesto_Marshmallows</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_18</RequiredCondition>
+        <Text>Do you have any siblings?</Text>
+        <DialogueTarget>SE_Ernesto_Siblings</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_19</RequiredCondition>
+        <Text>How old are you?</Text>
+        <DialogueTarget>SE_Ernesto_Age</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_20</RequiredCondition>
+        <Text>How fast can you fly?</Text>
+        <DialogueTarget>SE_Ernesto_FlyingSpeed</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_21</RequiredCondition>
+        <Text>Do you like music?</Text>
+        <DialogueTarget>SE_Ernesto_Music</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_22</RequiredCondition>
+        <Text>Which traveler's music is your favorite?</Text>
+        <DialogueTarget>SE_Ernesto_FavoriteTraveler</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_100</RequiredCondition>
+        <Text>Can you continue your story about Geswaldo?</Text>
+        <DialogueTarget>SE_Ernesto_Geswaldo</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Nevermind.</Text>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Swallow</Name>
+    <Dialogue>
+      <Page>African or European?</Page>
+      <Page>Heh, just messing with you. It's 10.4 m/s for an African swallow and 9.2 m/s for a European swallow.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Sports</Name>
+    <Dialogue>
+      <Page>Yeah, I loved playing sports as a kid, mostly Go Fish. I was the top performing player, believe it or not.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_DarkBramble</Name>
+    <Dialogue>
+      <Page>Cold. Lonely. Scary. Damp and wet.</Page>
+      <Page>I'm glad I got out of there when I did. Apparently the stock markets crashed not long after I left.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Jumpscare</Name>
+    <Dialogue>
+      <Page>I actually have camoflauge abilities. Here, watch I'll blend into the surroundings and you'll be so surprised it worked that you'll stop talking to me.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>That doesn't-</Text>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>You can't-</Text>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>What are you-</Text>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>I'm confu-</Text>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Sleeping</Name>
+    <Dialogue>
+      <Page>I don't sleep. There's too much to get done.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>What, like sitting in my cockpit doing nothing?</Text>
+        <DialogueTarget>SE_Ernesto_Sleeping_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Fair enough.</Text>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Sleeping_1</Name>
+    <Dialogue>
+      <Page>I'm not doing nothing, I'm gathering valuable intel.</Page>
+      <Page>I probably shouldn't have said that. You didn't hear anything.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_BrokenBone</Name>
+    <Dialogue>
+      <Page>I'm an invertebrate. I don't have bones.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>But you're a fish! All fish have bones!</Text>
+        <DialogueTarget>SE_Ernesto_BrokenBone_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Oh, sorry.</Text>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_BrokenBone_1</Name>
+    <Dialogue>
+      <Page>The "magic" part of "Ernesto the Magic Talking Anglerfish" means all my bones get taken away.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Breathing</Name>
+    <Dialogue>
+      <Page>No, I'm holding my breath so I don't consume extra oxygen.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Wow, you can hold your breath for a while.</Text>
+        <DialogueTarget>SE_Ernesto_Breathing_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>You can breath. My oxygen is going to be fine.</Text>
+        <DialogueTarget>SE_Ernesto_Breathing_2</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Breathing_1</Name>
+    <Dialogue>
+      <Page>I haven't tasted oxygen in a long time.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Breathing_2</Name>
+    <Dialogue>
+      <Page>Your ship wouldn't last a second if I started breathing. Neither would the solar system.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_SapWine</Name>
+    <Dialogue>
+      <Page>I'm convinced that stuff is poison. It tasted worse than the vines from Dark Bramble, and those things taste really bad.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Lungs</Name>
+    <Dialogue>
+      <Page>Neither.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>I- I don't want to know.</Text>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_MeetingGeswaldo</Name>
+    <Dialogue>
+      <Page>Making me dig through repressed memories, eh?</Page>
+      <Page>A long time ago, I was swimming around Giant's Deep, looking at all the jellyfish floating around there. One of them caught my eye.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Was it a particularly handsome jellyfish, by any chance?</Text>
+        <DialogueTarget>SE_Ernesto_MeetingGeswaldo_1</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_MeetingGeswaldo_1</Name>
+    <Dialogue>
+      <Page>What? No. It was a super small jellyfish.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Oh.</Text>
+        <DialogueTarget>SE_Ernesto_MeetingGeswaldo_2</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_MeetingGeswaldo_2</Name>
+    <Dialogue>
+      <Page>The moment I saw that jellyfish, I knew we were destined to be together.</Page>
+      <Page>A tiny anglerfish kicked out of his home and a tiny jellyfish estranged to his own people. What could be a more perfect combination?</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Marshmallows and a campfire.</Text>
+        <DialogueTarget>SE_Ernesto_MeetingGeswaldo_21</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>That's really sweet.</Text>
+        <DialogueTarget>SE_Ernesto_MeetingGeswaldo_22</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_MeetingGeswaldo_21</Name>
+    <Dialogue>
+      <Page>Be quiet, I'm telling a story.</Page>
+      <Page>After metting Geswaldo, I knew I wanted him to be my husband. And he was, eventually. Until...</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Until what? What happened?</Text>
+        <DialogueTarget>SE_Ernesto_MeetingGeswaldo_3</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_MeetingGeswaldo_22</Name>
+    <Dialogue>
+      <Page>It was love at first sight. I knew I wanted to marry him the moment I looked into his eyes.</Page>
+      <Page>And I did. Everything was perfect, until...</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Until what? What happened?</Text>
+        <DialogueTarget>SE_Ernesto_MeetingGeswaldo_3</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_MeetingGeswaldo_3</Name>
+    <Dialogue>
+      <Page>It's not important. Maybe I'll tell you some other time.</Page>
+      <Page>Story time's over, go fly your ship or whatever.</Page>
+    </Dialogue>
+    <SetPersistentCondition>SE_ERNESTO_GESWALDO_PART_ONE</SetPersistentCondition>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_House</Name>
+    <Dialogue>
+      <Page>
+      </Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Assault</Name>
+    <Dialogue>
+      <Page>Sometimes. Usually when people ask me too many questions.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Size</Name>
+    <Dialogue>
+      <Page>I decided to adopt a no-food lifestyle when I was born, but it had some impacts on my growth.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_FavoritePlanet</Name>
+    <Dialogue>
+      <Page>My favorite planet? Probably Mars.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Mars..?</Text>
+        <DialogueTarget>SE_Ernesto_FavoritePlanet_1</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_FavoritePlanet_1</Name>
+    <Dialogue>
+      <Page>Oh, sorry. Ember Twin. Mars is... somewhere else.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Picnic</Name>
+    <Dialogue>
+      <Page>
+      </Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Pilot</Name>
+    <Dialogue>
+      <Page>Yeah, sure. I don't have hands, but I should be able to use my tail.</Page>
+      <Page>Do you have a flight manual?</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Uh... no.</Text>
+        <DialogueTarget>SE_Ernesto_Pilot_1</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Pilot_1</Name>
+    <Dialogue>
+      <Page>Oh. I can't fly it then. You Hearthians need to make your ships more user friendly.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Marshmallows</Name>
+    <Dialogue>
+      <Page>Yeah. They're pretty good. Especially the green ones, they make me see colors.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Siblings</Name>
+    <Dialogue>
+      <Page>Yeah, I think I have like 30 or something. Unless you count half-siblings, because then I have like 200.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Age</Name>
+    <Dialogue>
+      <Page>Uh... 712 years, give or take a few.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Wow. You're old.</Text>
+        <DialogueTarget>SE_Ernesto_Age_1</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Age_1</Name>
+    <Dialogue>
+      <Page>Yeah, it's given me a lot of time to evade my taxes.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_FlyingSpeed</Name>
+    <Dialogue>
+      <Page>zoom</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Music</Name>
+    <Dialogue>
+      <Page>Not really. It hurts my ears.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_FavoriteTraveler</Name>
+    <Dialogue>
+      <Page>I like Chert's drums. They remind me of hitting people with rocks.</Page>
     </Dialogue>
   </DialogueNode>
 </DialogueTree>
