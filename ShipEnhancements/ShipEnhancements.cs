@@ -95,7 +95,6 @@ public class ShipEnhancements : ModBehaviour
         shipDamageMultiplier,
         shipDamageSpeedMultiplier,
         shipOxygenRefill,
-        disableShipRepair,
         enableGravityLandingGear,
         disableAirAutoRoll,
         disableWaterAutoRoll,
@@ -172,6 +171,7 @@ public class ShipEnhancements : ModBehaviour
         enableFragileShip,
         faultyHeatRegulators,
         addErnesto,
+        repairLimit,
     }
 
     private void Awake()
@@ -216,6 +216,8 @@ public class ShipEnhancements : ModBehaviour
             anyPartDamaged = false;
             groundedByHornfels = false;
             shipIgniting = false;
+            ShipRepairLimitController.SetRepairLimit(-1);
+            ShipRepairLimitController.SetPartsRepaired(0);
 
             if (AchievementsAPI != null)
             {
@@ -1023,6 +1025,10 @@ public class ShipEnhancements : ModBehaviour
             AssetBundleUtilities.ReplaceShaders(ernesto);
             GameObject ernestoObj = Instantiate(ernesto, SELocator.GetShipBody().transform.Find("Module_Cockpit"));
             DialogueBuilder.FixCustomDialogue(ernestoObj, "ConversationZone");
+        }
+        if ((int)(float)Settings.repairLimit.GetProperty() >= 0)
+        {
+            ShipRepairLimitController.SetRepairLimit((int)(float)Settings.repairLimit.GetProperty());
         }
 
         SetDamageColors();

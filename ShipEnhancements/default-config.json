@@ -91,12 +91,6 @@
       ],
       "tooltip": "Lets you disable some of your ship's thrusters."
     },
-    "disableShipRepair": {
-      "title": "Disable Ship Repairing",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Removes your ability to repair your ship. Be careful out there!"
-    },
     "disableDamageIndicators": {
       "title": "Disable Damage Indicators",
       "type": "toggle",
@@ -224,7 +218,13 @@
       "title": "Enable Fragile Ship",
       "type": "toggle",
       "value": false,
-      "tooltip": "You are unable to pilot your ship if anything is damaged. Please do not use this with Disable Ship Repair."
+      "tooltip": "You are unable to pilot your ship if anything is damaged."
+    },
+    "repairLimit": {
+      "title": "Repair Limit",
+      "type": "number",
+      "value": -1,
+      "tooltip": "Turns off ship repairing after you repair this many parts. Set to -1 to disable."
     },
     "repairTimeMultiplier": {
       "title": "Repair Time Multiplier",

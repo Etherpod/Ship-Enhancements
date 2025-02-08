@@ -19,7 +19,6 @@ public static class SettingsPresets
         { "shipDamageMultiplier", 1f },
         { "shipDamageSpeedMultiplier", 1f },
         { "shipOxygenRefill", false },
-        { "disableShipRepair", false },
         { "enableGravityLandingGear", false },
         { "disableAirAutoRoll", false },
         { "disableWaterAutoRoll", false },
@@ -96,6 +95,7 @@ public static class SettingsPresets
         { "enableFragileShip", false },
         { "faultyHeatRegulators", false },
         { "addErnesto", false },
+        { "repairLimit", -1f },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -111,7 +111,6 @@ public static class SettingsPresets
         { "shipDamageMultiplier", 0.9f },
         { "shipDamageSpeedMultiplier", 0.8f },
         { "shipOxygenRefill", false },
-        { "disableShipRepair", false },
         { "enableGravityLandingGear", false },
         { "disableAirAutoRoll", false },
         { "disableWaterAutoRoll", true },
@@ -188,6 +187,7 @@ public static class SettingsPresets
         { "enableFragileShip", true },
         { "faultyHeatRegulators", false },
         { "addErnesto", false },
+        { "repairLimit", -1f },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -203,7 +203,6 @@ public static class SettingsPresets
         { "shipDamageMultiplier", 0.4f },
         { "shipDamageSpeedMultiplier", 2f },
         { "shipOxygenRefill", false },
-        { "disableShipRepair", false },
         { "enableGravityLandingGear", true },
         { "disableAirAutoRoll", true },
         { "disableWaterAutoRoll", false },
@@ -280,6 +279,7 @@ public static class SettingsPresets
         { "enableFragileShip", false },
         { "faultyHeatRegulators", false },
         { "addErnesto", false },
+        { "repairLimit", -1f },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -295,7 +295,6 @@ public static class SettingsPresets
         { "shipDamageMultiplier", 2.5f },
         { "shipDamageSpeedMultiplier", 0.75f },
         { "shipOxygenRefill", true },
-        { "disableShipRepair", false },
         { "enableGravityLandingGear", false },
         { "disableAirAutoRoll", true },
         { "disableWaterAutoRoll", true },
@@ -372,6 +371,7 @@ public static class SettingsPresets
         { "enableFragileShip", true },
         { "faultyHeatRegulators", true },
         { "addErnesto", false },
+        { "repairLimit", 0f },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -387,7 +387,6 @@ public static class SettingsPresets
         { "shipDamageMultiplier", 0.8f },
         { "shipDamageSpeedMultiplier", 1.2f },
         { "shipOxygenRefill", true },
-        { "disableShipRepair", false },
         { "enableGravityLandingGear", false },
         { "disableAirAutoRoll", false },
         { "disableWaterAutoRoll", false },
@@ -464,6 +463,7 @@ public static class SettingsPresets
         { "enableFragileShip", false },
         { "faultyHeatRegulators", false },
         { "addErnesto", false },
+        { "repairLimit", -1f },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -479,7 +479,6 @@ public static class SettingsPresets
         { "shipDamageMultiplier", 2f },
         { "shipDamageSpeedMultiplier", 0.4f },
         { "shipOxygenRefill", true },
-        { "disableShipRepair", false },
         { "enableGravityLandingGear", true },
         { "disableAirAutoRoll", true },
         { "disableWaterAutoRoll", true },
@@ -556,6 +555,7 @@ public static class SettingsPresets
         { "enableFragileShip", false },
         { "faultyHeatRegulators", true },
         { "addErnesto", false },
+        { "repairLimit", -1f },
     };
 
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()
@@ -597,7 +597,6 @@ public static class SettingsPresets
             (3.5f, 5f)
         }, 0.75f, 1f)},
         { "shipOxygenRefill", new RandomSettingValue(0.8f) },
-        { "disableShipRepair", new RandomSettingValue(0.1f) },
         { "enableGravityLandingGear", new RandomSettingValue(0.5f) },
         { "disableAirAutoRoll", new RandomSettingValue(0.5f) },
         { "disableWaterAutoRoll", new RandomSettingValue(0.5f) },
@@ -842,6 +841,7 @@ public static class SettingsPresets
         { "enableFragileShip", new RandomSettingValue(0.1f) },
         { "faultyHeatRegulators", new RandomSettingValue(0.4f) },
         { "addErnesto", new RandomSettingValue(0.05f) },
+        { "repairLimit", new RandomSettingValue(0f, 13f, 0.1f, -1f) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

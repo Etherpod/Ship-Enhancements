@@ -32,7 +32,7 @@ public class ShipGravityCrystalSocket : OWItemSocket
 
     private void OnGravityDamaged(ShipComponent component)
     {
-        if (!(bool)disableShipRepair.GetProperty() && !SELocator.GetShipDamageController().IsSystemFailed())
+        if (ShipRepairLimitController.CanRepair() && !SELocator.GetShipDamageController().IsSystemFailed())
         {
             _collider.SetActivation(false);
         }

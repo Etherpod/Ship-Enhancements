@@ -470,7 +470,7 @@ public static class PatchClass
     public static void FixExitShipToRepairNotification(ShipDamageController __instance, ref bool __result)
     {
         bool flag = false;
-        if (!(bool)disableShipRepair.GetProperty())
+        if (ShipRepairLimitController.CanRepair())
         {
             for (int j = 0; j < __instance._shipComponents.Length; j++)
             {
@@ -611,32 +611,6 @@ public static class PatchClass
             }
         }
         return false;
-    }
-    #endregion
-
-    #region DisableShipRepair
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(ShipComponent), nameof(ShipComponent.Awake))]
-    public static void DisableShipComponentRepair(ShipComponent __instance)
-    {
-        if (!(bool)disableShipRepair.GetProperty()) return;
-
-        __instance._repairReceiver._repairDistance = 0f;
-    }
-
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(ShipHull), nameof(ShipHull.Start))]
-    public static void DisableShipHullRepair(ShipHull __instance)
-    {
-        if (!(bool)disableShipRepair.GetProperty()) return;
-
-        for (int i = 0; i < __instance._colliders.Length; i++)
-        {
-            if (__instance._colliders[i].TryGetComponent(out RepairReceiver repairReceiver))
-            {
-                repairReceiver._repairDistance = 0f;
-            }
-        }
     }
     #endregion
 
@@ -2304,6 +2278,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitUI), nameof(ShipCockpitUI.OnShipHullRepaired))]
     public static bool DisableCockpitUIHullRepaired()
     {
+        ShipRepairLimitController.AddPartRepaired();
         return !(bool)disableDamageIndicators.GetProperty();
     }
 
@@ -2318,6 +2293,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitUI), nameof(ShipCockpitUI.OnShipComponentRepaired))]
     public static bool DisableCockpitUIComponentRepaired(ShipComponent shipComponent)
     {
+        ShipRepairLimitController.AddPartRepaired();
         return !(bool)disableDamageIndicators.GetProperty();
     }
 
@@ -3182,6 +3158,18 @@ public static class PatchClass
             && (!(bool)enablePersistentInput.GetProperty() || !SELocator.GetShipBody().GetComponent<ShipPersistentInput>().InputEnabled()))
         {
             __instance._thrusterArrowRoot.gameObject.SetActive(false);
+        }
+    }
+    #endregion
+
+    #region ShipRepairLimit
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(RepairReceiver), nameof(RepairReceiver.IsRepairable))]
+    public static void ApplyShipRepairLimit(ref bool __result)
+    {
+        if (__result)
+        {
+            __result = ShipRepairLimitController.CanRepair();
         }
     }
     #endregion

@@ -20,7 +20,6 @@ public static class SettingExtensions
         { Settings.shipDamageMultiplier, (1f, 1f) },
         { Settings.shipDamageSpeedMultiplier, (1f, 1f) },
         { Settings.shipOxygenRefill, (false, false) },
-        { Settings.disableShipRepair, (false, false) },
         { Settings.enableGravityLandingGear, (false, false) },
         { Settings.disableAirAutoRoll, (false, false) },
         { Settings.disableWaterAutoRoll, (false, false) },
@@ -97,6 +96,7 @@ public static class SettingExtensions
         { Settings.enableFragileShip, (false, false) },
         { Settings.faultyHeatRegulators, (false, false) },
         { Settings.addErnesto, (false, false) },
+        { Settings.repairLimit, (1f, 1f) },
     };
 
     public static string GetName(this Settings setting)
