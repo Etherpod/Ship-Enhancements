@@ -96,6 +96,7 @@ public static class SettingsPresets
         { "faultyHeatRegulators", false },
         { "addErnesto", false },
         { "repairLimit", -1f },
+        { "extraEjectButtons", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -188,6 +189,7 @@ public static class SettingsPresets
         { "faultyHeatRegulators", false },
         { "addErnesto", false },
         { "repairLimit", -1f },
+        { "extraEjectButtons", false },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -280,6 +282,7 @@ public static class SettingsPresets
         { "faultyHeatRegulators", false },
         { "addErnesto", false },
         { "repairLimit", -1f },
+        { "extraEjectButtons", false },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -372,6 +375,7 @@ public static class SettingsPresets
         { "faultyHeatRegulators", true },
         { "addErnesto", false },
         { "repairLimit", 0f },
+        { "extraEjectButtons", false },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -464,6 +468,7 @@ public static class SettingsPresets
         { "faultyHeatRegulators", false },
         { "addErnesto", false },
         { "repairLimit", -1f },
+        { "extraEjectButtons", false },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -554,8 +559,9 @@ public static class SettingsPresets
         { "randomComponentDamage", 0.1f },
         { "enableFragileShip", false },
         { "faultyHeatRegulators", true },
-        { "addErnesto", false },
+        { "addErnesto", true },
         { "repairLimit", -1f },
+        { "extraEjectButtons", true },
     };
 
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()
@@ -842,6 +848,7 @@ public static class SettingsPresets
         { "faultyHeatRegulators", new RandomSettingValue(0.4f) },
         { "addErnesto", new RandomSettingValue(0.05f) },
         { "repairLimit", new RandomSettingValue(0f, 13f, 0.1f, -1f) },
+        { "extraEjectButtons", new RandomSettingValue(0.5f) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

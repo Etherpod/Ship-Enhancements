@@ -97,6 +97,7 @@ public static class SettingExtensions
         { Settings.faultyHeatRegulators, (false, false) },
         { Settings.addErnesto, (false, false) },
         { Settings.repairLimit, (1f, 1f) },
+        { Settings.extraEjectButtons, (false, false) },
     };
 
     public static string GetName(this Settings setting)

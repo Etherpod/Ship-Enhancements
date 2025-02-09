@@ -172,6 +172,7 @@ public class ShipEnhancements : ModBehaviour
         faultyHeatRegulators,
         addErnesto,
         repairLimit,
+        extraEjectButtons,
     }
 
     private void Awake()
@@ -1029,6 +1030,20 @@ public class ShipEnhancements : ModBehaviour
         if ((int)(float)Settings.repairLimit.GetProperty() >= 0)
         {
             ShipRepairLimitController.SetRepairLimit((int)(float)Settings.repairLimit.GetProperty());
+        }
+        if ((bool)Settings.extraEjectButtons.GetProperty())
+        {
+            GameObject suppliesButton = LoadPrefab("Assets/ShipEnhancements/SuppliesEjectButton.prefab");
+            AssetBundleUtilities.ReplaceShaders(suppliesButton);
+            Instantiate(suppliesButton, SELocator.GetShipTransform().Find("Module_Cabin"));
+
+            GameObject engineButton = LoadPrefab("Assets/ShipEnhancements/EngineEjectButton.prefab");
+            AssetBundleUtilities.ReplaceShaders(engineButton);
+            Instantiate(engineButton, SELocator.GetShipTransform().Find("Module_Cabin"));
+
+            GameObject landingGearButton = LoadPrefab("Assets/ShipEnhancements/LandingGearEjectButton.prefab");
+            AssetBundleUtilities.ReplaceShaders(landingGearButton);
+            Instantiate(landingGearButton, SELocator.GetShipTransform().Find("Module_Cabin"));
         }
 
         SetDamageColors();

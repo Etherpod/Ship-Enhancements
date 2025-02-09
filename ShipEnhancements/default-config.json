@@ -360,17 +360,23 @@
       "value": false,
       "tooltip": "Automatically closes the hatch when you leave the ship."
     },
-    "enableManualScoutRecall": {
-      "title": "Enable Manual Scout Recall",
+    "extraEjectButtons": {
+      "title": "Extra Eject Buttons",
       "type": "toggle",
       "value": false,
-      "tooltip": "Forces you to retrieve your scout by hand when you launch it. If you retrieve it with the ship, you need to go get it from on top of the ship before you can fire it on foot."
+      "tooltip": "Adds a few extra eject buttons to the ship."
     },
     "addShipWarpCore": {
       "title": "Add Ship Warp Core",
       "type": "toggle",
       "value": false,
       "tooltip": "Attaches a Nomai warp core to the cockpit, allowing you to recall your ship to the launch pad using a button on the ceiling of the cockpit."
+    },
+    "enableManualScoutRecall": {
+      "title": "Enable Manual Scout Recall",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Forces you to retrieve your scout by hand when you launch it. If you retrieve it with the ship, you need to go get it from on top of the ship before you can fire it on foot."
     },
     "temperatureZonesAmount": {
       "title": "Add Temperature Zones",
