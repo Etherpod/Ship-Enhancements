@@ -1045,6 +1045,11 @@ public class ShipEnhancements : ModBehaviour
         {
             ShipRepairLimitController.SetRepairLimit((int)(float)Settings.repairLimit.GetProperty());
         }
+        if (true)
+        {
+            GameObject entrywayTriggersObj = LoadPrefab("Assets/ShipEnhancements/BreachEntryTriggers.prefab");
+            Instantiate(entrywayTriggersObj, SELocator.GetShipTransform().Find("Volumes"));
+        }
 
         SetDamageColors();
 
@@ -1206,7 +1211,7 @@ public class ShipEnhancements : ModBehaviour
         {
             GameObject supernova = LoadPrefab("Assets/ShipEnhancements/ExplosionSupernova.prefab");
             AssetBundleUtilities.ReplaceShaders(supernova);
-            GameObject supernovaObj = Instantiate(supernova, SELocator.GetShipTransform().Find("Effects"));
+            GameObject supernovaObj = Instantiate(supernova, SELocator.GetShipTransform().Find("Module_Engine"));
             supernovaObj.SetActive(false);
             return;
         }

@@ -22,6 +22,7 @@ public class PortableCampfire : Campfire
     private float _reactorHeatMeterLength;
     private bool _shipDestroyed;
     private bool _lastOutsideWaterState = false;
+    private ShipReactorComponent _reactor;
 
     public override void Awake()
     {
@@ -30,6 +31,7 @@ public class PortableCampfire : Campfire
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
 
         _cancelPrompt = new PriorityScreenPrompt(InputLibrary.cancel, "Pack up", 0, ScreenPrompt.DisplayState.Normal, false);
+        _reactor = SELocator.GetShipBody().GetComponentInChildren<ShipReactorComponent>();
         _reactorHeatMeterLength = Random.Range(10f, 30f);
         _reactorHeatMeter = _reactorHeatMeterLength;
     }
@@ -51,7 +53,7 @@ public class PortableCampfire : Campfire
                 {
                     _reactorHeatMeter = _reactorHeatMeterLength;
                     _reactorHeatMeterLength = Random.Range(10f, 30f);
-                    SELocator.GetShipBody().GetComponentInChildren<ShipReactorComponent>().SetDamaged(true);
+                    _reactor.SetDamaged(true);
 
                     if (ShipEnhancements.InMultiplayer)
                     {

@@ -3194,4 +3194,110 @@ public static class PatchClass
         }
     }
     #endregion
+
+    #region PreventSystemFailure
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.OnModuleDetach))]
+    public static bool CheckDetachedModule(ShipDamageController __instance, ShipDetachableModule module)
+    {
+        if (module.CompareTag("ShipCockpit"))
+        {
+            return true;
+        }
+
+        if (PlayerState.IsInsideShip() && Locator.GetPlayerSuit().IsWearingSuit(true) && !Locator.GetPlayerSuit().IsWearingHelmet())
+        {
+            Locator.GetPlayerSuit().PutOnHelmet();
+        }
+
+        if (!SELocator.GetShipResources()._hullBreach)
+        {
+            __instance.GetComponentInChildren<HullBreachEntrywayTrigger>().OnHullBreached();
+
+            /*GameObject entrywayTriggersObj = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/BreachEntryTriggers.prefab");
+            GameObject entrywayTriggers = UnityEngine.Object.Instantiate(entrywayTriggersObj, __instance.transform.Find("Volumes"));
+            entrywayTriggers.name = "BreachEntryTriggers";
+
+            OWTriggerVolume triggerParent = entrywayTriggers.GetComponent<OWTriggerVolume>();*/
+
+            /*EntrywayTrigger engineEntry = entrywayTriggers.transform.Find("EntryTrigger_Engine").GetComponent<EntrywayTrigger>();
+            engineEntry.SetActivation(false);
+            EntrywayTrigger suppliesEntry = entrywayTriggers.transform.Find("EntryTrigger_Supplies").GetComponent<EntrywayTrigger>();
+            suppliesEntry.SetActivation(false);
+
+            if (PlayerState.IsInsideShip())
+            {
+                triggerParent.AddObjectToVolume(SELocator.GetPlayerBody().gameObject);
+            }
+
+            HatchController hatch = __instance.GetComponentInChildren<HatchController>();
+            hatch._triggerVolume.OnEntry -= hatch.OnEntry;
+            hatch._triggerVolume.OnExit -= hatch.OnExit;
+            hatch._triggerVolume = triggerParent;
+            triggerParent.OnEntry += hatch.OnEntry;
+            triggerParent.OnExit += hatch.OnExit;
+            ShipTractorBeamSwitch tractor = __instance.GetComponentInChildren<ShipTractorBeamSwitch>();
+            engineEntry.OnExit += obj => { hatch.OpenHatch(); tractor.ActivateTractorBeam(); };
+            suppliesEntry.OnExit += obj => { hatch.OpenHatch(); tractor.ActivateTractorBeam(); };
+
+            OWTriggerVolume gravityVolume = __instance.GetComponentInChildren<ShipDirectionalForceVolume>().GetOWTriggerVolume();
+            gravityVolume._childEntryways.AddRange([engineEntry, suppliesEntry]);
+            engineEntry.Register();
+            suppliesEntry.Register();
+            engineEntry.OnEntry += gravityVolume.AddObjectToVolume;
+            engineEntry.OnExit += gravityVolume.RemoveObjectFromVolume;
+            suppliesEntry.OnEntry += gravityVolume.AddObjectToVolume;
+            suppliesEntry.OnExit += gravityVolume.RemoveObjectFromVolume;*/
+        }
+
+        if (module.GetComponent<ShipHull>().section == ShipHull.Section.Left)
+        {
+            ShipGravityComponent gravityComponent = GameObject.Find("Module_Engine_Body").GetComponentInChildren<ShipGravityComponent>();
+            gravityComponent._repairReceiver.repairDistance = 0f;
+            gravityComponent._damaged = true;
+            gravityComponent._repairFraction = 0f;
+            gravityComponent.OnComponentDamaged();
+            gravityComponent._damageEffect.SetEffectBlend(1f - gravityComponent._repairFraction);
+
+            __instance.GetComponentInChildren<ExplosionController>().transform.parent = module.transform;
+
+            __instance.GetComponent<ShipThrusterModel>().SetThrusterBankEnabled(ThrusterBank.Left, false);
+            __instance.GetComponentInChildren<HullBreachEntrywayTrigger>().EnableEngineEntryway();
+        }
+        else if (module.GetComponent<ShipHull>().section == ShipHull.Section.Right)
+        {
+            __instance.GetComponent<ShipThrusterModel>().SetThrusterBankEnabled(ThrusterBank.Right, false);
+            __instance.GetComponentInChildren<HullBreachEntrywayTrigger>().EnableSuppliesEntryway();
+        }
+
+        __instance.transform.Find("Volumes/ShipAtmosphereVolume").GetComponent<OWTriggerVolume>().SetTriggerActivation(false);
+
+        SELocator.GetShipResources().OnShipHullBreach();
+
+        for (int j = 0; j < __instance._stencils.Length; j++)
+        {
+            __instance._stencils[j].SetActive(false);
+        }
+
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.Explode))]
+    public static bool PreventExplosionDamage(ShipDamageController __instance, bool debug)
+    {
+        if (!__instance._exploded && !__instance._invincible && !debug && __instance.transform.Find("Module_Engine") == null)
+        {
+            if (__instance._explosion != null)
+            {
+                __instance._explosion.Play();
+            }
+
+            __instance._exploded = true;
+            return false;
+        }
+
+        return true;
+    }
+    #endregion
 }

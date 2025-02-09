@@ -125,7 +125,8 @@ public class ShipRemoteControl : MonoBehaviour
                         else if (_currentCommand == ShipCommand.Eject
                             && !SELocator.GetShipDamageController()._cockpitDetached)
                         {
-                            SELocator.GetShipTransform().GetComponentInChildren<ShipEjectionSystem>()._ejectPressed = true;
+                            _cockpitEjectSystem._ejectPressed = true;
+                            _cockpitEjectSystem.enabled = true;
                         }
                         else if (_currentCommand == ShipCommand.EjectSupplies)
                         {
@@ -291,9 +292,8 @@ public class ShipRemoteControl : MonoBehaviour
             else if (command == ShipCommand.Eject
                 && !SELocator.GetShipDamageController()._cockpitDetached)
             {
-                ShipEjectionSystem eject = SELocator.GetShipTransform().GetComponentInChildren<ShipEjectionSystem>();
-                eject._ejectPressed = true;
-                eject.enabled = true;
+                _cockpitEjectSystem._ejectPressed = true;
+                _cockpitEjectSystem.enabled = true;
             }
             else if (_currentCommand == ShipCommand.EjectSupplies)
             {
