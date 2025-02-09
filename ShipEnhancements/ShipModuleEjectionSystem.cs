@@ -147,23 +147,7 @@ public class ShipModuleEjectionSystem : MonoBehaviour
 
     private void OnPressInteract()
     {
-        if (_landingGear != null)
-        {
-            bool found = false;
-            foreach (ShipDetachableLeg leg in _landingGear.GetLegs())
-            {
-                if (!leg.isDetached)
-                {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) return;
-        }
-        else if (_detachableModule.isDetached)
-        {
-            return;
-        }
+        if (!CanEject()) return;
 
         if (_ejectPrimed)
         {
@@ -176,6 +160,40 @@ public class ShipModuleEjectionSystem : MonoBehaviour
             _audioController.PlayRaiseEjectCover();
         }
         _pressTime = Time.time;
+        enabled = true;
+    }
+
+    public bool CanEject()
+    {
+        if (_landingGear != null)
+        {
+            bool found = false;
+            foreach (ShipDetachableLeg leg in _landingGear.GetLegs())
+            {
+                if (!leg.isDetached)
+                {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) return false;
+        }
+        else if (_detachableModule.isDetached)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public EjectableModule GetEjectType()
+    {
+        return _targetModule;
+    }
+
+    public void Eject()
+    {
+        _ejectPressed = true;
         enabled = true;
     }
 
