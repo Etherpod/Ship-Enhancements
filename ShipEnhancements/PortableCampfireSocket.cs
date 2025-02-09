@@ -12,6 +12,10 @@ public class PortableCampfireSocket : OWItemSocket
         _acceptableType = PortableCampfireItem.ItemType;
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+        if (true)
+        {
+            GlobalMessenger.AddListener("ShipHullDetached", OnShipSystemFailure);
+        }
     }
 
     public void SetCampfireItem(PortableCampfireItem item)
@@ -29,5 +33,9 @@ public class PortableCampfireSocket : OWItemSocket
     private void OnDestroy()
     {
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
+        if (true)
+        {
+            GlobalMessenger.RemoveListener("ShipHullDetached", OnShipSystemFailure);
+        }
     }
 }

@@ -10,6 +10,10 @@ public class FuelTankItemSocket : OWItemSocket
         _acceptableType = FuelTankItem.ItemType;
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+        if (true)
+        {
+            GlobalMessenger.AddListener("ShipHullDetached", OnShipSystemFailure);
+        }
     }
 
     private void OnShipSystemFailure()
@@ -21,5 +25,9 @@ public class FuelTankItemSocket : OWItemSocket
     private void OnDestroy()
     {
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
+        if (true)
+        {
+            GlobalMessenger.RemoveListener("ShipHullDetached", OnShipSystemFailure);
+        }
     }
 }

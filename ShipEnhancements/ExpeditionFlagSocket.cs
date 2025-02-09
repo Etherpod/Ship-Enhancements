@@ -10,6 +10,10 @@ public class ExpeditionFlagSocket : OWItemSocket
         _acceptableType = ExpeditionFlagItem.ItemType;
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+        if (true)
+        {
+            GlobalMessenger.AddListener("ShipHullDetached", OnShipSystemFailure);
+        }
     }
 
     private void OnShipSystemFailure()
@@ -21,5 +25,9 @@ public class ExpeditionFlagSocket : OWItemSocket
     private void OnDestroy()
     {
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
+        if (true)
+        {
+            GlobalMessenger.RemoveListener("ShipHullDetached", OnShipSystemFailure);
+        }
     }
 }

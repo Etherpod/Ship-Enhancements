@@ -14,6 +14,10 @@ public class TetherHookSocket : OWItemSocket
         _acceptableType = ShipEnhancements.Instance.TetherHookType;
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+        if (true)
+        {
+            GlobalMessenger.AddListener("ShipHullDetached", OnShipSystemFailure);
+        }
     }
 
     private void OnShipSystemFailure()
@@ -25,5 +29,9 @@ public class TetherHookSocket : OWItemSocket
     private void OnDestroy()
     {
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
+        if (true)
+        {
+            GlobalMessenger.RemoveListener("ShipHullDetached", OnShipSystemFailure);
+        }
     }
 }

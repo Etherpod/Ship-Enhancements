@@ -12,6 +12,10 @@ public class PortableTractorBeamSocket : OWItemSocket
         _acceptableType = PortableTractorBeamItem.ItemType;
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+        if (true)
+        {
+            GlobalMessenger.AddListener("ShipHullDetached", OnShipSystemFailure);
+        }
     }
 
     public override void Start()
@@ -32,5 +36,9 @@ public class PortableTractorBeamSocket : OWItemSocket
     private void OnDestroy()
     {
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
+        if (true)
+        {
+            GlobalMessenger.RemoveListener("ShipHullDetached", OnShipSystemFailure);
+        }
     }
 }

@@ -38,6 +38,7 @@ public class ShipOverdriveController : ElectricalComponent
     private float _resetStartTime;
     private bool _onResetTimer = false;
     private bool _fuelDepleted = false;
+    private bool _thrustersUsable = true;
 
     public bool Charging { get { return _charging; } }
     public bool OnCooldown { get { return _onCooldown; } }
@@ -125,6 +126,24 @@ public class ShipOverdriveController : ElectricalComponent
             _wasDisrupted = _electricalSystem.IsDisrupted();
             _primeButton.OnDisruptedEvent(_wasDisrupted);
             _activateButton.OnDisruptedEvent(_wasDisrupted);
+        }
+        if (_thrustersUsable != CanUseOverdrive())
+        {
+            _thrustersUsable = CanUseOverdrive();
+            if (!_thrustersUsable)
+            {
+                _primeButton.SetButtonOn(false);
+                _activateButton.SetButtonActive(false);
+                SetPowered(false);
+            }
+            else
+            {
+                if (!_powered && !SELocator.GetShipDamageController().IsElectricalFailed()
+                    && ShipEnhancements.Instance.engineOn)
+                {
+                    SetPowered(true);
+                }
+            }
         }
         if (OWInput.IsPressed(InputLibrary.freeLook, InputMode.ShipCockpit) != _wasInFreeLook)
         {
@@ -289,7 +308,7 @@ public class ShipOverdriveController : ElectricalComponent
 
     public override void SetPowered(bool powered)
     {
-        if (!(bool)enableThrustModulator.GetProperty() || (powered && _fuelDepleted)) return;
+        if (!(bool)enableThrustModulator.GetProperty() || (powered && _fuelDepleted) || (powered && !_thrustersUsable)) return;
         base.SetPowered(powered);
         if (!powered)
         {
@@ -306,6 +325,13 @@ public class ShipOverdriveController : ElectricalComponent
     {
         _panelAudioSource.pitch = Random.Range(0.9f, 1.1f);
         _panelAudioSource.PlayOneShot(audio, volume);
+    }
+
+    private bool CanUseOverdrive()
+    {
+        ShipThrusterModel thrusters = SELocator.GetShipBody().GetComponent<ShipThrusterModel>();
+        return SELocator.GetShipResources().AreThrustersUsable() 
+            && (thrusters.IsThrusterBankEnabled(ThrusterBank.Left) || thrusters.IsThrusterBankEnabled(ThrusterBank.Right));
     }
 
     public bool IsCharging()

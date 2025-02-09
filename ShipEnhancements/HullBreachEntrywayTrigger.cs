@@ -32,18 +32,26 @@ public class HullBreachEntrywayTrigger : MonoBehaviour
 
     private void Start()
     {
-        _suppliesEntryway.SetActivation(false);
-        _engineEntryway.SetActivation(false);
+        //_suppliesEntryway.SetActivation(false);
+        //_engineEntryway.SetActivation(false);
+
+        /*_triggerVolume.OnExit += ctx => { ShipEnhancements.WriteDebugMessage("Exit zone"); };
+        _triggerVolume.OnEntry += ctx => { ShipEnhancements.WriteDebugMessage("Enter zone"); };*/
     }
 
     private void OnExitHull(GameObject hitObj)
     {
+        if (!_hullBreached) return;
+
         if (hitObj.CompareTag("PlayerDetector"))
         {
             if (!(bool)ShipEnhancements.Settings.enableAutoHatch.GetProperty() && !ShipEnhancements.InMultiplayer)
             {
                 _hatch.OpenHatch();
-                _tractorBeam.ActivateTractorBeam();
+                if (_tractorBeam._functional)
+                {
+                    _tractorBeam.ActivateTractorBeam();
+                }
             }
         }
     }
@@ -55,9 +63,23 @@ public class HullBreachEntrywayTrigger : MonoBehaviour
 
     public void OnHullBreached()
     {
-        if (PlayerState.IsInsideShip())
+        /*if (PlayerState.IsInsideShip())
         {
             _triggerVolume.AddObjectToVolume(SELocator.GetPlayerBody().gameObject);
+        }*/
+
+        if (!_triggerVolume.IsTrackingObject(Locator.GetPlayerDetector().gameObject))
+        {
+            _hatch._triggerVolume.RemoveObjectFromVolume(Locator.GetPlayerDetector().gameObject);
+            SELocator.GetShipBody().GetComponentInChildren<ShipDirectionalForceVolume>()._triggerVolume.RemoveObjectFromVolume(Locator.GetPlayerDetector().gameObject);
+            if (!(bool)ShipEnhancements.Settings.enableAutoHatch.GetProperty() && !ShipEnhancements.InMultiplayer)
+            {
+                _hatch.OpenHatch();
+                if (_tractorBeam._functional)
+                {
+                    _tractorBeam.ActivateTractorBeam();
+                }
+            }
         }
 
         _hatch._triggerVolume.OnEntry -= _hatch.OnEntry;
@@ -72,7 +94,7 @@ public class HullBreachEntrywayTrigger : MonoBehaviour
     public void EnableSuppliesEntryway()
     {
         _suppliesEntryway.SetActivation(true);
-        _gravityVolume._childEntryways.Add(_suppliesEntryway);
+        //_gravityVolume._childEntryways.Add(_suppliesEntryway);
         _suppliesEntryway.Register();
         _suppliesEntryway.OnEntry += _gravityVolume.AddObjectToVolume;
         _suppliesEntryway.OnExit += _gravityVolume.RemoveObjectFromVolume;
@@ -81,10 +103,11 @@ public class HullBreachEntrywayTrigger : MonoBehaviour
     public void EnableEngineEntryway()
     {
         _engineEntryway.SetActivation(true);
-        _gravityVolume._childEntryways.Add(_engineEntryway);
-        _engineEntryway.Register();
-        _engineEntryway.OnEntry += _gravityVolume.AddObjectToVolume;
-        _engineEntryway.OnExit += _gravityVolume.RemoveObjectFromVolume;
+    }
+
+    public bool HasBreached()
+    {
+        return _hullBreached;
     }
 
     private void OnDestroy()
