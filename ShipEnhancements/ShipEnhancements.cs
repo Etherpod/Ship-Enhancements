@@ -1187,29 +1187,40 @@ public class ShipEnhancements : ModBehaviour
 
     private static void SetupExplosion(Transform effectsTransform, ExplosionController explosion)
     {
-        explosion._length *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.75f) + 0.25f;
-        explosion._forceVolume._acceleration *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.25f) + 0.75f;
-        explosion.transform.localScale *= (float)Settings.shipExplosionMultiplier.GetProperty();
-        explosion.GetComponent<SphereCollider>().radius = 0.1f;
-        OWAudioSource audio = effectsTransform.Find("ExplosionAudioSource").GetComponent<OWAudioSource>();
-        audio.maxDistance *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.1f) + 0.9f;
-        AnimationCurve curve = audio.GetCustomCurve(AudioSourceCurveType.CustomRolloff);
-        Keyframe[] newKeys = new Keyframe[curve.keys.Length];
-        for (int i = 0; i < curve.keys.Length; i++)
+        if ((float)Settings.shipExplosionMultiplier.GetProperty() > 30f)
         {
-            newKeys[i] = curve.keys[i];
-            newKeys[i].value *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.1f) + 0.9f;
+            GameObject supernova = LoadPrefab("Assets/ShipEnhancements/ExplosionSupernova.prefab");
+            AssetBundleUtilities.ReplaceShaders(supernova);
+            GameObject supernovaObj = Instantiate(supernova, SELocator.GetShipTransform().Find("Effects"));
+            supernovaObj.SetActive(false);
+            return;
         }
-        AnimationCurve newCurve = new();
-        foreach (Keyframe key in newKeys)
+        else
         {
-            newCurve.AddKey(key);
+            explosion._length *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.75f) + 0.25f;
+            explosion._forceVolume._acceleration *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.25f) + 0.75f;
+            explosion.transform.localScale *= (float)Settings.shipExplosionMultiplier.GetProperty();
+            explosion.GetComponent<SphereCollider>().radius = 0.1f;
+            OWAudioSource audio = effectsTransform.Find("ExplosionAudioSource").GetComponent<OWAudioSource>();
+            audio.maxDistance *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.1f) + 0.9f;
+            AnimationCurve curve = audio.GetCustomCurve(AudioSourceCurveType.CustomRolloff);
+            Keyframe[] newKeys = new Keyframe[curve.keys.Length];
+            for (int i = 0; i < curve.keys.Length; i++)
+            {
+                newKeys[i] = curve.keys[i];
+                newKeys[i].value *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.1f) + 0.9f;
+            }
+            AnimationCurve newCurve = new();
+            foreach (Keyframe key in newKeys)
+            {
+                newCurve.AddKey(key);
+            }
+            audio.SetCustomCurve(AudioSourceCurveType.CustomRolloff, newCurve);
         }
-        audio.SetCustomCurve(AudioSourceCurveType.CustomRolloff, newCurve);
 
         if ((bool)Settings.moreExplosionDamage.GetProperty())
         {
-            GameObject damage = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ExplosionDamage.prefab");
+            GameObject damage = LoadPrefab("Assets/ShipEnhancements/ExplosionDamage.prefab");
             GameObject damageObj = Instantiate(damage, explosion.transform);
             damageObj.transform.localPosition = Vector3.zero;
             damageObj.transform.localScale = Vector3.one;

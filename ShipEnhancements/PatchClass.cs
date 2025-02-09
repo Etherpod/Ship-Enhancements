@@ -2011,6 +2011,27 @@ public static class PatchClass
             return false;
         }
 
+        if ((float)shipExplosionMultiplier.GetProperty() > 30f)
+        {
+            SupernovaEffectController supernovaEffects = SELocator.GetShipTransform().GetComponentInChildren<SupernovaEffectController>(true);
+
+            GameObject supernovaBody = new GameObject("ShipSupernova_Body");
+            supernovaBody.transform.position = supernovaEffects.transform.position;
+            OWRigidbody body = supernovaBody.AddComponent<OWRigidbody>();
+            body.GetRigidbody().isKinematic = true;
+            body.EnableKinematicSimulation();
+            body.SetIsTargetable(false);
+            body.SetVelocity(SELocator.GetShipBody().GetVelocity());
+
+            supernovaEffects.transform.parent = GameObject.Find("Sun_Body").transform;
+            supernovaEffects.gameObject.SetActive(true);
+            supernovaEffects.transform.Find("ExplosionSource").GetComponent<OWAudioSource>().PlayOneShot(AudioType.Sun_Explosion, 1f);
+            supernovaEffects.enabled = true;
+
+            supernovaEffects.GetComponentInChildren<ShipSupernovaStreamersController>().OnSupernovaStart(supernovaEffects);
+            return false;
+        }
+
         if (__instance is BlackHoleExplosionController)
         {
             BlackHoleExplosionController controller = __instance as BlackHoleExplosionController;
