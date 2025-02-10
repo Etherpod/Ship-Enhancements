@@ -88,6 +88,23 @@ public class ShipRemoteControl : MonoBehaviour
 
     private void Update()
     {
+        if (_lastAutopilotState != _autopilot.enabled)
+        {
+            _lastAutopilotState = _autopilot.enabled;
+            if (_lastAutopilotState)
+            {
+                _commandNames[_currentCommand] = _disengageAutopilotText;
+            }
+            else
+            {
+                _commandNames[_currentCommand] = _engageAutopilotText;
+            }
+            if (_currentCommand == ShipCommand.Autopilot)
+            {
+                _commandPrompt.SetText(_commandNames[_currentCommand]);
+            }
+        }
+
         if (Locator.GetToolModeSwapper().GetToolMode() == ToolMode.SignalScope
             && OWInput.IsInputMode(InputMode.Character))
         {
@@ -201,23 +218,6 @@ public class ShipRemoteControl : MonoBehaviour
                 {
                     CycleCommand(true);
                     changed = true;
-                }
-
-                if (_lastAutopilotState != _autopilot.enabled)
-                {
-                    _lastAutopilotState = _autopilot.enabled;
-                    if (_lastAutopilotState)
-                    {
-                        _commandNames[_currentCommand] = _disengageAutopilotText;
-                    }
-                    else
-                    {
-                        _commandNames[_currentCommand] = _engageAutopilotText;
-                    }
-                    if (!changed && _currentCommand == ShipCommand.Autopilot)
-                    {
-                        _commandPrompt.SetText(_commandNames[_currentCommand]);
-                    }
                 }
 
                 if (changed)
