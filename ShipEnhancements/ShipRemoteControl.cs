@@ -18,12 +18,17 @@ public class ShipRemoteControl : MonoBehaviour
     private ShipModuleEjectionSystem _suppliesEjectSystem;
     private ShipModuleEjectionSystem _engineEjectSystem;
     private ShipModuleEjectionSystem _landingGearEjectSystem;
+    private Autopilot _autopilot;
+    private bool _lastAutopilotState = false;
+    private readonly string _engageAutopilotText = "Engage Autopilot";
+    private readonly string _disengageAutopilotText = "Disengage Autopilot";
 
     private List<ShipCommand> _commands = new()
     {
         ShipCommand.Explode,
         ShipCommand.Warp,
         ShipCommand.TurnOff,
+        ShipCommand.Autopilot,
         ShipCommand.Eject,
         ShipCommand.EjectSupplies,
         ShipCommand.EjectEngine,
@@ -35,6 +40,7 @@ public class ShipRemoteControl : MonoBehaviour
         { ShipCommand.Explode, "Explode" },
         { ShipCommand.Warp, "Activate Return Warp" },
         { ShipCommand.TurnOff, "Turn Off Engine" },
+        { ShipCommand.Autopilot, "Engage Autopilot" },
         { ShipCommand.Eject, "Eject Cockpit" },
         { ShipCommand.EjectSupplies, "Eject Supplies" },
         { ShipCommand.EjectEngine, "Eject Engine" },
@@ -47,6 +53,7 @@ public class ShipRemoteControl : MonoBehaviour
         _commandPrompt = new ScreenPrompt(InputLibrary.interact, _commandNames[_currentCommand], 0, ScreenPrompt.DisplayState.Normal, false);
         _cyclePrompt = new PriorityScreenPrompt(InputLibrary.toolOptionY, "Cycle Command", 0, ScreenPrompt.DisplayState.Normal, false);
 
+        _autopilot = SELocator.GetShipBody().GetComponent<Autopilot>();
         _cockpitEjectSystem = SELocator.GetShipTransform().GetComponentInChildren<ShipEjectionSystem>();
         ShipModuleEjectionSystem[] ejects = SELocator.GetShipTransform().GetComponentsInChildren<ShipModuleEjectionSystem>();
         foreach (ShipModuleEjectionSystem eject in ejects)
@@ -122,6 +129,21 @@ public class ShipRemoteControl : MonoBehaviour
                         {
                             SELocator.GetShipTransform().GetComponentInChildren<ShipEngineSwitch>().TurnOffEngine();
                         }
+                        else if (_currentCommand == ShipCommand.Autopilot)
+                        {
+                            if (!_autopilot.enabled)
+                            {
+                                ReferenceFrame rf = Locator.GetReferenceFrame(true);
+                                if (rf != null)
+                                {
+                                    _autopilot.FlyToDestination(rf);
+                                }
+                            }
+                            else
+                            {
+                                _autopilot.Abort();
+                            }
+                        }
                         else if (_currentCommand == ShipCommand.Eject
                             && !SELocator.GetShipDamageController()._cockpitDetached)
                         {
@@ -179,6 +201,23 @@ public class ShipRemoteControl : MonoBehaviour
                 {
                     CycleCommand(true);
                     changed = true;
+                }
+
+                if (_lastAutopilotState != _autopilot.enabled)
+                {
+                    _lastAutopilotState = _autopilot.enabled;
+                    if (_lastAutopilotState)
+                    {
+                        _commandNames[_currentCommand] = _disengageAutopilotText;
+                    }
+                    else
+                    {
+                        _commandNames[_currentCommand] = _engageAutopilotText;
+                    }
+                    if (!changed && _currentCommand == ShipCommand.Autopilot)
+                    {
+                        _commandPrompt.SetText(_commandNames[_currentCommand]);
+                    }
                 }
 
                 if (changed)
@@ -240,6 +279,10 @@ public class ShipRemoteControl : MonoBehaviour
                 return !_warpCoreController.IsWarping();
             case ShipCommand.TurnOff:
                 return ShipEnhancements.Instance.engineOn;
+            case ShipCommand.Autopilot:
+                ReferenceFrame referenceFrame = Locator.GetReferenceFrame(true);
+                return _autopilot.enabled || (referenceFrame != null && referenceFrame.GetAllowAutopilot() && !_autopilot.IsDamaged() 
+                    && Vector3.Distance(SELocator.GetShipBody().GetPosition(), referenceFrame.GetPosition()) > referenceFrame.GetAutopilotArrivalDistance());
             case ShipCommand.Eject:
                 return !SELocator.GetShipDamageController().IsCockpitDetached();
             case ShipCommand.EjectSupplies:
@@ -261,6 +304,8 @@ public class ShipRemoteControl : MonoBehaviour
                 return !(bool)addShipWarpCore.GetProperty() || _warpCoreController == null;
             case ShipCommand.TurnOff:
                 return !(bool)addEngineSwitch.GetProperty();
+            case ShipCommand.Autopilot:
+                return (bool)disableReferenceFrame.GetProperty() || !PlayerData.GetAutopilotEnabled();
             case ShipCommand.EjectSupplies:
                 return !(bool)extraEjectButtons.GetProperty();
             case ShipCommand.EjectEngine:
@@ -270,6 +315,11 @@ public class ShipRemoteControl : MonoBehaviour
             default:
                 return false;
         }
+    }
+
+    private string GetAutopilotCommandName()
+    {
+        return "test";
     }
 
     public void ReceiveCommandRemote(ShipCommand command)
@@ -325,6 +375,7 @@ public enum ShipCommand
     Explode, 
     Warp,
     TurnOff,
+    Autopilot,
     Eject,
     EjectEngine,
     EjectSupplies,
