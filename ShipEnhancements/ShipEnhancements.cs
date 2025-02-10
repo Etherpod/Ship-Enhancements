@@ -173,6 +173,7 @@ public class ShipEnhancements : ModBehaviour
         addErnesto,
         repairLimit,
         extraEjectButtons,
+        preventSystemFailure,
     }
 
     private void Awake()

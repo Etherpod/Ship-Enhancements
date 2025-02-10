@@ -98,6 +98,7 @@ public static class SettingExtensions
         { Settings.addErnesto, (false, false) },
         { Settings.repairLimit, (1f, 1f) },
         { Settings.extraEjectButtons, (false, false) },
+        { Settings.preventSystemFailure, (false, false) },
     };
 
     public static string GetName(this Settings setting)

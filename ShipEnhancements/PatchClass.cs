@@ -3200,7 +3200,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.OnModuleDetach))]
     public static bool CheckDetachedModule(ShipDamageController __instance, ShipDetachableModule module)
     {
-        if (module.CompareTag("ShipCockpit"))
+        if (!(bool)preventSystemFailure.GetProperty() || module.CompareTag("ShipCockpit"))
         {
             return true;
         }
@@ -3256,6 +3256,8 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.Explode))]
     public static bool PreventExplosionDamage(ShipDamageController __instance, bool debug)
     {
+        if (!(bool)preventSystemFailure.GetProperty()) return true;
+
         if (!__instance._exploded && !__instance._invincible && !debug && __instance.transform.Find("Module_Engine") == null)
         {
             if (__instance._explosion != null)

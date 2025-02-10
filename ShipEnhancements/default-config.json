@@ -220,6 +220,12 @@
       "value": false,
       "tooltip": "You are unable to pilot your ship if anything is damaged."
     },
+    "preventSystemFailure": {
+      "title": "Prevent System Failure",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Forces the ship to stay functional unless the cockpit detaches."
+    },
     "repairLimit": {
       "title": "Repair Limit",
       "type": "number",

@@ -12,7 +12,7 @@ public class PortableCampfireSocket : OWItemSocket
         _acceptableType = PortableCampfireItem.ItemType;
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
-        if (true)
+        if ((bool)ShipEnhancements.Settings.enableRemovableGravityCrystal.GetProperty())
         {
             GlobalMessenger.AddListener("ShipHullDetached", OnShipSystemFailure);
         }
@@ -33,7 +33,7 @@ public class PortableCampfireSocket : OWItemSocket
     private void OnDestroy()
     {
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
-        if (true)
+        if ((bool)ShipEnhancements.Settings.enableRemovableGravityCrystal.GetProperty())
         {
             GlobalMessenger.RemoveListener("ShipHullDetached", OnShipSystemFailure);
         }

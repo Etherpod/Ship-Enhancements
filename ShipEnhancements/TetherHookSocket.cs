@@ -14,7 +14,7 @@ public class TetherHookSocket : OWItemSocket
         _acceptableType = ShipEnhancements.Instance.TetherHookType;
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
-        if (true)
+        if ((bool)ShipEnhancements.Settings.enableRemovableGravityCrystal.GetProperty())
         {
             GlobalMessenger.AddListener("ShipHullDetached", OnShipSystemFailure);
         }
@@ -29,7 +29,7 @@ public class TetherHookSocket : OWItemSocket
     private void OnDestroy()
     {
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
-        if (true)
+        if ((bool)ShipEnhancements.Settings.enableRemovableGravityCrystal.GetProperty())
         {
             GlobalMessenger.RemoveListener("ShipHullDetached", OnShipSystemFailure);
         }
