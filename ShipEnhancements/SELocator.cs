@@ -28,6 +28,7 @@ public static class SELocator
     private static FlightConsoleInteractController _consoleInteractController;
     private static FuelTankItem _fuelTankItem;
     private static PortableTractorBeamItem _tractorBeamItem;
+    private static CockpitErnesto _ernesto;
 
     public static void Initalize()
     {
@@ -76,6 +77,10 @@ public static class SELocator
         if ((bool)addPortableTractorBeam.GetProperty())
         {
             _tractorBeamItem = _shipTransform.GetComponentInChildren<PortableTractorBeamItem>(true);
+        }
+        if ((bool)addErnesto.GetProperty())
+        {
+            _ernesto = _shipTransform.GetComponentInChildren<CockpitErnesto>();
         }
     }
 
@@ -202,5 +207,10 @@ public static class SELocator
     public static PortableTractorBeamItem GetTractorBeamItem()
     {
         return _tractorBeamItem;
+    }
+
+    public static CockpitErnesto GetErnesto()
+    {
+        return _ernesto;
     }
 }

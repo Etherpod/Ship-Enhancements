@@ -1040,13 +1040,18 @@ public class ShipEnhancements : ModBehaviour
             GameObject ernesto = LoadPrefab("Assets/ShipEnhancements/Ernesto.prefab");
             AssetBundleUtilities.ReplaceShaders(ernesto);
             GameObject ernestoObj = Instantiate(ernesto, SELocator.GetShipBody().transform.Find("Module_Cockpit"));
+            var font = (Font)Resources.Load(@"fonts\english - latin\HVD Fonts - BrandonGrotesque-Bold_Dynamic");
+            if (font != null)
+            {
+                ernestoObj.GetComponentInChildren<UnityEngine.UI.Text>().font = font;
+            }
             DialogueBuilder.FixCustomDialogue(ernestoObj, "ConversationZone");
         }
         if ((int)(float)Settings.repairLimit.GetProperty() >= 0)
         {
             ShipRepairLimitController.SetRepairLimit((int)(float)Settings.repairLimit.GetProperty());
         }
-        if (true)
+        if ((bool)Settings.preventSystemFailure.GetProperty())
         {
             GameObject entrywayTriggersObj = LoadPrefab("Assets/ShipEnhancements/BreachEntryTriggers.prefab");
             Instantiate(entrywayTriggersObj, SELocator.GetShipTransform().Find("Volumes"));

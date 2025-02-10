@@ -2011,25 +2011,31 @@ public static class PatchClass
             return false;
         }
 
-        if ((float)shipExplosionMultiplier.GetProperty() > 30f)
+        if ((float)shipExplosionMultiplier.GetProperty() > 50f && !__instance.GetComponentInParent<FuelTankItem>())
         {
             SupernovaEffectController supernovaEffects = SELocator.GetShipTransform().GetComponentInChildren<SupernovaEffectController>(true);
+            if (supernovaEffects == null)
+            {
+                supernovaEffects = GameObject.Find("Module_Engine_Body").GetComponentInChildren<SupernovaEffectController>(true);
+            }
+            if (supernovaEffects != null)
+            {
+                GameObject supernovaBody = new GameObject("ShipSupernova_Body");
+                supernovaBody.transform.position = supernovaEffects.transform.position;
+                OWRigidbody body = supernovaBody.AddComponent<OWRigidbody>();
+                body.GetRigidbody().isKinematic = true;
+                body.EnableKinematicSimulation();
+                body.SetIsTargetable(false);
+                body.SetVelocity(supernovaEffects.GetAttachedOWRigidbody().GetVelocity());
 
-            GameObject supernovaBody = new GameObject("ShipSupernova_Body");
-            supernovaBody.transform.position = supernovaEffects.transform.position;
-            OWRigidbody body = supernovaBody.AddComponent<OWRigidbody>();
-            body.GetRigidbody().isKinematic = true;
-            body.EnableKinematicSimulation();
-            body.SetIsTargetable(false);
-            body.SetVelocity(SELocator.GetShipBody().GetVelocity());
+                supernovaEffects.transform.parent = GameObject.Find("Sun_Body").transform;
+                supernovaEffects.gameObject.SetActive(true);
+                supernovaEffects.transform.Find("ExplosionSource").GetComponent<OWAudioSource>().PlayOneShot(AudioType.Sun_Explosion, 1f);
+                supernovaEffects.enabled = true;
 
-            supernovaEffects.transform.parent = GameObject.Find("Sun_Body").transform;
-            supernovaEffects.gameObject.SetActive(true);
-            supernovaEffects.transform.Find("ExplosionSource").GetComponent<OWAudioSource>().PlayOneShot(AudioType.Sun_Explosion, 1f);
-            supernovaEffects.enabled = true;
-
-            supernovaEffects.GetComponentInChildren<ShipSupernovaStreamersController>().OnSupernovaStart(supernovaEffects);
-            return false;
+                supernovaEffects.GetComponentInChildren<ShipSupernovaStreamersController>().OnSupernovaStart(supernovaEffects);
+                return false;
+            }
         }
 
         if (__instance is BlackHoleExplosionController)
@@ -2049,6 +2055,19 @@ public static class PatchClass
         if (__instance.GetComponent<ExplosionController>() && targetBody is ShipBody)
         {
             __result = Vector3.zero;
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.OnModuleDetach))]
+    public static void ParentExplosionToEngine(ShipDamageController __instance, ShipDetachableModule module)
+    {
+        if (module.GetComponent<ShipHull>().section == ShipHull.Section.Left)
+        {
+            if (__instance.GetComponentInChildren<ExplosionController>() != null)
+            {
+                __instance.GetComponentInChildren<ExplosionController>().transform.parent = module.transform;
+            }
         }
     }
     #endregion
@@ -3270,6 +3289,28 @@ public static class PatchClass
         }
 
         return true;
+    }
+    #endregion
+
+    #region ErnestoComments
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.OnHullImpact))]
+    public static void ErnestoHeavyImpact(float damage)
+    {
+        if ((bool)addErnesto.GetProperty() && damage > 0.2f)
+        {
+            SELocator.GetErnesto().OnHeavyImpact();
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ElectricityVolume), nameof(ElectricityVolume.ApplyShock))]
+    public static void ErnestoShock(HazardDetector detector)
+    {
+        if ((bool)addErnesto.GetProperty() && detector.CompareTag("ShipDetector"))
+        {
+            SELocator.GetErnesto().OnElectricalShock();
+        }
     }
     #endregion
 }
