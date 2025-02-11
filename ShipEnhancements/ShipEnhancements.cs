@@ -1056,6 +1056,26 @@ public class ShipEnhancements : ModBehaviour
             GameObject entrywayTriggersObj = LoadPrefab("Assets/ShipEnhancements/BreachEntryTriggers.prefab");
             Instantiate(entrywayTriggersObj, SELocator.GetShipTransform().Find("Volumes"));
         }
+        if (true)
+        {
+            MeshFilter rend;
+            if ((bool)Settings.addFuelCanister.GetProperty())
+            {
+                rend = LoadPrefab("Assets/ShipEnhancements/CurtainTankCabinReplacement.prefab").GetComponent<MeshFilter>();
+            }
+            else
+            {
+                rend = LoadPrefab("Assets/ShipEnhancements/CurtainCabinReplacement.prefab").GetComponent<MeshFilter>();
+            }
+            MeshFilter targetRend = SELocator.GetShipTransform()
+                .Find("Module_Cabin/Geo_Cabin/Cabin_Geometry/Cabin_Interior/Cabin_Interior 1/Cabin_Interior 1_MeshPart0")
+                .GetComponent<MeshFilter>();
+            targetRend.mesh = rend.mesh;
+
+            GameObject curtainObj = LoadPrefab("Assets/ShipEnhancements/ShipCurtains.prefab");
+            AssetBundleUtilities.ReplaceShaders(curtainObj);
+            Instantiate(curtainObj, SELocator.GetShipTransform().Find("Module_Cabin/Geo_Cabin/Cabin_Geometry/Cabin_Interior"));
+        }
 
         SetDamageColors();
 
