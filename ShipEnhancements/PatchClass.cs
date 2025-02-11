@@ -2381,7 +2381,7 @@ public static class PatchClass
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(MasterAlarm), nameof(MasterAlarm.UpdateAlarmState))]
-    public static bool DisableAlarm()
+    public static bool DisableAlarm(MasterAlarm __instance)
     {
         if ((bool)disableDamageIndicators.GetProperty())
         {
@@ -2389,6 +2389,26 @@ public static class PatchClass
         }
         else if (!ShipEnhancements.Instance.engineOn && (bool)addEngineSwitch.GetProperty())
         {
+            return false;
+        }
+        else if ((bool)preventSystemFailure.GetProperty())
+        {
+            if (__instance._shipDestroyed)
+            {
+                return false;
+            }
+            bool engineAttached = SELocator.GetShipTransform().Find("Module_Engine") != null;
+            bool useReactor = __instance._reactorCritical && engineAttached;
+            if ((__instance._hullCritical || useReactor) && !__instance._isAlarmOn)
+            {
+                __instance.TurnOnAlarm();
+                return false;
+            }
+            if (!__instance._hullCritical && !useReactor && __instance._isAlarmOn)
+            {
+                __instance.TurnOffAlarm();
+            }
+
             return false;
         }
 
@@ -3234,7 +3254,6 @@ public static class PatchClass
         if (!hullBreachTrigger.HasBreached())
         {
             hullBreachTrigger.OnHullBreached();
-            __instance.transform.Find("Volumes/ShipAtmosphereVolume").GetComponent<OWTriggerVolume>().SetTriggerActivation(false);
             GlobalMessenger.FireEvent("ShipHullDetached");
         }
 
@@ -3262,6 +3281,7 @@ public static class PatchClass
         }
 
         SELocator.GetShipResources().OnShipHullBreach();
+        __instance.GetComponentInChildren<MasterAlarm>().OnShipDamageUpdated();
 
         for (int j = 0; j < __instance._stencils.Length; j++)
         {
@@ -3289,6 +3309,24 @@ public static class PatchClass
         }
 
         return true;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.GetLowestHullIntegrity))]
+    public static bool IgnoreDetachedHulls(ShipDamageController __instance, ref float __result)
+    {
+        if (!(bool)preventSystemFailure.GetProperty()) return true;
+
+        float num = 1f;
+        for (int i = 0; i < __instance._shipHulls.Length; i++)
+        {
+            if (__instance._shipHulls[i].integrity < num && __instance.GetComponentInParent<ShipBody>())
+            {
+                num = __instance._shipHulls[i].integrity;
+            }
+        }
+        __result = num;
+        return false;
     }
     #endregion
 

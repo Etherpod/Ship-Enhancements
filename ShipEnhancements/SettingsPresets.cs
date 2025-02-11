@@ -98,6 +98,7 @@ public static class SettingsPresets
         { "repairLimit", -1f },
         { "extraEjectButtons", false },
         { "preventSystemFailure", false },
+        { "addShipCurtain", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -192,6 +193,7 @@ public static class SettingsPresets
         { "repairLimit", -1f },
         { "extraEjectButtons", false },
         { "preventSystemFailure", false },
+        { "addShipCurtain", false },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -286,6 +288,7 @@ public static class SettingsPresets
         { "repairLimit", -1f },
         { "extraEjectButtons", false },
         { "preventSystemFailure", true },
+        { "addShipCurtain", false },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -380,6 +383,7 @@ public static class SettingsPresets
         { "repairLimit", 0f },
         { "extraEjectButtons", false },
         { "preventSystemFailure", false },
+        { "addShipCurtain", false },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -474,6 +478,7 @@ public static class SettingsPresets
         { "repairLimit", -1f },
         { "extraEjectButtons", false },
         { "preventSystemFailure", false },
+        { "addShipCurtain", false },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -568,6 +573,7 @@ public static class SettingsPresets
         { "repairLimit", -1f },
         { "extraEjectButtons", true },
         { "preventSystemFailure", true },
+        { "addShipCurtain", true },
     };
 
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()
@@ -847,7 +853,7 @@ public static class SettingsPresets
         { "enableStunDamage", new RandomSettingValue(0.75f) },
         { "enableRepairConfirmation", new RandomSettingValue(0.75f) },
         { "shipGravityFix", new RandomSettingValue(1f) },
-        { "enableRemovableGravityCrystal", new RandomSettingValue(0.5f) },
+        { "enableRemovableGravityCrystal", new RandomSettingValue(0.3f) },
         { "randomHullDamage", new RandomSettingValue(0f, 1f, 0.1f, 0f) },
         { "randomComponentDamage", new RandomSettingValue(0f, 1f, 0.1f, 0f) },
         { "enableFragileShip", new RandomSettingValue(0.1f) },
@@ -856,6 +862,7 @@ public static class SettingsPresets
         { "repairLimit", new RandomSettingValue(0f, 13f, 0.1f, -1f) },
         { "extraEjectButtons", new RandomSettingValue(0.5f) },
         { "preventSystemFailure", new RandomSettingValue(0.5f) },
+        { "addShipCurtain", new RandomSettingValue(0.5f) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

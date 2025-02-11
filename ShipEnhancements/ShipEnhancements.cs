@@ -81,6 +81,7 @@ public class ShipEnhancements : ModBehaviour
     private bool _shipDestroyed;
     private bool _checkEndConversation = false;
     private bool _setupQSB = false;
+    private bool _disableAirWhenZeroOxygen = false;
 
     public enum Settings
     {
@@ -174,6 +175,7 @@ public class ShipEnhancements : ModBehaviour
         repairLimit,
         extraEjectButtons,
         preventSystemFailure,
+        addShipCurtain,
     }
 
     private void Awake()
@@ -211,6 +213,7 @@ public class ShipEnhancements : ModBehaviour
             GlobalMessenger.AddListener("RemoveSuit", OnPlayerRemoveSuit);
             GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
             GlobalMessenger.AddListener("WakeUp", OnWakeUp);
+            GlobalMessenger.AddListener("ShipHullDetached", OnShipHullDetached);
             oxygenDepleted = false;
             fuelDepleted = false;
             probeDestroyed = false;
@@ -276,6 +279,7 @@ public class ShipEnhancements : ModBehaviour
             GlobalMessenger.RemoveListener("RemoveSuit", OnPlayerRemoveSuit);
             GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
             GlobalMessenger.RemoveListener("WakeUp", OnWakeUp);
+            GlobalMessenger.RemoveListener("ShipHullDetached", OnShipHullDetached);
             if ((float)Settings.spaceAngularDragMultiplier.GetProperty() > 0 || (float)Settings.atmosphereAngularDragMultiplier.GetProperty() > 0)
             {
                 ShipFluidDetector detector = SELocator.GetShipDetector().GetComponent<ShipFluidDetector>();
@@ -408,6 +412,13 @@ public class ShipEnhancements : ModBehaviour
             {
                 oxygenTank._damageEffect._particleSystem.Stop();
                 oxygenTank._damageEffect._particleAudioSource.Stop();
+            }
+
+            if (_disableAirWhenZeroOxygen)
+            {
+                OWTriggerVolume atmoVolume = SELocator.GetShipTransform().Find("Volumes/ShipAtmosphereVolume").GetComponent<OWTriggerVolume>();
+                atmoVolume.SetTriggerActivation(false);
+                _disableAirWhenZeroOxygen = false;
             }
         }
         else if (oxygenDepleted && (SELocator.GetShipResources().GetOxygen() > 0 || ((bool)Settings.shipOxygenRefill.GetProperty() && IsShipInOxygen())))
@@ -1051,12 +1062,7 @@ public class ShipEnhancements : ModBehaviour
         {
             ShipRepairLimitController.SetRepairLimit((int)(float)Settings.repairLimit.GetProperty());
         }
-        if ((bool)Settings.preventSystemFailure.GetProperty())
-        {
-            GameObject entrywayTriggersObj = LoadPrefab("Assets/ShipEnhancements/BreachEntryTriggers.prefab");
-            Instantiate(entrywayTriggersObj, SELocator.GetShipTransform().Find("Volumes"));
-        }
-        if (true)
+        if ((bool)Settings.addShipCurtain.GetProperty())
         {
             MeshFilter rend;
             if ((bool)Settings.addFuelCanister.GetProperty())
@@ -1221,6 +1227,17 @@ public class ShipEnhancements : ModBehaviour
                     components.RemoveAt(index);
                     anyPartDamaged = true;
                 }
+            }
+            if ((bool)Settings.preventSystemFailure.GetProperty())
+            {
+                GameObject entrywayTriggersObj = LoadPrefab("Assets/ShipEnhancements/BreachEntryTriggers.prefab");
+                OWTriggerVolume entrywayVol = Instantiate(entrywayTriggersObj, SELocator.GetShipTransform().Find("Volumes")).GetComponent<OWTriggerVolume>();
+
+                PlayerSpawner spawner = GameObject.FindGameObjectWithTag("Player").GetRequiredComponent<PlayerSpawner>();
+                SpawnPoint shipSpawn = spawner.GetSpawnPoint(SpawnLocation.Ship);
+                List<OWTriggerVolume> shipTriggers = [.. shipSpawn._triggerVolumes];
+                shipTriggers.Add(entrywayVol);
+                shipSpawn._triggerVolumes = [.. shipTriggers];
             }
             if ((!InMultiplayer || QSBAPI.GetIsHost()) && (float)Settings.shipDamageSpeedMultiplier.GetProperty() < 0f)
             {
@@ -1744,6 +1761,11 @@ public class ShipEnhancements : ModBehaviour
     private void OnStopShipIgnition()
     {
         shipIgniting = false;
+    }
+
+    private void OnShipHullDetached()
+    {
+        _disableAirWhenZeroOxygen = true;
     }
 
     #endregion

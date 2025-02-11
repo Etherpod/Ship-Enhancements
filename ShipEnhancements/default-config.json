@@ -372,6 +372,12 @@
       "value": false,
       "tooltip": "Adds a few extra eject buttons to the ship."
     },
+    "addShipCurtain": {
+      "title": "Interactable Ship Curtain",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Lets you close the curtain in the ship cabin for some extra privacy in the cockpit."
+    },
     "addShipWarpCore": {
       "title": "Add Ship Warp Core",
       "type": "toggle",

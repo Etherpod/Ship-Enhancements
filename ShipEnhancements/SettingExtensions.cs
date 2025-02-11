@@ -99,6 +99,7 @@ public static class SettingExtensions
         { Settings.repairLimit, (1f, 1f) },
         { Settings.extraEjectButtons, (false, false) },
         { Settings.preventSystemFailure, (false, false) },
+        { Settings.addShipCurtain, (false, false) },
     };
 
     public static string GetName(this Settings setting)

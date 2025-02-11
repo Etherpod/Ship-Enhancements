@@ -331,7 +331,8 @@ public class ShipOverdriveController : ElectricalComponent
     {
         ShipThrusterModel thrusters = SELocator.GetShipBody().GetComponent<ShipThrusterModel>();
         return SELocator.GetShipResources().AreThrustersUsable() 
-            && (thrusters.IsThrusterBankEnabled(ThrusterBank.Left) || thrusters.IsThrusterBankEnabled(ThrusterBank.Right));
+            && (thrusters.IsThrusterBankEnabled(ThrusterBank.Left) || thrusters.IsThrusterBankEnabled(ThrusterBank.Right))
+            && SELocator.GetShipTransform().Find("Module_Engine") != null;
     }
 
     public bool IsCharging()
