@@ -3335,7 +3335,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.OnHullImpact))]
     public static void ErnestoHeavyImpact(float damage)
     {
-        if ((bool)addErnesto.GetProperty() && damage > 0.2f)
+        if ((bool)addErnesto.GetProperty() && damage > 0.3f)
         {
             SELocator.GetErnesto().OnHeavyImpact();
         }
@@ -3348,6 +3348,16 @@ public static class PatchClass
         if ((bool)addErnesto.GetProperty() && detector.CompareTag("ShipDetector"))
         {
             SELocator.GetErnesto().OnElectricalShock();
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipEjectionSystem), nameof(ShipEjectionSystem.Update))]
+    public static void ErnestoEjection(ShipEjectionSystem __instance)
+    {
+        if ((bool)addErnesto.GetProperty() && __instance._ejectPressed)
+        {
+            SELocator.GetErnesto().OnCockpitDetached();
         }
     }
     #endregion

@@ -28,7 +28,8 @@ public class CockpitErnesto : MonoBehaviour
         "How did you not see that there? It's like you hit it on purpose.",
         "And you call yourself a pilot?",
         "I don't remember anyone saying \"Fly fast and hit everything big.\"",
-        "I bet Slate is gonna be mad about that."
+        "I bet Slate is gonna be mad about that.",
+        "Hey, that was my favorite part!"
     ];
 
     private List<string> _availableShockComments = [];
@@ -39,7 +40,28 @@ public class CockpitErnesto : MonoBehaviour
         "Great. How am I going to watch TV if the power is out?",
         "Ouch.",
         "You know I'm sitting on a piece of metal, right?",
-        "You'd better go fix that before the ship blows up."
+        "That came as a shock. Ha!",
+        "Good job. Now go fix the electricity so I can watch my TV."
+    ];
+
+    private List<string> _availableEjectComments = [];
+    private string[] _ejectComments =
+    [
+        "What'd you do that for?",
+        "Nice job, you just ruined a perfectly good cockpit.",
+        "Good idea. You have a plan for what to do next, right?",
+        "Maybe you can screw the cockpit back on.",
+        "This wasn't exactly the space adventure I had in mind.",
+        "Well, at least now we know it works.",
+    ];
+
+    private List<string> _availableReactorComments = [];
+    private string[] _reactorComments =
+    [
+        "You might want to check on your reactor.",
+        "Is it just me, or is it getting hot in here? It might just be me.",
+        "Isn't there supposed to an alarm going off or something?",
+        "Is your reactor supposed to be glowing red?"
     ];
 
     private void Awake()
@@ -57,6 +79,8 @@ public class CockpitErnesto : MonoBehaviour
     {
         _availableHeavyImpactComments.AddRange(_heavyImpactComments);
         _availableShockComments.AddRange(_shockComments);
+        _availableEjectComments.AddRange(_ejectComments);
+        _availableReactorComments.AddRange(_reactorComments);
 
         if (ErnestoModListHandler.ActiveModList.Count > 0)
         {
@@ -156,9 +180,42 @@ public class CockpitErnesto : MonoBehaviour
         }
     }
 
+    public void OnCockpitDetached()
+    {
+        string comment = _availableEjectComments[Random.Range(0, _availableEjectComments.Count)];
+        MakeComment(comment);
+        _availableEjectComments.Remove(comment);
+
+        if (_availableEjectComments.Count == 0)
+        {
+            _availableEjectComments.AddRange(_ejectComments);
+        }
+    }
+
+    public void ReactorDamagedComment()
+    {
+        string comment = _availableReactorComments[Random.Range(0, _availableReactorComments.Count)];
+        MakeComment(comment);
+        _availableReactorComments.Remove(comment);
+
+        if (_availableReactorComments.Count == 0)
+        {
+            _availableReactorComments.AddRange(_reactorComments);
+        }
+    }
+
     private void OnEnterFlightConsole(OWRigidbody body)
     {
         _conversationZone.DisableInteraction();
+
+        if ((bool)ShipEnhancements.Settings.disableDamageIndicators.GetProperty() && Random.value < 0.25f)
+        {
+            ShipReactorComponent reactor = SELocator.GetShipTransform().GetComponentInChildren<ShipReactorComponent>();
+            if (reactor != null && reactor.isDamaged)
+            {
+                ReactorDamagedComment();
+            }
+        }
     }
 
     private void OnExitFlightConsole()
