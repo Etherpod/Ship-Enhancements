@@ -10,6 +10,12 @@ public class CockpitCurtainController : MonoBehaviour
     private GameObject _openCurtainObj;
     [SerializeField]
     private InteractReceiver _interactReceiver;
+    [SerializeField]
+    private OWAudioSource _audioSource;
+    [SerializeField]
+    private AudioClip _openClip;
+    [SerializeField]
+    private AudioClip _closeClip;
 
     private bool _open = true;
 
@@ -27,6 +33,10 @@ public class CockpitCurtainController : MonoBehaviour
     {
         _open = !_open;
         UpdateCurtain();
+
+        if (_audioSource.isPlaying) _audioSource.Stop();
+        _audioSource.clip = _open ? _openClip : _closeClip;
+        _audioSource.Play();
     }
 
     private void UpdateCurtain()
