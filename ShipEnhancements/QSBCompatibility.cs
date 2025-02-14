@@ -25,7 +25,7 @@ public class QSBCompatibility
         _api.RegisterHandler<(string, bool)>("switch-state", ReceiveSwitchState);
         _api.RegisterHandler<NoData>("ship-initialized", ReceiveInitializedShip);
         _api.RegisterHandler<NoData>("world-objects-ready", ReceiveWorldObjectsInitialized);
-        _api.RegisterHandler<bool>("engine-switch-state", ReceiveEngineSwitchState);
+        _api.RegisterHandler<(bool, bool)>("engine-switch-state", ReceiveEngineSwitchState);
         _api.RegisterHandler<bool>("initialize-engine-switch", InitializeEngineSwitch);
         _api.RegisterHandler<(float, bool)>("ship-oxygen-drain", ReceiveShipOxygenDrain);
         _api.RegisterHandler<(float, bool)>("ship-fuel-drain", ReceiveShipFuelDrain);
@@ -56,6 +56,8 @@ public class QSBCompatibility
         _api.RegisterHandler<float>("fuel-tank-capacity", ReceiveFuelTankCapacity);
         _api.RegisterHandler<(int, int)>("item-module-parent", ReceiveItemModuleParent);
         _api.RegisterHandler<bool>("tractor-beam-turbo", ReceiveTractorBeamTurbo);
+        _api.RegisterHandler<bool>("set-curtain-state", ReceiveCurtainState);
+        _api.RegisterHandler<string>("send-ernesto-comment", ReceiveErnestoComment);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -259,14 +261,14 @@ public class QSBCompatibility
         _engineSwitch = null;
     }
 
-    public void SendEngineSwitchState(uint id, bool wasPressed)
+    public void SendEngineSwitchState(uint id, bool wasPressed, bool turnOff)
     {
-        _api.SendMessage("engine-switch-state", wasPressed, id, false);
+        _api.SendMessage("engine-switch-state", (wasPressed, turnOff), id, false);
     }
 
-    private void ReceiveEngineSwitchState(uint id, bool wasPressed)
+    private void ReceiveEngineSwitchState(uint id, (bool wasPressed, bool turnOff) data)
     {
-        _engineSwitch?.UpdateWasPressed(wasPressed);
+        _engineSwitch?.UpdateWasPressed(data.wasPressed, data.turnOff);
     }
 
     private void InitializeEngineSwitch(uint id, bool completedIgnition)
@@ -703,6 +705,34 @@ public class QSBCompatibility
     private void ReceiveTractorBeamTurbo(uint id, bool enableTurbo)
     {
         SELocator.GetTractorBeamItem()?.ToggleTurbo(enableTurbo);
+    }
+    #endregion
+
+    #region Curtains
+    public void SendCurtainState(uint id, bool open)
+    {
+        _api.SendMessage("set-curtain-state", open, id, false);
+    }
+
+    public void ReceiveCurtainState(uint id, bool open)
+    {
+        CockpitCurtainController curtains = SELocator.GetShipTransform().GetComponentInChildren<CockpitCurtainController>();
+        if (curtains != null)
+        {
+            curtains.UpdateCurtainRemote(open);
+        }
+    }
+    #endregion
+
+    #region Ernesto
+    public void SendErnestoComment(uint id, string comment)
+    {
+        _api.SendMessage("send-ernesto-comment", comment, id, false);
+    }
+
+    private void ReceiveErnestoComment(uint id, string comment)
+    {
+        SELocator.GetErnesto()?.MakeCommentRemote(comment);
     }
     #endregion
 }

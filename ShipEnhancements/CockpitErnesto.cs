@@ -69,6 +69,7 @@ public class CockpitErnesto : MonoBehaviour
         _dialogueTree = _conversationZone.GetComponent<CharacterDialogueTree>();
 
         _dialogueTree.OnStartConversation += OnStartConversation;
+        _dialogueTree.OnEndConversation += OnEndConversation;
         GlobalMessenger<OWRigidbody>.AddListener("EnterFlightConsole", OnEnterFlightConsole);
         GlobalMessenger.AddListener("ExitFlightConsole", OnExitFlightConsole);
 
@@ -136,14 +137,39 @@ public class CockpitErnesto : MonoBehaviour
         }
     }
 
+    private void OnEndConversation()
+    {
+        if (PlayerState.AtFlightConsole())
+        {
+            _conversationZone.DisableInteraction();
+        }
+    }
+
     public void MakeComment(string comment)
     {
+        if (ShipEnhancements.InMultiplayer && !ShipEnhancements.QSBAPI.GetIsHost()) return;
+
         if (_currentComment == null)
         {
             _commentText.text = comment;
             StopAllCoroutines();
             _currentComment = StartCoroutine(ShowDialogueBox());
+
+            if (ShipEnhancements.InMultiplayer)
+            {
+                foreach (uint id in ShipEnhancements.PlayerIDs)
+                {
+                    ShipEnhancements.QSBCompat.SendErnestoComment(id, comment);
+                }
+            }
         }
+    }
+
+    public void MakeCommentRemote(string comment)
+    {
+        _commentText.text = comment;
+        StopAllCoroutines();
+        _currentComment = StartCoroutine(ShowDialogueBox());
     }
 
     private IEnumerator ShowDialogueBox()
@@ -226,6 +252,7 @@ public class CockpitErnesto : MonoBehaviour
     private void OnDestroy()
     {
         _dialogueTree.OnStartConversation -= OnStartConversation;
+        _dialogueTree.OnEndConversation -= OnEndConversation;
         GlobalMessenger<OWRigidbody>.RemoveListener("EnterFlightConsole", OnEnterFlightConsole);
         GlobalMessenger.RemoveListener("ExitFlightConsole", OnExitFlightConsole);
     }

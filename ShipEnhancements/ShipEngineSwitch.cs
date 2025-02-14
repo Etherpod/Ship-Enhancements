@@ -46,6 +46,7 @@ public class ShipEngineSwitch : CockpitInteractible
     private bool _lastShipThrusterState = false;
     private bool _reset = true;
     private float _baseIndicatorLightIntensity;
+    private bool _shipDestroyed = false;
 
     private bool _controlledRemote = false;
 
@@ -235,13 +236,14 @@ public class ShipEngineSwitch : CockpitInteractible
 
     protected override void OnPressInteract()
     {
+        bool turnOff = _completedTurn;
         OnStartPress();
 
         if (ShipEnhancements.InMultiplayer)
         {
             foreach (uint id in ShipEnhancements.PlayerIDs)
             {
-                ShipEnhancements.QSBCompat.SendEngineSwitchState(id, true);
+                ShipEnhancements.QSBCompat.SendEngineSwitchState(id, true, turnOff);
             }
         }
     }
@@ -278,7 +280,7 @@ public class ShipEngineSwitch : CockpitInteractible
         {
             foreach (uint id in ShipEnhancements.PlayerIDs)
             {
-                ShipEnhancements.QSBCompat.SendEngineSwitchState(id, false);
+                ShipEnhancements.QSBCompat.SendEngineSwitchState(id, false, false);
             }
         }
     }
@@ -344,11 +346,14 @@ public class ShipEngineSwitch : CockpitInteractible
         _interactReceiver.ResetInteraction();
     }
 
-    public void UpdateWasPressed(bool wasPressed)
+    public void UpdateWasPressed(bool wasPressed, bool turnOff)
     {
         if (wasPressed)
         {
-            OnStartPress();
+            if (_completedTurn || !turnOff)
+            {
+                OnStartPress();
+            }
             _controlledRemote = true;
             _interactReceiver.DisableInteraction();
         }
@@ -356,7 +361,10 @@ public class ShipEngineSwitch : CockpitInteractible
         {
             OnStopPress();
             _controlledRemote = false;
-            _interactReceiver.EnableInteraction();
+            if (!_shipDestroyed)
+            {
+                _interactReceiver.EnableInteraction();
+            }
         }
     }
     
@@ -411,6 +419,8 @@ public class ShipEngineSwitch : CockpitInteractible
             }
         }
         _interactReceiver.DisableInteraction();
+        DeactivateIndicatorLights();
+        _shipDestroyed = true;
     }
 
     protected override void OnDestroy()

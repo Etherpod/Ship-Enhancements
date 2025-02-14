@@ -23,6 +23,8 @@ using QSB.ShipSync.Messages;
 using QSB.Player.TransformSync;
 using System.Collections.Generic;
 using QSB.ItemSync.Patches;
+using QSB.ConversationSync.Messages;
+using QSB.ConversationSync.WorldObjects;
 
 namespace ShipEnhancementsQSB;
 
@@ -367,7 +369,7 @@ public static class QSBInteractionPatches
     public static bool AllowShipItemDrop(DropItemMessage __instance)
     {
         (Vector3 localPosition, Vector3 localNormal, int sectorId, int dropTargetId, int rigidBodyId) Data
-            = ((Vector3, Vector3, int, int, int))typeof(DropItemMessage).GetProperty("Data", 
+            = ((Vector3, Vector3, int, int, int))typeof(DropItemMessage).GetProperty("Data",
             BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static).GetValue(__instance);
 
         IQSBItem WorldObject = (IQSBItem)typeof(DropItemMessage).GetProperty("WorldObject",
@@ -531,7 +533,7 @@ public static class QSBInteractionPatches
 
                     //__instance.RaiseEvent(nameof(__instance.OnDamaged), __instance);
 
-                    var eventDelegate1 = (MulticastDelegate)typeof(ShipHull).GetField("OnDamaged", BindingFlags.Instance 
+                    var eventDelegate1 = (MulticastDelegate)typeof(ShipHull).GetField("OnDamaged", BindingFlags.Instance
                         | BindingFlags.NonPublic | BindingFlags.Public).GetValue(__0);
                     if (eventDelegate1 != null)
                     {
@@ -567,7 +569,7 @@ public static class QSBInteractionPatches
 
             //__instance.RaiseEvent(nameof(__instance.OnImpact), __instance._dominantImpact, damage);
 
-            var eventDelegate2 = (MulticastDelegate)typeof(ShipHull).GetField("OnImpact", BindingFlags.Instance 
+            var eventDelegate2 = (MulticastDelegate)typeof(ShipHull).GetField("OnImpact", BindingFlags.Instance
                 | BindingFlags.NonPublic | BindingFlags.Public).GetValue(__0);
             if (eventDelegate2 != null)
             {

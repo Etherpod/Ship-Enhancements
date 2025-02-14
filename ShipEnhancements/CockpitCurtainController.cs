@@ -37,6 +37,14 @@ public class CockpitCurtainController : MonoBehaviour
         if (_audioSource.isPlaying) _audioSource.Stop();
         _audioSource.clip = _open ? _openClip : _closeClip;
         _audioSource.Play();
+
+        if (ShipEnhancements.InMultiplayer)
+        {
+            foreach (uint id in ShipEnhancements.PlayerIDs)
+            {
+                ShipEnhancements.QSBCompat.SendCurtainState(id, _open);
+            }
+        }
     }
 
     private void UpdateCurtain()
@@ -44,5 +52,16 @@ public class CockpitCurtainController : MonoBehaviour
         _closedCurtainObj.SetActive(!_open);
         _openCurtainObj.SetActive(_open);
         _interactReceiver.ChangePrompt(_open ? "Close Curtain" : "Open Curtain");
+    }
+
+    public void UpdateCurtainRemote(bool open)
+    {
+        _closedCurtainObj.SetActive(!open);
+        _openCurtainObj.SetActive(open);
+        _interactReceiver.ChangePrompt(open ? "Close Curtain" : "Open Curtain");
+
+        if (_audioSource.isPlaying) _audioSource.Stop();
+        _audioSource.clip = _open ? _openClip : _closeClip;
+        _audioSource.Play();
     }
 }
