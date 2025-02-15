@@ -7,8 +7,8 @@ namespace ShipEnhancements;
 
 public static class ErnestoModListHandler
 {
-    public static List<string> ModList { get; private set; }
-    public static List<string> ActiveModList { get; private set; }
+    private static List<string> ModList { get; set; }
+    private static List<string> ActiveModList { get; set; }
 
     private static HttpClientGenerator _httpClientGenerator;
 
@@ -20,33 +20,43 @@ public static class ErnestoModListHandler
         );
 
         var response = GetModList(_httpClientGenerator.Client);
-        var jsonValues = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(response.Result);
-
-        ModList = jsonValues["Mods"];
-
-        List<string> activeMods = [];
-
-        foreach (string id in ModList)
+        if (response != null)
         {
-            if (ShipEnhancements.Instance.ModHelper.Interaction.ModExists(id))
+            var jsonValues = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(response.Result);
+
+            ModList = jsonValues["Mods"];
+
+            List<string> activeMods = [];
+
+            foreach (string id in ModList)
             {
-                activeMods.Add(id);
+                if (ShipEnhancements.Instance.ModHelper.Interaction.ModExists(id))
+                {
+                    activeMods.Add(id);
+                }
             }
+
+            ActiveModList = activeMods;
+            ShipEnhancements.WriteDebugMessage("Number of Ernestos: " + ActiveModList.Count);
         }
-
-        ActiveModList = activeMods;
-
-        ShipEnhancements.WriteDebugMessage("Number of Ernestos: " + ActiveModList.Count);
+        else
+        {
+            ModList = null;
+            ActiveModList = null;
+        }
     }
 
     private static Task<string> GetModList(HttpClient httpClient)
     {
         var response = httpClient.GetAsync(httpClient.BaseAddress);
-        response.Wait(2500);
-
-        if (!response.IsCompletedSuccessfully)
+        try
+        {
+            response.Wait(2500);
+        }
+        catch
         {
             ShipEnhancements.WriteDebugMessage("Could not access mod list!", warning: true);
+            return null;
         }
 
         var httpResponse = response.Result;
@@ -55,6 +65,11 @@ public static class ErnestoModListHandler
 
     public static int GetNumberErnestos()
     {
-        return ActiveModList.Count;
+        return ActiveModList != null ? ActiveModList.Count : -1;
+    }
+
+    public static int GetMaxErnestos()
+    {
+        return ModList != null ? ModList.Count : -2;
     }
 }

@@ -83,7 +83,7 @@ public class CockpitErnesto : MonoBehaviour
         _availableEjectComments.AddRange(_ejectComments);
         _availableReactorComments.AddRange(_reactorComments);
 
-        if (ErnestoModListHandler.ActiveModList.Count > 0)
+        if (ErnestoModListHandler.GetNumberErnestos() > 0)
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_MULTIPLE_ERNESTOS", true);
         }
@@ -142,6 +142,18 @@ public class CockpitErnesto : MonoBehaviour
         if (PlayerState.AtFlightConsole())
         {
             _conversationZone.DisableInteraction();
+        }
+
+        if (ErnestoModListHandler.GetNumberErnestos() > 0 && PlayerData.GetPersistentCondition("SE_KNOWS_ERNESTO") 
+            && !PlayerData.GetPersistentCondition("SE_ERNESTO_IS_AWARE")
+            && !DialogueConditionManager.SharedInstance.GetConditionState("SE_ERNESTO_AWARE_NEXT_TIME"))
+        {
+            DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_AWARE_NEXT_TIME", true);
+        }
+        else if (DialogueConditionManager.SharedInstance.GetConditionState("SE_ERNESTO_AWARE_NEXT_TIME"))
+        {
+            PlayerData.SetPersistentCondition("SE_ERNESTO_BECOME_AWARE", true);
+            DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_AWARE_NEXT_TIME", false);
         }
     }
 

@@ -232,6 +232,7 @@
     </Dialogue>
     <DialogueOptionsList>
       <DialogueOption>
+        <RequiredPersistentCondition>SE_ERNESTO_IS_AWARE</RequiredPersistentCondition>
         <Text>Are there any other Ernestos here?</Text>
         <DialogueTarget>SE_Ernesto_Ernestos</DialogueTarget>
       </DialogueOption>
@@ -685,6 +686,54 @@
     <Name>SE_Ernesto_Ernestos</Name>
     <Dialogue>
       <Page>ERNESTO_PLACEHOLDER</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Awareness</Name>
+    <EntryCondition>SE_KNOWS_ERNESTO</EntryCondition>
+    <EntryCondition>SE_ERNESTO_BECOME_AWARE</EntryCondition>
+    <Dialogue>
+      <Page>Hey, do you feel that?</Page>
+    </Dialogue>
+    <SetPersistentCondition>SE_ERNESTO_IS_AWARE</SetPersistentCondition>
+    <DisablePersistentCondition>SE_ERNESTO_BECOME_AWARE</DisablePersistentCondition>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Feel what?</Text>
+        <DialogueTarget>SE_Ernesto_Awareness_1</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Awareness_1</Name>
+    <Dialogue>
+      <Page>I don't know. It's a funny feeling, like I'm in multiple places at once. I think there's more than one of me.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>How can there be more than one Ernesto?</Text>
+        <DialogueTarget>SE_Ernesto_Awareness_21</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>There are? Where are they?</Text>
+        <DialogueTarget>SE_Ernesto_Awareness_22</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Awareness_21</Name>
+    <Dialogue>
+      <Page>Not sure. My best guess would be that Ernestos from other worlds are crossing over into this one.</Page>
+      <Page>If too many of them come here it might destroy the fabric of spacetime, but I'm sure it's fine.</Page>
+      <Page>If you're that worried, you can come ask me how many Ernestos there are and I'll try and give a clear answer.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Awareness_22</Name>
+    <Dialogue>
+      <Page>No clue. I just know that there's more Ernestos than there should be.</Page>
+      <Page>Maybe you can go looking for them. That could be a fun scavenger hunt, and I'm sure they wouldn't mind some company.</Page>
+      <Page>Feel free to come ask how many there are while you're out there searching, I'll see if I can give you an answer.</Page>
     </Dialogue>
   </DialogueNode>
 </DialogueTree>

@@ -3370,16 +3370,24 @@ public static class PatchClass
         if (key == "SE_Ernesto_ErnestosERNESTO_PLACEHOLDER")
         {
             int numErnestos = ErnestoModListHandler.GetNumberErnestos();
-            string[] lines = ["No clue, I'll check again later."];
+            string[] lines = 
+            [
+                "No clue, I'll check again later.", 
+                "Everything's a bit fuzzy right now, sorry.", 
+                "Uhh... not sure, my thoughts are a bit jumbled today. I'll try again later.", 
+                "Can you come back another time? I can't seem to sense anything right now."
+            ];
+
             if (numErnestos == 0)
             {
                 lines =
                 [
-                    "No, I'm not sensing any other Ernestos right now.",
-                    "I think I'm the only one here, it's kinda lonely. You're not an anglerfish so you don't count.",
-                    "I'm the only one here. Do you want a different Ernesto or something?",
+                    "No, I'm not sensing any other Ernestos right now. Maybe one will show up later.",
+                    "I think I'm the only Ernesto here. Nice to finally get some peace and quiet- oh wait. You're here.",
+                    "I'm the only one in this universe. Do you want a different Ernesto or something?",
                     "Just me and you, Hatchling.",
-                    "No. There's no one to stop me from hitting you with a rock.",
+                    "No. Guess what that means? There's no one to stop me from hitting you with a rock.",
+                    "Narp.",
                 ];
                 __result = lines[UnityEngine.Random.Range(0, lines.Length)];
             }
@@ -3389,7 +3397,7 @@ public static class PatchClass
                 {
                     lines =
                     [
-                        "There's only 1 other Ernesto. I get the feeling I might be related to them, though.",
+                        "Yeah, there's only 1 other Ernesto. I get the feeling I might be related to him.",
                     ];
                 }
                 else
@@ -3398,54 +3406,55 @@ public static class PatchClass
                     [
                         "There's 1 other Ernesto in this universe. Maybe you should go say hi to them.",
                         "Just me and some other guy I don't know. Not sure why they're here.",
-                        "Just one other anglerfish. Who do you think came first?",
-                        "There's 1 more Ernesto than there should be. What? No, that doesn't mean there's only one Ernesto.",
-                        "I sense one other. I wonder if they have the same name?"
+                        "Just one extra Ernesto. Who do you think came first? Maybe they're the original and I'm the copy.",
+                        "Yeah, there's another Ernesto here, but honestly this universe would be better off with just one. What? What do you mean it should be him??",
+                        "Yarp, there's one other Ernesto here. Do you think they have the same name as me?"
                     ];
                 }
             }
-            else if (numErnestos <= 8)
+            else if (numErnestos > 1 && numErnestos <= 8)
             {
                 lines =
                 [
-                    $"I'm sensing {numErnestos} other Ernestos. Good luck finding them all.",
-                    $"I think there's {numErnestos} of them, which if my calculations are correct is not the normal amount of Ernestos.",
-                    $"{numErnestos}. I can't think of a funny quip so that's all you're gonna get.",
-                    $"{numErnestos}. Maybe you can go bother one of them, I'm sure they have some interesting things to say.",
+                    $"There's {numErnestos} extra Ernestos in our universe, which isn't necessarily a bad thing.",
+                    $"I think there's {numErnestos} of them, which if my calculations are correct is not a normal amount of Ernestos.",
+                    $"Yarp, {numErnestos}. I can't think of a funny quip so that's all you're gonna get.",
+                    $"Yeah, {numErnestos} guys. Maybe you can go bother one of them, I'm sure they have some interesting things to say.",
+                    $"The anglerfish population suddenly increased by {numErnestos}, if that's what you're asking.",
                 ];
             }
-            else if (numErnestos <= 15)
+            else if (numErnestos > 8 && numErnestos <= 15)
             {
                 lines =
                 [
                     $"There's {numErnestos} Ernestos. That doesn't sound right.",
-                    $"{numErnestos}, which doesn't feel like a normal amount of Ernestos, but I guess that's what happens when you start combining worlds.",
-                    $"I sense {numErnestos} other Ernestos. That's gotta be at least {numErnestos - 5} who will beat you to death with a rock.",
-                    $"There's {numErnestos} of them, which probably means something isn't right.",
+                    $"Yeah, there's {numErnestos}, which doesn't feel like a normal amount of Ernestos, but I guess that's what happens when you start mixing worlds.",
+                    $"I'm sensing {numErnestos} other Ernestos. That's gotta be at least {numErnestos - 5} who will beat you to death with a rock.",
+                    $"Yeah, there's a surplus of magical talking anglerfish right now because {numErnestos} more Ernestos decided to cross into our world.",
                 ];
             }
-            else if (numErnestos < ErnestoModListHandler.ActiveModList.Count)
+            else if (numErnestos > 15 && numErnestos < ErnestoModListHandler.GetMaxErnestos())
             {
                 lines =
                 [
-                    $"A lot. {numErnestos}, to be exact.",
-                    $"{numErnestos} Ernestos. How did you even cram that many into one universe?",
-                    $"I don't know what you plan to do with {numErnestos} Ernestos, but whatever it is leave me out of it.",
-                    $"{numErnestos} Ernestos that could potentially beat you to death with a rock. It's a dangerous universe, Hatchling.",
-                    $"{numErnestos} other magical anglerfish that I could be talking to instead of you.",
+                    $"Yes, there are a lot. {numErnestos}, to be exact. And that isn't a normal amount of magical talking anglerfish to have in one universe, in case you were wondering.",
+                    $"Yeah, {numErnestos} Ernestos. How did you even cram that many into one universe?",
+                    $"Look, I don't know what you plan to do with {numErnestos} Ernestos, but whatever it is leave me out of it.",
+                    $"Yep. {numErnestos} Ernestos that could potentially beat you to death with a rock. It's a dangerous universe, Hatchling.",
+                    $"Yeah, {numErnestos} other magical anglerfish that I could be talking to instead of you.",
                 ];
             }
-            else if (numErnestos == ErnestoModListHandler.ActiveModList.Count)
+            else if (numErnestos == ErnestoModListHandler.GetMaxErnestos())
             {
                 lines =
                 [
-                    "Way more Ernestos than there ever should be.",
-                    "I don't know what you did Hatchling, but you've managed to fit every Ernesto from every world into this universe.",
-                    $"{numErnestos}. I don't know if this universe can handle every Ernesto to ever exist.",
+                    "Oh yeah. Way more Ernestos than there ever should be.",
+                    "Look, I don't know what you did Hatchling, but you managed to fit every Ernesto from every world into this universe. It's pretty impressive, honestly.",
+                    $"There sure are, and I don't know if this universe can even handle every Ernesto to ever exist. You really made a mistake bringing {numErnestos} of those guys here.",
                     "All of them. Every Ernesto ever.",
-                    $"{numErnestos} of them. You should go find them all before the fabric of spacetime is destroyed.",
-                    "Too many. Please get rid of some of them. The universe is falling apart as we speak.",
-                    "There are so many it's practically an infestation."
+                    $"Yarp, {numErnestos} of them. You should go find them all before the fabric of spacetime is destroyed and we all die.",
+                    "Yes and there are too many. Please get rid of some of them. The universe is falling apart as we speak.",
+                    "There are so many it's practically an invasion. An invasion of magical talking anglerfish."
                 ];
             }
             __result = lines[UnityEngine.Random.Range(0, lines.Length)];
