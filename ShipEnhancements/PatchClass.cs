@@ -1787,7 +1787,7 @@ public static class PatchClass
                 }
             }
         }
-        
+
         // Cancel normal parenting
         //Transform transform = ((customDropTarget == null) ? targetRigidbody.transform : customDropTarget.GetItemDropTargetTransform(hit.collider.gameObject));
 
@@ -2097,7 +2097,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.OnEnterConversation))]
     public static bool KeepThrustIndicatorOnInConversation(ThrustAndAttitudeIndicator __instance)
     {
-        if (!(bool)enablePersistentInput.GetProperty() || !__instance._shipIndicatorMode 
+        if (!(bool)enablePersistentInput.GetProperty() || !__instance._shipIndicatorMode
             || !SELocator.GetShipBody().GetComponent<ShipPersistentInput>().InputEnabled()) return true;
 
         __instance._inConversation = true;
@@ -2272,7 +2272,7 @@ public static class PatchClass
         MasterAlarm masterAlarm = SELocator.GetShipTransform().GetComponentInChildren<MasterAlarm>();
         float alarmNoiseRadius = masterAlarm._isAlarmOn ? 350f : 0f;
         ShipThrusterController thrusterController = SELocator.GetShipTransform().GetComponent<ShipThrusterController>();
-        bool shipIgniting = ShipEnhancements.Instance.shipIgniting || EngineSputtering || 
+        bool shipIgniting = ShipEnhancements.Instance.shipIgniting || EngineSputtering ||
             (SELocator.GetButtonPanel()?.GetComponentInChildren<ShipEngineSwitch>()?.IsEngineStalling() ?? false);
         float ignitionNoiseRadius = shipIgniting ? 500f : 0f;
         float overdriveNoiseRadius = (bool)enableThrustModulator.GetProperty() && SELocator.GetShipOverdriveController() != null
@@ -3359,6 +3359,97 @@ public static class PatchClass
         {
             SELocator.GetErnesto().OnCockpitDetached();
         }
+    }
+    #endregion
+
+    #region ErnestoAwareness
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(TextTranslation), nameof(TextTranslation.Translate))]
+    public static bool TextTranslation_Translate(TextTranslation __instance, string key, ref string __result)
+    {
+        if (key == "SE_Ernesto_ErnestosERNESTO_PLACEHOLDER")
+        {
+            int numErnestos = ErnestoModListHandler.GetNumberErnestos();
+            string[] lines = ["No clue, I'll check again later."];
+            if (numErnestos == 0)
+            {
+                lines =
+                [
+                    "No, I'm not sensing any other Ernestos right now.",
+                    "I think I'm the only one here, it's kinda lonely. You're not an anglerfish so you don't count.",
+                    "I'm the only one here. Do you want a different Ernesto or something?",
+                    "Just me and you, Hatchling.",
+                    "No. There's no one to stop me from hitting you with a rock.",
+                ];
+                __result = lines[UnityEngine.Random.Range(0, lines.Length)];
+            }
+            else if (numErnestos == 1)
+            {
+                if (ShipEnhancements.Instance.ModHelper.Interaction.ModExists("xen.NewHorizonsExamples"))
+                {
+                    lines =
+                    [
+                        "There's only 1 other Ernesto. I get the feeling I might be related to them, though.",
+                    ];
+                }
+                else
+                {
+                    lines =
+                    [
+                        "There's 1 other Ernesto in this universe. Maybe you should go say hi to them.",
+                        "Just me and some other guy I don't know. Not sure why they're here.",
+                        "Just one other anglerfish. Who do you think came first?",
+                        "There's 1 more Ernesto than there should be. What? No, that doesn't mean there's only one Ernesto.",
+                        "I sense one other. I wonder if they have the same name?"
+                    ];
+                }
+            }
+            else if (numErnestos <= 8)
+            {
+                lines =
+                [
+                    $"I'm sensing {numErnestos} other Ernestos. Good luck finding them all.",
+                    $"I think there's {numErnestos} of them, which if my calculations are correct is not the normal amount of Ernestos.",
+                    $"{numErnestos}. I can't think of a funny quip so that's all you're gonna get.",
+                    $"{numErnestos}. Maybe you can go bother one of them, I'm sure they have some interesting things to say.",
+                ];
+            }
+            else if (numErnestos <= 15)
+            {
+                lines =
+                [
+                    $"There's {numErnestos} Ernestos. That doesn't sound right.",
+                    $"{numErnestos}, which doesn't feel like a normal amount of Ernestos, but I guess that's what happens when you start combining worlds.",
+                    $"I sense {numErnestos} other Ernestos. That's gotta be at least {numErnestos - 5} who will beat you to death with a rock.",
+                    $"There's {numErnestos} of them, which probably means something isn't right.",
+                ];
+            }
+            else if (numErnestos < ErnestoModListHandler.ActiveModList.Count)
+            {
+                lines =
+                [
+                    $"A lot. {numErnestos}, to be exact.",
+                    $"{numErnestos} Ernestos. How did you even cram that many into one universe?",
+                    $"I don't know what you plan to do with {numErnestos} Ernestos, but whatever it is leave me out of it.",
+                    $"{numErnestos} Ernestos that could potentially beat you to death with a rock. It's a dangerous universe, Hatchling.",
+                    $"{numErnestos} other magical anglerfish that I could be talking to instead of you.",
+                ];
+            }
+            else if (numErnestos == ErnestoModListHandler.ActiveModList.Count)
+            {
+                lines =
+                [
+                    $"Way more Ernestos than there ever should be.",
+                    $"I don't know what you did Hatchling, but you've managed to fit every Ernesto from every world into this universe.",
+                    $"{numErnestos}, and I'm not sure whether this universe can handle every Ernesto to ever exist.",
+                    $"All of them. Every Ernesto ever.",
+                    $"{numErnestos}. You should go find them all before the fabric of spacetime is destroyed.",
+                ];
+            }
+            __result = lines[UnityEngine.Random.Range(0, lines.Length)];
+            return false;
+        }
+        return true;
     }
     #endregion
 }

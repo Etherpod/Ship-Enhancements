@@ -52,4 +52,9 @@ public static class ErnestoModListHandler
         var httpResponse = response.Result;
         return httpResponse.Content.ReadAsStringAsync();
     }
+
+    public static int GetNumberErnestos()
+    {
+        return ActiveModList.Count;
+    }
 }

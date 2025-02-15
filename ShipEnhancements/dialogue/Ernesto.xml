@@ -232,6 +232,10 @@
     </Dialogue>
     <DialogueOptionsList>
       <DialogueOption>
+        <Text>Are there any other Ernestos here?</Text>
+        <DialogueTarget>SE_Ernesto_Ernestos</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
         <RequiredCondition>SE_ERNESTO_OPTION_1</RequiredCondition>
         <Text>What's the airspeed velocity of an unladen swallow?</Text>
         <DialogueTarget>SE_Ernesto_Swallow</DialogueTarget>
@@ -278,8 +282,8 @@
       </DialogueOption>
       <DialogueOption>
         <RequiredCondition>SE_ERNESTO_OPTION_10</RequiredCondition>
-        <Text>Tell me the story of how you met Geswaldo.</Text>
-        <DialogueTarget>SE_Ernesto_MeetingGeswaldo</DialogueTarget>
+        <Text>Do you play any instruments?</Text>
+        <DialogueTarget>SE_Ernesto_Instrument</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
         <RequiredCondition>SE_ERNESTO_OPTION_11</RequiredCondition>
@@ -343,6 +347,11 @@
       </DialogueOption>
       <DialogueOption>
         <RequiredCondition>SE_ERNESTO_OPTION_100</RequiredCondition>
+        <Text>Tell me the story of how you met Geswaldo.</Text>
+        <DialogueTarget>SE_Ernesto_MeetingGeswaldo</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_101</RequiredCondition>
         <Text>Can you continue your story about Geswaldo?</Text>
         <DialogueTarget>SE_Ernesto_Geswaldo</DialogueTarget>
       </DialogueOption>
@@ -553,7 +562,13 @@
       <Page>It's not important. Maybe I'll tell you some other time.</Page>
       <Page>Story time's over, go fly your ship or whatever.</Page>
     </Dialogue>
-    <SetPersistentCondition>SE_ERNESTO_GESWALDO_PART_ONE</SetPersistentCondition>
+    <SetCondition>SE_ERNESTO_GESWALDO_PART_ONE</SetCondition>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Instrument</Name>
+    <Dialogue>
+      <Page>I play the vocal chords.</Page>
+    </Dialogue>
   </DialogueNode>
   <DialogueNode>
     <Name>SE_Ernesto_House</Name>
@@ -664,6 +679,12 @@
     <Name>SE_Ernesto_FavoriteTraveler</Name>
     <Dialogue>
       <Page>I like Chert's drums. They remind me of hitting people with rocks.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Ernestos</Name>
+    <Dialogue>
+      <Page>ERNESTO_PLACEHOLDER</Page>
     </Dialogue>
   </DialogueNode>
 </DialogueTree>

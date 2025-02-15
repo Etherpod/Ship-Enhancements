@@ -265,6 +265,10 @@ page = ["Hey."]
 [dialogue_node.dialogue_options_list]
 
 [[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Are there any other Ernestos here?"
+dialogue_target = "SE_Ernesto_Ernestos"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
 required_condition = "SE_ERNESTO_OPTION_1"
 text = "What's the airspeed velocity of an unladen swallow?"
 dialogue_target = "SE_Ernesto_Swallow"
@@ -620,7 +624,7 @@ dialogue_target = "SE_Ernesto_MeetingGeswaldo_3"
 
 [[dialogue_node]]
 name = "SE_Ernesto_MeetingGeswaldo_3"
-set_condition = "SE_ERNESTO_GESWALDO_PART_ONE"
+set_condition = ["SE_ERNESTO_GESWALDO_PART_ONE"]
 
 [[dialogue_node.dialogue]]
 page = ["It's not important. Maybe I'll tell you some other time.", "Story time's over, go fly your ship or whatever."]
@@ -770,3 +774,11 @@ name = "SE_Ernesto_FavoriteTraveler"
 
 [[dialogue_node.dialogue]]
 page = ["I like Chert's drums. They remind me of hitting people with rocks."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Ernestos"
+
+[[dialogue_node.dialogue]]
+page = ["ERNESTO_PLACEHOLDER"]
