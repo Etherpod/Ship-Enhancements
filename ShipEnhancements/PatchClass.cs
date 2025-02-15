@@ -3439,11 +3439,13 @@ public static class PatchClass
             {
                 lines =
                 [
-                    $"Way more Ernestos than there ever should be.",
-                    $"I don't know what you did Hatchling, but you've managed to fit every Ernesto from every world into this universe.",
-                    $"{numErnestos}, and I'm not sure whether this universe can handle every Ernesto to ever exist.",
-                    $"All of them. Every Ernesto ever.",
-                    $"{numErnestos}. You should go find them all before the fabric of spacetime is destroyed.",
+                    "Way more Ernestos than there ever should be.",
+                    "I don't know what you did Hatchling, but you've managed to fit every Ernesto from every world into this universe.",
+                    $"{numErnestos}. I don't know if this universe can handle every Ernesto to ever exist.",
+                    "All of them. Every Ernesto ever.",
+                    $"{numErnestos} of them. You should go find them all before the fabric of spacetime is destroyed.",
+                    "Too many. Please get rid of some of them. The universe is falling apart as we speak.",
+                    "There are so many it's practically an infestation."
                 ];
             }
             __result = lines[UnityEngine.Random.Range(0, lines.Length)];
