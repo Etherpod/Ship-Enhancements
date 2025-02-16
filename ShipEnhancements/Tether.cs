@@ -340,7 +340,7 @@ public class Tether : MonoBehaviour
         _rigidbody = attachedBody;
     }
 
-    public void UpdateTetherBody(OWRigidbody newBody, bool connectedBody)
+    public void UpdateTetherBody(OWRigidbody newBody, bool connectedBody, bool flipConnection = false)
     {
         if (!_tethered) return;
 
@@ -355,11 +355,18 @@ public class Tether : MonoBehaviour
             _rigidbody = newBody;
         }
 
+        ShipEnhancements.WriteDebugMessage("Generating tether from connected: " + connectedBody);
         TetherHookItem lastHook = _connectedHook;
         DisconnectTether();
         Vector3 worldPos = lastHook.transform.TransformPoint(lastHook.GetAttachPointOffset());
         Vector3 parentLocalPos = lastHook.transform.parent.InverseTransformPoint(worldPos);
         CreateTether(lastBody, _hook.GetAttachPointOffset(), parentLocalPos, true);
+        if (flipConnection)
+        {
+            ShipEnhancements.WriteDebugMessage("flip");
+            _joint.connectedMassScale = 0.001f;
+            _joint.massScale = 1000f;
+        }
         _connectedHook = lastHook;
         _hook.TransferToHook();
         lastHook.TransferToHook();

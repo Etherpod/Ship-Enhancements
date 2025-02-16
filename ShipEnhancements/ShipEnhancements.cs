@@ -1838,6 +1838,24 @@ public class ShipEnhancements : ModBehaviour
         }
     }
 
+    public static void LogMessage(object msg, bool warning = false, bool error = false)
+    {
+        msg ??= "null";
+
+        if (warning)
+        {
+            Instance?.ModHelper?.Console?.WriteLine(msg.ToString(), MessageType.Warning);
+        }
+        else if (error)
+        {
+            Instance?.ModHelper?.Console?.WriteLine(msg.ToString(), MessageType.Error);
+        }
+        else
+        {
+            Instance?.ModHelper?.Console?.WriteLine(msg.ToString());
+        }
+    }
+
     public static GameObject LoadPrefab(string path)
     {
         return (GameObject)Instance._shipEnhancementsBundle.LoadAsset(path);
