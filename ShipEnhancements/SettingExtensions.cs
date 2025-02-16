@@ -100,6 +100,7 @@ public static class SettingExtensions
         { Settings.extraEjectButtons, (false, false) },
         { Settings.preventSystemFailure, (false, false) },
         { Settings.addShipCurtain, (false, false) },
+        { Settings.addRepairWrench, (false, false) },
     };
 
     public static string GetName(this Settings setting)

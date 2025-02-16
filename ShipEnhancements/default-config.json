@@ -501,6 +501,12 @@
       "value": false,
       "tooltip": "Lets you drop items inside of the ship or on top of the ship."
     },
+    "addRepairWrench": {
+      "title": "Add Repair Wrench",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Adds a repair wrench to the cockpit and prevents you from making repairs unless you're holding it."
+    },
     "addPortableCampfire": {
       "title": "Add Portable Campfire",
       "type": "toggle",

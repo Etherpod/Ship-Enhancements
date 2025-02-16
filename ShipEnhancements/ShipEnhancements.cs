@@ -177,6 +177,7 @@ public class ShipEnhancements : ModBehaviour
         extraEjectButtons,
         preventSystemFailure,
         addShipCurtain,
+        addRepairWrench,
     }
 
     private void Awake()
@@ -1084,7 +1085,7 @@ public class ShipEnhancements : ModBehaviour
             AssetBundleUtilities.ReplaceShaders(curtainObj);
             Instantiate(curtainObj, SELocator.GetShipTransform().Find("Module_Cabin/Geo_Cabin/Cabin_Geometry/Cabin_Interior"));
         }
-        if (true)
+        if ((bool)Settings.addRepairWrench.GetProperty())
         {
             GameObject wrenchSocketObj = LoadPrefab("Assets/ShipEnhancements/RepairWrenchSocket.prefab");
             RepairWrenchSocket wrenchSocket = Instantiate(wrenchSocketObj, 
