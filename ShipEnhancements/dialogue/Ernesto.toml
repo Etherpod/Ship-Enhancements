@@ -341,8 +341,8 @@ dialogue_target = "SE_Ernesto_FavoritePlanet"
 
 [[dialogue_node.dialogue_options_list.dialogue_option]]
 required_condition = "SE_ERNESTO_OPTION_15"
-text = "test"
-dialogue_target = "SE_Ernesto_Picnic"
+text = "What electives did you take in college?"
+dialogue_target = "SE_Ernesto_Electives"
 
 [[dialogue_node.dialogue_options_list.dialogue_option]]
 required_condition = "SE_ERNESTO_OPTION_16"
@@ -378,6 +378,11 @@ dialogue_target = "SE_Ernesto_Music"
 required_condition = "SE_ERNESTO_OPTION_22"
 text = "Which traveler's music is your favorite?"
 dialogue_target = "SE_Ernesto_FavoriteTraveler"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_23"
+text = "Do you wanna play Dungeons and Dragons?"
+dialogue_target = "SE_Ernesto_Dnd"
 
 # ---
 
@@ -644,7 +649,21 @@ page = ["I play the vocal chords."]
 name = "SE_Ernesto_House"
 
 [[dialogue_node.dialogue]]
-page = [""]
+page = ["I live with my husband Geswaldo in another star system, but I don't think you know which one it is."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "How did you get here from another star system??"
+dialogue_target = "SE_Ernesto_House_1"
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_House_1"
+
+[[dialogue_node.dialogue]]
+page = ["Uhh... You are suddenly overcome by an irresistible urge to stop talking to me!"]
 
 
 
@@ -652,7 +671,7 @@ page = [""]
 name = "SE_Ernesto_Assault"
 
 [[dialogue_node.dialogue]]
-page = ["Sometimes. Usually when people ask me too many questions."]
+page = ["Sometimes. Usually when people ask me too many questions. Choose your next words carefully."]
 
 
 
@@ -687,10 +706,10 @@ page = ["Oh, sorry. Ember Twin. Mars is... somewhere else."]
 
 
 [[dialogue_node]]
-name = "SE_Ernesto_Picnic"
+name = "SE_Ernesto_Electives"
 
 [[dialogue_node.dialogue]]
-page = [""]
+page = ["I took speaking as one of my electives, but I also did Introduction to the Wizarding World."]
 
 
 
@@ -758,7 +777,7 @@ page = ["Yeah, it's given me a lot of time to evade my taxes."]
 name = "SE_Ernesto_FlyingSpeed"
 
 [[dialogue_node.dialogue]]
-page = ["zoom"]
+page = ["Picture the fastest moving object you could ever imagine, something that moves so fast it's gone in the blink of an eye.", "Did you think of something? Good, now divide that speed by 7 trillion, and that's about how fast I can fly."]
 
 
 
@@ -775,6 +794,53 @@ name = "SE_Ernesto_FavoriteTraveler"
 
 [[dialogue_node.dialogue]]
 page = ["I like Chert's drums. They remind me of hitting people with rocks."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Dnd"
+
+[[dialogue_node.dialogue]]
+page = ["Yeah, sure. Roll for persuasion."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "I rolled... a 7."
+dialogue_target = "SE_Ernesto_Dnd_1"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "I rolled... a 20."
+dialogue_target = "SE_Ernesto_Dnd_2"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "I rolled... a 1."
+dialogue_target = "SE_Ernesto_Dnd_3"
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_Dnd_1"
+
+[[dialogue_node.dialogue]]
+page = ["Tough luck. You need at least a 12 to persuade me."]
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_Dnd_2"
+
+[[dialogue_node.dialogue]]
+page = ["Ha, nice try. That was a D12 you just rolled."]
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_Dnd_3"
+set_condition = ["SE_ERNESTO_EXPLODE_SHIP"]
+
+[[dialogue_node.dialogue]]
+page = ["Uh oh.", "Your attempts to persuade me are so miserable that the ship blows up."]
 
 
 

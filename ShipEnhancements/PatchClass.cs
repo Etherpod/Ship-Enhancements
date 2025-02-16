@@ -3230,7 +3230,7 @@ public static class PatchClass
         if (__result)
         {
             bool isShipType = __instance.type == RepairReceiver.Type.ShipHull || __instance.type == RepairReceiver.Type.ShipComponent;
-            __result = (ShipRepairLimitController.CanRepair() || !isShipType) && (!(bool)addRepairWrench.GetProperty() 
+            __result = (ShipRepairLimitController.CanRepair() || !isShipType) && (!(bool)addRepairWrench.GetProperty()
                 || Locator.GetToolModeSwapper().GetItemCarryTool().GetHeldItemType() == ShipEnhancements.Instance.RepairWrenchType);
         }
     }
@@ -3372,12 +3372,12 @@ public static class PatchClass
         if (key == "SE_Ernesto_ErnestosERNESTO_PLACEHOLDER")
         {
             int numErnestos = ErnestoModListHandler.GetNumberErnestos();
-            string[] lines = 
+            string[] lines =
             [
-                "No clue, I'll check again later.", 
-                "Everything's a bit fuzzy right now, sorry.", 
-                "Uhh... not sure, my thoughts are a bit jumbled today. I'll try again later.", 
-                "Can you come back another time? I can't seem to sense anything right now."
+                "I dunno, I can't really feel anything right now.",
+                "Everything's all fuzzy right now, sorry.",
+                "No idea, but maybe I can tell you later.",
+                "Ask me later. I can't feel anything right now."
             ];
 
             if (numErnestos == 0)
@@ -3387,7 +3387,7 @@ public static class PatchClass
                     "No, I'm not sensing any other Ernestos right now. Maybe one will show up later.",
                     "I think I'm the only Ernesto here. Nice to finally get some peace and quiet- oh wait. You're here.",
                     "I'm the only one in this universe. Do you want a different Ernesto or something?",
-                    "Just me and you, Hatchling.",
+                    "Nope, it's just me and you.",
                     "No. Guess what that means? There's no one to stop me from hitting you with a rock.",
                     "Narp.",
                 ];
@@ -3399,18 +3399,18 @@ public static class PatchClass
                 {
                     lines =
                     [
-                        "Yeah, there's only 1 other Ernesto. I get the feeling I might be related to him.",
+                        "Yeah, there's only one other Ernesto. I get the feeling I might be related to him.",
                     ];
                 }
                 else
                 {
                     lines =
                     [
-                        "There's 1 other Ernesto in this universe. Maybe you should go say hi to them.",
+                        "Yeah, but there's only one. Maybe you should go say hi to them, they're probably lonely.",
                         "Just me and some other guy I don't know. Not sure why they're here.",
-                        "Just one extra Ernesto. Who do you think came first? Maybe they're the original and I'm the copy.",
+                        "Just one extra Ernesto. Who do you think existed first?",
                         "Yeah, there's another Ernesto here, but honestly this universe would be better off with just one. What? What do you mean it should be him??",
-                        "Yarp, there's one other Ernesto here. Do you think they have the same name as me?"
+                        "Yarp. Just one, though. I wonder if they have the same name as me?"
                     ];
                 }
             }
@@ -3432,7 +3432,7 @@ public static class PatchClass
                     $"There's {numErnestos} Ernestos. That doesn't sound right.",
                     $"Yeah, there's {numErnestos}, which doesn't feel like a normal amount of Ernestos, but I guess that's what happens when you start mixing worlds.",
                     $"I'm sensing {numErnestos} other Ernestos. That's gotta be at least {numErnestos - 5} who will beat you to death with a rock.",
-                    $"Yeah, there's a surplus of magical talking anglerfish right now because {numErnestos} more Ernestos decided to cross into our world.",
+                    $"Yeah, there's a surplus of magical talking anglerfish right now because {numErnestos} Ernestos decided to cross into our world.",
                 ];
             }
             else if (numErnestos > 15 && numErnestos < ErnestoModListHandler.GetMaxErnestos())

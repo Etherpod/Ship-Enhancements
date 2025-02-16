@@ -308,8 +308,8 @@
       </DialogueOption>
       <DialogueOption>
         <RequiredCondition>SE_ERNESTO_OPTION_15</RequiredCondition>
-        <Text>test</Text>
-        <DialogueTarget>SE_Ernesto_Picnic</DialogueTarget>
+        <Text>What electives did you take in college?</Text>
+        <DialogueTarget>SE_Ernesto_Electives</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
         <RequiredCondition>SE_ERNESTO_OPTION_16</RequiredCondition>
@@ -345,6 +345,11 @@
         <RequiredCondition>SE_ERNESTO_OPTION_22</RequiredCondition>
         <Text>Which traveler's music is your favorite?</Text>
         <DialogueTarget>SE_Ernesto_FavoriteTraveler</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_23</RequiredCondition>
+        <Text>Do you wanna play Dungeons and Dragons?</Text>
+        <DialogueTarget>SE_Ernesto_Dnd</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
         <RequiredCondition>SE_ERNESTO_OPTION_100</RequiredCondition>
@@ -574,14 +579,25 @@
   <DialogueNode>
     <Name>SE_Ernesto_House</Name>
     <Dialogue>
-      <Page>
-      </Page>
+      <Page>I live with my husband Geswaldo in another star system, but I don't think you know which one it is.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>How did you get here from another star system??</Text>
+        <DialogueTarget>SE_Ernesto_House_1</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_House_1</Name>
+    <Dialogue>
+      <Page>Uhh... You are suddenly overcome by an irresistible urge to stop talking to me!</Page>
     </Dialogue>
   </DialogueNode>
   <DialogueNode>
     <Name>SE_Ernesto_Assault</Name>
     <Dialogue>
-      <Page>Sometimes. Usually when people ask me too many questions.</Page>
+      <Page>Sometimes. Usually when people ask me too many questions. Choose your next words carefully.</Page>
     </Dialogue>
   </DialogueNode>
   <DialogueNode>
@@ -609,10 +625,9 @@
     </Dialogue>
   </DialogueNode>
   <DialogueNode>
-    <Name>SE_Ernesto_Picnic</Name>
+    <Name>SE_Ernesto_Electives</Name>
     <Dialogue>
-      <Page>
-      </Page>
+      <Page>I took speaking as one of my electives, but I also did Introduction to the Wizarding World.</Page>
     </Dialogue>
   </DialogueNode>
   <DialogueNode>
@@ -667,7 +682,8 @@
   <DialogueNode>
     <Name>SE_Ernesto_FlyingSpeed</Name>
     <Dialogue>
-      <Page>zoom</Page>
+      <Page>Picture the fastest moving object you could ever imagine, something that moves so fast it's gone in the blink of an eye.</Page>
+      <Page>Did you think of something? Good, now divide that speed by 7 trillion, and that's about how fast I can fly.</Page>
     </Dialogue>
   </DialogueNode>
   <DialogueNode>
@@ -681,6 +697,46 @@
     <Dialogue>
       <Page>I like Chert's drums. They remind me of hitting people with rocks.</Page>
     </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Dnd</Name>
+    <Dialogue>
+      <Page>Yeah, sure. Roll for persuasion.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>I rolled... a 7.</Text>
+        <DialogueTarget>SE_Ernesto_Dnd_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>I rolled... a 20.</Text>
+        <DialogueTarget>SE_Ernesto_Dnd_2</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>I rolled... a 1.</Text>
+        <DialogueTarget>SE_Ernesto_Dnd_3</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Dnd_1</Name>
+    <Dialogue>
+      <Page>Tough luck. You need at least a 12 to persuade me.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Dnd_2</Name>
+    <Dialogue>
+      <Page>Ha, nice try. That was a D12 you just rolled.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Dnd_3</Name>
+    <Dialogue>
+      <Page>Uh oh.</Page>
+      <Page>Your attempts to persuade me are so miserable that the ship blows up.</Page>
+    </Dialogue>
+    <SetCondition>SE_ERNESTO_EXPLODE_SHIP</SetCondition>
   </DialogueNode>
   <DialogueNode>
     <Name>SE_Ernesto_Ernestos</Name>

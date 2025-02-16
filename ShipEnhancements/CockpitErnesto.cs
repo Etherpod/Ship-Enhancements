@@ -17,6 +17,7 @@ public class CockpitErnesto : MonoBehaviour
     private List<int> _availableQuestions = [];
     private Coroutine _currentComment = null;
 
+    private readonly int _questionsCount = 23;
     private readonly float _commentLifetime = 10f;
 
     private List<string> _availableHeavyImpactComments = [];
@@ -96,7 +97,7 @@ public class CockpitErnesto : MonoBehaviour
         _questions.Clear();
         _availableQuestions.Clear();
 
-        for (int i = 1; i < 23; i++)
+        for (int i = 1; i <= _questionsCount; i++)
         {
             _questions.Add(i);
         }
@@ -154,6 +155,13 @@ public class CockpitErnesto : MonoBehaviour
         {
             PlayerData.SetPersistentCondition("SE_ERNESTO_BECOME_AWARE", true);
             DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_AWARE_NEXT_TIME", false);
+        }
+
+        if (DialogueConditionManager.SharedInstance.GetConditionState("SE_ERNESTO_EXPLODE_SHIP")
+            && !SELocator.GetShipDamageController().IsSystemFailed())
+        {
+            DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_EXPLODE_SHIP", false);
+            SELocator.GetShipDamageController().Explode();
         }
     }
 
