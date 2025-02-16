@@ -3229,7 +3229,8 @@ public static class PatchClass
     {
         if (__result)
         {
-            __result = ShipRepairLimitController.CanRepair();
+            __result = ShipRepairLimitController.CanRepair() 
+                && (!true || Locator.GetToolModeSwapper().GetItemCarryTool().GetHeldItemType() == ShipEnhancements.Instance.RepairWrenchType);
         }
     }
     #endregion
