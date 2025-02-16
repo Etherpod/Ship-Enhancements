@@ -3225,11 +3225,12 @@ public static class PatchClass
     #region ShipRepairLimit
     [HarmonyPostfix]
     [HarmonyPatch(typeof(RepairReceiver), nameof(RepairReceiver.IsRepairable))]
-    public static void ApplyShipRepairLimit(ref bool __result)
+    public static void ApplyShipRepairLimit(RepairReceiver __instance, ref bool __result)
     {
         if (__result)
         {
-            __result = ShipRepairLimitController.CanRepair() && (!(bool)addRepairWrench.GetProperty() 
+            bool isShipType = __instance.type == RepairReceiver.Type.ShipHull || __instance.type == RepairReceiver.Type.ShipComponent;
+            __result = (ShipRepairLimitController.CanRepair() || !isShipType) && (!(bool)addRepairWrench.GetProperty() 
                 || Locator.GetToolModeSwapper().GetItemCarryTool().GetHeldItemType() == ShipEnhancements.Instance.RepairWrenchType);
         }
     }
