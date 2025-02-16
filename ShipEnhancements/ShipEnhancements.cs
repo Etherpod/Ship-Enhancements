@@ -70,6 +70,7 @@ public class ShipEnhancements : ModBehaviour
     public ItemType ExpeditionFlagType { get; private set; }
     public ItemType FuelTankType { get; private set; }
     public ItemType GravityCrystalType { get; private set; }
+    public ItemType RepairWrenchType { get; private set; }
     public SignalName ShipSignalName { get; private set; }
     public int ThrustModulatorLevel { get; private set; }
 
@@ -201,6 +202,7 @@ public class ShipEnhancements : ModBehaviour
         ExpeditionFlagType = EnumUtils.Create<ItemType>("ExpeditionFlag");
         FuelTankType = EnumUtils.Create<ItemType>("PortableFuelTank");
         GravityCrystalType = EnumUtils.Create<ItemType>("ShipGravityCrystal");
+        RepairWrenchType = EnumUtils.Create<ItemType>("RepairWrench");
         ShipSignalName = EnumUtils.Create<SignalName>("Ship");
 
         SEItemAudioController.Initialize();
@@ -1081,6 +1083,17 @@ public class ShipEnhancements : ModBehaviour
             GameObject curtainObj = LoadPrefab("Assets/ShipEnhancements/ShipCurtains.prefab");
             AssetBundleUtilities.ReplaceShaders(curtainObj);
             Instantiate(curtainObj, SELocator.GetShipTransform().Find("Module_Cabin/Geo_Cabin/Cabin_Geometry/Cabin_Interior"));
+        }
+        if (true)
+        {
+            GameObject wrenchSocketObj = LoadPrefab("Assets/ShipEnhancements/RepairWrenchSocket.prefab");
+            RepairWrenchSocket wrenchSocket = Instantiate(wrenchSocketObj, 
+                SELocator.GetShipTransform().Find("Module_Cockpit")).GetComponent<RepairWrenchSocket>();
+
+            GameObject wrenchObj = LoadPrefab("Assets/ShipEnhancements/RepairWrenchItem.prefab");
+            AssetBundleUtilities.ReplaceShaders(wrenchObj);
+            RepairWrenchItem wrench = Instantiate(wrenchObj).GetComponent<RepairWrenchItem>();
+            wrenchSocket.PlaceIntoSocket(wrench);
         }
 
         SetDamageColors();

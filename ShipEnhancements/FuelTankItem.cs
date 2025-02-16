@@ -115,12 +115,12 @@ public class FuelTankItem : OWItem
             OWItem item = Locator.GetToolModeSwapper().GetItemCarryTool().GetHeldItem();
             if (item != null)
             {
-                _interactReceiver.ChangePrompt("Already holding " + item.GetDisplayName());
+                _interactReceiver.ChangePrompt("Already Holding " + item.GetDisplayName());
                 _interactReceiver.SetKeyCommandVisible(false);
             }
             else
             {
-                _interactReceiver.ChangePrompt("Pick up " + GetDisplayName());
+                _interactReceiver.ChangePrompt("Pick Up " + GetDisplayName());
                 _interactReceiver.SetKeyCommandVisible(true);
             }
 

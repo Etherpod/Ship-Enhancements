@@ -12,7 +12,7 @@ public class PortableTractorBeamSocket : OWItemSocket
         _acceptableType = PortableTractorBeamItem.ItemType;
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
-        if ((bool)ShipEnhancements.Settings.enableRemovableGravityCrystal.GetProperty())
+        if ((bool)ShipEnhancements.Settings.preventSystemFailure.GetProperty())
         {
             GlobalMessenger.AddListener("ShipHullDetached", OnShipSystemFailure);
         }
@@ -36,7 +36,7 @@ public class PortableTractorBeamSocket : OWItemSocket
     private void OnDestroy()
     {
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
-        if ((bool)ShipEnhancements.Settings.enableRemovableGravityCrystal.GetProperty())
+        if ((bool)ShipEnhancements.Settings.preventSystemFailure.GetProperty())
         {
             GlobalMessenger.RemoveListener("ShipHullDetached", OnShipSystemFailure);
         }
