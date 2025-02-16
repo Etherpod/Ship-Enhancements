@@ -68,6 +68,10 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
                 {
                     QSBWorldSync.Init<QSBFuelTankItem, FuelTankItem>();
                 }
+                if ((bool)addRepairWrench.GetProperty())
+                {
+                    QSBWorldSync.Init<QSBRepairWrenchItem, RepairWrenchItem>();
+                }
             }, 2);
         };
     }
