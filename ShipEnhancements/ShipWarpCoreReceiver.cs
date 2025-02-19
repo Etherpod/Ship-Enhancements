@@ -105,6 +105,10 @@ public class ShipWarpCoreReceiver : MonoBehaviour
         {
             _warpEffect.singularityController.Collapse();
         }
+        else if ((bool)funnySounds.GetProperty())
+        {
+            _warpEffect._singularity._owOneShotSource.PlayOneShot(ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/tube_out.ogg"), 0.5f);
+        }
     }
 
     public void PlayRecallEffect(float length, bool inShip)

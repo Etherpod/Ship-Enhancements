@@ -178,6 +178,7 @@ public class ShipEnhancements : ModBehaviour
         preventSystemFailure,
         addShipCurtain,
         addRepairWrench,
+        funnySounds,
     }
 
     private void Awake()

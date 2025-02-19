@@ -3465,4 +3465,76 @@ public static class PatchClass
         return true;
     }
     #endregion
+
+    #region FunnySounds
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipAudioController), nameof(ShipAudioController.PlayImpactAtPosition))]
+    public static bool ShipBonk(ShipAudioController __instance, float volume, Vector3 worldPos)
+    {
+        if (!(bool)funnySounds.GetProperty()) return true;
+
+        if (Time.time - __instance._lastImpactTime < 0.5f)
+        {
+            return false;
+        }
+        for (int i = 0; i < __instance._hullImpactSources.Length; i++)
+        {
+            if (!__instance._hullImpactSources[i].isPlaying)
+            {
+                __instance._lastImpactTime = Time.time;
+                __instance._hullImpactSources[i].transform.position = worldPos;
+                __instance._hullImpactSources[i].SetLocalVolume(volume);
+                __instance._hullImpactSources[i].clip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/bonk.ogg");
+                __instance._hullImpactSources[i].Play();
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.TriggerSystemFailure))]
+    public static void ShipLegoBreak(ShipDamageController __instance)
+    {
+        if ((bool)funnySounds.GetProperty() && __instance.IsHullBreached())
+        {
+            ShipAudioController audio = __instance.GetComponentInChildren<ShipAudioController>();
+            for (int i = 0; i < audio._hullImpactSources.Length; i++)
+            {
+                if (!audio._hullImpactSources[i].isPlaying)
+                {
+                    audio._lastImpactTime = Time.time;
+                    audio._hullImpactSources[i].transform.position = SELocator.GetShipTransform().TransformPoint(Vector3.zero);
+                    audio._hullImpactSources[i].SetLocalVolume(1f);
+                    audio._hullImpactSources[i].clip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/lego_break.ogg");
+                    audio._hullImpactSources[i].Play();
+                    return;
+                }
+            }
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipThrusterAudio), nameof(ShipThrusterAudio.OnStartShipIgnition))]
+    public static bool ShipCartoonRun(ShipThrusterAudio __instance)
+    {
+        if (!(bool)funnySounds.GetProperty()) return true;
+
+        __instance._ignitionSource.Stop();
+        __instance._isIgnitionPlaying = true;
+        __instance._ignitionSource.PlayOneShot(ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/cartoon_run.ogg"), 1f);
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipAudioController), nameof(ShipAudioController.PlayRaiseEjectCover))]
+    public static bool ShipShotgunEject(ShipAudioController __instance)
+    {
+        if (!(bool)funnySounds.GetProperty()) return true;
+
+        __instance._ejectCoverSource.PlayOneShot(ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/shotgun.ogg"));
+        return false;
+    }
+    #endregion
 }

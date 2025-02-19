@@ -325,6 +325,12 @@
       "value": 0,
       "tooltip": "Adds a delay while piloting the ship between when you press the button and when the ship recieves the input. Now you can pretend you're playing online!"
     },
+    "funnySounds": {
+      "title": "Funny Sounds",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Replaces some of the in-game sounds with silly sound effects."
+    },
 
     "Add Ship Functions": {
       "type": "separator"

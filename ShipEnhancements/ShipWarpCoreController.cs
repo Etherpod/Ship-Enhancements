@@ -179,6 +179,11 @@ public class ShipWarpCoreController : CockpitInteractible
                 _shipBody.GetComponentInChildren<ShipTractorBeamSwitch>().DeactivateTractorBeam();
             }
 
+            if ((bool)funnySounds.GetProperty())
+            {
+                _warpEffect._singularity._owOneShotSource.PlayOneShot(ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/tube_in.ogg"), 0.5f);
+            }
+
             _warpingWithPlayer = false;
             _warpEffect.OnWarpComplete += WarpShip;
             _warpEffect.WarpObjectOut(_warpLength);
@@ -238,6 +243,11 @@ public class ShipWarpCoreController : CockpitInteractible
                     hatch.CloseHatch();
                 }
                 _shipBody.GetComponentInChildren<ShipTractorBeamSwitch>().DeactivateTractorBeam();
+            }
+
+            if ((bool)funnySounds.GetProperty())
+            {
+                _warpEffect._singularity._owOneShotSource.PlayOneShot(ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/tube_in.ogg"), 0.5f);
             }
 
             _warpingWithPlayer = false;

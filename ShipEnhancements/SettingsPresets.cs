@@ -100,6 +100,7 @@ public static class SettingsPresets
         { "preventSystemFailure", false },
         { "addShipCurtain", false },
         { "addRepairWrench", false },
+        { "funnySounds", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -196,6 +197,7 @@ public static class SettingsPresets
         { "preventSystemFailure", false },
         { "addShipCurtain", false },
         { "addRepairWrench", false },
+        { "funnySounds", false },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -292,6 +294,7 @@ public static class SettingsPresets
         { "preventSystemFailure", true },
         { "addShipCurtain", false },
         { "addRepairWrench", false },
+        { "funnySounds", false },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -388,6 +391,7 @@ public static class SettingsPresets
         { "preventSystemFailure", false },
         { "addShipCurtain", false },
         { "addRepairWrench", false },
+        { "funnySounds", false },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -484,6 +488,7 @@ public static class SettingsPresets
         { "preventSystemFailure", false },
         { "addShipCurtain", false },
         { "addRepairWrench", false },
+        { "funnySounds", false },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -580,6 +585,7 @@ public static class SettingsPresets
         { "preventSystemFailure", true },
         { "addShipCurtain", true },
         { "addRepairWrench", true },
+        { "funnySounds", false },
     };
 
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()
@@ -870,6 +876,7 @@ public static class SettingsPresets
         { "preventSystemFailure", new RandomSettingValue(0.5f) },
         { "addShipCurtain", new RandomSettingValue(0.5f) },
         { "addRepairWrench", new RandomSettingValue(0.2f) },
+        { "funnySounds", new RandomSettingValue(0.05f) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }
