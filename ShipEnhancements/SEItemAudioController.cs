@@ -13,6 +13,12 @@ public static class SEItemAudioController
     private static AudioClip _tractorBeamPickUp;
     private static AudioClip _flagDrop;
     private static AudioClip _flagPickUp;
+    private static AudioClip _fuelTankDrop;
+    private static AudioClip _fuelTankPickUp;
+    private static AudioClip _gravityCrystalDrop;
+    private static AudioClip _gravityCrystalPickUp;
+    private static AudioClip _repairWrenchDrop;
+    private static AudioClip _repairWrenchPickUp;
 
     public static void Initialize()
     {
@@ -20,6 +26,12 @@ public static class SEItemAudioController
         _tractorBeamPickUp = ShipEnhancements.LoadAudio(AudioClipPath + "Pickup_BigRock_01.ogg");
         _flagDrop = ShipEnhancements.LoadAudio(AudioClipPath + "ExpeditionFlag_PutDown.ogg");
         _flagPickUp = ShipEnhancements.LoadAudio(AudioClipPath + "ExpeditionFlag_PickUp.ogg");
+        _fuelTankDrop = ShipEnhancements.LoadAudio(AudioClipPath + "FuelCanister_Drop.ogg");
+        _fuelTankPickUp = ShipEnhancements.LoadAudio(AudioClipPath + "FuelCanister_PickUp.ogg");
+        _gravityCrystalDrop = ShipEnhancements.LoadAudio(AudioClipPath + "GravityCrystal_Drop.ogg");
+        _gravityCrystalPickUp = ShipEnhancements.LoadAudio(AudioClipPath + "GravityCrystal_PickUp.ogg");
+        _repairWrenchDrop = ShipEnhancements.LoadAudio(AudioClipPath + "RepairWrench_Drop.ogg");
+        _repairWrenchPickUp = ShipEnhancements.LoadAudio(AudioClipPath + "RepairWrench_PickUp.ogg");
     }
 
     [HarmonyPostfix]
@@ -35,6 +47,18 @@ public static class SEItemAudioController
         {
             __instance._oneShotExternalSource.PlayOneShot(_tractorBeamDrop, DefaultVolume);
         }
+        if (itemType == ShipEnhancements.Instance.FuelTankType)
+        {
+            __instance._oneShotExternalSource.PlayOneShot(_fuelTankDrop, DefaultVolume);
+        }
+        if (itemType == ShipEnhancements.Instance.GravityCrystalType)
+        {
+            __instance._oneShotExternalSource.PlayOneShot(_gravityCrystalDrop, DefaultVolume);
+        }
+        if (itemType == ShipEnhancements.Instance.RepairWrenchType)
+        {
+            __instance._oneShotExternalSource.PlayOneShot(_repairWrenchDrop, DefaultVolume);
+        }
     }
 
     [HarmonyPostfix]
@@ -46,9 +70,23 @@ public static class SEItemAudioController
             return;
         }
 
+        ShipEnhancements.WriteDebugMessage(itemType);
+
         if (itemType == ShipEnhancements.Instance.PortableTractorBeamType)
         {
             __instance._oneShotExternalSource.PlayOneShot(_tractorBeamPickUp, DefaultVolume);
+        }
+        if (itemType == ShipEnhancements.Instance.FuelTankType)
+        {
+            __instance._oneShotExternalSource.PlayOneShot(_fuelTankPickUp, DefaultVolume);
+        }
+        if (itemType == ShipEnhancements.Instance.GravityCrystalType)
+        {
+            __instance._oneShotExternalSource.PlayOneShot(_gravityCrystalPickUp, DefaultVolume);
+        }
+        if (itemType == ShipEnhancements.Instance.RepairWrenchType)
+        {
+            __instance._oneShotExternalSource.PlayOneShot(_repairWrenchPickUp, DefaultVolume);
         }
     }
 
@@ -69,6 +107,18 @@ public static class SEItemAudioController
         {
             __instance._oneShotExternalSource.PlayOneShot(_flagDrop, DefaultVolume);
         }
+        if (itemType == ShipEnhancements.Instance.FuelTankType)
+        {
+            __instance._oneShotExternalSource.PlayOneShot(_fuelTankDrop, DefaultVolume);
+        }
+        if (itemType == ShipEnhancements.Instance.GravityCrystalType)
+        {
+            __instance._oneShotExternalSource.PlayOneShot(_gravityCrystalDrop, DefaultVolume);
+        }
+        if (itemType == ShipEnhancements.Instance.RepairWrenchType)
+        {
+            __instance._oneShotExternalSource.PlayOneShot(_repairWrenchDrop, DefaultVolume);
+        }
     }
 
     [HarmonyPostfix]
@@ -87,6 +137,18 @@ public static class SEItemAudioController
         else if (itemType == ShipEnhancements.Instance.ExpeditionFlagType)
         {
             __instance._oneShotExternalSource.PlayOneShot(_flagPickUp, DefaultVolume);
+        }
+        if (itemType == ShipEnhancements.Instance.FuelTankType)
+        {
+            __instance._oneShotExternalSource.PlayOneShot(_fuelTankPickUp, DefaultVolume);
+        }
+        if (itemType == ShipEnhancements.Instance.GravityCrystalType)
+        {
+            __instance._oneShotExternalSource.PlayOneShot(_gravityCrystalPickUp, DefaultVolume);
+        }
+        if (itemType == ShipEnhancements.Instance.RepairWrenchType)
+        {
+            __instance._oneShotExternalSource.PlayOneShot(_repairWrenchPickUp, DefaultVolume);
         }
     }
 }

@@ -41,6 +41,7 @@ public class FuelTankItem : OWItem
     public override void Awake()
     {
         base.Awake();
+        _type = ItemType;
         _itemCollider = GetComponent<Collider>();
         _refuelPrompt = new ScreenPrompt(InputLibrary.interactSecondary, "<CMD>" + UITextLibrary.GetString(UITextType.HoldPrompt)
             + " Refill Fuel", 0, ScreenPrompt.DisplayState.Normal, false);
