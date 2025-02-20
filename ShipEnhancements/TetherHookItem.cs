@@ -10,12 +10,8 @@ public class TetherHookItem : OWItem
     private GameObject _connectionMesh;
     [SerializeField]
     private Transform _anchorPos;
-    [SerializeField]
-    private OWAudioSource _audioSource;
-    [SerializeField]
-    private AudioClip _attachTetherAudio;
-    [SerializeField]
-    private AudioClip _dropAudio;
+    /*[SerializeField]
+    private OWAudioSource _audioSource;*/
 
     private Tether _tether;
     private Tether _activeTether;
@@ -24,6 +20,10 @@ public class TetherHookItem : OWItem
     private bool _lastFocused = false;
     private ShipDetachableModule _attachedModule = null;
     private ShipDetachableLeg _attachedLeg = null;
+    private OWAudioSource _playerExternalAudio = null;
+
+    private AudioClip _attachTetherAudio;
+    private AudioClip _detachTetherAudio;
 
     public override string GetDisplayName()
     {
@@ -37,7 +37,12 @@ public class TetherHookItem : OWItem
         _tether = GetComponent<Tether>();
         _activeTether = _tether;
         _cameraManipulator = FindObjectOfType<FirstPersonManipulator>();
+        _playerExternalAudio = SELocator.GetPlayerBody().GetComponentInChildren<PlayerAudioController>()._oneShotExternalSource;
         _tetherPrompt = new ScreenPrompt(InputLibrary.interactSecondary, "Attach Tether", 0, ScreenPrompt.DisplayState.Normal, false);
+
+        _attachTetherAudio = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/TetherHook_Attach.ogg");
+        _detachTetherAudio = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/TetherHook_Detach.ogg");
+
         _connectionMesh.SetActive(false);
 
         /*GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
@@ -79,7 +84,7 @@ public class TetherHookItem : OWItem
                 ShipEnhancements.Instance.playerTether = _activeTether;
                 _connectionMesh.SetActive(true);
                 _tetherPrompt.SetText("Detach Tether");
-                PlayOneShotAudio(_attachTetherAudio, 0.6f);
+                _playerExternalAudio.PlayOneShot(_attachTetherAudio, 0.5f);
 
                 if (ShipEnhancements.InMultiplayer)
                 {
@@ -95,7 +100,7 @@ public class TetherHookItem : OWItem
                 _activeTether = ShipEnhancements.Instance.playerTether;
                 _activeTether.TransferTether(GetComponentInParent<OWRigidbody>(), transform.parent.InverseTransformPoint(_anchorPos.position), this);
                 ShipEnhancements.Instance.playerTether = null;
-                PlayOneShotAudio(_attachTetherAudio, 0.6f);
+                _playerExternalAudio.PlayOneShot(_attachTetherAudio, 0.5f);
 
                 if (ShipEnhancements.InMultiplayer)
                 {
@@ -119,7 +124,7 @@ public class TetherHookItem : OWItem
         _activeTether.CreateRemoteTether(playerRemote.transform, _anchorPos.localPosition, Vector3.zero);
         _connectionMesh.SetActive(true);
         _tetherPrompt.SetText("Detach Tether");
-        PlayOneShotAudio(_attachTetherAudio, 0.6f);
+        _playerExternalAudio.PlayOneShot(_attachTetherAudio, 0.5f);
     }
 
     public void DisconnectTether()
@@ -141,6 +146,7 @@ public class TetherHookItem : OWItem
         _activeTether = _tether;
         _connectionMesh.SetActive(false);
         _tetherPrompt.SetText("Attach Tether");
+        _playerExternalAudio.PlayOneShot(_detachTetherAudio, 0.5f);
         if (_activeTether == ShipEnhancements.Instance.playerTether)
         {
             ShipEnhancements.Instance.playerTether = null;
@@ -169,7 +175,7 @@ public class TetherHookItem : OWItem
     {
         _activeTether = newTether;
         _activeTether.TransferTether(GetComponentInParent<OWRigidbody>(), transform.parent.InverseTransformPoint(_anchorPos.position), this);
-        PlayOneShotAudio(_attachTetherAudio, 0.6f);
+        _playerExternalAudio.PlayOneShot(_attachTetherAudio, 0.5f);
     }
 
     public void SetTether(Tether newTether)
@@ -215,9 +221,9 @@ public class TetherHookItem : OWItem
 
         Locator.GetPromptManager().AddScreenPrompt(_tetherPrompt, PromptPosition.Center, false);
         transform.localScale = Vector3.one;
-        _audioSource.clip = _dropAudio;
+        /*_audioSource.clip = _dropAudio;
         _audioSource.pitch = Random.Range(0.95f, 1.05f);
-        _audioSource.Play();
+        _audioSource.Play();*/
     }
 
     public override void PickUpItem(Transform holdTranform)
@@ -242,7 +248,7 @@ public class TetherHookItem : OWItem
         Locator.GetPromptManager().RemoveScreenPrompt(_tetherPrompt);
         transform.localScale = Vector3.one * 0.6f;
         transform.localPosition -= new Vector3(0f, 0.1f, 0f);
-        _audioSource.Stop();
+        //_audioSource.Stop();
     }
 
     public override void SocketItem(Transform socketTransform, Sector sector)
@@ -258,11 +264,11 @@ public class TetherHookItem : OWItem
         transform.localPosition -= new Vector3(0f, 0.1f, 0f);
     }
 
-    private void PlayOneShotAudio(AudioClip clip, float volume)
+    /*private void PlayOneShotAudio(AudioClip clip, float volume)
     {
         _audioSource.pitch = _audioSource.time > 0 ? _audioSource.pitch : Random.Range(0.95f, 1.05f);
         _audioSource.PlayOneShot(clip, volume);
-    }
+    }*/
 
     /*private void OnShipSystemFailure()
     {

@@ -19,6 +19,7 @@ public static class SEItemAudioController
     private static AudioClip _gravityCrystalPickUp;
     private static AudioClip _repairWrenchDrop;
     private static AudioClip _repairWrenchPickUp;
+    private static AudioClip _tetherHookDrop;
 
     public static void Initialize()
     {
@@ -32,6 +33,7 @@ public static class SEItemAudioController
         _gravityCrystalPickUp = ShipEnhancements.LoadAudio(AudioClipPath + "GravityCrystal_PickUp.ogg");
         _repairWrenchDrop = ShipEnhancements.LoadAudio(AudioClipPath + "RepairWrench_Drop.ogg");
         _repairWrenchPickUp = ShipEnhancements.LoadAudio(AudioClipPath + "RepairWrench_PickUp.ogg");
+        _tetherHookDrop = ShipEnhancements.LoadAudio(AudioClipPath + "TetherHook_Drop.ogg");
     }
 
     [HarmonyPostfix]
@@ -69,8 +71,6 @@ public static class SEItemAudioController
         {
             return;
         }
-
-        ShipEnhancements.WriteDebugMessage(itemType);
 
         if (itemType == ShipEnhancements.Instance.PortableTractorBeamType)
         {
@@ -118,6 +118,10 @@ public static class SEItemAudioController
         if (itemType == ShipEnhancements.Instance.RepairWrenchType)
         {
             __instance._oneShotExternalSource.PlayOneShot(_repairWrenchDrop, DefaultVolume);
+        }
+        if (itemType == ShipEnhancements.Instance.TetherHookType)
+        {
+            __instance._oneShotExternalSource.PlayOneShot(_tetherHookDrop, DefaultVolume);
         }
     }
 
