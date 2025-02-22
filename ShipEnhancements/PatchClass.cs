@@ -3537,4 +3537,33 @@ public static class PatchClass
         return false;
     }
     #endregion
+
+    #region AlwaysAllowMapLockOn
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ReferenceFrameTracker), nameof(ReferenceFrameTracker.Update))]
+    public static bool AlwaysAllowLockOn(ReferenceFrameTracker __instance)
+    {
+        if (!(bool)alwaysAllowLockOn.GetProperty()) return true;
+
+        if (__instance._activeCam == null)
+        {
+            return false;
+        }
+        if (__instance._cloakController != null && __instance._hasTarget && !__instance._currentReferenceFrame.GetOWRigidBody().IsKinematic() && __instance._cloakController.CheckBodyInsideCloak(__instance._currentReferenceFrame.GetOWRigidBody()) != __instance._cloakController.isPlayerInsideCloak)
+        {
+            __instance.UntargetReferenceFrame();
+        }
+        //__instance._playerTargetingActive = Locator.GetPlayerSuit().IsWearingHelmet() && PlayerState.InZeroG() && __instance._blockerCount <= 0;
+        __instance._playerTargetingActive = Locator.GetPlayerSuit().IsWearingHelmet() 
+            && (PlayerState.InZeroG() || PlayerState.InMapView()) && __instance._blockerCount <= 0;
+        __instance._shipTargetingActive = PlayerState.AtFlightConsole();
+        __instance._mapTargetingActive = __instance._isMapView && (__instance._playerTargetingActive || PlayerState.IsInsideShip());
+        if (__instance._playerTargetingActive || __instance._shipTargetingActive || __instance._mapTargetingActive)
+        {
+            __instance.UpdateTargeting();
+        }
+
+        return false;
+    }
+    #endregion
 }

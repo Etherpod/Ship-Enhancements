@@ -102,6 +102,7 @@ public static class SettingExtensions
         { Settings.addShipCurtain, (false, false) },
         { Settings.addRepairWrench, (false, false) },
         { Settings.funnySounds, (false, false) },
+        { Settings.alwaysAllowLockOn, (false, false) },
     };
 
     public static string GetName(this Settings setting)

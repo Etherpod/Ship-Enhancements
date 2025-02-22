@@ -703,6 +703,12 @@
       "type": "toggle",
       "value": true,
       "tooltip": "Lets you walk around your ship normally when in high-gravity areas, like near the sun."
+    },
+    "alwaysAllowLockOn": {
+      "title": "Always Allow Map Lock-on",
+      "type": "toggle",
+      "value": true,
+      "tooltip": "Let's you lock onto targets in the map view at any time."
     }
   }
 }

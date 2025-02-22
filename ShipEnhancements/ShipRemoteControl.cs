@@ -281,8 +281,9 @@ public class ShipRemoteControl : MonoBehaviour
                 return ShipEnhancements.Instance.engineOn;
             case ShipCommand.Autopilot:
                 ReferenceFrame referenceFrame = Locator.GetReferenceFrame(true);
-                return _autopilot.enabled || (referenceFrame != null && referenceFrame.GetAllowAutopilot() && !_autopilot.IsDamaged() 
-                    && Vector3.Distance(SELocator.GetShipBody().GetPosition(), referenceFrame.GetPosition()) > referenceFrame.GetAutopilotArrivalDistance());
+                return _autopilot.enabled || (referenceFrame != null && referenceFrame.GetAllowAutopilot() && !_autopilot.IsDamaged() && ShipEnhancements.Instance.engineOn 
+                    && PlayerData.GetAutopilotEnabled() && Vector3.Distance(SELocator.GetShipBody().GetPosition(), referenceFrame.GetPosition()) 
+                    > referenceFrame.GetAutopilotArrivalDistance());
             case ShipCommand.Eject:
                 return !SELocator.GetShipDamageController().IsCockpitDetached();
             case ShipCommand.EjectSupplies:
