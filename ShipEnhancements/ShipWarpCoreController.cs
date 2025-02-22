@@ -201,11 +201,13 @@ public class ShipWarpCoreController : CockpitInteractible
     {
         if (_receiver == null) return;
 
-        if (ShipLogEntryHUDMarker.s_entryLocationID == _brittleHollowCannonEntryID)
+        if (ShipLogEntryHUDMarker.s_entryLocationID == _brittleHollowCannonEntryID 
+            || Locator.GetReferenceFrame(true).GetOWRigidBody() == Locator.GetAstroObject(AstroObject.Name.BrittleHollow).GetOWRigidbody())
         {
             _targetCannon = _brittleHollowCannon;
         }
-        else if (ShipLogEntryHUDMarker.s_entryLocationID == _emberTwinCannonEntryID)
+        else if (ShipLogEntryHUDMarker.s_entryLocationID == _emberTwinCannonEntryID
+            || Locator.GetReferenceFrame(true).GetOWRigidBody() == Locator.GetAstroObject(AstroObject.Name.CaveTwin).GetOWRigidbody())
         {
             _targetCannon = _emberTwinCannon;
         }
