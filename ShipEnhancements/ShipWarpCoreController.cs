@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
@@ -120,6 +121,11 @@ public class ShipWarpCoreController : CockpitInteractible
         {
             _receiver.SetGravityCannonSocket(_targetCannon._shuttleSocket);
         }
+        else if (_damaged && !SELocator.GetShipDamageController().IsSystemFailed() && (float)shipDamageMultiplier.GetProperty() > 0f)
+        {
+            ApplyWarpDamage();
+        }
+
         _receiver.WarpBodyToReceiver(_shipBody, _warpingWithPlayer);
         _interactReceiver.EnableInteraction();
         _warping = false;
@@ -294,6 +300,46 @@ public class ShipWarpCoreController : CockpitInteractible
         else
         {
             return PlayerState.IsInsideShip() || PlayerState.AtFlightConsole();
+        }
+    }
+
+    private void ApplyWarpDamage()
+    {
+        if (ShipEnhancements.InMultiplayer && !ShipEnhancements.QSBAPI.GetIsHost()) return;
+
+        ShipComponent[] components = SELocator.GetShipDamageController()._shipComponents
+            .Where((component) => component.repairFraction == 1f && !component.isDamaged).ToArray();
+        if (components.Length > 0 && Random.value < 0.3f)
+        {
+            components[Random.Range(0, components.Length)].SetDamaged(true);
+        }
+        else
+        {
+            ShipHull[] hulls = SELocator.GetShipDamageController()._shipHulls.Where((hull) => hull.integrity > 0f).ToArray();
+            ShipHull targetHull = hulls[Random.Range(0, hulls.Length)];
+
+            bool wasDamaged = targetHull._damaged;
+            targetHull._damaged = true;
+            targetHull._integrity = Mathf.Max(0f, targetHull._integrity - Random.Range(0.05f, 0.15f) * (float)shipDamageMultiplier.GetProperty());
+            var eventDelegate1 = (System.MulticastDelegate)typeof(ShipHull).GetField("OnDamaged",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic
+                | System.Reflection.BindingFlags.Public).GetValue(targetHull);
+            if (eventDelegate1 != null)
+            {
+                foreach (var handler in eventDelegate1.GetInvocationList())
+                {
+                    handler.Method.Invoke(handler.Target, [targetHull]);
+                }
+            }
+            if (targetHull._damageEffect != null)
+            {
+                targetHull._damageEffect.SetEffectBlend(1f - targetHull._integrity);
+            }
+
+            if (ShipEnhancements.InMultiplayer)
+            {
+                ShipEnhancements.QSBInteraction.SetHullDamaged(targetHull, !wasDamaged);
+            }
         }
     }
 
