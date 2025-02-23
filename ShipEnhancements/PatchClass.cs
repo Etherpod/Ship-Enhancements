@@ -2523,6 +2523,23 @@ public static class PatchClass
             comp.OnDamaged += damageDisplay.OnComponentUpdate;
             comp.OnRepaired += damageDisplay.OnComponentUpdate;
         }
+        if ((bool)addShipWarpCore.GetProperty() && (bool)shipWarpCoreComponent.GetProperty())
+        {
+            GameObject warpCoreComponent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipWarpCoreComponent.prefab");
+            AssetBundleUtilities.ReplaceShaders(warpCoreComponent);
+            warpCoreComponent.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = UnityEngine.Object.FindObjectOfType<ShipBody>().gameObject;
+            GameObject componentObj = UnityEngine.Object.Instantiate(warpCoreComponent, __instance.transform.Find("Systems_Cockpit"));
+            SELocator.SetShipWarpCoreComponent(componentObj.GetComponent<ShipWarpCoreComponent>());
+
+            if (GameObject.Find("TimberHearth_Body"))
+            {
+                GameObject receiver = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipWarpReceiver.prefab");
+                AssetBundleUtilities.ReplaceShaders(receiver);
+                receiver.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = UnityEngine.Object.FindObjectOfType<ShipBody>().gameObject;
+                GameObject receiverObj = UnityEngine.Object.Instantiate(receiver, GameObject.Find("TimberHearth_Body").transform);
+                componentObj.GetComponentInChildren<ShipWarpCoreController>().SetReceiver(receiverObj.GetComponent<ShipWarpCoreReceiver>());
+            }
+        }
     }
 
     [HarmonyPostfix]
@@ -2548,6 +2565,10 @@ public static class PatchClass
         else if (TextID == ShipEnhancements.Instance.SignalscopeName)
         {
             __result = "SIGNALSCOPE";
+        }
+        else if (TextID == ShipEnhancements.Instance.WarpCoreName)
+        {
+            __result = "WARP CORE";
         }
     }
 
@@ -2882,19 +2903,6 @@ public static class PatchClass
             case "All Except Forward":
                 input = new Vector3(0f, 0f, Mathf.Max(input.z, 0f));
                 break;
-        }
-    }
-    #endregion
-
-    #region ShipWarpCore
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(SingularityWarpEffect), nameof(SingularityWarpEffect.Awake))]
-    public static void AssignWarpedObject(SingularityWarpEffect __instance)
-    {
-        if (__instance.GetComponentInParent<ShipWarpCoreController>()
-            || __instance.GetComponentInParent<ShipWarpCoreReceiver>())
-        {
-            __instance._warpedObjectGeometry = SELocator.GetShipBody().gameObject;
         }
     }
     #endregion

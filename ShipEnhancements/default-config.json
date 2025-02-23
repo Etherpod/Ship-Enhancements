@@ -390,6 +390,12 @@
       "value": false,
       "tooltip": "Attaches a Nomai warp core to the cockpit, allowing you to recall your ship to the launch pad using a button on the ceiling of the cockpit."
     },
+    "shipWarpCoreComponent": {
+      "title": "Ship Warp Core Component",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "If the Ship Warp Core is enabled, this turns the warp core into a fully functioning component. Return warps may not function as intended if the warp core is damaged."
+    },
     "enableManualScoutRecall": {
       "title": "Enable Manual Scout Recall",
       "type": "toggle",

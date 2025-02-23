@@ -29,6 +29,7 @@ public static class SELocator
     private static FuelTankItem _fuelTankItem;
     private static PortableTractorBeamItem _tractorBeamItem;
     private static CockpitErnesto _ernesto;
+    private static ShipWarpCoreComponent _warpCoreComponent;
 
     public static void Initalize()
     {
@@ -152,6 +153,16 @@ public static class SELocator
     public static void SetSignalscopeComponent(SignalscopeComponent obj)
     {
         _signalscopeComponent = obj;
+    }
+
+    public static ShipWarpCoreComponent GetShipWarpCoreComponent()
+    {
+        return _warpCoreComponent;
+    }
+
+    public static void SetShipWarpCoreComponent(ShipWarpCoreComponent obj)
+    {
+        _warpCoreComponent = obj;
     }
 
     public static ShipTemperatureDetector GetShipTemperatureDetector()

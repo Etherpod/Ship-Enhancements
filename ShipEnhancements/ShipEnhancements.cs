@@ -64,6 +64,7 @@ public class ShipEnhancements : ModBehaviour
 
     public UITextType ProbeLauncherName { get; private set; }
     public UITextType SignalscopeName { get; private set; }
+    public UITextType WarpCoreName { get; private set; }
     public ItemType PortableCampfireType { get; private set; }
     public ItemType TetherHookType { get; private set; }
     public ItemType PortableTractorBeamType { get; private set; }
@@ -180,6 +181,7 @@ public class ShipEnhancements : ModBehaviour
         addRepairWrench,
         funnySounds,
         alwaysAllowLockOn,
+        shipWarpCoreComponent,
     }
 
     private void Awake()
@@ -199,6 +201,7 @@ public class ShipEnhancements : ModBehaviour
 
         ProbeLauncherName = EnumUtils.Create<UITextType>("ScoutLauncher");
         SignalscopeName = EnumUtils.Create<UITextType>("Signalscope");
+        WarpCoreName = EnumUtils.Create<UITextType>("WarpCore");
         PortableCampfireType = EnumUtils.Create<ItemType>("PortableCampfire");
         TetherHookType = EnumUtils.Create<ItemType>("TetherHook");
         PortableTractorBeamType = EnumUtils.Create<ItemType>("PortableTractorBeam");
@@ -974,16 +977,18 @@ public class ShipEnhancements : ModBehaviour
         {
             SELocator.GetShipTransform().GetComponentInChildren<ShipTractorBeamSwitch>()._functional = false;
         }
-        if ((bool)Settings.addShipWarpCore.GetProperty())
+        if ((bool)Settings.addShipWarpCore.GetProperty() && !(bool)Settings.shipWarpCoreComponent.GetProperty())
         {
             GameObject core = LoadPrefab("Assets/ShipEnhancements/ShipWarpCore.prefab");
             AssetBundleUtilities.ReplaceShaders(core);
+            core.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = SELocator.GetShipBody().gameObject;
             GameObject coreObj = Instantiate(core, SELocator.GetShipTransform().Find("Module_Cockpit"));
 
             if (GameObject.Find("TimberHearth_Body"))
             {
                 GameObject receiver = LoadPrefab("Assets/ShipEnhancements/ShipWarpReceiver.prefab");
                 AssetBundleUtilities.ReplaceShaders(receiver);
+                receiver.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = SELocator.GetShipBody().gameObject;
                 GameObject receiverObj = Instantiate(receiver, GameObject.Find("TimberHearth_Body").transform);
                 coreObj.GetComponent<ShipWarpCoreController>().SetReceiver(receiverObj.GetComponent<ShipWarpCoreReceiver>());
             }

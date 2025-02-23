@@ -103,6 +103,7 @@ public static class SettingExtensions
         { Settings.addRepairWrench, (false, false) },
         { Settings.funnySounds, (false, false) },
         { Settings.alwaysAllowLockOn, (false, false) },
+        { Settings.shipWarpCoreComponent, (false, false) },
     };
 
     public static string GetName(this Settings setting)

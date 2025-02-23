@@ -19,11 +19,13 @@ public class ShipWarpCoreController : CockpitInteractible
     private bool _warpingWithPlayer = false;
     private readonly float _warpLength = 1f;
     private bool _warping = false;
+    private bool _damaged = false;
     private bool _pressed = false;
     private float _buttonOffset = -0.121f;
     private GravityCannonController _brittleHollowCannon;
     private GravityCannonController _emberTwinCannon;
     private GravityCannonController _targetCannon;
+    private Transform _randomDestination;
 
     private readonly string _brittleHollowCannonEntryID = "BH_GRAVITY_CANNON";
     private readonly string _emberTwinCannonEntryID = "CT_GRAVITY_CANNON";
@@ -31,7 +33,7 @@ public class ShipWarpCoreController : CockpitInteractible
     public override void Awake()
     {
         base.Awake();
-        _shipBody = SELocator.GetShipBody();
+        _shipBody = SELocator.GetShipBody() ?? FindObjectOfType<ShipBody>();
         GlobalMessenger<OWRigidbody>.AddListener("ShipCockpitDetached", OnShipCockpitDetached);
     }
 
@@ -39,6 +41,11 @@ public class ShipWarpCoreController : CockpitInteractible
     {
         _brittleHollowCannon = Locator.GetGravityCannon(NomaiShuttleController.ShuttleID.BrittleHollowShuttle);
         _emberTwinCannon = Locator.GetGravityCannon(NomaiShuttleController.ShuttleID.HourglassShuttle);
+        _randomDestination = new GameObject("ShipRandomWarpDestination").transform;
+        if (Locator.GetAstroObject(AstroObject.Name.Sun) != null)
+        {
+            _randomDestination.parent = Locator.GetAstroObject(AstroObject.Name.Sun).transform;
+        }
 
         _interactReceiver.ChangePrompt("Activate Return Warp");
         _warpEffect.transform.localPosition = _shipPivot.localPosition;
@@ -48,6 +55,7 @@ public class ShipWarpCoreController : CockpitInteractible
     {
         _buttonTransform.localPosition = new Vector3(0, _buttonOffset, 0);
         _pressed = true;
+
         ActivateWarp();
         SendWarpMessage();
     }
@@ -107,8 +115,8 @@ public class ShipWarpCoreController : CockpitInteractible
             _warpEffect.OnWarpComplete -= WarpShip;
             _receiver.PlayRecallEffect(_warpLength, _warpingWithPlayer);
         }
-        
-        if (_targetCannon != null)
+
+        if (_targetCannon != null && !_damaged)
         {
             _receiver.SetGravityCannonSocket(_targetCannon._shuttleSocket);
         }
@@ -202,12 +210,12 @@ public class ShipWarpCoreController : CockpitInteractible
         if (_receiver == null) return;
 
         if (ShipLogEntryHUDMarker.s_entryLocationID == _brittleHollowCannonEntryID 
-            || Locator.GetReferenceFrame(true).GetOWRigidBody() == Locator.GetAstroObject(AstroObject.Name.BrittleHollow).GetOWRigidbody())
+            || Locator.GetReferenceFrame(true)?.GetOWRigidBody() == Locator.GetAstroObject(AstroObject.Name.BrittleHollow)?.GetOWRigidbody())
         {
             _targetCannon = _brittleHollowCannon;
         }
         else if (ShipLogEntryHUDMarker.s_entryLocationID == _emberTwinCannonEntryID
-            || Locator.GetReferenceFrame(true).GetOWRigidBody() == Locator.GetAstroObject(AstroObject.Name.CaveTwin).GetOWRigidbody())
+            || Locator.GetReferenceFrame(true)?.GetOWRigidBody() == Locator.GetAstroObject(AstroObject.Name.CaveTwin)?.GetOWRigidbody())
         {
             _targetCannon = _emberTwinCannon;
         }
@@ -215,6 +223,12 @@ public class ShipWarpCoreController : CockpitInteractible
         {
             _targetCannon = null;
             _receiver.SetGravityCannonSocket(null);
+        }
+
+        if (_damaged)
+        {
+            _randomDestination.transform.localPosition = Random.insideUnitSphere * 20000f;
+            _receiver.SetCustomDestination(_randomDestination);
         }
 
         if (IsShipOccupied())
@@ -280,6 +294,15 @@ public class ShipWarpCoreController : CockpitInteractible
         else
         {
             return PlayerState.IsInsideShip() || PlayerState.AtFlightConsole();
+        }
+    }
+
+    public void SetDamaged(bool damaged)
+    {
+        _damaged = damaged;
+        if (!_damaged)
+        {
+            _receiver.SetCustomDestination(null);
         }
     }
 
