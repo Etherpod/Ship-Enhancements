@@ -108,11 +108,13 @@ public class ShipWarpCoreController : CockpitInteractible
     {
         if (_warpingWithPlayer)
         {
+            ShipEnhancements.WriteDebugMessage("Unsubscribed");
             _warpEffect.singularityController.OnCreation -= WarpShip;
             _warpEffect.singularityController.CollapseImmediate();
         }
         else
         {
+            ShipEnhancements.WriteDebugMessage("Unsubscribed 2");
             _warpEffect.OnWarpComplete -= WarpShip;
             _receiver.PlayRecallEffect(_warpLength, _warpingWithPlayer);
         }

@@ -89,8 +89,27 @@ public class CockpitFilthController : MonoBehaviour
 
     private void Update()
     {
-        if (_clearDirt)
+        float clearTime = _dirtClearTime;
+
+        float spinSpeed = SELocator.GetShipBody().GetAngularVelocity().sqrMagnitude;
+        float spinPercent = Mathf.InverseLerp(ShipEnhancements.Instance.levelOneSpinSpeed * ShipEnhancements.Instance.levelOneSpinSpeed,
+            ShipEnhancements.Instance.levelTwoSpinSpeed * ShipEnhancements.Instance.levelTwoSpinSpeed, spinSpeed);
+
+        if (_clearDirt || spinPercent > 0)
         {
+            if (spinPercent > 0)
+            {
+                float spinClearTime = Mathf.Lerp(15f, 3f, spinPercent);
+                if (_clearDirt)
+                {
+                    clearTime = Mathf.Min(spinClearTime, clearTime);
+                }
+                else
+                {
+                    clearTime = spinClearTime;
+                }
+            }
+
             if (_dirtMat.GetFloat(_dirtUpperClipPropID) < 1f)
             {
                 _dirtMat.SetFloat(_dirtUpperClipPropID, Mathf.Lerp(1f, 0.5f, (_dirtBuildupProgression - 0.5f) * 2));
@@ -100,7 +119,7 @@ public class CockpitFilthController : MonoBehaviour
                 _dirtMat.SetFloat(_dirtLowerClipPropID, Mathf.Lerp(1f, 0f, _dirtBuildupProgression * 2));
             }
 
-            _dirtBuildupProgression = Mathf.Clamp01(_dirtBuildupProgression - Time.deltaTime / _dirtClearTime);
+            _dirtBuildupProgression = Mathf.Clamp01(_dirtBuildupProgression - Time.deltaTime / clearTime);
         }
         else if (_addDirtBuildup && _dirtBuildupProgression < (float)maxDirtAccumulation.GetProperty())
         {

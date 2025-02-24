@@ -176,12 +176,14 @@ public class ShipWarpCoreReceiver : MonoBehaviour
 
     public void PlayRecallEffect(float length, bool inShip)
     {
+        ShipEnhancements.WriteDebugMessage("recall effect");
         if (inShip)
         {
             _warpEffect.singularityController.Create();
         }
         else
         {
+            ShipEnhancements.WriteDebugMessage("scale zero");
             _warpEffect.OnWarpComplete += OnWarpComplete;
             _warpEffect.WarpObjectIn(length);
         }

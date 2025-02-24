@@ -11,6 +11,7 @@ public class ShipTemperatureDetector : TemperatureDetector
     private ShipHull[] _shipHulls;
     private ShipHull _lastDamagedHull;
     private ShipComponent[] _shipComponents;
+    private ShockLayerController _shockLayerController;
     private float _damageDelay = 1.5f;
     private float _randDamageDelay;
     private float _delayStartTime;
@@ -24,6 +25,7 @@ public class ShipTemperatureDetector : TemperatureDetector
 
         _shipHulls = SELocator.GetShipDamageController()._shipHulls;
         _shipComponents = SELocator.GetShipDamageController()._shipComponents;
+        _shockLayerController = SELocator.GetShipTransform().GetComponentInChildren<ShockLayerController>();
 
         _delayStartTime = Time.time;
         _randDamageDelay = _damageDelay + UnityEngine.Random.Range(-1f, 1f);
@@ -130,6 +132,34 @@ public class ShipTemperatureDetector : TemperatureDetector
         }).ToArray();
         ShipComponent targetComponent = enabledComponents[UnityEngine.Random.Range(0, enabledComponents.Length)];
         ApplyComponentTempDamage(targetComponent);
+    }
+
+    protected override float CalculateCurrentTemperature()
+    {
+        float totalTemperature = 0f;
+        foreach (TemperatureZone zone in _activeZones)
+        {
+            float temp = zone.GetTemperature(this);
+            totalTemperature += temp;
+        }
+
+        if (_shockLayerController.enabled && _shockLayerController._ruleset != null)
+        {
+            Vector3 toCenter = _shockLayerController._ruleset.GetRadialCenter().position - _shockLayerController._owRigidbody.GetPosition();
+            float centerDist = toCenter.magnitude;
+            float radiusMultiplier = 1f - Mathf.InverseLerp(_shockLayerController._ruleset.GetInnerRadius(), 
+                _shockLayerController._ruleset.GetOuterRadius(), centerDist);
+
+            Vector3 relativeFluidVelocity = _shockLayerController._fluidDetector.GetRelativeFluidVelocity();
+            float velocityMagnitude = relativeFluidVelocity.magnitude;
+            float shockSpeedPercent = Mathf.InverseLerp(_shockLayerController._ruleset.GetMinShockSpeed(), 
+                _shockLayerController._ruleset.GetMaxShockSpeed(), velocityMagnitude);
+            shockSpeedPercent *= radiusMultiplier;
+
+            totalTemperature += Mathf.Lerp(0f, 65f, shockSpeedPercent);
+        }
+
+        return Mathf.Clamp(totalTemperature, -100f, 100f);
     }
 
     protected override bool RoundInternalTemperature()

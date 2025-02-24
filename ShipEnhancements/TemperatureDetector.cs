@@ -24,13 +24,7 @@ public class TemperatureDetector : MonoBehaviour
     {
         if (_activeZones.Count > 0 || _updateNextFrame)
         {
-            float totalTemperature = 0f;
-            foreach (TemperatureZone zone in _activeZones)
-            {
-                float temp = zone.GetTemperature(this);
-                totalTemperature += temp;
-            }
-            _currentTemperature = Mathf.Clamp(totalTemperature, -100f, 100f);
+            _currentTemperature = CalculateCurrentTemperature();
 
             if (!_highTemperature)
             {
@@ -85,6 +79,17 @@ public class TemperatureDetector : MonoBehaviour
     }
 
     protected virtual void UpdateHighTemperature() { }
+
+    protected virtual float CalculateCurrentTemperature()
+    {
+        float totalTemperature = 0f;
+        foreach (TemperatureZone zone in _activeZones)
+        {
+            float temp = zone.GetTemperature(this);
+            totalTemperature += temp;
+        }
+        return Mathf.Clamp(totalTemperature, -100f, 100f);
+    }
 
     protected virtual bool RoundInternalTemperature()
     {

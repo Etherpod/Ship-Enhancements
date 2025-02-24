@@ -947,7 +947,7 @@ public static class PatchClass
         if (__instance.CompareTag("ShipDetector") && SELocator.GetShipTemperatureDetector() != null)
         {
             float ratio = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
-            float lerp = Mathf.InverseLerp(0.5f, 0f, ratio);
+            float lerp = Mathf.InverseLerp(0.49f, 0.1f, ratio);
             __result *= 1 - (0.5f * lerp);
         }
     }
@@ -2525,6 +2525,7 @@ public static class PatchClass
         }
         if ((bool)addShipWarpCore.GetProperty() && (bool)shipWarpCoreComponent.GetProperty())
         {
+            // setting wrong here??
             GameObject warpCoreComponent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipWarpCoreComponent.prefab");
             AssetBundleUtilities.ReplaceShaders(warpCoreComponent);
             warpCoreComponent.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = UnityEngine.Object.FindObjectOfType<ShipBody>().gameObject;
@@ -3343,9 +3344,9 @@ public static class PatchClass
     #region ErnestoComments
     [HarmonyPostfix]
     [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.OnHullImpact))]
-    public static void ErnestoHeavyImpact(float damage)
+    public static void ErnestoHeavyImpact(ShipDamageController __instance, float damage)
     {
-        if ((bool)addErnesto.GetProperty() && damage > 0.3f)
+        if ((bool)addErnesto.GetProperty() && !__instance._exploded && damage > 0.3f)
         {
             SELocator.GetErnesto().OnHeavyImpact();
         }
