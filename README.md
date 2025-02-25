@@ -143,10 +143,10 @@ To use the API, copy the **IShipEnhancements** script from this mod's GitHub rep
 - The Portable Campfire can be lit inside the core of Giant's Deep
 
 # Credits
-Big thanks to ColumbidaeCafe for helping develop most of the ideas and sound effects.
+Big thanks to **ColumbidaeCafe** for helping develop most of the ideas and sound effects!
 
-Thanks to Ditzy and JohnCorby for helping with some of the code, especially with the physics stuff and multiplayer compatibility.
+Thank you **ditzy** and **JohnCorby** for helping with some physics shenanigans ::)
 
-Shoutout to SpatialX for leaving a ton of ideas on the mod page.
+Thank you **SpatialX** for making an amazing [trailer for Ship Enhancements](https://youtu.be/FT8VdG_Bzo0) and for leaving a ton of ideas on the mod page!
 
-And thanks to the Outer Wilds Modding Community, this wouldn't have been possible without them.
+And a final thank you to the **Outer Wilds Modding** server on Discord, this wouldn't have been possible without them.
