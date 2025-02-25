@@ -490,7 +490,7 @@ public class ShipEnhancements : ModBehaviour
                 || (float)Settings.fuelDrainMultiplier.GetProperty() < 0f
                 || (float)Settings.fuelTankDrainMultiplier.GetProperty() < 0f
                 || (float)Settings.idleFuelConsumptionMultiplier.GetProperty() < 0f);
-            bool noOxygen = (bool)Settings.disableShipOxygen.GetProperty() 
+            bool noOxygen = (bool)Settings.disableShipOxygen.GetProperty()
                 || !(!oxygenDepleted || (bool)Settings.shipOxygenRefill.GetProperty()
                 || (float)Settings.oxygenDrainMultiplier.GetProperty() < 0f
                 || (float)Settings.oxygenTankDrainMultiplier.GetProperty() < 0f);
@@ -600,16 +600,20 @@ public class ShipEnhancements : ModBehaviour
         AssetBundleUtilities.ReplaceShaders(buttonConsole);
         Instantiate(buttonConsole, SELocator.GetShipBody().transform.Find("Module_Cockpit"));
 
-        Material material1 = (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillageCabin_Recolored_mat.mat");
-        Material material2 = (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillageMetal_Recolored_mat.mat");
-        Material material3 = (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillagePlanks_Recolored_mat.mat");
-        Material material4 = (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_CampsiteProps_Recolored_mat.mat");
+        Material[] newMaterials =
+        {
+            (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillageCabin_Recolored_mat.mat"),
+            (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillageMetal_Recolored_mat.mat"),
+            (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillagePlanks_Recolored_mat.mat"),
+            (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_CampsiteProps_Recolored_mat.mat"),
+            (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_SignsDecal_Recolored_mat.mat"),
+            (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillageCloth_Recolored_mat.mat"),
+            (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_NOM_CopperOld_mat.mat"),
+            (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_NOM_Sandstone_mat.mat"),
+        };
         Transform cockpitLight = SELocator.GetShipTransform().Find("Module_Cockpit/Lights_Cockpit/Pointlight_HEA_ShipCockpit");
         List<Material> materials = [.. cockpitLight.GetComponent<LightmapController>()._materials];
-        materials.Add(material1);
-        materials.Add(material2);
-        materials.Add(material3);
-        materials.Add(material4);
+        materials.AddRange(newMaterials);
         cockpitLight.GetComponent<LightmapController>()._materials = [.. materials];
 
         _shipLoaded = true;
@@ -966,6 +970,9 @@ public class ShipEnhancements : ModBehaviour
                 .GetComponent<MeshFilter>();
             targetRend.mesh = rend.mesh;
 
+            Mesh shadowMesh = LoadPrefab("Assets/ShipEnhancements/AltShadowCasters/Shadowcaster_Cabin_NoMallows.fbx").GetComponent<MeshFilter>().mesh;
+            SELocator.GetShipTransform().Find("Module_Cabin/Geo_Cabin/Shadowcaster_Cabin").GetComponent<MeshFilter>().mesh = shadowMesh;
+
             GameObject tank = LoadPrefab("Assets/ShipEnhancements/FuelTankItem.prefab");
             AssetBundleUtilities.ReplaceShaders(tank);
             GameObject tankObj = Instantiate(tank);
@@ -1078,6 +1085,9 @@ public class ShipEnhancements : ModBehaviour
             if ((bool)Settings.addFuelCanister.GetProperty())
             {
                 rend = LoadPrefab("Assets/ShipEnhancements/CurtainTankCabinReplacement.prefab").GetComponent<MeshFilter>();
+
+                Mesh shadowMesh = LoadPrefab("Assets/ShipEnhancements/AltShadowCasters/Shadowcaster_Cabin_NoMallows.fbx").GetComponent<MeshFilter>().mesh;
+                SELocator.GetShipTransform().Find("Module_Cabin/Geo_Cabin/Shadowcaster_Cabin").GetComponent<MeshFilter>().mesh = shadowMesh;
             }
             else
             {
@@ -1095,7 +1105,7 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)Settings.addRepairWrench.GetProperty())
         {
             GameObject wrenchSocketObj = LoadPrefab("Assets/ShipEnhancements/RepairWrenchSocket.prefab");
-            RepairWrenchSocket wrenchSocket = Instantiate(wrenchSocketObj, 
+            RepairWrenchSocket wrenchSocket = Instantiate(wrenchSocketObj,
                 SELocator.GetShipTransform().Find("Module_Cockpit")).GetComponent<RepairWrenchSocket>();
 
             GameObject wrenchObj = LoadPrefab("Assets/ShipEnhancements/RepairWrenchItem.prefab");
@@ -1589,7 +1599,7 @@ public class ShipEnhancements : ModBehaviour
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_TEMPERATURE_ENABLED", true);
         }
-        if ((string)Settings.disableThrusters.GetProperty() == "Backward" 
+        if ((string)Settings.disableThrusters.GetProperty() == "Backward"
             || (string)Settings.disableThrusters.GetProperty() == "All Except Forward")
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_RETRO_ROCKETS_DISABLED", true);

@@ -10,6 +10,8 @@ public class ShipGravityCrystalSocket : OWItemSocket
     private List<GameObject> _componentMeshes = [];
     private ShipGravityComponent _gravityComponent;
     private OWCollider _collider;
+    private GameObject _socketedShadowCaster;
+    private GameObject _removedShadowCaster;
 
     public override void Awake()
     {
@@ -19,10 +21,19 @@ public class ShipGravityCrystalSocket : OWItemSocket
         _acceptableType = ShipGravityCrystalItem.ItemType;
         _gravityComponent = SELocator.GetShipTransform().GetComponentInChildren<ShipGravityComponent>();
         _collider = gameObject.GetAddComponent<OWCollider>();
+        _socketedShadowCaster = SELocator.GetShipTransform().Find("Module_Engine/Geo_Engine/ShadowCaster_Engine").gameObject;
+        Mesh altShadowMesh = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/AltShadowCasters/ShadowCaster_Engine_NoGravCrystal.fbx").GetComponent<MeshFilter>().mesh;
+        _removedShadowCaster = Instantiate(_socketedShadowCaster, _socketedShadowCaster.transform.parent);
+        _removedShadowCaster.GetComponent<MeshFilter>().mesh = altShadowMesh;
 
         _gravityComponent.OnDamaged += OnGravityDamaged;
         _gravityComponent.OnRepaired += OnGravityRepaired;
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+    }
+
+    public override void Start()
+    {
+        base.Start();
     }
 
     public void AddComponentMeshes(GameObject[] meshes)
@@ -62,6 +73,8 @@ public class ShipGravityCrystalSocket : OWItemSocket
             {
                 obj.SetActive(true);
             }
+            _socketedShadowCaster.SetActive(true);
+            //_removedShadowCaster.SetActive(false);
         }
         return result;
     }
@@ -75,6 +88,8 @@ public class ShipGravityCrystalSocket : OWItemSocket
             {
                 obj.SetActive(false);
             }
+            _socketedShadowCaster.SetActive(false);
+            _removedShadowCaster.SetActive(true);
         }
         return result;
     }
