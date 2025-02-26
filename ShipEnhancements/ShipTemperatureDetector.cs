@@ -145,16 +145,28 @@ public class ShipTemperatureDetector : TemperatureDetector
 
         if (_shockLayerController.enabled && _shockLayerController._ruleset != null)
         {
-            Vector3 toCenter = _shockLayerController._ruleset.GetRadialCenter().position - _shockLayerController._owRigidbody.GetPosition();
-            float centerDist = toCenter.magnitude;
-            float radiusMultiplier = 1f - Mathf.InverseLerp(_shockLayerController._ruleset.GetInnerRadius(), 
-                _shockLayerController._ruleset.GetOuterRadius(), centerDist);
+            float shockSpeedPercent;
+            if (_shockLayerController._ruleset.GetShockLayerType() == ShockLayerRuleset.ShockType.Atmospheric)
+            {
+                Vector3 toCenter = _shockLayerController._ruleset.GetRadialCenter().position - _shockLayerController._owRigidbody.GetPosition();
+                float centerDist = toCenter.magnitude;
+                float radiusMultiplier = 1f - Mathf.InverseLerp(_shockLayerController._ruleset.GetInnerRadius(),
+                    _shockLayerController._ruleset.GetOuterRadius(), centerDist);
 
-            Vector3 relativeFluidVelocity = _shockLayerController._fluidDetector.GetRelativeFluidVelocity();
-            float velocityMagnitude = relativeFluidVelocity.magnitude;
-            float shockSpeedPercent = Mathf.InverseLerp(_shockLayerController._ruleset.GetMinShockSpeed(), 
-                _shockLayerController._ruleset.GetMaxShockSpeed(), velocityMagnitude);
-            shockSpeedPercent *= radiusMultiplier;
+                Vector3 relativeFluidVelocity = _shockLayerController._fluidDetector.GetRelativeFluidVelocity();
+                float velocityMagnitude = relativeFluidVelocity.magnitude;
+                shockSpeedPercent = Mathf.InverseLerp(_shockLayerController._ruleset.GetMinShockSpeed(),
+                    _shockLayerController._ruleset.GetMaxShockSpeed(), velocityMagnitude);
+                shockSpeedPercent *= radiusMultiplier;
+            }
+            else
+            {
+                Vector3 toCenter = _shockLayerController._ruleset.GetRadialCenter().position - _shockLayerController._owRigidbody.GetPosition();
+                float centerDist = toCenter.magnitude;
+                float radiusMultiplier = 1f - Mathf.InverseLerp(_shockLayerController._ruleset.GetInnerRadius(),
+                    _shockLayerController._ruleset.GetOuterRadius(), centerDist);
+                shockSpeedPercent = radiusMultiplier;
+            }
 
             totalTemperature += Mathf.Lerp(0f, 65f, shockSpeedPercent);
         }
