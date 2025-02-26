@@ -399,6 +399,13 @@ dialogue_target = "SE_Ernesto_Geswaldo"
 # ---
 
 [[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_200"
+text = "Is it just me, or are you... bigger?"
+dialogue_target = "SE_Ernesto_BigHead"
+
+# ---
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
 text = "Nevermind."
 
 
@@ -841,6 +848,87 @@ set_condition = ["SE_ERNESTO_EXPLODE_SHIP"]
 
 [[dialogue_node.dialogue]]
 page = ["Uh oh.", "Your attempts to persuade me are so miserable that the ship blows up."]
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_BigHead"
+
+[[dialogue_node.dialogue]]
+page = ["Uh, no? You'd have to change history to do that. And you can't do that last time I checked.", "Unless... did you eat a green marshmallow?"]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Uhh... no."
+dialogue_target = "SE_Ernesto_BigHead_1"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Sure did."
+dialogue_target = "SE_Ernesto_BigHead_2"
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_BigHead_1"
+
+[[dialogue_node.dialogue]]
+page = ["Oh, whew. I was getting worried you might have been messing with the Spacetime Continuum again."]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Don't worry, I know to stay away from it."
+dialogue_target = "SE_Ernesto_BigHead_11"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Wait, what do you mean again?"
+dialogue_target = "SE_Ernesto_BigHead_12"
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_BigHead_11"
+
+[[dialogue_node.dialogue]]
+page = ["I learned the same thing pretty quick after I almost destroyed reality."]
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_BigHead_12"
+
+[[dialogue_node.dialogue]]
+page = ["That's not important. Just some repressed memories, that's all.", "I'm sure they'll come back to you eventually."]
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_BigHead_2"
+
+[[dialogue_node.dialogue]]
+page = ["Uh oh, that probably isn't good. Changing the past isn't a thing people normally do."]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "How do we fix it?"
+dialogue_target = "SE_Ernesto_BigHead_21"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "What happens if I eat more?"
+dialogue_target = "SE_Ernesto_BigHead_22"
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_BigHead_21"
+
+[[dialogue_node.dialogue]]
+page = ["We don't. I'm sure history will fix itself eventually, though, and there's only a 50/50 chance it fails to correct itself and instead continues to mutuate and eventually becomes completely unrecognizable to us."]
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_BigHead_22"
+
+[[dialogue_node.dialogue]]
+page = ["It would probably keep changing random stuff. I'm not exactly sure how they do it, or where Esker even got them.", "I think that was the last one, though. I ate the other ones already."]
 
 
 

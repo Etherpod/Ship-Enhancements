@@ -362,6 +362,11 @@
         <DialogueTarget>SE_Ernesto_Geswaldo</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_200</RequiredCondition>
+        <Text>Is it just me, or are you... bigger?</Text>
+        <DialogueTarget>SE_Ernesto_BigHead</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
         <Text>Nevermind.</Text>
       </DialogueOption>
     </DialogueOptionsList>
@@ -737,6 +742,81 @@
       <Page>Your attempts to persuade me are so miserable that the ship blows up.</Page>
     </Dialogue>
     <SetCondition>SE_ERNESTO_EXPLODE_SHIP</SetCondition>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_BigHead</Name>
+    <Dialogue>
+      <Page>Uh, no? You'd have to change history to do that. And you can't do that last time I checked.</Page>
+      <Page>Unless... did you eat a green marshmallow?</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Uhh... no.</Text>
+        <DialogueTarget>SE_Ernesto_BigHead_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Sure did.</Text>
+        <DialogueTarget>SE_Ernesto_BigHead_2</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_BigHead_1</Name>
+    <Dialogue>
+      <Page>Oh, whew. I was getting worried you might have been messing with the Spacetime Continuum again.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Don't worry, I know to stay away from it.</Text>
+        <DialogueTarget>SE_Ernesto_BigHead_11</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Wait, what do you mean again?</Text>
+        <DialogueTarget>SE_Ernesto_BigHead_12</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_BigHead_11</Name>
+    <Dialogue>
+      <Page>I learned the same thing pretty quick after I almost destroyed reality.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_BigHead_12</Name>
+    <Dialogue>
+      <Page>That's not important. Just some repressed memories, that's all.</Page>
+      <Page>I'm sure they'll come back to you eventually.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_BigHead_2</Name>
+    <Dialogue>
+      <Page>Uh oh, that probably isn't good. Changing the past isn't a thing people normally do.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>How do we fix it?</Text>
+        <DialogueTarget>SE_Ernesto_BigHead_21</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>What happens if I eat more?</Text>
+        <DialogueTarget>SE_Ernesto_BigHead_22</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_BigHead_21</Name>
+    <Dialogue>
+      <Page>We don't. I'm sure history will fix itself eventually, though, and there's only a 50/50 chance it fails to correct itself and instead continues to mutuate and eventually becomes completely unrecognizable to us.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_BigHead_22</Name>
+    <Dialogue>
+      <Page>It would probably keep changing random stuff. I'm not exactly sure how they do it, or where Esker even got them.</Page>
+      <Page>I think that was the last one, though. I ate the other ones already.</Page>
+    </Dialogue>
   </DialogueNode>
   <DialogueNode>
     <Name>SE_Ernesto_Ernestos</Name>

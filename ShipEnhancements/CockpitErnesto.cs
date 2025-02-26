@@ -16,6 +16,7 @@ public class CockpitErnesto : MonoBehaviour
     private List<int> _questions = [];
     private List<int> _availableQuestions = [];
     private Coroutine _currentComment = null;
+    private bool _bigHeadMode = false;
 
     private readonly int _questionsCount = 23;
     private readonly float _commentLifetime = 10f;
@@ -73,6 +74,7 @@ public class CockpitErnesto : MonoBehaviour
         _dialogueTree.OnEndConversation += OnEndConversation;
         GlobalMessenger<OWRigidbody>.AddListener("EnterFlightConsole", OnEnterFlightConsole);
         GlobalMessenger.AddListener("ExitFlightConsole", OnExitFlightConsole);
+        GlobalMessenger.AddListener("EnableBigHeadMode", OnEnableBigHeadMode);
 
         ResetAvailableQuestions();
     }
@@ -110,6 +112,11 @@ public class CockpitErnesto : MonoBehaviour
         {
             _questions.Add(100);
         }
+
+        /*if (_bigHeadMode)
+        {
+            _questions.Add(200);
+        }*/
 
         _availableQuestions.AddRange(_questions);
     }
@@ -269,11 +276,24 @@ public class CockpitErnesto : MonoBehaviour
         _conversationZone.EnableInteraction();
     }
 
+    private void OnEnableBigHeadMode()
+    {
+        if (!_bigHeadMode)
+        {
+            _bigHeadMode = true;
+            transform.Find("Beast_Anglerfish").transform.localScale *= 2f;
+            transform.position += new Vector3(0f, 0.11f, 0f);
+            _questions.Add(200);
+            _availableQuestions.Add(200);
+        }
+    }
+
     private void OnDestroy()
     {
         _dialogueTree.OnStartConversation -= OnStartConversation;
         _dialogueTree.OnEndConversation -= OnEndConversation;
         GlobalMessenger<OWRigidbody>.RemoveListener("EnterFlightConsole", OnEnterFlightConsole);
         GlobalMessenger.RemoveListener("ExitFlightConsole", OnExitFlightConsole);
+        GlobalMessenger.RemoveListener("EnableBigHeadMode", OnEnableBigHeadMode);
     }
 }
