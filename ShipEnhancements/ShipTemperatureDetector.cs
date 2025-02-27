@@ -73,8 +73,14 @@ public class ShipTemperatureDetector : TemperatureDetector
         if ((bool)faultyHeatRegulators.GetProperty())
         {
             float multiplier = Mathf.InverseLerp(-_highTempCutoff / 4f, 0f, _currentTemperature);
+            float additiveMultiplier = 0f;
+            if (SELocator.GetShipDamageController().IsReactorCritical())
+            {
+                additiveMultiplier = 1.5f;
+            }
             float scalar = 1 + (1f * Mathf.InverseLerp(_highTempCutoff, 0f, Mathf.Abs(_currentTemperature)));
-            _internalTempMeter = Mathf.Clamp(_internalTempMeter + (Time.deltaTime * multiplier * scalar), -_internalTempMeterLength, _internalTempMeterLength);
+            _internalTempMeter = Mathf.Clamp(_internalTempMeter + (Time.deltaTime 
+                * ((multiplier * scalar) + additiveMultiplier)), -_internalTempMeterLength, _internalTempMeterLength);
         }
 
         UpdateTemperatureDamage();
