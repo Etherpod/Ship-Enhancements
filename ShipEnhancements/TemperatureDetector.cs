@@ -13,6 +13,8 @@ public class TemperatureDetector : MonoBehaviour
     protected float _internalTempMeter;
     protected bool _updateNextFrame = false;
 
+    protected virtual bool UpdateTemperature => _activeZones.Count > 0 || _updateNextFrame;
+
     protected virtual void Start()
     {
         _currentTemperature = 0f;
@@ -22,7 +24,7 @@ public class TemperatureDetector : MonoBehaviour
 
     protected virtual void Update()
     {
-        if (_activeZones.Count > 0 || _updateNextFrame)
+        if (UpdateTemperature)
         {
             _currentTemperature = CalculateCurrentTemperature();
 

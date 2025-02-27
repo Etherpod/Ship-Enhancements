@@ -24,6 +24,7 @@ public class CockpitFilthController : MonoBehaviour
     private string _dirtLowerClipPropID = "_LowerClip";
     private string _dirtUpperClipPropID = "_UpperClip";
     private FluidDetector _cockpitDetector;
+    private ShockLayerController _shockLayerController;
 
     private float _dirtBuildupProgression;
     private float _dirtBuildupTime;
@@ -35,8 +36,8 @@ public class CockpitFilthController : MonoBehaviour
     {
         { FluidVolume.Type.WATER, 5f },
         { FluidVolume.Type.GEYSER, 2f },
-        { FluidVolume.Type.SAND, 8f },
-        { FluidVolume.Type.CLOUD, 15f }
+        { FluidVolume.Type.SAND, 20f },
+        { FluidVolume.Type.CLOUD, 7f }
     };
 
     private void Awake()
@@ -44,6 +45,7 @@ public class CockpitFilthController : MonoBehaviour
         _rustProgression = Mathf.Lerp(1f, 0.15f, (float)rustLevel.GetProperty());
         _dirtBuildupTime = (float)dirtAccumulationTime.GetProperty();
         _cockpitDetector = GetComponentInChildren<StaticFluidDetector>();
+        _shockLayerController = SELocator.GetShipTransform().GetComponentInChildren<ShockLayerController>();
 
         if (_dirtBuildupTime > 0f)
         {
@@ -95,7 +97,29 @@ public class CockpitFilthController : MonoBehaviour
         float spinPercent = Mathf.InverseLerp(ShipEnhancements.Instance.levelOneSpinSpeed * ShipEnhancements.Instance.levelOneSpinSpeed,
             ShipEnhancements.Instance.levelTwoSpinSpeed * ShipEnhancements.Instance.levelTwoSpinSpeed, spinSpeed);
 
-        if (_clearDirt || spinPercent > 0)
+        float shockPercent = 0f;
+
+        if (_shockLayerController.enabled && _shockLayerController._ruleset != null)
+        {
+            if (_shockLayerController._ruleset.GetShockLayerType() == ShockLayerRuleset.ShockType.Atmospheric)
+            {
+                Vector3 toCenter = _shockLayerController._ruleset.GetRadialCenter().position - _shockLayerController._owRigidbody.GetPosition();
+                float centerDist = toCenter.magnitude;
+                float radiusMultiplier = 1f - Mathf.InverseLerp(_shockLayerController._ruleset.GetInnerRadius(),
+                    _shockLayerController._ruleset.GetOuterRadius(), centerDist);
+
+                Vector3 relativeFluidVelocity = _shockLayerController._fluidDetector.GetRelativeFluidVelocity();
+                float velocityMagnitude = relativeFluidVelocity.magnitude;
+                float minSpeed = _shockLayerController._ruleset.GetMinShockSpeed();
+                float maxSpeed = _shockLayerController._ruleset.GetMaxShockSpeed();
+                float shockSpeedPercent = Mathf.InverseLerp(minSpeed + ((maxSpeed - minSpeed) / 4), maxSpeed, velocityMagnitude);
+                shockSpeedPercent *= radiusMultiplier;
+
+                shockPercent = shockSpeedPercent;
+            }
+        }
+
+        if (_clearDirt || spinPercent > 0 || shockPercent > 0)
         {
             if (spinPercent > 0)
             {
@@ -107,6 +131,18 @@ public class CockpitFilthController : MonoBehaviour
                 else
                 {
                     clearTime = spinClearTime;
+                }
+            }
+            if (shockPercent > 0)
+            {
+                float shockClearTime = Mathf.Lerp(20f, 1f, shockPercent);
+                if (_clearDirt || spinPercent > 0)
+                {
+                    clearTime = Mathf.Min(shockClearTime, clearTime);
+                }
+                else
+                {
+                    clearTime = shockClearTime;
                 }
             }
 
