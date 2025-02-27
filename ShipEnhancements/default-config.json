@@ -109,6 +109,12 @@
       "value": false,
       "tooltip": "Removes the suit from the ship. How long can you hold your breath in space?"
     },
+    "disableShipMedkit": {
+      "title": "Disable Ship Medkit",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Prevents you from recovering health using the ship supplies."
+    },
     "singleUseTractorBeam": {
       "title": "Single-Use Tractor Beam",
       "type": "toggle",

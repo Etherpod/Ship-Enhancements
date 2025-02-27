@@ -104,6 +104,7 @@ public static class SettingExtensions
         { Settings.funnySounds, (false, false) },
         { Settings.alwaysAllowLockOn, (false, false) },
         { Settings.shipWarpCoreComponent, (false, false) },
+        { Settings.disableShipMedkit, (false, false) },
     };
 
     public static string GetName(this Settings setting)

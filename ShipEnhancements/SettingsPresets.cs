@@ -103,6 +103,7 @@ public static class SettingsPresets
         { "funnySounds", false },
         { "alwaysAllowLockOn", true },
         { "shipWarpCoreComponent", false },
+        { "disableShipMedkit", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -202,6 +203,7 @@ public static class SettingsPresets
         { "funnySounds", false },
         { "alwaysAllowLockOn", true },
         { "shipWarpCoreComponent", false },
+        { "disableShipMedkit", false },
     };
 
     public static readonly Dictionary<string, object> RelaxedSettings = new Dictionary<string, object>()
@@ -301,6 +303,7 @@ public static class SettingsPresets
         { "funnySounds", false },
         { "alwaysAllowLockOn", true },
         { "shipWarpCoreComponent", false },
+        { "disableShipMedkit", false },
     };
 
     public static readonly Dictionary<string, object> HardcoreSettings = new Dictionary<string, object>()
@@ -400,6 +403,7 @@ public static class SettingsPresets
         { "funnySounds", false },
         { "alwaysAllowLockOn", true },
         { "shipWarpCoreComponent", false },
+        { "disableShipMedkit", false },
     };
 
     public static readonly Dictionary<string, object> WandererSettings = new Dictionary<string, object>()
@@ -499,6 +503,7 @@ public static class SettingsPresets
         { "funnySounds", false },
         { "alwaysAllowLockOn", true },
         { "shipWarpCoreComponent", false },
+        { "disableShipMedkit", false },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -598,6 +603,7 @@ public static class SettingsPresets
         { "funnySounds", false },
         { "alwaysAllowLockOn", true },
         { "shipWarpCoreComponent", true },
+        { "disableShipMedkit", true },
     };
 
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()

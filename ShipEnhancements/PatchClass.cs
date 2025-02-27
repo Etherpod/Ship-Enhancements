@@ -3575,4 +3575,16 @@ public static class PatchClass
         return false;
     }
     #endregion
+
+    #region DisableShipMedkit
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(PlayerRecoveryPoint), nameof(PlayerRecoveryPoint.Awake))]
+    public static void DisableShipMedkit(PlayerRecoveryPoint __instance)
+    {
+        if ((bool)disableShipMedkit.GetProperty() && __instance.GetComponentInParent<ShipBody>())
+        {
+            __instance._healsPlayer = false;
+        }
+    }
+    #endregion
 }

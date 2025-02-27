@@ -181,7 +181,7 @@ public static class QSBInteractionPatches
     {
         var playerResources = SELocator.GetPlayerResources();
 
-        var needsHealing = playerResources.GetHealthFraction() != 1f;
+        var needsHealing = playerResources.GetHealthFraction() != 1f && !(bool)disableShipMedkit.GetProperty();
         var needsRefueling = playerResources.GetFuelFraction() != 1f;
         var canRefuel = SELocator.GetShipResources().GetFuel() > 0f;
         UITextType uiTextType;
@@ -241,7 +241,7 @@ public static class QSBInteractionPatches
         PlayerResources playerResources = SELocator.GetPlayerResources();
 
         var canRefuel = playerResources.GetFuelFraction() != 1f && SELocator.GetShipResources().GetFuel() > 0f;
-        var needsHealing = playerResources.GetHealthFraction() != 1f;
+        var needsHealing = playerResources.GetHealthFraction() != 1f && !(bool)disableShipMedkit.GetProperty();
         var needsRefill = false;
 
         if (canRefuel)

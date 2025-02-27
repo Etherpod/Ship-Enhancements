@@ -182,6 +182,7 @@ public class ShipEnhancements : ModBehaviour
         funnySounds,
         alwaysAllowLockOn,
         shipWarpCoreComponent,
+        disableShipMedkit,
     }
 
     private void Awake()
