@@ -17,6 +17,7 @@ public class RadioItem : OWItem
 
     private PriorityScreenPrompt _powerPrompt;
     private ScreenPrompt _tunePrompt;
+    private PriorityScreenPrompt _volumePrompt;
     private ScreenPrompt _upDownPrompt;
     private ScreenPrompt _leftRightPrompt;
     private ScreenPrompt _leavePrompt;
@@ -32,6 +33,7 @@ public class RadioItem : OWItem
 
     private Dictionary<string, AudioClip> _codesToAudio;
     private bool _playingAudio = false;
+    private float _currentVolume = 0.5f;
 
     private readonly int _minFrequency = 1;
     private readonly int _maxFrequency = 6;
@@ -61,7 +63,7 @@ public class RadioItem : OWItem
     {
         _codesToAudio = new()
         {
-            { "4623", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_LostSignal.mp3") },
+            { "2441", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_LostSignal.mp3") },
             { "2662", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_Chadvelers.mp3") },
             { "1513", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_NoTimeForCaution.mp3") },
             { "3363", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_LastDreamOfHome.mp3") },
@@ -83,18 +85,24 @@ public class RadioItem : OWItem
         _playerCam = Locator.GetPlayerCamera();
         _powerPrompt = new PriorityScreenPrompt(InputLibrary.cancel, _powerOnText, 0, ScreenPrompt.DisplayState.Normal, false);
         _tunePrompt = new ScreenPrompt(InputLibrary.interactSecondary, "Tune Radio", 0, ScreenPrompt.DisplayState.Normal, false);
+        _volumePrompt = new PriorityScreenPrompt(InputLibrary.toolOptionUp, InputLibrary.toolOptionDown, "Adjust Volume", ScreenPrompt.MultiCommandType.POS_NEG, 
+            0, ScreenPrompt.DisplayState.Normal, false);
         _leftRightPrompt = new ScreenPrompt(InputLibrary.left, InputLibrary.right, "Change Knob   <CMD>", ScreenPrompt.MultiCommandType.POS_NEG, 0, ScreenPrompt.DisplayState.Normal, false);
         _upDownPrompt = new ScreenPrompt(InputLibrary.up, InputLibrary.down, "Change Frequency   <CMD>", ScreenPrompt.MultiCommandType.POS_NEG, 0, ScreenPrompt.DisplayState.Normal, false);
         _leavePrompt = new ScreenPrompt(InputLibrary.cancel, "Leave   <CMD>", 0, ScreenPrompt.DisplayState.Normal, false);
 
         Locator.GetPromptManager().AddScreenPrompt(_powerPrompt, PromptPosition.Center, false);
         Locator.GetPromptManager().AddScreenPrompt(_tunePrompt, PromptPosition.Center, false);
+        Locator.GetPromptManager().AddScreenPrompt(_volumePrompt, PromptPosition.Center, false);
+
+        _musicSource.SetLocalVolume(_currentVolume);
+        _staticSource.SetLocalVolume(_currentVolume);
     }
 
     private void Update()
     {
         bool focused = _cameraManipulator.GetFocusedOWItem() == this 
-            || _cameraManipulator.GetFocusedItemSocket()?._acceptableType == ItemType;
+            || (_socketed && _cameraManipulator.GetFocusedItemSocket()?._acceptableType == ItemType);
         if (_lastFocused != focused)
         {
             PatchClass.UpdateFocusedItems(focused);
@@ -123,8 +131,8 @@ public class RadioItem : OWItem
                         _musicSource.clip = clip;
                         if (_powerOn)
                         {
-                            _musicSource.FadeIn(2f);
-                            _staticSource.FadeOut(5f);
+                            _musicSource.FadeIn(2f, false, false, _currentVolume);
+                            _staticSource.FadeOut(10f);
                         }
                         _playingAudio = true;
                     }
@@ -169,7 +177,7 @@ public class RadioItem : OWItem
                     if (_powerOn)
                     {
                         _musicSource.FadeOut(0.5f);
-                        _staticSource.FadeIn(0.5f);
+                        _staticSource.FadeIn(0.5f, false, false, _currentVolume);
                     }
                     else if (_playingAudio)
                     {
@@ -193,7 +201,7 @@ public class RadioItem : OWItem
                     if (_powerOn)
                     {
                         _musicSource.FadeOut(0.5f);
-                        _staticSource.FadeIn(0.5f);
+                        _staticSource.FadeIn(0.5f, false, false, _currentVolume);
                     }
                     else if (_playingAudio)
                     {
@@ -212,11 +220,11 @@ public class RadioItem : OWItem
                 {
                     if (!_playingAudio)
                     {
-                        _staticSource.FadeIn(0.5f);
+                        _staticSource.FadeIn(0.5f, false, false, _currentVolume);
                     }
                     else
                     {
-                        _musicSource.FadeIn(0.5f);
+                        _musicSource.FadeIn(0.5f, false, false, _currentVolume);
                     }
                     _powerPrompt.SetText(_powerOffText);
                 }
@@ -244,6 +252,18 @@ public class RadioItem : OWItem
                 _codeLabels[_currentCodeIndex].color = _selectColor;
                 _playerInteracting = true;
             }
+            else if (OWInput.IsNewlyPressed(InputLibrary.toolOptionUp))
+            {
+                _currentVolume = Mathf.Min(_currentVolume + 0.1f, 1f);
+                _musicSource.SetLocalVolume(_currentVolume);
+                _staticSource.SetLocalVolume(_currentVolume);
+            }
+            else if (OWInput.IsNewlyPressed(InputLibrary.toolOptionDown))
+            {
+                _currentVolume = Mathf.Max(_currentVolume - 0.1f, 0f);
+                _musicSource.SetLocalVolume(_currentVolume);
+                _staticSource.SetLocalVolume(_currentVolume);
+            }
         }
     }
 
@@ -257,6 +277,10 @@ public class RadioItem : OWItem
         if (flag != _tunePrompt.IsVisible())
         {
             _tunePrompt.SetVisibility(flag);
+        }
+        if (flag != _volumePrompt.IsVisible())
+        {
+            _volumePrompt.SetVisibility(flag);
         }
     }
 
@@ -279,29 +303,30 @@ public class RadioItem : OWItem
     {
         base.SocketItem(socketTransform, sector);
         _socketed = true;
-        _musicSource.spread = 180f;
+        _musicSource.spatialBlend = 0f;
+        _musicSource.spread = 0f;
     }
 
     public override void PickUpItem(Transform holdTranform)
     {
         base.PickUpItem(holdTranform);
         _socketed = false;
+        _musicSource.spatialBlend = 1f;
         _musicSource.spread = 60f;
     }
 
     private void OnExitShip()
     {
-        if (_socketed)
-        {
-            _musicSource.spread = 60f;
-        }
+        _musicSource.spatialBlend = 1f;
+        _musicSource.spread = 60f;
     }
 
     private void OnEnterShip()
     {
         if (_socketed)
         {
-            _musicSource.spread = 180f;
+            _musicSource.spatialBlend = 0f;
+            _musicSource.spread = 0f;
         }
     }
 
