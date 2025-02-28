@@ -72,6 +72,7 @@ public class ShipEnhancements : ModBehaviour
     public ItemType FuelTankType { get; private set; }
     public ItemType GravityCrystalType { get; private set; }
     public ItemType RepairWrenchType { get; private set; }
+    public ItemType RadioType { get; private set; }
     public SignalName ShipSignalName { get; private set; }
     public int ThrustModulatorLevel { get; private set; }
 
@@ -210,6 +211,7 @@ public class ShipEnhancements : ModBehaviour
         FuelTankType = EnumUtils.Create<ItemType>("PortableFuelTank");
         GravityCrystalType = EnumUtils.Create<ItemType>("ShipGravityCrystal");
         RepairWrenchType = EnumUtils.Create<ItemType>("RepairWrench");
+        RadioType = EnumUtils.Create<ItemType>("Radio");
         ShipSignalName = EnumUtils.Create<SignalName>("Ship");
 
         SEItemAudioController.Initialize();
@@ -1113,6 +1115,17 @@ public class ShipEnhancements : ModBehaviour
             AssetBundleUtilities.ReplaceShaders(wrenchObj);
             RepairWrenchItem wrench = Instantiate(wrenchObj).GetComponent<RepairWrenchItem>();
             wrenchSocket.PlaceIntoSocket(wrench);
+        }
+        if (true)
+        {
+            GameObject radioSocketObj = LoadPrefab("Assets/ShipEnhancements/RadioItemSocket.prefab");
+            RadioItemSocket radioSocket = Instantiate(radioSocketObj,
+                SELocator.GetShipTransform().Find("Module_Cockpit")).GetComponent<RadioItemSocket>();
+
+            GameObject radioObj = LoadPrefab("Assets/ShipEnhancements/RadioItem.prefab");
+            AssetBundleUtilities.ReplaceShaders(radioObj);
+            RadioItem radio = Instantiate(radioObj).GetComponent<RadioItem>();
+            radioSocket.PlaceIntoSocket(radio);
         }
 
         SetDamageColors();
