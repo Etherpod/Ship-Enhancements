@@ -104,6 +104,7 @@ public static class SettingsPresets
         { "alwaysAllowLockOn", true },
         { "shipWarpCoreComponent", false },
         { "disableShipMedkit", false },
+        { "addRadio", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -204,6 +205,7 @@ public static class SettingsPresets
         { "alwaysAllowLockOn", true },
         { "shipWarpCoreComponent", false },
         { "disableShipMedkit", true },
+        { "addRadio", false },
     };
 
     public static readonly Dictionary<string, object> ImpossibleSettings = new Dictionary<string, object>()
@@ -304,6 +306,7 @@ public static class SettingsPresets
         { "alwaysAllowLockOn", true },
         { "shipWarpCoreComponent", false },
         { "disableShipMedkit", false },
+        { "addRadio", false },
     };
 
     public static readonly Dictionary<string, object> NewStuffSettings = new Dictionary<string, object>()
@@ -404,6 +407,7 @@ public static class SettingsPresets
         { "alwaysAllowLockOn", true },
         { "shipWarpCoreComponent", true },
         { "disableShipMedkit", false },
+        { "addRadio", true },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -504,6 +508,7 @@ public static class SettingsPresets
         { "alwaysAllowLockOn", true },
         { "shipWarpCoreComponent", true },
         { "disableShipMedkit", true },
+        { "addRadio", true },
     };
 
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()
@@ -798,6 +803,7 @@ public static class SettingsPresets
         { "alwaysAllowLockOn", new RandomSettingValue(1f) },
         { "shipWarpCoreComponent", new RandomSettingValue(0.5f) },
         { "disableShipMedkit", new RandomSettingValue(0.1f) },
+        { "addRadio", new RandomSettingValue(0.5f) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

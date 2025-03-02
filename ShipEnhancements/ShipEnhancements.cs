@@ -184,6 +184,7 @@ public class ShipEnhancements : ModBehaviour
         alwaysAllowLockOn,
         shipWarpCoreComponent,
         disableShipMedkit,
+        addRadio,
     }
 
     private void Awake()
@@ -1116,7 +1117,7 @@ public class ShipEnhancements : ModBehaviour
             RepairWrenchItem wrench = Instantiate(wrenchObj).GetComponent<RepairWrenchItem>();
             wrenchSocket.PlaceIntoSocket(wrench);
         }
-        if (true)
+        if ((bool)Settings.addRadio.GetProperty())
         {
             GameObject radioSocketObj = LoadPrefab("Assets/ShipEnhancements/RadioItemSocket.prefab");
             RadioItemSocket radioSocket = Instantiate(radioSocketObj,
