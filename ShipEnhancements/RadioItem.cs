@@ -33,17 +33,23 @@ public class RadioItem : OWItem
     [SerializeField]
     private Transform[] _knobTransforms;
     [SerializeField]
-    private float _knobFullRotation;
+    private Transform _knobStartRot;
+    [SerializeField]
+    private Transform _knobEndRot;
     [SerializeField]
     private RotateTransform[] _rotateEffects;
     [SerializeField]
     private Transform _powerSwitchTransform;
     [SerializeField]
-    private float _powerSwitchFullRotation;
+    private Transform _switchStartRot;
+    [SerializeField]
+    private Transform _switchEndRot;
     [SerializeField]
     private Transform _volumeNeedleTransform;
     [SerializeField]
-    private float _volumeNeedleFullRotation;
+    private Transform _needleStartRot;
+    [SerializeField]
+    private Transform _needleEndRot;
     [SerializeField]
     private OWEmissiveRenderer _screenRenderer;
 
@@ -69,17 +75,23 @@ public class RadioItem : OWItem
     private float _currentVolume = 0.5f;
     private AudioHighPassFilter _highPassFilter;
 
+    private bool _moveNeedle = false;
+    private float _needleT = 0f;
+    private Quaternion _initialNeedleRotation;
+    private Quaternion _targetNeedleRotation;
+    private float _needleRotateSpeed = 3f;
+    private int _volumeSteps = 8;
+
+    private bool _moveSwitch = false;
+    private float _switchT = 0f;
+    private Quaternion _initialSwitchRotation;
+    private Quaternion _targetSwitchRotation;
+    private float _switchRotateSpeed = 7f;
+
     private readonly int _minFrequency = 1;
     private readonly int _maxFrequency = 6;
     private AudioClip _connectAudio;
     private AudioClip _disconnectAudio;
-
-    private Quaternion _initialKnobRot;
-    private Quaternion _targetKnobRot;
-    private Quaternion _initialSwitchRot;
-    private Quaternion _targetSwitchRot;
-    private Quaternion _initialVolumeRot;
-    private Quaternion _targetVolumeRot;
 
     private readonly string _powerOnText = "Turn On Radio";
     private readonly string _powerOffText = "Turn Off Radio";
@@ -150,12 +162,12 @@ public class RadioItem : OWItem
         {
             rotator.enabled = false;
         }
-        /*foreach (Transform knob in _knobTransforms)
+        foreach (Transform knob in _knobTransforms)
         {
-            knob.transform.localRotation = _initialKnobRot;
-        }*/
-        //_powerSwitchTransform.rotation = Quaternion.Euler(_powerSwitchTransform.rotation.eulerAngles.x, _minPowerSwitchRotation, _powerSwitchTransform.rotation.eulerAngles.z);
-        //_volumeNeedleTransform.rotation = Quaternion.Euler(_volumeNeedleTransform.rotation.eulerAngles.x, _minVolumeNeedleRotation, _volumeNeedleTransform.rotation.eulerAngles.z);
+            knob.rotation = _knobStartRot.rotation;
+        }
+        _powerSwitchTransform.rotation = _switchStartRot.rotation;
+        _volumeNeedleTransform.rotation = _needleStartRot.rotation;
     }
 
     private void Update()
@@ -210,8 +222,7 @@ public class RadioItem : OWItem
                 }
             }
             else if (OWInput.IsNewlyPressed(InputLibrary.right, InputMode.All) 
-                || OWInput.IsNewlyPressed(InputLibrary.right2, InputMode.All) 
-                || OWInput.IsNewlyPressed(InputLibrary.toolActionPrimary, InputMode.All))
+                || OWInput.IsNewlyPressed(InputLibrary.right2, InputMode.All))
             {
                 _codeLabels[_currentCodeIndex].color = _deselectColor;
                 _currentCodeIndex++;
@@ -222,8 +233,7 @@ public class RadioItem : OWItem
                 _codeLabels[_currentCodeIndex].color = _selectColor;
             }
             else if (OWInput.IsNewlyPressed(InputLibrary.left, InputMode.All)
-                || OWInput.IsNewlyPressed(InputLibrary.left2, InputMode.All)
-                || OWInput.IsNewlyPressed(InputLibrary.toolActionSecondary, InputMode.All))
+                || OWInput.IsNewlyPressed(InputLibrary.left2, InputMode.All))
             {
                 _codeLabels[_currentCodeIndex].color = _deselectColor;
                 _currentCodeIndex--;
@@ -243,9 +253,8 @@ public class RadioItem : OWItem
                 }
                 _codeLabels[_currentCodeIndex].text = _codes[_currentCodeIndex].ToString();
 
-                /*Vector3 knobEuler = _knobTransforms[_currentCodeIndex].rotation.eulerAngles;
-                float nextRot = _minKnobRotation + (_maxKnobRotation - _minKnobRotation) / 5 * _codes[_currentCodeIndex];
-                _knobTransforms[_currentCodeIndex].rotation = Quaternion.Euler(knobEuler.x, knobEuler.y, nextRot);*/
+                Vector3 euler = Vector3.Lerp(_knobStartRot.eulerAngles, _knobEndRot.eulerAngles, (_codes[_currentCodeIndex] - 1) / 5f);
+                _knobTransforms[_currentCodeIndex].rotation = Quaternion.Euler(euler);
 
                 if (_playingAudio)
                 {
@@ -275,9 +284,8 @@ public class RadioItem : OWItem
                 }
                 _codeLabels[_currentCodeIndex].text = _codes[_currentCodeIndex].ToString();
 
-                /*Vector3 knobEuler = _knobTransforms[_currentCodeIndex].rotation.eulerAngles;
-                float nextRot = _minKnobRotation + (_maxKnobRotation - _minKnobRotation) / 5 * _codes[_currentCodeIndex];
-                _knobTransforms[_currentCodeIndex].rotation = Quaternion.Euler(knobEuler.x, knobEuler.y, nextRot);*/
+                Vector3 euler = Vector3.Lerp(_knobStartRot.eulerAngles, _knobEndRot.eulerAngles, (_codes[_currentCodeIndex] - 1) / 5f);
+                _knobTransforms[_currentCodeIndex].rotation = Quaternion.Euler(euler);
 
                 if (_playingAudio)
                 {
@@ -328,6 +336,16 @@ public class RadioItem : OWItem
                     {
                         rotator.enabled = true;
                     }
+
+                    _initialSwitchRotation = _powerSwitchTransform.rotation;
+                    _targetSwitchRotation = _switchEndRot.rotation;
+                    _switchT = 0f;
+                    _moveSwitch = true;
+
+                    _initialNeedleRotation = _volumeNeedleTransform.rotation;
+                    _targetNeedleRotation = Quaternion.Lerp(_needleStartRot.rotation, _needleEndRot.rotation, _currentVolume);
+                    _needleT = 0f;
+                    _moveNeedle = true;
                 }
                 else
                 {
@@ -351,6 +369,16 @@ public class RadioItem : OWItem
                     {
                         rotator.enabled = false;
                     }
+
+                    _initialSwitchRotation = _powerSwitchTransform.rotation;
+                    _targetSwitchRotation = _switchStartRot.rotation;
+                    _switchT = 0f;
+                    _moveSwitch = true;
+
+                    _initialNeedleRotation = _volumeNeedleTransform.rotation;
+                    _targetNeedleRotation = _needleStartRot.rotation;
+                    _needleT = 0f;
+                    _moveNeedle = true;
                 }
             }
             else if (OWInput.IsNewlyPressed(InputLibrary.interactSecondary))
@@ -366,19 +394,51 @@ public class RadioItem : OWItem
             }
             else if (OWInput.IsNewlyPressed(InputLibrary.toolOptionUp))
             {
-                _currentVolume = Mathf.Min(_currentVolume + 0.1f, 1f);
-                _musicSource.SetLocalVolume(_currentVolume);
-                _staticSource.SetLocalVolume(_currentVolume);
-                _codeSource.SetLocalVolume(_currentVolume);
+                _currentVolume = Mathf.Min(_currentVolume + 1f / _volumeSteps, 1f);
+                SetRadioVolume();
+
+                _initialNeedleRotation = _volumeNeedleTransform.rotation;
+                _targetNeedleRotation = Quaternion.Lerp(_needleStartRot.rotation, _needleEndRot.rotation, _currentVolume);
+                _needleT = 0f;
+                _moveNeedle = true;
             }
             else if (OWInput.IsNewlyPressed(InputLibrary.toolOptionDown))
             {
-                _currentVolume = Mathf.Max(_currentVolume - 0.1f, 0f);
-                _musicSource.SetLocalVolume(_currentVolume);
-                _staticSource.SetLocalVolume(_currentVolume);
-                _codeSource.SetLocalVolume(_currentVolume);
+                _currentVolume = Mathf.Max(_currentVolume - 1f / _volumeSteps, 0f);
+                SetRadioVolume();
+
+                _initialNeedleRotation = _volumeNeedleTransform.rotation;
+                _targetNeedleRotation = Quaternion.Lerp(_needleStartRot.rotation, _needleEndRot.rotation, _currentVolume);
+                _needleT = 0f;
+                _moveNeedle = true;
             }
         }
+
+        if (_moveNeedle)
+        {
+            _volumeNeedleTransform.rotation = Quaternion.Lerp(_initialNeedleRotation, _targetNeedleRotation, _needleT);
+            _needleT += Time.deltaTime * _needleRotateSpeed;
+            if (_needleT >= 1f)
+            {
+                _moveNeedle = false;
+            }
+        }
+        if (_moveSwitch)
+        {
+            _powerSwitchTransform.rotation = Quaternion.Lerp(_initialSwitchRotation, _targetSwitchRotation, _switchT);
+            _switchT += Time.deltaTime * _switchRotateSpeed;
+            if (_switchT >= 1f)
+            {
+                _moveSwitch = false;
+            }
+        }
+    }
+
+    private void SetRadioVolume()
+    {
+        _musicSource.FadeTo(_currentVolume, 0.2f);
+        _staticSource.FadeTo(_currentVolume, 0.2f);
+        _codeSource.FadeTo(_currentVolume, 0.2f);
     }
 
     private void UpdatePromptVisibility()
