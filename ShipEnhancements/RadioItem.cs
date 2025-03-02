@@ -13,6 +13,14 @@ public class RadioItem : OWItem
     [SerializeField]
     private OWAudioSource _musicSource;
     [SerializeField]
+    private OWAudioSource _oneShotSource;
+    [SerializeField]
+    private OWAudioSource _codeSource;
+    [SerializeField]
+    private GameObject _meshParent;
+    [SerializeField]
+    private RadioCodeDetector _codeDetector;
+    [SerializeField]
     private Text[] _codeLabels;
 
     private PriorityScreenPrompt _powerPrompt;
@@ -33,12 +41,16 @@ public class RadioItem : OWItem
 
     private Dictionary<string, AudioClip> _codesToAudio;
     private bool _playingAudio = false;
+    private bool _playingCodes = false;
     private float _currentVolume = 0.5f;
+    private AudioHighPassFilter _highPassFilter;
 
     private readonly int _minFrequency = 1;
     private readonly int _maxFrequency = 6;
     private Color _deselectColor = Color.black;
     private Color _selectColor = Color.blue;
+    private AudioClip _connectAudio;
+    private AudioClip _disconnectAudio;
 
     private readonly string _powerOnText = "Turn On Radio";
     private readonly string _powerOffText = "Turn Off Radio";
@@ -53,10 +65,14 @@ public class RadioItem : OWItem
         base.Awake();
         _type = ItemType;
         _cameraManipulator = FindObjectOfType<FirstPersonManipulator>();
+        _highPassFilter = _musicSource.GetComponent<AudioHighPassFilter>();
+        _connectAudio = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_Connect.ogg");
+        _disconnectAudio = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_Disconnect.ogg");
         InitializeAudioDict();
 
         GlobalMessenger.AddListener("ExitShip", OnExitShip);
         GlobalMessenger.AddListener("EnterShip", OnEnterShip);
+        _codeDetector.OnChangeActiveZone += OnChangeCodeZone;
     }
 
     private void InitializeAudioDict()
@@ -74,9 +90,9 @@ public class RadioItem : OWItem
             { "3156", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_RiversEndTimes.mp3") },
             { "4241", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_NomaiMeditation.mp3") },
             { "5511", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_CampfireSong.mp3") },
-            { "1111", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_MainTitle.mp3") },
-            { "1122", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_OuterWilds.mp3") },
-            { "1133", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_TimberHearth.mp3") },
+            { "1122", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_MainTitle.mp3") },
+            { "1133", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_OuterWilds.mp3") },
+            { "1144", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_TimberHearth.mp3") },
         };
     }
 
@@ -97,6 +113,7 @@ public class RadioItem : OWItem
 
         _musicSource.SetLocalVolume(_currentVolume);
         _staticSource.SetLocalVolume(_currentVolume);
+        _codeSource.SetLocalVolume(_currentVolume);
     }
 
     private void Update()
@@ -133,6 +150,10 @@ public class RadioItem : OWItem
                         {
                             _musicSource.FadeIn(2f, false, false, _currentVolume);
                             _staticSource.FadeOut(10f);
+                            if (_playingCodes)
+                            {
+                                _codeSource.FadeOut(2f);
+                            }
                         }
                         _playingAudio = true;
                     }
@@ -178,6 +199,10 @@ public class RadioItem : OWItem
                     {
                         _musicSource.FadeOut(0.5f);
                         _staticSource.FadeIn(0.5f, false, false, _currentVolume);
+                        if (_playingCodes)
+                        {
+                            _codeSource.FadeIn(0.5f, false, false, _currentVolume);
+                        }
                     }
                     else if (_playingAudio)
                     {
@@ -202,6 +227,10 @@ public class RadioItem : OWItem
                     {
                         _musicSource.FadeOut(0.5f);
                         _staticSource.FadeIn(0.5f, false, false, _currentVolume);
+                        if (_playingCodes)
+                        {
+                            _codeSource.FadeIn(0.5f, false, false, _currentVolume);
+                        }
                     }
                     else if (_playingAudio)
                     {
@@ -220,11 +249,23 @@ public class RadioItem : OWItem
                 {
                     if (!_playingAudio)
                     {
-                        _staticSource.FadeIn(0.5f, false, false, _currentVolume);
+                        /*_staticSource.FadeIn(0.5f, false, false, _currentVolume);
+                        if (_playingCodes)
+                        {
+                            _codeSource.FadeIn(0.5f, false, false, _currentVolume);
+                        }*/
+                        _staticSource.SetLocalVolume(_currentVolume);
+                        _staticSource.Play();
+                        if (_playingCodes)
+                        {
+                            _codeSource.SetLocalVolume(_currentVolume);
+                            _codeSource.Play();
+                        }
                     }
                     else
                     {
-                        _musicSource.FadeIn(0.5f, false, false, _currentVolume);
+                        _musicSource.SetLocalVolume(_currentVolume);
+                        _musicSource.Play();
                     }
                     _powerPrompt.SetText(_powerOffText);
                 }
@@ -232,11 +273,16 @@ public class RadioItem : OWItem
                 {
                     if (!_playingAudio)
                     {
-                        _staticSource.FadeOut(0.5f);
+                        //_staticSource.FadeOut(0.5f);
+                        _staticSource.Stop();
+                        if (_playingCodes)
+                        {
+                            _codeSource.Stop();
+                        }
                     }
                     else
                     {
-                        _musicSource.FadeOut(0.5f, OWAudioSource.FadeOutCompleteAction.PAUSE);
+                        _musicSource.Pause();
                     }
                     _powerPrompt.SetText(_powerOnText);
                 }
@@ -257,12 +303,14 @@ public class RadioItem : OWItem
                 _currentVolume = Mathf.Min(_currentVolume + 0.1f, 1f);
                 _musicSource.SetLocalVolume(_currentVolume);
                 _staticSource.SetLocalVolume(_currentVolume);
+                _codeSource.SetLocalVolume(_currentVolume);
             }
             else if (OWInput.IsNewlyPressed(InputLibrary.toolOptionDown))
             {
                 _currentVolume = Mathf.Max(_currentVolume - 0.1f, 0f);
                 _musicSource.SetLocalVolume(_currentVolume);
                 _staticSource.SetLocalVolume(_currentVolume);
+                _codeSource.SetLocalVolume(_currentVolume);
             }
         }
     }
@@ -302,17 +350,32 @@ public class RadioItem : OWItem
     public override void SocketItem(Transform socketTransform, Sector sector)
     {
         base.SocketItem(socketTransform, sector);
-        _socketed = true;
         _musicSource.spatialBlend = 0f;
         _musicSource.spread = 0f;
+        _highPassFilter.enabled = false;
+        _oneShotSource.PlayOneShot(_connectAudio, 1f);
+        _meshParent.transform.localScale = Vector3.one;
+        _socketed = true;
     }
 
     public override void PickUpItem(Transform holdTranform)
     {
         base.PickUpItem(holdTranform);
-        _socketed = false;
         _musicSource.spatialBlend = 1f;
         _musicSource.spread = 60f;
+        _highPassFilter.enabled = true;
+        if (_socketed)
+        {
+            _oneShotSource.PlayOneShot(_disconnectAudio, 1f);
+        }
+        _meshParent.transform.localScale = Vector3.one * 0.6f;
+        _socketed = false;
+    }
+
+    public override void DropItem(Vector3 position, Vector3 normal, Transform parent, Sector sector, IItemDropTarget customDropTarget)
+    {
+        base.DropItem(position, normal, parent, sector, customDropTarget);
+        _meshParent.transform.localScale = Vector3.one;
     }
 
     private void OnExitShip()
@@ -330,10 +393,35 @@ public class RadioItem : OWItem
         }
     }
 
+    private void OnChangeCodeZone(RadioCodeZone zone)
+    {
+        if (zone != null && !_playingCodes)
+        {
+            _codeSource.clip = zone.GetAudioCode();
+            if (_powerOn && !_playingAudio)
+            {
+                _codeSource.time = 0f;
+                _codeSource.SetLocalVolume(_currentVolume);
+                _codeSource.Play();
+            }
+            _playingCodes = true;
+        }
+        else if (_playingCodes)
+        {
+            _codeSource.clip = null;
+            if (_codeSource.isPlaying)
+            {
+                _codeSource.Stop();
+            }
+            _playingCodes = false;
+        }
+    }
+
     public override void OnDestroy()
     {
         base.OnDestroy();
         GlobalMessenger.RemoveListener("ExitShip", OnExitShip);
         GlobalMessenger.RemoveListener("EnterShip", OnEnterShip);
+        _codeDetector.OnChangeActiveZone -= OnChangeCodeZone;
     }
 }

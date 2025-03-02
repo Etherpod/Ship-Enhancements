@@ -1126,6 +1126,8 @@ public class ShipEnhancements : ModBehaviour
             AssetBundleUtilities.ReplaceShaders(radioObj);
             RadioItem radio = Instantiate(radioObj).GetComponent<RadioItem>();
             radioSocket.PlaceIntoSocket(radio);
+
+            AddRadioCodeZones();
         }
 
         SetDamageColors();
@@ -1447,6 +1449,67 @@ public class ShipEnhancements : ModBehaviour
             {
                 Instantiate(campfireTempZone, fire.transform.parent);
             }
+        }
+    }
+
+    private void AddRadioCodeZones()
+    {
+        GameObject et = GameObject.Find("CaveTwin_Body");
+        if (et != null)
+        {
+            GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_NomaiMeditation.prefab");
+            Instantiate(zone, et.transform.Find("Sector_CaveTwin"));
+        }
+
+        GameObject th = GameObject.Find("TimberHearth_Body");
+        if (th != null)
+        {
+            GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_HearthsShadow.prefab");
+            Instantiate(zone, th.transform.Find("Sector_TH"));
+        }
+
+        GameObject ss = GameObject.Find("SunStation_Body");
+        if (ss != null)
+        {
+            GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_NoTimeForCaution.prefab");
+            Instantiate(zone, ss.transform.Find("Sector_SunStation"));
+        }
+
+        GameObject co = GameObject.Find("Comet_Body");
+        if (co != null)
+        {
+            GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_RiversEndTimes.prefab");
+            Instantiate(zone, co.transform.Find("Sector_CO"));
+        }
+
+        GameObject qm = GameObject.Find("QuantumMoon_Body");
+        if (qm != null)
+        {
+            GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_LastDreamOfHome.prefab");
+            Instantiate(zone, qm.transform.Find("Sector_QuantumMoon/State_EYE"));
+        }
+
+        GameObject vessel = GameObject.Find("DB_VesselDimension_Body");
+        if (vessel != null)
+        {
+            GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_OlderThanTheUniverse.prefab");
+            Instantiate(zone, vessel.transform.Find("Sector_VesselDimension"));
+        }
+
+        GameObject rw = GameObject.Find("RingWorld_Body");
+        if (rw != null)
+        {
+            GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_ElegyForTheRings.prefab");
+            Instantiate(zone, rw.transform.Find("Sector_RingInterior/Sector_Zone1/Sector_DreamFireHouse_Zone1"));
+            Instantiate(zone, rw.transform.Find("Sector_RingInterior/Sector_Zone2/Sector_DreamFireLighthouse_Zone2_AnimRoot"));
+            Instantiate(zone, rw.transform.Find("Sector_RingInterior/Sector_Zone3/Sector_HiddenGorge/Sector_DreamFireHouse_Zone3"));
+        }
+
+        GameObject sun = GameObject.Find("Sun_Body");
+        if (sun != null)
+        {
+            GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_TheSpiritOfWater.prefab");
+            Instantiate(zone, sun.transform.Find("Sector_SUN/Volumes_SUN/SupernovaVolume"));
         }
     }
 
