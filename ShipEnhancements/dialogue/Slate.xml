@@ -45,6 +45,11 @@
         <DialogueTarget>SE_ShipSignal_1</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
+        <RequiredCondition>SE_RADIO_ENABLED</RequiredCondition>
+        <Text>How does the radio work?</Text>
+        <DialogueTarget>SE_ShipRadio_1</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
         <RequiredCondition>SE_TETHER_HOOKS_ENABLED</RequiredCondition>
         <Text>How do I use the tether hooks?</Text>
         <DialogueTarget>SE_TetherHook_1</DialogueTarget>
@@ -739,8 +744,41 @@
     <Dialogue>
       <Page>What, you think I flew around the Solar System and set up warp receivers on each planet? No, it can't warp to other planets. Not normally, at least.</Page>
       <Page>Since the ship log uses Nomai parts in the computer, it might be possible for it to connect to other Nomaian technology and warp to them.</Page>
-      <Page>If you find something out there that can warp objects back to it, try marking its location in the ship log. That should be enough to coax them into interfacing.</Page>
+      <Page>If you find something out there that can warp objects back to it, try marking it in the ship log or locking on to it. That should be enough to coax them into interfacing.</Page>
     </Dialogue>
+  </DialogueNode>
+  
+  <!--Radio-->
+  
+  <DialogueNode>
+    <Name>SE_ShipRadio_1</Name>
+    <Dialogue>
+      <Page>That old thing? It works like any radio does. You turn those little knobs to adjust the frequency, and if you find a good frequency it'll start playing music.</Page>
+      <Page>These days you'll find a whole lot of nothing with it. Most of the old signals have been taken down, and the newer radios and signalscopes work on a different set of frequencies.</Page>
+    </Dialogue>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Do you know any good frequencies?</Text>
+        <DialogueTarget>SE_ShipRadio_11</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Alright, thanks.</Text>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_ShipRadio_11</Name>
+    <Dialogue>
+      <Page>I put some of the classics on the wall next to the radio, but everyone knows those. Personally, I would tune in to 5511.</Page>
+    </Dialogue>
+  
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Got it.</Text>
+      </DialogueOption>
+    </DialogueOptionsList>
   </DialogueNode>
   
 </DialogueTree>

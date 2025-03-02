@@ -63,7 +63,8 @@ public class RadioItem : OWItem
     private OWCamera _playerCam;
     private bool _lastFocused = false;
     private bool _playerInteracting = false;
-    private bool _socketed = false;
+    private bool _connectedToShip = false;
+    private float _socketedMusicTime = 0f;
 
     private int[] _codes = [1, 1, 1, 1];
     private int _currentCodeIndex = 0;
@@ -148,9 +149,9 @@ public class RadioItem : OWItem
         _upDownPrompt = new ScreenPrompt(InputLibrary.up, InputLibrary.down, "Change Frequency   <CMD>", ScreenPrompt.MultiCommandType.POS_NEG, 0, ScreenPrompt.DisplayState.Normal, false);
         _leavePrompt = new ScreenPrompt(InputLibrary.cancel, "Leave   <CMD>", 0, ScreenPrompt.DisplayState.Normal, false);
 
-        Locator.GetPromptManager().AddScreenPrompt(_powerPrompt, PromptPosition.Center, false);
-        Locator.GetPromptManager().AddScreenPrompt(_tunePrompt, PromptPosition.Center, false);
-        Locator.GetPromptManager().AddScreenPrompt(_volumePrompt, PromptPosition.Center, false);
+        Locator.GetPromptManager().AddScreenPrompt(_powerPrompt, PromptPosition.Center);
+        Locator.GetPromptManager().AddScreenPrompt(_tunePrompt, PromptPosition.Center);
+        Locator.GetPromptManager().AddScreenPrompt(_volumePrompt, PromptPosition.Center);
 
         _musicSource.SetLocalVolume(_currentVolume);
         _staticSource.SetLocalVolume(_currentVolume);
@@ -173,7 +174,7 @@ public class RadioItem : OWItem
     private void Update()
     {
         bool focused = _cameraManipulator.GetFocusedOWItem() == this 
-            || (_socketed && _cameraManipulator.GetFocusedItemSocket()?._acceptableType == ItemType);
+            || (_connectedToShip && _cameraManipulator.GetFocusedItemSocket()?._acceptableType == ItemType);
         if (_lastFocused != focused)
         {
             PatchClass.UpdateFocusedItems(focused);
@@ -476,26 +477,33 @@ public class RadioItem : OWItem
     public override void SocketItem(Transform socketTransform, Sector sector)
     {
         base.SocketItem(socketTransform, sector);
-        _musicSource.spatialBlend = 0f;
-        _musicSource.spread = 0f;
-        _highPassFilter.enabled = false;
-        _oneShotSource.PlayOneShot(_connectAudio, 1f);
+
+        if (socketTransform.GetComponent<RadioItemSocket>())
+        {
+            _musicSource.spatialBlend = 0f;
+            _musicSource.spread = 0f;
+            _highPassFilter.enabled = false;
+            _oneShotSource.PlayOneShot(_connectAudio, 1f);
+            _connectedToShip = true;
+        }
+
         _meshParent.transform.localScale = Vector3.one;
-        _socketed = true;
     }
 
     public override void PickUpItem(Transform holdTranform)
     {
         base.PickUpItem(holdTranform);
-        _musicSource.spatialBlend = 1f;
-        _musicSource.spread = 60f;
-        _highPassFilter.enabled = true;
-        if (_socketed)
+
+        if (_connectedToShip)
         {
+            _musicSource.spatialBlend = 1f;
+            _musicSource.spread = 60f;
+            _highPassFilter.enabled = true;
             _oneShotSource.PlayOneShot(_disconnectAudio, 1f);
+            _connectedToShip = false;
         }
+
         _meshParent.transform.localScale = Vector3.one * 0.6f;
-        _socketed = false;
     }
 
     public override void DropItem(Vector3 position, Vector3 normal, Transform parent, Sector sector, IItemDropTarget customDropTarget)
@@ -512,7 +520,7 @@ public class RadioItem : OWItem
 
     private void OnEnterShip()
     {
-        if (_socketed)
+        if (_connectedToShip)
         {
             _musicSource.spatialBlend = 0f;
             _musicSource.spread = 0f;
@@ -549,6 +557,25 @@ public class RadioItem : OWItem
         {
             SELocator.GetFlightConsoleInteractController().RemoveInteractible();
             _lastFocused = false;
+        }
+    }
+
+    private void OnEnable()
+    {
+        if (!_powerOn) return;
+
+        if (_playingAudio)
+        {
+            _musicSource.time = _socketedMusicTime;
+            _musicSource.Play();
+        }
+        else
+        {
+            _staticSource.Play();
+            if (_playingCodes)
+            {
+                _codeSource.Play();
+            }
         }
     }
 

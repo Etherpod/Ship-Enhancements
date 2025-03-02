@@ -1710,6 +1710,10 @@ public class ShipEnhancements : ModBehaviour
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_WARP_CORE_ENABLED", true);
         }
+        if ((bool)Settings.addRadio.GetProperty())
+        {
+            DialogueConditionManager.SharedInstance.SetConditionState("SE_RADIO_ENABLED", true);
+        }
     }
 
     #endregion
