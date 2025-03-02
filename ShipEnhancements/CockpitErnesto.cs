@@ -113,10 +113,10 @@ public class CockpitErnesto : MonoBehaviour
             _questions.Add(100);
         }
 
-        /*if (_bigHeadMode)
+        if ((bool)ShipEnhancements.Settings.addRadio.GetProperty())
         {
-            _questions.Add(200);
-        }*/
+            _questions.Add(201);
+        }
 
         _availableQuestions.AddRange(_questions);
     }
@@ -162,6 +162,12 @@ public class CockpitErnesto : MonoBehaviour
         {
             PlayerData.SetPersistentCondition("SE_ERNESTO_BECOME_AWARE", true);
             DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_AWARE_NEXT_TIME", false);
+        }
+
+        if (DialogueConditionManager.SharedInstance.GetConditionState("SE_ERNESTO_GESWALDO_PART_TWO"))
+        {
+            DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_GESWALDO_PART_ONE", false);
+            DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_GESWALDO_PART_TWO", false);
         }
 
         if (DialogueConditionManager.SharedInstance.GetConditionState("SE_ERNESTO_EXPLODE_SHIP")

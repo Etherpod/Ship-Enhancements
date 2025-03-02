@@ -359,12 +359,17 @@
       <DialogueOption>
         <RequiredCondition>SE_ERNESTO_OPTION_101</RequiredCondition>
         <Text>Can you continue your story about Geswaldo?</Text>
-        <DialogueTarget>SE_Ernesto_Geswaldo</DialogueTarget>
+        <DialogueTarget>SE_Ernesto_GeswaldoIncident</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
         <RequiredCondition>SE_ERNESTO_OPTION_200</RequiredCondition>
         <Text>Is it just me, or are you... bigger?</Text>
         <DialogueTarget>SE_Ernesto_BigHead</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_201</RequiredCondition>
+        <Text>Do you want me to play anything on the radio?</Text>
+        <DialogueTarget>SE_Ernesto_Radio</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
         <Text>Nevermind.</Text>
@@ -576,6 +581,86 @@
     <SetCondition>SE_ERNESTO_GESWALDO_PART_ONE</SetCondition>
   </DialogueNode>
   <DialogueNode>
+    <Name>SE_Ernesto_GeswaldoIncident</Name>
+    <Dialogue>
+      <Page>Yeah, sure. Where was I?</Page>
+      <Page>Geswaldo and I had just gotten married, and we had been living together for about a year. We were happy.</Page>
+      <Page>But that happiness didn't last long. Not because we divorced, or because we were fighting. Geswaldo simply... disappeared.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>What? He just left?!</Text>
+        <DialogueTarget>SE_Ernesto_GeswaldoIncident_11</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Did he at least say goodbye?</Text>
+        <DialogueTarget>SE_Ernesto_GeswaldoIncident_12</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_GeswaldoIncident_11</Name>
+    <Dialogue>
+      <Page>Geswaldo didn't leave. He just vanished. He faded away right before my eyes.</Page>
+      <Page>The look he gave me as he slipped away told me he would never be returning.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>That's... horrible.</Text>
+        <DialogueTarget>SE_Ernesto_GeswaldoIncident_2</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_GeswaldoIncident_12</Name>
+    <Dialogue>
+      <Page>He couldn't. It was all so sudden. One minute he was right there in front of me, the next minute he was fading into nothingness.</Page>
+      <Page>As he vanished, I looked into his eyes, and somehow I knew that he would never return.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>That's... horrible.</Text>
+        <DialogueTarget>SE_Ernesto_GeswaldoIncident_2</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_GeswaldoIncident_2</Name>
+    <Dialogue>
+      <Page>I spent the following years searching for an explanation, a reason for why this happened to me, maybe a way to fix it. And I discovered the truth.</Page>
+      <Page>Only 3 days before I met Geswaldo, I had eaten something. A green marshmallow, something known to have... hallucinogenic properties, you could say.</Page>
+      <Page>Maybe Geswaldo was real, somewhere, but here? Geswaldo never existed.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>But what about all your stories about Geswaldo?</Text>
+        <DialogueTarget>SE_Ernesto_GeswaldoIncident_21</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>Geswaldo never existed?!</Text>
+        <DialogueTarget>SE_Ernesto_GeswaldoIncident_22</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_GeswaldoIncident_21</Name>
+    <Dialogue>
+      <Page>Lies. A way to convince myself that everything was okay, when it really wasn't.</Page>
+      <Page>Did you really believe all of those stories about a jellyfish you've never seen? Can you think of one time you saw us together?</Page>
+      <Page>I'm sorry, but Geswaldo is gone, and in his place is a hole in my heart that will never be filled again. Not even by you.</Page>
+      <Page>Now, if you'll excuse me, I'm gonna make myself forget about our whole conversation. Those memories were repressed for a reason, you know.</Page>
+    </Dialogue>
+    <SetCondition>SE_ERNESTO_GESWALDO_PART_TWO</SetCondition>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_GeswaldoIncident_22</Name>
+    <Dialogue>
+      <Page>He's gone, forever. I'm sorry you never got to know him. He was... amazing.</Page>
+      <Page>This is bringing back a lot of repressed memories, so I'm just gonna make myself forget about our entire conversation.</Page>
+    </Dialogue>
+    <SetCondition>SE_ERNESTO_GESWALDO_PART_TWO</SetCondition>
+  </DialogueNode>
+  <DialogueNode>
     <Name>SE_Ernesto_Instrument</Name>
     <Dialogue>
       <Page>I play the vocal chords.</Page>
@@ -701,6 +786,12 @@
     <Name>SE_Ernesto_FavoriteTraveler</Name>
     <Dialogue>
       <Page>I like Chert's drums. They remind me of hitting people with rocks.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Radio</Name>
+    <Dialogue>
+      <Page>Yeah, can you switch to 4554? It's my favorite.</Page>
     </Dialogue>
   </DialogueNode>
   <DialogueNode>

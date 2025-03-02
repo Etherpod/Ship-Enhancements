@@ -394,7 +394,7 @@ dialogue_target = "SE_Ernesto_MeetingGeswaldo"
 [[dialogue_node.dialogue_options_list.dialogue_option]]
 required_condition = "SE_ERNESTO_OPTION_101"
 text = "Can you continue your story about Geswaldo?"
-dialogue_target = "SE_Ernesto_Geswaldo"
+dialogue_target = "SE_Ernesto_GeswaldoIncident"
 
 # ---
 
@@ -402,6 +402,11 @@ dialogue_target = "SE_Ernesto_Geswaldo"
 required_condition = "SE_ERNESTO_OPTION_200"
 text = "Is it just me, or are you... bigger?"
 dialogue_target = "SE_Ernesto_BigHead"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_201"
+text = "Do you want me to play anything on the radio?"
+dialogue_target = "SE_Ernesto_Radio"
 
 # ---
 
@@ -645,6 +650,82 @@ page = ["It's not important. Maybe I'll tell you some other time.", "Story time'
 
 
 [[dialogue_node]]
+name = "SE_Ernesto_GeswaldoIncident"
+
+[[dialogue_node.dialogue]]
+page = ["Yeah, sure. Where was I?", "Geswaldo and I had just gotten married, and we had been living together for about a year. We were happy.", "But that happiness didn't last long. Not because we divorced, or because we were fighting. Geswaldo simply... disappeared."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "What? He just left?!"
+dialogue_target = "SE_Ernesto_GeswaldoIncident_11"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Did he at least say goodbye?"
+dialogue_target = "SE_Ernesto_GeswaldoIncident_12"
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_GeswaldoIncident_11"
+
+[[dialogue_node.dialogue]]
+page = ["Geswaldo didn't leave. He just vanished. He faded away right before my eyes.", "The look he gave me as he slipped away told me he would never be returning."]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "That's... horrible."
+dialogue_target = "SE_Ernesto_GeswaldoIncident_2"
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_GeswaldoIncident_12"
+
+[[dialogue_node.dialogue]]
+page = ["He couldn't. It was all so sudden. One minute he was right there in front of me, the next minute he was fading into nothingness.", "As he vanished, I looked into his eyes, and somehow I knew that he would never return."]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "That's... horrible."
+dialogue_target = "SE_Ernesto_GeswaldoIncident_2"
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_GeswaldoIncident_2"
+
+[[dialogue_node.dialogue]]
+page = ["I spent the following years searching for an explanation, a reason for why this happened to me, maybe a way to fix it. And I discovered the truth.", "Only 3 days before I met Geswaldo, I had eaten something. A green marshmallow, something known to have... hallucinogenic properties, you could say.", "Maybe Geswaldo was real, somewhere, but here? Geswaldo never existed."]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "But what about all your stories about Geswaldo?"
+dialogue_target = "SE_Ernesto_GeswaldoIncident_21"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Geswaldo never existed?!"
+dialogue_target = "SE_Ernesto_GeswaldoIncident_22"
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_GeswaldoIncident_21"
+set_condition = ["SE_ERNESTO_GESWALDO_PART_TWO"]
+
+[[dialogue_node.dialogue]]
+page = ["Lies. A way to convince myself that everything was okay, when it really wasn't.", "Did you really believe all of those stories about a jellyfish you've never seen? Can you think of one time you saw us together?", "I'm sorry, but Geswaldo is gone, and in his place is a hole in my heart that will never be filled again. Not even by you.", "Now, if you'll excuse me, I'm gonna make myself forget about our whole conversation. Those memories were repressed for a reason, you know."]
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_GeswaldoIncident_22"
+set_condition = ["SE_ERNESTO_GESWALDO_PART_TWO"]
+
+[[dialogue_node.dialogue]]
+page = ["He's gone, forever. I'm sorry you never got to know him. He was... amazing.", "This is bringing back a lot of repressed memories, so I'm just gonna make myself forget about our entire conversation."]
+
+
+
+[[dialogue_node]]
 name = "SE_Ernesto_Instrument"
 
 [[dialogue_node.dialogue]]
@@ -801,6 +882,14 @@ name = "SE_Ernesto_FavoriteTraveler"
 
 [[dialogue_node.dialogue]]
 page = ["I like Chert's drums. They remind me of hitting people with rocks."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Radio"
+
+[[dialogue_node.dialogue]]
+page = ["Yeah, can you switch to 4554? It's my favorite."]
 
 
 

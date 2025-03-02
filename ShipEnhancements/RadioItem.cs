@@ -122,7 +122,7 @@ public class RadioItem : OWItem
         _codesToAudio = new()
         {
             { "2441", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_LostSignal.mp3") },
-            { "2662", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_Chadvelers.mp3") },
+            { "4554", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_Chadvelers.mp3") },
             { "1513", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_NoTimeForCaution.mp3") },
             { "3363", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_LastDreamOfHome.mp3") },
             { "5416", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_HearthsShadow.mp3") },
