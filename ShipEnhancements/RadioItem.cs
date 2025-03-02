@@ -21,7 +21,31 @@ public class RadioItem : OWItem
     [SerializeField]
     private RadioCodeDetector _codeDetector;
     [SerializeField]
+    private Canvas _codeLabelCanvas;
+    [SerializeField]
     private Text[] _codeLabels;
+    [SerializeField]
+    private Color _deselectColor;
+    [SerializeField]
+    private Color _selectColor;
+
+    [Header("Radio Effects")]
+    [SerializeField]
+    private Transform[] _knobTransforms;
+    [SerializeField]
+    private float _knobFullRotation;
+    [SerializeField]
+    private RotateTransform[] _rotateEffects;
+    [SerializeField]
+    private Transform _powerSwitchTransform;
+    [SerializeField]
+    private float _powerSwitchFullRotation;
+    [SerializeField]
+    private Transform _volumeNeedleTransform;
+    [SerializeField]
+    private float _volumeNeedleFullRotation;
+    [SerializeField]
+    private OWEmissiveRenderer _screenRenderer;
 
     private PriorityScreenPrompt _powerPrompt;
     private ScreenPrompt _tunePrompt;
@@ -35,7 +59,7 @@ public class RadioItem : OWItem
     private bool _playerInteracting = false;
     private bool _socketed = false;
 
-    private int[] _codes = new int[4];
+    private int[] _codes = [1, 1, 1, 1];
     private int _currentCodeIndex = 0;
     private bool _powerOn = false;
 
@@ -47,10 +71,15 @@ public class RadioItem : OWItem
 
     private readonly int _minFrequency = 1;
     private readonly int _maxFrequency = 6;
-    private Color _deselectColor = Color.black;
-    private Color _selectColor = Color.blue;
     private AudioClip _connectAudio;
     private AudioClip _disconnectAudio;
+
+    private Quaternion _initialKnobRot;
+    private Quaternion _targetKnobRot;
+    private Quaternion _initialSwitchRot;
+    private Quaternion _targetSwitchRot;
+    private Quaternion _initialVolumeRot;
+    private Quaternion _targetVolumeRot;
 
     private readonly string _powerOnText = "Turn On Radio";
     private readonly string _powerOffText = "Turn Off Radio";
@@ -114,6 +143,19 @@ public class RadioItem : OWItem
         _musicSource.SetLocalVolume(_currentVolume);
         _staticSource.SetLocalVolume(_currentVolume);
         _codeSource.SetLocalVolume(_currentVolume);
+
+        _codeLabelCanvas.gameObject.SetActive(false);
+        _screenRenderer.SetEmissiveScale(0f);
+        foreach (RotateTransform rotator in _rotateEffects)
+        {
+            rotator.enabled = false;
+        }
+        /*foreach (Transform knob in _knobTransforms)
+        {
+            knob.transform.localRotation = _initialKnobRot;
+        }*/
+        //_powerSwitchTransform.rotation = Quaternion.Euler(_powerSwitchTransform.rotation.eulerAngles.x, _minPowerSwitchRotation, _powerSwitchTransform.rotation.eulerAngles.z);
+        //_volumeNeedleTransform.rotation = Quaternion.Euler(_volumeNeedleTransform.rotation.eulerAngles.x, _minVolumeNeedleRotation, _volumeNeedleTransform.rotation.eulerAngles.z);
     }
 
     private void Update()
@@ -124,6 +166,14 @@ public class RadioItem : OWItem
         {
             PatchClass.UpdateFocusedItems(focused);
             _lastFocused = focused;
+            if (focused)
+            {
+                SELocator.GetFlightConsoleInteractController().AddInteractible();
+            }
+            else
+            {
+                SELocator.GetFlightConsoleInteractController().RemoveInteractible();
+            }
         }
 
         UpdatePromptVisibility();
@@ -193,6 +243,10 @@ public class RadioItem : OWItem
                 }
                 _codeLabels[_currentCodeIndex].text = _codes[_currentCodeIndex].ToString();
 
+                /*Vector3 knobEuler = _knobTransforms[_currentCodeIndex].rotation.eulerAngles;
+                float nextRot = _minKnobRotation + (_maxKnobRotation - _minKnobRotation) / 5 * _codes[_currentCodeIndex];
+                _knobTransforms[_currentCodeIndex].rotation = Quaternion.Euler(knobEuler.x, knobEuler.y, nextRot);*/
+
                 if (_playingAudio)
                 {
                     if (_powerOn)
@@ -220,6 +274,10 @@ public class RadioItem : OWItem
                     _codes[_currentCodeIndex] = _maxFrequency;
                 }
                 _codeLabels[_currentCodeIndex].text = _codes[_currentCodeIndex].ToString();
+
+                /*Vector3 knobEuler = _knobTransforms[_currentCodeIndex].rotation.eulerAngles;
+                float nextRot = _minKnobRotation + (_maxKnobRotation - _minKnobRotation) / 5 * _codes[_currentCodeIndex];
+                _knobTransforms[_currentCodeIndex].rotation = Quaternion.Euler(knobEuler.x, knobEuler.y, nextRot);*/
 
                 if (_playingAudio)
                 {
@@ -249,11 +307,6 @@ public class RadioItem : OWItem
                 {
                     if (!_playingAudio)
                     {
-                        /*_staticSource.FadeIn(0.5f, false, false, _currentVolume);
-                        if (_playingCodes)
-                        {
-                            _codeSource.FadeIn(0.5f, false, false, _currentVolume);
-                        }*/
                         _staticSource.SetLocalVolume(_currentVolume);
                         _staticSource.Play();
                         if (_playingCodes)
@@ -268,12 +321,18 @@ public class RadioItem : OWItem
                         _musicSource.Play();
                     }
                     _powerPrompt.SetText(_powerOffText);
+
+                    _codeLabelCanvas.gameObject.SetActive(true);
+                    _screenRenderer.SetEmissiveScale(1f);
+                    foreach (RotateTransform rotator in _rotateEffects)
+                    {
+                        rotator.enabled = true;
+                    }
                 }
                 else
                 {
                     if (!_playingAudio)
                     {
-                        //_staticSource.FadeOut(0.5f);
                         _staticSource.Stop();
                         if (_playingCodes)
                         {
@@ -285,6 +344,13 @@ public class RadioItem : OWItem
                         _musicSource.Pause();
                     }
                     _powerPrompt.SetText(_powerOnText);
+
+                    _codeLabelCanvas.gameObject.SetActive(false);
+                    _screenRenderer.SetEmissiveScale(0f);
+                    foreach (RotateTransform rotator in _rotateEffects)
+                    {
+                        rotator.enabled = false;
+                    }
                 }
             }
             else if (OWInput.IsNewlyPressed(InputLibrary.interactSecondary))
@@ -414,6 +480,15 @@ public class RadioItem : OWItem
                 _codeSource.Stop();
             }
             _playingCodes = false;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (_lastFocused)
+        {
+            SELocator.GetFlightConsoleInteractController().RemoveInteractible();
+            _lastFocused = false;
         }
     }
 
