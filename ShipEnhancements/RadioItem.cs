@@ -326,18 +326,21 @@ public class RadioItem : OWItem
                 {
                     if (!_playingAudio)
                     {
-                        _staticSource.SetLocalVolume(_currentVolume);
-                        _staticSource.Play();
+                        //_staticSource.SetLocalVolume(_currentVolume);
+                        //_staticSource.Play();
+                        _staticSource.FadeIn(0f, false, false, _currentVolume);
                         if (_playingCodes)
                         {
-                            _codeSource.SetLocalVolume(_currentVolume);
-                            _codeSource.Play();
+                            //_codeSource.SetLocalVolume(_currentVolume);
+                            //_codeSource.Play();
+                            _codeSource.FadeIn(0f, false, false, _currentVolume);
                         }
                     }
                     else
                     {
-                        _musicSource.SetLocalVolume(_currentVolume);
-                        _musicSource.Play();
+                        //_musicSource.SetLocalVolume(_currentVolume);
+                        //_musicSource.Play();
+                        _musicSource.FadeIn(0f, false, false, _currentVolume);
                     }
                     _powerPrompt.SetText(_powerOffText);
 
@@ -362,15 +365,18 @@ public class RadioItem : OWItem
                 {
                     if (!_playingAudio)
                     {
-                        _staticSource.Stop();
+                        //_staticSource.Stop();
+                        _staticSource.FadeOut(0f);
                         if (_playingCodes)
                         {
-                            _codeSource.Stop();
+                            //_codeSource.Stop();
+                            _codeSource.FadeOut(0f);
                         }
                     }
                     else
                     {
-                        _musicSource.Pause();
+                        //_musicSource.Pause();
+                        _musicSource.FadeOut(0f, OWAudioSource.FadeOutCompleteAction.PAUSE);
                     }
                     _powerPrompt.SetText(_powerOnText);
 
@@ -569,8 +575,9 @@ public class RadioItem : OWItem
             if (_powerOn && !_playingAudio)
             {
                 _codeSource.time = 0f;
-                _codeSource.SetLocalVolume(_currentVolume);
-                _codeSource.Play();
+                //_codeSource.SetLocalVolume(_currentVolume);
+                //_codeSource.Play();
+                _codeSource.FadeIn(0f, false, false, _currentVolume);
             }
             _playingCodes = true;
         }
