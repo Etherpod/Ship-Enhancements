@@ -40,6 +40,7 @@ public class RadioCodeZone : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (_triggerVolume == null) return;
         _triggerVolume.OnEntry -= OnEffectVolumeEnter;
         _triggerVolume.OnExit -= OnEffectVolumeExit;
     }

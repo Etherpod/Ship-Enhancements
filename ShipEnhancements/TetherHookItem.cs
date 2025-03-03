@@ -21,6 +21,7 @@ public class TetherHookItem : OWItem
     private ShipDetachableModule _attachedModule = null;
     private ShipDetachableLeg _attachedLeg = null;
     private OWAudioSource _playerExternalAudio = null;
+    private OWCamera _playerCam;
 
     private AudioClip _attachTetherAudio;
     private AudioClip _detachTetherAudio;
@@ -57,18 +58,34 @@ public class TetherHookItem : OWItem
         }
     }
 
+    private void Start()
+    {
+        _playerCam = Locator.GetPlayerCamera();
+    }
+
     private void Update()
     {
         bool focused = _cameraManipulator.GetFocusedOWItem() == this;
-        _tetherPrompt.SetVisibility(focused);
         if (_lastFocused != focused)
         {
             PatchClass.UpdateFocusedItems(focused);
             _lastFocused = focused;
         }
+
+        UpdatePromptVisibility();
+
         if (focused && OWInput.IsNewlyPressed(InputLibrary.interactSecondary))
         {
             OnPressInteract();
+        }
+    }
+
+    private void UpdatePromptVisibility()
+    {
+        bool flag = _lastFocused && _playerCam.enabled && OWInput.IsInputMode(InputMode.Character | InputMode.ShipCockpit);
+        if (flag != _tetherPrompt.IsVisible())
+        {
+            _tetherPrompt.SetVisibility(flag);
         }
     }
 

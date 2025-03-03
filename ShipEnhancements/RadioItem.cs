@@ -64,7 +64,7 @@ public class RadioItem : OWItem
     private bool _lastFocused = false;
     private bool _playerInteracting = false;
     private bool _connectedToShip = false;
-    private float _socketedMusicTime = 0f;
+    private bool _playingInDreamWorld = false;
 
     private int[] _codes = [1, 1, 1, 1];
     private int _currentCodeIndex = 0;
@@ -74,7 +74,9 @@ public class RadioItem : OWItem
     private bool _playingAudio = false;
     private bool _playingCodes = false;
     private float _currentVolume = 0.5f;
+    private AudioLowPassFilter _lowPassFilter;
     private AudioHighPassFilter _highPassFilter;
+    private AudioReverbFilter _reverbFilter;
 
     private bool _moveNeedle = false;
     private float _needleT = 0f;
@@ -107,13 +109,17 @@ public class RadioItem : OWItem
         base.Awake();
         _type = ItemType;
         _cameraManipulator = FindObjectOfType<FirstPersonManipulator>();
+        _lowPassFilter = _musicSource.GetComponent<AudioLowPassFilter>();
         _highPassFilter = _musicSource.GetComponent<AudioHighPassFilter>();
+        _reverbFilter = _musicSource.GetComponent<AudioReverbFilter>();
         _connectAudio = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_Connect.ogg");
         _disconnectAudio = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_Disconnect.ogg");
         InitializeAudioDict();
 
         GlobalMessenger.AddListener("ExitShip", OnExitShip);
         GlobalMessenger.AddListener("EnterShip", OnEnterShip);
+        GlobalMessenger.AddListener("EnterDreamWorld", OnEnterDreamWorld);
+        GlobalMessenger.AddListener("ExitDreamWorld", OnExitDreamWorld);
         _codeDetector.OnChangeActiveZone += OnChangeCodeZone;
     }
 
@@ -152,6 +158,10 @@ public class RadioItem : OWItem
         Locator.GetPromptManager().AddScreenPrompt(_powerPrompt, PromptPosition.Center);
         Locator.GetPromptManager().AddScreenPrompt(_tunePrompt, PromptPosition.Center);
         Locator.GetPromptManager().AddScreenPrompt(_volumePrompt, PromptPosition.Center);
+
+        _lowPassFilter.enabled = false;
+        _highPassFilter.enabled = true;
+        _reverbFilter.enabled = false;
 
         _musicSource.SetLocalVolume(_currentVolume);
         _staticSource.SetLocalVolume(_currentVolume);
@@ -527,6 +537,30 @@ public class RadioItem : OWItem
         }
     }
 
+    private void OnEnterDreamWorld()
+    {
+        if (!PlayerState.IsResurrected() && Vector3.Distance(Locator.GetDreamWorldController().GetDreamCampfire().transform.position, transform.position) < 7f)
+        {
+            _playingInDreamWorld = true;
+            _musicSource.spatialBlend = 0f;
+            _musicSource.spread = 0f;
+            _lowPassFilter.enabled = true;
+            _reverbFilter.enabled = true;
+        }
+    }
+
+    private void OnExitDreamWorld()
+    {
+        if (_playingInDreamWorld)
+        {
+            _playingInDreamWorld = false;
+            _musicSource.spatialBlend = _connectedToShip && PlayerState.IsInsideShip() ? 0f : 1f;
+            _musicSource.spread = _connectedToShip && PlayerState.IsInsideShip() ? 0f : 60f;
+            _lowPassFilter.enabled = false;
+            _reverbFilter.enabled = false;
+        }
+    }
+
     private void OnChangeCodeZone(RadioCodeZone zone)
     {
         if (zone != null && !_playingCodes)
@@ -566,7 +600,6 @@ public class RadioItem : OWItem
 
         if (_playingAudio)
         {
-            _musicSource.time = _socketedMusicTime;
             _musicSource.Play();
         }
         else
@@ -584,6 +617,8 @@ public class RadioItem : OWItem
         base.OnDestroy();
         GlobalMessenger.RemoveListener("ExitShip", OnExitShip);
         GlobalMessenger.RemoveListener("EnterShip", OnEnterShip);
+        GlobalMessenger.RemoveListener("EnterDreamWorld", OnEnterDreamWorld);
+        GlobalMessenger.RemoveListener("ExitDreamWorld", OnExitDreamWorld);
         _codeDetector.OnChangeActiveZone -= OnChangeCodeZone;
     }
 }

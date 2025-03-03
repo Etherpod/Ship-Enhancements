@@ -72,6 +72,10 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
                 {
                     QSBWorldSync.Init<QSBRepairWrenchItem, RepairWrenchItem>();
                 }
+                if ((bool)addRadio.GetProperty())
+                {
+                    QSBWorldSync.Init<QSBRadioItem, RadioItem>();
+                }
             }, 2);
         };
     }
