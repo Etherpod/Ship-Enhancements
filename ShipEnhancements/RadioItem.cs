@@ -453,6 +453,7 @@ public class RadioItem : OWItem
 
     private void SetRadioVolume()
     {
+        if (!_powerOn) return;
         _musicSource.FadeTo(_currentVolume, 0.2f);
         _staticSource.FadeTo(_currentVolume, 0.2f);
         _codeSource.FadeTo(_currentVolume, 0.2f);

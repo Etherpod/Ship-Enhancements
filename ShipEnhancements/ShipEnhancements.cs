@@ -1504,7 +1504,7 @@ public class ShipEnhancements : ModBehaviour
         {
             GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_ElegyForTheRings.prefab");
             Instantiate(zone, rw.transform.Find("Sector_RingInterior/Sector_Zone1/Sector_DreamFireHouse_Zone1"));
-            Instantiate(zone, rw.transform.Find("Sector_RingInterior/Sector_Zone2/Sector_DreamFireLighthouse_Zone2_AnimRoot"));
+            Instantiate(zone, rw.transform.Find("Sector_RingInterior/Sector_Zone2/Sector_DreamFireLighthouse_Zone2_AnimRoot/Volumes_DreamFireLighthouse_Zone2"));
             Instantiate(zone, rw.transform.Find("Sector_RingInterior/Sector_Zone3/Sector_HiddenGorge/Sector_DreamFireHouse_Zone3"));
         }
 
