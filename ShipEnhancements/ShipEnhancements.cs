@@ -582,6 +582,8 @@ public class ShipEnhancements : ModBehaviour
             var qsbAssembly = Assembly.LoadFrom(Path.Combine(ModHelper.Manifest.ModFolderPath, "ShipEnhancementsQSB.dll"));
             gameObject.AddComponent(qsbAssembly.GetType("ShipEnhancementsQSB.QSBInteraction", true));
             _shipResourceSync = new ShipResourceSyncManager(QSBCompat);
+
+            QSBAPI.RegisterRequiredForAllPlayers(this);
         }
     }
 

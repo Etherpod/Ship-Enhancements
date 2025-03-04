@@ -99,7 +99,7 @@ public class ShipWarpCoreController : CockpitInteractible
                 {
                     cannonID = _emberTwinCannonEntryID;
                 }
-                ShipEnhancements.QSBCompat.SendActivateWarp(id, _warpingWithPlayer, cannonID);
+                ShipEnhancements.QSBCompat.SendActivateWarp(id, _warpingWithPlayer, cannonID, _randomDestination.position);
             }
         }
     }
@@ -148,7 +148,7 @@ public class ShipWarpCoreController : CockpitInteractible
         _receiver = receiver;
     }
 
-    public void ActivateWarpRemote(bool playerInShip, string targetCannonEntryID)
+    public void ActivateWarpRemote(bool playerInShip, string targetCannonEntryID, Vector3 randomPos)
     {
         if (_receiver == null) return;
 
@@ -164,6 +164,12 @@ public class ShipWarpCoreController : CockpitInteractible
         {
             _targetCannon = null;
             _receiver.SetGravityCannonSocket(null);
+        }
+
+        if (_damaged)
+        {
+            _randomDestination.position = randomPos;
+            _receiver.SetCustomDestination(_randomDestination);
         }
 
         _interactReceiver.DisableInteraction();

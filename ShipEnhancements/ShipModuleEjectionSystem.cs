@@ -111,18 +111,26 @@ public class ShipModuleEjectionSystem : MonoBehaviour
                     legs.Add(leg.Detach());
                 }
 
-                _shipBody.transform.position -= _shipBody.transform.TransformVector(_ejectDirection);
+                //_shipBody.transform.position -= _shipBody.transform.TransformVector(_ejectDirection);
                 float num = _ejectImpulse;
                 if (Locator.GetShipDetector().GetComponent<ShipFluidDetector>().InOceanBarrierZone())
                 {
                     MonoBehaviour.print("Ship in ocean barrier zone, reducing eject impulse.");
                     num = 1f;
                 }
-                _shipBody.AddLocalImpulse(-_ejectDirection * num);
+                _shipBody.AddLocalImpulse(-_ejectDirection * num / 2f);
                 foreach (OWRigidbody leg in legs)
                 {
                     Vector3 toShip = leg.transform.position - _shipBody.transform.position;
                     leg.AddLocalImpulse(-toShip.normalized * num);
+                }
+
+                if (ShipEnhancements.InMultiplayer)
+                {
+                    foreach (uint id in ShipEnhancements.PlayerIDs)
+                    {
+                        ShipEnhancements.QSBCompat.SendDetachLandingGear(id, _ejectImpulse);
+                    }
                 }
             }
             else

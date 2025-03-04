@@ -23,8 +23,6 @@ using QSB.ShipSync.Messages;
 using QSB.Player.TransformSync;
 using System.Collections.Generic;
 using QSB.ItemSync.Patches;
-using QSB.ConversationSync.Messages;
-using QSB.ConversationSync.WorldObjects;
 
 namespace ShipEnhancementsQSB;
 
@@ -35,7 +33,7 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
         ShipEnhancements.ShipEnhancements.Instance.AssignQSBInterface(this);
         Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
 
-        LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
+        /*LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
         {
             if (loadScene != OWScene.SolarSystem || !ShipEnhancements.ShipEnhancements.InMultiplayer)
             {
@@ -77,7 +75,7 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
                     QSBWorldSync.Init<QSBRadioItem, RadioItem>();
                 }
             }, 2);
-        };
+        };*/
     }
 
     public bool FlightConsoleOccupied()
@@ -126,7 +124,7 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
         hull.SendMessage(new HullChangeIntegrityMessage(shipHull._integrity));
     }
 
-    public int GetIDFromTetherHook(TetherHookItem hookItem)
+    /*public int GetIDFromTetherHook(TetherHookItem hookItem)
     {
         var worldObj = hookItem.GetWorldObject<QSBTetherHookItem>();
         return worldObj.ObjectId;
@@ -135,7 +133,7 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
     public TetherHookItem GetTetherHookFromID(int hookID)
     {
         return hookID.GetWorldObject<QSBTetherHookItem>().AttachedObject;
-    }
+    }*/
 
     public int GetIDFromItem(OWItem item)
     {

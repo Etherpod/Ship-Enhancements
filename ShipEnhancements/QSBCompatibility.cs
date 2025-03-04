@@ -16,6 +16,35 @@ public class QSBCompatibility
     [Serializable]
     private struct NoData { }
 
+    [Serializable]
+    private struct SerializedVector3
+    {
+        public float x;
+        public float y;
+        public float z;
+
+        public SerializedVector3(Vector3 vector)
+        {
+            x = vector.x;
+            y = vector.y;
+            z = vector.z;
+        }
+
+        public Vector3 Vector
+        { 
+            get 
+            { 
+                return new Vector3(x, y, z); 
+            } 
+            set 
+            { 
+                x = value.x;
+                y = value.y;
+                z = value.z;
+            } 
+        }
+    }
+
     public QSBCompatibility(IQSBAPI api)
     {
         _api = api;
@@ -50,7 +79,7 @@ public class QSBCompatibility
         _api.RegisterHandler<(float, float, float)>("initial-persistent-input", ReceiveInitialPersistentInput);
         _api.RegisterHandler<float>("initial-black-hole", ReceiveInitialBlackHoleState);
         _api.RegisterHandler<ShipCommand>("send-ship-command", ReceiveShipCommand);
-        _api.RegisterHandler<(bool, string)>("activate-warp", ReceiveActivateWarp);
+        _api.RegisterHandler<(bool, string, SerializedVector3)>("activate-warp", ReceiveActivateWarp);
         _api.RegisterHandler<bool>("toggle-fuel-tank-drain", ReceiveToggleFuelTankDrain);
         _api.RegisterHandler<NoData>("fuel-tank-explosion", ReceiveFuelTankExplosion);
         _api.RegisterHandler<float>("fuel-tank-capacity", ReceiveFuelTankCapacity);
@@ -58,6 +87,7 @@ public class QSBCompatibility
         _api.RegisterHandler<bool>("tractor-beam-turbo", ReceiveTractorBeamTurbo);
         _api.RegisterHandler<bool>("set-curtain-state", ReceiveCurtainState);
         _api.RegisterHandler<string>("send-ernesto-comment", ReceiveErnestoComment);
+        _api.RegisterHandler<float>("detach-landing-gear", ReceiveDetachLandingGear);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -502,38 +532,38 @@ public class QSBCompatibility
     #region Tether
     public void SendAttachTether(uint id, TetherHookItem hook)
     {
-        _api.SendMessage("attach-tether", ShipEnhancements.QSBInteraction.GetIDFromTetherHook(hook), id, false);
+        _api.SendMessage("attach-tether", ShipEnhancements.QSBInteraction.GetIDFromItem(hook), id, false);
     }
 
     private void ReceiveAttachTether(uint id, int hookID)
     {
         if (!ShipEnhancements.QSBInteraction.WorldObjectsLoaded()) return;
-        ShipEnhancements.QSBInteraction.GetTetherHookFromID(hookID).OnConnectTetherRemote(id);
+        ((TetherHookItem)ShipEnhancements.QSBInteraction.GetItemFromID(hookID)).OnConnectTetherRemote(id);
     }
 
     public void SendDisconnectTether(uint id, TetherHookItem hook)
     {
-        _api.SendMessage("disconnect-tether", ShipEnhancements.QSBInteraction.GetIDFromTetherHook(hook), id, false);
+        _api.SendMessage("disconnect-tether", ShipEnhancements.QSBInteraction.GetIDFromItem(hook), id, false);
     }
 
     private void ReceiveDisconnectTether(uint id, int hookID)
     {
         if (!ShipEnhancements.QSBInteraction.WorldObjectsLoaded()) return;
-        ShipEnhancements.QSBInteraction.GetTetherHookFromID(hookID).OnDisconnectTetherRemote();
+        ((TetherHookItem)ShipEnhancements.QSBInteraction.GetItemFromID(hookID)).OnDisconnectTetherRemote();
     }
 
     public void SendTransferTether(uint id, TetherHookItem newHook, TetherHookItem lastHook)
     {
-        int newID = ShipEnhancements.QSBInteraction.GetIDFromTetherHook(newHook);
-        int lastID = ShipEnhancements.QSBInteraction.GetIDFromTetherHook(lastHook);
+        int newID = ShipEnhancements.QSBInteraction.GetIDFromItem(newHook);
+        int lastID = ShipEnhancements.QSBInteraction.GetIDFromItem(lastHook);
         _api.SendMessage("transfer-tether", (newID, lastID), id, false);
     }
 
     private void ReceiveTransferTether(uint id, (int newID, int lastID) data)
     {
         if (!ShipEnhancements.QSBInteraction.WorldObjectsLoaded()) return;
-        Tether newTether = ShipEnhancements.QSBInteraction.GetTetherHookFromID(data.lastID).GetTether();
-        ShipEnhancements.QSBInteraction.GetTetherHookFromID(data.newID).OnTransferRemote(newTether);
+        Tether newTether = ((TetherHookItem)ShipEnhancements.QSBInteraction.GetItemFromID(data.lastID)).GetTether();
+        ((TetherHookItem)ShipEnhancements.QSBInteraction.GetItemFromID(data.newID)).OnTransferRemote(newTether);
     }
 
     public void AddTetherHook(TetherHookItem hook)
@@ -638,15 +668,15 @@ public class QSBCompatibility
     #endregion
 
     #region ShipWarpCore
-    public void SendActivateWarp(uint id, bool playerInShip, string targetCannonEntryID)
+    public void SendActivateWarp(uint id, bool playerInShip, string targetCannonEntryID, Vector3 randomPos)
     {
-        _api.SendMessage("activate-warp", (playerInShip, targetCannonEntryID), id, false);
+        _api.SendMessage("activate-warp", (playerInShip, targetCannonEntryID, new SerializedVector3(randomPos)), id, false);
     }
 
-    private void ReceiveActivateWarp(uint id, (bool playerInShip, string targetCannonEntryID) data)
+    private void ReceiveActivateWarp(uint id, (bool playerInShip, string targetCannonEntryID, SerializedVector3 randomPos) data)
     {
         SELocator.GetShipTransform().GetComponentInChildren<ShipWarpCoreController>()?
-            .ActivateWarpRemote(data.playerInShip, data.targetCannonEntryID);
+            .ActivateWarpRemote(data.playerInShip, data.targetCannonEntryID, data.randomPos.Vector);
     }
     #endregion
 
@@ -733,6 +763,37 @@ public class QSBCompatibility
     private void ReceiveErnestoComment(uint id, string comment)
     {
         SELocator.GetErnesto()?.MakeCommentRemote(comment);
+    }
+    #endregion
+
+    #region EjectLandingGear
+    public void SendDetachLandingGear(uint id, float ejectImpulse)
+    {
+        _api.SendMessage("detach-landing-gear", ejectImpulse, id, false);
+    }
+
+    private void ReceiveDetachLandingGear(uint id, float ejectImpulse)
+    {
+        ShipLandingGear landingGear = SELocator.GetShipTransform().GetComponentInChildren<ShipLandingGear>();
+        List<OWRigidbody> legs = [];
+        foreach (ShipDetachableLeg leg in landingGear.GetLegs())
+        {
+            legs.Add(leg.Detach());
+        }
+
+        //_shipBody.transform.position -= _shipBody.transform.TransformVector(_ejectDirection);
+        float num = ejectImpulse;
+        if (Locator.GetShipDetector().GetComponent<ShipFluidDetector>().InOceanBarrierZone())
+        {
+            MonoBehaviour.print("Ship in ocean barrier zone, reducing eject impulse.");
+            num = 1f;
+        }
+        SELocator.GetShipBody().AddLocalImpulse(Vector3.up * num / 2f);
+        foreach (OWRigidbody leg in legs)
+        {
+            Vector3 toShip = leg.transform.position - SELocator.GetShipTransform().position;
+            leg.AddLocalImpulse(-toShip.normalized * num);
+        }
     }
     #endregion
 }

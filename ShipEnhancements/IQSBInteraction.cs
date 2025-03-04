@@ -15,9 +15,9 @@ public interface IQSBInteraction
 
     void SetHullDamaged(ShipHull shipHull, bool newlyDamaged);
 
-    int GetIDFromTetherHook(TetherHookItem hookItem);
+    //int GetIDFromTetherHook(TetherHookItem hookItem);
 
-    TetherHookItem GetTetherHookFromID(int hookID);
+    //TetherHookItem GetTetherHookFromID(int hookID);
 
     int GetIDFromItem(OWItem item);
 
