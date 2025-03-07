@@ -107,6 +107,7 @@ public static class SettingExtensions
         { Settings.disableShipMedkit, (false, false) },
         { Settings.addRadio, (false, false) },
         { Settings.disableFluidPrevention, (false, false) },
+        { Settings.disableHazardPrevention, (false, false) },
     };
 
     public static string GetName(this Settings setting)

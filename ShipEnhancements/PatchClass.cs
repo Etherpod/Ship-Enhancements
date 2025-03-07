@@ -47,7 +47,9 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.OnPressInteract))]
     public static bool KeepHelmetOnAtCockpit(ShipCockpitController __instance)
     {
-        if (!(bool)keepHelmetOn.GetProperty() || !ShipEnhancements.Instance.oxygenDepleted) return true;
+        bool run = (bool)keepHelmetOn.GetProperty() && (ShipEnhancements.Instance.oxygenDepleted
+            || (bool)disableFluidPrevention.GetProperty());
+        if (!run) return true;
 
         if (!__instance._playerAtFlightConsole)
         {
@@ -3580,6 +3582,18 @@ public static class PatchClass
         if ((bool)disableShipMedkit.GetProperty() && __instance.GetComponentInParent<ShipBody>())
         {
             __instance._healsPlayer = false;
+        }
+    }
+    #endregion
+
+    #region DisableHazardPrevention
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(HazardDetector), nameof(HazardDetector.IsInvulnerable))]
+    public static void ShipHazardVulnerability(HazardDetector __instance, ref bool __result)
+    {
+        if ((bool)disableHazardPrevention.GetProperty() && __result && __instance._isPlayerDetector)
+        {
+            __result = PlayerState.IsInsideTheEye();
         }
     }
     #endregion

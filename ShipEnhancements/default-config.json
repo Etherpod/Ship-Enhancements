@@ -142,7 +142,13 @@
       "title": "Disable Fluid Prevention",
       "type": "toggle",
       "value": false,
-      "tooltip": "Lets fluids like sand and water enter your ship."
+      "tooltip": "Allows fluids like sand and water to enter your ship."
+    },
+    "disableHazardPrevention": {
+      "title": "Disable Hazard Prevention",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Allows hazards like heat and ghost matter to damage you while inside of the ship."
     },
     "disableReferenceFrame": {
       "title": "Disable Lock-on",

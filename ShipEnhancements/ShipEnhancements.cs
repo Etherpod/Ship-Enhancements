@@ -186,6 +186,7 @@ public class ShipEnhancements : ModBehaviour
         disableShipMedkit,
         addRadio,
         disableFluidPrevention,
+        disableHazardPrevention,
     }
 
     private void Awake()
