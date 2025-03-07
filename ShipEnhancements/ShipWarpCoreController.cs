@@ -31,17 +31,14 @@ public class ShipWarpCoreController : CockpitInteractible
     private readonly string _brittleHollowCannonEntryID = "BH_GRAVITY_CANNON";
     private readonly string _emberTwinCannonEntryID = "CT_GRAVITY_CANNON";
 
-    public override void Awake()
-    {
-        base.Awake();
-        _shipBody = SELocator.GetShipBody() ?? FindObjectOfType<ShipBody>();
-        GlobalMessenger<OWRigidbody>.AddListener("ShipCockpitDetached", OnShipCockpitDetached);
-    }
-
     private void Start()
     {
+        _shipBody = SELocator.GetShipBody() ?? FindObjectOfType<ShipBody>();
         _brittleHollowCannon = Locator.GetGravityCannon(NomaiShuttleController.ShuttleID.BrittleHollowShuttle);
         _emberTwinCannon = Locator.GetGravityCannon(NomaiShuttleController.ShuttleID.HourglassShuttle);
+
+        GlobalMessenger<OWRigidbody>.AddListener("ShipCockpitDetached", OnShipCockpitDetached);
+
         _randomDestination = new GameObject("ShipRandomWarpDestination").transform;
         if (Locator.GetAstroObject(AstroObject.Name.Sun) != null)
         {
@@ -247,6 +244,7 @@ public class ShipWarpCoreController : CockpitInteractible
 
         if (IsShipOccupied())
         {
+            ShipEnhancements.WriteDebugMessage("Ship occupied");
             if (PlayerState.InBrambleDimension())
             {
                 PlayerFogWarpDetector detector = Locator.GetPlayerDetector().GetComponent<PlayerFogWarpDetector>();

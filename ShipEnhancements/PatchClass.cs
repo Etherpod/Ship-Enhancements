@@ -3070,7 +3070,7 @@ public static class PatchClass
     public static void HullDamageEffect_SetEffectBlend(HullDamageEffect instance, float blend) { }
     #endregion
 
-    #region Air drag multiplier
+    #region AirDragMultiplier
     [HarmonyPrefix]
     [HarmonyPatch(typeof(FluidDetector), nameof(FluidDetector.AddLinearDrag))]
     public static bool AirDragMultiplier(FluidDetector __instance, FluidVolume fluidVolume, float fluidDensity, float fractionSubmerged)

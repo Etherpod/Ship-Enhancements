@@ -15,16 +15,11 @@ public class ShipWarpCoreReceiver : MonoBehaviour
     private Transform _gravityCannonSocket;
     private Transform _customDestionation;
 
-    private void Awake()
+    private void Start()
     {
-        if (SELocator.GetShipDetector() != null)
-        {
-            _shipFluidDetector = SELocator.GetShipDetector().GetComponent<FluidDetector>();
-        }
-        else
-        {
-            _shipFluidDetector = GameObject.FindWithTag("ShipDetector").GetComponent<FluidDetector>();
-        }
+        _shipFluidDetector = SELocator.GetShipDetector().GetComponent<FluidDetector>();
+
+        ShipEnhancements.WriteDebugMessage(_warpDestination);
     }
 
     public void SetGravityCannonSocket(Transform destination)
