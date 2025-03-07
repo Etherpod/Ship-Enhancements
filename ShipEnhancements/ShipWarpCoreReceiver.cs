@@ -60,6 +60,11 @@ public class ShipWarpCoreReceiver : MonoBehaviour
         }
     }
 
+    public void OnCustomSpawnPoint()
+    {
+        _warpDestination.transform.localPosition = Vector3.zero;
+    }
+
     public void WarpBodyToReceiver(OWRigidbody body, bool inShip)
     {
         if (_customDestionation != null)

@@ -147,7 +147,7 @@ public class ShipWarpCoreController : CockpitInteractible
 
     public void ActivateWarpRemote(bool playerInShip, string targetCannonEntryID, Vector3 randomPos)
     {
-        if (_receiver == null || !_receiver.isActiveAndEnabled) return;
+        if (_receiver == null || !_receiver.gameObject.activeInHierarchy) return;
 
         if (targetCannonEntryID == _brittleHollowCannonEntryID)
         {
@@ -218,7 +218,7 @@ public class ShipWarpCoreController : CockpitInteractible
 
     public void ActivateWarp()
     {
-        if (_receiver == null || !_receiver.isActiveAndEnabled) return;
+        if (_receiver == null || !_receiver.gameObject.activeInHierarchy) return;
 
         if (ShipLogEntryHUDMarker.s_entryLocationID == _brittleHollowCannonEntryID 
             || Locator.GetReferenceFrame(true)?.GetOWRigidBody() == Locator.GetAstroObject(AstroObject.Name.BrittleHollow)?.GetOWRigidbody())

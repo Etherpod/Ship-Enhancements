@@ -138,6 +138,12 @@
       "value": false,
       "tooltip": "Turns off the ship's friction so that it slides everywhere. Good luck landing on anything."
     },
+    "disableFluidPrevention": {
+      "title": "Disable Fluid Prevention",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Lets fluids like sand and water enter your ship."
+    },
     "disableReferenceFrame": {
       "title": "Disable Lock-on",
       "type": "toggle",

@@ -185,6 +185,7 @@ public class ShipEnhancements : ModBehaviour
         shipWarpCoreComponent,
         disableShipMedkit,
         addRadio,
+        disableFluidPrevention,
     }
 
     private void Awake()
@@ -1005,6 +1006,31 @@ public class ShipEnhancements : ModBehaviour
                 GameObject receiverObj = Instantiate(receiver, GameObject.Find("TimberHearth_Body").transform);
                 coreObj.GetComponent<ShipWarpCoreController>().SetReceiver(receiverObj.GetComponent<ShipWarpCoreReceiver>());
             }
+
+            // add when NH assembly created
+
+            /*ModHelper.Events.Unity.FireInNUpdates(() =>
+            {
+                if (GameObject.Find("TimberHearth_Body"))
+                {
+                    GameObject receiver = LoadPrefab("Assets/ShipEnhancements/ShipWarpReceiver.prefab");
+                    AssetBundleUtilities.ReplaceShaders(receiver);
+                    receiver.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = SELocator.GetShipBody().gameObject;
+                    GameObject receiverObj = Instantiate(receiver, GameObject.Find("TimberHearth_Body").transform);
+                    coreObj.GetComponent<ShipWarpCoreController>().SetReceiver(receiverObj.GetComponent<ShipWarpCoreReceiver>());
+                }
+                else if (false)
+                {
+                    WriteDebugMessage("Custom spawn");
+                    GameObject receiver = LoadPrefab("Assets/ShipEnhancements/ShipWarpReceiver.prefab");
+                    AssetBundleUtilities.ReplaceShaders(receiver);
+                    receiver.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = SELocator.GetShipBody().gameObject;
+                    ShipWarpCoreReceiver receiverObj = Instantiate(receiver.gameObject,
+                        spawner.GetInitialSpawnPoint()._attachedBody?.transform).GetComponent<ShipWarpCoreReceiver>();
+                    receiverObj.OnCustomSpawnPoint();
+                    coreObj.GetComponent<ShipWarpCoreController>().SetReceiver(receiverObj);
+                }
+            }, 5);*/
         }
         if ((float)Settings.repairTimeMultiplier.GetProperty() != 1f
             && (float)Settings.repairTimeMultiplier.GetProperty() != 0f)
@@ -1131,6 +1157,17 @@ public class ShipEnhancements : ModBehaviour
             radioSocket.PlaceIntoSocket(radio);
 
             AddRadioCodeZones();
+        }
+        if ((bool)Settings.disableFluidPrevention.GetProperty())
+        {
+            GameObject[] stencils = SELocator.GetShipDamageController()._stencils;
+            for (int j = 0; j < stencils.Length; j++)
+            {
+                stencils[j].SetActive(false);
+            }
+
+            Transform atmoVolume = SELocator.GetShipTransform().Find("Volumes/ShipAtmosphereVolume");
+            atmoVolume.GetComponent<FluidVolume>().SetPriority(0);
         }
 
         SetDamageColors();
