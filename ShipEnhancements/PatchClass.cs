@@ -2304,8 +2304,10 @@ public static class PatchClass
         float ignitionNoiseRadius = shipIgniting ? 500f : 0f;
         float overdriveNoiseRadius = (bool)enableThrustModulator.GetProperty() && SELocator.GetShipOverdriveController() != null
             && SELocator.GetShipOverdriveController().IsCharging() ? 300f : 0f;
+        float radioNoiseRadius = (bool)addRadio.GetProperty() && SELocator.GetRadio() != null ? SELocator.GetRadio().GetNoiseRadius() : 0f;
 
-        __instance._noiseRadius = Mathf.Max(thrusterNoiseRadius, __instance._impactNoiseRadius, alarmNoiseRadius, ignitionNoiseRadius, overdriveNoiseRadius);
+        __instance._noiseRadius = Mathf.Max(thrusterNoiseRadius, __instance._impactNoiseRadius, alarmNoiseRadius, ignitionNoiseRadius, overdriveNoiseRadius,
+            radioNoiseRadius);
 
         return false;
     }

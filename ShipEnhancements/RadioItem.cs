@@ -526,8 +526,11 @@ public class RadioItem : OWItem
     private void SetRadioVolume()
     {
         if (!_powerOn) return;
-        _musicSource.FadeTo(_currentVolume, 0.2f);
-        if (!_playingAudio)
+        if (_playingAudio)
+        {
+            _musicSource.FadeTo(_currentVolume, 0.2f);
+        }
+        else
         {
             _staticSource.FadeTo(_currentVolume, 0.2f);
             _codeSource.FadeTo(_currentVolume, 0.2f);
@@ -698,6 +701,23 @@ public class RadioItem : OWItem
             _needleT = 0f;
             _moveNeedle = true;
         }
+    }
+
+    public float GetNoiseRadius()
+    {
+        if (!_powerOn || !_playingAudio) return 0f;
+
+        float lerp = 0f;
+        if (_connectedToShip)
+        {
+            lerp = _currentVolume;
+        }
+        else if (GetComponentInParent<ShipBody>())
+        {
+            lerp = _currentVolume / 2;
+        }
+
+        return Mathf.Lerp(0f, 250f, lerp);
     }
 
     public override void SocketItem(Transform socketTransform, Sector sector)
