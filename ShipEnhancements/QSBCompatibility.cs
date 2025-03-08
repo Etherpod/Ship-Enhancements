@@ -88,6 +88,10 @@ public class QSBCompatibility
         _api.RegisterHandler<bool>("set-curtain-state", ReceiveCurtainState);
         _api.RegisterHandler<string>("send-ernesto-comment", ReceiveErnestoComment);
         _api.RegisterHandler<float>("detach-landing-gear", ReceiveDetachLandingGear);
+        _api.RegisterHandler<bool>("radio-power", ReceiveRadioPower);
+        _api.RegisterHandler<int[]>("radio-codes", ReceiveRadioCodes);
+        _api.RegisterHandler<NoData>("radio-cancel-tuning", ReceiveRadioCancelTuning);
+        _api.RegisterHandler<float>("radio-volume", ReceiveRadioVolume);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -794,6 +798,48 @@ public class QSBCompatibility
             Vector3 toShip = leg.transform.position - SELocator.GetShipTransform().position;
             leg.AddLocalImpulse(-toShip.normalized * num);
         }
+    }
+    #endregion
+
+    #region Radio
+    public void SendRadioPower(uint id, bool powered)
+    {
+        _api.SendMessage("radio-power", powered, id, false);
+    }
+
+    private void ReceiveRadioPower(uint id, bool powered)
+    {
+        SELocator.GetRadio().SetRadioPowerRemote(powered);
+    }
+
+    public void SendRadioCodes(uint id, int[] codes)
+    {
+        _api.SendMessage("radio-codes", codes, id, false);
+    }
+
+    private void ReceiveRadioCodes(uint id, int[] codes)
+    {
+        SELocator.GetRadio().SetRadioCodesRemote(codes);
+    }
+
+    public void SendRadioCancelTuning(uint id)
+    {
+        _api.SendMessage("radio-cancel-tuning", new NoData(), id, false);
+    }
+
+    private void ReceiveRadioCancelTuning(uint id, NoData noData)
+    {
+        SELocator.GetRadio().CancelTuningRemote();
+    }
+
+    public void SendRadioVolume(uint id, float volume)
+    {
+        _api.SendMessage("radio-volume", volume, id, false);
+    }
+
+    private void ReceiveRadioVolume(uint id, float volume)
+    {
+        SELocator.GetRadio().ChangeVolumeRemote(volume);
     }
     #endregion
 }

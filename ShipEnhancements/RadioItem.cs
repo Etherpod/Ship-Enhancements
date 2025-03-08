@@ -236,6 +236,14 @@ public class RadioItem : OWItem
                         _playingAudio = true;
                     }
                 }
+
+                if (ShipEnhancements.InMultiplayer)
+                {
+                    foreach (uint id in ShipEnhancements.PlayerIDs)
+                    {
+                        ShipEnhancements.QSBCompat.SendRadioCancelTuning(id);
+                    }
+                }
             }
             else if (OWInput.IsNewlyPressed(InputLibrary.right, InputMode.All) 
                 || OWInput.IsNewlyPressed(InputLibrary.right2, InputMode.All))
@@ -287,7 +295,7 @@ public class RadioItem : OWItem
                             _codeSource.FadeIn(0.5f, false, false, _currentVolume);
                         }
                     }
-                    else if (_playingAudio)
+                    else
                     {
                         _musicSource.time = 0;
                     }
@@ -295,6 +303,14 @@ public class RadioItem : OWItem
                 }
 
                 _playerExternalSource.PlayOneShot(AudioType.Menu_LeftRight, 0.5f);
+
+                if (ShipEnhancements.InMultiplayer)
+                {
+                    foreach (uint id in ShipEnhancements.PlayerIDs)
+                    {
+                        ShipEnhancements.QSBCompat.SendRadioCodes(id, _codes);
+                    }
+                }
             }
             else if (OWInput.IsNewlyPressed(InputLibrary.down, InputMode.All)
                 || OWInput.IsNewlyPressed(InputLibrary.down2, InputMode.All))
@@ -320,7 +336,7 @@ public class RadioItem : OWItem
                             _codeSource.FadeIn(0.5f, false, false, _currentVolume);
                         }
                     }
-                    else if (_playingAudio)
+                    else
                     {
                         _musicSource.time = 0;
                     }
@@ -328,6 +344,14 @@ public class RadioItem : OWItem
                 }
 
                 _playerExternalSource.PlayOneShot(AudioType.Menu_LeftRight, 0.5f);
+
+                if (ShipEnhancements.InMultiplayer)
+                {
+                    foreach (uint id in ShipEnhancements.PlayerIDs)
+                    {
+                        ShipEnhancements.QSBCompat.SendRadioCodes(id, _codes);
+                    }
+                }
             }
         }
         else if (focused)
@@ -406,6 +430,14 @@ public class RadioItem : OWItem
                     _needleT = 0f;
                     _moveNeedle = true;
                 }
+
+                if (ShipEnhancements.InMultiplayer)
+                {
+                    foreach (uint id in ShipEnhancements.PlayerIDs)
+                    {
+                        ShipEnhancements.QSBCompat.SendRadioPower(id, _powerOn);
+                    }
+                }
             }
             else if (OWInput.IsNewlyPressed(InputLibrary.interactSecondary))
             {
@@ -430,6 +462,14 @@ public class RadioItem : OWItem
                     _needleT = 0f;
                     _moveNeedle = true;
                 }
+
+                if (ShipEnhancements.InMultiplayer)
+                {
+                    foreach (uint id in ShipEnhancements.PlayerIDs)
+                    {
+                        ShipEnhancements.QSBCompat.SendRadioVolume(id, _currentVolume);
+                    }
+                }
             }
             else if (OWInput.IsNewlyPressed(InputLibrary.toolOptionDown))
             {
@@ -442,6 +482,14 @@ public class RadioItem : OWItem
                     _targetNeedleRotation = Quaternion.Lerp(_needleStartRot.rotation, _needleEndRot.rotation, _currentVolume);
                     _needleT = 0f;
                     _moveNeedle = true;
+                }
+
+                if (ShipEnhancements.InMultiplayer)
+                {
+                    foreach (uint id in ShipEnhancements.PlayerIDs)
+                    {
+                        ShipEnhancements.QSBCompat.SendRadioVolume(id, _currentVolume);
+                    }
                 }
             }
         }
@@ -516,6 +564,140 @@ public class RadioItem : OWItem
         }
 
         return null;
+    }
+
+    public void SetRadioPowerRemote(bool powered)
+    {
+        _powerOn = powered;
+        if (_powerOn)
+        {
+            if (!_playingAudio)
+            {
+                _staticSource.FadeIn(0f, false, false, _currentVolume);
+                if (_playingCodes)
+                {
+                    _codeSource.FadeIn(0f, false, false, _currentVolume);
+                }
+            }
+            else
+            {
+                _musicSource.FadeIn(0f, false, false, _currentVolume);
+            }
+            _powerPrompt.SetText(_powerOffText);
+
+            _codeLabelCanvas.gameObject.SetActive(true);
+            _screenRenderer.SetEmissiveScale(1f);
+            foreach (RotateTransform rotator in _rotateEffects)
+            {
+                rotator.enabled = true;
+            }
+
+            _initialSwitchRotation = _powerSwitchTransform.rotation;
+            _targetSwitchRotation = _switchEndRot.rotation;
+            _switchT = 0f;
+            _moveSwitch = true;
+
+            _initialNeedleRotation = _volumeNeedleTransform.rotation;
+            _targetNeedleRotation = Quaternion.Lerp(_needleStartRot.rotation, _needleEndRot.rotation, _currentVolume);
+            _needleT = 0f;
+            _moveNeedle = true;
+        }
+        else
+        {
+            _staticSource.FadeOut(0f);
+            if (_playingCodes)
+            {
+                _codeSource.FadeOut(0f);
+            }
+            if (_playingAudio)
+            {
+                _musicSource.FadeOut(0f, OWAudioSource.FadeOutCompleteAction.PAUSE);
+            }
+            _powerPrompt.SetText(_powerOnText);
+
+            _codeLabelCanvas.gameObject.SetActive(false);
+            _screenRenderer.SetEmissiveScale(0f);
+            foreach (RotateTransform rotator in _rotateEffects)
+            {
+                rotator.enabled = false;
+            }
+
+            _initialSwitchRotation = _powerSwitchTransform.rotation;
+            _targetSwitchRotation = _switchStartRot.rotation;
+            _switchT = 0f;
+            _moveSwitch = true;
+
+            _initialNeedleRotation = _volumeNeedleTransform.rotation;
+            _targetNeedleRotation = _needleStartRot.rotation;
+            _needleT = 0f;
+            _moveNeedle = true;
+        }
+    }
+
+    public void SetRadioCodesRemote(int[] newCodes)
+    {
+        for (int i = 0; i < _codes.Length; i++)
+        {
+            _codes[i] = newCodes[i];
+            _codeLabels[i].text = _codes[i].ToString();
+
+            Vector3 euler = Vector3.Lerp(_knobStartRot.eulerAngles, _knobEndRot.eulerAngles, (_codes[i] - 1) / 5f);
+            _knobTransforms[i].rotation = Quaternion.Euler(euler);
+        }
+
+        if (_playingAudio)
+        {
+            if (_powerOn)
+            {
+                _musicSource.FadeOut(0.5f);
+                _staticSource.FadeIn(0.5f, false, false, _currentVolume);
+                if (_playingCodes)
+                {
+                    _codeSource.FadeIn(0.5f, false, false, _currentVolume);
+                }
+            }
+            else
+            {
+                _musicSource.time = 0;
+            }
+            _playingAudio = false;
+        }
+    }
+
+    public void CancelTuningRemote()
+    {
+        if (!_playingAudio)
+        {
+            var clip = GetSelectedAudio();
+            if (clip != null)
+            {
+                _musicSource.clip = clip;
+                if (_powerOn)
+                {
+                    _musicSource.FadeIn(2f, false, false, _currentVolume);
+                    _staticSource.FadeOut(10f);
+                    if (_playingCodes)
+                    {
+                        _codeSource.FadeOut(2f);
+                    }
+                }
+                _playingAudio = true;
+            }
+        }
+    }
+
+    public void ChangeVolumeRemote(float volume)
+    {
+        _currentVolume = volume;
+        SetRadioVolume();
+
+        if (_powerOn)
+        {
+            _initialNeedleRotation = _volumeNeedleTransform.rotation;
+            _targetNeedleRotation = Quaternion.Lerp(_needleStartRot.rotation, _needleEndRot.rotation, _currentVolume);
+            _needleT = 0f;
+            _moveNeedle = true;
+        }
     }
 
     public override void SocketItem(Transform socketTransform, Sector sector)

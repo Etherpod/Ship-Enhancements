@@ -30,6 +30,7 @@ public static class SELocator
     private static PortableTractorBeamItem _tractorBeamItem;
     private static CockpitErnesto _ernesto;
     private static ShipWarpCoreComponent _warpCoreComponent;
+    private static RadioItem _radio;
 
     public static void Initalize()
     {
@@ -82,6 +83,10 @@ public static class SELocator
         if ((bool)addErnesto.GetProperty())
         {
             _ernesto = _shipTransform.GetComponentInChildren<CockpitErnesto>();
+        }
+        if ((bool)addRadio.GetProperty())
+        {
+            _radio = _shipTransform.GetComponentInChildren<RadioItem>();
         }
     }
 
@@ -223,5 +228,10 @@ public static class SELocator
     public static CockpitErnesto GetErnesto()
     {
         return _ernesto;
+    }
+
+    public static RadioItem GetRadio()
+    {
+        return _radio;
     }
 }
