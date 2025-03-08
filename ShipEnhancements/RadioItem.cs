@@ -720,6 +720,11 @@ public class RadioItem : OWItem
         return Mathf.Lerp(0f, 250f, lerp);
     }
 
+    public bool ShouldOverrideTravelMusic()
+    {
+        return _powerOn && _playingAudio && _connectedToShip;
+    }
+
     public override void SocketItem(Transform socketTransform, Sector sector)
     {
         base.SocketItem(socketTransform, sector);

@@ -3599,4 +3599,21 @@ public static class PatchClass
         }
     }
     #endregion
+
+    #region Radio
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(RulesetDetector), nameof(RulesetDetector.AllowTravelMusic))]
+    public static void DisableTravelMusicForRadio(ref bool __result)
+    {
+        if (!(bool)addRadio.GetProperty())
+        {
+            return;
+        }
+
+        if (__result)
+        {
+            __result = !SELocator.GetRadio().ShouldOverrideTravelMusic();
+        }
+    }
+    #endregion
 }
