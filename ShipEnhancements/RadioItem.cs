@@ -61,6 +61,7 @@ public class RadioItem : OWItem
     private ScreenPrompt _leavePrompt;
     private FirstPersonManipulator _cameraManipulator;
     private OWCamera _playerCam;
+    private OWAudioSource _playerExternalSource;
     private bool _lastFocused = false;
     private bool _playerInteracting = false;
     private bool _connectedToShip = false;
@@ -95,6 +96,9 @@ public class RadioItem : OWItem
     private readonly int _maxFrequency = 6;
     private AudioClip _connectAudio;
     private AudioClip _disconnectAudio;
+
+    private float _minDreamDist = 3f;
+    private float _maxDreamDist = 20f;
 
     private readonly string _powerOnText = "Turn On Radio";
     private readonly string _powerOffText = "Turn Off Radio";
@@ -147,6 +151,7 @@ public class RadioItem : OWItem
     private void Start()
     {
         _playerCam = Locator.GetPlayerCamera();
+        _playerExternalSource = Locator.GetPlayerAudioController()._oneShotExternalSource;
         _powerPrompt = new PriorityScreenPrompt(InputLibrary.cancel, _powerOnText, 0, ScreenPrompt.DisplayState.Normal, false);
         _tunePrompt = new ScreenPrompt(InputLibrary.interactSecondary, "Tune Radio", 0, ScreenPrompt.DisplayState.Normal, false);
         _volumePrompt = new PriorityScreenPrompt(InputLibrary.toolOptionUp, InputLibrary.toolOptionDown, "Adjust Volume", ScreenPrompt.MultiCommandType.POS_NEG, 
@@ -160,7 +165,7 @@ public class RadioItem : OWItem
         Locator.GetPromptManager().AddScreenPrompt(_volumePrompt, PromptPosition.Center);
 
         _lowPassFilter.enabled = false;
-        _highPassFilter.enabled = true;
+        _highPassFilter.enabled = !_connectedToShip;
         _reverbFilter.enabled = false;
 
         _musicSource.SetLocalVolume(_currentVolume);
@@ -242,6 +247,8 @@ public class RadioItem : OWItem
                     _currentCodeIndex = 0;
                 }
                 _codeLabels[_currentCodeIndex].color = _selectColor;
+
+                _playerExternalSource.PlayOneShot(AudioType.Menu_UpDown, 0.5f);
             }
             else if (OWInput.IsNewlyPressed(InputLibrary.left, InputMode.All)
                 || OWInput.IsNewlyPressed(InputLibrary.left2, InputMode.All))
@@ -253,6 +260,8 @@ public class RadioItem : OWItem
                     _currentCodeIndex = _codes.Length - 1;
                 }
                 _codeLabels[_currentCodeIndex].color = _selectColor;
+
+                _playerExternalSource.PlayOneShot(AudioType.Menu_UpDown, 0.5f);
             }
             else if (OWInput.IsNewlyPressed(InputLibrary.up, InputMode.All)
                 || OWInput.IsNewlyPressed(InputLibrary.up2, InputMode.All))
@@ -284,6 +293,8 @@ public class RadioItem : OWItem
                     }
                     _playingAudio = false;
                 }
+
+                _playerExternalSource.PlayOneShot(AudioType.Menu_LeftRight, 0.5f);
             }
             else if (OWInput.IsNewlyPressed(InputLibrary.down, InputMode.All)
                 || OWInput.IsNewlyPressed(InputLibrary.down2, InputMode.All))
@@ -315,6 +326,8 @@ public class RadioItem : OWItem
                     }
                     _playingAudio = false;
                 }
+
+                _playerExternalSource.PlayOneShot(AudioType.Menu_LeftRight, 0.5f);
             }
         }
         else if (focused)
@@ -363,17 +376,13 @@ public class RadioItem : OWItem
                 }
                 else
                 {
-                    if (!_playingAudio)
+                    _staticSource.FadeOut(0f);
+                    if (_playingCodes)
                     {
-                        //_staticSource.Stop();
-                        _staticSource.FadeOut(0f);
-                        if (_playingCodes)
-                        {
-                            //_codeSource.Stop();
-                            _codeSource.FadeOut(0f);
-                        }
+                        //_codeSource.Stop();
+                        _codeSource.FadeOut(0f);
                     }
-                    else
+                    if (_playingAudio)
                     {
                         //_musicSource.Pause();
                         _musicSource.FadeOut(0f, OWAudioSource.FadeOutCompleteAction.PAUSE);
@@ -414,20 +423,26 @@ public class RadioItem : OWItem
                 _currentVolume = Mathf.Min(_currentVolume + 1f / _volumeSteps, 1f);
                 SetRadioVolume();
 
-                _initialNeedleRotation = _volumeNeedleTransform.rotation;
-                _targetNeedleRotation = Quaternion.Lerp(_needleStartRot.rotation, _needleEndRot.rotation, _currentVolume);
-                _needleT = 0f;
-                _moveNeedle = true;
+                if (_powerOn)
+                {
+                    _initialNeedleRotation = _volumeNeedleTransform.rotation;
+                    _targetNeedleRotation = Quaternion.Lerp(_needleStartRot.rotation, _needleEndRot.rotation, _currentVolume);
+                    _needleT = 0f;
+                    _moveNeedle = true;
+                }
             }
             else if (OWInput.IsNewlyPressed(InputLibrary.toolOptionDown))
             {
                 _currentVolume = Mathf.Max(_currentVolume - 1f / _volumeSteps, 0f);
                 SetRadioVolume();
 
-                _initialNeedleRotation = _volumeNeedleTransform.rotation;
-                _targetNeedleRotation = Quaternion.Lerp(_needleStartRot.rotation, _needleEndRot.rotation, _currentVolume);
-                _needleT = 0f;
-                _moveNeedle = true;
+                if (_powerOn)
+                {
+                    _initialNeedleRotation = _volumeNeedleTransform.rotation;
+                    _targetNeedleRotation = Quaternion.Lerp(_needleStartRot.rotation, _needleEndRot.rotation, _currentVolume);
+                    _needleT = 0f;
+                    _moveNeedle = true;
+                }
             }
         }
 
@@ -449,14 +464,26 @@ public class RadioItem : OWItem
                 _moveSwitch = false;
             }
         }
+
+        if (_playingInDreamWorld)
+        {
+            Vector3 sleepPosition = Locator.GetDreamWorldController().GetDreamCampfire().transform.position
+                + Locator.GetDreamWorldController()._relativeSleepLocation.localPosition;
+            float distSqr = (sleepPosition - transform.position).sqrMagnitude;
+            float lerp = Mathf.InverseLerp(_maxDreamDist * _maxDreamDist, _minDreamDist * _minDreamDist, distSqr);
+            _musicSource.SetMaxVolume(lerp);
+        }
     }
 
     private void SetRadioVolume()
     {
         if (!_powerOn) return;
         _musicSource.FadeTo(_currentVolume, 0.2f);
-        _staticSource.FadeTo(_currentVolume, 0.2f);
-        _codeSource.FadeTo(_currentVolume, 0.2f);
+        if (!_playingAudio)
+        {
+            _staticSource.FadeTo(_currentVolume, 0.2f);
+            _codeSource.FadeTo(_currentVolume, 0.2f);
+        }
     }
 
     private void UpdatePromptVisibility()
@@ -546,8 +573,9 @@ public class RadioItem : OWItem
 
     private void OnEnterDreamWorld()
     {
-        if (!PlayerState.IsResurrected() && Vector3.Distance(Locator.GetDreamWorldController().GetDreamCampfire().transform.position, transform.position) < 7f)
+        if (!PlayerState.IsResurrected())
         {
+            ShipEnhancements.WriteDebugMessage("Start playing in DW");
             _playingInDreamWorld = true;
             _musicSource.spatialBlend = 0f;
             _musicSource.spread = 0f;
@@ -560,9 +588,11 @@ public class RadioItem : OWItem
     {
         if (_playingInDreamWorld)
         {
+            ShipEnhancements.WriteDebugMessage("Stop playing in DW");
             _playingInDreamWorld = false;
             _musicSource.spatialBlend = _connectedToShip && PlayerState.IsInsideShip() ? 0f : 1f;
             _musicSource.spread = _connectedToShip && PlayerState.IsInsideShip() ? 0f : 60f;
+            _musicSource.SetMaxVolume(1f);
             _lowPassFilter.enabled = false;
             _reverbFilter.enabled = false;
         }
