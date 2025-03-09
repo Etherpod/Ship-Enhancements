@@ -306,6 +306,12 @@
       "value": false,
       "tooltip": "Changes cyclones to add an upwards spin to your ship when you enter one."
     },
+    "prolongDigestion": {
+      "title": "Prolong Digestion",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Makes the digestion of your ship a longer process. You will still die."
+    },
     "shipExplosionMultiplier": {
       "title": "Ship Explosion Multiplier",
       "type": "number",

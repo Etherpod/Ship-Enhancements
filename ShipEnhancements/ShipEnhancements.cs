@@ -187,6 +187,7 @@ public class ShipEnhancements : ModBehaviour
         addRadio,
         disableFluidPrevention,
         disableHazardPrevention,
+        prolongDigestion,
     }
 
     private void Awake()

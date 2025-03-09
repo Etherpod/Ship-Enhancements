@@ -3616,4 +3616,134 @@ public static class PatchClass
         }
     }
     #endregion
+
+    #region ProlongDigestion
+    public static float digestionDamageDelay = 0f;
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(AnglerfishController), nameof(AnglerfishController.Start))]
+    public static void SetDigestionLength(AnglerfishController __instance)
+    {
+        if (!(bool)prolongDigestion.GetProperty()) return;
+
+        __instance._consumeDeathDelay = 8f;
+        __instance._consumeShipCrushDelay = 6f;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(AnglerfishController), nameof(AnglerfishController.OnCaughtObject))]
+    public static bool ProlongDigestion(AnglerfishController __instance, OWRigidbody caughtBody)
+    {
+        if (!(bool)prolongDigestion.GetProperty()) return true;
+
+        if (__instance._currentState == AnglerfishController.AnglerState.Consuming)
+        {
+            if (!__instance._targetBody.CompareTag("Player") && caughtBody.CompareTag("Player") 
+                && !PlayerState.IsInsideShip() && !PlayerState.AtFlightConsole())
+            {
+                Locator.GetDeathManager().KillPlayer(DeathType.Digestion);
+            }
+            return false;
+        }
+        if (caughtBody.CompareTag("Player") || caughtBody.CompareTag("Ship"))
+        {
+            __instance._targetBody = caughtBody;
+            __instance._consumeStartTime = Time.time;
+            __instance.ChangeState(AnglerfishController.AnglerState.Consuming);
+            if (caughtBody.CompareTag("Ship"))
+            {
+                ShipNotifications.PostDigestionNotification();
+                digestionDamageDelay = UnityEngine.Random.Range(0.6f, 1.2f);
+
+                if (PlayerState.IsInsideShip())
+                {
+                    Locator.GetPlayerDeathAudio()._deathSource.PlayOneShot(AudioType.Death_Digestion, 1f);
+                    Locator.GetPlayerDeathAudio()._shipGroanSource.PlayDelayed(1f);
+                }
+            }
+        }
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(AnglerfishController), nameof(AnglerfishController.UpdateState))]
+    public static void ShipDigestionEffects(AnglerfishController __instance)
+    {
+        if (!(bool)prolongDigestion.GetProperty()) return;
+
+        if (__instance._currentState == AnglerfishController.AnglerState.Consuming)
+        {
+            if (!__instance._consumeComplete)
+            {
+                if (__instance._targetBody == null)
+                {
+                    return;
+                }
+                float num = Time.time - __instance._consumeStartTime;
+                if (__instance._targetBody.CompareTag("Ship"))
+                {
+                    if (SELocator.GetShipDamageController().IsSystemFailed()) return;
+
+                    if (num > __instance._consumeShipCrushDelay)
+                    {
+                        SELocator.GetShipTransform().GetComponentInChildren<ShipAudioController>()
+                            ._shipElectrics._audioSource.PlayOneShot(AudioType.ShipDamageElectricalFailure, 0.5f);
+                    }
+                    else
+                    {
+                        if (digestionDamageDelay < 0f)
+                        {
+                            RandomDigestionDamage();
+                            digestionDamageDelay = UnityEngine.Random.Range(0.2f, 0.8f);
+                        }
+                        else
+                        {
+                            digestionDamageDelay -= Time.deltaTime;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public static void RandomDigestionDamage()
+    {
+        if (ShipEnhancements.InMultiplayer && !ShipEnhancements.QSBAPI.GetIsHost() || (float)shipDamageMultiplier.GetProperty() <= 0f) return;
+
+        ShipComponent[] components = SELocator.GetShipDamageController()._shipComponents
+            .Where((component) => component.repairFraction == 1f && !component.isDamaged).ToArray();
+        ShipHull[] hulls = SELocator.GetShipDamageController()._shipHulls.Where((hull) => hull.integrity > 0f).ToArray();
+        if (components.Length > 0 && UnityEngine.Random.value < 0.3f)
+        {
+            components[UnityEngine.Random.Range(0, components.Length)].SetDamaged(true);
+        }
+        else if (hulls.Length > 0)
+        {
+            ShipHull targetHull = hulls[UnityEngine.Random.Range(0, hulls.Length)];
+
+            bool wasDamaged = targetHull._damaged;
+            targetHull._damaged = true;
+            targetHull._integrity = Mathf.Max(0f, targetHull._integrity - UnityEngine.Random.Range(0.05f, 0.15f) * (float)shipDamageMultiplier.GetProperty());
+            var eventDelegate1 = (MulticastDelegate)typeof(ShipHull).GetField("OnDamaged",
+                BindingFlags.Instance | BindingFlags.NonPublic
+                | BindingFlags.Public).GetValue(targetHull);
+            if (eventDelegate1 != null)
+            {
+                foreach (var handler in eventDelegate1.GetInvocationList())
+                {
+                    handler.Method.Invoke(handler.Target, [targetHull]);
+                }
+            }
+            if (targetHull._damageEffect != null)
+            {
+                targetHull._damageEffect.SetEffectBlend(1f - targetHull._integrity);
+            }
+
+            if (ShipEnhancements.InMultiplayer)
+            {
+                ShipEnhancements.QSBInteraction.SetHullDamaged(targetHull, !wasDamaged);
+            }
+        }
+    }
+    #endregion
 }

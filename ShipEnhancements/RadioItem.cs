@@ -124,6 +124,7 @@ public class RadioItem : OWItem
         GlobalMessenger.AddListener("EnterShip", OnEnterShip);
         GlobalMessenger.AddListener("EnterDreamWorld", OnEnterDreamWorld);
         GlobalMessenger.AddListener("ExitDreamWorld", OnExitDreamWorld);
+        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
         _codeDetector.OnChangeActiveZone += OnChangeCodeZone;
     }
 
@@ -729,7 +730,7 @@ public class RadioItem : OWItem
     {
         base.SocketItem(socketTransform, sector);
 
-        if (socketTransform.GetComponent<RadioItemSocket>())
+        if (socketTransform.GetComponent<RadioItemSocket>() && !SELocator.GetShipDamageController().IsSystemFailed())
         {
             _musicSource.spatialBlend = 0f;
             _musicSource.spread = 0f;
@@ -805,6 +806,18 @@ public class RadioItem : OWItem
         }
     }
 
+    private void OnShipSystemFailure()
+    {
+        if (_connectedToShip)
+        {
+            _musicSource.spatialBlend = 1f;
+            _musicSource.spread = 60f;
+            _highPassFilter.enabled = true;
+            //_oneShotSource.PlayOneShot(_disconnectAudio, 1f);
+            _connectedToShip = false;
+        }
+    }
+
     private void OnChangeCodeZone(RadioCodeZone zone)
     {
         if (zone != null && !_playingCodes)
@@ -864,6 +877,7 @@ public class RadioItem : OWItem
         GlobalMessenger.RemoveListener("EnterShip", OnEnterShip);
         GlobalMessenger.RemoveListener("EnterDreamWorld", OnEnterDreamWorld);
         GlobalMessenger.RemoveListener("ExitDreamWorld", OnExitDreamWorld);
+        GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
         _codeDetector.OnChangeActiveZone -= OnChangeCodeZone;
     }
 }

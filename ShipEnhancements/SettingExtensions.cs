@@ -108,6 +108,7 @@ public static class SettingExtensions
         { Settings.addRadio, (false, false) },
         { Settings.disableFluidPrevention, (false, false) },
         { Settings.disableHazardPrevention, (false, false) },
+        { Settings.prolongDigestion, (false, false) },
     };
 
     public static string GetName(this Settings setting)

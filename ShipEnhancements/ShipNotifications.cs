@@ -12,7 +12,7 @@ public static class ShipNotifications
     private static NotificationData _oxygenCriticalNotification = new NotificationData(NotificationTarget.Ship, "SHIP OXYGEN CRITICAL", 5f, true);
 
     private static NotificationData _oxygenRefillingNotification = new NotificationData(NotificationTarget.Ship, "REFILLING OXYGEN TANK", 5f, true);
-    private static NotificationData _oxygenNotRefillingNotification = new NotificationData(NotificationTarget.Ship, "DRAINING OXYGEN TANK >:)", 5F, true);
+    private static NotificationData _oxygenNotRefillingNotification = new NotificationData(NotificationTarget.Ship, "DRAINING OXYGEN TANK >:)", 5f, true);
 
     private static NotificationData _fuelLowNotification = new NotificationData(NotificationTarget.Ship, "SHIP FUEL LOW", 5f, true);
     private static NotificationData _fuelCriticalNotification = new NotificationData(NotificationTarget.Ship, "SHIP FUEL CRITICAL", 5f, true);
@@ -28,6 +28,8 @@ public static class ShipNotifications
     private static NotificationData _noScoutInShipNotification = new NotificationData(NotificationTarget.Ship, "SCOUT LAUNCHER EMPTY", 5f, true);
 
     private static NotificationData _playerRefueling = new NotificationData(NotificationTarget.Player, "REFUELING", 5f, true);
+
+    private static NotificationData _digestionNotification = new NotificationData(NotificationTarget.Ship, "ACIDITY LEVELS CRITICAL", 5f, true);
 
     private static bool _oxygenLow = false;
     private static bool _oxygenCritical = false;
@@ -226,5 +228,10 @@ public static class ShipNotifications
     public static void RemoveRefuelingNotification()
     {
         NotificationManager.SharedInstance.UnpinNotification(_playerRefueling);
+    }
+
+    public static void PostDigestionNotification()
+    {
+        NotificationManager.SharedInstance.PostNotification(_digestionNotification, false);
     }
 }

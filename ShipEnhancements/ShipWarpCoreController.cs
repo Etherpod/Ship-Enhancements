@@ -134,9 +134,10 @@ public class ShipWarpCoreController : CockpitInteractible
     {
         _shipBody = body;
         _warpEffect.transform.localPosition = _cockpitPivot.localPosition;
+        _warpEffect._warpedObjectGeometry = body.gameObject;
         if (_receiver != null)
         {
-            _receiver.OnCockpitDetached(_cockpitPivot);
+            _receiver.OnCockpitDetached(body, _cockpitPivot);
         }
     }
 
@@ -311,7 +312,7 @@ public class ShipWarpCoreController : CockpitInteractible
 
     private void ApplyWarpDamage()
     {
-        if (ShipEnhancements.InMultiplayer && !ShipEnhancements.QSBAPI.GetIsHost()) return;
+        if (ShipEnhancements.InMultiplayer && !ShipEnhancements.QSBAPI.GetIsHost() || (float)shipDamageMultiplier.GetProperty() <= 0f) return;
 
         ShipComponent[] components = SELocator.GetShipDamageController()._shipComponents
             .Where((component) => component.repairFraction == 1f && !component.isDamaged).ToArray();
