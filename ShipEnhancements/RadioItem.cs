@@ -62,6 +62,7 @@ public class RadioItem : OWItem
     private FirstPersonManipulator _cameraManipulator;
     private OWCamera _playerCam;
     private OWAudioSource _playerExternalSource;
+    private InputMode _lastInputMode = InputMode.Character;
     private bool _lastFocused = false;
     private bool _playerInteracting = false;
     private bool _connectedToShip = false;
@@ -97,6 +98,10 @@ public class RadioItem : OWItem
     private AudioClip _connectAudio;
     private AudioClip _disconnectAudio;
 
+    private float _minVolumeDist = 50f;
+    private float _maxVolumeDist = 150f;
+    private float _minShipVolumeDist = 75f;
+    private float _maxShipVolumeDist = 250f;
     private float _minDreamDist = 3f;
     private float _maxDreamDist = 20f;
 
@@ -169,9 +174,7 @@ public class RadioItem : OWItem
         _highPassFilter.enabled = !_connectedToShip;
         _reverbFilter.enabled = false;
 
-        _musicSource.SetLocalVolume(_currentVolume);
-        _staticSource.SetLocalVolume(_currentVolume);
-        _codeSource.SetLocalVolume(_currentVolume);
+        SetRadioVolume();
 
         _codeLabelCanvas.gameObject.SetActive(false);
         _screenRenderer.SetEmissiveScale(0f);
@@ -215,7 +218,8 @@ public class RadioItem : OWItem
                 Locator.GetPromptManager().RemoveScreenPrompt(_upDownPrompt);
                 Locator.GetPromptManager().RemoveScreenPrompt(_leavePrompt);
                 Locator.GetPlayerTransform().GetComponent<PlayerLockOnTargeting>().BreakLock();
-                GlobalMessenger.FireEvent("ExitSatelliteCameraMode");
+                //GlobalMessenger.FireEvent("ExitSatelliteCameraMode");
+                OWInput.ChangeInputMode(_lastInputMode);
                 _codeLabels[_currentCodeIndex].color = _deselectColor;
                 _playerInteracting = false;
 
@@ -444,7 +448,9 @@ public class RadioItem : OWItem
             {
                 Locator.GetToolModeSwapper().UnequipTool();
                 Locator.GetPlayerTransform().GetComponent<PlayerLockOnTargeting>().LockOn(transform, Vector3.zero);
-                GlobalMessenger.FireEvent("EnterSatelliteCameraMode");
+                //GlobalMessenger.FireEvent("EnterSatelliteCameraMode");
+                _lastInputMode = OWInput.GetInputMode();
+                OWInput.ChangeInputMode(InputMode.SatelliteCam);
                 Locator.GetPromptManager().AddScreenPrompt(_upDownPrompt, PromptPosition.UpperRight, true);
                 Locator.GetPromptManager().AddScreenPrompt(_leftRightPrompt, PromptPosition.UpperRight, true);
                 Locator.GetPromptManager().AddScreenPrompt(_leavePrompt, PromptPosition.UpperRight, true);
@@ -526,6 +532,15 @@ public class RadioItem : OWItem
 
     private void SetRadioVolume()
     {
+        if (_connectedToShip)
+        {
+            _musicSource.maxDistance = Mathf.Lerp(_minShipVolumeDist, _maxShipVolumeDist, _currentVolume);
+        }
+        else
+        {
+            _musicSource.maxDistance = Mathf.Lerp(_minVolumeDist, _maxVolumeDist, _currentVolume);
+        }
+
         if (!_powerOn) return;
         if (_playingAudio)
         {
@@ -737,6 +752,8 @@ public class RadioItem : OWItem
             _highPassFilter.enabled = false;
             _oneShotSource.PlayOneShot(_connectAudio, 1f);
             _connectedToShip = true;
+
+            SetRadioVolume();
         }
 
         _meshParent.transform.localScale = Vector3.one;
@@ -753,9 +770,12 @@ public class RadioItem : OWItem
             _highPassFilter.enabled = true;
             _oneShotSource.PlayOneShot(_disconnectAudio, 1f);
             _connectedToShip = false;
+
+            SetRadioVolume();
         }
 
         _meshParent.transform.localScale = Vector3.one * 0.6f;
+        transform.localPosition = new Vector3(0f, -0.1f, 0f);
     }
 
     public override void DropItem(Vector3 position, Vector3 normal, Transform parent, Sector sector, IItemDropTarget customDropTarget)

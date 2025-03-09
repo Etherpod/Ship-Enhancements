@@ -1158,6 +1158,10 @@ public class ShipEnhancements : ModBehaviour
             RadioItem radio = Instantiate(radioObj).GetComponent<RadioItem>();
             radioSocket.PlaceIntoSocket(radio);
 
+            GameObject codeNotesObj = LoadPrefab("Assets/ShipEnhancements/CodeNotes.prefab");
+            AssetBundleUtilities.ReplaceShaders(codeNotesObj);
+            Instantiate(codeNotesObj, SELocator.GetShipTransform().Find("Module_Cockpit"));
+
             AddRadioCodeZones();
         }
         if ((bool)Settings.disableFluidPrevention.GetProperty())
