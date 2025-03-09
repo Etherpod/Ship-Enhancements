@@ -1170,6 +1170,10 @@ public class ShipEnhancements : ModBehaviour
             Transform atmoVolume = SELocator.GetShipTransform().Find("Volumes/ShipAtmosphereVolume");
             atmoVolume.GetComponent<FluidVolume>().SetPriority(0);
         }
+        if ((bool)Settings.disableRotationSpeedLimit.GetProperty())
+        {
+            SELocator.GetPlayerBody().GetComponentInChildren<PlayerCameraEffectController>().gameObject.AddComponent<PlayerTorpidityEffect>();
+        }
 
         SetDamageColors();
 
