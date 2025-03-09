@@ -13,9 +13,13 @@ public class CockpitFilthController : MonoBehaviour
     [SerializeField]
     MeshRenderer _dirtRenderer;
     [SerializeField]
+    MeshRenderer _dirtShadowRenderer;
+    [SerializeField]
     GameObject _rustParent;
     [SerializeField]
     GameObject _dirtParent;
+    [SerializeField]
+    GameObject _dirtShadowParent;
 
     private Material _rustMat;
     private int _rustTexIndex;
@@ -23,6 +27,8 @@ public class CockpitFilthController : MonoBehaviour
     private Material _dirtMat;
     private string _dirtLowerClipPropID = "_LowerClip";
     private string _dirtUpperClipPropID = "_UpperClip";
+    private Material _dirtShadowMat;
+    private string _dirtShadowCutoffPropID = "_Cutoff";
     private FluidDetector _cockpitDetector;
     private ShockLayerController _shockLayerController;
 
@@ -72,19 +78,22 @@ public class CockpitFilthController : MonoBehaviour
             _rustParent.SetActive(false);
         }
 
-        if (_dirtBuildupTime > 0f)
+        if (_dirtBuildupTime > 0f && (float)maxDirtAccumulation.GetProperty() > 0f)
         {
             _dirtMat = _dirtRenderer.sharedMaterial;
+            _dirtShadowMat = _dirtShadowRenderer.sharedMaterial;
             if (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost())
             {
                 _dirtMat.SetTextureOffset("_MainTex", new Vector2(Random.Range(0f, 1f), Random.Range(0f, 1f)));
                 _dirtMat.SetFloat(_dirtLowerClipPropID, 1f);
                 _dirtMat.SetFloat(_dirtUpperClipPropID, 1f);
+                _dirtShadowMat.SetFloat(_dirtShadowCutoffPropID, 1f);
             }
         }
         else
         {
             _dirtParent.SetActive(false);
+            _dirtShadowParent.SetActive(false);
             enabled = false;
         }
     }
@@ -148,12 +157,13 @@ public class CockpitFilthController : MonoBehaviour
 
             if (_dirtMat.GetFloat(_dirtUpperClipPropID) < 1f)
             {
-                _dirtMat.SetFloat(_dirtUpperClipPropID, Mathf.Lerp(1f, 0.5f, (_dirtBuildupProgression - 0.5f) * 2));
+                _dirtMat.SetFloat(_dirtUpperClipPropID, Mathf.Lerp(1f, 0f, (_dirtBuildupProgression - 0.5f) * 2));
             }
             else if (_dirtMat.GetFloat(_dirtLowerClipPropID) < 1f)
             {
                 _dirtMat.SetFloat(_dirtLowerClipPropID, Mathf.Lerp(1f, 0f, _dirtBuildupProgression * 2));
             }
+            _dirtShadowMat.SetFloat(_dirtShadowCutoffPropID, 1 - _dirtBuildupProgression);
 
             _dirtBuildupProgression = Mathf.Clamp01(_dirtBuildupProgression - Time.deltaTime / clearTime);
         }
@@ -165,8 +175,9 @@ public class CockpitFilthController : MonoBehaviour
             }
             else if (_dirtMat.GetFloat(_dirtUpperClipPropID) > 0f)
             {
-                _dirtMat.SetFloat(_dirtUpperClipPropID, Mathf.Lerp(1f, 0.5f, (_dirtBuildupProgression - 0.5f) * 2));
+                _dirtMat.SetFloat(_dirtUpperClipPropID, Mathf.Lerp(1f, 0f, (_dirtBuildupProgression - 0.5f) * 2));
             }
+            _dirtShadowMat.SetFloat(_dirtShadowCutoffPropID, 1 - _dirtBuildupProgression);
 
             _dirtBuildupProgression = Mathf.Clamp01(_dirtBuildupProgression + (Time.deltaTime * (float)maxDirtAccumulation.GetProperty()) / _dirtBuildupTime);
         }

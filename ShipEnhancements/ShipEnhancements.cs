@@ -946,7 +946,8 @@ public class ShipEnhancements : ModBehaviour
                 collider.material = mat;
             }
         }
-        if ((float)Settings.rustLevel.GetProperty() > 0f || (float)Settings.dirtAccumulationTime.GetProperty() > 0f)
+        if ((float)Settings.rustLevel.GetProperty() > 0f || ((float)Settings.dirtAccumulationTime.GetProperty() > 0f
+            && (float)Settings.maxDirtAccumulation.GetProperty() > 0f))
         {
             GameObject rustController = LoadPrefab("Assets/ShipEnhancements/RustController.prefab");
             AssetBundleUtilities.ReplaceShaders(rustController);
