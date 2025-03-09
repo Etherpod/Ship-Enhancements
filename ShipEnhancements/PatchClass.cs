@@ -3654,10 +3654,12 @@ public static class PatchClass
             {
                 ShipNotifications.PostDigestionNotification();
                 digestionDamageDelay = UnityEngine.Random.Range(0.6f, 1.2f);
-
+            }
+            if (PlayerState.IsInsideShip() || PlayerState.AtFlightConsole())
+            {
+                Locator.GetPlayerDeathAudio()._deathSource.PlayOneShot(AudioType.Death_Digestion, 1f);
                 if (PlayerState.IsInsideShip())
                 {
-                    Locator.GetPlayerDeathAudio()._deathSource.PlayOneShot(AudioType.Death_Digestion, 1f);
                     Locator.GetPlayerDeathAudio()._shipGroanSource.PlayDelayed(1f);
                 }
             }
@@ -3713,7 +3715,7 @@ public static class PatchClass
         ShipComponent[] components = SELocator.GetShipDamageController()._shipComponents
             .Where((component) => component.repairFraction == 1f && !component.isDamaged).ToArray();
         ShipHull[] hulls = SELocator.GetShipDamageController()._shipHulls.Where((hull) => hull.integrity > 0f).ToArray();
-        if (components.Length > 0 && UnityEngine.Random.value < 0.3f)
+        if (components.Length > 0 && UnityEngine.Random.value < 0.5f)
         {
             components[UnityEngine.Random.Range(0, components.Length)].SetDamaged(true);
         }
