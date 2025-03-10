@@ -38,12 +38,7 @@ public class TemperatureDetector : MonoBehaviour
             else
             {
                 UpdateInternalTemperature();
-
-                // Check if internal temp is on the same side as temp
-                if ((GetInternalTemperatureRatio() - 0.5f < 0) == (GetTemperatureRatio() < 0))
-                {
-                    UpdateHighTemperature();
-                }
+                UpdateHighTemperature();
             }
             
             if (_updateNextFrame)
@@ -58,22 +53,7 @@ public class TemperatureDetector : MonoBehaviour
         }
         if (!_highTemperature)
         {
-            if (RoundInternalTemperature() && Mathf.Abs(_internalTempMeter) / _internalTempMeterLength < 0.01f)
-            {
-                _internalTempMeter = 0f;
-            }
-            else
-            {
-                float step = Time.deltaTime * Mathf.InverseLerp(_highTempCutoff, 0f, Mathf.Abs(_currentTemperature));
-                if (_internalTempMeter > 0f)
-                {
-                    _internalTempMeter -= step;
-                }
-                else if (_internalTempMeter < 0f)
-                {
-                    _internalTempMeter += step;
-                }
-            }
+            UpdateCooldown();
         }
     }
 
@@ -98,9 +78,24 @@ public class TemperatureDetector : MonoBehaviour
         }
     }
 
-    protected virtual bool RoundInternalTemperature()
+    protected virtual void UpdateCooldown()
     {
-        return true;
+        if (Mathf.Abs(_internalTempMeter) / _internalTempMeterLength < 0.01f)
+        {
+            _internalTempMeter = 0f;
+        }
+        else
+        {
+            float step = Time.deltaTime * Mathf.InverseLerp(_highTempCutoff, 0f, Mathf.Abs(_currentTemperature));
+            if (_internalTempMeter > 0f)
+            {
+                _internalTempMeter -= step;
+            }
+            else if (_internalTempMeter < 0f)
+            {
+                _internalTempMeter += step;
+            }
+        }
     }
 
     public float GetTemperatureRatio()

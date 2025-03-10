@@ -32,7 +32,7 @@ public class ShipTemperatureDetector : TemperatureDetector
 
         _delayStartTime = Time.time;
         _randDamageDelay = _damageDelay + UnityEngine.Random.Range(-1f, 1f);
-        _internalTempMeterLength *= (float)temperatureResistanceMultiplier.GetProperty();
+        _internalTempMeterLength *= Mathf.Max(Mathf.Abs((float)temperatureResistanceMultiplier.GetProperty()), 1f);
     }
 
     private void UpdateTemperatureDamage()
@@ -72,15 +72,28 @@ public class ShipTemperatureDetector : TemperatureDetector
 
         if ((bool)faultyHeatRegulators.GetProperty())
         {
+            float resistance = (float)temperatureResistanceMultiplier.GetProperty();
             float multiplier = Mathf.InverseLerp(-_highTempCutoff / 4f, 0f, _currentTemperature);
             float additiveMultiplier = 0f;
             if (SELocator.GetShipDamageController().IsReactorCritical())
             {
                 additiveMultiplier = 1.5f;
             }
-            float scalar = 1 + (1f * Mathf.InverseLerp(_highTempCutoff, 0f, Mathf.Abs(_currentTemperature)));
-            _internalTempMeter = Mathf.Clamp(_internalTempMeter + (Time.deltaTime 
-                * ((multiplier * scalar) + additiveMultiplier)), -_internalTempMeterLength, _internalTempMeterLength);
+
+            if (multiplier > 0 || additiveMultiplier > 0)
+            {
+                if (resistance == 0)
+                {
+                    SELocator.GetShipDamageController().Explode();
+                }
+                else
+                {
+                    float scalar = 1 + (1f * Mathf.InverseLerp(_highTempCutoff, 0f, Mathf.Abs(_currentTemperature)));
+                    _internalTempMeter = Mathf.Clamp(_internalTempMeter + Time.deltaTime
+                        * ((multiplier * scalar) + additiveMultiplier) * Mathf.Sign(resistance),
+                        -_internalTempMeterLength, _internalTempMeterLength);
+                }
+            }
         }
 
         UpdateTemperatureDamage();
@@ -176,26 +189,54 @@ public class ShipTemperatureDetector : TemperatureDetector
         return Mathf.Clamp(totalTemperature, -100f, 100f);
     }
 
-    protected override void UpdateInternalTemperature()
+    protected override void UpdateHighTemperature()
     {
-        if ((_currentTemperature > 0 && _internalTempMeter < _internalTempMeterLength * GetTemperatureRatio())
-            || (_currentTemperature < 0 && _internalTempMeter > _internalTempMeterLength * GetTemperatureRatio()))
+        if ((float)temperatureResistanceMultiplier.GetProperty() == 0)
         {
-            bool sameSide = _internalTempMeter < 0 == _currentTemperature < 0;
-            if (sameSide)
-            {
-                _internalTempMeter += Time.deltaTime * 3f * Mathf.InverseLerp(_highTempCutoff, 100f, Mathf.Abs(_currentTemperature)) * Mathf.Sign(GetTemperatureRatio());
-            }
-            else
-            {
-                _internalTempMeter += Time.deltaTime * Mathf.Sign(GetTemperatureRatio());
-            }
+            SELocator.GetShipDamageController().Explode();
         }
     }
 
-    protected override bool RoundInternalTemperature()
+    protected override void UpdateInternalTemperature()
     {
-        return !(bool)faultyHeatRegulators.GetProperty();
+        float cutoff = Mathf.Abs(_internalTempMeterLength * GetTemperatureRatio());
+
+        bool sameSide = _internalTempMeter < 0 == _currentTemperature < 0;
+
+        if ((float)temperatureResistanceMultiplier.GetProperty() < 0f)
+        {
+            sameSide = !sameSide;
+        }
+
+        if (sameSide && Mathf.Abs(_internalTempMeter) < cutoff)
+        {
+            _internalTempMeter += Time.deltaTime * 3f * Mathf.InverseLerp(_highTempCutoff, 100f, Mathf.Abs(_currentTemperature)) * Mathf.Sign(GetTemperatureRatio())
+                * Mathf.Sign((float)temperatureResistanceMultiplier.GetProperty());
+        }
+        else if (!sameSide)
+        {
+            _internalTempMeter += Time.deltaTime * Mathf.Sign(GetTemperatureRatio()) * Mathf.Sign((float)temperatureResistanceMultiplier.GetProperty());
+        }
+    }
+
+    protected override void UpdateCooldown()
+    {
+        if (!(bool)faultyHeatRegulators.GetProperty() && Mathf.Abs(_internalTempMeter) / _internalTempMeterLength < 0.01f)
+        {
+            _internalTempMeter = 0f;
+        }
+        else
+        {
+            float step = Time.deltaTime * Mathf.InverseLerp(_highTempCutoff, 0f, Mathf.Abs(_currentTemperature));
+            if (_internalTempMeter > 0f)
+            {
+                _internalTempMeter -= step;
+            }
+            else if (_internalTempMeter < 0f)
+            {
+                _internalTempMeter += step;
+            }
+        }
     }
 
     public void ApplyComponentTempDamage(ShipComponent component)

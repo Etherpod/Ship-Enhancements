@@ -27,7 +27,7 @@ public class FuelTankTemperatureDetector : TemperatureDetector
 
     protected override void UpdateHighTemperature()
     {
-        if (_fuelTank.GetFuelRatio() <= 0f)
+        if (_fuelTank.GetFuelRatio() <= 0f || (_currentTemperature < 0 != _internalTempMeter < 0))
         {
             return;
         }
