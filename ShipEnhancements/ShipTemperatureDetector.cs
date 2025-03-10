@@ -79,6 +79,7 @@ public class ShipTemperatureDetector : TemperatureDetector
                 additiveMultiplier = 1.5f;
             }
             float scalar = 1 + (1f * Mathf.InverseLerp(_highTempCutoff, 0f, Mathf.Abs(_currentTemperature)));
+            ShipEnhancements.WriteDebugMessage("Mult: " + multiplier + ", Scalar: " + scalar);
             _internalTempMeter = Mathf.Clamp(_internalTempMeter + (Time.deltaTime 
                 * ((multiplier * scalar) + additiveMultiplier)), -_internalTempMeterLength, _internalTempMeterLength);
         }
@@ -184,9 +185,26 @@ public class ShipTemperatureDetector : TemperatureDetector
         return Mathf.Clamp(totalTemperature, -100f, 100f);
     }
 
+    protected override void UpdateInternalTemperature()
+    {
+        if ((_currentTemperature > 0 && _internalTempMeter < _internalTempMeterLength * GetTemperatureRatio())
+            || (_currentTemperature < 0 && _internalTempMeter > _internalTempMeterLength * GetTemperatureRatio()))
+        {
+            bool sameSide = _internalTempMeter < 0 == _currentTemperature < 0;
+            if (sameSide)
+            {
+                _internalTempMeter += Time.deltaTime * 3f * Mathf.InverseLerp(_highTempCutoff, 100f, Mathf.Abs(_currentTemperature)) * Mathf.Sign(GetTemperatureRatio());
+            }
+            else
+            {
+                _internalTempMeter += Time.deltaTime * Mathf.Sign(GetTemperatureRatio());
+            }
+        }
+    }
+
     protected override bool RoundInternalTemperature()
     {
-        return (bool)faultyHeatRegulators.GetProperty();
+        return !(bool)faultyHeatRegulators.GetProperty();
     }
 
     public void ApplyComponentTempDamage(ShipComponent component)

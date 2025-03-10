@@ -37,10 +37,7 @@ public class TemperatureDetector : MonoBehaviour
             }
             else
             {
-                if (Mathf.Abs(_internalTempMeter) < _internalTempMeterLength)
-                {
-                    _internalTempMeter += Time.deltaTime * 3f * Mathf.InverseLerp(_highTempCutoff, 100f, Mathf.Abs(_currentTemperature)) * Mathf.Sign(GetTemperatureRatio());
-                }
+                UpdateInternalTemperature();
 
                 // Check if internal temp is on the same side as temp
                 if ((GetInternalTemperatureRatio() - 0.5f < 0) == (GetTemperatureRatio() < 0))
@@ -91,6 +88,14 @@ public class TemperatureDetector : MonoBehaviour
             totalTemperature += temp;
         }
         return Mathf.Clamp(totalTemperature, -100f, 100f);
+    }
+
+    protected virtual void UpdateInternalTemperature()
+    {
+        if (Mathf.Abs(_internalTempMeter) < _internalTempMeterLength)
+        {
+            _internalTempMeter += Time.deltaTime * 3f * Mathf.InverseLerp(_highTempCutoff, 100f, Mathf.Abs(_currentTemperature)) * Mathf.Sign(GetTemperatureRatio());
+        }
     }
 
     protected virtual bool RoundInternalTemperature()
