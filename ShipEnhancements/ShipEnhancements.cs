@@ -157,7 +157,7 @@ public class ShipEnhancements : ModBehaviour
         disableAutoLights,
         addExpeditionFlag,
         addFuelCanister,
-        chaoticCyclones,
+        cycloneChaos,
         moreExplosionDamage,
         singleUseTractorBeam,
         disableThrusters,

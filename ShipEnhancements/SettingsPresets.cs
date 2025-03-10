@@ -77,7 +77,7 @@ public static class SettingsPresets
         { "disableAutoLights", false },
         { "addExpeditionFlag", false },
         { "addFuelCanister", false },
-        { "chaoticCyclones", false },
+        { "cycloneChaos", 0f },
         { "moreExplosionDamage", false },
         { "singleUseTractorBeam", false },
         { "disableThrusters", "None" },
@@ -182,7 +182,7 @@ public static class SettingsPresets
         { "disableAutoLights", false },
         { "addExpeditionFlag", false },
         { "addFuelCanister", false },
-        { "chaoticCyclones", false },
+        { "cycloneChaos", 0f },
         { "moreExplosionDamage", false },
         { "singleUseTractorBeam", true },
         { "disableThrusters", "Backward" },
@@ -287,7 +287,7 @@ public static class SettingsPresets
         { "disableAutoLights", false },
         { "addExpeditionFlag", false },
         { "addFuelCanister", false },
-        { "chaoticCyclones", true },
+        { "cycloneChaos", 1f },
         { "moreExplosionDamage", true },
         { "singleUseTractorBeam", false },
         { "disableThrusters", "None" },
@@ -392,7 +392,7 @@ public static class SettingsPresets
         { "disableAutoLights", true },
         { "addExpeditionFlag", true },
         { "addFuelCanister", true },
-        { "chaoticCyclones", false },
+        { "cycloneChaos", 0f },
         { "moreExplosionDamage", false },
         { "singleUseTractorBeam", false },
         { "disableThrusters", "None" },
@@ -497,7 +497,7 @@ public static class SettingsPresets
         { "disableAutoLights", true },
         { "addExpeditionFlag", true },
         { "addFuelCanister", true },
-        { "chaoticCyclones", true },
+        { "cycloneChaos", 1f },
         { "moreExplosionDamage", true },
         { "singleUseTractorBeam", true },
         { "disableThrusters", "None" },
@@ -653,7 +653,7 @@ public static class SettingsPresets
             (0.2f, 0.5f),
             (0.5f, 1f),
             (1f, 3f)
-        }, 0.5f, 0f) },
+        }, 0.2f, 0f) },
         { "enablePersistentInput", new RandomSettingValue(0.5f) },
         { "shipInputLatency", new RandomSettingValue(new (object, object)[]
         {
@@ -720,7 +720,7 @@ public static class SettingsPresets
         { "disableDamageIndicators", new RandomSettingValue(0.3f) },
         { "addShipSignal", new RandomSettingValue(0.5f) },
         { "reactorLifetimeMultiplier", new RandomSettingValue(0.1f, 3f, 0.5f, 1f) },
-        { "disableShipFriction", new RandomSettingValue(0.25f) },
+        { "disableShipFriction", new RandomSettingValue(0.2f) },
         { "enableSignalscopeComponent", new RandomSettingValue(0.5f) },
         { "rustLevel", new RandomSettingValue(new (object, object)[]
         {
@@ -773,7 +773,13 @@ public static class SettingsPresets
         { "disableAutoLights", new RandomSettingValue(0.5f) },
         { "addExpeditionFlag", new RandomSettingValue(0.5f) },
         { "addFuelCanister", new RandomSettingValue(0.5f) },
-        { "chaoticCyclones", new RandomSettingValue(0.75f) },
+        { "cycloneChaos", new RandomSettingValue(new (object, object)[]
+        {
+            (0f, 0.3f),
+            (0.3f, 0.5f),
+            (0.5f, 0.8f),
+            (0.8f, 1f)
+        }, 0.5f, 0f) },
         { "moreExplosionDamage", new RandomSettingValue(0.75f) },
         { "singleUseTractorBeam", new RandomSettingValue(0.25f) },
         { "disableThrusters", new RandomSettingValue([
@@ -827,7 +833,7 @@ public static class SettingsPresets
         { "disableFluidPrevention", new RandomSettingValue(0.5f) },
         { "disableHazardPrevention", new RandomSettingValue(0.5f) },
         { "prolongDigestion", new RandomSettingValue(0.5f) },
-        { "unlimitedItems", new RandomSettingValue(0.5f) },
+        { "unlimitedItems", new RandomSettingValue(0.05f) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

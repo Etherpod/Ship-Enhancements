@@ -300,11 +300,13 @@
       "value": 1,
       "tooltip": "Larger numbers increase how much the ship is slowed down by air. Set to zero to disable air drag."
     },
-    "chaoticCyclones": {
-      "title": "Chaotic Cyclones",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Changes cyclones to add an upwards spin to your ship when you enter one."
+    "cycloneChaos": {
+      "title": "Cyclone Chaos",
+      "type": "slider",
+      "min": 0,
+      "max": 1,
+      "value": 0,
+      "tooltip": "Controls how violently cyclones should affect your ship."
     },
     "prolongDigestion": {
       "title": "Prolong Digestion",

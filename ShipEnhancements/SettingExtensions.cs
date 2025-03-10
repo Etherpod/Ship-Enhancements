@@ -78,7 +78,7 @@ public static class SettingExtensions
         { Settings.disableAutoLights, (false, false) },
         { Settings.addExpeditionFlag, (false, false) },
         { Settings.addFuelCanister, (false, false) },
-        { Settings.chaoticCyclones, (false, false) },
+        { Settings.cycloneChaos, (1f, 1f) },
         { Settings.moreExplosionDamage, (false, false) },
         { Settings.singleUseTractorBeam, (false, false) },
         { Settings.disableThrusters, (false, false) },

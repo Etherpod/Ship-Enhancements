@@ -2835,13 +2835,60 @@ public static class PatchClass
     #region ChaoticCyclones
     [HarmonyPostfix]
     [HarmonyPatch(typeof(TornadoFluidVolume), nameof(TornadoFluidVolume.GetPointFluidAngularVelocity))]
-    public static void ChangeTornadoShipRotation(TornadoFluidVolume __instance, FluidDetector detector, ref Vector3 __result)
+    public static void ChaoticTornadoRotation(TornadoFluidVolume __instance, FluidDetector detector, ref Vector3 __result)
     {
-        if ((bool)chaoticCyclones.GetProperty() && detector.CompareTag("ShipDetector"))
+        if ((float)cycloneChaos.GetProperty() > 0f && detector.CompareTag("ShipDetector"))
         {
-            __result = (__instance._tornadoPivot.transform.up -
-                __instance._tornadoPivot.transform.right * UnityEngine.Random.Range(0.4f, 0.8f)) * __instance._angularSpeed;
+            float upMult = 0.4f * Mathf.Sin(1.5f * Time.time) + 0.3f * Mathf.Cos(5f * Time.time) + 1f;
+            Vector3 upRotation = __instance._tornadoPivot.transform.right * upMult;
+            float speedMult = 0.5f * Mathf.Cos(2f * Time.time) + 1.2f;
+            Vector3 chaos = (__instance._tornadoPivot.transform.up - upRotation)
+                * __instance._angularSpeed * speedMult;
+            __result = Vector3.Lerp(__result, chaos, (float)cycloneChaos.GetProperty());
         }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(TornadoFluidVolume), nameof(TornadoFluidVolume.GetPointFluidVelocity))]
+    public static void ChaoticTornadoSpeed(TornadoFluidVolume __instance, Vector3 worldPosition, FluidDetector detector, ref Vector3 __result)
+    {
+        if ((float)cycloneChaos.GetProperty() >= 0.5f && detector.CompareTag("ShipDetector"))
+        {
+            float speedMult = 0.6f * Mathf.Sin(3f * Time.time) + 1f;
+
+            Vector3 pointVelocity = __instance._attachedBody.GetPointVelocity(worldPosition);
+            Vector3 vector = Vector3.ProjectOnPlane(__instance._tornadoPivot.position - worldPosition, __instance._tornadoPivot.up);
+            float magnitude = vector.magnitude;
+            float num = Mathf.InverseLerp(20f, 0f, magnitude);
+            float num2 = Mathf.Lerp(__instance._inwardSpeed * 3f, 0f, num);
+            Vector3 chaos = pointVelocity + __instance._tornadoPivot.up * __instance._verticalSpeed * speedMult + vector.normalized * num2;
+
+            float lerp = Mathf.InverseLerp(0.5f, 1f, (float)cycloneChaos.GetProperty());
+            __result = Vector3.Lerp(__result, chaos, lerp);
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(PriorityDetector), nameof(PriorityDetector.AddVolume))]
+    public static void ForceTornadoPriority(PriorityDetector __instance, EffectVolume eVol, ref object __state)
+    {
+        if (__instance is not ShipFluidDetector || eVol is not TornadoFluidVolume) return;
+
+        PriorityVolume vol = eVol as PriorityVolume;
+
+        ShipEnhancements.WriteDebugMessage(__instance.gameObject.name + ": " + vol.GetPriority());
+        __state = (vol, vol.GetPriority());
+        vol.SetPriority(4);
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(PriorityDetector), nameof(PriorityDetector.AddVolume))]
+    public static void ForceTornadoPriority(PriorityDetector __instance, EffectVolume eVol, object __state)
+    {
+        if (__state == null || __instance is not ShipFluidDetector || eVol is not TornadoFluidVolume) return;
+        ShipEnhancements.WriteDebugMessage(__state);
+        (PriorityVolume, int) dos = ((PriorityVolume, int))__state;
+        dos.Item1.SetPriority(dos.Item2);
     }
     #endregion
 

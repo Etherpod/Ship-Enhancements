@@ -75,7 +75,7 @@ public class RadioItem : OWItem
     private Dictionary<string, AudioClip> _codesToAudio;
     private bool _playingAudio = false;
     private bool _playingCodes = false;
-    private float _currentVolume = 0.5f;
+    private float _currentVolume = 0.375f;
     private AudioLowPassFilter _lowPassFilter;
     private AudioHighPassFilter _highPassFilter;
     private AudioReverbFilter _reverbFilter;
