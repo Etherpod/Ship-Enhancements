@@ -1862,7 +1862,7 @@ public static class PatchClass
                     {
                         foreach (uint id in ShipEnhancements.PlayerIDs)
                         {
-                            ShipEnhancements.QSBCompat.SendCampfireExtinguishState(id);
+                            ShipEnhancements.QSBCompat.SendCampfireExtinguishState(id, campfire.GetItem());
                         }
                     }
                 }

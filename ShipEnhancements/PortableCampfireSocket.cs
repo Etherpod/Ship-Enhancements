@@ -1,41 +1,32 @@
-﻿namespace ShipEnhancements;
+﻿using UnityEngine;
 
-public class PortableCampfireSocket : OWItemSocket
+namespace ShipEnhancements;
+
+public class PortableCampfireSocket : SEItemSocket
 {
-    private PortableCampfireItem _campfireItem;
-
-    public override void Awake()
+    protected override ItemType GetAcceptableType()
     {
-        Reset();
-        _sector = SELocator.GetShipSector();
-        base.Awake();
-        _acceptableType = PortableCampfireItem.ItemType;
+        return ShipEnhancements.Instance.PortableCampfireType;
+    }
 
-        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
-        if ((bool)ShipEnhancements.Settings.preventSystemFailure.GetProperty())
+    protected override void CreateItem()
+    {
+        base.CreateItem();
+
+        FluidDetector detector = _socketedItem.GetComponentInChildren<FluidDetector>(true);
+        if (detector != null)
         {
-            GlobalMessenger.AddListener("ShipHullDetached", OnShipSystemFailure);
+            detector.gameObject.SetActive(true);
         }
-    }
 
-    public void SetCampfireItem(PortableCampfireItem item)
-    {
-        _campfireItem = item;
-        PlaceIntoSocket(item);
-    }
-
-    private void OnShipSystemFailure()
-    {
-        _sector = null;
-        _socketedItem?.SetSector(null);
-    }
-
-    private void OnDestroy()
-    {
-        GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
-        if ((bool)ShipEnhancements.Settings.preventSystemFailure.GetProperty())
+        if ((string)ShipEnhancements.Settings.temperatureZonesAmount.GetProperty() == "All")
         {
-            GlobalMessenger.RemoveListener("ShipHullDetached", OnShipSystemFailure);
+            Campfire campfire = _socketedItem.GetComponentInChildren<Campfire>();
+            if (campfire != null)
+            {
+                GameObject campfireTempZone = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Campfire.prefab");
+                Instantiate(campfireTempZone, campfire.transform.parent);
+            }
         }
     }
 }

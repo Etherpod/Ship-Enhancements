@@ -780,10 +780,10 @@ public class ShipEnhancements : ModBehaviour
             Transform suppliesParent = SELocator.GetShipTransform().Find("Module_Supplies");
             GameObject portableCampfireSocket = LoadPrefab("Assets/ShipEnhancements/PortableCampfireSocket.prefab");
             PortableCampfireSocket campfireSocket = Instantiate(portableCampfireSocket, suppliesParent).GetComponent<PortableCampfireSocket>();
-            GameObject portableCampfireItem = LoadPrefab("assets/ShipEnhancements/PortableCampfireItem.prefab");
+            /*GameObject portableCampfireItem = LoadPrefab("assets/ShipEnhancements/PortableCampfireItem.prefab");
             AssetBundleUtilities.ReplaceShaders(portableCampfireItem);
             PortableCampfireItem campfireItem = Instantiate(portableCampfireItem, suppliesParent).GetComponent<PortableCampfireItem>();
-            campfireSocket.SetCampfireItem(campfireItem);
+            campfireSocket.SetCampfireItem(campfireItem);*/
         }
         if (Settings.temperatureZonesAmount.GetProperty().ToString() != "None")
         {
@@ -961,12 +961,12 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((bool)Settings.addExpeditionFlag.GetProperty())
         {
-            GameObject flag = LoadPrefab("Assets/ShipEnhancements/ExpeditionFlagItem.prefab");
+            /*GameObject flag = LoadPrefab("Assets/ShipEnhancements/ExpeditionFlagItem.prefab");
             AssetBundleUtilities.ReplaceShaders(flag);
-            GameObject flagObj = Instantiate(flag);
+            GameObject flagObj = Instantiate(flag);*/
             GameObject flagSocket = LoadPrefab("Assets/ShipEnhancements/ExpeditionFlagSocket.prefab");
             GameObject flagSocketObj = Instantiate(flagSocket, SELocator.GetShipTransform().Find("Module_Cabin"));
-            flagSocketObj.GetComponent<ExpeditionFlagSocket>().PlaceIntoSocket(flagObj.GetComponent<ExpeditionFlagItem>());
+            //flagSocketObj.GetComponent<ExpeditionFlagSocket>().PlaceIntoSocket(flagObj.GetComponent<ExpeditionFlagItem>());
         }
         if ((bool)Settings.addFuelCanister.GetProperty())
         {
@@ -980,12 +980,12 @@ public class ShipEnhancements : ModBehaviour
             Mesh shadowMesh = LoadPrefab("Assets/ShipEnhancements/AltShadowCasters/Shadowcaster_Cabin_NoMallows.fbx").GetComponent<MeshFilter>().mesh;
             SELocator.GetShipTransform().Find("Module_Cabin/Geo_Cabin/Shadowcaster_Cabin").GetComponent<MeshFilter>().mesh = shadowMesh;
 
-            GameObject tank = LoadPrefab("Assets/ShipEnhancements/FuelTankItem.prefab");
+            /*GameObject tank = LoadPrefab("Assets/ShipEnhancements/FuelTankItem.prefab");
             AssetBundleUtilities.ReplaceShaders(tank);
-            GameObject tankObj = Instantiate(tank);
+            GameObject tankObj = Instantiate(tank);*/
             GameObject tankSocket = LoadPrefab("Assets/ShipEnhancements/FuelTankSocket.prefab");
             GameObject tankSocketObj = Instantiate(tankSocket, SELocator.GetShipTransform().Find("Module_Cabin"));
-            tankSocketObj.GetComponent<FuelTankItemSocket>().PlaceIntoSocket(tankObj.GetComponent<FuelTankItem>());
+            //tankSocketObj.GetComponent<FuelTankItemSocket>().PlaceIntoSocket(tankObj.GetComponent<FuelTankItem>());
         }
         if ((bool)Settings.singleUseTractorBeam.GetProperty())
         {
@@ -1140,10 +1140,10 @@ public class ShipEnhancements : ModBehaviour
             RepairWrenchSocket wrenchSocket = Instantiate(wrenchSocketObj,
                 SELocator.GetShipTransform().Find("Module_Cockpit")).GetComponent<RepairWrenchSocket>();
 
-            GameObject wrenchObj = LoadPrefab("Assets/ShipEnhancements/RepairWrenchItem.prefab");
+            /*GameObject wrenchObj = LoadPrefab("Assets/ShipEnhancements/RepairWrenchItem.prefab");
             AssetBundleUtilities.ReplaceShaders(wrenchObj);
             RepairWrenchItem wrench = Instantiate(wrenchObj).GetComponent<RepairWrenchItem>();
-            wrenchSocket.PlaceIntoSocket(wrench);
+            wrenchSocket.PlaceIntoSocket(wrench);*/
         }
         if ((bool)Settings.addRadio.GetProperty())
         {
@@ -1151,10 +1151,10 @@ public class ShipEnhancements : ModBehaviour
             RadioItemSocket radioSocket = Instantiate(radioSocketObj,
                 SELocator.GetShipTransform().Find("Module_Cockpit")).GetComponent<RadioItemSocket>();
 
-            GameObject radioObj = LoadPrefab("Assets/ShipEnhancements/RadioItem.prefab");
+            /*GameObject radioObj = LoadPrefab("Assets/ShipEnhancements/RadioItem.prefab");
             AssetBundleUtilities.ReplaceShaders(radioObj);
             RadioItem radio = Instantiate(radioObj).GetComponent<RadioItem>();
-            radioSocket.PlaceIntoSocket(radio);
+            radioSocket.PlaceIntoSocket(radio);*/
 
             GameObject codeNotesObj = LoadPrefab("Assets/ShipEnhancements/CodeNotes.prefab");
             AssetBundleUtilities.ReplaceShaders(codeNotesObj);

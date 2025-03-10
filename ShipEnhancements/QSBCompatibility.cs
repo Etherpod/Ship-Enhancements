@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -64,9 +65,9 @@ public class QSBCompatibility
         _api.RegisterHandler<(int, bool)>("modulator-button-state", ReceiveModulatorButtonState);
         _api.RegisterHandler<(bool, bool, bool)>("overdrive-button-state", ReceiveOverdriveButtonState);
         _api.RegisterHandler<NoData>("overdrive-stop-coroutines", ReceiveStopOverdriveCoroutines);
-        _api.RegisterHandler<NoData>("campfire-reactor-damage", ReceiveCampfireReactorDamaged);
-        _api.RegisterHandler<NoData>("campfire-extinguished", ReceiveCampfireExtinguished);
-        _api.RegisterHandler<(bool, bool, bool)>("campfire-initial-state", ReceiveCampfireInitialState);
+        _api.RegisterHandler<int>("campfire-reactor-damage", ReceiveCampfireReactorDamaged);
+        _api.RegisterHandler<int>("campfire-extinguished", ReceiveCampfireExtinguished);
+        _api.RegisterHandler<(int, bool, bool, bool)>("campfire-initial-state", ReceiveCampfireInitialState);
         _api.RegisterHandler<float>("ship-temp-meter", ReceiveShipHullTemp);
         _api.RegisterHandler<int>("attach-tether", ReceiveAttachTether);
         _api.RegisterHandler<int>("disconnect-tether", ReceiveDisconnectTether);
@@ -177,35 +178,38 @@ public class QSBCompatibility
         {
             _api.SendMessage("initialize-engine-switch", ShipEnhancements.Instance.engineOn, id, false);
         }
-        if ((bool)ShipEnhancements.Settings.addPortableCampfire.GetProperty())
+        if ((bool)addPortableCampfire.GetProperty())
         {
-            bool dropped = false;
-            bool unpacked = false;
-            bool lit = false;
-            PortableCampfireItem item = SELocator.GetPortableCampfire().GetComponentInParent<PortableCampfireItem>();
-            if (item.IsDropped())
+            foreach (PortableCampfireItem campfire in UnityEngine.Object.FindObjectsOfType<PortableCampfireItem>())
             {
-                dropped = true;
-                if (item.IsUnpacked())
+                bool dropped = false;
+                bool unpacked = false;
+                bool lit = false;
+
+                if (campfire.IsDropped())
                 {
-                    unpacked = true;
-                    if (!SELocator.GetPortableCampfire().IsExtinguished())
+                    dropped = true;
+                    if (campfire.IsUnpacked())
                     {
-                        lit = true;
+                        unpacked = true;
+                        if (!campfire.GetCampfire().IsExtinguished())
+                        {
+                            lit = true;
+                        }
                     }
                 }
+                SendCampfireInitialState(id, campfire, dropped, unpacked, lit);
             }
-            SendCampfireInitialState(id, dropped, unpacked, lit);
         }
-        if ((float)ShipEnhancements.Settings.rustLevel.GetProperty() > 0)
+        if ((float)rustLevel.GetProperty() > 0)
         {
             SELocator.GetCockpitFilthController()?.BroadcastInitialRustState();
         }
-        if ((float)ShipEnhancements.Settings.dirtAccumulationTime.GetProperty() > 0f)
+        if ((float)dirtAccumulationTime.GetProperty() > 0f)
         {
             SELocator.GetCockpitFilthController()?.BroadcastInitialDirtState();
         }
-        if ((float)ShipEnhancements.Settings.shipExplosionMultiplier.GetProperty() < 0f)
+        if ((float)shipExplosionMultiplier.GetProperty() < 0f)
         {
             BlackHoleExplosionController controller = SELocator.GetShipTransform().GetComponentInChildren<BlackHoleExplosionController>();
             if (controller != null && controller.IsPlaying())
@@ -478,42 +482,54 @@ public class QSBCompatibility
     #endregion
 
     #region Portable Campfire
-    public void SendCampfireReactorDamaged(uint id)
+    public void SendCampfireReactorDamaged(uint id, OWItem item)
     {
-        _api.SendMessage("campfire-reactor-delay", new NoData(), id, false);
+        _api.SendMessage("campfire-reactor-delay", ShipEnhancements.QSBInteraction.GetIDFromItem(item), id, false);
     }
 
-    private void ReceiveCampfireReactorDamaged(uint id, NoData noData)
+    private void ReceiveCampfireReactorDamaged(uint id, int itemID)
     {
-        SELocator.GetPortableCampfire()?.OnRemoteReactorDamaged();
+        OWItem item = ShipEnhancements.QSBInteraction.GetItemFromID(itemID);
+        if (item == null) return;
+
+        PortableCampfireItem campfire = item as PortableCampfireItem;
+        campfire.GetCampfire().OnRemoteReactorDamaged();
     }
 
-    public void SendCampfireExtinguishState(uint id)
+    public void SendCampfireExtinguishState(uint id, OWItem item)
     {
-        _api.SendMessage("campfire-extinguished", new NoData(), id, false);
+        _api.SendMessage("campfire-extinguished", ShipEnhancements.QSBInteraction.GetIDFromItem(item), id, false);
     }
 
-    private void ReceiveCampfireExtinguished(uint id, NoData noData)
+    private void ReceiveCampfireExtinguished(uint id, int itemID)
     {
-        SELocator.GetPortableCampfire()?.OnExtinguishInteract();
+        OWItem item = ShipEnhancements.QSBInteraction.GetItemFromID(itemID);
+        if (item == null) return;
+
+        PortableCampfireItem campfire = item as PortableCampfireItem;
+        campfire.GetCampfire().OnExtinguishInteract();
     }
 
-    public void SendCampfireInitialState(uint id, bool dropped, bool unpacked, bool lit)
+    public void SendCampfireInitialState(uint id, OWItem item, bool dropped, bool unpacked, bool lit)
     {
-        _api.SendMessage("campfire-initial-state", (dropped, unpacked, lit), id, false);
+        _api.SendMessage("campfire-initial-state", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), dropped, unpacked, lit), id, false);
     }
 
-    private void ReceiveCampfireInitialState(uint id, (bool, bool, bool) data)
+    private void ReceiveCampfireInitialState(uint id, (int itemID, bool dropped, bool unpacked, bool lit) data)
     {
-        PortableCampfireItem item = SELocator.GetPortableCampfire().GetComponentInParent<PortableCampfireItem>();
-        if (!item.IsDropped()) return;
+        OWItem item = ShipEnhancements.QSBInteraction.GetItemFromID(data.itemID);
+        if (item == null) return;
 
-        if (data.Item1)
+        PortableCampfireItem campfire = item as PortableCampfireItem;
+        if (!campfire.IsDropped()) return;
+
+        if (data.dropped)
         {
-            item.TogglePackUp(false);
+            campfire.TogglePackUp(false);
 
-            if (data.Item2)
+            if (data.unpacked)
             {
+                // not using the lit data?
                 SELocator.GetPortableCampfire().SetInitialState(Campfire.State.LIT);
                 SELocator.GetPortableCampfire().SetState(Campfire.State.LIT);
             }

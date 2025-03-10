@@ -1,4 +1,6 @@
-﻿namespace ShipEnhancements;
+﻿using static ShipEnhancements.ShipEnhancements.Settings;
+
+namespace ShipEnhancements;
 
 public class ShipResourceSyncManager
 {
@@ -6,8 +8,8 @@ public class ShipResourceSyncManager
     private int _currentFrameDelay;
     private QSBCompatibility _qsbCompat;
 
-    private bool TempSync => (string)ShipEnhancements.Settings.temperatureZonesAmount.GetProperty() != "None";
-    private bool FilthSync => (float)ShipEnhancements.Settings.dirtAccumulationTime.GetProperty() > 0f;
+    private bool TempSync => (string)temperatureZonesAmount.GetProperty() != "None";
+    private bool FilthSync => (float)dirtAccumulationTime.GetProperty() > 0f && (float)maxDirtAccumulation.GetProperty() > 0f;
 
     public ShipResourceSyncManager(QSBCompatibility qsbCompatibility)
     {

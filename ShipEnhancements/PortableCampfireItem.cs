@@ -70,6 +70,11 @@ public class PortableCampfireItem : OWItem
         _interactRange = packUp ? _baseInteractRange : 0f;
     }
 
+    public PortableCampfire GetCampfire()
+    {
+        return _campfire;
+    }
+
     public bool IsUnpacked()
     {
         return _interactRange > 0f && _campfireObject.activeInHierarchy;

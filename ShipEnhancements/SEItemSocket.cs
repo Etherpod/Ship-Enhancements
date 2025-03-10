@@ -6,11 +6,12 @@ namespace ShipEnhancements;
 public class SEItemSocket : OWItemSocket
 {
     [SerializeField]
-    private OWItem _prefabItem;
+    protected OWItem _prefabItem;
 
-    private FirstPersonManipulator _manipulator;
-    private ScreenPrompt _createItemPrompt;
-    private ScreenPrompt _noCreateItemPrompt;
+    protected FirstPersonManipulator _manipulator;
+    protected OWCamera _playerCam;
+    protected ScreenPrompt _createItemPrompt;
+    protected ScreenPrompt _noCreateItemPrompt;
 
     public override void Awake()
     {
@@ -32,6 +33,7 @@ public class SEItemSocket : OWItemSocket
     public override void Start()
     {
         base.Start();
+        _playerCam = Locator.GetPlayerCamera();
         AssetBundleUtilities.ReplaceShaders(_prefabItem.gameObject);
         if ((bool)unlimitedItems.GetProperty())
         {
@@ -73,21 +75,26 @@ public class SEItemSocket : OWItemSocket
         if ((bool)unlimitedItems.GetProperty())
         {
             bool focused = _manipulator.GetFocusedItemSocket() == this;
+            UpdatePromptVisibility(focused);
 
-            if (ShipEnhancements.InMultiplayer)
-            {
-                _noCreateItemPrompt.SetVisibility(focused && _socketedItem == null);
-            }
-            else
-            {
-                _createItemPrompt.SetVisibility(focused && _socketedItem == null);
-            }
-
-            if (focused && _socketedItem == null
+            if (focused && _socketedItem == null && !ShipEnhancements.InMultiplayer
                 && OWInput.IsNewlyPressed(InputLibrary.interactSecondary, InputMode.Character))
             {
                 CreateItem();
             }
+        }
+    }
+
+    protected virtual void UpdatePromptVisibility(bool focused)
+    {
+        bool flag = focused && _socketedItem == null && _playerCam.enabled && OWInput.IsInputMode(InputMode.Character | InputMode.ShipCockpit);
+        if (flag != _createItemPrompt.IsVisible() && !ShipEnhancements.InMultiplayer)
+        {
+            _createItemPrompt.SetVisibility(flag);
+        }
+        else if (flag != _noCreateItemPrompt.IsVisible() && ShipEnhancements.InMultiplayer)
+        {
+            _noCreateItemPrompt.SetVisibility(flag);
         }
     }
 

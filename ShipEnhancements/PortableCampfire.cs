@@ -23,10 +23,12 @@ public class PortableCampfire : Campfire
     private bool _shipDestroyed;
     private bool _lastOutsideWaterState = false;
     private ShipReactorComponent _reactor;
+    private PortableCampfireItem _item;
 
     public override void Awake()
     {
         base.Awake();
+        _item = _itemParent.GetComponent<PortableCampfireItem>();
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
         if (true)
@@ -63,7 +65,7 @@ public class PortableCampfire : Campfire
                     {
                         foreach (uint id in ShipEnhancements.PlayerIDs)
                         {
-                            ShipEnhancements.QSBCompat.SendCampfireReactorDamaged(id);
+                            ShipEnhancements.QSBCompat.SendCampfireReactorDamaged(id, _item);
                         }
                     }
 
@@ -112,7 +114,7 @@ public class PortableCampfire : Campfire
         {
             StopSleeping();
         }
-        _itemParent.GetComponent<PortableCampfireItem>().TogglePackUp(true);
+        _item.TogglePackUp(true);
     }
 
     public void UpdateProperties()
@@ -194,6 +196,11 @@ public class PortableCampfire : Campfire
     public override bool CanSleepHereNow()
     {
         return base.CanSleepHereNow() && !PlayerState.OnQuantumMoon();
+    }
+
+    public OWItem GetItem()
+    {
+        return _item;
     }
 
     private void OnShipSystemFailure()
