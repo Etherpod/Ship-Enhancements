@@ -2288,6 +2288,12 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipNoiseMaker), nameof(ShipNoiseMaker.Update))]
     public static bool AddExtraNoises(ShipNoiseMaker __instance)
     {
+        if ((float)noiseMultiplier.GetProperty() == 0f)
+        {
+            __instance._noiseRadius = 0f;
+            return false;
+        }
+
         if (!(bool)extraNoise.GetProperty()) return true;
 
         if (Time.time > __instance._lastImpactTime + 1f)
@@ -2316,7 +2322,30 @@ public static class PatchClass
         __instance._noiseRadius = Mathf.Max(thrusterNoiseRadius, __instance._impactNoiseRadius, alarmNoiseRadius, ignitionNoiseRadius, overdriveNoiseRadius,
             radioNoiseRadius);
 
+        if ((float)noiseMultiplier.GetProperty() > 0f)
+        {
+            __instance._noiseRadius *= (float)noiseMultiplier.GetProperty();
+        }
+
         return false;
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipNoiseMaker), nameof(ShipNoiseMaker.Update))]
+    public static void ApplyNegativeNoise(ShipNoiseMaker __instance)
+    {
+        if ((float)noiseMultiplier.GetProperty() < 0f)
+        {
+            if (__instance._noiseRadius > 0f)
+            {
+                __instance._noiseRadius = 0f;
+            }
+            else if (__instance._noiseRadius <= 0f)
+            {
+                __instance._noiseRadius = 400f;
+            }
+
+        }
     }
 
     [HarmonyPostfix]

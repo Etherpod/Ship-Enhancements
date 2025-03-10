@@ -79,7 +79,6 @@ public class ShipTemperatureDetector : TemperatureDetector
                 additiveMultiplier = 1.5f;
             }
             float scalar = 1 + (1f * Mathf.InverseLerp(_highTempCutoff, 0f, Mathf.Abs(_currentTemperature)));
-            ShipEnhancements.WriteDebugMessage("Mult: " + multiplier + ", Scalar: " + scalar);
             _internalTempMeter = Mathf.Clamp(_internalTempMeter + (Time.deltaTime 
                 * ((multiplier * scalar) + additiveMultiplier)), -_internalTempMeterLength, _internalTempMeterLength);
         }
@@ -170,14 +169,6 @@ public class ShipTemperatureDetector : TemperatureDetector
                 shockSpeedPercent = Mathf.InverseLerp(minSpeed + ((maxSpeed - minSpeed) / 2), maxSpeed, velocityMagnitude);
                 shockSpeedPercent *= radiusMultiplier;
             }
-            /*else
-            {
-                Vector3 toCenter = _shockLayerController._ruleset.GetRadialCenter().position - _shockLayerController._owRigidbody.GetPosition();
-                float centerDist = toCenter.magnitude;
-                float radiusMultiplier = 1f - Mathf.InverseLerp(_shockLayerController._ruleset.GetInnerRadius(),
-                    _shockLayerController._ruleset.GetOuterRadius(), centerDist);
-                shockSpeedPercent = radiusMultiplier;
-            }*/
 
             totalTemperature += Mathf.Lerp(0f, 65f, shockSpeedPercent);
         }

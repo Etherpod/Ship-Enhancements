@@ -110,6 +110,7 @@ public static class SettingExtensions
         { Settings.disableHazardPrevention, (false, false) },
         { Settings.prolongDigestion, (false, false) },
         { Settings.unlimitedItems, (false, false) },
+        { Settings.noiseMultiplier, (1f, 1f) },
     };
 
     public static string GetName(this Settings setting)

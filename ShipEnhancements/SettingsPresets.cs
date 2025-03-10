@@ -109,6 +109,7 @@ public static class SettingsPresets
         { "disableHazardPrevention", false },
         { "prolongDigestion", false },
         { "unlimitedItems", false },
+        { "noiseMultiplier", 1f },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -214,6 +215,7 @@ public static class SettingsPresets
         { "disableHazardPrevention", false },
         { "prolongDigestion", false },
         { "unlimitedItems", false },
+        { "noiseMultiplier", 1f },
     };
 
     public static readonly Dictionary<string, object> ImpossibleSettings = new Dictionary<string, object>()
@@ -319,6 +321,7 @@ public static class SettingsPresets
         { "disableHazardPrevention", false },
         { "prolongDigestion", false },
         { "unlimitedItems", false },
+        { "noiseMultiplier", 5f },
     };
 
     public static readonly Dictionary<string, object> NewStuffSettings = new Dictionary<string, object>()
@@ -424,6 +427,7 @@ public static class SettingsPresets
         { "disableHazardPrevention", false },
         { "prolongDigestion", false },
         { "unlimitedItems", false },
+        { "noiseMultiplier", 1f },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -529,6 +533,7 @@ public static class SettingsPresets
         { "disableHazardPrevention", true },
         { "prolongDigestion", true },
         { "unlimitedItems", false },
+        { "noiseMultiplier", 1f },
     };
 
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()
@@ -834,6 +839,13 @@ public static class SettingsPresets
         { "disableHazardPrevention", new RandomSettingValue(0.5f) },
         { "prolongDigestion", new RandomSettingValue(0.5f) },
         { "unlimitedItems", new RandomSettingValue(0.05f) },
+        { "noiseMultiplier", new RandomSettingValue(new (object, object)[]
+        {
+            (0f, 0.5f),
+            (0.5f, 1.5f),
+            (1.5f, 2f),
+            (2f, 5f)
+        }, 0.25f, 1f) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

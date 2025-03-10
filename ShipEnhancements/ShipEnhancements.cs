@@ -189,6 +189,7 @@ public class ShipEnhancements : ModBehaviour
         disableHazardPrevention,
         prolongDigestion,
         unlimitedItems,
+        noiseMultiplier,
     }
 
     private void Awake()
