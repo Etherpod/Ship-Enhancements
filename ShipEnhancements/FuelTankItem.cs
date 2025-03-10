@@ -153,7 +153,7 @@ public class FuelTankItem : OWItem
                             {
                                 foreach (uint id in ShipEnhancements.PlayerIDs)
                                 {
-                                    ShipEnhancements.QSBCompat.SendToggleFuelTankDrain(id, true);
+                                    ShipEnhancements.QSBCompat.SendToggleFuelTankDrain(id, this, true);
                                 }
                             }
                         }
@@ -226,7 +226,7 @@ public class FuelTankItem : OWItem
         {
             foreach (uint id in ShipEnhancements.PlayerIDs)
             {
-                ShipEnhancements.QSBCompat.SendToggleFuelTankDrain(id, false);
+                ShipEnhancements.QSBCompat.SendToggleFuelTankDrain(id, this, false);
             }
         }
     }
@@ -277,7 +277,7 @@ public class FuelTankItem : OWItem
         {
             foreach (uint id in ShipEnhancements.PlayerIDs)
             {
-                ShipEnhancements.QSBCompat.SendFuelTankExplosion(id);
+                ShipEnhancements.QSBCompat.SendFuelTankExplosion(id, this);
             }
         }
 
@@ -335,7 +335,7 @@ public class FuelTankItem : OWItem
         {
             foreach (uint id in ShipEnhancements.PlayerIDs)
             {
-                ShipEnhancements.QSBCompat.SendFuelTankCapacity(id, _currentFuel);
+                ShipEnhancements.QSBCompat.SendFuelTankCapacity(id, this, _currentFuel);
             }
         }
     }

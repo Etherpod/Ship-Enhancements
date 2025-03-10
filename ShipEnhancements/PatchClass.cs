@@ -2304,7 +2304,14 @@ public static class PatchClass
         float ignitionNoiseRadius = shipIgniting ? 500f : 0f;
         float overdriveNoiseRadius = (bool)enableThrustModulator.GetProperty() && SELocator.GetShipOverdriveController() != null
             && SELocator.GetShipOverdriveController().IsCharging() ? 300f : 0f;
-        float radioNoiseRadius = (bool)addRadio.GetProperty() && SELocator.GetRadio() != null ? SELocator.GetRadio().GetNoiseRadius() : 0f;
+        float radioNoiseRadius = 0f;
+        if ((bool)addRadio.GetProperty())
+        {
+            foreach (RadioItem radio in SELocator.GetShipTransform().GetComponentsInChildren<RadioItem>())
+            {
+                radioNoiseRadius = Mathf.Max(radioNoiseRadius, radio.GetNoiseRadius());
+            }
+        }
 
         __instance._noiseRadius = Mathf.Max(thrusterNoiseRadius, __instance._impactNoiseRadius, alarmNoiseRadius, ignitionNoiseRadius, overdriveNoiseRadius,
             radioNoiseRadius);
@@ -3612,7 +3619,14 @@ public static class PatchClass
 
         if (__result)
         {
-            __result = !SELocator.GetRadio().ShouldOverrideTravelMusic();
+            foreach (RadioItem radio in SELocator.GetShipTransform().GetComponentsInChildren<RadioItem>())
+            {
+                if (radio.ShouldOverrideTravelMusic())
+                {
+                    __result = false;
+                    return;
+                }
+            }
         }
     }
     #endregion

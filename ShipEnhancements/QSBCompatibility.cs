@@ -80,18 +80,18 @@ public class QSBCompatibility
         _api.RegisterHandler<float>("initial-black-hole", ReceiveInitialBlackHoleState);
         _api.RegisterHandler<ShipCommand>("send-ship-command", ReceiveShipCommand);
         _api.RegisterHandler<(bool, string, SerializedVector3)>("activate-warp", ReceiveActivateWarp);
-        _api.RegisterHandler<bool>("toggle-fuel-tank-drain", ReceiveToggleFuelTankDrain);
-        _api.RegisterHandler<NoData>("fuel-tank-explosion", ReceiveFuelTankExplosion);
-        _api.RegisterHandler<float>("fuel-tank-capacity", ReceiveFuelTankCapacity);
+        _api.RegisterHandler<(int, bool)>("toggle-fuel-tank-drain", ReceiveToggleFuelTankDrain);
+        _api.RegisterHandler<int>("fuel-tank-explosion", ReceiveFuelTankExplosion);
+        _api.RegisterHandler<(int, float)>("fuel-tank-capacity", ReceiveFuelTankCapacity);
         _api.RegisterHandler<(int, int)>("item-module-parent", ReceiveItemModuleParent);
-        _api.RegisterHandler<bool>("tractor-beam-turbo", ReceiveTractorBeamTurbo);
+        _api.RegisterHandler<(int, bool)>("tractor-beam-turbo", ReceiveTractorBeamTurbo);
         _api.RegisterHandler<bool>("set-curtain-state", ReceiveCurtainState);
         _api.RegisterHandler<string>("send-ernesto-comment", ReceiveErnestoComment);
         _api.RegisterHandler<float>("detach-landing-gear", ReceiveDetachLandingGear);
-        _api.RegisterHandler<bool>("radio-power", ReceiveRadioPower);
-        _api.RegisterHandler<int[]>("radio-codes", ReceiveRadioCodes);
-        _api.RegisterHandler<NoData>("radio-cancel-tuning", ReceiveRadioCancelTuning);
-        _api.RegisterHandler<float>("radio-volume", ReceiveRadioVolume);
+        _api.RegisterHandler<(int, bool)>("radio-power", ReceiveRadioPower);
+        _api.RegisterHandler<(int, int[])>("radio-codes", ReceiveRadioCodes);
+        _api.RegisterHandler<int>("radio-cancel-tuning", ReceiveRadioCancelTuning);
+        _api.RegisterHandler<(int, float)>("radio-volume", ReceiveRadioVolume);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -685,34 +685,46 @@ public class QSBCompatibility
     #endregion
 
     #region FuelTankItem
-    public void SendToggleFuelTankDrain(uint id, bool started)
+    public void SendToggleFuelTankDrain(uint id, OWItem item, bool started)
     {
-        _api.SendMessage("toggle-fuel-tank-drain", started, id, false);
+        _api.SendMessage("toggle-fuel-tank-drain", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), started), id, false);
     }
 
-    private void ReceiveToggleFuelTankDrain(uint id, bool started)
+    private void ReceiveToggleFuelTankDrain(uint id, (int itemID, bool started) data)
     {
-        SELocator.GetFuelTankItem()?.ToggleDrainRemote(started);
+        OWItem item = ShipEnhancements.QSBInteraction.GetItemFromID(data.itemID);
+        if (item == null) return;
+
+        FuelTankItem fuelTank = item as FuelTankItem;
+        fuelTank.ToggleDrainRemote(data.started);
     }
 
-    public void SendFuelTankExplosion(uint id)
+    public void SendFuelTankExplosion(uint id, OWItem item)
     {
-        _api.SendMessage("fuel-tank-explosion", new NoData(), id, false);
+        _api.SendMessage("fuel-tank-explosion", ShipEnhancements.QSBInteraction.GetIDFromItem(item), id, false);
     }
 
-    private void ReceiveFuelTankExplosion(uint id, NoData noData)
+    private void ReceiveFuelTankExplosion(uint id, int itemID)
     {
-        SELocator.GetFuelTankItem()?.ExplodeRemote();
+        OWItem item = ShipEnhancements.QSBInteraction.GetItemFromID(itemID);
+        if (item == null) return;
+
+        FuelTankItem fuelTank = item as FuelTankItem;
+        fuelTank.ExplodeRemote();
     }
 
-    public void SendFuelTankCapacity(uint id, float fuel)
+    public void SendFuelTankCapacity(uint id, OWItem item, float fuel)
     {
-        _api.SendMessage("fuel-tank-capacity", fuel, id, false);
+        _api.SendMessage("fuel-tank-capacity", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), fuel), id, false);
     }
 
-    private void ReceiveFuelTankCapacity(uint id, float fuel)
+    private void ReceiveFuelTankCapacity(uint id, (int itemID, float fuel) data)
     {
-        SELocator.GetFuelTankItem()?.UpdateFuelRemote(fuel);
+        OWItem item = ShipEnhancements.QSBInteraction.GetItemFromID(data.itemID);
+        if (item == null) return;
+
+        FuelTankItem fuelTank = item as FuelTankItem;
+        fuelTank.UpdateFuelRemote(data.fuel);
     }
     #endregion
 
@@ -731,14 +743,18 @@ public class QSBCompatibility
     #endregion
 
     #region PortableTractorBeam
-    public void SendTractorBeamTurbo(uint id, bool enableTurbo)
+    public void SendTractorBeamTurbo(uint id, PortableTractorBeamItem item, bool enableTurbo)
     {
-        _api.SendMessage("tractor-beam-turbo", enableTurbo, id, false);
+        _api.SendMessage("tractor-beam-turbo", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), enableTurbo), id, false);
     }
 
-    private void ReceiveTractorBeamTurbo(uint id, bool enableTurbo)
+    private void ReceiveTractorBeamTurbo(uint id, (int itemID, bool enableTurbo) data)
     {
-        SELocator.GetTractorBeamItem()?.ToggleTurbo(enableTurbo);
+        OWItem item = ShipEnhancements.QSBInteraction.GetItemFromID(data.itemID);
+        if (item == null) return;
+
+        PortableTractorBeamItem tractorBeam = item as PortableTractorBeamItem;
+        tractorBeam.ToggleTurbo(data.enableTurbo);
     }
     #endregion
 
@@ -802,44 +818,60 @@ public class QSBCompatibility
     #endregion
 
     #region Radio
-    public void SendRadioPower(uint id, bool powered)
+    public void SendRadioPower(uint id, OWItem item, bool powered)
     {
-        _api.SendMessage("radio-power", powered, id, false);
+        _api.SendMessage("radio-power", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), powered), id, false);
     }
 
-    private void ReceiveRadioPower(uint id, bool powered)
+    private void ReceiveRadioPower(uint id, (int itemID, bool powered) data)
     {
-        SELocator.GetRadio().SetRadioPowerRemote(powered);
+        OWItem item = ShipEnhancements.QSBInteraction.GetItemFromID(data.itemID);
+        if (item == null) return;
+
+        RadioItem radio = item as RadioItem;
+        radio.SetRadioPowerRemote(data.powered);
     }
 
-    public void SendRadioCodes(uint id, int[] codes)
+    public void SendRadioCodes(uint id, OWItem item, int[] codes)
     {
-        _api.SendMessage("radio-codes", codes, id, false);
+        _api.SendMessage("radio-codes", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), codes), id, false);
     }
 
-    private void ReceiveRadioCodes(uint id, int[] codes)
+    private void ReceiveRadioCodes(uint id, (int itemID, int[] codes) data)
     {
-        SELocator.GetRadio().SetRadioCodesRemote(codes);
+        OWItem item = ShipEnhancements.QSBInteraction.GetItemFromID(data.itemID);
+        if (item == null) return;
+
+        RadioItem radio = item as RadioItem;
+        radio.SetRadioCodesRemote(data.codes);
     }
 
-    public void SendRadioCancelTuning(uint id)
+    public void SendRadioCancelTuning(uint id, OWItem item)
     {
-        _api.SendMessage("radio-cancel-tuning", new NoData(), id, false);
+        _api.SendMessage("radio-cancel-tuning", ShipEnhancements.QSBInteraction.GetIDFromItem(item), id, false);
     }
 
-    private void ReceiveRadioCancelTuning(uint id, NoData noData)
+    private void ReceiveRadioCancelTuning(uint id, int itemID)
     {
-        SELocator.GetRadio().CancelTuningRemote();
+        OWItem item = ShipEnhancements.QSBInteraction.GetItemFromID(itemID);
+        if (item == null) return;
+
+        RadioItem radio = item as RadioItem;
+        radio.CancelTuningRemote();
     }
 
-    public void SendRadioVolume(uint id, float volume)
+    public void SendRadioVolume(uint id, OWItem item, float volume)
     {
-        _api.SendMessage("radio-volume", volume, id, false);
+        _api.SendMessage("radio-volume", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), volume), id, false);
     }
 
-    private void ReceiveRadioVolume(uint id, float volume)
+    private void ReceiveRadioVolume(uint id, (int itemID, float volume) data)
     {
-        SELocator.GetRadio().ChangeVolumeRemote(volume);
+        OWItem item = ShipEnhancements.QSBInteraction.GetItemFromID(data.itemID);
+        if (item == null) return;
+
+        RadioItem radio = item as RadioItem;
+        radio.ChangeVolumeRemote(data.volume);
     }
     #endregion
 }

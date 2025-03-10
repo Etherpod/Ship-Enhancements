@@ -176,5 +176,11 @@ public class ExplosionDamage : MonoBehaviour
                 }
             }
         }
+
+        FuelTankItem tank = hitObj.GetComponentInParent<FuelTankItem>();
+        if (tank != null)
+        {
+            tank.Explode();
+        }
     }
 }

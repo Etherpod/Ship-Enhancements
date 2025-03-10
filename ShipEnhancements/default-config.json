@@ -578,6 +578,12 @@
       "value": false,
       "tooltip": "Adds a few hooks inside the ship that you can place anywhere you want. Interact with it to tether yourself to it, and interact with another to create a line between them."
     },
+    "unlimitedItems": {
+      "title": "Unlimited Items",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Lets you duplicate items inside the ship. This does not work in multiplayer."
+    },
     "enableRemovableGravityCrystal": {
       "title": "Removable Gravity Crystal",
       "type": "toggle",

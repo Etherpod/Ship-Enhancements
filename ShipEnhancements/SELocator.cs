@@ -26,11 +26,8 @@ public static class SELocator
     private static PortableCampfire _portableCampfire;
     private static CockpitFilthController _cockpitFilthController;
     private static FlightConsoleInteractController _consoleInteractController;
-    private static FuelTankItem _fuelTankItem;
-    private static PortableTractorBeamItem _tractorBeamItem;
     private static CockpitErnesto _ernesto;
     private static ShipWarpCoreComponent _warpCoreComponent;
-    private static RadioItem _radio;
 
     public static void Initalize()
     {
@@ -72,21 +69,9 @@ public static class SELocator
         {
             _cockpitFilthController = _shipTransform.GetComponentInChildren<CockpitFilthController>(true);
         }
-        if ((bool)addFuelCanister.GetProperty())
-        {
-            _fuelTankItem = _shipTransform.GetComponentInChildren<FuelTankItem>(true);
-        }
-        if ((bool)addPortableTractorBeam.GetProperty())
-        {
-            _tractorBeamItem = _shipTransform.GetComponentInChildren<PortableTractorBeamItem>(true);
-        }
         if ((bool)addErnesto.GetProperty())
         {
             _ernesto = _shipTransform.GetComponentInChildren<CockpitErnesto>();
-        }
-        if ((bool)addRadio.GetProperty())
-        {
-            _radio = _shipTransform.GetComponentInChildren<RadioItem>();
         }
     }
 
@@ -215,23 +200,8 @@ public static class SELocator
         _consoleInteractController = controller;
     }
 
-    public static FuelTankItem GetFuelTankItem()
-    {
-        return _fuelTankItem;
-    }
-
-    public static PortableTractorBeamItem GetTractorBeamItem()
-    {
-        return _tractorBeamItem;
-    }
-
     public static CockpitErnesto GetErnesto()
     {
         return _ernesto;
-    }
-
-    public static RadioItem GetRadio()
-    {
-        return _radio;
     }
 }

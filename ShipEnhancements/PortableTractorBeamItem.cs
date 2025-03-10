@@ -73,7 +73,7 @@ public class PortableTractorBeamItem : OWItem
             {
                 foreach (uint id in ShipEnhancements.PlayerIDs)
                 {
-                    ShipEnhancements.QSBCompat.SendTractorBeamTurbo(id, _turbo);
+                    ShipEnhancements.QSBCompat.SendTractorBeamTurbo(id, this, _turbo);
                 }
             }
         }

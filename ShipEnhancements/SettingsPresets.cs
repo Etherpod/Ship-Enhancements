@@ -108,6 +108,7 @@ public static class SettingsPresets
         { "disableFluidPrevention", false },
         { "disableHazardPrevention", false },
         { "prolongDigestion", false },
+        { "unlimitedItems", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -212,6 +213,7 @@ public static class SettingsPresets
         { "disableFluidPrevention", true },
         { "disableHazardPrevention", false },
         { "prolongDigestion", false },
+        { "unlimitedItems", false },
     };
 
     public static readonly Dictionary<string, object> ImpossibleSettings = new Dictionary<string, object>()
@@ -316,6 +318,7 @@ public static class SettingsPresets
         { "disableFluidPrevention", false },
         { "disableHazardPrevention", false },
         { "prolongDigestion", false },
+        { "unlimitedItems", false },
     };
 
     public static readonly Dictionary<string, object> NewStuffSettings = new Dictionary<string, object>()
@@ -420,6 +423,7 @@ public static class SettingsPresets
         { "disableFluidPrevention", false },
         { "disableHazardPrevention", false },
         { "prolongDigestion", false },
+        { "unlimitedItems", false },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -524,6 +528,7 @@ public static class SettingsPresets
         { "disableFluidPrevention", true },
         { "disableHazardPrevention", true },
         { "prolongDigestion", true },
+        { "unlimitedItems", false },
     };
 
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()
@@ -822,6 +827,7 @@ public static class SettingsPresets
         { "disableFluidPrevention", new RandomSettingValue(0.5f) },
         { "disableHazardPrevention", new RandomSettingValue(0.5f) },
         { "prolongDigestion", new RandomSettingValue(0.5f) },
+        { "unlimitedItems", new RandomSettingValue(0.5f) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

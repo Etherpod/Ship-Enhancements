@@ -32,50 +32,6 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
     {
         ShipEnhancements.ShipEnhancements.Instance.AssignQSBInterface(this);
         Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
-
-        /*LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
-        {
-            if (loadScene != OWScene.SolarSystem || !ShipEnhancements.ShipEnhancements.InMultiplayer)
-            {
-                return;
-            }
-
-            ShipEnhancements.ShipEnhancements.Instance.ModHelper.Events.Unity.FireInNUpdates(() =>
-            {
-                if ((bool)addPortableCampfire.GetProperty())
-                {
-                    QSBWorldSync.Init<QSBPortableCampfireItem, PortableCampfireItem>();
-                }
-                if ((bool)addPortableTractorBeam.GetProperty())
-                {
-                    QSBWorldSync.Init<QSBPortableTractorBeamItem, PortableTractorBeamItem>();
-                }
-                if ((bool)addTether.GetProperty())
-                {
-                    QSBWorldSync.Init<QSBTetherHookItem, TetherHookItem>();
-                }
-                if ((bool)addExpeditionFlag.GetProperty())
-                {
-                    QSBWorldSync.Init<QSBExpeditionFlagItem, ExpeditionFlagItem>();
-                }
-                if ((bool)enableRemovableGravityCrystal.GetProperty())
-                {
-                    QSBWorldSync.Init<QSBShipGravityCrystal, ShipGravityCrystalItem>();
-                }
-                if ((bool)addFuelCanister.GetProperty())
-                {
-                    QSBWorldSync.Init<QSBFuelTankItem, FuelTankItem>();
-                }
-                if ((bool)addRepairWrench.GetProperty())
-                {
-                    QSBWorldSync.Init<QSBRepairWrenchItem, RepairWrenchItem>();
-                }
-                if ((bool)addRadio.GetProperty())
-                {
-                    QSBWorldSync.Init<QSBRadioItem, RadioItem>();
-                }
-            }, 2);
-        };*/
     }
 
     public bool FlightConsoleOccupied()
@@ -123,17 +79,6 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
         }
         hull.SendMessage(new HullChangeIntegrityMessage(shipHull._integrity));
     }
-
-    /*public int GetIDFromTetherHook(TetherHookItem hookItem)
-    {
-        var worldObj = hookItem.GetWorldObject<QSBTetherHookItem>();
-        return worldObj.ObjectId;
-    }
-
-    public TetherHookItem GetTetherHookFromID(int hookID)
-    {
-        return hookID.GetWorldObject<QSBTetherHookItem>().AttachedObject;
-    }*/
 
     public int GetIDFromItem(OWItem item)
     {

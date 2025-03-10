@@ -109,6 +109,7 @@ public static class SettingExtensions
         { Settings.disableFluidPrevention, (false, false) },
         { Settings.disableHazardPrevention, (false, false) },
         { Settings.prolongDigestion, (false, false) },
+        { Settings.unlimitedItems, (false, false) },
     };
 
     public static string GetName(this Settings setting)

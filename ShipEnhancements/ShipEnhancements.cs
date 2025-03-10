@@ -188,6 +188,7 @@ public class ShipEnhancements : ModBehaviour
         disableFluidPrevention,
         disableHazardPrevention,
         prolongDigestion,
+        unlimitedItems,
     }
 
     private void Awake()
@@ -885,20 +886,16 @@ public class ShipEnhancements : ModBehaviour
 
         if ((bool)Settings.addTether.GetProperty())
         {
-            GameObject hook = LoadPrefab("Assets/ShipEnhancements/TetherHook.prefab");
-            AssetBundleUtilities.ReplaceShaders(hook);
+            /*GameObject hook = LoadPrefab("Assets/ShipEnhancements/TetherHook.prefab");
+            AssetBundleUtilities.ReplaceShaders(hook);*/
 
             GameObject socketParent = Instantiate(LoadPrefab("Assets/ShipEnhancements/HookSocketParent.prefab"), SELocator.GetShipTransform());
             socketParent.transform.localPosition = Vector3.zero;
-            foreach (TetherHookSocket socket in socketParent.GetComponentsInChildren<TetherHookSocket>())
+            /*foreach (TetherHookSocket socket in socketParent.GetComponentsInChildren<TetherHookSocket>())
             {
                 GameObject hookItem = Instantiate(hook);
                 socket.PlaceIntoSocket(hookItem.GetComponent<TetherHookItem>());
-                ModHelper.Events.Unity.FireOnNextUpdate(() =>
-                {
-                    hookItem.transform.localScale = Vector3.one * 0.7f;
-                });
-            }
+            }*/
 
             SELocator.GetPlayerBody().gameObject.AddComponent<TetherPromptController>();
         }
@@ -955,12 +952,12 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((bool)Settings.addPortableTractorBeam.GetProperty())
         {
-            GameObject tractor = LoadPrefab("Assets/ShipEnhancements/PortableTractorBeamItem.prefab");
+            /*GameObject tractor = LoadPrefab("Assets/ShipEnhancements/PortableTractorBeamItem.prefab");
             AssetBundleUtilities.ReplaceShaders(tractor);
-            GameObject tractorObj = Instantiate(tractor);
+            GameObject tractorObj = Instantiate(tractor);*/
             GameObject tractorSocket = LoadPrefab("Assets/ShipEnhancements/PortableTractorBeamSocket.prefab");
             GameObject tractorSocketObj = Instantiate(tractorSocket, SELocator.GetShipTransform().Find("Module_Cabin"));
-            tractorSocketObj.GetComponent<PortableTractorBeamSocket>().PlaceIntoSocket(tractorObj.GetComponent<PortableTractorBeamItem>());
+            //tractorSocketObj.GetComponent<PortableTractorBeamSocket>().PlaceIntoSocket(tractorObj.GetComponent<PortableTractorBeamItem>());
         }
         if ((bool)Settings.addExpeditionFlag.GetProperty())
         {

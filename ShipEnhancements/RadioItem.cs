@@ -193,7 +193,7 @@ public class RadioItem : OWItem
     private void Update()
     {
         bool focused = _cameraManipulator.GetFocusedOWItem() == this 
-            || (_connectedToShip && _cameraManipulator.GetFocusedItemSocket()?._acceptableType == ItemType);
+            || (_cameraManipulator.GetFocusedItemSocket()?._acceptableType == ItemType && GetComponentInParent<RadioItemSocket>());
         if (_lastFocused != focused)
         {
             PatchClass.UpdateFocusedItems(focused);
@@ -246,7 +246,7 @@ public class RadioItem : OWItem
                 {
                     foreach (uint id in ShipEnhancements.PlayerIDs)
                     {
-                        ShipEnhancements.QSBCompat.SendRadioCancelTuning(id);
+                        ShipEnhancements.QSBCompat.SendRadioCancelTuning(id, this);
                     }
                 }
             }
@@ -313,7 +313,7 @@ public class RadioItem : OWItem
                 {
                     foreach (uint id in ShipEnhancements.PlayerIDs)
                     {
-                        ShipEnhancements.QSBCompat.SendRadioCodes(id, _codes);
+                        ShipEnhancements.QSBCompat.SendRadioCodes(id, this, _codes);
                     }
                 }
             }
@@ -354,7 +354,7 @@ public class RadioItem : OWItem
                 {
                     foreach (uint id in ShipEnhancements.PlayerIDs)
                     {
-                        ShipEnhancements.QSBCompat.SendRadioCodes(id, _codes);
+                        ShipEnhancements.QSBCompat.SendRadioCodes(id, this, _codes);
                     }
                 }
             }
@@ -440,7 +440,7 @@ public class RadioItem : OWItem
                 {
                     foreach (uint id in ShipEnhancements.PlayerIDs)
                     {
-                        ShipEnhancements.QSBCompat.SendRadioPower(id, _powerOn);
+                        ShipEnhancements.QSBCompat.SendRadioPower(id, this, _powerOn);
                     }
                 }
             }
@@ -474,7 +474,7 @@ public class RadioItem : OWItem
                 {
                     foreach (uint id in ShipEnhancements.PlayerIDs)
                     {
-                        ShipEnhancements.QSBCompat.SendRadioVolume(id, _currentVolume);
+                        ShipEnhancements.QSBCompat.SendRadioVolume(id, this, _currentVolume);
                     }
                 }
             }
@@ -495,7 +495,7 @@ public class RadioItem : OWItem
                 {
                     foreach (uint id in ShipEnhancements.PlayerIDs)
                     {
-                        ShipEnhancements.QSBCompat.SendRadioVolume(id, _currentVolume);
+                        ShipEnhancements.QSBCompat.SendRadioVolume(id, this, _currentVolume);
                     }
                 }
             }

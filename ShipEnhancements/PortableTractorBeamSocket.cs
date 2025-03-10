@@ -1,44 +1,9 @@
-﻿using UnityEngine;
+﻿namespace ShipEnhancements;
 
-namespace ShipEnhancements;
-
-public class PortableTractorBeamSocket : OWItemSocket
+public class PortableTractorBeamSocket : SEItemSocket
 {
-    public override void Awake()
+    protected override ItemType GetAcceptableType()
     {
-        Reset();
-        _sector = SELocator.GetShipSector();
-        base.Awake();
-        _acceptableType = PortableTractorBeamItem.ItemType;
-
-        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
-        if ((bool)ShipEnhancements.Settings.preventSystemFailure.GetProperty())
-        {
-            GlobalMessenger.AddListener("ShipHullDetached", OnShipSystemFailure);
-        }
-    }
-
-    public override void Start()
-    {
-        base.Start();
-        if (_socketedItem)
-        {
-            _socketedItem.transform.localScale = Vector3.one * 0.5f;
-        }
-    }
-
-    private void OnShipSystemFailure()
-    {
-        _sector = null;
-        _socketedItem?.SetSector(null);
-    }
-
-    private void OnDestroy()
-    {
-        GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
-        if ((bool)ShipEnhancements.Settings.preventSystemFailure.GetProperty())
-        {
-            GlobalMessenger.RemoveListener("ShipHullDetached", OnShipSystemFailure);
-        }
+        return ShipEnhancements.Instance.PortableTractorBeamType;
     }
 }

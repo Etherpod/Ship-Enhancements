@@ -5,6 +5,7 @@ namespace ShipEnhancements;
 public class PlayerTorpidityEffect : MonoBehaviour
 {
     private PlayerCameraEffectController _effectController;
+    private OWRigidbody _shipBody;
     private float _minSpinSpeed;
     private float _maxSpinSpeed;
     private float _currentPercent;
@@ -13,6 +14,9 @@ public class PlayerTorpidityEffect : MonoBehaviour
     private void Awake()
     {
         _effectController = GetComponent<PlayerCameraEffectController>();
+        _shipBody = SELocator.GetShipBody();
+
+        GlobalMessenger<OWRigidbody>.AddListener("ShipCockpitDetached", OnCockpitDetached);
     }
 
     private void Start()
@@ -52,5 +56,15 @@ public class PlayerTorpidityEffect : MonoBehaviour
             _currentPercent += step * Mathf.Sign(diff);
             _effectController._owCamera.postProcessingSettings.vignette.intensity = _currentPercent;
         }
+    }
+
+    private void OnCockpitDetached(OWRigidbody body)
+    {
+        _shipBody = body;
+    }
+
+    private void OnDestroy()
+    {
+        GlobalMessenger<OWRigidbody>.RemoveListener("ShipCockpitDetached", OnCockpitDetached);
     }
 }

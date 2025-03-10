@@ -1,33 +1,9 @@
 ﻿namespace ShipEnhancements;
 
-public class FuelTankItemSocket : OWItemSocket
+public class FuelTankItemSocket : SEItemSocket
 {
-    public override void Awake()
+    protected override ItemType GetAcceptableType()
     {
-        Reset();
-        _sector = SELocator.GetShipSector();
-        base.Awake();
-        _acceptableType = FuelTankItem.ItemType;
-
-        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
-        if ((bool)ShipEnhancements.Settings.preventSystemFailure.GetProperty())
-        {
-            GlobalMessenger.AddListener("ShipHullDetached", OnShipSystemFailure);
-        }
-    }
-
-    private void OnShipSystemFailure()
-    {
-        _sector = null;
-        _socketedItem?.SetSector(null);
-    }
-
-    private void OnDestroy()
-    {
-        GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
-        if ((bool)ShipEnhancements.Settings.preventSystemFailure.GetProperty())
-        {
-            GlobalMessenger.RemoveListener("ShipHullDetached", OnShipSystemFailure);
-        }
+        return ShipEnhancements.Instance.FuelTankType;
     }
 }
