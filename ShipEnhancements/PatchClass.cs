@@ -621,8 +621,11 @@ public static class PatchClass
     [HarmonyPatch(typeof(LandingPadSensor), nameof(LandingPadSensor.Awake))]
     public static void AddGravityComponent(LandingPadSensor __instance)
     {
-        if (!(bool)enableGravityLandingGear.GetProperty()) return;
-        __instance.gameObject.AddComponent<GravityLandingGear>();
+        if ((bool)enableGravityLandingGear.GetProperty())
+        {
+            GameObject gravityPadObj = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/GravityLandingPad.prefab");
+            UnityEngine.Object.Instantiate(gravityPadObj, __instance.transform);
+        }
     }
     #endregion
 
