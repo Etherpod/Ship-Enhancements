@@ -308,6 +308,22 @@
       "value": 0,
       "tooltip": "Controls how violently cyclones should affect your ship."
     },
+    "waterDamage": {
+      "title": "Ship Water Damage",
+      "type": "slider",
+      "min": 0,
+      "max": 1,
+      "value": 0,
+      "tooltip": "Controls how much your ship is damaged by water. Maximum damage blows up your ship if you touch water."
+    },
+    "sandDamage": {
+      "title": "Ship Sand Damage",
+      "type": "slider",
+      "min": 0,
+      "max": 1,
+      "value": 0,
+      "tooltip": "Controls how much your ship is damaged by falling sand. Maximum damage blows up your ship if you touch falling sand."
+    },
     "prolongDigestion": {
       "title": "Prolong Digestion",
       "type": "toggle",

@@ -19,7 +19,7 @@ public class GravityLandingPad : MonoBehaviour
 
     private ShipLandingGear _landingGear;
     private ShipThrusterModel _thrusterModel;
-    private float _gravityMagnitude = 4.5f;
+    private float _gravityMagnitude = 10f;
     private bool _inverted = true;
     private bool _gravityEnabled = false;
     private bool _shipDestroyed = false;
@@ -71,7 +71,7 @@ public class GravityLandingPad : MonoBehaviour
         }
     }
 
-    private void Update()
+    private void FixedUpdate()
     {
         if (_shipDestroyed || _landingGear.isDamaged || !_gravityEnabled || !ShipEnhancements.Instance.engineOn)
         {

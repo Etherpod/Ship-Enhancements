@@ -190,6 +190,8 @@ public class ShipEnhancements : ModBehaviour
         prolongDigestion,
         unlimitedItems,
         noiseMultiplier,
+        waterDamage,
+        sandDamage,
     }
 
     private void Awake()
@@ -1178,7 +1180,8 @@ public class ShipEnhancements : ModBehaviour
         {
             SELocator.GetPlayerBody().GetComponentInChildren<PlayerCameraEffectController>().gameObject.AddComponent<PlayerTorpidityEffect>();
         }
-        if (true)
+        if ((float)Settings.waterDamage.GetProperty() > 0f
+            || (float)Settings.sandDamage.GetProperty() > 0f)
         {
             GameObject fluidDamage = LoadPrefab("Assets/ShipEnhancements/ShipFluidDamageController.prefab");
             Instantiate(fluidDamage, SELocator.GetShipTransform());

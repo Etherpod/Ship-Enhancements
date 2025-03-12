@@ -8,11 +8,12 @@ namespace ShipEnhancements;
 public class ShipFluidDamageController : MonoBehaviour
 {
     private List<StaticFluidDetector> _moduleDetectors = [];
-    private List<FluidVolume.Type> _damageFluids = [];
+    private Dictionary<FluidVolume.Type, float> _damageFluids = [];
     private List<ShipModule> _trackedModules = [];
     private float _minDamageDelay = 0.3f;
     private float _maxDamageDelay = 1f;
     private float _damageDelay;
+    private float _currentDamagePercent;
 
     private void Awake()
     {
@@ -33,11 +34,19 @@ public class ShipFluidDamageController : MonoBehaviour
             detector.OnExitFluid += (vol) => OnExitFluid(vol, detector);
         }
 
-        _damageFluids.Add(FluidVolume.Type.WATER);
-        _damageFluids.Add(FluidVolume.Type.GEYSER);
-        _damageFluids.Add(FluidVolume.Type.SAND);
+        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
 
-        _damageDelay = Random.Range(_minDamageDelay, _maxDamageDelay);
+        if ((float)waterDamage.GetProperty() > 0f)
+        {
+            _damageFluids.Add(FluidVolume.Type.WATER, (float)waterDamage.GetProperty());
+            _damageFluids.Add(FluidVolume.Type.GEYSER, (float)waterDamage.GetProperty());
+        }
+        if ((float)sandDamage.GetProperty() > 0f)
+        {
+            _damageFluids.Add(FluidVolume.Type.SAND, (float)sandDamage.GetProperty());
+        }
+
+        _damageDelay = 1f;
     }
 
     private void Start()
@@ -60,19 +69,21 @@ public class ShipFluidDamageController : MonoBehaviour
         {
             ShipModule module = _trackedModules[Random.Range(0, _trackedModules.Count)];
             ShipHull hull = module._hulls[Random.Range(0, module._hulls.Length)];
-            RandomDamageToModule(hull);
-            _damageDelay = Random.Range(_minDamageDelay, _maxDamageDelay);
+            RandomDamageToModule(hull, _currentDamagePercent);
+
+            float mult = Mathf.Lerp(10f, 1f, _currentDamagePercent);
+            _damageDelay = Random.Range(_minDamageDelay * mult, _maxDamageDelay * mult);
         }
     }
 
-    private void RandomDamageToModule(ShipHull targetHull)
+    private void RandomDamageToModule(ShipHull targetHull, float damagePercent)
     {
         if ((ShipEnhancements.InMultiplayer && !ShipEnhancements.QSBAPI.GetIsHost()) || (float)shipDamageMultiplier.GetProperty() <= 0f) return;
 
         ShipComponent[] components = targetHull._components
             .Where((component) => component.repairFraction == 1f && !component.isDamaged).ToArray();
 
-        if (components.Length > 0 && Random.value < 0.5f)
+        if (components.Length > 0 && Random.value < 0.1f + (damagePercent * 0.3f))
         {
             components[Random.Range(0, components.Length)].SetDamaged(true);
         }
@@ -80,7 +91,9 @@ public class ShipFluidDamageController : MonoBehaviour
         {
             bool wasDamaged = targetHull._damaged;
             targetHull._damaged = true;
-            targetHull._integrity = Mathf.Max(0f, targetHull._integrity - Random.Range(0.05f, 0.15f) * (float)shipDamageMultiplier.GetProperty());
+            float mult = Mathf.Lerp(3f, 1f, damagePercent);
+            targetHull._integrity = Mathf.Max(0f, targetHull._integrity - Random.Range(0.05f * mult, 0.15f * mult) 
+                * (float)shipDamageMultiplier.GetProperty());
             var eventDelegate1 = (System.MulticastDelegate)typeof(ShipHull).GetField("OnDamaged",
                 System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic
                 | System.Reflection.BindingFlags.Public).GetValue(targetHull);
@@ -105,24 +118,35 @@ public class ShipFluidDamageController : MonoBehaviour
 
     private void OnEnterFluid(FluidVolume vol, StaticFluidDetector detector)
     {
-        if (!_damageFluids.Contains(vol.GetFluidType())) return;
+        if (!_damageFluids.Keys.Contains(vol.GetFluidType())) return;
 
         ShipModule module = detector.GetComponentInParent<ShipModule>();
         if (module != null && !_trackedModules.Contains(module))
         {
             _trackedModules.Add(module);
         }
+
+        _currentDamagePercent = _damageFluids[vol.GetFluidType()];
+        if (_currentDamagePercent >= 1f)
+        {
+            SELocator.GetShipDamageController().Explode();
+        }
     }
 
     private void OnExitFluid(FluidVolume vol, StaticFluidDetector detector)
     {
-        if (!_damageFluids.Contains(vol.GetFluidType())) return;
+        if (!_damageFluids.Keys.Contains(vol.GetFluidType())) return;
 
         ShipModule module = detector.GetComponentInParent<ShipModule>();
         if (module != null && _trackedModules.Contains(module))
         {
             _trackedModules.Remove(module);
         }
+    }
+
+    private void OnShipSystemFailure()
+    {
+        enabled = false;
     }
 
     private void OnDestroy()
@@ -132,5 +156,7 @@ public class ShipFluidDamageController : MonoBehaviour
             detector.OnEnterFluid -= (vol) => OnEnterFluid(vol, detector);
             detector.OnExitFluid -= (vol) => OnExitFluid(vol, detector);
         }
+
+        GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
     }
 }

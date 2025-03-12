@@ -110,6 +110,8 @@ public static class SettingsPresets
         { "prolongDigestion", false },
         { "unlimitedItems", false },
         { "noiseMultiplier", 1f },
+        { "waterDamage", 0f },
+        { "sandDamage", 0f },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -216,6 +218,8 @@ public static class SettingsPresets
         { "prolongDigestion", false },
         { "unlimitedItems", false },
         { "noiseMultiplier", 1f },
+        { "waterDamage", 0f },
+        { "sandDamage", 0f },
     };
 
     public static readonly Dictionary<string, object> ImpossibleSettings = new Dictionary<string, object>()
@@ -322,6 +326,8 @@ public static class SettingsPresets
         { "prolongDigestion", false },
         { "unlimitedItems", false },
         { "noiseMultiplier", 5f },
+        { "waterDamage", 1f },
+        { "sandDamage", 1f },
     };
 
     public static readonly Dictionary<string, object> NewStuffSettings = new Dictionary<string, object>()
@@ -428,6 +434,8 @@ public static class SettingsPresets
         { "prolongDigestion", false },
         { "unlimitedItems", false },
         { "noiseMultiplier", 1f },
+        { "waterDamage", 0f },
+        { "sandDamage", 0f },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -534,6 +542,8 @@ public static class SettingsPresets
         { "prolongDigestion", true },
         { "unlimitedItems", false },
         { "noiseMultiplier", 1f },
+        { "waterDamage", 0.5f },
+        { "sandDamage", 0.5f },
     };
 
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()
@@ -846,6 +856,22 @@ public static class SettingsPresets
             (1.5f, 2f),
             (2f, 5f)
         }, 0.25f, 1f) },
+        { "waterDamage", new RandomSettingValue(new (object, object)[]
+        {
+            (0f, 0.3f),
+            (0.3f, 0.4f),
+            (0.4f, 0.6f),
+            (0.6f, 0.99f),
+            (1f, 1f),
+        }, 0.2f, 0f) },
+        { "sandDamage", new RandomSettingValue(new (object, object)[]
+        {
+            (0f, 0.3f),
+            (0.3f, 0.4f),
+            (0.4f, 0.6f),
+            (0.6f, 0.99f),
+            (1f, 1f),
+        }, 0.2f, 0f) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }
