@@ -23,6 +23,9 @@ using QSB.ShipSync.Messages;
 using QSB.Player.TransformSync;
 using System.Collections.Generic;
 using QSB.ItemSync.Patches;
+using QSB.Anglerfish.Patches;
+using QSB.Anglerfish.WorldObjects;
+using QSB.Anglerfish.Messages;
 
 namespace ShipEnhancementsQSB;
 
@@ -716,6 +719,53 @@ public static class QSBInteractionPatches
             {
                 electricalSystem.SetPowered(true);
             }
+        }
+
+        return false;
+    }
+    #endregion
+
+    #region ProlongDigestion
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(AnglerPatches), nameof(AnglerPatches.OnCaughtObject))]
+    public static bool OnCaughtObjectFix(AnglerfishController __0, OWRigidbody caughtBody)
+    {
+        if (!(bool)prolongDigestion.GetProperty()) return true;
+
+        var qsbAngler = __0.GetWorldObject<QSBAngler>();
+
+        if (__0._currentState == AnglerfishController.AnglerState.Consuming)
+        {
+            if (!qsbAngler.TargetTransform.CompareTag("Player") && caughtBody.CompareTag("Player")
+                && !PlayerState.IsInsideShip() && !PlayerState.AtFlightConsole())
+            {
+                Locator.GetDeathManager().KillPlayer(DeathType.Digestion);
+            }
+
+            return false;
+        }
+
+        if (caughtBody.CompareTag("Player") || caughtBody.CompareTag("Ship"))
+        {
+            qsbAngler.TargetTransform = caughtBody.transform;
+            __0._consumeStartTime = Time.time;
+            __0.ChangeState(AnglerfishController.AnglerState.Consuming);
+
+            if (caughtBody.CompareTag("Ship"))
+            {
+                ShipNotifications.PostDigestionNotification();
+                PatchClass.digestionDamageDelay = UnityEngine.Random.Range(0.6f, 1.2f);
+            }
+            if (PlayerState.IsInsideShip() || PlayerState.AtFlightConsole())
+            {
+                Locator.GetPlayerDeathAudio()._deathSource.PlayOneShot(AudioType.Death_Digestion, 1f);
+                if (PlayerState.IsInsideShip())
+                {
+                    Locator.GetPlayerDeathAudio()._shipGroanSource.PlayDelayed(1f);
+                }
+            }
+
+            qsbAngler.SendMessage(new AnglerDataMessage(qsbAngler));
         }
 
         return false;
