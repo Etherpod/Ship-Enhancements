@@ -3841,4 +3841,18 @@ public static class PatchClass
         }
     }
     #endregion
+
+    #region FluidDamage
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(SandFunnelTriggerVolume), nameof(SandFunnelTriggerVolume.IsObjectExposed))]
+    public static void ForceModuleDetectorsExposed(SandFunnelTriggerVolume __instance, GameObject obj, ref bool __result)
+    {
+        if (!obj.GetComponent<StaticFluidDetector>() || !obj.GetComponentInParent<ShipModule>()) return;
+
+        if (!__result)
+        {
+            __result = __instance.IsObjectExposed(SELocator.GetShipDetector());
+        }
+    }
+    #endregion
 }

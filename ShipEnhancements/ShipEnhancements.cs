@@ -1178,6 +1178,11 @@ public class ShipEnhancements : ModBehaviour
         {
             SELocator.GetPlayerBody().GetComponentInChildren<PlayerCameraEffectController>().gameObject.AddComponent<PlayerTorpidityEffect>();
         }
+        if (true)
+        {
+            GameObject fluidDamage = LoadPrefab("Assets/ShipEnhancements/ShipFluidDamageController.prefab");
+            Instantiate(fluidDamage, SELocator.GetShipTransform());
+        }
 
         SetDamageColors();
 
