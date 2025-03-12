@@ -19,7 +19,7 @@ public class GravityLandingPad : MonoBehaviour
 
     private ShipLandingGear _landingGear;
     private ShipThrusterModel _thrusterModel;
-    private float _gravityMagnitude = 4f;
+    private float _gravityMagnitude = 4.5f;
     private bool _inverted = true;
     private bool _gravityEnabled = false;
     private bool _shipDestroyed = false;

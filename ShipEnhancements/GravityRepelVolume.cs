@@ -1,11 +1,12 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace ShipEnhancements;
 
 public class GravityRepelVolume : MonoBehaviour
 {
     private bool _repel = false;
-    private int _trackedColliders = 0;
+    private List<GameObject> _trackedObjects = [];
 
     private void Start()
     {
@@ -17,25 +18,32 @@ public class GravityRepelVolume : MonoBehaviour
         return _repel;
     }
 
+    private bool IsTrackable(GameObject hitObj)
+    {
+        return OWLayerMask.IsLayerInMask(hitObj.layer, OWLayerMask.physicalMask)
+            || hitObj.GetComponent<FluidVolume>()?.GetFluidType() == FluidVolume.Type.WATER;
+    }
+
     private void OnTriggerEnter(Collider hitCollider)
     {
-        if (OWLayerMask.IsLayerInMask(hitCollider.gameObject.layer, OWLayerMask.physicalMask)
-            || hitCollider.GetComponent<FluidVolume>()?.GetFluidType() == FluidVolume.Type.WATER)
+        if (IsTrackable(hitCollider.gameObject))
         {
-            _trackedColliders++;
+            _trackedObjects.Add(hitCollider.gameObject);
             _repel = true;
         }
     }
 
     private void OnTriggerExit(Collider hitCollider)
     {
-        if (OWLayerMask.IsLayerInMask(hitCollider.gameObject.layer, OWLayerMask.physicalMask)
-            || hitCollider.GetComponent<FluidVolume>()?.GetFluidType() == FluidVolume.Type.WATER)
+        if (IsTrackable(hitCollider.gameObject))
         {
-            _trackedColliders = Mathf.Max(_trackedColliders - 1, 0);
-            if (_trackedColliders == 0)
+            if (_trackedObjects.Contains(hitCollider.gameObject))
             {
-                _repel = false;
+                _trackedObjects.Remove(hitCollider.gameObject);
+                if (_trackedObjects.Count == 0)
+                {
+                    _repel = false;
+                }
             }
         }
     }
