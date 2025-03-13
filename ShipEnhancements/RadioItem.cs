@@ -147,6 +147,7 @@ public class RadioItem : OWItem
             { "2425", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_ElegyForTheRings.mp3") },
             { "3156", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_RiversEndTimes.mp3") },
             { "4241", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_NomaiMeditation.mp3") },
+            { "6152", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_Doom.mp3") },
             { "5511", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_CampfireSong.mp3") },
             { "1122", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_MainTitle.mp3") },
             { "1133", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_OuterWilds.mp3") },
