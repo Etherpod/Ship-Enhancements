@@ -3717,10 +3717,15 @@ public static class PatchClass
     [HarmonyPatch(typeof(AnglerfishController), nameof(AnglerfishController.Start))]
     public static void SetDigestionLength(AnglerfishController __instance)
     {
-        if (!(bool)prolongDigestion.GetProperty()) return;
-
-        __instance._consumeDeathDelay = 8f;
-        __instance._consumeShipCrushDelay = 6f;
+        if ((bool)moreExplosionDamage.GetProperty())
+        {
+            __instance._stunTimer = 120f;
+        }
+        if ((bool)prolongDigestion.GetProperty())
+        {
+            __instance._consumeDeathDelay = 8f;
+            __instance._consumeShipCrushDelay = 6f;
+        }
     }
 
     [HarmonyPrefix]

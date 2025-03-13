@@ -182,5 +182,11 @@ public class ExplosionDamage : MonoBehaviour
         {
             tank.Explode();
         }
+
+        AnglerfishController angler = hitObj.GetComponentInParent<AnglerfishController>();
+        if (angler != null)
+        {
+            angler.ChangeState(AnglerfishController.AnglerState.Stunned);
+        }
     }
 }
