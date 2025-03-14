@@ -187,6 +187,7 @@ public class ExplosionDamage : MonoBehaviour
         if (angler != null)
         {
             angler.ChangeState(AnglerfishController.AnglerState.Stunned);
+            angler.GetComponentInChildren<AnglerfishFluidVolume>().SetVolumeActivation(false);
         }
     }
 }

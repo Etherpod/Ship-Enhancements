@@ -729,12 +729,12 @@ public class RadioItem : OWItem
         {
             lerp = _currentVolume;
         }
-        else if (GetComponentInParent<ShipBody>())
+        else
         {
-            lerp = _currentVolume / 2;
+            lerp = _currentVolume * 0.75f;
         }
 
-        return Mathf.Lerp(0f, 250f, lerp);
+        return Mathf.Lerp(0f, 450f, lerp);
     }
 
     public bool ShouldOverrideTravelMusic()
