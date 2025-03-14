@@ -3806,6 +3806,16 @@ public static class PatchClass
         }
     }
 
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(NoiseMaker), nameof(NoiseMaker.GetNoiseOrigin))]
+    public static void FixShipNoiseOrigin(NoiseMaker __instance, ref Vector3 __result)
+    {
+        if (__instance is ShipNoiseMaker)
+        {
+            __result = __instance._attachedBody.GetWorldCenterOfMass();
+        }
+    }
+
     public static void RandomDigestionDamage()
     {
         if (ShipEnhancements.InMultiplayer && !ShipEnhancements.QSBAPI.GetIsHost() || (float)shipDamageMultiplier.GetProperty() <= 0f) return;
