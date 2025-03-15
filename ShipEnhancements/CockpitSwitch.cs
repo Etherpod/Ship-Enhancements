@@ -51,7 +51,7 @@ public abstract class CockpitSwitch : CockpitInteractible
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
 
-        _interactReceiver.ChangePrompt("Turn on " + _label);
+        _interactReceiver.ChangePrompt("Turn On " + _label);
         transform.localRotation = Quaternion.Euler(_initialRotation.eulerAngles.x + _rotationOffset,
             _initialRotation.eulerAngles.y, _initialRotation.eulerAngles.z);
         _renderer.SetEmissiveScale(0f);
@@ -95,7 +95,7 @@ public abstract class CockpitSwitch : CockpitInteractible
         {
             transform.localRotation = Quaternion.Euler(_initialRotation.eulerAngles.x - _rotationOffset,
                 _initialRotation.eulerAngles.y, _initialRotation.eulerAngles.z);
-            _interactReceiver.ChangePrompt("Turn off " + _label);
+            _interactReceiver.ChangePrompt("Turn Off " + _label);
             _renderer.SetEmissiveScale(1f);
             if (_onAudio)
             {
@@ -107,7 +107,7 @@ public abstract class CockpitSwitch : CockpitInteractible
         {
             transform.localRotation = Quaternion.Euler(_initialRotation.eulerAngles.x + _rotationOffset,
                 _initialRotation.eulerAngles.y, _initialRotation.eulerAngles.z);
-            _interactReceiver.ChangePrompt("Turn on " + _label);
+            _interactReceiver.ChangePrompt("Turn On " + _label);
             _renderer.SetEmissiveScale(0f);
             if (_offAudio)
             {
@@ -181,7 +181,10 @@ public abstract class CockpitSwitch : CockpitInteractible
     {
         base.OnDestroy();
 
-        GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
+        if (_enabledInShip)
+        {
+            GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
+        }
 
         if (ShipEnhancements.InMultiplayer)
         {

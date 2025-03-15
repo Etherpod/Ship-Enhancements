@@ -16,6 +16,7 @@ public class ShipEnhancements : ModBehaviour
 {
     public delegate void SwitchEvent(bool enabled);
     public event SwitchEvent OnGravityLandingGearSwitch;
+    public event SwitchEvent OnGravityLandingGearInverted;
 
     public delegate void ResourceEvent();
     public event ResourceEvent OnFuelDepleted;
@@ -1993,6 +1994,11 @@ public class ShipEnhancements : ModBehaviour
     public void SetGravityLandingGearEnabled(bool enabled)
     {
         OnGravityLandingGearSwitch?.Invoke(enabled);
+    }
+
+    public void SetGravityLandingGearInverted(bool inverted)
+    {
+        OnGravityLandingGearInverted?.Invoke(inverted);
     }
 
     public void SetThrustModulatorLevel(int level)
