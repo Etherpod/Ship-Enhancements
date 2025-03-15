@@ -113,6 +113,7 @@ public static class SettingExtensions
         { Settings.noiseMultiplier, (1f, 1f) },
         { Settings.waterDamage, (1f, 1f) },
         { Settings.sandDamage, (1f, 1f) },
+        { Settings.disableMinimapMarkers, (1f, 1f) },
     };
 
     public static string GetName(this Settings setting)

@@ -163,10 +163,16 @@
       "tooltip": "Disables your ability to lock on to objects. You may find it difficult to use autopilot with this enabled."
     },
     "disableMapMarkers": {
-      "title": "Disable Map Markers",
+      "title": "Disable HUD Markers",
       "type": "toggle",
       "value": false,
-      "tooltip": "Removes the markers that tell you the location of your ship, your scout, and any marked locations in the ship log. Try not to get lost."
+      "tooltip": "Removes the on-screen markers that show you the location of your ship, your scout, and any marked locations in the ship log."
+    },
+    "disableMinimapMarkers": {
+      "title": "Disable Minimap Markers",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Turns off the icons showing the location of your ship and scout on your suit's minimap and your ship's minimap."
     },
 
     "Adjust Ship Functions": {

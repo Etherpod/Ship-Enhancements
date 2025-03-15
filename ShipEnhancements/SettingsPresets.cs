@@ -112,6 +112,7 @@ public static class SettingsPresets
         { "noiseMultiplier", 1f },
         { "waterDamage", 0f },
         { "sandDamage", 0f },
+        { "disableMinimapMarkers", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -220,6 +221,7 @@ public static class SettingsPresets
         { "noiseMultiplier", 1f },
         { "waterDamage", 0f },
         { "sandDamage", 0f },
+        { "disableMinimapMarkers", true },
     };
 
     public static readonly Dictionary<string, object> ImpossibleSettings = new Dictionary<string, object>()
@@ -328,6 +330,7 @@ public static class SettingsPresets
         { "noiseMultiplier", 5f },
         { "waterDamage", 1f },
         { "sandDamage", 1f },
+        { "disableMinimapMarkers", false },
     };
 
     public static readonly Dictionary<string, object> NewStuffSettings = new Dictionary<string, object>()
@@ -436,6 +439,7 @@ public static class SettingsPresets
         { "noiseMultiplier", 1f },
         { "waterDamage", 0f },
         { "sandDamage", 0f },
+        { "disableMinimapMarkers", false },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -544,6 +548,7 @@ public static class SettingsPresets
         { "noiseMultiplier", 1f },
         { "waterDamage", 0.5f },
         { "sandDamage", 0.5f },
+        { "disableMinimapMarkers", false },
     };
 
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()
@@ -872,6 +877,7 @@ public static class SettingsPresets
             (0.6f, 0.99f),
             (1f, 1f),
         }, 0.2f, 0f) },
+        { "disableMinimapMarkers", new RandomSettingValue(0.25f) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

@@ -8,6 +8,7 @@ using OWML.Utils;
 using System.Reflection;
 using System.Linq;
 using UnityEngine.Events;
+using UnityEngine.TextCore.LowLevel;
 
 namespace ShipEnhancements;
 
@@ -195,6 +196,7 @@ public class ShipEnhancements : ModBehaviour
         noiseMultiplier,
         waterDamage,
         sandDamage,
+        disableMinimapMarkers,
     }
 
     private void Awake()
@@ -1190,6 +1192,27 @@ public class ShipEnhancements : ModBehaviour
             GameObject fluidDamage = LoadPrefab("Assets/ShipEnhancements/ShipFluidDamageController.prefab");
             Instantiate(fluidDamage, SELocator.GetShipTransform());
         }
+        if ((bool)Settings.disableMinimapMarkers.GetProperty())
+        {
+            Minimap playerMinimap = SELocator.GetPlayerBody().GetComponentInChildren<Minimap>();
+            playerMinimap._playerTrailRenderer.enabled = false;
+            playerMinimap._probeTrailRenderer.enabled = false;
+            foreach (Renderer renderer in playerMinimap._minimapRenderersToSwitchOnOff)
+            {
+                if (renderer.transform.parent != playerMinimap._globeMeshTransform)
+                {
+                    renderer.enabled = false;
+                }
+            }
+
+            Minimap shipMinimap = SELocator.GetShipBody().GetComponentInChildren<Minimap>();
+            shipMinimap._playerTrailRenderer.enabled = false;
+            shipMinimap._probeTrailRenderer.enabled = false;
+            foreach (Renderer renderer in shipMinimap._minimapRenderersToSwitchOnOff)
+            {
+                renderer.enabled = false;
+            }
+        }
 
         SetDamageColors();
 
@@ -1346,6 +1369,17 @@ public class ShipEnhancements : ModBehaviour
                 List<OWTriggerVolume> shipTriggers = [.. shipSpawn._triggerVolumes];
                 shipTriggers.Add(entrywayVol);
                 shipSpawn._triggerVolumes = [.. shipTriggers];
+            }
+            if ((bool)Settings.disableMinimapMarkers.GetProperty())
+            {
+                Minimap playerMinimap = GameObject.Find("SecondaryGroup/HUD_Minimap/Minimap_Root").GetComponent<Minimap>();
+                for (int i = 0; i < playerMinimap.transform.childCount; i++)
+                {
+                    if (playerMinimap.transform.GetChild(i).name.Contains("PlayerMarker"))
+                    {
+                        playerMinimap.transform.GetChild(i).gameObject.SetActive(false);
+                    }
+                }
             }
             if ((!InMultiplayer || QSBAPI.GetIsHost()) && (float)Settings.shipDamageSpeedMultiplier.GetProperty() < 0f)
             {

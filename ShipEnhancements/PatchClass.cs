@@ -4028,4 +4028,27 @@ public static class PatchClass
         }
     }
     #endregion
+
+    #region DisableMinimapIcons
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Minimap), nameof(Minimap.SetComponentsEnabled))]
+    public static bool KeepMinimapOff(Minimap __instance, bool value)
+    {
+        if (!(bool)disableMinimapMarkers.GetProperty() || !value) return true;
+
+        for (int i = 0; i < __instance._minimapRenderersToSwitchOnOff.Length; i++)
+        {
+            if (__instance._minimapRenderersToSwitchOnOff[i].transform.parent == __instance._globeMeshTransform)
+            {
+                __instance._minimapRenderersToSwitchOnOff[i].enabled = value;
+            }
+        }
+        for (int j = 0; j < __instance._electricalComponentsToSwitchOnOff.Length; j++)
+        {
+            __instance._electricalComponentsToSwitchOnOff[j].SetPowered(value);
+        }
+
+        return false;
+    }
+    #endregion
 }
