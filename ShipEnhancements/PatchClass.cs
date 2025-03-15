@@ -3962,16 +3962,6 @@ public static class PatchClass
         return true;
     }
 
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(NoiseMaker), nameof(NoiseMaker.GetNoiseOrigin))]
-    public static void FixShipNoiseOrigin(NoiseMaker __instance, ref Vector3 __result)
-    {
-        if (__instance is ShipNoiseMaker)
-        {
-            __result = __instance._attachedBody.GetWorldCenterOfMass();
-        }
-    }
-
     public static void RandomDigestionDamage()
     {
         if (ShipEnhancements.InMultiplayer && !ShipEnhancements.QSBAPI.GetIsHost() || (float)shipDamageMultiplier.GetProperty() <= 0f) return;
@@ -4023,6 +4013,18 @@ public static class PatchClass
         if (!__result)
         {
             __result = __instance.IsObjectExposed(SELocator.GetShipDetector());
+        }
+    }
+    #endregion
+
+    #region NoiseDetectionFix
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(NoiseMaker), nameof(NoiseMaker.GetNoiseOrigin))]
+    public static void FixShipNoiseOrigin(NoiseMaker __instance, ref Vector3 __result)
+    {
+        if (!ShipEnhancements.VanillaFixEnabled && __instance is ShipNoiseMaker)
+        {
+            __result = __instance._attachedBody.GetWorldCenterOfMass();
         }
     }
     #endregion

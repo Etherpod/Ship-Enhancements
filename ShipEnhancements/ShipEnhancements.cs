@@ -44,6 +44,9 @@ public class ShipEnhancements : ModBehaviour
     public static IQSBAPI QSBAPI;
     public static QSBCompatibility QSBCompat;
     public static IQSBInteraction QSBInteraction;
+
+    public static bool VanillaFixEnabled;
+
     public static uint[] PlayerIDs
     {
         get
@@ -206,6 +209,7 @@ public class ShipEnhancements : ModBehaviour
 
         InitializeAchievements();
         InitializeQSB();
+        VanillaFixEnabled = ModHelper.Interaction.ModExists("JohnCorby.VanillaFix");
         ErnestoModListHandler.Initialize();
         SettingsPresets.InitializePresets();
 
