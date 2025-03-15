@@ -77,6 +77,12 @@
       "value": false,
       "tooltip": "Removes your ability to launch the scout with the ship."
     },
+    "enableManualScoutRecall": {
+      "title": "Disable Handheld Scout Recall",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Forces you to retrieve your scout by hand when you launch it. If you retrieve it with the ship, you need to go get it from on top of the ship before you can fire it again on foot."
+    },
     "disableThrusters": {
       "title": "Disable Thrusters",
       "type": "selector",
@@ -442,12 +448,6 @@
       "type": "toggle",
       "value": false,
       "tooltip": "If the Ship Warp Core is enabled, this turns the warp core into a fully functioning component. Return warps may not function as intended if the warp core is damaged."
-    },
-    "enableManualScoutRecall": {
-      "title": "Enable Manual Scout Recall",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Forces you to retrieve your scout by hand when you launch it. If you retrieve it with the ship, you need to go get it from on top of the ship before you can fire it on foot."
     },
     "temperatureZonesAmount": {
       "title": "Add Temperature Zones",
