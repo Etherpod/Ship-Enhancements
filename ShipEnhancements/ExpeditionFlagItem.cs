@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace ShipEnhancements;
@@ -11,6 +13,7 @@ public class ExpeditionFlagItem : OWItem
     [SerializeField] private GameObject _objModelParent;
     [SerializeField] private Collider _flagCollider;
     [SerializeField] private OWTriggerVolume _colTrigger;
+    [SerializeField] private MeshRenderer _decalRenderer;
 
     private readonly Vector3 _holdOffset = new(0f, -0.4f, 0f);
     private Vector3 _defaultOffset;
@@ -30,6 +33,26 @@ public class ExpeditionFlagItem : OWItem
 
     private void Start()
     {
+        Texture2D tex = null;
+        byte[] fileData;
+
+        List<string> files = [];
+        files.AddRange(Directory.GetFiles(Path.Combine(ShipEnhancements.Instance.ModHelper.Manifest.ModFolderPath, "ExpeditionFlagIcons"), 
+            "*.jpg", SearchOption.AllDirectories));
+        files.AddRange(Directory.GetFiles(Path.Combine(ShipEnhancements.Instance.ModHelper.Manifest.ModFolderPath, "ExpeditionFlagIcons"),
+            "*.png", SearchOption.AllDirectories));
+        if (files.Count > 0)
+        {
+            fileData = File.ReadAllBytes(files[Random.Range(0, files.Count)]);
+            tex = new Texture2D(2, 2);
+            tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
+        }
+
+        if (tex != null)
+        {
+            _decalRenderer.material.SetTexture("_MainTex", tex);
+        }
+
         SetIsDropped(false);
     }
 

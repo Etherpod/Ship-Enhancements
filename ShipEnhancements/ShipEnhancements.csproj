@@ -47,6 +47,9 @@
     <None Include="dialogue/**/*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+  <None Include="ExpeditionFlagIcons/**/*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="ShipEnhancements.csproj.user" />
