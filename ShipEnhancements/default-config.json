@@ -352,19 +352,19 @@
       "title": "Extra Explosion Damage",
       "type": "toggle",
       "value": false,
-      "tooltip": "Makes explosions apply damage to the ship and to fragments of Brittle Hollow."
+      "tooltip": "Makes explosions apply damage to the ship and to fragments of Brittle Hollow. Also lets you kill anglerfish."
     },
     "noiseMultiplier": {
       "title": "Ship Noise Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the distance your ship can be heard by noise sensors."
+      "tooltip": "Larger numbers increase the distance your ship can be heard by noise detectors."
     },
     "extraNoise": {
       "title": "Extra Noise",
       "type": "toggle",
       "value": false,
-      "tooltip": "Makes noisy parts of the ship like the master alarm detectable by noise sensors."
+      "tooltip": "Makes noisy parts of the ship like the master alarm detectable by noise detectors."
     },
     "reactorLifetimeMultiplier": {
       "title": "Reactor Lifetime Multiplier",
