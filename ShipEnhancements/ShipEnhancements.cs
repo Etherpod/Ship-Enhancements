@@ -1643,7 +1643,11 @@ public class ShipEnhancements : ModBehaviour
 
     private void OnNHBodyLoaded(string name)
     {
-
+        if ((bool)Settings.addRadio.GetProperty() && name == "Egg Star")
+        {
+            GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_Doom.prefab");
+            Instantiate(zone, NHAPI.GetPlanet("Egg Star").transform);
+        }
     }
 
     private void DisableHeadlights()
