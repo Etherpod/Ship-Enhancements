@@ -22,7 +22,7 @@ public class TemperatureZone : MonoBehaviour
     private float _scale = 1f;
     private bool _active = true;
 
-    private void Start()
+    private void Awake()
     {
         _shape = GetComponent<SphereShape>();
         _triggerVolume = gameObject.GetAddComponent<OWTriggerVolume>();

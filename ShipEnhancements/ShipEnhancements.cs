@@ -94,6 +94,7 @@ public class ShipEnhancements : ModBehaviour
     private bool _setupQSB = false;
     private bool _disableAirWhenZeroOxygen = false;
     private bool _unsubFromBodyLoaded = false;
+    private bool _unsubFromSystemLoaded = false;
 
     public enum Settings
     {
@@ -369,6 +370,11 @@ public class ShipEnhancements : ModBehaviour
             {
                 NHAPI.GetBodyLoadedEvent().RemoveListener(OnNHBodyLoaded);
                 _unsubFromBodyLoaded = false;
+            }
+            if (NHAPI != null && _unsubFromSystemLoaded)
+            {
+                NHAPI.GetStarSystemLoadedEvent().RemoveListener(OnNHStarSystemLoaded);
+                _unsubFromSystemLoaded = false;
             }
 
             if (!InMultiplayer || QSBAPI.GetIsHost())
@@ -829,14 +835,7 @@ public class ShipEnhancements : ModBehaviour
 
             if (Settings.temperatureZonesAmount.GetProperty().ToString() == "Sun")
             {
-                GameObject sun = GameObject.Find("Sun_Body");
-                if (sun != null)
-                {
-                    GameObject sunTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Sun.prefab");
-                    Instantiate(sunTempZone, sun.transform.Find("Sector_SUN/Volumes_SUN"));
-                    GameObject supernovaTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Supernova.prefab");
-                    Instantiate(supernovaTempZone, sun.GetComponentInChildren<SupernovaEffectController>().transform);
-                }
+                SpawnSunTemperatureZones();
             }
             else
             {
@@ -1463,16 +1462,37 @@ public class ShipEnhancements : ModBehaviour
         }
     }
 
+    private void SpawnSunTemperatureZones()
+    {
+        if (NHAPI != null)
+        {
+            NHAPI.GetStarSystemLoadedEvent().AddListener(OnNHStarSystemLoaded);
+        }
+        else
+        {
+            GameObject sun = GameObject.Find("Sun_Body");
+            if (sun != null)
+            {
+                GameObject sunTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Sun.prefab");
+                Instantiate(sunTempZone, sun.transform.Find("Sector_SUN/Volumes_SUN"));
+                GameObject supernovaTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Supernova.prefab");
+                Instantiate(supernovaTempZone, sun.GetComponentInChildren<SupernovaEffectController>().transform);
+            }
+        }
+    }
+
     private void AddTemperatureZones()
     {
-        GameObject sun = GameObject.Find("Sun_Body");
+        /*GameObject sun = GameObject.Find("Sun_Body");
         if (sun != null)
         {
             GameObject sunTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Sun.prefab");
             Instantiate(sunTempZone, sun.transform.Find("Sector_SUN/Volumes_SUN"));
             GameObject supernovaTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Supernova.prefab");
             Instantiate(supernovaTempZone, sun.GetComponentInChildren<SupernovaEffectController>().transform);
-        }
+        }*/
+
+        SpawnSunTemperatureZones();
 
         GameObject vm = GameObject.Find("VolcanicMoon_Body");
         if (vm != null)
@@ -1647,6 +1667,32 @@ public class ShipEnhancements : ModBehaviour
         {
             GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_Doom.prefab");
             Instantiate(zone, NHAPI.GetPlanet("Egg Star").transform);
+        }
+    }
+
+    private void OnNHStarSystemLoaded(string name)
+    {
+        ShipEnhancements.WriteDebugMessage("loaded");
+        if ((string)Settings.temperatureZonesAmount.GetProperty() != "None")
+        {
+            ShipEnhancements.WriteDebugMessage("spawning");
+            GameObject sunTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Sun.prefab");
+
+            SunController[] suns = FindObjectsOfType<SunController>();
+            foreach (SunController sun in suns)
+            {
+                ShipEnhancements.WriteDebugMessage("sun found: " + sun.gameObject.name);
+                if (sun.GetComponentInChildren<HeatHazardVolume>() && !sun.GetComponentInChildren<TemperatureZone>())
+                {
+                    ShipEnhancements.WriteDebugMessage("sun can support temp zone");
+                    TemperatureZone zone = Instantiate(sunTempZone, sun.GetComponentInChildren<Sector>().transform).GetComponent<TemperatureZone>();
+                    zone.transform.localPosition = Vector3.zero;
+                    float sunScale = sun.GetComponentInChildren<TessellatedSphereRenderer>().transform.localScale.magnitude / 2;
+                    zone.SetProperties(100f, sunScale * 2.25f, sunScale, false, 0f, 0f);
+                }
+            }
+
+            NHInteraction.AddTempZoneToNHSuns(sunTempZone);
         }
     }
 
