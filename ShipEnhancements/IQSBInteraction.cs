@@ -19,6 +19,10 @@ public interface IQSBInteraction
 
     OWItem GetItemFromID(int itemID);
 
+    int GetIDFromSocket(OWItemSocket socket);
+
+    OWItemSocket GetSocketFromID(int socketID);
+
     bool WorldObjectsLoaded();
 
     void OnDetachAllPlayers(Vector3 velocity);

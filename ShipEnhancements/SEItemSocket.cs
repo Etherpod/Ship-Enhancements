@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
@@ -13,6 +14,10 @@ public class SEItemSocket : OWItemSocket
     protected ScreenPrompt _createItemPrompt;
     protected ScreenPrompt _noCreateItemPrompt;
 
+    protected List<OWItem> _itemPool = [];
+    protected List<OWItem> _spawnedItems = [];
+    protected readonly int _numItemsToSpawn = 10;
+
     public override void Awake()
     {
         Reset();
@@ -21,7 +26,7 @@ public class SEItemSocket : OWItemSocket
         _acceptableType = GetAcceptableType();
         _manipulator = FindObjectOfType<FirstPersonManipulator>();
         _createItemPrompt = new ScreenPrompt(InputLibrary.interactSecondary, "Create New " + _prefabItem.GetDisplayName());
-        _noCreateItemPrompt = new ScreenPrompt("Cannot create items in multiplayer");
+        _noCreateItemPrompt = new ScreenPrompt("Item Limit Reached");
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
         if ((bool)preventSystemFailure.GetProperty())
@@ -32,21 +37,36 @@ public class SEItemSocket : OWItemSocket
 
     public override void Start()
     {
-        base.Start();
+        if (_socketedItem != null)
+        {
+            _socketedItem.MoveAndChildToTransform(_socketTransform);
+        }
+
+        enabled = (bool)unlimitedItems.GetProperty();
+
         _playerCam = Locator.GetPlayerCamera();
         AssetBundleUtilities.ReplaceShaders(_prefabItem.gameObject);
         if ((bool)unlimitedItems.GetProperty())
         {
+            Locator.GetPromptManager().AddScreenPrompt(_createItemPrompt, PromptPosition.Center, false);
             if (ShipEnhancements.InMultiplayer)
             {
                 Locator.GetPromptManager().AddScreenPrompt(_noCreateItemPrompt, PromptPosition.Center, false);
-            }
-            else
-            {
-                Locator.GetPromptManager().AddScreenPrompt(_createItemPrompt, PromptPosition.Center, false);
+
+                for (int i = 0; i < _numItemsToSpawn; i++)
+                {
+                    OWItem newItem = Instantiate(_prefabItem, transform);
+                    newItem.gameObject.SetActive(false);
+                    _itemPool.Add(newItem);
+                }
             }
         }
-        CreateItem();
+
+        if (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost() 
+            || !(bool)unlimitedItems.GetProperty())
+        {
+            CreateItem();
+        }
     }
 
     public override void Update()
@@ -77,7 +97,7 @@ public class SEItemSocket : OWItemSocket
             bool focused = _manipulator.GetFocusedItemSocket() == this;
             UpdatePromptVisibility(focused);
 
-            if (focused && _socketedItem == null && !ShipEnhancements.InMultiplayer
+            if (focused && _socketedItem == null && (!ShipEnhancements.InMultiplayer || _itemPool.Count > 0)
                 && OWInput.IsNewlyPressed(InputLibrary.interactSecondary, InputMode.Character))
             {
                 CreateItem();
@@ -88,11 +108,12 @@ public class SEItemSocket : OWItemSocket
     protected virtual void UpdatePromptVisibility(bool focused)
     {
         bool flag = focused && _socketedItem == null && _playerCam.enabled && OWInput.IsInputMode(InputMode.Character | InputMode.ShipCockpit);
-        if (flag != _createItemPrompt.IsVisible() && !ShipEnhancements.InMultiplayer)
+        if (flag != _createItemPrompt.IsVisible() && (!ShipEnhancements.InMultiplayer || _itemPool.Count > 0))
         {
             _createItemPrompt.SetVisibility(flag);
         }
-        else if (flag != _noCreateItemPrompt.IsVisible() && ShipEnhancements.InMultiplayer)
+        else if (flag != _noCreateItemPrompt.IsVisible() && ShipEnhancements.InMultiplayer
+            && _itemPool.Count == 0)
         {
             _noCreateItemPrompt.SetVisibility(flag);
         }
@@ -103,12 +124,48 @@ public class SEItemSocket : OWItemSocket
         return ItemType.Invalid;
     }
 
-    protected virtual void CreateItem()
+    public virtual void CreateItem()
     {
         if (_socketedItem != null) return;
 
-        OWItem newItem = Instantiate(_prefabItem);
-        PlaceIntoSocket(newItem);
+        if (!ShipEnhancements.InMultiplayer)
+        {
+            OWItem newItem = Instantiate(_prefabItem);
+            PlaceIntoSocket(newItem);
+        }
+        else if (_itemPool.Count > 0)
+        {
+            OWItem newItem = _itemPool[0];
+            _itemPool.Remove(newItem);
+            _spawnedItems.Add(newItem);
+            newItem.gameObject.SetActive(true);
+            ShipEnhancements.WriteDebugMessage("Socket item on host: " + ShipEnhancements.QSBAPI.GetIsHost());
+            PlaceIntoSocket(newItem);
+
+            foreach (uint id in ShipEnhancements.PlayerIDs)
+            {
+                ShipEnhancements.QSBCompat.SendCreateItem(id, newItem, this);
+            }
+        }
+    }
+
+    public virtual void CreateItemRemote(OWItem item, bool socketItem)
+    {
+        if (_itemPool.Contains(item))
+        {
+            _itemPool.Remove(item);
+            _spawnedItems.Add(item);
+            item.gameObject.SetActive(true);
+            if (socketItem)
+            {
+                PlaceIntoSocket(item);
+            }
+        }
+    }
+
+    public OWItem[] GetSpawnedItems()
+    {
+        return _spawnedItems.ToArray();
     }
 
     private void OnShipSystemFailure()

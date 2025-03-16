@@ -93,6 +93,7 @@ public class QSBCompatibility
         _api.RegisterHandler<(int, int[])>("radio-codes", ReceiveRadioCodes);
         _api.RegisterHandler<int>("radio-cancel-tuning", ReceiveRadioCancelTuning);
         _api.RegisterHandler<(int, float)>("radio-volume", ReceiveRadioVolume);
+        _api.RegisterHandler<(int, int, bool)>("create-item", ReceiveCreateItem);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -215,6 +216,18 @@ public class QSBCompatibility
             if (controller != null && controller.IsPlaying())
             {
                 SendInitialBlackHoleState(id, controller.GetCurrentScale());
+            }
+        }
+        if ((bool)unlimitedItems.GetProperty())
+        {
+            foreach (SEItemSocket socket in UnityEngine.Object.FindObjectsOfType<SEItemSocket>())
+            {
+                OWItem[] spawned = socket.GetSpawnedItems();
+                for (int i = 0; i < spawned.Length; i++)
+                {
+                    OWItem item = spawned[i];
+                    SendCreateItem(id, item, socket, false);
+                }
             }
         }
     }
@@ -888,6 +901,27 @@ public class QSBCompatibility
 
         RadioItem radio = item as RadioItem;
         radio.ChangeVolumeRemote(data.volume);
+    }
+    #endregion
+
+    #region ItemDuping
+    public void SendCreateItem(uint id, OWItem item, OWItemSocket socket, bool socketItem = true)
+    {
+        _api.SendMessage("create-item", 
+            (ShipEnhancements.QSBInteraction.GetIDFromItem(item), 
+            ShipEnhancements.QSBInteraction.GetIDFromSocket(socket), socketItem), id, false);
+    }
+
+    private void ReceiveCreateItem(uint id, (int itemID, int socketID, bool socketItem) data)
+    {
+        OWItem item = ShipEnhancements.QSBInteraction.GetItemFromID(data.itemID);
+        if (item == null) return;
+
+        OWItemSocket socket = ShipEnhancements.QSBInteraction.GetSocketFromID(data.socketID);
+        if (socket == null) return;
+
+        SEItemSocket itemSocket = socket as SEItemSocket;
+        itemSocket.CreateItemRemote(item, data.socketItem);
     }
     #endregion
 }

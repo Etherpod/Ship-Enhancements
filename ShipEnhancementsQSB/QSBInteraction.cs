@@ -26,6 +26,7 @@ using QSB.ItemSync.Patches;
 using QSB.Anglerfish.Patches;
 using QSB.Anglerfish.WorldObjects;
 using QSB.Anglerfish.Messages;
+using QSB.ItemSync.WorldObjects.Sockets;
 
 namespace ShipEnhancementsQSB;
 
@@ -94,6 +95,21 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
         if (obj is OWItem)
         {
             return (OWItem)obj;
+        }
+        return null;
+    }
+
+    public int GetIDFromSocket(OWItemSocket socket)
+    {
+        return socket.GetWorldObject<QSBItemSocket>().ObjectId;
+    }
+
+    public OWItemSocket GetSocketFromID(int socketID)
+    {
+        var obj = socketID.GetWorldObject<QSBItemSocket>().AttachedObject;
+        if (obj is OWItemSocket)
+        {
+            return (OWItemSocket)obj;
         }
         return null;
     }
