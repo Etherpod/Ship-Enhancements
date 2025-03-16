@@ -122,7 +122,7 @@ public abstract class CockpitSwitch : CockpitInteractible
     private void PlaySwitchAudio(AudioClip clip)
     {
         _audioSource.pitch = Random.Range(0.9f, 1.1f);
-        _audioSource.PlayOneShot(clip);
+        _audioSource.PlayOneShot(clip, 0.5f);
     }
 
     public override void SetPowered(bool powered)

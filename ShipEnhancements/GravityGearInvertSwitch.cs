@@ -158,4 +158,10 @@ public class GravityGearInvertSwitch : CockpitInteractible
         enabled = false;
         _interactReceiver.DisableInteraction();
     }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+    }
 }
