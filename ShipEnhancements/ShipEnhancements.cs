@@ -47,6 +47,9 @@ public class ShipEnhancements : ModBehaviour
     public static QSBCompatibility QSBCompat;
     public static IQSBInteraction QSBInteraction;
 
+    public static INewHorizons NHAPI;
+    public static INHInteraction NHInteraction;
+
     public static bool VanillaFixEnabled;
 
     public static uint[] PlayerIDs
@@ -90,6 +93,7 @@ public class ShipEnhancements : ModBehaviour
     private bool _checkEndConversation = false;
     private bool _setupQSB = false;
     private bool _disableAirWhenZeroOxygen = false;
+    private bool _unsubFromBodyLoaded = false;
 
     public enum Settings
     {
@@ -212,6 +216,7 @@ public class ShipEnhancements : ModBehaviour
 
         InitializeAchievements();
         InitializeQSB();
+        InitializeNH();
         VanillaFixEnabled = ModHelper.Interaction.ModExists("JohnCorby.VanillaFix");
         ErnestoModListHandler.Initialize();
         SettingsPresets.InitializePresets();
@@ -359,6 +364,11 @@ public class ShipEnhancements : ModBehaviour
             {
                 SELocator.GetShipDamageController().OnShipComponentDamaged -= ctx => CheckAllPartsDamaged();
                 SELocator.GetShipDamageController().OnShipHullDamaged -= ctx => CheckAllPartsDamaged();
+            }
+            if (NHAPI != null && _unsubFromBodyLoaded)
+            {
+                NHAPI.GetBodyLoadedEvent().RemoveListener(OnNHBodyLoaded);
+                _unsubFromBodyLoaded = false;
             }
 
             if (!InMultiplayer || QSBAPI.GetIsHost())
@@ -604,6 +614,22 @@ public class ShipEnhancements : ModBehaviour
     public void AssignQSBInterface(IQSBInteraction qsbInterface)
     {
         QSBInteraction = qsbInterface;
+    }
+
+    private void InitializeNH()
+    {
+        bool nhEnabled = ModHelper.Interaction.ModExists("xen.NewHorizons");
+        if (nhEnabled)
+        {
+            NHAPI = ModHelper.Interaction.TryGetModApi<INewHorizons>("xen.NewHorizons");
+            var nhAssembly = Assembly.LoadFrom(Path.Combine(ModHelper.Manifest.ModFolderPath, "ShipEnhancementsNH.dll"));
+            gameObject.AddComponent(nhAssembly.GetType("ShipEnhancementsNH.NHInteraction", true));
+        }
+    }
+
+    public void AssignNHInterface(INHInteraction nhInterface)
+    {
+        NHInteraction = nhInterface;
     }
 
     private void InitializeShip()
@@ -1607,6 +1633,17 @@ public class ShipEnhancements : ModBehaviour
             GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_TheSpiritOfWater.prefab");
             Instantiate(zone, sun.transform.Find("Sector_SUN/Volumes_SUN/SupernovaVolume"));
         }
+
+        if (NHAPI != null)
+        {
+            NHAPI.GetBodyLoadedEvent().AddListener(OnNHBodyLoaded);
+            _unsubFromBodyLoaded = true;
+        }
+    }
+
+    private void OnNHBodyLoaded(string name)
+    {
+
     }
 
     private void DisableHeadlights()
