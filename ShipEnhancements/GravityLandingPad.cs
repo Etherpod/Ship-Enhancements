@@ -85,9 +85,9 @@ public class GravityLandingPad : MonoBehaviour
             return;
         }
 
-        if (_landed != _weakRepelVol.IsRepelling())
+        if (_landed != _weakRepelVol.IsRepelling(!_inverted))
         {
-            _landed = _weakRepelVol.IsRepelling();
+            _landed = _weakRepelVol.IsRepelling(!_inverted);
             if (_landed)
             {
                 if (!_shipDestroyed && !_damaged && _gravityEnabled)
@@ -104,15 +104,15 @@ public class GravityLandingPad : MonoBehaviour
         if (_landed)
         {
             float mult = 0.25f;
-            if (_baseRepelVol.IsRepelling())
+            if (_baseRepelVol.IsRepelling(!_inverted))
             {
                 mult = 1f;
             }
-            else if (_strongRepelVol.IsRepelling())
+            else if (_strongRepelVol.IsRepelling(!_inverted))
             {
                 mult = 0.75f;
             }
-            else if (_midRepelVol.IsRepelling())
+            else if (_midRepelVol.IsRepelling(!_inverted))
             {
                 mult = 0.5f;
             }
