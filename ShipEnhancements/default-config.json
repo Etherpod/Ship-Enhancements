@@ -534,7 +534,7 @@
       "title": "Add Scout Launcher Component",
       "type": "toggle",
       "value": false,
-      "tooltip": "Turns the ship's scout launcher into a fully functioning component."
+      "tooltip": "Turns the ship's scout launcher into a fully functioning component. You won't be able to launch or recall your scout from the ship if it's damaged."
     },
     "enableSignalscopeComponent": {
       "title": "Add Signalscope Component",
@@ -582,7 +582,7 @@
       "title": "Add Portable Fuel Canister",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds a portable fuel canister to the ship by the ship log. You can bring it with you to refuel your jetpack on the go. It has enough fuel for about 3 complete refills of your jetpack."
+      "tooltip": "Adds a portable fuel canister to the ship by the ship log. It has enough fuel to refill your jetpack about 3 times, and will also blow up if you hit it too hard."
     },
     "addPortableTractorBeam": {
       "title": "Add Portable Tractor Beam",
@@ -594,13 +594,13 @@
       "title": "Add Expedition Flag",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds a portable flag to the ship between the cockpit and the supplies section. Place it on the ground if you want to mark where no Hearthian has gone before."
+      "tooltip": "Adds a portable flag to the ship between the cockpit and the supplies module. You can change the icon on the flag by following the instructions on the mod website."
     },
     "addRadio": {
       "title": "Add Radio",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds a radio to the ship cockpit. You can change the frequency to listen to music on it."
+      "tooltip": "Adds a radio to the ship cockpit. You can change the 4-digit frequency to listen to music on it."
     },
     "addTether": {
       "title": "Add Ship Tether",
@@ -612,19 +612,19 @@
       "title": "Unlimited Items",
       "type": "toggle",
       "value": false,
-      "tooltip": "Lets you duplicate items inside the ship. This does not work in multiplayer."
+      "tooltip": "Lets you duplicate items inside the ship."
     },
     "enableRemovableGravityCrystal": {
       "title": "Removable Gravity Crystal",
       "type": "toggle",
       "value": false,
-      "tooltip": "Lets you remove the gravity crystal from the ship. It can be placed anywhere on any surface for a portable gravity source."
+      "tooltip": "Lets you remove the gravity crystal from the ship. It can be placed outside the ship on any surface for a portable gravity source."
     },
     "enableGravityLandingGear": {
       "title": "Add Gravity Landing Gear",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds a switch to the cockpit to enable gravity-powered landing gear."
+      "tooltip": "Adds an interface to the cockpit for controlling the new gravity tech on your landing gear, which only functions when the landing gear isn't damaged."
     },
     "enableThrustModulator": {
       "title": "Add Thrust Modulator",
