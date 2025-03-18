@@ -69,15 +69,15 @@ public class ShipWarpCoreReceiver : MonoBehaviour
     {
         if (_customDestination != null)
         {
-            RepositionBody(body, _customDestination, inShip);
+            RepositionBody(body, _customDestination, Vector3.zero, inShip);
         }
         else if (_gravityCannonSocket != null)
         {
-            RepositionBody(body, _gravityCannonSocket, inShip);
+            RepositionBody(body, _gravityCannonSocket, new Vector3(0, 4, 0), inShip);
         }
         else
         {
-            RepositionBody(body, _warpDestination, inShip);
+            RepositionBody(body, _warpDestination, Vector3.zero, inShip);
         }
 
         if (inShip)
@@ -90,9 +90,9 @@ public class ShipWarpCoreReceiver : MonoBehaviour
         }
     }
 
-    private void RepositionBody(OWRigidbody body, Transform destination, bool inShip)
+    private void RepositionBody(OWRigidbody body, Transform destination, Vector3 offset, bool inShip)
     {
-        body.WarpToPositionRotation(destination.position, destination.rotation);
+        body.WarpToPositionRotation(destination.TransformPoint(offset), destination.rotation);
 
         if (body is not ShipBody && inShip && PlayerState.IsAttached())
         {

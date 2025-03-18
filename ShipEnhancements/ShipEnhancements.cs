@@ -1297,7 +1297,7 @@ public class ShipEnhancements : ModBehaviour
             {
                 float lerp = (float)Settings.randomHullDamage.GetProperty();
                 List<ShipHull> hulls = [.. SELocator.GetShipDamageController()._shipHulls];
-                int iterations = Mathf.RoundToInt(Mathf.Lerp(1, hulls.Count, lerp));
+                int iterations = (int)(lerp * hulls.Count + 0.1f);
                 for (int i = 0; i < iterations; i++)
                 {
                     int index = UnityEngine.Random.Range(0, hulls.Count);
@@ -1376,7 +1376,8 @@ public class ShipEnhancements : ModBehaviour
                     components.Add(shipComponent);
                 }
 
-                int iterations = Mathf.RoundToInt(Mathf.Lerp(1, components.Count, (float)Settings.randomComponentDamage.GetProperty()));
+                float lerp = (float)Settings.randomHullDamage.GetProperty();
+                int iterations = (int)(lerp * components.Count + 0.1f);
                 for (int i = 0; i < iterations; i++)
                 {
                     int index = UnityEngine.Random.Range(0, components.Count);

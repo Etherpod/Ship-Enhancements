@@ -128,7 +128,7 @@ public class SEItemSocket : OWItemSocket
     {
         if (_socketedItem != null) return;
 
-        if (!ShipEnhancements.InMultiplayer)
+        if (!ShipEnhancements.InMultiplayer || !(bool)unlimitedItems.GetProperty())
         {
             OWItem newItem = Instantiate(_prefabItem);
             PlaceIntoSocket(newItem);

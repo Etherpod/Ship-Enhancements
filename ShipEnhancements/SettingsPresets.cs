@@ -673,7 +673,7 @@ public static class SettingsPresets
             (0.2f, 0.5f),
             (0.5f, 1f),
             (1f, 3f)
-        }, 0.2f, 0f) },
+        }, 0.05f, 0f) },
         { "enablePersistentInput", new RandomSettingValue(0.5f) },
         { "shipInputLatency", new RandomSettingValue(new (object, object)[]
         {
@@ -740,7 +740,7 @@ public static class SettingsPresets
         { "disableDamageIndicators", new RandomSettingValue(0.3f) },
         { "addShipSignal", new RandomSettingValue(0.5f) },
         { "reactorLifetimeMultiplier", new RandomSettingValue(0.1f, 3f, 0.5f, 1f) },
-        { "disableShipFriction", new RandomSettingValue(0.2f) },
+        { "disableShipFriction", new RandomSettingValue(0.05f) },
         { "enableSignalscopeComponent", new RandomSettingValue(0.5f) },
         { "rustLevel", new RandomSettingValue(new (object, object)[]
         {
