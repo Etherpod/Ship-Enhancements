@@ -13,7 +13,9 @@ public class MinimapFlagController : MonoBehaviour
     private void Awake()
     {
         _minimap = GetComponent<Minimap>();
-        _flagMarkerPrefab = ShipEnhancements.LoadPrefab("FlagMarker.prefab");
+        GameObject prefab = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/FlagMarkerPivot.prefab");
+        AssetBundleUtilities.ReplaceShaders(prefab);
+        _flagMarkerPrefab = prefab;
     }
 
     public void UpdateMarkers()

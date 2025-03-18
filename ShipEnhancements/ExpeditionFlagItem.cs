@@ -28,7 +28,8 @@ public class ExpeditionFlagItem : OWItem
     {
         base.Awake();
         _type = ItemType;
-        _flagController = SELocator.GetPlayerBody().GetComponentInChildren<MinimapFlagController>();
+        //_flagController = GameObject.Find("SecondaryGroup/HUD_Minimap/Minimap_Root").GetComponent<MinimapFlagController>();
+        _flagController = SELocator.GetShipTransform().GetComponentInChildren<MinimapFlagController>();
         if (_flagController == null) ShipEnhancements.WriteDebugMessage("Missing minimap flag controller on player!", error: true);
         _defaultOffset = _itemModelParent.transform.localPosition;
         _colTrigger.OnExit += OnExit;
