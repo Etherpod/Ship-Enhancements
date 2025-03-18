@@ -4059,4 +4059,26 @@ public static class PatchClass
         return false;
     }
     #endregion
+
+    #region FlagMarkers
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(Minimap), nameof(Minimap.UpdateMarkers))]
+    public static void UpdateFlagMarkers(Minimap __instance)
+    {
+        if (__instance.TryGetComponent(out MinimapFlagController flagController))
+        {
+            flagController.UpdateMarkers();
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(Minimap), nameof(Minimap.SetComponentsEnabled))]
+    public static void SetFlagMarkersEnabled(Minimap __instance, bool value)
+    {
+        if (__instance.TryGetComponent(out MinimapFlagController flagController))
+        {
+            flagController.SetComponentsEnabled(value);
+        }
+    }
+    #endregion
 }
