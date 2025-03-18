@@ -33,7 +33,7 @@ public class ShipWarpCoreReceiver : MonoBehaviour
         else
         {
             _warpEffect.transform.parent = _warpDestination;
-            _warpEffect.transform.localPosition = Vector3.zero;
+            _warpEffect.transform.localPosition = new Vector3(0, 6, 0);
         }
     }
 
@@ -50,7 +50,7 @@ public class ShipWarpCoreReceiver : MonoBehaviour
             if (_gravityCannonSocket != null)
             {
                 _warpEffect.transform.parent = _gravityCannonSocket;
-                _warpEffect.transform.localPosition = Vector3.zero;
+                _warpEffect.transform.localPosition = new Vector3(0, 6, 0);
             }
             else
             {
@@ -69,15 +69,15 @@ public class ShipWarpCoreReceiver : MonoBehaviour
     {
         if (_customDestination != null)
         {
-            RepositionBody(body, _customDestination, Vector3.zero, inShip);
+            RepositionBody(body, _customDestination, 0, inShip);
         }
         else if (_gravityCannonSocket != null)
         {
-            RepositionBody(body, _gravityCannonSocket, new Vector3(0, 4, 0), inShip);
+            RepositionBody(body, _gravityCannonSocket, 6, inShip);
         }
         else
         {
-            RepositionBody(body, _warpDestination, Vector3.zero, inShip);
+            RepositionBody(body, _warpDestination, 0, inShip);
         }
 
         if (inShip)
@@ -90,19 +90,19 @@ public class ShipWarpCoreReceiver : MonoBehaviour
         }
     }
 
-    private void RepositionBody(OWRigidbody body, Transform destination, Vector3 offset, bool inShip)
+    private void RepositionBody(OWRigidbody body, Transform destination, float offsetY, bool inShip)
     {
-        body.WarpToPositionRotation(destination.TransformPoint(offset), destination.rotation);
+        body.WarpToPositionRotation(destination.position + (destination.up * offsetY), destination.rotation);
 
         if (body is not ShipBody && inShip && PlayerState.IsAttached())
         {
             GlobalMessenger.FireEvent("PlayerRepositioned");
         }
 
-        OWRigidbody newBody = gameObject.GetAttachedOWRigidbody();
+        OWRigidbody newBody = destination.GetAttachedOWRigidbody();
         if (newBody != null)
         {
-            body.SetVelocity(newBody.GetPointVelocity(destination.position));
+            body.SetVelocity(newBody.GetPointVelocity(destination.position + (destination.up * offsetY)));
             body.SetAngularVelocity(newBody.GetAngularVelocity());
 
             if (!inShip && _suspendedBody == null)
