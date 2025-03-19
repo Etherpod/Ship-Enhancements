@@ -155,7 +155,7 @@ public class ShipEnhancements : ModBehaviour
         disableDamageIndicators,
         addShipSignal,
         reactorLifetimeMultiplier,
-        disableShipFriction,
+        shipFriction,
         enableSignalscopeComponent,
         rustLevel,
         dirtAccumulationTime,
@@ -956,21 +956,45 @@ public class ShipEnhancements : ModBehaviour
             SELocator.GetPlayerBody().GetComponentInChildren<Signalscope>().gameObject.AddComponent<ShipRemoteControl>();
         }
         bool physicsBounce = (float)Settings.shipBounciness.GetProperty() > 0f && (float)Settings.shipBounciness.GetProperty() <= 1f;
-        if ((bool)Settings.disableShipFriction.GetProperty() || physicsBounce)
+        if ((float)Settings.shipFriction.GetProperty() != 0.5f || physicsBounce)
         {
-            bool both = (bool)Settings.disableShipFriction.GetProperty() && physicsBounce;
+            bool both = (float)Settings.shipFriction.GetProperty() != 0.5f && physicsBounce;
             PhysicMaterial mat;
             if (both)
             {
+                float friction;
+                if ((float)Settings.shipFriction.GetProperty() < 0.5f)
+                {
+                    friction = Mathf.Lerp(0f, 0.6f, (float)Settings.shipFriction.GetProperty() * 2f);
+                }
+                else
+                {
+                    friction = Mathf.Lerp(0.6f, 1f, ((float)Settings.shipFriction.GetProperty() - 0.5f) * 2f);
+                }
+
                 mat = (PhysicMaterial)LoadAsset("Assets/ShipEnhancements/FrictionlessBouncyShip.physicMaterial");
+                mat.dynamicFriction = friction;
+                mat.bounciness = (float)Settings.shipBounciness.GetProperty();
             }
             else if (physicsBounce)
             {
                 mat = (PhysicMaterial)LoadAsset("Assets/ShipEnhancements/BouncyShip.physicMaterial");
+                mat.bounciness = (float)Settings.shipBounciness.GetProperty();
             }
             else
             {
+                float friction;
+                if ((float)Settings.shipFriction.GetProperty() < 0.5f)
+                {
+                    friction = Mathf.Lerp(0f, 0.6f, (float)Settings.shipFriction.GetProperty() * 2f);
+                }
+                else
+                {
+                    friction = Mathf.Lerp(0.6f, 1f, ((float)Settings.shipFriction.GetProperty() - 0.5f) * 2f);
+                }
+
                 mat = (PhysicMaterial)LoadAsset("Assets/ShipEnhancements/FrictionlessShip.physicMaterial");
+                mat.dynamicFriction = friction;
             }
 
             foreach (Collider collider in SELocator.GetShipTransform().GetComponentsInChildren<Collider>(true))

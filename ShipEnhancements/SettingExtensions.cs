@@ -66,7 +66,7 @@ public static class SettingExtensions
         { Settings.disableDamageIndicators, (false, false) },
         { Settings.addShipSignal, (false, false) },
         { Settings.reactorLifetimeMultiplier, (1f, 1f) },
-        { Settings.disableShipFriction, (false, false) },
+        { Settings.shipFriction, (1f, 1f) },
         { Settings.enableSignalscopeComponent, (false, false) },
         { Settings.rustLevel, (1f, 1f) },
         { Settings.dirtAccumulationTime, (1f, 1f) },

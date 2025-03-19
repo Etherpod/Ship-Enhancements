@@ -138,12 +138,6 @@
       "value": false,
       "tooltip": "Allows your ship to rotate freely in water."
     },
-    "disableShipFriction": {
-      "title": "Disable Ship Friction",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Turns off the ship's friction so that it slides everywhere. Good luck landing on anything."
-    },
     "disableFluidPrevention": {
       "title": "Disable Fluid Prevention",
       "type": "toggle",
@@ -371,6 +365,14 @@
       "type": "number",
       "value": 1,
       "tooltip": "Larger numbers increase the time it takes for the reactor to blow up the ship. The default time is between 25 and 35 seconds."
+    },
+    "shipFriction": {
+      "title": "Ship Friction",
+      "type": "slider",
+      "min": 0,
+      "max": 1,
+      "value": 0.5,
+      "tooltip": "Adjusts how much friction the ship has. The minimum makes your ship super slippery."
     },
     "shipBounciness": {
       "title": "Ship Bounciness",
