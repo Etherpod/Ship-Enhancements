@@ -4080,5 +4080,21 @@ public static class PatchClass
             flagController.SetComponentsEnabled(value);
         }
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipCockpitUI), nameof(ShipCockpitUI.Update))]
+    public static void UpdateFlagMarkersOn(ShipCockpitUI __instance)
+    {
+        MinimapFlagController flagController = __instance.GetComponentInChildren<MinimapFlagController>();
+        if (flagController == null) return;
+        if (__instance._shipSystemsCtrlr.UsingLandingCam() && !__instance._landingCamScreenLight.IsOn())
+        {
+            flagController.SetComponentsOn(true);
+        }
+        else if (!__instance._shipSystemsCtrlr.UsingLandingCam() && __instance._landingCamScreenLight.IsOn())
+        {
+            flagController.SetComponentsOn(false);
+        }
+    }
     #endregion
 }

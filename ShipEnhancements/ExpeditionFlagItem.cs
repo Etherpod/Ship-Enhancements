@@ -15,7 +15,8 @@ public class ExpeditionFlagItem : OWItem
     [SerializeField] private OWTriggerVolume _colTrigger;
     [SerializeField] private MeshRenderer _decalRenderer;
 
-    private MinimapFlagController _flagController;
+    private MinimapFlagController _playerFlagController;
+    private MinimapFlagController _shipFlagController;
     private readonly Vector3 _holdOffset = new(0f, -0.4f, 0f);
     private Vector3 _defaultOffset;
 
@@ -28,9 +29,12 @@ public class ExpeditionFlagItem : OWItem
     {
         base.Awake();
         _type = ItemType;
-        //_flagController = GameObject.Find("SecondaryGroup/HUD_Minimap/Minimap_Root").GetComponent<MinimapFlagController>();
-        _flagController = SELocator.GetShipTransform().GetComponentInChildren<MinimapFlagController>();
-        if (_flagController == null) ShipEnhancements.WriteDebugMessage("Missing minimap flag controller on player!", error: true);
+
+        _playerFlagController = GameObject.Find("SecondaryGroup/HUD_Minimap/Minimap_Root").GetComponent<MinimapFlagController>();
+        if (_playerFlagController == null) ShipEnhancements.WriteDebugMessage("Missing minimap flag controller on player!", error: true);
+        _shipFlagController = SELocator.GetShipTransform().GetComponentInChildren<MinimapFlagController>();
+        if (_shipFlagController == null) ShipEnhancements.WriteDebugMessage("Missing minimap flag controller on ship!", error: true);
+
         _defaultOffset = _itemModelParent.transform.localPosition;
         _colTrigger.OnExit += OnExit;
     }
@@ -100,11 +104,13 @@ public class ExpeditionFlagItem : OWItem
 
         if (dropped)
         {
-            _flagController.AddFlag(this);
+            _playerFlagController?.AddFlag(this);
+            _shipFlagController?.AddFlag(this);
         }
         else
         {
-            _flagController.RemoveFlag(this);
+            _playerFlagController?.RemoveFlag(this);
+            _shipFlagController?.RemoveFlag(this);
         }
     }
 

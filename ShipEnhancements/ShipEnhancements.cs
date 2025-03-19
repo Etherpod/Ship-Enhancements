@@ -997,6 +997,7 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)Settings.addExpeditionFlag.GetProperty())
         {
             SELocator.GetShipTransform().GetComponentInChildren<Minimap>().gameObject.AddComponent<MinimapFlagController>();
+            SELocator.GetPlayerBody().GetComponentInChildren<Minimap>().gameObject.AddComponent<MinimapFlagController>();
 
             /*GameObject flag = LoadPrefab("Assets/ShipEnhancements/ExpeditionFlagItem.prefab");
             AssetBundleUtilities.ReplaceShaders(flag);

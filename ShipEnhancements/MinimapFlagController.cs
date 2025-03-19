@@ -9,11 +9,20 @@ public class MinimapFlagController : MonoBehaviour
     private GameObject _flagMarkerPrefab;
     private Dictionary<ExpeditionFlagItem, Transform> _activeFlags = [];
     private List<Renderer> _renderersToToggle = [];
+    private List<ElectricalComponent> _componentsToToggle = [];
 
     private void Awake()
     {
         _minimap = GetComponent<Minimap>();
-        GameObject prefab = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/FlagMarkerPivot.prefab");
+        GameObject prefab;
+        if (_minimap._minimapMode == Minimap.MinimapMode.Player)
+        {
+            prefab = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/PlayerFlagMarkerPivot.prefab");
+        }
+        else
+        {
+            prefab = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipFlagMarkerPivot.prefab");
+        }
         AssetBundleUtilities.ReplaceShaders(prefab);
         _flagMarkerPrefab = prefab;
     }
@@ -43,16 +52,57 @@ public class MinimapFlagController : MonoBehaviour
                 _renderersToToggle[i].enabled = value;
             }
         }
+        for (int i = 0; i < _componentsToToggle.Count; i++)
+        {
+            if (_componentsToToggle[i] == null)
+            {
+                _componentsToToggle.RemoveAt(i);
+                i--;
+            }
+            else
+            {
+                _componentsToToggle[i].SetPowered(value);
+            }
+        }
+    }
+
+    public void SetComponentsOn(bool value)
+    {
+        for (int i = 0; i < _componentsToToggle.Count; i++)
+        {
+            if (_componentsToToggle[i] == null)
+            {
+                _componentsToToggle.RemoveAt(i);
+                i--;
+            }
+            else if (_componentsToToggle[i] is ShipLight)
+            {
+                (_componentsToToggle[i] as ShipLight).SetOn(value);
+            }
+        }
     }
 
     public void AddFlag(ExpeditionFlagItem flag)
     {
         if (!_activeFlags.ContainsKey(flag))
         {
-            ShipEnhancements.WriteDebugMessage("Add flag");
+            ShipCockpitUI cockpitUI = SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitUI>();
             Transform markerTransform = Instantiate(_flagMarkerPrefab, transform).transform;
             _activeFlags.Add(flag, markerTransform);
-            _renderersToToggle.AddRange(markerTransform.GetComponentsInChildren<Renderer>());
+            foreach (var rend in markerTransform.GetComponentsInChildren<Renderer>())
+            {
+                rend.enabled = _minimap._updateMinimap;
+                _renderersToToggle.Add(rend);
+            }
+            foreach (var comp in markerTransform.GetComponentsInChildren<ElectricalComponent>())
+            {
+                comp.SetPowered(_minimap._updateMinimap);
+                if (comp is ShipLight)
+                {
+                    (comp as ShipLight).SetOn(cockpitUI._landingCamScreenLight.IsOn());
+                }
+                _componentsToToggle.Add(comp);
+            }
         }
     }
 
@@ -60,10 +110,13 @@ public class MinimapFlagController : MonoBehaviour
     {
         if (_activeFlags.ContainsKey(flag))
         {
-            ShipEnhancements.WriteDebugMessage("Remove flag");
             foreach (var rend in _activeFlags[flag].GetComponentsInChildren<Renderer>())
             {
                 _renderersToToggle.Remove(rend);
+            }
+            foreach (var comp in _activeFlags[flag].GetComponentsInChildren<ElectricalComponent>())
+            {
+                _componentsToToggle.Remove(comp);
             }
             Destroy(_activeFlags[flag].gameObject);
             _activeFlags.Remove(flag);
