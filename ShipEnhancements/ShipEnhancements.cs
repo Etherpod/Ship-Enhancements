@@ -974,6 +974,7 @@ public class ShipEnhancements : ModBehaviour
 
                 mat = (PhysicMaterial)LoadAsset("Assets/ShipEnhancements/FrictionlessBouncyShip.physicMaterial");
                 mat.dynamicFriction = friction;
+                mat.staticFriction = friction;
                 mat.bounciness = (float)Settings.shipBounciness.GetProperty();
             }
             else if (physicsBounce)
@@ -995,6 +996,7 @@ public class ShipEnhancements : ModBehaviour
 
                 mat = (PhysicMaterial)LoadAsset("Assets/ShipEnhancements/FrictionlessShip.physicMaterial");
                 mat.dynamicFriction = friction;
+                mat.staticFriction = friction;
             }
 
             foreach (Collider collider in SELocator.GetShipTransform().GetComponentsInChildren<Collider>(true))

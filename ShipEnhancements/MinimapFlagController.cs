@@ -31,10 +31,17 @@ public class MinimapFlagController : MonoBehaviour
     {
         foreach (var flag in _activeFlags.Keys)
         {
-            // check for ruleset
-
-            _activeFlags[flag].localPosition = _minimap.GetLocalMapPosition(flag.transform);
-            _activeFlags[flag].LookAt(_minimap._globeMeshTransform, _minimap._globeMeshTransform.up);
+            if (flag.GetRulesetDetector() != null
+                && flag.GetRulesetDetector().GetPlanetoidRuleset() == _minimap._playerRulesetDetector.GetPlanetoidRuleset())
+            {
+                _activeFlags[flag].localPosition = _minimap.GetLocalMapPosition(flag.transform);
+                _activeFlags[flag].LookAt(_minimap._globeMeshTransform, _minimap._globeMeshTransform.up);
+            }
+            else
+            {
+                _activeFlags[flag].localPosition = Vector3.zero;
+                _activeFlags[flag].localRotation = Quaternion.identity;
+            }
         }
     }
 

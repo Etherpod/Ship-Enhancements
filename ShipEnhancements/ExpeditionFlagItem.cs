@@ -14,6 +14,7 @@ public class ExpeditionFlagItem : OWItem
     [SerializeField] private Collider _flagCollider;
     [SerializeField] private OWTriggerVolume _colTrigger;
     [SerializeField] private MeshRenderer _decalRenderer;
+    [SerializeField] private RulesetDetector _rulesetDetector;
 
     private MinimapFlagController _playerFlagController;
     private MinimapFlagController _shipFlagController;
@@ -112,6 +113,11 @@ public class ExpeditionFlagItem : OWItem
             _playerFlagController?.RemoveFlag(this);
             _shipFlagController?.RemoveFlag(this);
         }
+    }
+
+    public RulesetDetector GetRulesetDetector()
+    {
+        return _rulesetDetector;
     }
 
     private void OnExit(GameObject hitObj)
