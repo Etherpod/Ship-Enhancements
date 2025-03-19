@@ -95,6 +95,7 @@ public class ShipEnhancements : ModBehaviour
     private bool _disableAirWhenZeroOxygen = false;
     private bool _unsubFromBodyLoaded = false;
     private bool _unsubFromSystemLoaded = false;
+    private bool _unsubFromShipSpawn = false;
 
     public enum Settings
     {
@@ -376,6 +377,11 @@ public class ShipEnhancements : ModBehaviour
             {
                 NHAPI.GetStarSystemLoadedEvent().RemoveListener(OnNHStarSystemLoaded);
                 _unsubFromSystemLoaded = false;
+            }
+            if (NHAPI != null && _unsubFromShipSpawn)
+            {
+                NHAPI.GetStarSystemLoadedEvent().RemoveListener(SetCustomWarpDestination);
+                _unsubFromShipSpawn = false;
             }
 
             if (!InMultiplayer || QSBAPI.GetIsHost())
@@ -1063,13 +1069,18 @@ public class ShipEnhancements : ModBehaviour
             core.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = SELocator.GetShipBody().gameObject;
             GameObject coreObj = Instantiate(core, SELocator.GetShipTransform().Find("Module_Cockpit"));
 
-            if (GameObject.Find("TimberHearth_Body"))
+            if (NHAPI == null && GameObject.Find("TimberHearth_Body"))
             {
                 GameObject receiver = LoadPrefab("Assets/ShipEnhancements/ShipWarpReceiver.prefab");
                 AssetBundleUtilities.ReplaceShaders(receiver);
                 receiver.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = SELocator.GetShipBody().gameObject;
                 GameObject receiverObj = Instantiate(receiver, GameObject.Find("TimberHearth_Body").transform);
                 coreObj.GetComponent<ShipWarpCoreController>().SetReceiver(receiverObj.GetComponent<ShipWarpCoreReceiver>());
+            }
+            else if (NHAPI != null && !_unsubFromShipSpawn)
+            {
+                NHAPI.GetStarSystemLoadedEvent().AddListener(SetCustomWarpDestination);
+                _unsubFromShipSpawn = true;
             }
 
             // add when NH assembly created
@@ -1495,9 +1506,10 @@ public class ShipEnhancements : ModBehaviour
 
     private void SpawnSunTemperatureZones()
     {
-        if (NHAPI != null)
+        if (NHAPI != null && !_unsubFromSystemLoaded)
         {
             NHAPI.GetStarSystemLoadedEvent().AddListener(OnNHStarSystemLoaded);
+            _unsubFromSystemLoaded = true;
         }
         else
         {
@@ -1703,10 +1715,8 @@ public class ShipEnhancements : ModBehaviour
 
     private void OnNHStarSystemLoaded(string name)
     {
-        ShipEnhancements.WriteDebugMessage("loaded");
         if ((string)Settings.temperatureZonesAmount.GetProperty() != "None")
         {
-            ShipEnhancements.WriteDebugMessage("spawning");
             GameObject sunTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Sun.prefab");
 
             SunController[] suns = FindObjectsOfType<SunController>();
@@ -1724,6 +1734,26 @@ public class ShipEnhancements : ModBehaviour
             }
 
             NHInteraction.AddTempZoneToNHSuns(sunTempZone);
+        }
+    }
+
+    private void SetCustomWarpDestination(string name)
+    {
+        if (name != "SolarSystem" || !GameObject.Find("TimberHearth_Body"))
+        {
+            (Transform transform, Vector3 offset) spawn = NHInteraction.GetShipSpawnPoint();
+            if (spawn.transform == null) return;
+
+            GameObject receiver = LoadPrefab("Assets/ShipEnhancements/ShipWarpReceiver.prefab");
+            AssetBundleUtilities.ReplaceShaders(receiver);
+            receiver.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = SELocator.GetShipBody().gameObject;
+            ShipWarpCoreReceiver receiverObj = Instantiate(receiver, spawn.transform).GetComponent<ShipWarpCoreReceiver>();
+            receiverObj.transform.localPosition = Vector3.zero;
+            receiverObj.transform.localRotation = Quaternion.identity;
+            receiverObj.OnCustomSpawnPoint();
+
+            ShipWarpCoreController core = SELocator.GetShipTransform().GetComponentInChildren<ShipWarpCoreController>();
+            core.SetReceiver(receiverObj);
         }
     }
 

@@ -5,6 +5,7 @@ using System.Reflection;
 using NewHorizons.Components.Stars;
 using NewHorizons.Components.SizeControllers;
 using static ShipEnhancements.ShipEnhancements.Settings;
+using NewHorizons.Builder.General;
 
 namespace ShipEnhancementsNH;
 
@@ -33,6 +34,13 @@ public class NHInteraction : MonoBehaviour, INHInteraction
                 zone.SetProperties(100f, sunScale * 2.25f, sunScale, false, 0f, 0f);
             }
         }
+    }
+
+    public (Transform, Vector3) GetShipSpawnPoint()
+    {
+        if (SpawnPointBuilder.ShipSpawn == null) return (null, Vector3.zero);
+
+        return (SpawnPointBuilder.ShipSpawn.transform, SpawnPointBuilder.ShipSpawnOffset);
     }
 }
 

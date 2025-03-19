@@ -18,8 +18,6 @@ public class ShipWarpCoreReceiver : MonoBehaviour
     private void Start()
     {
         _shipFluidDetector = SELocator.GetShipDetector().GetComponent<FluidDetector>();
-
-        ShipEnhancements.WriteDebugMessage(_warpDestination);
     }
 
     public void SetGravityCannonSocket(Transform destination)
@@ -63,6 +61,7 @@ public class ShipWarpCoreReceiver : MonoBehaviour
     public void OnCustomSpawnPoint()
     {
         _warpDestination.transform.localPosition = Vector3.zero;
+        _warpDestination.transform.localRotation = Quaternion.identity;
     }
 
     public void WarpBodyToReceiver(OWRigidbody body, bool inShip)
