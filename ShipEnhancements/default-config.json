@@ -538,6 +538,12 @@
       "value": false,
       "tooltip": "Turns the ship's scout launcher into a fully functioning component. You won't be able to launch or recall your scout from the ship if it's damaged."
     },
+    "scoutPhotoMode": {
+      "title": "Ship Scout Photo Mode",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Lets you switch to photo mode with the ship's scout launcher."
+    },
     "enableSignalscopeComponent": {
       "title": "Add Signalscope Component",
       "type": "toggle",

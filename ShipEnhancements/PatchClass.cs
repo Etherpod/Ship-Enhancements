@@ -1546,6 +1546,7 @@ public static class PatchClass
         bool scoutLauncherComponent = (bool)enableScoutLauncherComponent.GetProperty();
         bool recallDisabled = (bool)disableScoutRecall.GetProperty();
         bool launchingDisabled = (bool)disableScoutLaunching.GetProperty();
+        bool shipPhotoMode = (bool)scoutPhotoMode.GetProperty();
         bool playerLauncher = __instance._activeLauncher.GetName() == ProbeLauncher.Name.Player;
         bool shipLauncher = __instance._activeLauncher.GetName() == ProbeLauncher.Name.Ship;
         bool usingShip = PlayerState.AtFlightConsole();
@@ -1562,6 +1563,7 @@ public static class PatchClass
 
         bool canRecall = true;
         bool canLaunch = true;
+        bool canSnapshot = false;
 
         if (usingShip)
         {
@@ -1578,9 +1580,14 @@ public static class PatchClass
             {
                 canLaunch = false;
             }
+            if (shipPhotoMode && (!recallDisabled || ShipProbePickupVolume.probeInShip) && !damaged)
+            {
+                canSnapshot = true;
+            }
         }
         else
         {
+            canSnapshot = true;
             if (manualScoutRecall)
             {
                 canRecall = false;
@@ -1611,6 +1618,16 @@ public static class PatchClass
         {
             __instance._launchPrompt.SetDisplayState(ScreenPrompt.DisplayState.GrayedOut);
         }
+
+        if (canSnapshot)
+        {
+            __instance._takeSnapshotPrompt.SetDisplayState(ScreenPrompt.DisplayState.Normal);
+        }
+        else
+        {
+            __instance._takeSnapshotPrompt.SetDisplayState(ScreenPrompt.DisplayState.GrayedOut);
+            __instance._snapshotCenterPrompt.SetVisibility(false);
+        }
     }
 
     [HarmonyPostfix]
@@ -1638,15 +1655,16 @@ public static class PatchClass
     [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.AllowPhotoMode))]
     public static void UpdateAllowPhotoMode(ProbeLauncher __instance, ref bool __result)
     {
-        if (!(bool)disableScoutLaunching.GetProperty() && !(bool)disableScoutRecall.GetProperty()
-            && !(bool)enableManualScoutRecall.GetProperty() && !(bool)enableScoutLauncherComponent.GetProperty())
+        if (__instance.GetName() == ProbeLauncher.Name.Player)
         {
-            return;
+            if (__result && ShipProbePickupVolume.probeInShip)
+            {
+                __result = false;
+            }
         }
-
-        if (__result && ShipProbePickupVolume.probeInShip)
+        else if (__instance.GetName() == ProbeLauncher.Name.Ship && (bool)scoutPhotoMode.GetProperty())
         {
-            __result = false;
+            __result = !(bool)disableScoutRecall.GetProperty() || ShipProbePickupVolume.probeInShip;
         }
     }
 
@@ -1662,11 +1680,37 @@ public static class PatchClass
             return true;
         }
 
-        if ((recallOrLaunchingDisabled || manualScoutRecall) && ShipProbePickupVolume.probeInShip)
+        if (__instance.GetName() == ProbeLauncher.Name.Player
+            && (recallOrLaunchingDisabled || manualScoutRecall) && ShipProbePickupVolume.probeInShip)
         {
             if (OWInput.IsNewlyPressed(InputLibrary.toolActionPrimary, InputMode.All))
             {
                 if (__instance.InPhotoMode())
+                {
+                    if (__instance._launcherGeometry != null)
+                    {
+                        __instance._launcherGeometry.SetActive(false);
+                    }
+                    __instance.TakeSnapshotWithCamera(__instance._preLaunchCamera);
+                    if (__instance._launcherGeometry != null)
+                    {
+                        __instance._launcherGeometry.SetActive(true);
+                        return false;
+                    }
+                }
+                else if (__instance.AllowLaunchMode())
+                {
+                    __instance.LaunchProbe();
+                }
+            }
+            return false;
+        }
+        else if (__instance.GetName() == ProbeLauncher.Name.Ship)
+        {
+            if (OWInput.IsNewlyPressed(InputLibrary.toolActionPrimary, InputMode.All))
+            {
+                if (__instance.InPhotoMode() && (!(bool)disableScoutRecall.GetProperty() || ShipProbePickupVolume.probeInShip)
+                    && (SELocator.GetProbeLauncherComponent() == null || SELocator.GetProbeLauncherComponent().isDamaged))
                 {
                     if (__instance._launcherGeometry != null)
                     {
@@ -4094,6 +4138,66 @@ public static class PatchClass
         else if (!__instance._shipSystemsCtrlr.UsingLandingCam() && __instance._landingCamScreenLight.IsOn())
         {
             flagController.SetComponentsOn(false);
+        }
+    }
+    #endregion
+
+    #region ScoutPhotoMode
+    // Borrowed from Archipelago Randomizer
+
+    // Many OW players never realized "photo mode" exists, so default to that when they don't have the Scout
+    [HarmonyPostfix, HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.Start))]
+    public static void ProbeLauncher_Start_Postfix(ProbeLauncher __instance)
+    {
+        if (!(bool)scoutPhotoMode.GetProperty()) return;
+
+        if ((bool)disableScoutLaunching.GetProperty() && __instance.GetName() == ProbeLauncher.Name.Ship)
+        {
+            //APRandomizer.OWMLModConsole.WriteLine($"putting the Scout Launcher in photo mode since we don't have the Scout yet");
+            __instance._photoMode = true;
+        }
+    }
+
+    // The above patch also causes "ship photo mode" to be a thing, with inconsistent UI prompts, only until you have Scout.
+    // So these two patches allow the ship to properly toggle between photo and launch modes just like you can on foot
+    // even after you get Scout, effectively promoting ship photo mode to an intended quality-of-life feature.
+    [HarmonyPostfix, HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.AllowPhotoMode))]
+    public static void ProbeLauncher_AllowPhotoMode(ProbeLauncher __instance, ref bool __result)
+    {
+        if (!(bool)scoutPhotoMode.GetProperty()) return;
+
+        if (__instance.GetName() == ProbeLauncher.Name.Ship)
+        {
+            __result = true;
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.AllowLaunchMode))]
+    public static void ProbeLauncher_AllowLaunchMode(ProbeLauncher __instance, ref bool __result)
+    {
+        if (__instance.GetName() == ProbeLauncher.Name.Ship
+            && (bool)disableScoutLaunching.GetProperty() && (bool)scoutPhotoMode.GetProperty())
+        {
+            __result = false;
+        }
+    }
+
+    [HarmonyPrefix, HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.UpdatePreLaunch))]
+    public static void ProbeLauncher_UpdatePreLaunch(ProbeLauncher __instance)
+    {
+        if (!(bool)scoutPhotoMode.GetProperty()) return;
+
+        if ((bool)disableScoutLaunching.GetProperty() && __instance._name == ProbeLauncher.Name.Ship 
+            && __instance._photoMode) return;
+
+        // copy-pasted from vanilla impl, with the first == changed to !=, so this is effectively:
+        // "if the vanilla UpdatePreLaunch is about to ignore a tool left/right press only because
+        // this is the ship's scout launcher, then don't ignore it"
+        if (__instance._name == ProbeLauncher.Name.Ship && (OWInput.IsNewlyPressed(InputLibrary.toolOptionLeft, InputMode.All) 
+                || OWInput.IsNewlyPressed(InputLibrary.toolOptionRight, InputMode.All)))
+        {
+            __instance._photoMode = !__instance._photoMode;
         }
     }
     #endregion

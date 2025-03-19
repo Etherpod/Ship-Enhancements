@@ -29,7 +29,7 @@ public class ShipProbeLauncherEffects : MonoBehaviour
     // Manual recall
     private void OnRetrieveProbe()
     {
-        if (PlayerState.AtFlightConsole())
+        if (PlayerState.AtFlightConsole() && _shipProbeLauncher.IsEquipped())
         {
             _hasLaunched = true;
         }

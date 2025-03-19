@@ -114,6 +114,7 @@ public static class SettingExtensions
         { Settings.waterDamage, (1f, 1f) },
         { Settings.sandDamage, (1f, 1f) },
         { Settings.disableMinimapMarkers, (1f, 1f) },
+        { Settings.scoutPhotoMode, (false, false) },
     };
 
     public static string GetName(this Settings setting)
