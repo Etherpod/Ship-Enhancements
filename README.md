@@ -34,7 +34,6 @@ Permanently remove useless or very important parts of the ship.
 - **Medkit**: Prevents you from healing inside the ship. Marshmallows might end up being your only way to regain health.
 - **Single-Use Tractor Beam**: Turns off the ship's tractor beam after you enter the ship for the first time. If you leave without your suit, you might have trouble getting back in again.
 - **Air/Water Auto Roll**: Lets you fly around upside down in air and water, which is really confusing when paired with no ship gravity. Also makes it easier to land on walls, if you wanted to do that.
-- **Ship Friction**: Essentially makes your ship a block of ice that will slide anywhere on anything.
 - **Fluid Prevention**: Makes it possible for fluids to enter your ship. Make sure your suit is on before you start flying around underwater.
 - **Hazard Prevention**: Makes it possible for outside hazards to injure you inside the ship. Don't fly too close to the sun!
 - **Lock-on**: Removes your ability to lock on to objects. You may find it difficult to use autopilot with this enabled.
@@ -71,6 +70,7 @@ Change some of the values that control how the ship works.
 - **Ship Noise Multiplier**: Larger numbers increase the distance your ship can be detected by noise detectors.
 - **Extra Noise**: Makes noisy parts of the ship, like the master alarm, alert noise detectors.
 - **Reactor Lifetime Multiplier**: Larger numbers increase the time it takes for the reactor to blow up when it has been damaged. Set this to something small to give yourself a panic attack every time the master alarm goes off.
+- **Ship Friction**: Lets you adjust how much friction to apply to the ship.
 - **Ship Bounciness**: Larger numbers increase the bounciness of the ship. Values above 1 will be less accurate and will no longer affect players.
 - **Ship Input Latency**: This basically simulates internet lag, where larger numbers increase the time it takes for the ship to process your inputs. A value of 1 means it takes 1 second for your "upwards thrust" input to register.
 - **Funny Sounds**: Replaces some of the in-game sounds with silly sound effects.
@@ -85,7 +85,7 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Automatic Hatch**: Automatically closes the hatch when you leave the ship. **Quantum Space Buddies** has this feature by default.
 - **Extra Eject Buttons**: Adds a few more eject buttons that all eject different parts of the ship.
 - **Interactable Ship Curtain**: Lets you close the curtain inside the ship, blocking off the cockpit.
-- **Ship Warp Core**: Attaches a Nomai warp core to your ship's cockpit. You can press the button on the ceiling of the cockpit to activate the warp core, which will warp you back to Timber Hearth.
+- **Ship Warp Core**: Attaches a Nomai warp core to your ship's cockpit. You can press the button on the ceiling of the cockpit to activate the warp core, which will warp your ship back to where it started.
 - **Ship Warp Core Component**: Turns the **Ship Warp Core** into a functioning component. Attempting to warp with a damaged warp core may have unintended results.
 - **Temperature Zones**: Implements a temperature mechanic for the ship using the "TEMP" (temperature) dial and a new "SHIP TEMP" (ship temperature) dial. Subjecting your ship to extreme temperatures will increase the ship temperature, making it more likely for your ship to sustain damage or bad side effects.
   - Any extreme temperatures can damage your ship if temperature damage is enabled. The temperature dial will start flashing if the temperature reaches a dangerous level.
@@ -102,6 +102,7 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Dirt Accumulation Time**: Larger numbers increase the time (in seconds) it takes for dirt to build up on your cockpit glass, which you can wash off by finding a source of water. Set this to 0 to disable it.
 - **Max Dirt Accumulation**: Stops dirt from building up on your cockpit when it reaches a certain level.
 - **Scout Launcher Component**: Turns the ship's scout launcher into a fully functioning ship component. If you damage it, you won't be able to launch or recall your scout from the ship until you repair it.
+- **Ship Scout Photo Mode**: Lets you switch to photo mode on the ship's scout launcher. It will default to photo mode if scout launching is disabled.
 - **Signalscope Component**: Turns the ship's signalscope into a fully functioning ship component. If you damage it, you won't be able to receive or broadcast signals from the ship until you repair it.
 - **Ship Signal**: Adds a signal for the ship on the Outer Wilds Ventures frequency. The signal will stop if the ship's signalscope is damaged. Slate also said they added a "command transmitter" to your signalscope, whatever that means.
 - **Clock**: Adds a clock to the cockpit that tells the time in minutes and seconds. It makes a nice ticking sound, if you like that sort of background noise.
@@ -111,16 +112,16 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Portable Campfire**: Adds a portable campfire to the ship next to your suit. Set it up wherever you want and roast a marshmallow.
 - **Portable Tractor Beam**: Adds a portable Nomai tractor beam to the ship near the ship log. Place it down somewhere if you need an extra boost in height.
 - **Portable Fuel Canister**: Adds a portable fuel tank inside the ship at the back. You can bring it around with you in case you need to refuel your jetpack while traveling. The fuel tank can completely refill your jetpack about 3 times before it runs out of fuel.
-- **Expedition Flag**: Adds a portable flag to the ship between the cockpit and the supplies section. Place it down somewhere if you want to mark some exploratory feat or if you want to mark where you've been.
+- **Expedition Flag**: Adds a portable flag to the ship between the cockpit and the supplies section. Placing it down will add a flag marker to your minimap.
   - You can add custom images to the **Expedition Flag**! If that sounds interesting, navigate to this mod's folder using the mod manager and open the folder named "ExpeditionFlagIcons".
 - **Add Radio**: Adds a radio to the cockpit. You can tune in to radio stations by inputting a 4-digit code. Slate posted the codes for a few of the classics on the wall behind the radio.
 - **Ship Tether**: Adds a few hooks to the ship cabin. You can attach these hooks to pretty much any surface- including the ship- and tether yourself to them. If you want to get even crazier, grab a second hook after tethering to one and tether to the new one; it will connect the two hooks together.
 - **Unlimited Items**: Lets you duplicate items inside the ship.
 - **Removable Gravity Crystal**: Lets you detach the ship's gravity crystal and place it somewhere else to create a localized gravity field. The removed gravity crystal will have the same strength as it did in the ship.
-- **Gravity Landing Gear**: Adds a switch to the cockpit that powers your landing gear with gravitational force, letting you stick to surfaces. It's a bit fragile though, and only works if your landing gear isn't damaged.
+- **Gravity Landing Gear**: Adds an interface to the cockpit that controls the new gravity technology built into your ship's landing gear. It will stop working if your landing gear is damaged.
 - **Thrust Modulator**: Adds an interface to the cockpit that lets you lower or disproportionately raise the maximum thrust your ship can use. Stacks with the smooth thrust option from General Enhancements.
 - **Persistent Input**: Adds a switch to the cockpit that, when enabled, lets you continue your last input when you unbuckle from the ship. Useful when you want to hold forward for 10 minutes and don't feel like actually holding it the entire time.
-- **Engine Switch**: Controls your ship's power and engine. The switch needs to be on if you want to use your ship. If the **Idle Fuel Consumption Multiplier** is above 0, it will only consume fuel when the ship is on.
+- **Engine Switch**: Controls your ship's power and engine. The switch needs to be turned on if you want to fly your ship. If the **Idle Fuel Consumption Multiplier** is above 0, it will only consume fuel when the ship is on.
 
 ## Decoration
 Haven't you ever wished your ship had a little more color?

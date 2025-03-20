@@ -3660,6 +3660,13 @@ public static class PatchClass
             __result = lines[UnityEngine.Random.Range(0, lines.Length)];
             return false;
         }
+        else if (key == "SE_Ernesto_ClockERNESTO_PLACEHOLDER")
+        {
+            int randomHour = UnityEngine.Random.Range(1, 13);
+            int randomMinute = UnityEngine.Random.Range(10, 60);
+            __result = $"It's {randomHour}:{randomMinute} if I'm reading that clock correctly.";
+            return false;
+        }
         return true;
     }
     #endregion

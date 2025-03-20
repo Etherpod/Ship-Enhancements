@@ -372,6 +372,11 @@
         <DialogueTarget>SE_Ernesto_Radio</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_202</RequiredCondition>
+        <Text>What time is it?</Text>
+        <DialogueTarget>SE_Ernesto_Clock</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
         <Text>Nevermind.</Text>
       </DialogueOption>
     </DialogueOptionsList>
@@ -961,6 +966,14 @@
       <Page>No clue. I just know that there's more Ernestos than there should be.</Page>
       <Page>Maybe you can go looking for them. That could be a fun scavenger hunt, and I'm sure they wouldn't mind some company.</Page>
       <Page>Feel free to come ask how many there are while you're out there searching, I'll see if I can give you an answer.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Clock</Name>
+    <Dialogue>
+      <Page>Time for you to get a watch!</Page>
+      <Page>Sorry, thought I'd hit you with one of the classics. It sounded funnier in my head.</Page>
+      <Page>ERNESTO_PLACEHOLDER</Page>
     </Dialogue>
   </DialogueNode>
 </DialogueTree>

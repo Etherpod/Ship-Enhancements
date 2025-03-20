@@ -408,6 +408,11 @@ required_condition = "SE_ERNESTO_OPTION_201"
 text = "Do you want me to play anything on the radio?"
 dialogue_target = "SE_Ernesto_Radio"
 
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_202"
+text = "What time is it?"
+dialogue_target = "SE_Ernesto_Clock"
+
 # ---
 
 [[dialogue_node.dialogue_options_list.dialogue_option]]
@@ -1077,3 +1082,11 @@ name = "SE_Ernesto_Awareness_22"
 
 [[dialogue_node.dialogue]]
 page = ["No clue. I just know that there's more Ernestos than there should be.", "Maybe you can go looking for them. That could be a fun scavenger hunt, and I'm sure they wouldn't mind some company.", "Feel free to come ask how many there are while you're out there searching, I'll see if I can give you an answer."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Clock"
+
+[[dialogue_node.dialogue]]
+page = ["Time for you to get a watch!", "Sorry, thought I'd hit you with one of the classics. It sounded funnier in my head.", "ERNESTO_PLACEHOLDER"]

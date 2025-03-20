@@ -117,6 +117,10 @@ public class CockpitErnesto : MonoBehaviour
         {
             _questions.Add(201);
         }
+        if ((bool)ShipEnhancements.Settings.addShipClock.GetProperty())
+        {
+            _questions.Add(202);
+        }
 
         _availableQuestions.AddRange(_questions);
     }
