@@ -42,6 +42,11 @@ public class NHInteraction : MonoBehaviour, INHInteraction
 
         return (SpawnPointBuilder.ShipSpawn.transform, SpawnPointBuilder.ShipSpawnOffset);
     }
+
+    public GameObject GetCenterOfUniverse()
+    {
+        return AstroObjectBuilder.CenterOfUniverse;
+    }
 }
 
 [HarmonyPatch]

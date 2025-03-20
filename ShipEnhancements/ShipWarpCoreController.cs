@@ -40,9 +40,21 @@ public class ShipWarpCoreController : CockpitInteractible
         GlobalMessenger<OWRigidbody>.AddListener("ShipCockpitDetached", OnShipCockpitDetached);
 
         _randomDestination = new GameObject("ShipRandomWarpDestination").transform;
-        if (Locator.GetAstroObject(AstroObject.Name.Sun) != null)
+        if (ShipEnhancements.NHAPI == null)
         {
-            _randomDestination.parent = Locator.GetAstroObject(AstroObject.Name.Sun).transform;
+            if (Locator.GetAstroObject(AstroObject.Name.Sun) != null)
+            {
+                _randomDestination.parent = Locator.GetAstroObject(AstroObject.Name.Sun).transform;
+            }
+        }
+        else
+        {
+            Transform parent = (ShipEnhancements.NHInteraction.GetCenterOfUniverse() ?? GameObject.Find("Sun_Body"))?.transform;
+            if (parent != null)
+            {
+                ShipEnhancements.WriteDebugMessage(parent.gameObject.name);
+                _randomDestination.parent = parent;
+            }
         }
 
         _interactReceiver.ChangePrompt("Activate Return Warp");
@@ -105,13 +117,11 @@ public class ShipWarpCoreController : CockpitInteractible
     {
         if (_warpingWithPlayer)
         {
-            ShipEnhancements.WriteDebugMessage("Unsubscribed");
             _warpEffect.singularityController.OnCreation -= WarpShip;
             _warpEffect.singularityController.CollapseImmediate();
         }
         else
         {
-            ShipEnhancements.WriteDebugMessage("Unsubscribed 2");
             _warpEffect.OnWarpComplete -= WarpShip;
             _receiver.PlayRecallEffect(_warpLength, _warpingWithPlayer);
         }
@@ -245,7 +255,6 @@ public class ShipWarpCoreController : CockpitInteractible
 
         if (IsShipOccupied())
         {
-            ShipEnhancements.WriteDebugMessage("Ship occupied");
             if (PlayerState.InBrambleDimension())
             {
                 PlayerFogWarpDetector detector = Locator.GetPlayerDetector().GetComponent<PlayerFogWarpDetector>();

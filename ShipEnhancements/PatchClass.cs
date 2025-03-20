@@ -2670,13 +2670,17 @@ public static class PatchClass
             GameObject componentObj = UnityEngine.Object.Instantiate(warpCoreComponent, __instance.transform.Find("Systems_Cockpit"));
             SELocator.SetShipWarpCoreComponent(componentObj.GetComponent<ShipWarpCoreComponent>());
 
-            if (GameObject.Find("TimberHearth_Body"))
+            if (ShipEnhancements.NHAPI == null && GameObject.Find("TimberHearth_Body"))
             {
                 GameObject receiver = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipWarpReceiver.prefab");
                 AssetBundleUtilities.ReplaceShaders(receiver);
                 receiver.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = UnityEngine.Object.FindObjectOfType<ShipBody>().gameObject;
                 GameObject receiverObj = UnityEngine.Object.Instantiate(receiver, GameObject.Find("TimberHearth_Body").transform);
                 componentObj.GetComponentInChildren<ShipWarpCoreController>().SetReceiver(receiverObj.GetComponent<ShipWarpCoreReceiver>());
+            }
+            else
+            {
+                ShipEnhancements.Instance.WaitForCustomSpawnLoaded();
             }
         }
     }
