@@ -9,6 +9,7 @@ using System.Reflection;
 using System.Linq;
 using UnityEngine.Events;
 using UnityEngine.TextCore.LowLevel;
+using UnityEngine.InputSystem;
 
 namespace ShipEnhancements;
 
@@ -541,6 +542,11 @@ public class ShipEnhancements : ModBehaviour
                 SEAchievementTracker.DeadInTheWater = true;
                 AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.DEAD_IN_THE_WATER");
             }
+        }
+
+        if (Keyboard.current.rightBracketKey.isPressed)
+        {
+            SELocator.GetShipTransform().GetComponent<OrbitAutopilotTest>().ToggleOrbitEnabled();
         }
     }
 
@@ -1254,6 +1260,8 @@ public class ShipEnhancements : ModBehaviour
                 renderer.enabled = false;
             }
         }
+
+        SELocator.GetShipTransform().gameObject.AddComponent<OrbitAutopilotTest>();
 
         SetDamageColors();
 
