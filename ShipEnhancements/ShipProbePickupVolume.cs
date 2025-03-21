@@ -18,6 +18,13 @@ public class ShipProbePickupVolume : ProbePickupVolume
         _probeLauncher = Locator.GetPlayerTransform().GetComponentInChildren<PlayerProbeLauncher>();
         _shipProbeLauncher = GetComponentInParent<PlayerProbeLauncher>();
         _probeLauncherEffects = _shipProbeLauncher.GetComponent<ShipProbeLauncherEffects>();
+
+        if (SELocator.GetProbeLauncherComponent() != null)
+        {
+            SELocator.GetProbeLauncherComponent().OnDamaged += OnLauncherDamaged;
+            SELocator.GetProbeLauncherComponent().OnRepaired += OnLauncherRepaired;
+        }
+
         if (!(bool)disableScoutRecall.GetProperty() 
             || ((bool)disableScoutLaunching.GetProperty() && !(bool)scoutPhotoMode.GetProperty()))
         {
@@ -33,7 +40,10 @@ public class ShipProbePickupVolume : ProbePickupVolume
 
     protected override void OnRetrieveProbe()
     {
-        if (_probeLauncherEffects.componentDamaged || ShipEnhancements.Instance.probeDestroyed) return;
+        if (_probeLauncherEffects.componentDamaged || ShipEnhancements.Instance.probeDestroyed)
+        {
+            _interactReceiver.DisableInteraction();
+        }
 
         if ((bool)disableScoutRecall.GetProperty() 
             && (!(bool)disableScoutLaunching.GetProperty() || (bool)scoutPhotoMode.GetProperty()) 
@@ -131,6 +141,34 @@ public class ShipProbePickupVolume : ProbePickupVolume
         if (PlayerState.IsWearingSuit())
         {
             _interactReceiver.EnableInteraction();
+        }
+    }
+
+    private void OnLauncherDamaged(ShipComponent comp)
+    {
+        _interactReceiver.DisableInteraction();
+    }
+
+    private void OnLauncherRepaired(ShipComponent comp)
+    {
+        if (ShipEnhancements.Instance.probeDestroyed || !PlayerState.IsWearingSuit()) return;
+
+        if (((bool)disableScoutRecall.GetProperty()
+            && (!(bool)disableScoutLaunching.GetProperty() || (bool)scoutPhotoMode.GetProperty())
+            && _probeLauncher._activeProbe == null)
+            || (probeInShip && (bool)enableManualScoutRecall.GetProperty()))
+        {
+            _interactReceiver.EnableInteraction();
+        }
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        if (SELocator.GetProbeLauncherComponent() != null)
+        {
+            SELocator.GetProbeLauncherComponent().OnDamaged -= OnLauncherDamaged;
+            SELocator.GetProbeLauncherComponent().OnRepaired -= OnLauncherRepaired;
         }
     }
 }

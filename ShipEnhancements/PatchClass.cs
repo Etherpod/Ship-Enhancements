@@ -1710,7 +1710,7 @@ public static class PatchClass
             if (OWInput.IsNewlyPressed(InputLibrary.toolActionPrimary, InputMode.All))
             {
                 if (__instance.InPhotoMode() && (!(bool)disableScoutRecall.GetProperty() || ShipProbePickupVolume.probeInShip)
-                    && (SELocator.GetProbeLauncherComponent() == null || SELocator.GetProbeLauncherComponent().isDamaged))
+                    && (SELocator.GetProbeLauncherComponent() == null || !SELocator.GetProbeLauncherComponent().isDamaged))
                 {
                     if (__instance._launcherGeometry != null)
                     {
