@@ -54,8 +54,6 @@ public class GravityGearInvertSwitch : CockpitInteractible
         List<ElectricalComponent> componentList = [.. _electricalSystem._connectedComponents];
         componentList.Add(this);
         _electricalSystem._connectedComponents = [.. componentList];
-
-        ShipEnhancements.WriteDebugMessage(_electricalSystem._connectedComponents.Contains(this));
     }
 
     private void Update()
@@ -75,7 +73,7 @@ public class GravityGearInvertSwitch : CockpitInteractible
         {
             foreach (uint id in ShipEnhancements.PlayerIDs)
             {
-                //ShipEnhancements.QSBCompat.SendSwitchState(id, (GetType().Name, _on));
+                ShipEnhancements.QSBCompat.SendGravInvertSwitchState(id, _on);
             }
         }
     }

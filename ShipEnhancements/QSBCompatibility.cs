@@ -94,6 +94,7 @@ public class QSBCompatibility
         _api.RegisterHandler<int>("radio-cancel-tuning", ReceiveRadioCancelTuning);
         _api.RegisterHandler<(int, float)>("radio-volume", ReceiveRadioVolume);
         _api.RegisterHandler<(int, int, bool)>("create-item", ReceiveCreateItem);
+        _api.RegisterHandler<bool>("grav-gear-invert", ReceiveGravInvertSwitchState);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -174,6 +175,11 @@ public class QSBCompatibility
             {
                 SendSwitchState(id, (cockpitSwitch.GetType().Name, cockpitSwitch.IsOn()));
             }
+        }
+        GravityGearInvertSwitch invertSwitch = SELocator.GetShipTransform().GetComponentInChildren<GravityGearInvertSwitch>();
+        if (invertSwitch != null)
+        {
+            SendGravInvertSwitchState(id, invertSwitch.IsOn());
         }
         if (_engineSwitch != null)
         {
@@ -922,6 +928,18 @@ public class QSBCompatibility
 
         SEItemSocket itemSocket = socket as SEItemSocket;
         itemSocket.CreateItemRemote(item, data.socketItem);
+    }
+    #endregion
+
+    #region GravInvertSwitch
+    public void SendGravInvertSwitchState(uint id, bool enabled)
+    {
+        _api.SendMessage("grav-gear-invert", enabled, id, false);
+    }
+
+    private void ReceiveGravInvertSwitchState(uint id, bool enabled)
+    {
+        SELocator.GetShipTransform().GetComponentInChildren<GravityGearInvertSwitch>()?.ChangeSwitchState(enabled);
     }
     #endregion
 }
