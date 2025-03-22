@@ -3069,6 +3069,18 @@ public static class PatchClass
             }
         }
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipTractorBeamSwitch), nameof(ShipTractorBeamSwitch.ActivateTractorBeam))]
+    public static bool PreventTractorBeamActivate()
+    {
+        if ((bool)singleUseTractorBeam.GetProperty())
+        {
+            return false;
+        }
+
+        return true;
+    }
     #endregion
 
     #region DisableRetroRockets
