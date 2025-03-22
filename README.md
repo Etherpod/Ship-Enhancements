@@ -1,6 +1,6 @@
 ![Ship Enhancements banner](banner.png)
 
-Ship Enhancements adds way too much stuff to the ship, all of which you can find in the mod settings menu. Experiment and have fun!
+Ship Enhancements adds way too much stuff to the ship, all of which you can find in the mod settings menu. Any changes to the ship will be applied on the next loop. Experiment and have fun!
 
 To answer some questions you may have...
 
