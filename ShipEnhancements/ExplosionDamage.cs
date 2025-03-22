@@ -188,6 +188,14 @@ public class ExplosionDamage : MonoBehaviour
         {
             angler.ChangeState(AnglerfishController.AnglerState.Stunned);
             angler.GetComponentInChildren<AnglerfishFluidVolume>().SetVolumeActivation(false);
+
+            if (ShipEnhancements.InMultiplayer)
+            {
+                foreach (uint id in ShipEnhancements.PlayerIDs)
+                {
+                    ShipEnhancements.QSBCompat.SendAnglerDeath(id, angler);
+                }
+            }
         }
     }
 }

@@ -133,6 +133,21 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
             sync.Value = SELocator.GetShipBody().GetComponent<ShipThrusterModel>().GetLocalAcceleration();
         }
     }
+
+    public int GetIDFromAngler(AnglerfishController angler)
+    {
+        return angler.GetWorldObject<QSBAngler>().ObjectId;
+    }
+
+    public AnglerfishController GetAnglerFromID(int id)
+    {
+        var obj = id.GetWorldObject<QSBAngler>().AttachedObject;
+        if (obj is AnglerfishController)
+        {
+            return obj;
+        }
+        return null;
+    }
 }
 
 [HarmonyPatch]

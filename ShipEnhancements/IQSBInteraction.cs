@@ -28,4 +28,8 @@ public interface IQSBInteraction
     void OnDetachAllPlayers(Vector3 velocity);
 
     void UpdateShipThrusterSync();
+
+    int GetIDFromAngler(AnglerfishController angler);
+
+    AnglerfishController GetAnglerFromID(int id);
 }

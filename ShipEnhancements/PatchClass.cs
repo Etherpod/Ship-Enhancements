@@ -2428,7 +2428,7 @@ public static class PatchClass
             __instance.GetComponentInChildren<ShipNoiseMaker>()._noiseRadius = 1000f * (float)shipExplosionMultiplier.GetProperty();
         }
 
-        __instance.GetComponentInChildren<ExplosionDamage>()?.OnExplode();
+        __instance._explosion.GetComponentInChildren<ExplosionDamage>()?.OnExplode();
     }
 
     [HarmonyPostfix]
@@ -3800,7 +3800,7 @@ public static class PatchClass
     {
         if ((bool)moreExplosionDamage.GetProperty())
         {
-            __instance._stunTimer = 120f;
+            __instance._stunTimer = 100f;
         }
         if ((bool)prolongDigestion.GetProperty())
         {
@@ -3813,7 +3813,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(AnglerfishController), nameof(AnglerfishController.OnCaughtObject))]
     public static bool ProlongDigestion(AnglerfishController __instance, OWRigidbody caughtBody)
     {
-        if (!(bool)prolongDigestion.GetProperty()) return true;
+        if (!(bool)prolongDigestion.GetProperty() || ShipEnhancements.InMultiplayer) return true;
 
         if (__instance._currentState == AnglerfishController.AnglerState.Consuming)
         {
@@ -3846,183 +3846,55 @@ public static class PatchClass
         return false;
     }
 
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(AnglerfishController), nameof(AnglerfishController.UpdateState))]
+    public static void PermanentStunMode(AnglerfishController __instance)
+    {
+        if ((bool)moreExplosionDamage.GetProperty() && __instance._currentState == AnglerfishController.AnglerState.Stunned)
+        {
+            __instance._stunTimer = 100f;
+        }
+    }
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(AnglerfishController), nameof(AnglerfishController.UpdateState))]
-    public static bool ShipDigestionEffects(AnglerfishController __instance)
+    public static void ShipDigestionEffects(AnglerfishController __instance)
     {
-        if ((bool)moreExplosionDamage.GetProperty())
+        if (!(bool)prolongDigestion.GetProperty()) return;
+
+        if (__instance._currentState == AnglerfishController.AnglerState.Consuming)
         {
-            switch (__instance._currentState)
+            if (!__instance._consumeComplete)
             {
-                case AnglerfishController.AnglerState.Investigating:
-                    if ((__instance._brambleBody.transform.TransformPoint(__instance._localDisturbancePos) - __instance._anglerBody.GetPosition()).sqrMagnitude < __instance._arrivalDistance * __instance._arrivalDistance)
-                    {
-                        __instance.ChangeState(AnglerfishController.AnglerState.Lurking);
-                        return false;
-                    }
-                    break;
-                case AnglerfishController.AnglerState.Chasing:
-                    if (__instance._targetBody == null)
-                    {
-                        __instance.ChangeState(AnglerfishController.AnglerState.Lurking);
-                        return false;
-                    }
-                    if ((__instance._targetBody.GetPosition() - __instance._anglerBody.GetPosition()).sqrMagnitude > __instance._escapeDistance * __instance._escapeDistance)
-                    {
-                        __instance._targetBody = null;
-                        __instance.ChangeState(AnglerfishController.AnglerState.Lurking);
-                        return false;
-                    }
-                    break;
-                case AnglerfishController.AnglerState.Consuming:
-                    if (__instance._consumeComplete) return false;
+                if (__instance._targetBody == null)
+                {
+                    return;
+                }
+                float num = Time.time - __instance._consumeStartTime;
+                if (__instance._targetBody.CompareTag("Ship"))
+                {
+                    if (SELocator.GetShipDamageController().IsSystemFailed()) return;
 
-                    if (__instance._targetBody == null)
+                    if (num > __instance._consumeShipCrushDelay)
                     {
-                        __instance.ChangeState(AnglerfishController.AnglerState.Lurking);
-                        return false;
-                    }
-
-                    if ((bool)prolongDigestion.GetProperty())
-                    {
-                        if (__instance._targetBody == null)
-                        {
-                            __instance.ChangeState(AnglerfishController.AnglerState.Lurking);
-                            return false;
-                        }
-                        float num = Time.time - __instance._consumeStartTime;
-                        if (__instance._targetBody.CompareTag("Player") && num > __instance._consumeDeathDelay)
-                        {
-                            Locator.GetDeathManager().KillPlayer(DeathType.Digestion);
-                            __instance._consumeComplete = true;
-                            return false;
-                        }
-                        if (__instance._targetBody.CompareTag("Ship"))
-                        {
-                            if (SELocator.GetShipDamageController().IsSystemFailed()) return false;
-
-                            if (num > __instance._consumeShipCrushDelay)
-                            {
-                                SELocator.GetShipTransform().GetComponentInChildren<ShipAudioController>()
-                                    ._shipElectrics._audioSource.PlayOneShot(AudioType.ShipDamageElectricalFailure, 0.5f);
-
-                                __instance._targetBody.GetComponentInChildren<ShipDamageController>().TriggerSystemFailure(false);
-                            }
-                            else
-                            {
-                                if (digestionDamageDelay < 0f)
-                                {
-                                    RandomDigestionDamage();
-                                    digestionDamageDelay = UnityEngine.Random.Range(0.2f, 0.8f);
-                                }
-                                else
-                                {
-                                    digestionDamageDelay -= Time.deltaTime;
-                                }
-                            }
-
-                            if (num > __instance._consumeDeathDelay)
-                            {
-                                if (PlayerState.IsInsideShip())
-                                {
-                                    Locator.GetDeathManager().KillPlayer(DeathType.Digestion);
-                                }
-                                __instance._consumeComplete = true;
-                                return false;
-                            }
-                        }
+                        SELocator.GetShipTransform().GetComponentInChildren<ShipAudioController>()
+                            ._shipElectrics._audioSource.PlayOneShot(AudioType.ShipDamageElectricalFailure, 0.5f);
                     }
                     else
                     {
-                        if (!__instance._consumeComplete)
+                        if (digestionDamageDelay < 0f)
                         {
-                            if (__instance._targetBody == null)
-                            {
-                                __instance.ChangeState(AnglerfishController.AnglerState.Lurking);
-                                return false;
-                            }
-                            float num = Time.time - __instance._consumeStartTime;
-                            if (__instance._targetBody.CompareTag("Player") && num > __instance._consumeDeathDelay)
-                            {
-                                Locator.GetDeathManager().KillPlayer(DeathType.Digestion);
-                                __instance._consumeComplete = true;
-                                return false;
-                            }
-                            if (__instance._targetBody.CompareTag("Ship"))
-                            {
-                                if (num > __instance._consumeShipCrushDelay)
-                                {
-                                    __instance._targetBody.GetComponentInChildren<ShipDamageController>().TriggerSystemFailure(false);
-                                }
-                                if (num > __instance._consumeDeathDelay)
-                                {
-                                    if (PlayerState.IsInsideShip())
-                                    {
-                                        Locator.GetDeathManager().KillPlayer(DeathType.Digestion);
-                                    }
-                                    __instance._consumeComplete = true;
-                                    return false;
-                                }
-                            }
-                        }
-                    }
-                    break;
-                /*case AnglerfishController.AnglerState.Stunned:
-                    __instance._stunTimer -= Time.deltaTime;
-                    if (__instance._stunTimer <= 0f)
-                    {
-                        if (__instance._targetBody != null)
-                        {
-                            __instance.ChangeState(AnglerfishController.AnglerState.Chasing);
-                            return;
-                        }
-                        __instance.ChangeState(AnglerfishController.AnglerState.Lurking);
-                    }
-                    break;*/
-                default:
-                    return false;
-            }
-            return false;
-        }
-        else if ((bool)prolongDigestion.GetProperty())
-        {
-            if (__instance._currentState == AnglerfishController.AnglerState.Consuming)
-            {
-                if (!__instance._consumeComplete)
-                {
-                    if (__instance._targetBody == null)
-                    {
-                        return true;
-                    }
-                    float num = Time.time - __instance._consumeStartTime;
-                    if (__instance._targetBody.CompareTag("Ship"))
-                    {
-                        if (SELocator.GetShipDamageController().IsSystemFailed()) return true;
-
-                        if (num > __instance._consumeShipCrushDelay)
-                        {
-                            SELocator.GetShipTransform().GetComponentInChildren<ShipAudioController>()
-                                ._shipElectrics._audioSource.PlayOneShot(AudioType.ShipDamageElectricalFailure, 0.5f);
+                            RandomDigestionDamage();
+                            digestionDamageDelay = UnityEngine.Random.Range(0.2f, 0.8f);
                         }
                         else
                         {
-                            if (digestionDamageDelay < 0f)
-                            {
-                                RandomDigestionDamage();
-                                digestionDamageDelay = UnityEngine.Random.Range(0.2f, 0.8f);
-                            }
-                            else
-                            {
-                                digestionDamageDelay -= Time.deltaTime;
-                            }
+                            digestionDamageDelay -= Time.deltaTime;
                         }
                     }
                 }
             }
-            return true;
         }
-
-        return true;
     }
 
     public static void RandomDigestionDamage()

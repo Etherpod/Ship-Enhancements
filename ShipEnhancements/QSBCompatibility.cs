@@ -95,6 +95,7 @@ public class QSBCompatibility
         _api.RegisterHandler<(int, float)>("radio-volume", ReceiveRadioVolume);
         _api.RegisterHandler<(int, int, bool)>("create-item", ReceiveCreateItem);
         _api.RegisterHandler<bool>("grav-gear-invert", ReceiveGravInvertSwitchState);
+        _api.RegisterHandler<int>("angler-death", ReceiveAnglerDeath);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -940,6 +941,23 @@ public class QSBCompatibility
     private void ReceiveGravInvertSwitchState(uint id, bool enabled)
     {
         SELocator.GetShipTransform().GetComponentInChildren<GravityGearInvertSwitch>()?.ChangeSwitchState(enabled);
+    }
+    #endregion
+
+    #region ExplosionDamage
+    public void SendAnglerDeath(uint id, AnglerfishController angler)
+    {
+        _api.SendMessage("angler-death", ShipEnhancements.QSBInteraction.GetIDFromAngler(angler), id, false);
+    }
+
+    private void ReceiveAnglerDeath(uint id, int anglerID)
+    {
+        AnglerfishController angler = ShipEnhancements.QSBInteraction.GetAnglerFromID(anglerID);
+        if (angler != null)
+        {
+            angler.ChangeState(AnglerfishController.AnglerState.Stunned);
+            angler.GetComponentInChildren<AnglerfishFluidVolume>().SetVolumeActivation(false);
+        }
     }
     #endregion
 }
