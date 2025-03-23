@@ -241,8 +241,11 @@ public static class ShipNotifications
         NotificationManager.SharedInstance.PostNotification(_digestionNotification, false);
     }
 
-    public static void PostOrbitAutopilotActiveNotification() =>
+    public static void PostOrbitAutopilotActiveNotification(float radius)
+    {
+        _orbitAutopilotActiveNotification.displayMessage = "AUTOPILOT: ORBITING AT " + Mathf.Round(radius) + "m";
         NotificationManager.SharedInstance.PostNotification(_orbitAutopilotActiveNotification, true);
+    }
     
     public static void RemoveOrbitAutopilotActiveNotification() =>
         NotificationManager.SharedInstance.UnpinNotification(_orbitAutopilotActiveNotification);

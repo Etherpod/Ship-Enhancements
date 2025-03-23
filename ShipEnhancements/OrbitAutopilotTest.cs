@@ -45,7 +45,7 @@ public class OrbitAutopilotTest : ThrusterController
         
         enabled = true;
         
-        ShipNotifications.PostOrbitAutopilotActiveNotification();
+        ShipNotifications.PostOrbitAutopilotActiveNotification(_orbitRadius);
     }
 
     public override Vector3 ReadTranslationalInput()
