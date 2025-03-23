@@ -16,7 +16,16 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.UpdateShipLightInput))]
     public static bool DisableHeadlights(ShipCockpitController __instance)
     {
+        if (OWInput.IsNewlyPressed(InputLibrary.flashlight, InputMode.ShipCockpit)
+            && !__instance._shipSystemFailure
+            && SELocator.GetShipTransform().GetComponentInChildren<Signalscope>().IsEquipped())
+        {
+            // do horn
+            return false;
+        }
+
         if ((bool)disableHeadlights.GetProperty()) return false;
+
         return true;
     }
     #endregion
