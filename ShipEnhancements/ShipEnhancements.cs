@@ -544,9 +544,10 @@ public class ShipEnhancements : ModBehaviour
             }
         }
 
-        if (Keyboard.current.rightBracketKey.isPressed)
+        if (Keyboard.current.rightBracketKey.wasPressedThisFrame)
         {
-            SELocator.GetShipTransform().GetComponent<OrbitAutopilotTest>().ToggleOrbitEnabled();
+            WriteDebugMessage("attempting orbit");
+            SELocator.GetShipTransform().GetComponent<OrbitAutopilotTest>().ToggleMaintainOrbit();
         }
     }
 
@@ -1261,6 +1262,7 @@ public class ShipEnhancements : ModBehaviour
             }
         }
 
+        WriteDebugMessage("adding orbit autopilot");
         SELocator.GetShipTransform().gameObject.AddComponent<OrbitAutopilotTest>();
 
         SetDamageColors();
