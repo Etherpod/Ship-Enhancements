@@ -27,6 +27,7 @@ public class OrbitAutopilotTest : ThrusterController
     {
         if (enabled || Locator.GetReferenceFrame() == null)
         {
+            PostAutopilotOffNotification();
             enabled = false;
             _ignoreThrustLimits = false;
             ShipEnhancements.WriteDebugMessage("nothing to orbit");
@@ -43,12 +44,15 @@ public class OrbitAutopilotTest : ThrusterController
         _orbitalPlaneNormal = Vector3.Cross(relativeVelocity, dirToReference).normalized;
         
         enabled = true;
+        
+        ShipNotifications.PostOrbitAutopilotActiveNotification();
     }
 
     public override Vector3 ReadTranslationalInput()
     {
         if (_referenceFrame == null)
         {
+            PostAutopilotOffNotification();
             enabled = false;
             ShipEnhancements.WriteDebugMessage("nothing to orbit");
             return Vector3.zero;
@@ -113,6 +117,15 @@ public class OrbitAutopilotTest : ThrusterController
 
         desiredImpulse += orbitPositionImpulse;
         return transform.InverseTransformDirection(shipThrustFactor * Vector3.ClampMagnitude(desiredImpulse, 1));
+    }
+
+    private void PostAutopilotOffNotification()
+    {
+        ShipNotifications.RemoveOrbitAutopilotActiveNotification();
+        if (enabled)
+            ShipNotifications.PostOrbitAutopilotDisabledNotification();
+        else
+            ShipNotifications.PostOrbitAutopilotNoTargetNotification();
     }
 
     public override Vector3 ReadRotationalInput()
