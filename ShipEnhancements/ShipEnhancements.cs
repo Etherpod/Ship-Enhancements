@@ -947,6 +947,8 @@ public class ShipEnhancements : ModBehaviour
             }*/
 
             SELocator.GetPlayerBody().gameObject.AddComponent<TetherPromptController>();
+            GameObject audio = LoadPrefab("Assets/ShipEnhancements/TetherAudioController.prefab");
+            Instantiate(audio, SELocator.GetPlayerBody().transform);
         }
         if ((bool)Settings.extraEjectButtons.GetProperty())
         {

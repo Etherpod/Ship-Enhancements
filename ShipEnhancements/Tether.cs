@@ -5,6 +5,7 @@ namespace ShipEnhancements;
 public class Tether : MonoBehaviour
 {
     private bool _tethered = false;
+    private TetherAudioController _audioController;
     private SpringJoint _joint;
     private Transform _tetherMesh;
     private GameObject _tether;
@@ -16,8 +17,10 @@ public class Tether : MonoBehaviour
     private TetherHookItem _connectedHook;
     private bool _tetheredToSelf = false;
     private CapsuleCollider _collider;
+    private bool _reelingIn = false;
+    private bool _reelingOut = false;
     private readonly float _minTetherDistance = 0.25f;
-    private readonly float _maxTetherDistance = 50f;
+    private readonly float _maxTetherDistance = 1000f;
     private readonly float _transferBufferDistance = 2f;
 
     private Transform _connectedTransform;
@@ -43,6 +46,7 @@ public class Tether : MonoBehaviour
     private void Awake()
     {
         _hook = GetComponent<TetherHookItem>();
+        _audioController = SELocator.GetPlayerBody().GetComponentInChildren<TetherAudioController>();
     }
 
     private void Update()
@@ -75,11 +79,29 @@ public class Tether : MonoBehaviour
                 {
                     _joint.minDistance += Time.deltaTime * 5f;
                     // Play reel noise
+                    if (!_reelingIn)
+                    {
+                        _reelingIn = true;
+                        _reelingOut = false;
+                        _audioController.PlayReelAudio(false);
+                    }
                 }
                 else if (tetherDist < Mathf.Pow(_joint.minDistance + 2f, 2) && OWInput.IsPressed(InputLibrary.toolOptionUp) && _joint.minDistance > _minTetherDistance)
                 {
                     _joint.minDistance -= Time.deltaTime * 5f;
                     // Play reel noise
+                    if (!_reelingOut)
+                    {
+                        _reelingOut = true;
+                        _reelingIn = false;
+                        _audioController.PlayReelAudio(true);
+                    }
+                }
+                else if (_reelingIn || _reelingOut)
+                {
+                    _reelingIn = false;
+                    _reelingOut = false;
+                    _audioController.StopReelAudio();
                 }
 
                 if (OWInput.IsPressed(InputLibrary.freeLook) && OWInput.IsNewlyPressed(InputLibrary.interact))
@@ -386,5 +408,12 @@ public class Tether : MonoBehaviour
     public OWRigidbody GetConnectedBody()
     {
         return _connectedRigidbody;
+    }
+
+    public float GetDistanceToTetherEnd()
+    {
+        if (_joint == null) return 0f;
+        float dist = (_connectedTransform.TransformPoint(_connectedAnchor) - transform.TransformPoint(_anchor)).magnitude;
+        return _joint.minDistance - dist;
     }
 }
