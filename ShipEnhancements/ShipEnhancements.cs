@@ -86,6 +86,8 @@ public class ShipEnhancements : ModBehaviour
     public int ThrustModulatorLevel { get; private set; }
 
     private SettingsPresets.PresetName _currentPreset = (SettingsPresets.PresetName)(-1);
+    
+    public GameObject DebugObjects { get; private set; }
 
     private AssetBundle _shipEnhancementsBundle;
     private float _lastSuitOxygen;
@@ -661,6 +663,9 @@ public class ShipEnhancements : ModBehaviour
 
         SELocator.GetShipBody().GetComponentInChildren<ShipCockpitController>()
             ._interactVolume.gameObject.AddComponent<FlightConsoleInteractController>();
+        
+        var debugObjectsPrefab = LoadPrefab("Assets/ShipEnhancements/DebugObjects.prefab");
+        DebugObjects = Instantiate(debugObjectsPrefab, SELocator.GetShipBody().transform);
 
         GameObject buttonConsole = LoadPrefab("Assets/ShipEnhancements/ButtonConsole.prefab");
         AssetBundleUtilities.ReplaceShaders(buttonConsole);
