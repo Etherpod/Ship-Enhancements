@@ -33,7 +33,7 @@ public static class SEItemAudioController
         _gravityCrystalPickUp = ShipEnhancements.LoadAudio(AudioClipPath + "GravityCrystal_PickUp.ogg");
         _repairWrenchDrop = ShipEnhancements.LoadAudio(AudioClipPath + "RepairWrench_Drop.ogg");
         _repairWrenchPickUp = ShipEnhancements.LoadAudio(AudioClipPath + "RepairWrench_PickUp.ogg");
-        _tetherHookDrop = ShipEnhancements.LoadAudio(AudioClipPath + "TetherHook_Drop.ogg");
+        _tetherHookDrop = ShipEnhancements.LoadAudio(AudioClipPath + "TetherHook_Drop.mp3");
     }
 
     [HarmonyPostfix]

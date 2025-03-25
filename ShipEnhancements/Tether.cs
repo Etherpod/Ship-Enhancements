@@ -200,7 +200,7 @@ public class Tether : MonoBehaviour
 
         if (attachedToPlayer)
         {
-            GlobalMessenger.FireEvent("AttachPlayerTether");
+            ShipEnhancements.Instance.ModHelper.Events.Unity.FireOnNextUpdate(() => GlobalMessenger.FireEvent("AttachPlayerTether"));
         }
     }
 
@@ -380,9 +380,13 @@ public class Tether : MonoBehaviour
         ShipEnhancements.WriteDebugMessage("Generating tether from connected: " + connectedBody);
         TetherHookItem lastHook = _connectedHook;
         DisconnectTether();
-        Vector3 worldPos = lastHook.transform.TransformPoint(lastHook.GetAttachPointOffset());
-        Vector3 parentLocalPos = lastHook.transform.parent.InverseTransformPoint(worldPos);
-        CreateTether(lastBody, _hook.GetAttachPointOffset(), parentLocalPos, true);
+        Vector3 localPos = Vector3.zero;
+        if (lastHook != null)
+        {
+            Vector3 worldPos = lastHook.transform.TransformPoint(lastHook.GetAttachPointOffset());
+            localPos = lastHook.transform.parent.InverseTransformPoint(worldPos);
+        }
+        CreateTether(lastBody, _hook.GetAttachPointOffset(), localPos, true);
         if (flipConnection)
         {
             ShipEnhancements.WriteDebugMessage("flip");
@@ -391,8 +395,11 @@ public class Tether : MonoBehaviour
         }
         _connectedHook = lastHook;
         _hook.TransferToHook();
-        lastHook.TransferToHook();
-        lastHook.SetTether(this);
+        if (lastHook != null)
+        {
+            lastHook.TransferToHook();
+            lastHook.SetTether(this);
+        }
     }
 
     public bool IsTethered()
