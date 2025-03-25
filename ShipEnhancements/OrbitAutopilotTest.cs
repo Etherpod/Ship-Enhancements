@@ -7,8 +7,8 @@ namespace ShipEnhancements;
 
 public class OrbitAutopilotTest : ThrusterController
 {
-    private static readonly Vector3[] CirclePoints = Enumerable.Range(0, 48)
-        .Select(i => Quaternion.AngleAxis(i * 360f / 48, Vector3.up) * Vector3.right)
+    private static readonly Vector3[] CirclePoints = Enumerable.Range(0, 128)
+        .Select(i => Quaternion.AngleAxis(i * 360f / 128, Vector3.up) * Vector3.right)
         .ToArray();
 
     private static readonly Vector3[] ArrowHeadPoints =
@@ -41,10 +41,10 @@ public class OrbitAutopilotTest : ThrusterController
     private float _orbitSpeed;
     private Vector3 _orbitalPlaneNormal;
 
-    private bool _usePid = false;
-    private float _kP = 1;
-    private float _kI = 0.1f;
-    private float _kD = 0.3f;
+    private bool _usePid = true;
+    private float _kP = 0.35f;
+    private float _kI = 0.0f;
+    private float _kD = 1.0f;
     private Vector3 _errorIntegral = Vector3.zero;
 
     private Vector3 _currentPosition;
@@ -116,6 +116,7 @@ public class OrbitAutopilotTest : ThrusterController
         _targetOrbitPathRenderer.transform.SetParent(_referenceFrame.GetOWRigidBody().transform);
         _targetOrbitPathRenderer.transform.localPosition = Vector3.zero;
         _targetOrbitPathRenderer.transform.localRotation = Quaternion.FromToRotation(Vector3.up, _orbitalPlaneNormal);
+        _targetOrbitPathRenderer.widthMultiplier = _orbitRadius / 1000;
         _targetOrbitPathRenderer.positionCount = CirclePoints.Length;
         _targetOrbitPathRenderer.SetPositions(CirclePoints
             .Select(p => p * _orbitRadius)
@@ -140,7 +141,7 @@ public class OrbitAutopilotTest : ThrusterController
         _currentPosition = _owRigidbody.GetWorldCenterOfMass();
         _velocityRelativeToTarget = _referenceFrame.GetOWRigidBody().GetRelativeVelocity(_owRigidbody);
         _relativePosition = _currentPosition - _referenceFrame.GetPosition();
-        _speedTowardsTarget = Mathf.Abs(Vector3.Dot(_velocityRelativeToTarget, -_relativePosition.normalized));
+        _speedTowardsTarget = Vector3.Dot(_velocityRelativeToTarget, -_relativePosition.normalized);
 
         _maxThrust = _ignoreThrustLimits
             ? _thrusterModel.GetMaxTranslationalThrust()
@@ -151,11 +152,11 @@ public class OrbitAutopilotTest : ThrusterController
         _targetOrbitalDirection = Vector3.ProjectOnPlane(_relativePosition, _orbitalPlaneNormal).normalized;
         _targetOrbitalPosition = _referenceFrame.GetPosition() + _targetOrbitalDirection * _orbitRadius;
         _targetOrbitalVelocity = Vector3.Cross(_orbitalPlaneNormal, _targetOrbitalDirection) * _orbitSpeed;
-        _deltaOrbitalVelocity = _targetOrbitalVelocity - _velocityRelativeToTarget;
+        _deltaOrbitalVelocity = _targetOrbitalVelocity - Vector3.Project(_velocityRelativeToTarget, _targetOrbitalVelocity.normalized);
         _deltaOrbitalSpeed = _deltaOrbitalVelocity.magnitude;
         _deltaPositionToOrbit = _targetOrbitalPosition - _currentPosition;
         _distanceToOrbit = _deltaPositionToOrbit.magnitude;
-        _proximityThrottleFactor = Mathf.Lerp(0.05f, 1, (_distanceToOrbit + _speedTowardsTarget) / 1000);
+        _proximityThrottleFactor = Mathf.Lerp(0.05f, 1, (_distanceToOrbit + Mathf.Abs(_speedTowardsTarget)) / 1000);
 
         if (_usePid)
             GetPidOrbitalPositionInput();
@@ -172,7 +173,7 @@ public class OrbitAutopilotTest : ThrusterController
 
         SetArrow(_targetOrbitalPositionRenderer, _targetOrbitalPosition, _targetOrbitalVelocity);
         SetArrow(_positionDeltaRenderer, _currentPosition, _deltaPositionToOrbit);
-        SetArrow(_velocityDeltaRenderer, _currentPosition, _desiredImpulse);
+        SetArrow(_velocityDeltaRenderer, _currentPosition, _velocityRelativeToTarget);
         SetArrow(_orbitVelocityDeltaRenderer, _currentPosition, _deltaOrbitalVelocity);
         SetArrow(_orbitPositionImpulseRenderer, _currentPosition, _orbitPositionImpulse);
 
@@ -184,9 +185,11 @@ public class OrbitAutopilotTest : ThrusterController
         // acceleration direction to orbit
         _orbitPositionImpulse = _deltaPositionToOrbit.normalized * _proximityThrottleFactor;
 
+        if (_speedTowardsTarget < 0) return;
+
         _decelerationForce = -_orbitPositionImpulse;
         _decelerationForce += _forceDetector.GetForceAcceleration();
-        _decelerationForceTowardsOrbit = Vector3.Project(_decelerationForce, _deltaPositionToOrbit);
+        _decelerationForceTowardsOrbit = Vector3.Project(_decelerationForce, _deltaPositionToOrbit.normalized);
         _accelerationToMatchOrbit = _decelerationForceTowardsOrbit.magnitude;
         _timeToDecelerate = _speedTowardsTarget / _accelerationToMatchOrbit;
         _distanceToDecelerate = _speedTowardsTarget * _timeToDecelerate / 2;
@@ -202,11 +205,12 @@ public class OrbitAutopilotTest : ThrusterController
     {
         var proportional = _deltaPositionToOrbit;
         var integral = _errorIntegral + _deltaPositionToOrbit * Time.fixedDeltaTime;
-        var differential = _velocityRelativeToTarget;
+        var differential = _velocityRelativeToTarget - _targetOrbitalVelocity;
 
         _errorIntegral = integral;
 
-        _orbitPositionImpulse = Vector3.ClampMagnitude(_kP * proportional + _kI * integral - _kD * differential, 1);
+        // _orbitPositionImpulse = Vector3.ClampMagnitude(_kP * proportional + _kI * integral - _kD * differential, 1);
+        _orbitPositionImpulse = _kP * proportional + _kI * integral - _kD * differential;
     }
 
     private void PostAutopilotOffNotification()
@@ -225,13 +229,15 @@ public class OrbitAutopilotTest : ThrusterController
 
     private void SetArrow(LineRenderer renderer, Vector3 position, Vector3 vector)
     {
+        var arrowLength = vector.magnitude;
         renderer.transform.SetPositionAndRotation(
             position,
             Quaternion.FromToRotation(Vector3.forward, vector.normalized)
         );
+        renderer.widthMultiplier = arrowLength / 24;
         renderer.positionCount = ArrowHeadPoints.Length + 1;
         renderer.SetPositions(ArrowHeadPoints
-            .Select(p => vector.magnitude * (p / 8 + Vector3.forward))
+            .Select(p => arrowLength * (p / 8 + Vector3.forward))
             .Concat([Vector3.zero])
             .ToArray()
         );
