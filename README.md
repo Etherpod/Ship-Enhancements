@@ -166,10 +166,12 @@ To use the API, copy the **IShipEnhancements** script from this mod's GitHub rep
 # Credits
 Big thanks to **ColumbidaeCafe** for helping develop most of the ideas and sound effects!
 
-Thank you **harperlr** for making the radio model and for helping playtesting QSB support!
+Big thanks to **ditzy** for helping with shaders, helping with one of Ernesto's special abilities, and for coding pretty much the entire program for the orbital autopilot!
+
+Thank you **harperlr** for making the radio model and for helping to playtest QSB support!
 
 Thank you **SpatialX** for making a [Ship Enhancements trailer](https://youtu.be/FT8VdG_Bzo0) and for leaving a ton of ideas on the mod page!
 
-Thank you **ditzy** for helping with custom shaders and one of Ernesto's special abilities, and thank you **JohnCorby** for helping with some physics shenanigans ::)
+Thank you **JohnCorby** for helping with some physics shenanigans ::)
 
 And a final thank you to the **Outer Wilds Modding** server on Discord, this wouldn't have been possible without them.
