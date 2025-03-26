@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -98,7 +99,7 @@ public class MinimapFlagController : MonoBehaviour
             _activeFlags.Add(flag, markerTransform);
             foreach (var rend in markerTransform.GetComponentsInChildren<Renderer>())
             {
-                rend.enabled = _minimap._updateMinimap;
+                rend.enabled = _minimap._updateMinimap && !(bool)disableMinimapMarkers.GetProperty();
                 _renderersToToggle.Add(rend);
             }
             foreach (var comp in markerTransform.GetComponentsInChildren<ElectricalComponent>())
@@ -106,7 +107,8 @@ public class MinimapFlagController : MonoBehaviour
                 comp.SetPowered(_minimap._updateMinimap);
                 if (comp is ShipLight)
                 {
-                    (comp as ShipLight).SetOn(cockpitUI._landingCamScreenLight.IsOn());
+                    (comp as ShipLight).SetOn(cockpitUI._landingCamScreenLight.IsOn() 
+                        && !(bool)disableMinimapMarkers.GetProperty());
                 }
                 _componentsToToggle.Add(comp);
             }

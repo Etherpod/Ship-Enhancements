@@ -4011,8 +4011,10 @@ public static class PatchClass
     #region FlagMarkers
     [HarmonyPostfix]
     [HarmonyPatch(typeof(Minimap), nameof(Minimap.UpdateMarkers))]
-    public static void UpdateFlagMarkers(Minimap __instance)
+    public static void UpdateFlagMarkers(Minimap __instance, bool __runOriginal)
     {
+        if (!__runOriginal) return;
+
         if (__instance.TryGetComponent(out MinimapFlagController flagController))
         {
             flagController.UpdateMarkers();
@@ -4021,8 +4023,10 @@ public static class PatchClass
 
     [HarmonyPostfix]
     [HarmonyPatch(typeof(Minimap), nameof(Minimap.SetComponentsEnabled))]
-    public static void SetFlagMarkersEnabled(Minimap __instance, bool value)
+    public static void SetFlagMarkersEnabled(Minimap __instance, bool value, bool __runOriginal)
     {
+        if (!__runOriginal) return;
+
         if (__instance.TryGetComponent(out MinimapFlagController flagController))
         {
             flagController.SetComponentsEnabled(value);
@@ -4033,6 +4037,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitUI), nameof(ShipCockpitUI.Update))]
     public static void UpdateFlagMarkersOn(ShipCockpitUI __instance)
     {
+        if ((bool)disableMinimapMarkers.GetProperty()) return;
         MinimapFlagController flagController = __instance.GetComponentInChildren<MinimapFlagController>();
         if (flagController == null) return;
         if (__instance._shipSystemsCtrlr.UsingLandingCam() && !__instance._landingCamScreenLight.IsOn())
