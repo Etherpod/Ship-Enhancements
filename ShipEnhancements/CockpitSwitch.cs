@@ -7,74 +7,54 @@ namespace ShipEnhancements;
 public abstract class CockpitSwitch : CockpitInteractible
 {
     [SerializeField]
-    protected float _rotationOffset;
+    protected Transform _switchTransform;
     [SerializeField]
-    protected string _label;
+    protected string _onLabel;
+    [SerializeField]
+    protected string _offLabel;
+    [SerializeField]
+    protected OWEmissiveRenderer _emissiveRenderer; 
+    [SerializeField]
+    protected Light _switchLight;
+    [SerializeField]
+    protected Vector3 _rotationOffset;
+    [SerializeField]
+    protected Vector3 _positionOffset;
     [SerializeField]
     protected OWAudioSource _audioSource;
     [SerializeField]
     protected AudioClip _onAudio;
     [SerializeField]
     protected AudioClip _offAudio;
-    [SerializeField]
-    protected Light _light;
 
-    protected Quaternion _initialRotation;
-    protected OWEmissiveRenderer _renderer;
     protected bool _on = false;
-    protected ElectricalSystem _electricalSystem;
-    protected bool _wasDisrupted = false;
+    protected Vector3 _initialPosition;
+    protected Quaternion _initialRotation;
     protected float _baseLightIntensity;
-    protected bool _enabledInShip;
-
-    public override void Awake()
-    {
-        base.Awake();
-        _renderer = GetComponent<OWEmissiveRenderer>();
-    }
 
     protected virtual void Start()
     {
-        /*if (!_enabledInShip)
-        {
-            enabled = false;
-            return;
-        }*/
-
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
 
-        _interactReceiver.ChangePrompt("Turn On " + _label);
-        transform.localRotation = Quaternion.Euler(_initialRotation.eulerAngles.x + _rotationOffset,
-            _initialRotation.eulerAngles.y, _initialRotation.eulerAngles.z);
-        _renderer.SetEmissiveScale(0f);
-        _baseLightIntensity = _light.intensity;
-        _light.intensity = 0f;
+        _initialPosition = _switchTransform.localPosition;
+        _initialRotation = _switchTransform.localRotation;
+        _baseLightIntensity = _switchLight.intensity;
 
-        _electricalSystem = SELocator.GetShipBody().transform
-            .Find("Module_Cockpit/Systems_Cockpit/FlightControlsElectricalSystem")
-            .GetComponent<ElectricalSystem>();
-        List<ElectricalComponent> componentList = [.. _electricalSystem._connectedComponents];
-        componentList.Add(this);
-        _electricalSystem._connectedComponents = [.. componentList];
+        _interactReceiver.ChangePrompt(_onLabel);
+        _emissiveRenderer.SetEmissiveScale(0f);
+        _switchLight.intensity = 0f;
 
-        if (ShipEnhancements.InMultiplayer && _enabledInShip)
+        AddToElectricalSystem();
+
+        if (ShipEnhancements.InMultiplayer)
         {
             ShipEnhancements.QSBCompat.AddActiveSwitch(this);
         }
     }
 
-    protected void Update()
-    {
-        if (_wasDisrupted != _electricalSystem.IsDisrupted())
-        {
-            _wasDisrupted = _electricalSystem.IsDisrupted();
-            _interactReceiver.SetInteractionEnabled(!_wasDisrupted);
-        }
-    }
-
     protected override void OnPressInteract()
     {
-        ChangeSwitchState(!_on);
+        SetState(!_on);
 
         if (ShipEnhancements.InMultiplayer)
         {
@@ -85,35 +65,36 @@ public abstract class CockpitSwitch : CockpitInteractible
         }
     }
 
-    public void ChangeSwitchState(bool state)
+    public void SetState(bool state)
     {
         _on = state;
+
         if (_on)
         {
-            transform.localRotation = Quaternion.Euler(_initialRotation.eulerAngles.x - _rotationOffset,
-                _initialRotation.eulerAngles.y, _initialRotation.eulerAngles.z);
-            _interactReceiver.ChangePrompt("Turn Off " + _label);
-            _renderer.SetEmissiveScale(1f);
+            _switchTransform.localPosition = _initialPosition + _positionOffset;
+            _switchTransform.localRotation = Quaternion.Euler(_initialRotation.eulerAngles + _rotationOffset);
+            _interactReceiver.ChangePrompt(_offLabel);
+            _emissiveRenderer.SetEmissiveScale(1f);
+            _switchLight.intensity = _baseLightIntensity;
             if (_onAudio)
             {
                 PlaySwitchAudio(_onAudio);
             }
-            _light.intensity = _baseLightIntensity;
         }
         else
         {
-            transform.localRotation = Quaternion.Euler(_initialRotation.eulerAngles.x + _rotationOffset,
-                _initialRotation.eulerAngles.y, _initialRotation.eulerAngles.z);
-            _interactReceiver.ChangePrompt("Turn On " + _label);
-            _renderer.SetEmissiveScale(0f);
+            _switchTransform.localPosition = _initialPosition;
+            _switchTransform.localRotation = _initialRotation;
+            _interactReceiver.ChangePrompt(_onLabel);
+            _emissiveRenderer.SetEmissiveScale(0f);
+            _switchLight.intensity = 0f;
             if (_offAudio)
             {
                 PlaySwitchAudio(_offAudio);
             }
-            _light.intensity = 0f;
         }
 
-        OnFlipSwitch(_on);
+        OnChangeState();
     }
 
     private void PlaySwitchAudio(AudioClip clip)
@@ -124,46 +105,25 @@ public abstract class CockpitSwitch : CockpitInteractible
 
     public override void SetPowered(bool powered)
     {
-        if (!_electricalSystem.IsDisrupted())
+        base.SetPowered(powered);
+
+        if (powered)
         {
-            base.SetPowered(powered);
-            if (powered)
-            {
-                _interactReceiver.EnableInteraction();
-                if (_on)
-                {
-                    _renderer.SetEmissiveScale(1f);
-                    _light.intensity = _baseLightIntensity;
-                }
-            }
-            else
-            {
-                if (_on)
-                {
-                    _renderer.SetEmissiveScale(0f);
-                    _light.intensity = 0f;
-                }
-                _interactReceiver.DisableInteraction();
-            }
+            _emissiveRenderer.SetEmissiveScale(_on ? 1f : 0f);
+            _switchLight.intensity = _on ? _baseLightIntensity : 0f;
         }
-        else if (_on)
+        else
         {
-            if (powered)
-            {
-                _renderer.SetEmissiveScale(1f);
-                _light.intensity = _baseLightIntensity;
-            }
-            else
-            {
-                _renderer.SetEmissiveScale(0f);
-                _light.intensity = 0f;
-            }
+            _emissiveRenderer.SetEmissiveScale(0f);
+            _switchLight.intensity = 0f;
         }
+        ShipEnhancements.WriteDebugMessage(powered);
+        _interactReceiver.SetInteractionEnabled(_electricalDisrupted ? _lastPoweredState : powered);
     }
 
-    protected virtual void OnFlipSwitch(bool state) { }
+    protected virtual void OnChangeState() { }
 
-    public bool IsOn()
+    public virtual bool IsOn()
     {
         return _on;
     }
@@ -178,10 +138,8 @@ public abstract class CockpitSwitch : CockpitInteractible
     {
         base.OnDestroy();
 
-        if (_enabledInShip)
-        {
-            GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
-        }
+        ShipEnhancements.WriteDebugMessage("destroy switch");
+        GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
 
         if (ShipEnhancements.InMultiplayer)
         {

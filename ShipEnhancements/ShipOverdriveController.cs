@@ -30,7 +30,8 @@ public class ShipOverdriveController : ElectricalComponent
     private ElectricalSystem _electricalSystem;
     private CockpitButtonPanel _buttonPanel;
     private ThrustModulatorController _modulatorController;
-    private bool _wasDisrupted = false;
+    private bool _electricalDisrupted = false;
+    private bool _lastPoweredState = false;
     private int _focusedButtons;
     private bool _focused = false;
     private bool _wasInFreeLook = false;
@@ -120,12 +121,6 @@ public class ShipOverdriveController : ElectricalComponent
             {
                 _onCooldown = false;
             }
-        }
-        if (_electricalSystem.IsDisrupted() != _wasDisrupted)
-        {
-            _wasDisrupted = _electricalSystem.IsDisrupted();
-            _primeButton.OnDisruptedEvent(_wasDisrupted);
-            _activateButton.OnDisruptedEvent(_wasDisrupted);
         }
         if (_thrustersUsable != CanUseOverdrive())
         {
@@ -308,17 +303,25 @@ public class ShipOverdriveController : ElectricalComponent
 
     public override void SetPowered(bool powered)
     {
+        if (_electricalSystem != null && _electricalDisrupted != _electricalSystem.IsDisrupted())
+        {
+            _electricalDisrupted = _electricalSystem.IsDisrupted();
+            _lastPoweredState = _powered;
+        }
+
         if (!(bool)enableThrustModulator.GetProperty() || (powered && _fuelDepleted) || (powered && !_thrustersUsable)) return;
+
         base.SetPowered(powered);
-        if (!powered)
+
+        if (!powered && !_electricalDisrupted)
         {
             InterruptOverdrive();
             _primeButton.SetButtonOn(false);
             _activateButton.SetButtonActive(false);
         }
 
-        _primeButton.SetButtonPowered(powered, _electricalSystem.IsDisrupted());
-        _activateButton.SetButtonPowered(powered, _electricalSystem.IsDisrupted());
+        _primeButton.SetButtonPowered(powered, _electricalDisrupted);
+        _activateButton.SetButtonPowered(powered, _electricalDisrupted);
     }
 
     public void PlayButtonAudio(AudioClip audio, float volume)

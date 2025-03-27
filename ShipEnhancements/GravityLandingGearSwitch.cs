@@ -1,18 +1,17 @@
-﻿using static ShipEnhancements.ShipEnhancements.Settings;
-
-namespace ShipEnhancements;
+﻿namespace ShipEnhancements;
 
 public class GravityLandingGearSwitch : CockpitSwitch
 {
-    protected override void OnFlipSwitch(bool state)
+    protected override void OnChangeState()
     {
-        ShipEnhancements.Instance.SetGravityLandingGearEnabled(state);
+        ShipEnhancements.Instance.SetGravityLandingGearEnabled(_on);
     }
 
     public override void SetPowered(bool powered)
     {
         base.SetPowered(powered);
-        if (_electricalSystem.IsDisrupted() || !SELocator.GetShipDamageController().IsElectricalFailed()) return;
-        ShipEnhancements.Instance.SetGravityLandingGearEnabled(_on && powered && !SELocator.GetShipDamageController().IsElectricalFailed());
+        if (_electricalDisrupted) return;
+        ShipEnhancements.Instance.SetGravityLandingGearEnabled(_on && powered 
+            && !SELocator.GetShipDamageController().IsElectricalFailed());
     }
 }

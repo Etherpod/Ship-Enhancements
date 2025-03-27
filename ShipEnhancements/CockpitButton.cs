@@ -5,37 +5,42 @@ namespace ShipEnhancements;
 public class CockpitButton : CockpitInteractible
 {
     [SerializeField]
-    private Transform _buttonTransform;
+    protected Transform _buttonTransform;
     [SerializeField]
-    private string _onLabel;
+    protected string _onLabel;
     [SerializeField]
-    private string _offLabel;
+    protected string _offLabel;
     [SerializeField]
-    private OWEmissiveRenderer _emissiveRenderer;
+    protected OWEmissiveRenderer _emissiveRenderer;
     [SerializeField]
-    private Light _buttonLight;
+    protected Light _buttonLight;
     [SerializeField]
-    private Vector3 _pressOffset;
+    protected Vector3 _rotationOffset;
     [SerializeField]
-    private OWAudioSource _audioSource;
+    protected Vector3 _positionOffset;
     [SerializeField]
-    private AudioClip _pressAudio;
+    protected OWAudioSource _audioSource;
     [SerializeField]
-    private AudioClip _releaseAudio;
+    protected AudioClip _pressAudio;
+    [SerializeField]
+    protected AudioClip _releaseAudio;
 
     protected bool _pressed;
     protected bool _on;
     protected Vector3 _initialButtonPosition;
+    protected Quaternion _initialButtonRotation;
     protected float _baseLightIntensity;
 
     protected virtual void Start()
     {
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
 
-        _interactReceiver.ChangePrompt(_onLabel);
         _initialButtonPosition = _buttonTransform.localPosition;
-        _emissiveRenderer.SetEmissiveScale(0f);
+        _initialButtonRotation = _buttonTransform.localRotation;
         _baseLightIntensity = _buttonLight.intensity;
+
+        _interactReceiver.ChangePrompt(_onLabel);
+        _emissiveRenderer.SetEmissiveScale(0f);
         _buttonLight.intensity = 0f;
 
         AddToElectricalSystem();
@@ -44,7 +49,8 @@ public class CockpitButton : CockpitInteractible
     protected override void OnPressInteract()
     {
         _pressed = true;
-        _buttonTransform.localPosition = _initialButtonPosition + _pressOffset;
+        _buttonTransform.localPosition = _initialButtonPosition + _positionOffset;
+        _buttonTransform.localRotation = Quaternion.Euler(_initialButtonRotation.eulerAngles + _rotationOffset);
         if (_pressAudio)
         {
             _audioSource.PlayOneShot(_pressAudio, 0.5f);
@@ -57,9 +63,19 @@ public class CockpitButton : CockpitInteractible
     {
         _pressed = false;
         _buttonTransform.localPosition = _initialButtonPosition;
+        _buttonTransform.localRotation = _initialButtonRotation;
         if (_releaseAudio)
         {
             _audioSource.PlayOneShot(_releaseAudio, 0.5f);
+        }
+    }
+
+    protected override void OnLoseFocus()
+    {
+        base.OnLoseFocus();
+        if (_pressed)
+        {
+            OnReleaseInteract();
         }
     }
 
@@ -79,6 +95,8 @@ public class CockpitButton : CockpitInteractible
             _emissiveRenderer.SetEmissiveScale(0f);
             _buttonLight.intensity = 0f;
         }
+
+        OnChangeState();
     }
 
     protected virtual void OnChangeState() { }
@@ -101,7 +119,7 @@ public class CockpitButton : CockpitInteractible
         _interactReceiver.SetInteractionEnabled(_electricalDisrupted ? _lastPoweredState : powered);
     }
 
-    public bool IsOn()
+    public virtual bool IsOn()
     {
         return _on;
     }
@@ -114,6 +132,8 @@ public class CockpitButton : CockpitInteractible
 
     protected override void OnDestroy()
     {
+        base.OnDestroy();
+
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
     }
 }

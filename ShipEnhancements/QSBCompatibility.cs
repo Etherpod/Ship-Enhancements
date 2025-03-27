@@ -302,7 +302,7 @@ public class QSBCompatibility
         {
             if (cockpitSwitch.GetType().Name == data.Item1)
             {
-                cockpitSwitch.ChangeSwitchState(data.Item2);
+                cockpitSwitch.SetState(data.Item2);
             }
         }
     }
@@ -940,7 +940,7 @@ public class QSBCompatibility
 
     private void ReceiveGravInvertSwitchState(uint id, bool enabled)
     {
-        SELocator.GetShipTransform().GetComponentInChildren<GravityGearInvertSwitch>()?.ChangeSwitchState(enabled);
+        SELocator.GetShipTransform().GetComponentInChildren<GravityGearInvertSwitch>()?.SetState(enabled);
     }
     #endregion
 
