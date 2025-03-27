@@ -21,7 +21,6 @@ public abstract class CockpitSwitch : CockpitInteractible
 
     protected Quaternion _initialRotation;
     protected OWEmissiveRenderer _renderer;
-    protected CockpitButtonPanel _buttonPanel;
     protected bool _on = false;
     protected ElectricalSystem _electricalSystem;
     protected bool _wasDisrupted = false;
@@ -31,23 +30,16 @@ public abstract class CockpitSwitch : CockpitInteractible
     public override void Awake()
     {
         base.Awake();
-
-        _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
         _renderer = GetComponent<OWEmissiveRenderer>();
-
-        if (ShipEnhancements.InMultiplayer && _enabledInShip)
-        {
-            ShipEnhancements.QSBCompat.AddActiveSwitch(this);
-        }
     }
 
     protected virtual void Start()
     {
-        if (!_enabledInShip)
+        /*if (!_enabledInShip)
         {
             enabled = false;
             return;
-        }
+        }*/
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
 
@@ -64,6 +56,11 @@ public abstract class CockpitSwitch : CockpitInteractible
         List<ElectricalComponent> componentList = [.. _electricalSystem._connectedComponents];
         componentList.Add(this);
         _electricalSystem._connectedComponents = [.. componentList];
+
+        if (ShipEnhancements.InMultiplayer && _enabledInShip)
+        {
+            ShipEnhancements.QSBCompat.AddActiveSwitch(this);
+        }
     }
 
     protected void Update()

@@ -4,13 +4,6 @@ namespace ShipEnhancements;
 
 public class GravityLandingGearSwitch : CockpitSwitch
 {
-    public override void Awake()
-    {
-        _enabledInShip = (bool)enableGravityLandingGear.GetProperty();
-        base.Awake();
-        _buttonPanel.SetGravityLandingGearActive((bool)enableGravityLandingGear.GetProperty());
-    }
-
     protected override void OnFlipSwitch(bool state)
     {
         ShipEnhancements.Instance.SetGravityLandingGearEnabled(state);

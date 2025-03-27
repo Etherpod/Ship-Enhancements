@@ -26,7 +26,6 @@ public class ShipEngineSwitch : CockpitInteractible
     [SerializeField]
     private AudioClip _releaseAudio;
 
-    private CockpitButtonPanel _buttonPanel;
     private ShipThrusterController _thrusterController;
     private ShipAudioController _audioController;
     private MasterAlarm _alarm;
@@ -53,19 +52,6 @@ public class ShipEngineSwitch : CockpitInteractible
     public override void Awake()
     {
         base.Awake();
-
-        _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
-
-        if ((bool)addEngineSwitch.GetProperty())
-        {
-            _buttonPanel.SetEngineSwitchActive(true);
-        }
-        else
-        {
-            _buttonPanel.SetEngineSwitchActive(false);
-            enabled = false;
-            return;
-        }
 
         _thrusterController = SELocator.GetShipBody().GetComponent<ShipThrusterController>();
         _audioController = SELocator.GetShipBody().GetComponentInChildren<ShipAudioController>();

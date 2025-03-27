@@ -1,4 +1,4 @@
-﻿using System.Linq;
+﻿using static ShipEnhancements.ShipEnhancements.Settings;
 using UnityEngine;
 
 namespace ShipEnhancements;
@@ -38,25 +38,37 @@ public class CockpitButtonPanel : MonoBehaviour
     [SerializeField]
     private AudioClip _finishSlideAudio;
 
-    private int _numButtons = 0;
-    private int _numBottomButtons = 0;
     private bool _extending = false;
     private bool _completedSlide = false;
     private float _buttonPanelT = 0f;
     private float _extensionTime = 0.4f;
     private int _focusedButtons = 0;
 
-    private void Start()
+    private void Awake()
     {
-        if (_numButtons == 0)
+        if (!(bool)enableGravityLandingGear.GetProperty()
+            && !(bool)enableThrustModulator.GetProperty()
+            && !(bool)enablePersistentInput.GetProperty()
+            && !(bool)addEngineSwitch.GetProperty())
         {
             gameObject.SetActive(false);
             return;
         }
-        else if (_numBottomButtons == 0)
+        else if (!(bool)enablePersistentInput.GetProperty()
+            && !(bool)addEngineSwitch.GetProperty())
         {
             _bottomPanel.SetActive(false);
         }
+
+        _gravityGearObject.SetActive((bool)enableGravityLandingGear.GetProperty());
+        _gravityGearReplacement.SetActive(!(bool)enableGravityLandingGear.GetProperty());
+        _thrustModulatorObject.SetActive((bool)enableThrustModulator.GetProperty());
+        _thrustModulatorReplacement.SetActive(!(bool)enableThrustModulator.GetProperty());
+        _persistentInputObject.SetActive((bool)enablePersistentInput.GetProperty());
+        _persistentInputReplacement.SetActive(!(bool)enablePersistentInput.GetProperty());
+        _engineSwitchObject.SetActive((bool)addEngineSwitch.GetProperty());
+        _engineSwitchReplacement.SetActive(!(bool)addEngineSwitch.GetProperty());
+
         GlobalMessenger.AddListener("ExitFlightConsole", OnExitFlightConsole);
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
     }
@@ -160,7 +172,7 @@ public class CockpitButtonPanel : MonoBehaviour
         }
     }
 
-    public void SetThrustModulatorActive(bool active)
+    /*public void SetThrustModulatorActive(bool active)
     {
         if (active)
         {
@@ -220,7 +232,7 @@ public class CockpitButtonPanel : MonoBehaviour
             _engineSwitchObject.SetActive(false);
             _engineSwitchReplacement.SetActive(true);
         }
-    }
+    }*/
 
     private void OnShipSystemFailure()
     {

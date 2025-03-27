@@ -27,17 +27,6 @@ public class ThrustModulatorController : ElectricalComponent
     public override void Awake()
     {
         _powered = true;
-        _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
-        if ((bool)enableThrustModulator.GetProperty())
-        {
-            _buttonPanel.SetThrustModulatorActive(true);
-        }
-        else
-        {
-            _buttonPanel.SetThrustModulatorActive(false);
-            enabled = false;
-            return;
-        }
 
         base.Awake();
 
