@@ -1,6 +1,6 @@
 ﻿namespace ShipEnhancements;
 
-public class ApproachAutopilotButton : CockpitButton
+public class ApproachAutopilotButton : CockpitButtonSwitch
 {
     private Autopilot _autopilot;
 
@@ -12,9 +12,9 @@ public class ApproachAutopilotButton : CockpitButton
         _autopilot.OnInitFlyToDestination += OnInitFlyToDestination;
     }
 
-    public override void OnChangeState()
+    public override void OnChangeActive()
     {
-        if (_on && Locator.GetReferenceFrame() != null && !_autopilot.IsDamaged()
+        if (_activated && Locator.GetReferenceFrame() != null && !_autopilot.IsDamaged()
             && Locator.GetReferenceFrame().GetAllowAutopilot())
         {
             _autopilot.FlyToDestination(Locator.GetReferenceFrame());
@@ -27,15 +27,12 @@ public class ApproachAutopilotButton : CockpitButton
 
     private void OnAbortAutopilot()
     {
-        SetState(false);
+        SetActive(false);
     }
 
     private void OnInitFlyToDestination()
     {
-        if (!_on)
-        {
-            SetState(true);
-        }
+        SetActive(true);
     }
 
     protected override void OnDestroy()
