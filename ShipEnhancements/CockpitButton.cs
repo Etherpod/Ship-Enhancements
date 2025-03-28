@@ -57,6 +57,7 @@ public class CockpitButton : CockpitInteractible
         }
 
         SetState(!_on);
+        OnChangeState();
     }
 
     protected override void OnReleaseInteract()
@@ -80,7 +81,7 @@ public class CockpitButton : CockpitInteractible
         }
     }
 
-    protected virtual void SetState(bool state)
+    public virtual void SetState(bool state)
     {
         _on = state;
 
@@ -99,11 +100,9 @@ public class CockpitButton : CockpitInteractible
         {
             _interactReceiver.ChangePrompt(_on ? _offLabel : _onLabel);
         }
-
-        OnChangeState();
     }
 
-    protected virtual void OnChangeState() { }
+    public virtual void OnChangeState() { }
 
     public override void SetPowered(bool powered)
     {

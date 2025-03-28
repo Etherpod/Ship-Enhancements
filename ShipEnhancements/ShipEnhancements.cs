@@ -546,11 +546,11 @@ public class ShipEnhancements : ModBehaviour
             }
         }
 
-        if (Keyboard.current.rightBracketKey.wasPressedThisFrame)
+        /*if (Keyboard.current.rightBracketKey.wasPressedThisFrame)
         {
             WriteDebugMessage("attempting orbit");
             SELocator.GetShipTransform().GetComponent<OrbitAutopilotTest>().ToggleMaintainOrbit();
-        }
+        }*/
     }
 
     private void LateUpdate()

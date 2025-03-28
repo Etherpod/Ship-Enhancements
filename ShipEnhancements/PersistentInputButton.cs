@@ -13,7 +13,7 @@ public class PersistentInputButton : CockpitButton
         _persistentInput.SetInputEnabled(_on && !SELocator.GetShipDamageController().IsElectricalFailed());
     }
 
-    protected override void OnChangeState()
+    public override void OnChangeState()
     {
         _persistentInput.SetInputEnabled(_on);
     }

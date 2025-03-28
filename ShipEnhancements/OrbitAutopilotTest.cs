@@ -92,14 +92,18 @@ public class OrbitAutopilotTest : ThrusterController
         return ShipEnhancements.Instance.DebugObjects.transform.Find(objectName).GetComponent<LineRenderer>();
     }
 
-    public void ToggleMaintainOrbit(bool ignoreThrustLimits = true)
+    public void SetOrbitEnabled(bool orbit, bool ignoreThrustLimits = true)
     {
-        if (enabled || Locator.GetReferenceFrame() == null)
+        if (!orbit || Locator.GetReferenceFrame() == null
+            || !SELocator.GetShipResources().AreThrustersUsable())
         {
-            PostAutopilotOffNotification();
-            enabled = false;
-            _ignoreThrustLimits = false;
-            ShipEnhancements.WriteDebugMessage("nothing to orbit");
+            if (enabled)
+            {
+                PostAutopilotOffNotification();
+                enabled = false;
+                _ignoreThrustLimits = false;
+                ShipEnhancements.WriteDebugMessage("nothing to orbit");
+            }
             return;
         }
 
@@ -130,7 +134,7 @@ public class OrbitAutopilotTest : ThrusterController
 
     public override Vector3 ReadTranslationalInput()
     {
-        if (_referenceFrame == null)
+        if (Locator.GetReferenceFrame() == null || !SELocator.GetShipResources().AreThrustersUsable())
         {
             PostAutopilotOffNotification();
             enabled = false;
