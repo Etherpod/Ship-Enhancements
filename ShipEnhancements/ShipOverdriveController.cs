@@ -204,8 +204,8 @@ public class ShipOverdriveController : ElectricalComponent
         }
 
         _defaultColor = _thrusterRenderers[0].material.GetColor("_Color");
-        _primeButton.SetButtonOn(false);
-        _activateButton.SetButtonActive(false);
+        _primeButton.SetCooldown(4f);
+        _activateButton.SetCooldown(4f);
         _cooldownT = 1f;
         _onCooldown = true;
     }

@@ -117,7 +117,7 @@ public abstract class CockpitSwitch : CockpitInteractible
             _emissiveRenderer.SetEmissiveScale(0f);
             _switchLight.intensity = 0f;
         }
-        ShipEnhancements.WriteDebugMessage(powered);
+
         _interactReceiver.SetInteractionEnabled(_electricalDisrupted ? _lastPoweredState : powered);
     }
 

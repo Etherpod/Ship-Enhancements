@@ -31,6 +31,7 @@ public class OverdriveButton : CockpitInteractible
     private bool _on;
     private float _depressionDistance = 0.00521f;
     private bool _pressed;
+    private float _cooldownT;
 
     public override void Awake()
     {
@@ -46,6 +47,35 @@ public class OverdriveButton : CockpitInteractible
 
         _interactReceiver.ChangePrompt(_isPrimeButton ? "Disable safeties" : "Activate Overdrive");
         _light.color = _inactiveColor;
+
+        enabled = false;
+    }
+
+    private void Update()
+    {
+        if (_cooldownT > 0f)
+        {
+            _cooldownT -= Time.deltaTime;
+
+            if (_cooldownT <= 0f)
+            {
+                enabled = false;
+                _interactReceiver.SetInteractionEnabled(_powered);
+                if (!_powered) return;
+                if (_isPrimeButton)
+                {
+                    SetButtonOn(false);
+                }
+                else
+                {
+                    SetButtonActive(false);
+                }
+            }
+        }
+        else
+        {
+            enabled = false;
+        }
     }
 
     protected override void OnPressInteract()
@@ -127,25 +157,10 @@ public class OverdriveButton : CockpitInteractible
         return _active;
     }
 
-    public void OnDisruptedEvent(bool disrupted)
-    {
-        if (disrupted)
-        {
-            _interactReceiver.DisableInteraction();
-        }
-        else
-        {
-            if (_active && _powered && (_isPrimeButton || !_on))
-            {
-                _interactReceiver.EnableInteraction();
-            }
-        }
-    }
-
     public void SetButtonActive(bool active)
     {
         _active = active;
-        if (!_powered) return;
+        if (!_powered || _cooldownT > 0f) return;
         if (active)
         {
             _emissiveRenderer.SetEmissionColor(_on ? _onColor : _offColor);
@@ -177,7 +192,7 @@ public class OverdriveButton : CockpitInteractible
         {
             _interactReceiver.ChangePrompt(_on ? "Enable safeties" : "Disable safeties");
         }
-        if (!_powered) return;
+        if (!_powered || _cooldownT > 0f) return;
         _emissiveRenderer.SetEmissionColor(_on ? _onColor : _offColor);
         _light.color = _on ? _onColor : _offColor;
         if (_pressed)
@@ -189,6 +204,8 @@ public class OverdriveButton : CockpitInteractible
     public void SetButtonPowered(bool state, bool disrupted)
     {
         _powered = disrupted ? _powered : state;
+
+        if (_cooldownT > 0f) return;
 
         if (state)
         {
@@ -214,5 +231,14 @@ public class OverdriveButton : CockpitInteractible
         }
 
         _interactReceiver.SetInteractionEnabled(_powered);
+    }
+
+    public void SetCooldown(float cooldown)
+    {
+        SetButtonActive(false);
+        _interactReceiver.DisableInteraction();
+
+        _cooldownT = cooldown;
+        enabled = true;
     }
 }

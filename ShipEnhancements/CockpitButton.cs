@@ -64,6 +64,7 @@ public class CockpitButton : CockpitInteractible
         _pressed = false;
         _buttonTransform.localPosition = _initialButtonPosition;
         _buttonTransform.localRotation = _initialButtonRotation;
+        _interactReceiver.ChangePrompt(_on ? _offLabel : _onLabel);
         if (_releaseAudio)
         {
             _audioSource.PlayOneShot(_releaseAudio, 0.5f);
@@ -85,15 +86,18 @@ public class CockpitButton : CockpitInteractible
 
         if (_on)
         {
-            _interactReceiver.ChangePrompt(_offLabel);
             _emissiveRenderer.SetEmissiveScale(1f);
             _buttonLight.intensity = _baseLightIntensity;
         }
         else
         {
-            _interactReceiver.ChangePrompt(_onLabel);
             _emissiveRenderer.SetEmissiveScale(0f);
             _buttonLight.intensity = 0f;
+        }
+
+        if (!_pressed)
+        {
+            _interactReceiver.ChangePrompt(_on ? _offLabel : _onLabel);
         }
 
         OnChangeState();
