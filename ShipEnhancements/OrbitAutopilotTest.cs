@@ -134,7 +134,7 @@ public class OrbitAutopilotTest : ThrusterController
 
     public override Vector3 ReadTranslationalInput()
     {
-        if (Locator.GetReferenceFrame() == null || !SELocator.GetShipResources().AreThrustersUsable())
+        if (Locator.GetReferenceFrame() != _referenceFrame || !SELocator.GetShipResources().AreThrustersUsable())
         {
             PostAutopilotOffNotification();
             enabled = false;
