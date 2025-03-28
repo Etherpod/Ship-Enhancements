@@ -25,6 +25,9 @@ public class CockpitButton : CockpitInteractible
     [SerializeField]
     protected AudioClip _releaseAudio;
 
+    public delegate void CockpitButtonEvent(bool value);
+    public event CockpitButtonEvent OnChangeState;
+
     protected bool _pressed;
     protected bool _on;
     protected Vector3 _initialButtonPosition;
@@ -59,7 +62,8 @@ public class CockpitButton : CockpitInteractible
         }
 
         SetState(!_on);
-        OnChangeState();
+        RaiseChangeStateEvent();
+        OnChangeStateEvent();
     }
 
     protected override void OnReleaseInteract()
@@ -104,7 +108,12 @@ public class CockpitButton : CockpitInteractible
         }
     }
 
-    public virtual void OnChangeState() { }
+    public virtual void OnChangeStateEvent() { }
+
+    public void RaiseChangeStateEvent()
+    {
+        OnChangeState?.Invoke(_on);
+    }
 
     public override void SetPowered(bool powered)
     {

@@ -12,9 +12,9 @@ public class ApproachAutopilotButton : CockpitButtonSwitch
         _autopilot.OnInitFlyToDestination += OnInitFlyToDestination;
     }
 
-    public override void OnChangeActive()
+    public override void OnChangeActiveEvent()
     {
-        if (_activated && Locator.GetReferenceFrame() != null && !_autopilot.IsDamaged()
+        if (IsActivated() && Locator.GetReferenceFrame() != null && !_autopilot.IsDamaged()
             && Locator.GetReferenceFrame().GetAllowAutopilot())
         {
             _autopilot.FlyToDestination(Locator.GetReferenceFrame());

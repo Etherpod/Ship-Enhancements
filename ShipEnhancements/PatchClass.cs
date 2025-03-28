@@ -4110,4 +4110,111 @@ public static class PatchClass
         }
     }
     #endregion
+
+    #region AutopilotOverride
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.Update))]
+    public static bool OverrideAutopilotInputs(ShipCockpitController __instance)
+    {
+        if (!(bool)enablePersistentInput.GetProperty()) return true;
+
+        if (!__instance._playerAtFlightConsole)
+        {
+            return false;
+        }
+        if (__instance._controlsLocked && Time.time >= __instance._controlsUnlockTime)
+        {
+            __instance._controlsLocked = false;
+            __instance._thrustController.enabled = !__instance._shipSystemFailure;
+            if (!__instance._shipSystemFailure)
+            {
+                if (__instance._thrustController.RequiresIgnition() && __instance._landingManager.IsLanded())
+                {
+                    RumbleManager.SetShipThrottleCold();
+                }
+                else
+                {
+                    RumbleManager.SetShipThrottleNormal();
+                }
+            }
+        }
+        if (!OWInput.IsInputMode(InputMode.ShipCockpit | InputMode.LandingCam))
+        {
+            if (__instance._autopilot.IsMatchingVelocity() && !__instance._autopilot.IsFlyingToDestination())
+            {
+                SELocator.GetShipTransform().GetComponentInChildren<AutopilotPanelController>().OnCancelMatchVelocity();
+                //__instance._autopilot.StopMatchVelocity();
+            }
+            return false;
+        }
+        __instance.UpdateShipLightInput();
+        if (__instance._autopilot.IsFlyingToDestination())
+        {
+            if (OWInput.IsNewlyPressed(InputLibrary.autopilot, InputMode.All))
+            {
+                SELocator.GetShipTransform().GetComponentInChildren<AutopilotPanelController>().OnCancelAutopilot();
+                //__instance.AbortAutopilot();
+            }
+        }
+        else
+        {
+            if (__instance.IsAutopilotAvailable() && OWInput.IsNewlyPressed(InputLibrary.autopilot, InputMode.ShipCockpit))
+            {
+                InputLibrary.lockOn.BlockNextRelease();
+
+                SELocator.GetShipTransform().GetComponentInChildren<AutopilotPanelController>().OnInitAutopilot();
+                //__instance._autopilot.FlyToDestination(Locator.GetReferenceFrame(true));
+            }
+            if (__instance.IsMatchVelocityAvailable(false) && OWInput.IsNewlyPressed(InputLibrary.matchVelocity, InputMode.All))
+            {
+                SELocator.GetShipTransform().GetComponentInChildren<AutopilotPanelController>().OnInitMatchVelocity();
+                //__instance._autopilot.StartMatchVelocity(Locator.GetReferenceFrame(false), false);
+            }
+            else if (__instance._autopilot.IsMatchingVelocity() && !__instance._autopilot.IsFlyingToDestination() && OWInput.IsNewlyReleased(InputLibrary.matchVelocity, InputMode.All))
+            {
+                SELocator.GetShipTransform().GetComponentInChildren<AutopilotPanelController>().OnCancelMatchVelocity();
+                //__instance._autopilot.StopMatchVelocity();
+            }
+            if (!__instance._enteringLandingCam)
+            {
+                if (!__instance.UsingLandingCam() && OWInput.IsNewlyPressed(InputLibrary.landingCamera, InputMode.All) && !OWInput.IsPressed(InputLibrary.freeLook, 0f))
+                {
+                    __instance.EnterLandingView();
+                }
+                else if (__instance.UsingLandingCam() && (OWInput.IsNewlyPressed(InputLibrary.landingCamera, InputMode.All) || OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.All)))
+                {
+                    InputLibrary.cancel.ConsumeInput();
+                    __instance.ExitLandingView();
+                }
+            }
+        }
+        if (__instance.UsingLandingCam())
+        {
+            if (__instance._enteringLandingCam)
+            {
+                __instance.UpdateEnterLandingCamTransition();
+            }
+            if (!__instance._isLandingMode && __instance.IsLandingModeAvailable())
+            {
+                __instance.EnterLandingMode();
+            }
+            else if (__instance._isLandingMode && !__instance.IsLandingModeAvailable())
+            {
+                __instance.ExitLandingMode();
+            }
+            __instance._playerAttachOffset = Vector3.MoveTowards(__instance._playerAttachOffset, Vector3.zero, Time.deltaTime);
+        }
+        else
+        {
+            __instance._playerAttachOffset = __instance._thrusterModel.GetLocalAcceleration() / __instance._thrusterModel.GetMaxTranslationalThrust() * -0.2f;
+            if (Locator.GetToolModeSwapper().GetToolMode() == ToolMode.None && OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.All))
+            {
+                __instance.ExitFlightConsole();
+            }
+        }
+        __instance._playerAttachPoint.SetAttachOffset(__instance._playerAttachOffset);
+
+        return false;
+    }
+    #endregion
 }

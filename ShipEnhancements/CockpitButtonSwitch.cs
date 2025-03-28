@@ -9,6 +9,8 @@ public class CockpitButtonSwitch : CockpitButton
     [SerializeField]
     protected string _deactivateLabel;
 
+    public event CockpitButtonEvent OnChangeActive;
+
     protected bool _activated;
 
     protected override void Start()
@@ -30,12 +32,14 @@ public class CockpitButtonSwitch : CockpitButton
         if (!_on)
         {
             SetState(true);
-            OnChangeState();
+            RaiseChangeStateEvent();
+            OnChangeStateEvent();
         }
         else
         {
             SetActive(!_activated);
-            OnChangeActive();
+            RaiseChangeActiveEvent();
+            OnChangeActiveEvent();
         }
     }
 
@@ -49,10 +53,15 @@ public class CockpitButtonSwitch : CockpitButton
         }
     }
 
-    public virtual void OnChangeActive() { }
+    public virtual void OnChangeActiveEvent() { }
+
+    public void RaiseChangeActiveEvent()
+    {
+        OnChangeActive?.Invoke(_activated);
+    }
 
     public virtual bool IsActivated()
     {
-        return _activated;
+        return _on && _activated;
     }
 }

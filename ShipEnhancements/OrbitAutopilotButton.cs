@@ -1,6 +1,6 @@
 ﻿namespace ShipEnhancements;
 
-public class OrbitAutopilotButton : CockpitButton
+public class OrbitAutopilotButton : CockpitButtonSwitch
 {
     private Autopilot _autopilot;
     private OrbitAutopilotTest _orbitAutopilot;
@@ -12,9 +12,9 @@ public class OrbitAutopilotButton : CockpitButton
         _orbitAutopilot = SELocator.GetShipBody().GetComponent<OrbitAutopilotTest>();
     }
 
-    public override void OnChangeState()
+    public override void OnChangeActiveEvent()
     {
-        if (_on && Locator.GetReferenceFrame() != null && !_autopilot.IsDamaged())
+        if (IsActivated() && Locator.GetReferenceFrame() != null && !_autopilot.IsDamaged())
         {
             _orbitAutopilot.SetOrbitEnabled(true, false);
         }

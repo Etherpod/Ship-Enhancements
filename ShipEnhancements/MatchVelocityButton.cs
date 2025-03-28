@@ -1,6 +1,6 @@
 ﻿namespace ShipEnhancements;
 
-public class MatchVelocityButton : CockpitButton
+public class MatchVelocityButton : CockpitButtonSwitch
 {
     private Autopilot _autopilot;
 
@@ -12,9 +12,9 @@ public class MatchVelocityButton : CockpitButton
         // disable event?
     }
 
-    public override void OnChangeState()
+    public override void OnChangeActiveEvent()
     {
-        if (_on && Locator.GetReferenceFrame() != null && !_autopilot.IsDamaged())
+        if (IsActivated() && Locator.GetReferenceFrame() != null && !_autopilot.IsDamaged())
         {
             _autopilot.StartMatchVelocity(Locator.GetReferenceFrame());
         }
@@ -26,7 +26,7 @@ public class MatchVelocityButton : CockpitButton
 
     private void OnInitMatchVelocity()
     {
-        SetState(true);
+        //SetActive(true);
     }
 
     protected override void OnDestroy()
