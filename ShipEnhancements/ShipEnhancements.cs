@@ -206,6 +206,7 @@ public class ShipEnhancements : ModBehaviour
         sandDamage,
         disableMinimapMarkers,
         scoutPhotoMode,
+        fixShipThrustIndicator,
     }
 
     private void Awake()

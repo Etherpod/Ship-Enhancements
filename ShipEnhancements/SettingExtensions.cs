@@ -115,6 +115,7 @@ public static class SettingExtensions
         { Settings.sandDamage, (1f, 1f) },
         { Settings.disableMinimapMarkers, (1f, 1f) },
         { Settings.scoutPhotoMode, (false, false) },
+        { Settings.fixShipThrustIndicator, (false, false) },
     };
 
     public static string GetName(this Settings setting)

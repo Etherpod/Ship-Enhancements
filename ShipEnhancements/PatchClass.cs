@@ -2165,37 +2165,6 @@ public static class PatchClass
 
     #region PersistentInput
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.OnExitFlightConsole))]
-    public static bool KeepThrustIndicatorOn(ThrustAndAttitudeIndicator __instance)
-    {
-        if (!(bool)enableEnhancedAutopilot.GetProperty() || !SELocator.GetShipBody().GetComponent<ShipPersistentInput>().InputEnabled()) return true;
-
-        __instance._activeThrusterModel = __instance._jetpackThrusterModel;
-        __instance._activeThrusterController = __instance._jetpackThrusterController;
-        if (__instance._shipIndicatorMode)
-        {
-            //__instance.ResetAllArrows();
-            //__instance._thrusterArrowRoot.gameObject.SetActive(false);
-            __instance.enabled = false;
-            return false;
-        }
-        __instance._thrusterArrowRoot.gameObject.SetActive(true);
-        __instance.enabled = true;
-        return false;
-    }
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.OnEnterConversation))]
-    public static bool KeepThrustIndicatorOnInConversation(ThrustAndAttitudeIndicator __instance)
-    {
-        if (!(bool)enableEnhancedAutopilot.GetProperty() || !__instance._shipIndicatorMode
-            || !SELocator.GetShipBody().GetComponent<ShipPersistentInput>().InputEnabled()) return true;
-
-        __instance._inConversation = true;
-        return false;
-    }
-
-    [HarmonyPrefix]
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.ExitFlightConsole))]
     public static void UpdatePersistentInputAutopilotState()
     {
@@ -4225,6 +4194,58 @@ public static class PatchClass
             && __instance.enabled)
         {
             SELocator.GetAutopilotPanelController().OnCancelMatchVelocity();
+        }
+    }
+    #endregion
+
+    #region AlwaysEnableThrustIndicator
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.Start))]
+    public static void ThrustIndicatorStartOn(ThrustAndAttitudeIndicator __instance)
+    {
+        if ((bool)fixShipThrustIndicator.GetProperty() && __instance._shipIndicatorMode && !__instance.enabled)
+        {
+            __instance._activeThrusterModel = __instance._shipThrusterModel;
+            __instance._activeThrusterController = __instance._shipThrusterController;
+            __instance._thrusterArrowRoot.gameObject.SetActive(true);
+            __instance.enabled = true;
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.OnExitFlightConsole))]
+    public static void KeepThrustIndicatorOn(ThrustAndAttitudeIndicator __instance)
+    {
+        if ((bool)fixShipThrustIndicator.GetProperty() && __instance._shipIndicatorMode && !__instance.enabled)
+        {
+            __instance._activeThrusterModel = __instance._shipThrusterModel;
+            __instance._activeThrusterController = __instance._shipThrusterController;
+            __instance._thrusterArrowRoot.gameObject.SetActive(true);
+            __instance.enabled = true;
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.OnEnterConversation))]
+    public static void KeepThrustIndicatorOnInConversation(ThrustAndAttitudeIndicator __instance)
+    {
+        if ((bool)fixShipThrustIndicator.GetProperty() && __instance._shipIndicatorMode && __instance._inConversation)
+        {
+            __instance._thrusterArrowRoot.gameObject.SetActive(true);
+            __instance._inConversation = false;
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.LateUpdate))]
+    public static void OverrideJetpackDisplay(ThrustAndAttitudeIndicator __instance)
+    {
+        if ((bool)fixShipThrustIndicator.GetProperty() && __instance._shipIndicatorMode && __instance._jetpackThrusterModel.IsBoosterFiring())
+        {
+            Vector3 localAcceleration = __instance._activeThrusterModel.GetLocalAcceleration();
+            float num3 = __instance._activeThrusterModel.GetMaxTranslationalThrust();
+            __instance.DisplayArrows(0f, 1f, __instance._boostArrows, null);
+            __instance.DisplayArrows(localAcceleration.y, num3, __instance._rendererDown, __instance._lightsDown);
         }
     }
     #endregion

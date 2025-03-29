@@ -114,6 +114,7 @@ public static class SettingsPresets
         { "sandDamage", 0f },
         { "disableMinimapMarkers", false },
         { "scoutPhotoMode", false },
+        { "fixShipThrustIndicator", true },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -224,6 +225,7 @@ public static class SettingsPresets
         { "sandDamage", 0f },
         { "disableMinimapMarkers", true },
         { "scoutPhotoMode", false },
+        { "fixShipThrustIndicator", true },
     };
 
     public static readonly Dictionary<string, object> ImpossibleSettings = new Dictionary<string, object>()
@@ -334,6 +336,7 @@ public static class SettingsPresets
         { "sandDamage", 1f },
         { "disableMinimapMarkers", false },
         { "scoutPhotoMode", false },
+        { "fixShipThrustIndicator", true },
     };
 
     public static readonly Dictionary<string, object> NewStuffSettings = new Dictionary<string, object>()
@@ -444,6 +447,7 @@ public static class SettingsPresets
         { "sandDamage", 0f },
         { "disableMinimapMarkers", false },
         { "scoutPhotoMode", true },
+        { "fixShipThrustIndicator", true },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -554,6 +558,7 @@ public static class SettingsPresets
         { "sandDamage", 0.5f },
         { "disableMinimapMarkers", false },
         { "scoutPhotoMode", true },
+        { "fixShipThrustIndicator", true },
     };
 
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()
@@ -884,6 +889,7 @@ public static class SettingsPresets
         }, 0.2f, 0f) },
         { "disableMinimapMarkers", new RandomSettingValue(0.25f) },
         { "scoutPhotoMode", new RandomSettingValue(0.5f) },
+        { "fixShipThrustIndicator", new RandomSettingValue(1f) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

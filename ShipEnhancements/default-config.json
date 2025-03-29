@@ -788,6 +788,12 @@
       "type": "toggle",
       "value": true,
       "tooltip": "Let's you lock onto targets in the map view at any time."
+    },
+    "fixShipThrustIndicator": {
+      "title": "Fix Ship Thrust Indicator",
+      "type": "toggle",
+      "value": true,
+      "tooltip": "Fixes a bug where the ship's thrust indicator turns off when you leave the console."
     }
   }
 }
