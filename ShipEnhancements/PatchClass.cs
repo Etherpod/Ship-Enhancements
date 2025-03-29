@@ -2164,7 +2164,7 @@ public static class PatchClass
     #endregion
 
     #region PersistentInput
-    [HarmonyPrefix]
+    /*[HarmonyPrefix]
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.ExitFlightConsole))]
     public static void UpdatePersistentInputAutopilotState()
     {
@@ -2172,7 +2172,7 @@ public static class PatchClass
         {
             SELocator.GetShipBody().GetComponent<ShipPersistentInput>().UpdateLastAutopilotState();
         }
-    }
+    }*/
     #endregion
 
     #region InputLatency
@@ -2306,10 +2306,26 @@ public static class PatchClass
             return false;
         }
 
-        else if (SELocator.GetShipTemperatureDetector() != null && SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio() < 0.25f)
+        if (SELocator.GetShipTemperatureDetector() != null && SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio() < 0.25f)
         {
             __result = AddIgnitionSputter(__instance);
             return false;
+        }
+
+        if ((bool)enableEnhancedAutopilot.GetProperty())
+        {
+            if (SELocator.GetAutopilotPanelController().IsAutopilotActive())
+            {
+                __result = Vector3.zero;
+                return false;
+            }
+
+            ShipPersistentInput persistentInput = SELocator.GetShipBody().GetComponent<ShipPersistentInput>();
+            if (persistentInput != null && persistentInput.enabled)
+            {
+                __result = Vector3.zero;
+                return false;
+            }
         }
 
         return true;
@@ -3397,19 +3413,6 @@ public static class PatchClass
     }
     #endregion
 
-    #region ThrustIndicatorConversationFix
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.OnExitConversation))]
-    public static void FixThrustIndicatorLightOnExitConversation(ThrustAndAttitudeIndicator __instance)
-    {
-        if (__instance._shipIndicatorMode && !PlayerState.AtFlightConsole()
-            && (!(bool)enableEnhancedAutopilot.GetProperty() || !SELocator.GetShipBody().GetComponent<ShipPersistentInput>().InputEnabled()))
-        {
-            __instance._thrusterArrowRoot.gameObject.SetActive(false);
-        }
-    }
-    #endregion
-
     #region ShipRepairLimit
     [HarmonyPostfix]
     [HarmonyPatch(typeof(RepairReceiver), nameof(RepairReceiver.IsRepairable))]
@@ -4109,7 +4112,7 @@ public static class PatchClass
         }
         if (!OWInput.IsInputMode(InputMode.ShipCockpit | InputMode.LandingCam))
         {
-            if (__instance._autopilot.IsMatchingVelocity() && !__instance._autopilot.IsFlyingToDestination())
+            if (/*__instance._autopilot.IsMatchingVelocity() && !__instance._autopilot.IsFlyingToDestination()*/true)
             {
                 SELocator.GetAutopilotPanelController().OnCancelMatchVelocity();
                 //__instance._autopilot.StopMatchVelocity();
@@ -4127,19 +4130,21 @@ public static class PatchClass
         }
         else
         {
-            if (/*__instance.IsAutopilotAvailable() && */OWInput.IsNewlyPressed(InputLibrary.autopilot, InputMode.ShipCockpit))
+            if (/*__instance.IsAutopilotAvailable() && */__instance._playerAtFlightConsole && !__instance._shipSystemFailure
+                && OWInput.IsNewlyPressed(InputLibrary.autopilot, InputMode.ShipCockpit))
             {
                 InputLibrary.lockOn.BlockNextRelease();
 
                 SELocator.GetAutopilotPanelController().OnInitAutopilot();
                 //__instance._autopilot.FlyToDestination(Locator.GetReferenceFrame(true));
             }
-            if (__instance.IsMatchVelocityAvailable(false) && OWInput.IsNewlyPressed(InputLibrary.matchVelocity, InputMode.All))
+            if (/*__instance.IsMatchVelocityAvailable(false) && */__instance._playerAtFlightConsole && !__instance._shipSystemFailure
+                && OWInput.IsNewlyPressed(InputLibrary.matchVelocity, InputMode.All))
             {
                 SELocator.GetAutopilotPanelController().OnInitMatchVelocity();
                 //__instance._autopilot.StartMatchVelocity(Locator.GetReferenceFrame(false), false);
             }
-            else if (__instance._autopilot.IsMatchingVelocity() && !__instance._autopilot.IsFlyingToDestination() && OWInput.IsNewlyReleased(InputLibrary.matchVelocity, InputMode.All))
+            else if (/*__instance._autopilot.IsMatchingVelocity() && !__instance._autopilot.IsFlyingToDestination() && */OWInput.IsNewlyReleased(InputLibrary.matchVelocity, InputMode.All))
             {
                 SELocator.GetAutopilotPanelController().OnCancelMatchVelocity();
                 //__instance._autopilot.StopMatchVelocity();

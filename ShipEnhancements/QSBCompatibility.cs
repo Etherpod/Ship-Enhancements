@@ -76,8 +76,8 @@ public class QSBCompatibility
         _api.RegisterHandler<(int, float, float)>("rust-state", ReceiveInitialRustState);
         _api.RegisterHandler<(float, float, float)>("initial-dirt-state", ReceiveInitialDirtState);
         _api.RegisterHandler<float>("dirt-state", ReceiveDirtState);
-        _api.RegisterHandler<(float, float, float)>("detach-all-players", ReceiveDetachAllPlayers);
-        _api.RegisterHandler<(float, float, float)>("initial-persistent-input", ReceiveInitialPersistentInput);
+        _api.RegisterHandler<SerializedVector3>("detach-all-players", ReceiveDetachAllPlayers);
+        _api.RegisterHandler<SerializedVector3>("initial-persistent-input", ReceiveInitialPersistentInput);
         _api.RegisterHandler<float>("initial-black-hole", ReceiveInitialBlackHoleState);
         _api.RegisterHandler<ShipCommand>("send-ship-command", ReceiveShipCommand);
         _api.RegisterHandler<(bool, string, SerializedVector3)>("activate-warp", ReceiveActivateWarp);
@@ -550,8 +550,8 @@ public class QSBCompatibility
             if (data.unpacked)
             {
                 // not using the lit data?
-                SELocator.GetPortableCampfire().SetInitialState(Campfire.State.LIT);
-                SELocator.GetPortableCampfire().SetState(Campfire.State.LIT);
+                campfire.GetCampfire().SetInitialState(Campfire.State.LIT);
+                campfire.GetCampfire().SetState(Campfire.State.LIT);
             }
         }
     }
@@ -657,27 +657,27 @@ public class QSBCompatibility
     #region DisableSeatbelt
     public void SendDetachAllPlayers(uint id, Vector3 velocity)
     {
-        _api.SendMessage("detach-all-players", (velocity.x, velocity.y, velocity.z), id, false);
+        _api.SendMessage("detach-all-players", new SerializedVector3(velocity), id, false);
     }
 
-    private void ReceiveDetachAllPlayers(uint id, (float x, float y, float z) velocity)
+    private void ReceiveDetachAllPlayers(uint id, SerializedVector3 velocity)
     {
-        ShipEnhancements.QSBInteraction.OnDetachAllPlayers(new Vector3(velocity.x, velocity.y, velocity.z));
+        ShipEnhancements.QSBInteraction.OnDetachAllPlayers(velocity.Vector);
     }
     #endregion
 
     #region PersistentInput
     public void SendInitialPersistentInput(uint id, Vector3 input)
     {
-        _api.SendMessage("initial-persistent-input", (input.x, input.y, input.z), id, false);
+        _api.SendMessage("initial-persistent-input", new SerializedVector3(input), id, false);
     }
 
-    private void ReceiveInitialPersistentInput(uint id, (float x, float y, float z) input)
+    private void ReceiveInitialPersistentInput(uint id, SerializedVector3 input)
     {
-        ShipPersistentInput persistentInput = SELocator.GetShipTransform().GetComponentInChildren<ShipPersistentInput>();
-        if (persistentInput)
+        ShipPersistentInput persistentInput = SELocator.GetShipBody().GetComponent<ShipPersistentInput>();
+        if (persistentInput != null)
         {
-            persistentInput.SetInputRemote(new Vector3(input.x, input.y, input.z));
+            persistentInput.SetInputRemote(input.Vector);
         }
     }
     #endregion

@@ -5,113 +5,140 @@ namespace ShipEnhancements;
 public class AutopilotPanelController : MonoBehaviour
 {
     [SerializeField]
-    private CockpitButtonSwitch[] _leftButtonGroup;
+    private CockpitButtonSwitch _approachAutopilotButton;
     [SerializeField]
-    private CockpitButtonSwitch[] _rightButtonGroup;
+    private CockpitButtonSwitch _orbitAutopilotButton;
+    [SerializeField]
+    private CockpitButtonSwitch _matchVelocityButton;
+    [SerializeField]
+    private CockpitButtonSwitch _holdPositionButton;
+    [SerializeField]
+    private CockpitButtonSwitch _holdInputButton;
 
-    private CockpitButtonSwitch _activeLeft;
-    private CockpitButtonSwitch _activeRight;
+    private CockpitButtonSwitch _activeAutopilot;
+    private CockpitButtonSwitch _activeMatch;
 
     private void Start()
     {
-        _leftButtonGroup[0].SetState(true);
-        _activeLeft = _leftButtonGroup[0];
-        _rightButtonGroup[0].SetState(true);
-        _activeRight = _rightButtonGroup[0];
+        _approachAutopilotButton.SetState(true);
+        _activeAutopilot = _approachAutopilotButton;
+        _matchVelocityButton.SetState(true);
+        _activeMatch = _matchVelocityButton;
 
-        foreach (var button in _leftButtonGroup)
-        {
-            button.OnChangeState += (state) => OnChangeState(button, true, state);
-        }
-        foreach (var button in _rightButtonGroup)
-        {
-            button.OnChangeState += (state) => OnChangeState(button, false, state);
-        }
+        _approachAutopilotButton.OnChangeState += (state) => OnChangeState(_approachAutopilotButton, true, state);
+        _orbitAutopilotButton.OnChangeState += (state) => OnChangeState(_orbitAutopilotButton, true, state);
+        _matchVelocityButton.OnChangeState += (state) => OnChangeState(_matchVelocityButton, false, state);
+        _holdPositionButton.OnChangeState += (state) => OnChangeState(_holdPositionButton, false, state);
+        _holdInputButton.OnChangeState += (state) => OnChangeState(_holdInputButton, false, state);
     }
 
-    private void OnChangeState(CockpitButtonSwitch button, bool left, bool state)
+    private void OnChangeState(CockpitButtonSwitch button, bool autopilot, bool state)
     {
         if (!state) return;
 
-        if (left)
+        if (autopilot)
         {
-            if (_activeLeft != null)
+            if (_activeAutopilot != null)
             {
-                _activeLeft.SetActive(false);
-                _activeLeft.SetState(false);
-                _activeLeft.OnChangeActiveEvent();
+                _activeAutopilot.SetActive(false);
+                _activeAutopilot.SetState(false);
+                _activeAutopilot.OnChangeActiveEvent();
+                _activeAutopilot.OnChangeStateEvent();
             }
 
-            _activeLeft = button;
+            _activeAutopilot = button;
         }
         else
         {
-            if (_activeRight != null)
+            if (_activeMatch != null)
             {
-                _activeRight.SetActive(false);
-                _activeRight.SetState(false);
-                _activeRight.OnChangeActiveEvent();
+                _activeMatch.SetActive(false);
+                _activeMatch.SetState(false);
+                _activeMatch.OnChangeActiveEvent();
+                _activeMatch.OnChangeStateEvent();
             }
 
-            _activeRight = button;
+            _activeMatch = button;
         }
     }
 
     private void OnDestroy()
     {
-        foreach (var button in _leftButtonGroup)
-        {
-            button.OnChangeState -= (state) => OnChangeState(button, true, state);
-        }
-        foreach (var button in _rightButtonGroup)
-        {
-            button.OnChangeState -= (state) => OnChangeState(button, false, state);
-        }
+        _approachAutopilotButton.OnChangeState -= (state) => OnChangeState(_approachAutopilotButton, true, state);
+        _orbitAutopilotButton.OnChangeState -= (state) => OnChangeState(_orbitAutopilotButton, true, state);
+        _matchVelocityButton.OnChangeState -= (state) => OnChangeState(_matchVelocityButton, false, state);
+        _holdPositionButton.OnChangeState -= (state) => OnChangeState(_holdPositionButton, false, state);
+        _holdInputButton.OnChangeState -= (state) => OnChangeState(_holdInputButton, false, state);
     }
 
     public void OnInitAutopilot()
     {
-        if (!_activeLeft.IsActivated())
+        if (!_activeAutopilot.IsActivated())
         {
-            _activeLeft.SetActive(true);
-            _activeLeft.OnChangeActiveEvent();
+            _activeAutopilot.SetActive(true);
+            _activeAutopilot.OnChangeActiveEvent();
         }
     }
 
     public void OnCancelAutopilot()
     {
-        if (_activeLeft.IsActivated())
+        if (_activeAutopilot.IsActivated())
         {
-            _activeLeft.SetActive(false);
-            _activeLeft.OnChangeActiveEvent();
+            _activeAutopilot.SetActive(false);
+            _activeAutopilot.OnChangeActiveEvent();
+
+            if (IsHoldInputSelected())
+            {
+                _holdInputButton.OnChangeStateEvent();
+            }
         }
     }
 
     public void OnInitMatchVelocity()
     {
-        if (!_activeRight.IsActivated())
+        if (!_activeMatch.IsActivated())
         {
-            _activeRight.SetActive(true);
-            _activeRight.OnChangeActiveEvent();
+            _activeMatch.SetActive(true);
+            _activeMatch.OnChangeActiveEvent();
         }
     }
 
     public void OnCancelMatchVelocity()
     {
-        if (_activeRight.IsActivated())
+        if (_activeMatch.IsActivated())
         {
-            _activeRight.SetActive(false);
-            _activeRight.OnChangeActiveEvent();
+            _activeMatch.SetActive(false);
+            _activeMatch.OnChangeActiveEvent();
         }
     }
 
-    public CockpitButtonSwitch GetLeftActiveButton()
+    public bool IsApproachSelected()
     {
-        return _activeLeft;
+        return _activeAutopilot == _approachAutopilotButton;
     }
 
-    public CockpitButtonSwitch GetRightActiveButton()
+    public bool IsOrbitSelected()
     {
-        return _activeRight;
+        return _activeAutopilot == _orbitAutopilotButton;
+    }
+
+    public bool IsAutopilotActive()
+    {
+        return _activeAutopilot.IsActivated();
+    }
+
+    public bool IsMatchVelocitySelected()
+    {
+        return _activeMatch == _matchVelocityButton;
+    }
+
+    public bool IsHoldPositionSelected()
+    {
+        return _activeMatch == _holdPositionButton;
+    }
+
+    public bool IsHoldInputSelected()
+    {
+        return _activeMatch == _holdInputButton;
     }
 }

@@ -164,6 +164,13 @@ public class ShipEngineSwitch : CockpitInteractible
                         AudioClip clip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/PowerRestored.mp3");
                         electricalComponent._audioSource.PlayOneShot(clip, 0.8f);
                     }
+                    if ((bool)enableEnhancedAutopilot.GetProperty())
+                    {
+                        if (SELocator.GetAutopilotPanelController().IsHoldInputSelected())
+                        {
+                            SELocator.GetShipBody().GetComponent<ShipPersistentInput>().SetInputEnabled(true);
+                        }
+                    }
                     _alarm.UpdateAlarmState();
                     _audioController.PlayShipAmbient();
                     StartCoroutine(ActivateIndicatorLights(electricalComponent._electricalSystem._systemDelay));
@@ -286,7 +293,7 @@ public class ShipEngineSwitch : CockpitInteractible
         }
         if ((bool)enableEnhancedAutopilot.GetProperty())
         {
-            SELocator.GetShipBody().GetComponent<ShipPersistentInput>().OnDisableEngine();
+            SELocator.GetShipBody().GetComponent<ShipPersistentInput>().SetInputEnabled(false);
         }
         if (Locator.GetToolModeSwapper().IsInToolMode(ToolMode.Probe, ToolGroup.Ship)
             || Locator.GetToolModeSwapper().IsInToolMode(ToolMode.SignalScope, ToolGroup.Ship))

@@ -303,7 +303,7 @@ public class ShipRemoteControl : MonoBehaviour
         }
 
         if ((bool)enableEnhancedAutopilot.GetProperty() 
-            && SELocator.GetAutopilotPanelController().GetLeftActiveButton() is OrbitAutopilotButton)
+            && SELocator.GetAutopilotPanelController().IsOrbitSelected())
         {
             ReferenceFrame rf = Locator.GetReferenceFrame(false);
             return _orbitAutopilot.enabled || rf != null;
