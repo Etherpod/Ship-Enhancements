@@ -1,4 +1,6 @@
-﻿namespace ShipEnhancements;
+﻿using UnityEngine;
+
+namespace ShipEnhancements;
 
 public class ApproachAutopilotButton : CockpitButtonSwitch
 {
@@ -9,15 +11,27 @@ public class ApproachAutopilotButton : CockpitButtonSwitch
         base.Awake();
         _autopilot = SELocator.GetShipBody().GetComponent<Autopilot>();
         _autopilot.OnAbortAutopilot += OnAbortAutopilot;
+        _autopilot.OnAlreadyAtDestination += OnAbortAutopilot;
+        _autopilot.OnArriveAtDestination += ctx => OnAbortAutopilot();
         _autopilot.OnInitFlyToDestination += OnInitFlyToDestination;
     }
 
     public override void OnChangeActiveEvent()
     {
-        if (IsActivated() && Locator.GetReferenceFrame() != null && !_autopilot.IsDamaged()
-            && Locator.GetReferenceFrame().GetAllowAutopilot())
+        if (IsActivated())
         {
-            _autopilot.FlyToDestination(Locator.GetReferenceFrame());
+            if (Locator.GetReferenceFrame() != null 
+                && Locator.GetReferenceFrame().GetAllowAutopilot() && !_autopilot.IsDamaged()
+                && !_autopilot.IsFlyingToDestination()
+                && Vector3.Distance(SELocator.GetShipBody().GetPosition(), Locator.GetReferenceFrame().GetPosition()) 
+                > Locator.GetReferenceFrame().GetAutopilotArrivalDistance())
+            {
+                _autopilot.FlyToDestination(Locator.GetReferenceFrame());
+            }
+            else
+            {
+                SetActive(false);
+            }
         }
         else if (_autopilot.IsFlyingToDestination())
         {
@@ -27,18 +41,26 @@ public class ApproachAutopilotButton : CockpitButtonSwitch
 
     private void OnAbortAutopilot()
     {
-        SetActive(false);
+        if (_activated)
+        {
+            SetActive(false);
+        }
     }
 
     private void OnInitFlyToDestination()
     {
-        SetActive(true);
+        if (!_activated)
+        {
+            SetActive(true);
+        }
     }
 
     protected override void OnDestroy()
     {
         base.OnDestroy();
         _autopilot.OnAbortAutopilot -= OnAbortAutopilot;
+        _autopilot.OnAlreadyAtDestination -= OnAbortAutopilot;
+        _autopilot.OnArriveAtDestination -= ctx => OnAbortAutopilot();
         _autopilot.OnInitFlyToDestination -= OnInitFlyToDestination;
     }
 }

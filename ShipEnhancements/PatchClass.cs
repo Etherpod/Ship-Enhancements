@@ -4142,37 +4142,37 @@ public static class PatchClass
         {
             if (__instance._autopilot.IsMatchingVelocity() && !__instance._autopilot.IsFlyingToDestination())
             {
-                SELocator.GetShipTransform().GetComponentInChildren<AutopilotPanelController>().OnCancelMatchVelocity();
+                SELocator.GetAutopilotPanelController().OnCancelMatchVelocity();
                 //__instance._autopilot.StopMatchVelocity();
             }
             return false;
         }
         __instance.UpdateShipLightInput();
-        if (__instance._autopilot.IsFlyingToDestination())
+        if (__instance._autopilot.IsFlyingToDestination() || __instance._autopilot.GetComponent<OrbitAutopilotTest>().enabled)
         {
             if (OWInput.IsNewlyPressed(InputLibrary.autopilot, InputMode.All))
             {
-                SELocator.GetShipTransform().GetComponentInChildren<AutopilotPanelController>().OnCancelAutopilot();
+                SELocator.GetAutopilotPanelController().OnCancelAutopilot();
                 //__instance.AbortAutopilot();
             }
         }
         else
         {
-            if (__instance.IsAutopilotAvailable() && OWInput.IsNewlyPressed(InputLibrary.autopilot, InputMode.ShipCockpit))
+            if (/*__instance.IsAutopilotAvailable() && */OWInput.IsNewlyPressed(InputLibrary.autopilot, InputMode.ShipCockpit))
             {
                 InputLibrary.lockOn.BlockNextRelease();
 
-                SELocator.GetShipTransform().GetComponentInChildren<AutopilotPanelController>().OnInitAutopilot();
+                SELocator.GetAutopilotPanelController().OnInitAutopilot();
                 //__instance._autopilot.FlyToDestination(Locator.GetReferenceFrame(true));
             }
             if (__instance.IsMatchVelocityAvailable(false) && OWInput.IsNewlyPressed(InputLibrary.matchVelocity, InputMode.All))
             {
-                SELocator.GetShipTransform().GetComponentInChildren<AutopilotPanelController>().OnInitMatchVelocity();
+                SELocator.GetAutopilotPanelController().OnInitMatchVelocity();
                 //__instance._autopilot.StartMatchVelocity(Locator.GetReferenceFrame(false), false);
             }
             else if (__instance._autopilot.IsMatchingVelocity() && !__instance._autopilot.IsFlyingToDestination() && OWInput.IsNewlyReleased(InputLibrary.matchVelocity, InputMode.All))
             {
-                SELocator.GetShipTransform().GetComponentInChildren<AutopilotPanelController>().OnCancelMatchVelocity();
+                SELocator.GetAutopilotPanelController().OnCancelMatchVelocity();
                 //__instance._autopilot.StopMatchVelocity();
             }
             if (!__instance._enteringLandingCam)
@@ -4215,6 +4215,17 @@ public static class PatchClass
         __instance._playerAttachPoint.SetAttachOffset(__instance._playerAttachOffset);
 
         return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Autopilot), nameof(Autopilot.StopMatchVelocity))]
+    public static void DisableSwitchWhenStopMatching(Autopilot __instance)
+    {
+        if ((bool)enablePersistentInput.GetProperty() && __instance._isShipAutopilot
+            && __instance.enabled)
+        {
+            SELocator.GetAutopilotPanelController().OnCancelMatchVelocity();
+        }
     }
     #endregion
 }

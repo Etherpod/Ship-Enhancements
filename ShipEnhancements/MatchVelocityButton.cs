@@ -8,15 +8,21 @@ public class MatchVelocityButton : CockpitButtonSwitch
     {
         base.Awake();
         _autopilot = SELocator.GetShipBody().GetComponent<Autopilot>();
-        _autopilot.OnInitMatchVelocity += OnInitMatchVelocity;
-        // disable event?
     }
 
     public override void OnChangeActiveEvent()
     {
-        if (IsActivated() && Locator.GetReferenceFrame() != null && !_autopilot.IsDamaged())
+        if (IsActivated())
         {
-            _autopilot.StartMatchVelocity(Locator.GetReferenceFrame());
+            if (Locator.GetReferenceFrame(false) != null && !_autopilot.IsDamaged()
+                && !_autopilot.IsMatchingVelocity() && !_autopilot.IsFlyingToDestination())
+            {
+                _autopilot.StartMatchVelocity(Locator.GetReferenceFrame(false));
+            }
+            else
+            {
+                SetActive(false);
+            }
         }
         else if (_autopilot.IsMatchingVelocity())
         {
@@ -26,12 +32,11 @@ public class MatchVelocityButton : CockpitButtonSwitch
 
     private void OnInitMatchVelocity()
     {
-        //SetActive(true);
+        SetActive(!_autopilot.IsFlyingToDestination());
     }
 
     protected override void OnDestroy()
     {
         base.OnDestroy();
-        _autopilot.OnInitMatchVelocity -= OnInitMatchVelocity;
     }
 }

@@ -44,7 +44,7 @@ public class CockpitButton : CockpitInteractible
         _initialButtonRotation = _buttonTransform.localRotation;
         _baseLightIntensity = _buttonLight.intensity;
 
-        _interactReceiver.ChangePrompt(_onLabel);
+        _interactReceiver.ChangePrompt(_on ? _offLabel : _onLabel);
         _emissiveRenderer.SetEmissiveScale(0f);
         _buttonLight.intensity = 0f;
 

@@ -15,8 +15,8 @@ public class CockpitButtonSwitch : CockpitButton
 
     protected override void Start()
     {
+        _offLabel = _activated ? _deactivateLabel : _activateLabel;
         base.Start();
-        _offLabel = _activateLabel;
     }
 
     protected override void OnPressInteract()

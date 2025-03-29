@@ -71,25 +71,37 @@ public class AutopilotPanelController : MonoBehaviour
 
     public void OnInitAutopilot()
     {
-        _activeLeft.SetActive(true);
-        _activeLeft.OnChangeActiveEvent();
+        if (!_activeLeft.IsActivated())
+        {
+            _activeLeft.SetActive(true);
+            _activeLeft.OnChangeActiveEvent();
+        }
     }
 
     public void OnCancelAutopilot()
     {
-        _activeLeft.SetActive(false);
-        _activeLeft.OnChangeActiveEvent();
+        if (_activeLeft.IsActivated())
+        {
+            _activeLeft.SetActive(false);
+            _activeLeft.OnChangeActiveEvent();
+        }
     }
 
     public void OnInitMatchVelocity()
     {
-        _activeRight.SetActive(true);
-        _activeRight.OnChangeActiveEvent();
+        if (!_activeRight.IsActivated())
+        {
+            _activeRight.SetActive(true);
+            _activeRight.OnChangeActiveEvent();
+        }
     }
 
     public void OnCancelMatchVelocity()
     {
-        _activeRight.SetActive(false);
-        _activeRight.OnChangeActiveEvent();
+        if (_activeRight.IsActivated())
+        {
+            _activeRight.SetActive(false);
+            _activeRight.OnChangeActiveEvent();
+        }
     }
 }

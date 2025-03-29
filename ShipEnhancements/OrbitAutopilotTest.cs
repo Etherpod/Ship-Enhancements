@@ -23,6 +23,11 @@ public class OrbitAutopilotTest : ThrusterController
             .Select(p => new Vector3(p.x, 0, p.y))
             .ToArray();
 
+    public delegate void AbortAutopilotEvent();
+    public event AbortAutopilotEvent OnAbortAutopilot;
+    public delegate void InitOrbitEvent();
+    public event InitOrbitEvent OnInitOrbit;
+
     private OWRigidbody _owRigidbody;
     private ReferenceFrame _referenceFrame;
     private RulesetDetector _rulesetDetector;
@@ -94,7 +99,7 @@ public class OrbitAutopilotTest : ThrusterController
 
     public void SetOrbitEnabled(bool orbit, bool ignoreThrustLimits = true)
     {
-        if (!orbit || Locator.GetReferenceFrame() == null
+        if (!orbit || Locator.GetReferenceFrame(false) == null
             || !SELocator.GetShipResources().AreThrustersUsable())
         {
             if (enabled)
@@ -107,7 +112,7 @@ public class OrbitAutopilotTest : ThrusterController
             return;
         }
 
-        _referenceFrame = Locator.GetReferenceFrame();
+        _referenceFrame = Locator.GetReferenceFrame(false);
         _ignoreThrustLimits = ignoreThrustLimits;
         _errorIntegral = Vector3.zero;
 
@@ -129,15 +134,18 @@ public class OrbitAutopilotTest : ThrusterController
 
         enabled = true;
 
+        OnInitOrbit?.Invoke();
+
         ShipNotifications.PostOrbitAutopilotActiveNotification(_orbitRadius);
     }
 
     public override Vector3 ReadTranslationalInput()
     {
-        if (Locator.GetReferenceFrame() != _referenceFrame || !SELocator.GetShipResources().AreThrustersUsable())
+        if (Locator.GetReferenceFrame(false) != _referenceFrame || !SELocator.GetShipResources().AreThrustersUsable())
         {
             PostAutopilotOffNotification();
             enabled = false;
+            OnAbortAutopilot?.Invoke();
             ShipEnhancements.WriteDebugMessage("nothing to orbit");
             return Vector3.zero;
         }
@@ -181,7 +189,8 @@ public class OrbitAutopilotTest : ThrusterController
         SetArrow(_orbitVelocityDeltaRenderer, _currentPosition, _deltaOrbitalVelocity);
         SetArrow(_orbitPositionImpulseRenderer, _currentPosition, _orbitPositionImpulse);
 
-        return transform.InverseTransformDirection(_shipThrustFactor * Vector3.ClampMagnitude(_desiredImpulse, 1));
+        return transform.InverseTransformDirection(_shipThrustFactor * Vector3.ClampMagnitude(_desiredImpulse, 1)
+            * ShipEnhancements.Instance.ThrustModulatorLevel / 5f);
     }
 
     private void GetNaiveOrbitalPositionInput()

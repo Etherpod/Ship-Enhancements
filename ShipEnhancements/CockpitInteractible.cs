@@ -17,7 +17,7 @@ public class CockpitInteractible : ElectricalComponent
     {
         base.Awake();
 
-        _electricalSystem = SELocator.GetShipBody().transform
+        _electricalSystem = FindObjectOfType<ShipBody>().transform
             .Find("Module_Cockpit/Systems_Cockpit/FlightControlsElectricalSystem")
             .GetComponent<ElectricalSystem>();
 

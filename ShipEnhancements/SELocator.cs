@@ -28,6 +28,7 @@ public static class SELocator
     private static FlightConsoleInteractController _consoleInteractController;
     private static CockpitErnesto _ernesto;
     private static ShipWarpCoreComponent _warpCoreComponent;
+    private static AutopilotPanelController _autopilotPanelController;
 
     public static void Initalize()
     {
@@ -72,6 +73,10 @@ public static class SELocator
         if ((bool)addErnesto.GetProperty())
         {
             _ernesto = _shipTransform.GetComponentInChildren<CockpitErnesto>();
+        }
+        if ((bool)enablePersistentInput.GetProperty())
+        {
+            _autopilotPanelController = _shipTransform.GetComponentInChildren<AutopilotPanelController>();
         }
     }
 
@@ -203,5 +208,10 @@ public static class SELocator
     public static CockpitErnesto GetErnesto()
     {
         return _ernesto;
+    }
+
+    public static AutopilotPanelController GetAutopilotPanelController()
+    {
+        return _autopilotPanelController;
     }
 }
