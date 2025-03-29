@@ -2168,7 +2168,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.OnExitFlightConsole))]
     public static bool KeepThrustIndicatorOn(ThrustAndAttitudeIndicator __instance)
     {
-        if (!(bool)enablePersistentInput.GetProperty() || !SELocator.GetShipBody().GetComponent<ShipPersistentInput>().InputEnabled()) return true;
+        if (!(bool)enableEnhancedAutopilot.GetProperty() || !SELocator.GetShipBody().GetComponent<ShipPersistentInput>().InputEnabled()) return true;
 
         __instance._activeThrusterModel = __instance._jetpackThrusterModel;
         __instance._activeThrusterController = __instance._jetpackThrusterController;
@@ -2188,7 +2188,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.OnEnterConversation))]
     public static bool KeepThrustIndicatorOnInConversation(ThrustAndAttitudeIndicator __instance)
     {
-        if (!(bool)enablePersistentInput.GetProperty() || !__instance._shipIndicatorMode
+        if (!(bool)enableEnhancedAutopilot.GetProperty() || !__instance._shipIndicatorMode
             || !SELocator.GetShipBody().GetComponent<ShipPersistentInput>().InputEnabled()) return true;
 
         __instance._inConversation = true;
@@ -2199,7 +2199,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.ExitFlightConsole))]
     public static void UpdatePersistentInputAutopilotState()
     {
-        if ((bool)enablePersistentInput.GetProperty())
+        if ((bool)enableEnhancedAutopilot.GetProperty())
         {
             SELocator.GetShipBody().GetComponent<ShipPersistentInput>().UpdateLastAutopilotState();
         }
@@ -3434,7 +3434,7 @@ public static class PatchClass
     public static void FixThrustIndicatorLightOnExitConversation(ThrustAndAttitudeIndicator __instance)
     {
         if (__instance._shipIndicatorMode && !PlayerState.AtFlightConsole()
-            && (!(bool)enablePersistentInput.GetProperty() || !SELocator.GetShipBody().GetComponent<ShipPersistentInput>().InputEnabled()))
+            && (!(bool)enableEnhancedAutopilot.GetProperty() || !SELocator.GetShipBody().GetComponent<ShipPersistentInput>().InputEnabled()))
         {
             __instance._thrusterArrowRoot.gameObject.SetActive(false);
         }
@@ -4116,7 +4116,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.Update))]
     public static bool OverrideAutopilotInputs(ShipCockpitController __instance)
     {
-        if (!(bool)enablePersistentInput.GetProperty()) return true;
+        if (!(bool)enableEnhancedAutopilot.GetProperty()) return true;
 
         if (!__instance._playerAtFlightConsole)
         {
@@ -4221,7 +4221,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(Autopilot), nameof(Autopilot.StopMatchVelocity))]
     public static void DisableSwitchWhenStopMatching(Autopilot __instance)
     {
-        if ((bool)enablePersistentInput.GetProperty() && __instance._isShipAutopilot
+        if ((bool)enableEnhancedAutopilot.GetProperty() && __instance._isShipAutopilot
             && __instance.enabled)
         {
             SELocator.GetAutopilotPanelController().OnCancelMatchVelocity();

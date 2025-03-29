@@ -120,7 +120,7 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Removable Gravity Crystal**: Lets you detach the ship's gravity crystal and place it somewhere else to create a localized gravity field. The removed gravity crystal will have the same strength as it did in the ship.
 - **Gravity Landing Gear**: Adds an interface to the cockpit that controls the new gravity technology built into your ship's landing gear. It will stop working if your landing gear is damaged.
 - **Thrust Modulator**: Adds an interface to the cockpit that lets you lower or disproportionately raise the maximum thrust your ship can use. Stacks with the smooth thrust option from General Enhancements.
-- **Persistent Input**: Adds a switch to the cockpit that, when enabled, lets you continue your last input when you unbuckle from the ship. Useful when you want to hold forward for 10 minutes and don't feel like actually holding it the entire time.
+- **Autopilot Controls**: Adds an interface to the cockpit that lets you control the new features added to the ship's autopilot system.
 - **Engine Switch**: Controls your ship's power and engine. The switch needs to be turned on if you want to fly your ship. If the **Idle Fuel Consumption Multiplier** is above 0, it will only consume fuel when the ship is on.
 
 ## Decoration

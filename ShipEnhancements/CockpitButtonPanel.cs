@@ -48,13 +48,13 @@ public class CockpitButtonPanel : MonoBehaviour
     {
         if (!(bool)enableGravityLandingGear.GetProperty()
             && !(bool)enableThrustModulator.GetProperty()
-            && !(bool)enablePersistentInput.GetProperty()
+            && !(bool)enableEnhancedAutopilot.GetProperty()
             && !(bool)addEngineSwitch.GetProperty())
         {
             gameObject.SetActive(false);
             return;
         }
-        else if (!(bool)enablePersistentInput.GetProperty()
+        else if (!(bool)enableEnhancedAutopilot.GetProperty()
             && !(bool)addEngineSwitch.GetProperty())
         {
             _bottomPanel.SetActive(false);
@@ -64,8 +64,8 @@ public class CockpitButtonPanel : MonoBehaviour
         _gravityGearReplacement.SetActive(!(bool)enableGravityLandingGear.GetProperty());
         _thrustModulatorObject.SetActive((bool)enableThrustModulator.GetProperty());
         _thrustModulatorReplacement.SetActive(!(bool)enableThrustModulator.GetProperty());
-        _persistentInputObject.SetActive((bool)enablePersistentInput.GetProperty());
-        _persistentInputReplacement.SetActive(!(bool)enablePersistentInput.GetProperty());
+        _persistentInputObject.SetActive((bool)enableEnhancedAutopilot.GetProperty());
+        _persistentInputReplacement.SetActive(!(bool)enableEnhancedAutopilot.GetProperty());
         _engineSwitchObject.SetActive((bool)addEngineSwitch.GetProperty());
         _engineSwitchReplacement.SetActive(!(bool)addEngineSwitch.GetProperty());
 

@@ -19,6 +19,7 @@ public class ShipRemoteControl : MonoBehaviour
     private ShipModuleEjectionSystem _engineEjectSystem;
     private ShipModuleEjectionSystem _landingGearEjectSystem;
     private Autopilot _autopilot;
+    private OrbitAutopilotTest _orbitAutopilot;
     private bool _lastAutopilotState = false;
     private readonly string _engageAutopilotText = "Engage Autopilot";
     private readonly string _disengageAutopilotText = "Disengage Autopilot";
@@ -26,9 +27,9 @@ public class ShipRemoteControl : MonoBehaviour
     private List<ShipCommand> _commands = new()
     {
         ShipCommand.Explode,
-        ShipCommand.Warp,
-        ShipCommand.TurnOff,
         ShipCommand.Autopilot,
+        ShipCommand.TurnOff,
+        ShipCommand.Warp,
         ShipCommand.Eject,
         ShipCommand.EjectSupplies,
         ShipCommand.EjectEngine,
@@ -37,10 +38,10 @@ public class ShipRemoteControl : MonoBehaviour
 
     private Dictionary<ShipCommand, string> _commandNames = new()
     {
-        { ShipCommand.Explode, "Explode" },
-        { ShipCommand.Warp, "Activate Return Warp" },
-        { ShipCommand.TurnOff, "Turn Off Engine" },
         { ShipCommand.Autopilot, "Engage Autopilot" },
+        { ShipCommand.TurnOff, "Turn Off Engine" },
+        { ShipCommand.Warp, "Activate Return Warp" },
+        { ShipCommand.Explode, "Explode" },
         { ShipCommand.Eject, "Eject Cockpit" },
         { ShipCommand.EjectSupplies, "Eject Supplies" },
         { ShipCommand.EjectEngine, "Eject Engine" },
@@ -84,26 +85,12 @@ public class ShipRemoteControl : MonoBehaviour
         }
 
         _warpCoreController = SELocator.GetShipTransform().GetComponentInChildren<ShipWarpCoreController>();
+        _orbitAutopilot = SELocator.GetShipBody().GetComponent<OrbitAutopilotTest>();
     }
 
     private void Update()
     {
-        if (_lastAutopilotState != _autopilot.enabled)
-        {
-            _lastAutopilotState = _autopilot.enabled;
-            if (_lastAutopilotState)
-            {
-                _commandNames[_currentCommand] = _disengageAutopilotText;
-            }
-            else
-            {
-                _commandNames[_currentCommand] = _engageAutopilotText;
-            }
-            if (_currentCommand == ShipCommand.Autopilot)
-            {
-                _commandPrompt.SetText(_commandNames[_currentCommand]);
-            }
-        }
+        UpdateAutopilotText();
 
         if (Locator.GetToolModeSwapper().GetToolMode() == ToolMode.SignalScope
             && OWInput.IsInputMode(InputMode.Character))
@@ -148,17 +135,31 @@ public class ShipRemoteControl : MonoBehaviour
                         }
                         else if (_currentCommand == ShipCommand.Autopilot)
                         {
-                            if (!_autopilot.enabled)
+                            if ((bool)enableEnhancedAutopilot.GetProperty())
                             {
-                                ReferenceFrame rf = Locator.GetReferenceFrame(true);
-                                if (rf != null)
+                                if (_autopilot.enabled || _orbitAutopilot.enabled)
                                 {
-                                    _autopilot.FlyToDestination(rf);
+                                    SELocator.GetAutopilotPanelController().OnCancelAutopilot();
+                                }
+                                else
+                                {
+                                    SELocator.GetAutopilotPanelController().OnInitAutopilot();
                                 }
                             }
                             else
                             {
-                                _autopilot.Abort();
+                                if (!_autopilot.enabled)
+                                {
+                                    ReferenceFrame rf = Locator.GetReferenceFrame(true);
+                                    if (rf != null)
+                                    {
+                                        _autopilot.FlyToDestination(rf);
+                                    }
+                                }
+                                else
+                                {
+                                    _autopilot.Abort();
+                                }
                             }
                         }
                         else if (_currentCommand == ShipCommand.Eject
@@ -280,10 +281,7 @@ public class ShipRemoteControl : MonoBehaviour
             case ShipCommand.TurnOff:
                 return ShipEnhancements.Instance.engineOn;
             case ShipCommand.Autopilot:
-                ReferenceFrame referenceFrame = Locator.GetReferenceFrame(true);
-                return _autopilot.enabled || (referenceFrame != null && referenceFrame.GetAllowAutopilot() && !_autopilot.IsDamaged() && ShipEnhancements.Instance.engineOn 
-                    && PlayerData.GetAutopilotEnabled() && Vector3.Distance(SELocator.GetShipBody().GetPosition(), referenceFrame.GetPosition()) 
-                    > referenceFrame.GetAutopilotArrivalDistance());
+                return AutopilotCommandAvailable();
             case ShipCommand.Eject:
                 return !SELocator.GetShipDamageController().IsCockpitDetached();
             case ShipCommand.EjectSupplies:
@@ -297,6 +295,29 @@ public class ShipRemoteControl : MonoBehaviour
         }
     }
 
+    private bool AutopilotCommandAvailable()
+    {
+        if (!ShipEnhancements.Instance.engineOn || _autopilot.IsDamaged())
+        {
+            return false;
+        }
+
+        if ((bool)enableEnhancedAutopilot.GetProperty() 
+            && SELocator.GetAutopilotPanelController().GetLeftActiveButton() is OrbitAutopilotButton)
+        {
+            ReferenceFrame rf = Locator.GetReferenceFrame(false);
+            return _orbitAutopilot.enabled || rf != null;
+        }
+        else
+        {
+            ReferenceFrame referenceFrame = Locator.GetReferenceFrame(true);
+            return _autopilot.enabled || (referenceFrame != null && referenceFrame.GetAllowAutopilot()
+                && (PlayerData.GetAutopilotEnabled() || (bool)enableEnhancedAutopilot.GetProperty())
+                && Vector3.Distance(SELocator.GetShipBody().GetPosition(), referenceFrame.GetPosition())
+                > referenceFrame.GetAutopilotArrivalDistance());
+        }
+    }
+
     private bool ShipCommandHidden(ShipCommand cmd)
     {
         switch (cmd)
@@ -306,7 +327,8 @@ public class ShipRemoteControl : MonoBehaviour
             case ShipCommand.TurnOff:
                 return !(bool)addEngineSwitch.GetProperty();
             case ShipCommand.Autopilot:
-                return (bool)disableReferenceFrame.GetProperty() || !PlayerData.GetAutopilotEnabled();
+                return !(bool)enableEnhancedAutopilot.GetProperty() &&
+                    ((bool)disableReferenceFrame.GetProperty() || !PlayerData.GetAutopilotEnabled());
             case ShipCommand.EjectSupplies:
                 return !(bool)extraEjectButtons.GetProperty();
             case ShipCommand.EjectEngine:
@@ -318,9 +340,42 @@ public class ShipRemoteControl : MonoBehaviour
         }
     }
 
-    private string GetAutopilotCommandName()
+    private void UpdateAutopilotText()
     {
-        return "test";
+        if (_currentCommand != ShipCommand.Autopilot) return;
+
+        if ((bool)enableEnhancedAutopilot.GetProperty())
+        {
+            if (_lastAutopilotState != (_autopilot.enabled || _orbitAutopilot.enabled))
+            {
+                _lastAutopilotState = _autopilot.enabled || _orbitAutopilot.enabled;
+                if (_lastAutopilotState)
+                {
+                    _commandNames[_currentCommand] = _disengageAutopilotText;
+                }
+                else
+                {
+                    _commandNames[_currentCommand] = _engageAutopilotText;
+                }
+                _commandPrompt.SetText(_commandNames[_currentCommand]);
+            }
+        }
+        else
+        {
+            if (_lastAutopilotState != _autopilot.enabled)
+            {
+                _lastAutopilotState = _autopilot.enabled;
+                if (_lastAutopilotState)
+                {
+                    _commandNames[_currentCommand] = _disengageAutopilotText;
+                }
+                else
+                {
+                    _commandNames[_currentCommand] = _engageAutopilotText;
+                }
+                _commandPrompt.SetText(_commandNames[_currentCommand]);
+            }
+        }
     }
 
     public void ReceiveCommandRemote(ShipCommand command)

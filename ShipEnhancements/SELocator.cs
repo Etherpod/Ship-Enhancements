@@ -74,7 +74,7 @@ public static class SELocator
         {
             _ernesto = _shipTransform.GetComponentInChildren<CockpitErnesto>();
         }
-        if ((bool)enablePersistentInput.GetProperty())
+        if ((bool)enableEnhancedAutopilot.GetProperty())
         {
             _autopilotPanelController = _shipTransform.GetComponentInChildren<AutopilotPanelController>();
         }

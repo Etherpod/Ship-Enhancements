@@ -8,8 +8,6 @@ using OWML.Utils;
 using System.Reflection;
 using System.Linq;
 using UnityEngine.Events;
-using UnityEngine.TextCore.LowLevel;
-using UnityEngine.InputSystem;
 
 namespace ShipEnhancements;
 
@@ -146,7 +144,7 @@ public class ShipEnhancements : ModBehaviour
         showWarningNotifications,
         shipExplosionMultiplier,
         shipBounciness,
-        enablePersistentInput,
+        enableEnhancedAutopilot,
         shipInputLatency,
         addEngineSwitch,
         idleFuelConsumptionMultiplier,
@@ -883,7 +881,7 @@ public class ShipEnhancements : ModBehaviour
         {
             SELocator.GetShipTransform().gameObject.AddComponent<ModifiedShipHull>();
         }
-        if ((bool)Settings.enablePersistentInput.GetProperty())
+        if ((bool)Settings.enableEnhancedAutopilot.GetProperty())
         {
             SELocator.GetShipBody().gameObject.AddComponent<ShipPersistentInput>();
         }
@@ -1924,7 +1922,7 @@ public class ShipEnhancements : ModBehaviour
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_THRUST_MODULATOR_ENABLED", true);
         }
-        if ((bool)Settings.enablePersistentInput.GetProperty())
+        if ((bool)Settings.enableEnhancedAutopilot.GetProperty())
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_PERSISTENT_INPUT_ENABLED", true);
         }

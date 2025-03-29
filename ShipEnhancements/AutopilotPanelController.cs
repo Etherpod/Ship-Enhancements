@@ -104,4 +104,14 @@ public class AutopilotPanelController : MonoBehaviour
             _activeRight.OnChangeActiveEvent();
         }
     }
+
+    public CockpitButtonSwitch GetLeftActiveButton()
+    {
+        return _activeLeft;
+    }
+
+    public CockpitButtonSwitch GetRightActiveButton()
+    {
+        return _activeRight;
+    }
 }

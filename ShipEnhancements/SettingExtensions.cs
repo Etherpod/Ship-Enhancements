@@ -53,7 +53,7 @@ public static class SettingExtensions
         { Settings.showWarningNotifications, (false, false) },
         { Settings.shipExplosionMultiplier, (1f, 1f) },
         { Settings.shipBounciness, (1f, 1f) },
-        { Settings.enablePersistentInput, (false, false) },
+        { Settings.enableEnhancedAutopilot, (false, false) },
         { Settings.shipInputLatency, (1f, 1f) },
         { Settings.addEngineSwitch, (false, false) },
         { Settings.idleFuelConsumptionMultiplier, (1f, 1f) },

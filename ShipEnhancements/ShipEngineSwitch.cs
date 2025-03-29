@@ -284,7 +284,7 @@ public class ShipEngineSwitch : CockpitInteractible
             electricalComponent._electricalSystem.SetPowered(false);
             electricalComponent._audioSource.PlayOneShot(AudioType.ShipDamageElectricalFailure, 0.5f);
         }
-        if ((bool)enablePersistentInput.GetProperty())
+        if ((bool)enableEnhancedAutopilot.GetProperty())
         {
             SELocator.GetShipBody().GetComponent<ShipPersistentInput>().OnDisableEngine();
         }
