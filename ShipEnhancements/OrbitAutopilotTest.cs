@@ -32,6 +32,7 @@ public class OrbitAutopilotTest : ThrusterController
     private ReferenceFrame _referenceFrame;
     private RulesetDetector _rulesetDetector;
     private ForceDetector _forceDetector;
+    private ShipAudioController _shipAudio;
 
     // debug
     private LineRenderer _targetOrbitPathRenderer;
@@ -81,6 +82,7 @@ public class OrbitAutopilotTest : ThrusterController
         _owRigidbody = this.GetRequiredComponent<OWRigidbody>();
         _rulesetDetector = this.GetRequiredComponentInChildren<RulesetDetector>();
         _forceDetector = this.GetRequiredComponentInChildren<ForceDetector>();
+        _shipAudio = GetComponentInChildren<ShipAudioController>();
 
         _targetOrbitPathRenderer = GetDebugLineRenderer("TargetOrbitPath");
         _targetOrbitalPositionRenderer = GetDebugLineRenderer("TargetOrbitalPosition");
@@ -100,7 +102,8 @@ public class OrbitAutopilotTest : ThrusterController
     public void SetOrbitEnabled(bool orbit, bool ignoreThrustLimits = true)
     {
         if (!orbit || Locator.GetReferenceFrame(false) == null
-            || !SELocator.GetShipResources().AreThrustersUsable())
+            || !SELocator.GetShipResources().AreThrustersUsable()
+            || Locator.GetReferenceFrame(false).GetOWRigidBody().GetAttachedGravityVolume() == null)
         {
             if (enabled)
             {
@@ -136,6 +139,7 @@ public class OrbitAutopilotTest : ThrusterController
 
         OnInitOrbit?.Invoke();
 
+        _shipAudio.PlayAutopilotOn();
         ShipNotifications.PostOrbitAutopilotActiveNotification(_orbitRadius);
     }
 
@@ -228,6 +232,7 @@ public class OrbitAutopilotTest : ThrusterController
 
     private void PostAutopilotOffNotification()
     {
+        _shipAudio.PlayAutopilotOff();
         ShipNotifications.RemoveOrbitAutopilotActiveNotification();
         if (enabled)
             ShipNotifications.PostOrbitAutopilotDisabledNotification();

@@ -2163,18 +2163,6 @@ public static class PatchClass
     }
     #endregion
 
-    #region PersistentInput
-    /*[HarmonyPrefix]
-    [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.ExitFlightConsole))]
-    public static void UpdatePersistentInputAutopilotState()
-    {
-        if ((bool)enableEnhancedAutopilot.GetProperty())
-        {
-            SELocator.GetShipBody().GetComponent<ShipPersistentInput>().UpdateLastAutopilotState();
-        }
-    }*/
-    #endregion
-
     #region InputLatency
     [HarmonyPostfix]
     [HarmonyPatch(typeof(ShipThrusterController), nameof(ShipThrusterController.ReadTranslationalInput))]
@@ -3985,7 +3973,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(Minimap), nameof(Minimap.UpdateMarkers))]
     public static void UpdateFlagMarkers(Minimap __instance, bool __runOriginal)
     {
-        if (!__runOriginal) return;
+        if (!__runOriginal || !(bool)addExpeditionFlag.GetProperty()) return;
 
         if (__instance.TryGetComponent(out MinimapFlagController flagController))
         {
@@ -3997,7 +3985,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(Minimap), nameof(Minimap.SetComponentsEnabled))]
     public static void SetFlagMarkersEnabled(Minimap __instance, bool value, bool __runOriginal)
     {
-        if (!__runOriginal) return;
+        if (!__runOriginal || !(bool)addExpeditionFlag.GetProperty()) return;
 
         if (__instance.TryGetComponent(out MinimapFlagController flagController))
         {
@@ -4009,16 +3997,18 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitUI), nameof(ShipCockpitUI.Update))]
     public static void UpdateFlagMarkersOn(ShipCockpitUI __instance)
     {
-        if ((bool)disableMinimapMarkers.GetProperty()) return;
-        MinimapFlagController flagController = __instance.GetComponentInChildren<MinimapFlagController>();
-        if (flagController == null) return;
-        if (__instance._shipSystemsCtrlr.UsingLandingCam() && !__instance._landingCamScreenLight.IsOn())
+        if ((bool)addExpeditionFlag.GetProperty() && !(bool)disableMapMarkers.GetProperty())
         {
-            flagController.SetComponentsOn(true);
-        }
-        else if (!__instance._shipSystemsCtrlr.UsingLandingCam() && __instance._landingCamScreenLight.IsOn())
-        {
-            flagController.SetComponentsOn(false);
+            MinimapFlagController flagController = __instance.GetComponentInChildren<MinimapFlagController>();
+            if (flagController == null) return;
+            if (__instance._shipSystemsCtrlr.UsingLandingCam() && !__instance._landingCamScreenLight.IsOn())
+            {
+                flagController.SetComponentsOn(true);
+            }
+            else if (!__instance._shipSystemsCtrlr.UsingLandingCam() && __instance._landingCamScreenLight.IsOn())
+            {
+                flagController.SetComponentsOn(false);
+            }
         }
     }
     #endregion
@@ -4199,6 +4189,42 @@ public static class PatchClass
             && __instance.enabled)
         {
             SELocator.GetAutopilotPanelController().OnCancelMatchVelocity();
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipCockpitUI), nameof(ShipCockpitUI.Update))]
+    public static void UpdateAutopilotUI(ShipCockpitUI __instance)
+    {
+        if ((bool)enableEnhancedAutopilot.GetProperty())
+        {
+            if (SELocator.GetAutopilotPanelController().IsAutopilotActive())
+            {
+                if (!__instance._autopilotLight.enabled)
+                {
+                    __instance._autopilotLight.enabled = true;
+                    __instance._autopilotLightMaterial.SetColor(__instance._propID_EmissionColor, __instance._autopilotLightColor);
+                }
+            }
+            else if (__instance._autopilotLight.enabled)
+            {
+                __instance._autopilotLight.enabled = false;
+                __instance._autopilotLightMaterial.SetColor(__instance._propID_EmissionColor, 0f * __instance._autopilotLightColor);
+            }
+
+            if (__instance._autopilot.IsMatchingVelocity() || __instance._autopilot.GetComponent<ShipPersistentInput>().enabled)
+            {
+                if (!__instance._matchingVelocityLight.enabled)
+                {
+                    __instance._matchingVelocityLight.enabled = true;
+                    __instance._matchVLightMaterial.SetColor(__instance._propID_EmissionColor, __instance._matchVLightColor);
+                }
+            }
+            else if (__instance._matchingVelocityLight.enabled)
+            {
+                __instance._matchingVelocityLight.enabled = false;
+                __instance._matchVLightMaterial.SetColor(__instance._propID_EmissionColor, 0f * __instance._matchVLightColor);
+            }
         }
     }
     #endregion

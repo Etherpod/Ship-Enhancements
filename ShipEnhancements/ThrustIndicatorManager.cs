@@ -50,4 +50,11 @@ public static class ThrustIndicatorManager
             renderer.material.SetColor("_BarColor", Color.Lerp(_currentColor, color, amount));
         }
     }
+
+    public static void DisableIndicator()
+    {
+        _indicator.ResetAllArrows();
+        _indicator._thrusterArrowRoot.gameObject.SetActive(false);
+        _indicator.enabled = false;
+    }
 }

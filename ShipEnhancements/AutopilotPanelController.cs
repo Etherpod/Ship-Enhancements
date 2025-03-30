@@ -44,6 +44,7 @@ public class AutopilotPanelController : MonoBehaviour
                 _activeAutopilot.SetState(false);
                 _activeAutopilot.OnChangeActiveEvent();
                 _activeAutopilot.OnChangeStateEvent();
+                UpdatePersistentInput();
             }
 
             _activeAutopilot = button;
@@ -70,6 +71,14 @@ public class AutopilotPanelController : MonoBehaviour
         _holdPositionButton.OnChangeState -= (state) => OnChangeState(_holdPositionButton, false, state);
         _holdInputButton.OnChangeState -= (state) => OnChangeState(_holdInputButton, false, state);
     }
+    
+    public void UpdatePersistentInput()
+    {
+        if (IsHoldInputSelected())
+        {
+            _holdInputButton.OnChangeStateEvent();
+        }
+    }
 
     public void OnInitAutopilot()
     {
@@ -86,11 +95,7 @@ public class AutopilotPanelController : MonoBehaviour
         {
             _activeAutopilot.SetActive(false);
             _activeAutopilot.OnChangeActiveEvent();
-
-            if (IsHoldInputSelected())
-            {
-                _holdInputButton.OnChangeStateEvent();
-            }
+            UpdatePersistentInput();
         }
     }
 

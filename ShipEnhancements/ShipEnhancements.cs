@@ -2011,6 +2011,10 @@ public class ShipEnhancements : ModBehaviour
     {
         _shipDestroyed = true;
         SELocator.GetShipBody().SetCenterOfMass(SELocator.GetShipBody().GetWorldCenterOfMass());
+        if ((bool)Settings.fixShipThrustIndicator.GetProperty())
+        {
+            ThrustIndicatorManager.DisableIndicator();
+        }
     }
 
     private void OnWakeUp()

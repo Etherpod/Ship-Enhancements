@@ -44,6 +44,7 @@ public class ApproachAutopilotButton : CockpitButtonSwitch
         if (_activated)
         {
             SetActive(false);
+            SELocator.GetAutopilotPanelController().UpdatePersistentInput();
         }
     }
 
