@@ -116,6 +116,7 @@ public static class SettingExtensions
         { Settings.disableMinimapMarkers, (1f, 1f) },
         { Settings.scoutPhotoMode, (false, false) },
         { Settings.fixShipThrustIndicator, (false, false) },
+        { Settings.enableAutoAlign, (false, false) },
     };
 
     public static string GetName(this Settings setting)

@@ -207,6 +207,7 @@ public class ShipEnhancements : ModBehaviour
         disableMinimapMarkers,
         scoutPhotoMode,
         fixShipThrustIndicator,
+        enableAutoAlign,
     }
 
     private void Awake()
@@ -1267,9 +1268,15 @@ public class ShipEnhancements : ModBehaviour
                 renderer.enabled = false;
             }
         }
-
-        WriteDebugMessage("adding orbit autopilot");
-        SELocator.GetShipTransform().gameObject.AddComponent<OrbitAutopilotTest>();
+        if ((bool)Settings.enableEnhancedAutopilot.GetProperty())
+        {
+            WriteDebugMessage("adding orbit autopilot");
+            SELocator.GetShipBody().gameObject.AddComponent<OrbitAutopilotTest>();
+        }
+        if ((bool)Settings.enableAutoAlign.GetProperty())
+        {
+            SELocator.GetShipBody().gameObject.AddComponent<ShipAutoAlign>();
+        }
 
         SetDamageColors();
 

@@ -18,6 +18,8 @@ public class CockpitButtonPanel : MonoBehaviour
     [SerializeField]
     private GameObject _engineSwitchObject;
     [SerializeField]
+    private GameObject _alignSwitchObject;
+    [SerializeField]
     private GameObject _thrustModulatorReplacement;
     [SerializeField]
     private GameObject _gravityGearReplacement;
@@ -25,6 +27,8 @@ public class CockpitButtonPanel : MonoBehaviour
     private GameObject _persistentInputReplacement;
     [SerializeField]
     private GameObject _engineSwitchReplacement;
+    [SerializeField]
+    private GameObject _alignSwitchReplacement;
     [SerializeField]
     private Transform _retractedTransform;
     [SerializeField]
@@ -49,7 +53,8 @@ public class CockpitButtonPanel : MonoBehaviour
         if (!(bool)enableGravityLandingGear.GetProperty()
             && !(bool)enableThrustModulator.GetProperty()
             && !(bool)enableEnhancedAutopilot.GetProperty()
-            && !(bool)addEngineSwitch.GetProperty())
+            && !(bool)addEngineSwitch.GetProperty()
+            && !(bool)enableAutoAlign.GetProperty())
         {
             gameObject.SetActive(false);
             return;
@@ -64,6 +69,8 @@ public class CockpitButtonPanel : MonoBehaviour
         _gravityGearReplacement.SetActive(!(bool)enableGravityLandingGear.GetProperty());
         _thrustModulatorObject.SetActive((bool)enableThrustModulator.GetProperty());
         _thrustModulatorReplacement.SetActive(!(bool)enableThrustModulator.GetProperty());
+        _alignSwitchObject.SetActive((bool)enableAutoAlign.GetProperty());
+        _alignSwitchReplacement.SetActive(!(bool)enableAutoAlign.GetProperty());
         _persistentInputObject.SetActive((bool)enableEnhancedAutopilot.GetProperty());
         _persistentInputReplacement.SetActive(!(bool)enableEnhancedAutopilot.GetProperty());
         _engineSwitchObject.SetActive((bool)addEngineSwitch.GetProperty());

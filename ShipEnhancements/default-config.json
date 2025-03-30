@@ -640,6 +640,12 @@
       "value": false,
       "tooltip": "Adds an interface to the cockpit for decreasing your ship's maximum thrust or putting your reactor in overdrive."
     },
+    "enableAutoAlign": {
+      "title": "Add Auto Align Controls",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Adds an interface to the cockpit that lets you rotate your ship to face the current targeted object."
+    },
     "enableEnhancedAutopilot": {
       "title": "Add Autopilot Controls",
       "type": "toggle",

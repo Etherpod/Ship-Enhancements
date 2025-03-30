@@ -115,6 +115,7 @@ public static class SettingsPresets
         { "disableMinimapMarkers", false },
         { "scoutPhotoMode", false },
         { "fixShipThrustIndicator", true },
+        { "enableAutoAlign", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -226,6 +227,7 @@ public static class SettingsPresets
         { "disableMinimapMarkers", true },
         { "scoutPhotoMode", false },
         { "fixShipThrustIndicator", true },
+        { "enableAutoAlign", false },
     };
 
     public static readonly Dictionary<string, object> ImpossibleSettings = new Dictionary<string, object>()
@@ -337,6 +339,7 @@ public static class SettingsPresets
         { "disableMinimapMarkers", false },
         { "scoutPhotoMode", false },
         { "fixShipThrustIndicator", true },
+        { "enableAutoAlign", false },
     };
 
     public static readonly Dictionary<string, object> NewStuffSettings = new Dictionary<string, object>()
@@ -448,6 +451,7 @@ public static class SettingsPresets
         { "disableMinimapMarkers", false },
         { "scoutPhotoMode", true },
         { "fixShipThrustIndicator", true },
+        { "enableAutoAlign", true },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -559,6 +563,7 @@ public static class SettingsPresets
         { "disableMinimapMarkers", false },
         { "scoutPhotoMode", true },
         { "fixShipThrustIndicator", true },
+        { "enableAutoAlign", true },
     };
 
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()
@@ -890,6 +895,7 @@ public static class SettingsPresets
         { "disableMinimapMarkers", new RandomSettingValue(0.25f) },
         { "scoutPhotoMode", new RandomSettingValue(0.5f) },
         { "fixShipThrustIndicator", new RandomSettingValue(1f) },
+        { "enableAutoAlign", new RandomSettingValue(0.5f) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }
