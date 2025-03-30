@@ -2,7 +2,7 @@
 
 namespace ShipEnhancements;
 
-public class AutoAlignDirectionSwitch : CockpitSwitch
+public class AutoAlignDirectionButton : CockpitButton
 {
     private ShipAutoAlign _shipAlign;
 
@@ -12,7 +12,7 @@ public class AutoAlignDirectionSwitch : CockpitSwitch
         _shipAlign = SELocator.GetShipBody().GetComponent<ShipAutoAlign>();
     }
 
-    protected override void OnChangeState()
+    public override void OnChangeStateEvent()
     {
         if (!_on)
         {

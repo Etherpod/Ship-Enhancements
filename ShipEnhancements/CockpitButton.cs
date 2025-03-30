@@ -15,6 +15,10 @@ public class CockpitButton : CockpitInteractible
     [SerializeField]
     protected Light _buttonLight;
     [SerializeField]
+    protected float _enabledEmissionScale = 1;
+    [SerializeField]
+    protected float _disabledEmissionScale;
+    [SerializeField]
     protected Vector3 _rotationOffset;
     [SerializeField]
     protected Vector3 _positionOffset;
@@ -33,8 +37,6 @@ public class CockpitButton : CockpitInteractible
     protected Vector3 _initialButtonPosition;
     protected Quaternion _initialButtonRotation;
     protected float _baseLightIntensity;
-    protected float _disabledEmissionLevel = 0.2f;
-    protected float _enabledEmissionLevel = 1f;
 
     protected virtual void Start()
     {
@@ -93,12 +95,12 @@ public class CockpitButton : CockpitInteractible
 
         if (_on)
         {
-            _emissiveRenderer.SetEmissiveScale(_enabledEmissionLevel);
+            _emissiveRenderer.SetEmissiveScale(_enabledEmissionScale);
             _buttonLight.intensity = _baseLightIntensity;
         }
         else
         {
-            _emissiveRenderer.SetEmissiveScale(_disabledEmissionLevel);
+            _emissiveRenderer.SetEmissiveScale(_disabledEmissionScale);
             _buttonLight.intensity = 0f;
         }
 
@@ -121,7 +123,7 @@ public class CockpitButton : CockpitInteractible
 
         if (powered)
         {
-            _emissiveRenderer.SetEmissiveScale(_on ? _enabledEmissionLevel : _disabledEmissionLevel);
+            _emissiveRenderer.SetEmissiveScale(_on ? _enabledEmissionScale : _disabledEmissionScale);
             _buttonLight.intensity = _on ? _baseLightIntensity : 0f;
         }
         else

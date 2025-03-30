@@ -1,6 +1,6 @@
 ﻿namespace ShipEnhancements;
 
-public class AutoAlignSwitch : CockpitSwitch
+public class AutoAlignButton : CockpitButton
 {
     private ShipAutoAlign _shipAlign;
 
@@ -10,7 +10,7 @@ public class AutoAlignSwitch : CockpitSwitch
         _shipAlign = SELocator.GetShipBody().GetComponent<ShipAutoAlign>();
     }
 
-    protected override void OnChangeState()
+    public override void OnChangeStateEvent()
     {
         _shipAlign.enabled = _on;
     }
