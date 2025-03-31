@@ -144,6 +144,12 @@ public class ShipTemperatureDetector : TemperatureDetector
             targetHull._damageEffect.SetEffectBlend(1f - targetHull._integrity);
         }
         _lastDamagedHull = targetHull;
+
+        if (targetHull._integrity <= 0f && targetHull.shipModule is ShipDetachableModule
+            && (!(bool)preventSystemFailure.GetProperty() || targetHull.section == ShipHull.Section.Front))
+        {
+            ErnestoDetectiveController.ItWasTemperatureDamage(_internalTempMeter >= 0f);
+        }
     }
 
     private void ComponentTemperatureDamage()
@@ -241,6 +247,10 @@ public class ShipTemperatureDetector : TemperatureDetector
 
     public void ApplyComponentTempDamage(ShipComponent component)
     {
+        if (component is ShipReactorComponent && !component.isDamaged)
+        {
+            ErnestoDetectiveController.SetReactorCause("temperature" + (_internalTempMeter >= 0f ? "_hot" : "_cold"));
+        }
         component.SetDamaged(true);
     }
 

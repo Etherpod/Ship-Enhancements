@@ -258,8 +258,10 @@ public class ShipEnhancements : ModBehaviour
             anyPartDamaged = false;
             groundedByHornfels = false;
             shipIgniting = false;
+            ThrustModulatorLevel = 5;
             ShipRepairLimitController.SetRepairLimit(-1);
             ShipRepairLimitController.SetPartsRepaired(0);
+            ErnestoDetectiveController.Initialize();
 
             if (AchievementsAPI != null)
             {
@@ -425,7 +427,8 @@ public class ShipEnhancements : ModBehaviour
                 fuelTank._damageEffect._particleSystem.Stop();
                 fuelTank._damageEffect._particleAudioSource.Stop();
             }
-            SELocator.GetShipBody().GetComponent<ShipDamageController>().Explode();
+            ErnestoDetectiveController.ItWasExplosion(fromTorque: true);
+            SELocator.GetShipDamageController().Explode();
 
             if (!SEAchievementTracker.TorqueExplosion && AchievementsAPI != null)
             {
@@ -929,7 +932,7 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((float)Settings.reactorLifetimeMultiplier.GetProperty() != 1f)
         {
-            ShipReactorComponent reactor = SELocator.GetShipTransform().GetComponentInChildren<ShipReactorComponent>();
+            ShipReactorComponent reactor = SELocator.GetShipDamageController()._shipReactorComponent;
 
             float multiplier = Mathf.Max((float)Settings.reactorLifetimeMultiplier.GetProperty(), 0f);
             reactor._minCountdown *= multiplier;
@@ -1788,16 +1791,26 @@ public class ShipEnhancements : ModBehaviour
 
     private void SetHullColor()
     {
+        if ((string)Settings.interiorHullColor.GetProperty() == "Defualt"
+            && (string)Settings.exteriorHullColor.GetProperty() == "Default")
+        {
+            return;
+        }
+
         MeshRenderer suppliesRenderer = SELocator.GetShipTransform().
             Find("Module_Supplies/Geo_Supplies/Supplies_Geometry/Supplies_Interior").GetComponent<MeshRenderer>();
         Material inSharedMat = suppliesRenderer.sharedMaterials[0];
+        Material inSharedMat2 = inSharedMat;
 
-        Transform buttonPanel = SELocator.GetShipTransform().GetComponentInChildren<CockpitButtonPanel>().transform;
-        MeshRenderer buttonPanelRenderer = buttonPanel.Find("Panel/PanelBody.001").GetComponent<MeshRenderer>();
-        Material inSharedMat2 = buttonPanelRenderer.sharedMaterials[0];
+        CockpitButtonPanel buttonPanel = SELocator.GetButtonPanel();
+        if (buttonPanel != null)
+        {
+            MeshRenderer buttonPanelRenderer = buttonPanel.transform.Find("Panel/PanelBody.001").GetComponent<MeshRenderer>();
+            inSharedMat2 = buttonPanelRenderer.sharedMaterials[0];
+        }
+
         if ((string)Settings.interiorHullColor.GetProperty() != "Default")
         {
-
             if ((string)Settings.interiorHullColor.GetProperty() == "Rainbow")
             {
                 if (SELocator.GetShipTransform().TryGetComponent(out RainbowShipHull rainbowHull))

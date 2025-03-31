@@ -84,6 +84,7 @@ public class TetherAudioController : MonoBehaviour
 
     private void OnDetachPlayerTether()
     {
+        StopReelAudio();
         enabled = false;
     }
 

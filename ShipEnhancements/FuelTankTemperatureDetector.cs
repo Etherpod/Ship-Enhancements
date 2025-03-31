@@ -41,6 +41,12 @@ public class FuelTankTemperatureDetector : TemperatureDetector
         if (GetInternalTemperatureRatio() == 1f)
         {
             enabled = false;
+
+            if (_fuelTank.GetComponentInParent<ShipBody>() && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
+            {
+                ErnestoDetectiveController.ItWasFuelTank(temperature: true);
+            }
+
             _fuelTank.Explode();
         }
     }

@@ -180,6 +180,11 @@ public class ExplosionDamage : MonoBehaviour
         FuelTankItem tank = hitObj.GetComponentInParent<FuelTankItem>();
         if (tank != null)
         {
+            if (tank.GetComponentInParent<ShipBody>() && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
+            {
+                ErnestoDetectiveController.ItWasFuelTank(chain: true);
+            }
+
             tank.Explode();
         }
 

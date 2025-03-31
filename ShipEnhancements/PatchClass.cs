@@ -527,6 +527,7 @@ public static class PatchClass
             {
                 SEAchievementTracker.PlayerCausedExplosion = true;
             }
+            ErnestoDetectiveController.ItWasExplosion(fromSpeed: true);
             __instance.Explode(false);
             return false;
         }
@@ -545,10 +546,16 @@ public static class PatchClass
     [HarmonyPatch(typeof(HighSpeedImpactSensor), nameof(HighSpeedImpactSensor.FixedUpdate))]
     public static void DisableDamageExplode(HighSpeedImpactSensor __instance)
     {
-        if (__instance._dieNextUpdate && (float)shipDamageMultiplier.GetProperty() <= 0f
-            && __instance.gameObject.CompareTag("Ship"))
+        if (__instance._dieNextUpdate && __instance.gameObject.CompareTag("Ship"))
         {
-            __instance._dieNextUpdate = false;
+            if ((float)shipDamageMultiplier.GetProperty() <= 0f)
+            {
+                __instance._dieNextUpdate = false;
+            }
+            else
+            {
+                ErnestoDetectiveController.ItWasExplosion(fromSpeed: true);
+            }
         }
     }
     #endregion
@@ -1589,7 +1596,7 @@ public static class PatchClass
             {
                 canLaunch = false;
             }
-            if (shipPhotoMode && (!recallDisabled || ShipProbePickupVolume.probeInShip) && !damaged)
+            if (!shipPhotoMode || ((!recallDisabled || ShipProbePickupVolume.probeInShip) && !damaged))
             {
                 canSnapshot = true;
             }
@@ -2409,8 +2416,10 @@ public static class PatchClass
         {
             __instance.GetComponentInChildren<ShipNoiseMaker>()._noiseRadius = 1000f * (float)shipExplosionMultiplier.GetProperty();
         }
-
-        __instance._explosion.GetComponentInChildren<ExplosionDamage>()?.OnExplode();
+        if (__instance._explosion != null)
+        {
+            __instance._explosion.GetComponentInChildren<ExplosionDamage>()?.OnExplode();
+        }
     }
 
     [HarmonyPostfix]
@@ -3120,6 +3129,7 @@ public static class PatchClass
         {
             if (__instance._repairFraction <= 0f)
             {
+                ErnestoDetectiveController.ItWasExplosion(sabotage: true);
                 SELocator.GetShipDamageController().Explode();
             }
             return false;
@@ -3211,6 +3221,11 @@ public static class PatchClass
                 if (__instance.shipModule is ShipDetachableModule)
                 {
                     (__instance.shipModule as ShipDetachableModule).Detach();
+                    if (!(bool)preventSystemFailure.GetProperty()
+                        || __instance.shipModule._hulls[0].section != ShipHull.Section.Front)
+                    {
+                        ErnestoDetectiveController.ItWasHullBreach(sabotage: true);
+                    }
                 }
                 else if (__instance.shipModule is ShipLandingModule)
                 {
@@ -3648,7 +3663,102 @@ public static class PatchClass
             __result = $"It's {randomHour}:{randomMinute} if I'm reading that clock correctly.";
             return false;
         }
+        else if (key == "SE_Ernesto_ShipFailureERNESTO_PLACEHOLDER")
+        {
+            __result = ErnestoDetectiveController.GetHypothesis();
+            return false;
+        }
         return true;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ElectricityVolume), nameof(ElectricityVolume.ApplyShock))]
+    public static void ErnestoDetectElectricityShock(ElectricityVolume __instance, bool __runOriginal, HazardDetector detector)
+    {
+        if (!(bool)addErnesto.GetProperty() || !__runOriginal) return;
+
+        OWRigidbody attachedOWRigidbody = detector.GetAttachedOWRigidbody(false);
+        if (attachedOWRigidbody != null)
+        {
+            if (detector.CompareTag("ShipDetector"))
+            {
+                ShipDamageController component = attachedOWRigidbody.GetComponent<ShipDamageController>();
+                if (component.IsElectricalFailed())
+                {
+                    if (!component._shipReactorComponent.isDamaged)
+                    {
+                        ShipEnhancements.WriteDebugMessage("electricity");
+                        ErnestoDetectiveController.SetReactorCause("electricity");
+                    }
+                }
+            }
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipReactorComponent), nameof(ShipReactorComponent.Update))]
+    public static void ErnestoDetectReactorExplosion(ShipReactorComponent __instance)
+    {
+        if (!(bool)addErnesto.GetProperty()) return;
+
+        if (__instance._damaged && __instance._criticalTimer <= 0f)
+        {
+            ErnestoDetectiveController.ItWasExplosion(fromReactor: true);
+        }
+        else if (!__instance._damaged)
+        {
+            ErnestoDetectiveController.SetReactorCause("");
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipDetachableModule), nameof(ShipDetachableModule.ApplyImpact))]
+    public static void ErnestoDetectHullImpact(ShipDetachableModule __instance, bool __runOriginal)
+    {
+        if (!(bool)addErnesto.GetProperty() || !__runOriginal 
+            || SELocator.GetShipDamageController().IsSystemFailed()) return;
+
+        for (int i = 0; i < __instance._hulls.Length; i++)
+        {
+            if (__instance._hulls[i]._integrity <= 0f && __instance._hulls[i].shipModule is ShipDetachableModule
+            && (!(bool)preventSystemFailure.GetProperty() || __instance._hulls[i].section == ShipHull.Section.Front))
+            {
+                ErnestoDetectiveController.ItWasHullBreach(impact: true);
+                return;
+            }
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.TriggerHullBreach))]
+    public static void ErnestoDefaultHullBreach(ShipDamageController __instance)
+    {
+        if (!(bool)addErnesto.GetProperty()) return;
+
+        ShipEnhancements.Instance.ModHelper.Events.Unity
+            .FireInNUpdates(() => ErnestoDetectiveController.ItWasHullBreach(), 3);
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.Explode))]
+    public static void ErnestoDefaultExplode(ShipDamageController __instance)
+    {
+        if (!(bool)addErnesto.GetProperty()) return;
+
+        ShipEnhancements.Instance.ModHelper.Events.Unity
+            .FireInNUpdates(() => ErnestoDetectiveController.ItWasExplosion(), 3);
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipEjectionSystem), nameof(ShipEjectionSystem.Update))]
+    public static void ErnestoCockpitEject(ShipEjectionSystem __instance)
+    {
+        if (!(bool)addErnesto.GetProperty()) return;
+
+        if (__instance._ejectPressed)
+        {
+            ErnestoDetectiveController.ItWasHullBreach(ejected: true);
+        }
     }
     #endregion
 
@@ -3860,6 +3970,7 @@ public static class PatchClass
                     {
                         SELocator.GetShipTransform().GetComponentInChildren<ShipAudioController>()
                             ._shipElectrics._audioSource.PlayOneShot(AudioType.ShipDamageElectricalFailure, 0.5f);
+                        ErnestoDetectiveController.ItWasAnglerfish();
                     }
                     else
                     {
@@ -3887,7 +3998,12 @@ public static class PatchClass
         ShipHull[] hulls = SELocator.GetShipDamageController()._shipHulls.Where((hull) => hull.integrity > 0f).ToArray();
         if (components.Length > 0 && UnityEngine.Random.value < 0.5f)
         {
-            components[UnityEngine.Random.Range(0, components.Length)].SetDamaged(true);
+            int index = UnityEngine.Random.Range(0, components.Length);
+            if (components[index] is ShipReactorComponent && !components[index].isDamaged)
+            {
+                ErnestoDetectiveController.SetReactorCause("anglerfish");
+            }
+            components[index].SetDamaged(true);
         }
         else if (hulls.Length > 0)
         {

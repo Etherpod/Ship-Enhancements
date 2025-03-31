@@ -85,7 +85,12 @@ public class ShipFluidDamageController : MonoBehaviour
 
         if (components.Length > 0 && Random.value < 0.1f + (damagePercent * 0.3f))
         {
-            components[Random.Range(0, components.Length)].SetDamaged(true);
+            int index = Random.Range(0, components.Length);
+            if (components[index] is ShipReactorComponent && !components[index].isDamaged)
+            {
+                ErnestoDetectiveController.SetReactorCause("fluid");
+            }
+            components[index].SetDamaged(true);
         }
         else
         {
@@ -109,6 +114,12 @@ public class ShipFluidDamageController : MonoBehaviour
                 targetHull._damageEffect.SetEffectBlend(1f - targetHull._integrity);
             }
 
+            if (targetHull._integrity <= 0f && targetHull.shipModule is ShipDetachableModule
+            && (!(bool)preventSystemFailure.GetProperty() || targetHull.section == ShipHull.Section.Front))
+            {
+                ErnestoDetectiveController.ItWasFluidDamage();
+            }
+
             if (ShipEnhancements.InMultiplayer)
             {
                 ShipEnhancements.QSBInteraction.SetHullDamaged(targetHull, !wasDamaged);
@@ -129,6 +140,7 @@ public class ShipFluidDamageController : MonoBehaviour
         _currentDamagePercent = _damageFluids[vol.GetFluidType()];
         if (_currentDamagePercent >= 1f)
         {
+            ErnestoDetectiveController.ItWasExplosion(fromFluid: true);
             SELocator.GetShipDamageController().Explode();
         }
     }

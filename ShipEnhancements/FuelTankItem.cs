@@ -245,6 +245,11 @@ public class FuelTankItem : OWItem
     {
         if (impact.speed > _explosionSpeed && _currentFuel > 0f)
         {
+            if (GetComponentInParent<ShipBody>() && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
+            {
+                ErnestoDetectiveController.ItWasFuelTank(impact: true);
+            }
+
             Explode();
         }
     }

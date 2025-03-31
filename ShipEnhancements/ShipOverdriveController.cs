@@ -60,7 +60,7 @@ public class ShipOverdriveController : ElectricalComponent
 
         base.Awake();
         _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
-        _reactor = SELocator.GetShipTransform().GetComponentInChildren<ShipReactorComponent>();
+        _reactor = SELocator.GetShipDamageController()._shipReactorComponent;
         _modulatorController = GetComponent<ThrustModulatorController>();
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
         ShipEnhancements.Instance.OnFuelDepleted += OnFuelDepleted;
@@ -186,11 +186,16 @@ public class ShipOverdriveController : ElectricalComponent
 
             if (host)
             {
+                if (!_reactor.isDamaged)
+                {
+                    ErnestoDetectiveController.SetReactorCause("overdrive");
+                }
                 _reactor.SetDamaged(true);
             }
         }
         else if (host)
         {
+            ErnestoDetectiveController.ItWasExplosion(fromOverdrive: true);
             SELocator.GetShipDamageController().Explode();
             return;
         }

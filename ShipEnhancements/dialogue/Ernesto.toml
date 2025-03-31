@@ -265,9 +265,18 @@ page = ["Hey."]
 [dialogue_node.dialogue_options_list]
 
 [[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_SHIP_FAILURE"
+text = "What happened to my ship?!"
+dialogue_target = "SE_Ernesto_ShipFailure"
+
+# --
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
 required_persistent_condition = ["SE_ERNESTO_IS_AWARE"]
 text = "Are there any other Ernestos here?"
 dialogue_target = "SE_Ernesto_Ernestos"
+
+# --
 
 [[dialogue_node.dialogue_options_list.dialogue_option]]
 required_condition = "SE_ERNESTO_OPTION_1"
@@ -1090,3 +1099,11 @@ name = "SE_Ernesto_Clock"
 
 [[dialogue_node.dialogue]]
 page = ["Time for you to get a watch!", "Sorry, thought I'd hit you with one of the classics. It sounded funnier in my head.", "ERNESTO_PLACEHOLDER"]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_ShipFailure"
+
+[[dialogue_node.dialogue]]
+page = ["ERNESTO_PLACEHOLDER"]

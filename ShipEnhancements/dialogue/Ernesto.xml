@@ -232,6 +232,11 @@
     </Dialogue>
     <DialogueOptionsList>
       <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_SHIP_FAILURE</RequiredCondition>
+        <Text>What happened to my ship?!</Text>
+        <DialogueTarget>SE_Ernesto_ShipFailure</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
         <RequiredPersistentCondition>SE_ERNESTO_IS_AWARE</RequiredPersistentCondition>
         <Text>Are there any other Ernestos here?</Text>
         <DialogueTarget>SE_Ernesto_Ernestos</DialogueTarget>
@@ -973,6 +978,12 @@
     <Dialogue>
       <Page>Time for you to get a watch!</Page>
       <Page>Sorry, thought I'd hit you with one of the classics. It sounded funnier in my head.</Page>
+      <Page>ERNESTO_PLACEHOLDER</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_ShipFailure</Name>
+    <Dialogue>
       <Page>ERNESTO_PLACEHOLDER</Page>
     </Dialogue>
   </DialogueNode>

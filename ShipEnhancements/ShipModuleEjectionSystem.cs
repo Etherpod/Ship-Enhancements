@@ -135,6 +135,8 @@ public class ShipModuleEjectionSystem : MonoBehaviour
             }
             else
             {
+                ErnestoDetectiveController.ItWasHullBreach(ejected: true);
+
                 OWRigidbody owrigidbody = _detachableModule.Detach();
                 _shipBody.transform.position -= _shipBody.transform.TransformVector(_ejectDirection);
                 float num = _ejectImpulse;

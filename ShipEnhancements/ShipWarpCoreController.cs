@@ -352,6 +352,12 @@ public class ShipWarpCoreController : CockpitInteractible
                 targetHull._damageEffect.SetEffectBlend(1f - targetHull._integrity);
             }
 
+            if (targetHull._integrity <= 0f && targetHull.shipModule is ShipDetachableModule
+            && (!(bool)preventSystemFailure.GetProperty() || targetHull.section == ShipHull.Section.Front))
+            {
+                ErnestoDetectiveController.ItWasBrokenWarp();
+            }
+
             if (ShipEnhancements.InMultiplayer)
             {
                 ShipEnhancements.QSBInteraction.SetHullDamaged(targetHull, !wasDamaged);

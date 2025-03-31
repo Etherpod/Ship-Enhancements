@@ -37,7 +37,7 @@ public class PortableCampfire : Campfire
         }
 
         _cancelPrompt = new PriorityScreenPrompt(InputLibrary.cancel, "Pack up", 0, ScreenPrompt.DisplayState.Normal, false);
-        _reactor = SELocator.GetShipBody().GetComponentInChildren<ShipReactorComponent>();
+        _reactor = SELocator.GetShipDamageController()._shipReactorComponent;
         _reactorHeatMeterLength = Random.Range(10f, 30f);
         _reactorHeatMeter = _reactorHeatMeterLength;
     }
@@ -59,6 +59,11 @@ public class PortableCampfire : Campfire
                 {
                     _reactorHeatMeter = _reactorHeatMeterLength;
                     _reactorHeatMeterLength = Random.Range(10f, 30f);
+                    if (!_reactor.isDamaged)
+                    {
+                        ShipEnhancements.WriteDebugMessage("campfire");
+                        ErnestoDetectiveController.SetReactorCause("campfire");
+                    }
                     _reactor.SetDamaged(true);
 
                     if (ShipEnhancements.InMultiplayer)

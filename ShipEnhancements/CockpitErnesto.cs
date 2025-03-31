@@ -17,6 +17,7 @@ public class CockpitErnesto : MonoBehaviour
     private List<int> _availableQuestions = [];
     private Coroutine _currentComment = null;
     private bool _bigHeadMode = false;
+    private bool _showShipFailNextTime = false;
 
     private readonly int _questionsCount = 23;
     private readonly float _commentLifetime = 10f;
@@ -75,6 +76,7 @@ public class CockpitErnesto : MonoBehaviour
         GlobalMessenger<OWRigidbody>.AddListener("EnterFlightConsole", OnEnterFlightConsole);
         GlobalMessenger.AddListener("ExitFlightConsole", OnExitFlightConsole);
         GlobalMessenger.AddListener("EnableBigHeadMode", OnEnableBigHeadMode);
+        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
 
         ResetAvailableQuestions();
     }
@@ -147,6 +149,12 @@ public class CockpitErnesto : MonoBehaviour
         {
             ResetAvailableQuestions();
         }
+
+        if (_showShipFailNextTime)
+        {
+            DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_SHIP_FAILURE", true);
+            _showShipFailNextTime = false;
+        }
     }
 
     private void OnEndConversation()
@@ -179,6 +187,11 @@ public class CockpitErnesto : MonoBehaviour
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_EXPLODE_SHIP", false);
             SELocator.GetShipDamageController().Explode();
+        }
+
+        if (DialogueConditionManager.SharedInstance.GetConditionState("SE_ERNESTO_SHIP_FAILURE"))
+        {
+            DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_SHIP_FAILURE", false);
         }
     }
 
@@ -273,7 +286,7 @@ public class CockpitErnesto : MonoBehaviour
 
         if ((bool)ShipEnhancements.Settings.disableDamageIndicators.GetProperty() && Random.value < 0.25f)
         {
-            ShipReactorComponent reactor = SELocator.GetShipTransform().GetComponentInChildren<ShipReactorComponent>();
+            ShipReactorComponent reactor = SELocator.GetShipDamageController()._shipReactorComponent;
             if (reactor != null && reactor.isDamaged)
             {
                 ReactorDamagedComment();
@@ -298,6 +311,11 @@ public class CockpitErnesto : MonoBehaviour
         }
     }
 
+    private void OnShipSystemFailure()
+    {
+        _showShipFailNextTime = true;
+    }
+
     private void OnDestroy()
     {
         _dialogueTree.OnStartConversation -= OnStartConversation;
@@ -305,5 +323,6 @@ public class CockpitErnesto : MonoBehaviour
         GlobalMessenger<OWRigidbody>.RemoveListener("EnterFlightConsole", OnEnterFlightConsole);
         GlobalMessenger.RemoveListener("ExitFlightConsole", OnExitFlightConsole);
         GlobalMessenger.RemoveListener("EnableBigHeadMode", OnEnableBigHeadMode);
+        GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
     }
 }
