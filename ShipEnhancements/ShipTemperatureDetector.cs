@@ -84,6 +84,7 @@ public class ShipTemperatureDetector : TemperatureDetector
             {
                 if (resistance == 0)
                 {
+                    ErnestoDetectiveController.ItWasExplosion(fromTemperature: true);
                     SELocator.GetShipDamageController().Explode();
                 }
                 else

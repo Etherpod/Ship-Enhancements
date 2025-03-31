@@ -84,13 +84,21 @@ public static class ErnestoDetectiveController
         _reachedConclusion = true;
     }
 
+    public static void ItWasExplosionDamage()
+    {
+        if (_reachedConclusion) return;
+
+        _hypothesis = "Your ship got hit by some sort of explosion. It knocked one of the hulls clean off.";
+        _reachedConclusion = true;
+    }
+
     public static void SetReactorCause(string cause)
     {
         _reactorCause = cause;
     }
 
     public static void ItWasExplosion(bool fromReactor = false, bool fromSpeed = false, bool fromOverdrive = false, bool sabotage = false,
-        bool fromTorque = false, bool fromFluid = false)
+        bool fromTorque = false, bool fromFluid = false, bool fromErnesto = false, bool fromTemperature = false)
     {
         if (_reachedConclusion) return;
 
@@ -159,6 +167,14 @@ public static class ErnestoDetectiveController
         else if (fromFluid)
         {
             _hypothesis = "Your ship touched something it didn't like, so it blew up. Doesn't get much simpler than that.";
+        }
+        else if (fromErnesto)
+        {
+            _hypothesis = "You rolled a 1. You said so yourself.";
+        }
+        else if (fromTemperature)
+        {
+            _hypothesis = "Your ship got a little uncomfortable with the temperature, so it decided to blow up and call it a day.";
         }
         else
         {

@@ -186,6 +186,7 @@ public class CockpitErnesto : MonoBehaviour
             && !SELocator.GetShipDamageController().IsSystemFailed())
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_EXPLODE_SHIP", false);
+            ErnestoDetectiveController.ItWasExplosion(fromErnesto: true);
             SELocator.GetShipDamageController().Explode();
         }
 

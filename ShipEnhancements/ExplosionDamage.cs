@@ -146,6 +146,7 @@ public class ExplosionDamage : MonoBehaviour
                     ShipDetachableModule module = hull.shipModule as ShipDetachableModule;
                     if (hull.integrity <= 0f && !module.isDetached)
                     {
+                        ErnestoDetectiveController.ItWasExplosionDamage();
                         module.Detach();
                     }
                 }
