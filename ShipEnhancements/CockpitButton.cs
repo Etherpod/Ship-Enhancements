@@ -13,11 +13,14 @@ public class CockpitButton : CockpitInteractible
     [SerializeField]
     protected OWEmissiveRenderer _emissiveRenderer;
     [SerializeField]
+    [ColorUsage(true, true)]
+    protected Color _highlightColor = Color.white;
+    [SerializeField]
+    protected float _enabledEmissionScale = 1f;
+    [SerializeField]
+    protected float _disabledEmissionScale = 0f;
+    [SerializeField]
     protected Light _buttonLight;
-    [SerializeField]
-    protected float _enabledEmissionScale = 1;
-    [SerializeField]
-    protected float _disabledEmissionScale;
     [SerializeField]
     protected Vector3 _rotationOffset;
     [SerializeField]
@@ -80,12 +83,25 @@ public class CockpitButton : CockpitInteractible
         }
     }
 
+    protected override void OnGainFocus()
+    {
+        base.OnGainFocus();
+        if (!_electricalDisrupted && _powered)
+        {
+            _emissiveRenderer.SetEmissiveScale(0.5f);
+        }
+    }
+
     protected override void OnLoseFocus()
     {
         base.OnLoseFocus();
         if (_pressed)
         {
             OnReleaseInteract();
+        }
+        if (!_electricalDisrupted && _powered)
+        {
+            _emissiveRenderer.SetEmissiveScale(_on ? _enabledEmissionScale : _disabledEmissionScale);
         }
     }
 

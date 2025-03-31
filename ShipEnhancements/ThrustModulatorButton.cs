@@ -119,6 +119,12 @@ public class ThrustModulatorButton : CockpitInteractible
         _interactReceiver.DisableInteraction();
     }
 
+    protected override void OnGainFocus()
+    {
+        base.OnGainFocus();
+        _emissiveRenderer.SetEmissiveScale(0.5f);
+    }
+
     protected override void OnLoseFocus()
     {
         base.OnLoseFocus();
@@ -126,6 +132,7 @@ public class ThrustModulatorButton : CockpitInteractible
         {
             OnReleaseInteract();
         }
+        _emissiveRenderer.SetEmissiveScale(_active ? 1f : 0f);
     }
 
     public int GetModulatorLevel()

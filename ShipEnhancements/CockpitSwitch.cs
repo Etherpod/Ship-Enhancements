@@ -13,7 +13,14 @@ public abstract class CockpitSwitch : CockpitInteractible
     [SerializeField]
     protected string _offLabel;
     [SerializeField]
-    protected OWEmissiveRenderer _emissiveRenderer; 
+    protected OWEmissiveRenderer _emissiveRenderer;
+    [SerializeField]
+    [ColorUsage(true, true)]
+    protected Color _highlightColor = Color.white;
+    [SerializeField]
+    protected float _enabledEmissionScale = 1f;
+    [SerializeField]
+    protected float _disabledEmissionScale = 0f;
     [SerializeField]
     protected Light _switchLight;
     [SerializeField]
@@ -62,6 +69,24 @@ public abstract class CockpitSwitch : CockpitInteractible
             {
                 ShipEnhancements.QSBCompat.SendSwitchState(id, (GetType().Name, _on));
             }
+        }
+    }
+
+    protected override void OnGainFocus()
+    {
+        base.OnGainFocus();
+        if (!_electricalDisrupted && _powered)
+        {
+            _emissiveRenderer.SetEmissiveScale(0.5f);
+        }
+    }
+
+    protected override void OnLoseFocus()
+    {
+        base.OnLoseFocus();
+        if (!_electricalDisrupted && _powered)
+        {
+            _emissiveRenderer.SetEmissiveScale(_on ? _enabledEmissionScale : _disabledEmissionScale);
         }
     }
 
