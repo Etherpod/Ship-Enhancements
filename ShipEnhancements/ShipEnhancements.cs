@@ -1,4 +1,4 @@
-﻿using OWML.Common;
+using OWML.Common;
 using OWML.ModHelper;
 using UnityEngine;
 using System.IO;
@@ -82,6 +82,7 @@ public class ShipEnhancements : ModBehaviour
     public ItemType RadioType { get; private set; }
     public SignalName ShipSignalName { get; private set; }
     public int ThrustModulatorLevel { get; private set; }
+    public float ThrustModulatorFactor => ThrustModulatorLevel / 5f;
 
     private SettingsPresets.PresetName _currentPreset = (SettingsPresets.PresetName)(-1);
     
@@ -1274,7 +1275,7 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)Settings.enableEnhancedAutopilot.GetProperty())
         {
             WriteDebugMessage("adding orbit autopilot");
-            SELocator.GetShipBody().gameObject.AddComponent<OrbitAutopilotTest>();
+            SELocator.GetShipBody().gameObject.AddComponent<PidAutopilot>();
         }
         if ((bool)Settings.enableAutoAlign.GetProperty())
         {

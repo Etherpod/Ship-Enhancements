@@ -36,6 +36,10 @@ public static class ShipNotifications
     private static NotificationData _orbitAutopilotActiveNotification = new NotificationData(NotificationTarget.Ship, "AUTOPILOT: ORBITING", 5f, true);
     
     private static NotificationData _orbitAutopilotDisabledNotification = new NotificationData(NotificationTarget.Ship, "AUTOPILOT: ORBIT DISABLED", 5f, true);
+    
+    private static NotificationData _holdPositionAutopilotActiveNotification = new NotificationData(NotificationTarget.Ship, "AUTOPILOT: HOLDING POSITION", 5f, true);
+    
+    private static NotificationData _holdPositionAutopilotDisabledNotification = new NotificationData(NotificationTarget.Ship, "AUTOPILOT: HOLD POSITION DISABLED", 5f, true);
 
     private static bool _oxygenLow = false;
     private static bool _oxygenCritical = false;
@@ -255,4 +259,13 @@ public static class ShipNotifications
 
     public static void PostOrbitAutopilotDisabledNotification() =>
         NotificationManager.SharedInstance.PostNotification(_orbitAutopilotDisabledNotification, false);
+
+    public static void PostHoldPositionAutopilotNotification() =>
+        NotificationManager.SharedInstance.PostNotification(_holdPositionAutopilotActiveNotification, true);
+
+    public static void RemoveHoldPositionAutopilotNotification() =>
+        NotificationManager.SharedInstance.UnpinNotification(_holdPositionAutopilotActiveNotification);
+
+    public static void PostHoldPositionAutopilotDisabledNotification() =>
+        NotificationManager.SharedInstance.PostNotification(_holdPositionAutopilotDisabledNotification, false);
 }

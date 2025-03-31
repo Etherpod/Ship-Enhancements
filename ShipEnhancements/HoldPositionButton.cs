@@ -1,6 +1,3 @@
 ﻿namespace ShipEnhancements;
 
-public class HoldPositionButton : CockpitButtonSwitch
-{
-
-}
+public class HoldPositionButton() : PidAutopilotButton(PidMode.HoldPosition);

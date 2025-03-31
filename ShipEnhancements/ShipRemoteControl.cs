@@ -19,7 +19,7 @@ public class ShipRemoteControl : MonoBehaviour
     private ShipModuleEjectionSystem _engineEjectSystem;
     private ShipModuleEjectionSystem _landingGearEjectSystem;
     private Autopilot _autopilot;
-    private OrbitAutopilotTest _orbitAutopilot;
+    private PidAutopilot _pidAutopilot;
     private bool _lastAutopilotState = false;
     private readonly string _engageAutopilotText = "Engage Autopilot";
     private readonly string _disengageAutopilotText = "Disengage Autopilot";
@@ -85,7 +85,7 @@ public class ShipRemoteControl : MonoBehaviour
         }
 
         _warpCoreController = SELocator.GetShipTransform().GetComponentInChildren<ShipWarpCoreController>();
-        _orbitAutopilot = SELocator.GetShipBody().GetComponent<OrbitAutopilotTest>();
+        _pidAutopilot = SELocator.GetShipBody().GetComponent<PidAutopilot>();
     }
 
     private void Update()
@@ -137,7 +137,7 @@ public class ShipRemoteControl : MonoBehaviour
                         {
                             if ((bool)enableEnhancedAutopilot.GetProperty())
                             {
-                                if (_autopilot.enabled || _orbitAutopilot.enabled)
+                                if (_autopilot.enabled || _pidAutopilot.enabled)
                                 {
                                     SELocator.GetAutopilotPanelController().OnCancelAutopilot();
                                 }
@@ -306,7 +306,7 @@ public class ShipRemoteControl : MonoBehaviour
             && SELocator.GetAutopilotPanelController().IsOrbitSelected())
         {
             ReferenceFrame rf = Locator.GetReferenceFrame(false);
-            return _orbitAutopilot.enabled || rf != null;
+            return _pidAutopilot.enabled || rf != null;
         }
         else
         {
@@ -346,9 +346,9 @@ public class ShipRemoteControl : MonoBehaviour
 
         if ((bool)enableEnhancedAutopilot.GetProperty())
         {
-            if (_lastAutopilotState != (_autopilot.enabled || _orbitAutopilot.enabled))
+            if (_lastAutopilotState != (_autopilot.enabled || _pidAutopilot.enabled))
             {
-                _lastAutopilotState = _autopilot.enabled || _orbitAutopilot.enabled;
+                _lastAutopilotState = _autopilot.enabled || _pidAutopilot.enabled;
                 if (_lastAutopilotState)
                 {
                     _commandNames[_currentCommand] = _disengageAutopilotText;

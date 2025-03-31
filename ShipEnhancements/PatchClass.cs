@@ -668,7 +668,7 @@ public static class PatchClass
     {
         if ((bool)enableThrustModulator.GetProperty())
         {
-            __result *= ShipEnhancements.Instance.ThrustModulatorLevel / 5f
+            __result *= ShipEnhancements.Instance.ThrustModulatorFactor
                 * (SELocator.GetShipOverdriveController().OnCooldown ? SELocator.GetShipOverdriveController().ThrustMultiplier : 1f);
         }
     }
@@ -693,7 +693,7 @@ public static class PatchClass
             return false;
         }
 
-        float multiplier = ShipEnhancements.Instance.ThrustModulatorLevel / 5f;
+        float multiplier = ShipEnhancements.Instance.ThrustModulatorFactor;
 
         if (__instance._isMatchingVelocity && __instance._referenceFrame != null)
         {
@@ -4226,7 +4226,7 @@ public static class PatchClass
             return false;
         }
         __instance.UpdateShipLightInput();
-        if (__instance._autopilot.IsFlyingToDestination() || __instance._autopilot.GetComponent<OrbitAutopilotTest>().enabled)
+        if (__instance._autopilot.IsFlyingToDestination() || __instance._autopilot.GetComponent<PidAutopilot>().enabled)
         {
             if (OWInput.IsNewlyPressed(InputLibrary.autopilot, InputMode.All))
             {

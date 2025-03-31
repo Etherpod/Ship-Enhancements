@@ -38,7 +38,7 @@ public class ShipPersistentInput : ThrusterController
 
         float num = Mathf.Min(_rulesetDetector.GetThrustLimit(), _thrustController._thrusterModel.GetMaxTranslationalThrust()) 
             / _thrustController._thrusterModel.GetMaxTranslationalThrust();
-        return _currentInput * ((bool)enableThrustModulator.GetProperty() ? ShipEnhancements.Instance.ThrustModulatorLevel / 5f : 1f) * num;
+        return _currentInput * ((bool)enableThrustModulator.GetProperty() ? ShipEnhancements.Instance.ThrustModulatorFactor : 1f) * num;
     }
 
     public void StartRecordingInput()
