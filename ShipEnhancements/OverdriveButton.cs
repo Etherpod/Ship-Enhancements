@@ -138,12 +138,25 @@ public class OverdriveButton : CockpitInteractible
         }
     }
 
+    protected override void OnGainFocus()
+    {
+        base.OnGainFocus();
+        if (_active)
+        {
+            _emissiveRenderer.SetEmissionColor(_active ? (_on ? _onColor : _offColor) * 0.5f : _inactiveColor);
+        }
+    }
+
     protected override void OnLoseFocus()
     {
         base.OnLoseFocus();
         if (_pressed)
         {
             OnReleaseInteract();
+        }
+        if (_active)
+        {
+            _emissiveRenderer.SetEmissionColor(_active ? (_on ? _onColor : _offColor) : _inactiveColor);
         }
     }
 
