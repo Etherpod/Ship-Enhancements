@@ -35,16 +35,12 @@ public class OverdriveButton : CockpitInteractible
 
     public override void Awake()
     {
+        base.Awake();
         _overdriveController = GetComponentInParent<ShipOverdriveController>();
     }
 
     private void Start()
     {
-        _interactReceiver.OnPressInteract += OnPressInteract;
-        _interactReceiver.OnReleaseInteract += OnReleaseInteract;
-        _interactReceiver.OnGainFocus += OnGainFocus;
-        _interactReceiver.OnLoseFocus += OnLoseFocus;
-
         _interactReceiver.ChangePrompt(_isPrimeButton ? "Disable safeties" : "Activate Overdrive");
         _light.color = _inactiveColor;
 
@@ -141,7 +137,7 @@ public class OverdriveButton : CockpitInteractible
     protected override void OnGainFocus()
     {
         base.OnGainFocus();
-        if (_active)
+        if (_active && _powered)
         {
             _emissiveRenderer.SetEmissionColor(_active ? (_on ? _onColor : _offColor) * 0.5f : _inactiveColor);
         }
@@ -154,7 +150,7 @@ public class OverdriveButton : CockpitInteractible
         {
             OnReleaseInteract();
         }
-        if (_active)
+        if (_active && _powered)
         {
             _emissiveRenderer.SetEmissionColor(_active ? (_on ? _onColor : _offColor) : _inactiveColor);
         }
@@ -218,7 +214,7 @@ public class OverdriveButton : CockpitInteractible
     {
         _powered = disrupted ? _powered : state;
 
-        if (_cooldownT > 0f) return;
+        if (!state && _cooldownT > 0f) return;
 
         if (state)
         {

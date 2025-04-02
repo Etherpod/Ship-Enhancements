@@ -49,6 +49,9 @@ public class ShipEngineSwitch : CockpitInteractible
 
     private bool _controlledRemote = false;
 
+    private readonly string _onPrompt = UITextLibrary.GetString(UITextType.HoldPrompt) + " Start Engine";
+    private readonly string _offPrompt = "Turn Off Engine";
+
     public override void Awake()
     {
         base.Awake();
@@ -78,8 +81,7 @@ public class ShipEngineSwitch : CockpitInteractible
     {
         if (!(bool)addEngineSwitch.GetProperty()) return;
 
-        _interactReceiver.SetPromptText(UITextType.HoldPrompt);
-        _interactReceiver.ChangePrompt("Start engine");
+        _interactReceiver.ChangePrompt(_onPrompt);
         _baseIndicatorLightIntensity = _powerIndicatorLight.intensity;
         _thrustersIndicatorLight.intensity = 0f;
         _powerIndicatorLight.intensity = 0f;
@@ -175,7 +177,7 @@ public class ShipEngineSwitch : CockpitInteractible
                     _audioController.PlayShipAmbient();
                     StartCoroutine(ActivateIndicatorLights(electricalComponent._electricalSystem._systemDelay));
                     //_thrusterController._isIgniting = false;
-                    _interactReceiver.ChangePrompt("Turn off engine");
+                    _interactReceiver.ChangePrompt(_offPrompt);
                     _interactReceiver.EnableInteraction();
                     GlobalMessenger.FireEvent("CompleteShipIgnition");
                 }
@@ -311,7 +313,7 @@ public class ShipEngineSwitch : CockpitInteractible
             _alarm.TurnOffAlarm();
         }
         _audioController.StopShipAmbient();
-        _interactReceiver.ChangePrompt("Start engine");
+        _interactReceiver.ChangePrompt(_onPrompt);
         StopAllCoroutines();
         DeactivateIndicatorLights();
     }
@@ -377,7 +379,7 @@ public class ShipEngineSwitch : CockpitInteractible
             //_alarm.UpdateAlarmState();
             //_audioController.PlayShipAmbient();
             StartCoroutine(ActivateIndicatorLights(0f));
-            _interactReceiver.ChangePrompt("Turn off engine");
+            _interactReceiver.ChangePrompt(_offPrompt);
         }
     }
 
