@@ -887,7 +887,7 @@ page = ["Picture the fastest moving object you could ever imagine, something tha
 name = "SE_Ernesto_Music"
 
 [[dialogue_node.dialogue]]
-page = ["Not really. It hurts my ears."]
+page = ["Sometimes."]
 
 
 

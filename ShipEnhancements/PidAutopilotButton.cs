@@ -19,8 +19,6 @@ public class PidAutopilotButton : CockpitButtonSwitch
 
         _pidAutopilot.OnAbortAutopilot += OnAbortAutopilot;
         _pidAutopilot.OnInitOrbit += OnInitPid;
-        GlobalMessenger<OWRigidbody>.AddListener("EnterFlightConsole", OnEnterFlightConsole);
-        GlobalMessenger.AddListener("ExitFlightConsole", OnExitFlightConsole);
     }
 
     public override void OnChangeActiveEvent()
@@ -58,23 +56,10 @@ public class PidAutopilotButton : CockpitButtonSwitch
         }
     }
 
-    private void OnEnterFlightConsole(OWRigidbody shipBody)
-    {
-        AlignShipWithReferenceFrame align = _pidAutopilot.GetComponent<AlignShipWithReferenceFrame>();
-        align.enabled = false;
-    }
-
-    private void OnExitFlightConsole()
-    {
-        _pidAutopilot.GetComponent<AlignShipWithReferenceFrame>().enabled = IsActivated();
-    }
-
     protected override void OnDestroy()
     {
         base.OnDestroy();
         _pidAutopilot.OnAbortAutopilot -= OnAbortAutopilot;
         _pidAutopilot.OnInitOrbit -= OnInitPid;
-        GlobalMessenger<OWRigidbody>.RemoveListener("EnterFlightConsole", OnEnterFlightConsole);
-        GlobalMessenger.RemoveListener("ExitFlightConsole", OnExitFlightConsole);
     }
 }
