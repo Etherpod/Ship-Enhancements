@@ -18,8 +18,18 @@ public class AutopilotPanelController : MonoBehaviour
     private CockpitButtonSwitch _activeAutopilot;
     private CockpitButtonSwitch _activeMatch;
 
+    private Autopilot _autopilot;
+    private PidAutopilot _pidAutopilot;
+    private ShipPersistentInput _persistentInput;
+    private ShipAutopilotComponent _autopilotComponent;
+
     private void Start()
     {
+        _autopilot = SELocator.GetShipBody().GetComponent<Autopilot>();
+        _pidAutopilot = SELocator.GetShipBody().GetComponent<PidAutopilot>();
+        _persistentInput = SELocator.GetShipBody().GetComponent<ShipPersistentInput>();
+        _autopilotComponent = SELocator.GetShipTransform().GetComponentInChildren<ShipAutopilotComponent>();
+
         _approachAutopilotButton.SetState(true);
         _activeAutopilot = _approachAutopilotButton;
         _matchVelocityButton.SetState(true);
@@ -30,6 +40,14 @@ public class AutopilotPanelController : MonoBehaviour
         _matchVelocityButton.OnChangeState += (state) => OnChangeState(_matchVelocityButton, false, state);
         _holdPositionButton.OnChangeState += (state) => OnChangeState(_holdPositionButton, false, state);
         _holdInputButton.OnChangeState += (state) => OnChangeState(_holdInputButton, false, state);
+
+        _autopilot.OnAbortAutopilot += OnAbortAutopilot;
+        _autopilot.OnAlreadyAtDestination += OnAbortAutopilot;
+        _autopilot.OnArriveAtDestination += ctx => OnAbortAutopilot();
+        _autopilot.OnInitFlyToDestination += OnInitAutopilot;
+        _pidAutopilot.OnAbortAutopilot += OnAbortAutopilot;
+        _pidAutopilot.OnInitAutopilot += OnInitAutopilot;
+        _autopilotComponent.OnDamaged += ctx => OnAutopilotDamaged();
     }
 
     private void OnChangeState(CockpitButtonSwitch button, bool autopilot, bool state)
@@ -44,7 +62,6 @@ public class AutopilotPanelController : MonoBehaviour
                 _activeAutopilot.SetState(false);
                 _activeAutopilot.OnChangeActiveEvent();
                 _activeAutopilot.OnChangeStateEvent();
-                UpdatePersistentInput();
             }
 
             _activeAutopilot = button;
@@ -70,17 +87,61 @@ public class AutopilotPanelController : MonoBehaviour
         _matchVelocityButton.OnChangeState -= (state) => OnChangeState(_matchVelocityButton, false, state);
         _holdPositionButton.OnChangeState -= (state) => OnChangeState(_holdPositionButton, false, state);
         _holdInputButton.OnChangeState -= (state) => OnChangeState(_holdInputButton, false, state);
+
+        _autopilot.OnAbortAutopilot -= OnAbortAutopilot;
+        _autopilot.OnAlreadyAtDestination -= OnAbortAutopilot;
+        _autopilot.OnArriveAtDestination -= ctx => OnAbortAutopilot();
+        _autopilot.OnInitFlyToDestination -= OnInitAutopilot;
+        _pidAutopilot.OnAbortAutopilot -= OnAbortAutopilot;
+        _pidAutopilot.OnInitAutopilot -= OnInitAutopilot;
+        _autopilotComponent.OnDamaged -= ctx => OnAutopilotDamaged();
     }
     
-    public void UpdatePersistentInput()
+    private void OnAbortAutopilot()
     {
-        if (IsHoldInputSelected())
+        if (IsApproachSelected())
         {
-            _holdInputButton.OnChangeStateEvent();
+            _approachAutopilotButton.SetActive(false);
+        }
+        else if (IsOrbitSelected())
+        {
+            _orbitAutopilotButton.SetActive(false);
+        }
+        if (IsHoldInputSelected() && !_autopilotComponent.isDamaged)
+        {
+            _persistentInput.SetInputEnabled(true);
         }
     }
 
-    public void OnInitAutopilot()
+    private void OnInitAutopilot()
+    {
+        if (IsApproachSelected())
+        {
+            _approachAutopilotButton.SetActive(true);
+        }
+        else if (IsOrbitSelected())
+        {
+            _orbitAutopilotButton.SetActive(true);
+        }
+        if (IsHoldInputSelected())
+        {
+            _persistentInput.SetInputEnabled(false);
+        }
+    }
+
+    private void OnAutopilotDamaged()
+    {
+        if (_pidAutopilot.enabled)
+        {
+            _pidAutopilot.SetAutopilotActive(false);
+        }
+        if (_persistentInput.enabled)
+        {
+            _persistentInput.SetInputEnabled(false);
+        }
+    }
+
+    public void ActivateAutopilot()
     {
         if (!_activeAutopilot.IsActivated())
         {
@@ -89,17 +150,16 @@ public class AutopilotPanelController : MonoBehaviour
         }
     }
 
-    public void OnCancelAutopilot()
+    public void CancelAutopilot()
     {
         if (_activeAutopilot.IsActivated())
         {
             _activeAutopilot.SetActive(false);
             _activeAutopilot.OnChangeActiveEvent();
-            UpdatePersistentInput();
         }
     }
 
-    public void OnInitMatchVelocity()
+    public void ActivateMatchVelocity()
     {
         if (!_activeMatch.IsActivated())
         {
@@ -108,7 +168,7 @@ public class AutopilotPanelController : MonoBehaviour
         }
     }
 
-    public void OnCancelMatchVelocity()
+    public void CancelMatchVelocity()
     {
         if (_activeMatch.IsActivated())
         {

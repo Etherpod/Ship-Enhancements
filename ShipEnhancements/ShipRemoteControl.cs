@@ -139,11 +139,11 @@ public class ShipRemoteControl : MonoBehaviour
                             {
                                 if (_autopilot.enabled || _pidAutopilot.enabled)
                                 {
-                                    SELocator.GetAutopilotPanelController().OnCancelAutopilot();
+                                    SELocator.GetAutopilotPanelController().CancelAutopilot();
                                 }
                                 else
                                 {
-                                    SELocator.GetAutopilotPanelController().OnInitAutopilot();
+                                    SELocator.GetAutopilotPanelController().ActivateAutopilot();
                                 }
                             }
                             else

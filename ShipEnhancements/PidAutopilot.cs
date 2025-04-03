@@ -24,7 +24,7 @@ public class PidAutopilot : ThrusterController
     public delegate void AbortAutopilotEvent();
     public event AbortAutopilotEvent OnAbortAutopilot;
     public delegate void InitOrbitEvent();
-    public event InitOrbitEvent OnInitOrbit;
+    public event InitOrbitEvent OnInitAutopilot;
 
     private OWRigidbody _owRigidbody;
     private ReferenceFrame _referenceFrame;
@@ -93,6 +93,7 @@ public class PidAutopilot : ThrusterController
                 PostAutopilotOffNotification();
                 enabled = false;
                 _ignoreThrustLimits = false;
+                OnAbortAutopilot?.Invoke();
                 ShipEnhancements.WriteDebugMessage("nothing to orbit");
             }
             return;
@@ -129,7 +130,7 @@ public class PidAutopilot : ThrusterController
 
         enabled = true;
 
-        OnInitOrbit?.Invoke();
+        OnInitAutopilot?.Invoke();
 
         _shipAudio.PlayAutopilotOn();
         if (_mode == PidMode.Orbit)

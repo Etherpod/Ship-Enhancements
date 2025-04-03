@@ -4234,7 +4234,7 @@ public static class PatchClass
         {
             if (/*__instance._autopilot.IsMatchingVelocity() && !__instance._autopilot.IsFlyingToDestination()*/true)
             {
-                SELocator.GetAutopilotPanelController().OnCancelMatchVelocity();
+                SELocator.GetAutopilotPanelController().CancelMatchVelocity();
                 //__instance._autopilot.StopMatchVelocity();
             }
             return false;
@@ -4244,7 +4244,7 @@ public static class PatchClass
         {
             if (OWInput.IsNewlyPressed(InputLibrary.autopilot, InputMode.All))
             {
-                SELocator.GetAutopilotPanelController().OnCancelAutopilot();
+                SELocator.GetAutopilotPanelController().CancelAutopilot();
                 //__instance.AbortAutopilot();
             }
         }
@@ -4255,18 +4255,18 @@ public static class PatchClass
             {
                 InputLibrary.lockOn.BlockNextRelease();
 
-                SELocator.GetAutopilotPanelController().OnInitAutopilot();
+                SELocator.GetAutopilotPanelController().ActivateAutopilot();
                 //__instance._autopilot.FlyToDestination(Locator.GetReferenceFrame(true));
             }
             if (/*__instance.IsMatchVelocityAvailable(false) && */__instance._playerAtFlightConsole && !__instance._shipSystemFailure
                 && OWInput.IsNewlyPressed(InputLibrary.matchVelocity, InputMode.All))
             {
-                SELocator.GetAutopilotPanelController().OnInitMatchVelocity();
+                SELocator.GetAutopilotPanelController().ActivateMatchVelocity();
                 //__instance._autopilot.StartMatchVelocity(Locator.GetReferenceFrame(false), false);
             }
             else if (/*__instance._autopilot.IsMatchingVelocity() && !__instance._autopilot.IsFlyingToDestination() && */OWInput.IsNewlyReleased(InputLibrary.matchVelocity, InputMode.All))
             {
-                SELocator.GetAutopilotPanelController().OnCancelMatchVelocity();
+                SELocator.GetAutopilotPanelController().CancelMatchVelocity();
                 //__instance._autopilot.StopMatchVelocity();
             }
             if (!__instance._enteringLandingCam)
@@ -4318,7 +4318,7 @@ public static class PatchClass
         if ((bool)enableEnhancedAutopilot.GetProperty() && __instance._isShipAutopilot
             && __instance.enabled)
         {
-            SELocator.GetAutopilotPanelController().OnCancelMatchVelocity();
+            SELocator.GetAutopilotPanelController().CancelMatchVelocity();
         }
     }
 

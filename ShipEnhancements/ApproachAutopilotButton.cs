@@ -10,10 +10,6 @@ public class ApproachAutopilotButton : CockpitButtonSwitch
     {
         base.Awake();
         _autopilot = SELocator.GetShipBody().GetComponent<Autopilot>();
-        _autopilot.OnAbortAutopilot += OnAbortAutopilot;
-        _autopilot.OnAlreadyAtDestination += OnAbortAutopilot;
-        _autopilot.OnArriveAtDestination += ctx => OnAbortAutopilot();
-        _autopilot.OnInitFlyToDestination += OnInitFlyToDestination;
     }
 
     public override void OnChangeActiveEvent()
@@ -37,31 +33,5 @@ public class ApproachAutopilotButton : CockpitButtonSwitch
         {
             _autopilot.Abort();
         }
-    }
-
-    private void OnAbortAutopilot()
-    {
-        if (_activated)
-        {
-            SetActive(false);
-            SELocator.GetAutopilotPanelController().UpdatePersistentInput();
-        }
-    }
-
-    private void OnInitFlyToDestination()
-    {
-        if (!_activated)
-        {
-            SetActive(true);
-        }
-    }
-
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
-        _autopilot.OnAbortAutopilot -= OnAbortAutopilot;
-        _autopilot.OnAlreadyAtDestination -= OnAbortAutopilot;
-        _autopilot.OnArriveAtDestination -= ctx => OnAbortAutopilot();
-        _autopilot.OnInitFlyToDestination -= OnInitFlyToDestination;
     }
 }

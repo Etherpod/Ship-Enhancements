@@ -16,9 +16,6 @@ public class PidAutopilotButton : CockpitButtonSwitch
         base.Start();
         _autopilot = SELocator.GetShipBody().GetComponent<Autopilot>();
         _pidAutopilot = SELocator.GetShipBody().GetComponent<PidAutopilot>();
-
-        _pidAutopilot.OnAbortAutopilot += OnAbortAutopilot;
-        _pidAutopilot.OnInitOrbit += OnInitPid;
     }
 
     public override void OnChangeActiveEvent()
@@ -38,28 +35,5 @@ public class PidAutopilotButton : CockpitButtonSwitch
         {
             _pidAutopilot.SetAutopilotActive(false);
         }
-    }
-
-    private void OnAbortAutopilot()
-    {
-        if (_activated)
-        {
-            SetActive(false);
-        }
-    }
-
-    private void OnInitPid()
-    {
-        if (!_activated)
-        {
-            SetActive(true);
-        }
-    }
-
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
-        _pidAutopilot.OnAbortAutopilot -= OnAbortAutopilot;
-        _pidAutopilot.OnInitOrbit -= OnInitPid;
     }
 }
