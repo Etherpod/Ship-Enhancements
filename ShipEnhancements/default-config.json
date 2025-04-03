@@ -570,7 +570,7 @@
         "Clown",
         "Annoying"
       ],
-      "tooltip": "Chooses which sound the ship's horn should make. You can honk by pressing the flashlight button when the signalscope is equipped and isn't damaged. The mod website explains how to use custom sounds."
+      "tooltip": "Chooses which sound the ship's horn should make. You can honk by pressing the flashlight button when the signalscope is equipped and isn't damaged."
     },
     "addShipClock": {
       "title": "Add Ship Clock",
