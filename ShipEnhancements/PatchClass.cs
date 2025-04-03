@@ -3389,32 +3389,44 @@ public static class PatchClass
     #endregion
 
     #region DialogueEntryConditionFix
-    [HarmonyPostfix]
+    [HarmonyPrefix]
     [HarmonyPatch(typeof(DialogueNode), nameof(DialogueNode.EntryConditionsSatisfied))]
-    public static void DialogueEntryConditionsSatisfied(DialogueNode __instance, ref bool __result)
+    public static bool DialogueEntryConditi4onsSatisfied(DialogueNode __instance, ref bool __result)
     {
+        if (ShipEnhancements.VanillaFixEnabled) return false;
+
+        bool flag = true;
         if (__instance._listEntryCondition.Count == 0)
         {
             __result = false;
-            return;
+            return false;
         }
-
-        var sharedInstance = DialogueConditionManager.SharedInstance;
-        __result = __instance._listEntryCondition
-            .All(condition =>
+        DialogueConditionManager sharedInstance = DialogueConditionManager.SharedInstance;
+        for (int i = 0; i < __instance._listEntryCondition.Count; i++)
+        {
+            string text = __instance._listEntryCondition[i];
+            // CHANGED: remove the !
+            if (PlayerData.PersistentConditionExists(text))
             {
-                if (PlayerData.PersistentConditionExists(condition))
+                if (!PlayerData.GetPersistentCondition(text))
                 {
-                    return PlayerData.GetPersistentCondition(condition);
+                    flag = false;
                 }
-
-                if (sharedInstance.ConditionExists(condition))
+            }
+            else if (sharedInstance.ConditionExists(text))
+            {
+                if (!sharedInstance.GetConditionState(text))
                 {
-                    return sharedInstance.GetConditionState(condition);
+                    flag = false;
                 }
-
-                return false;
-            });
+            }
+            else
+            {
+                flag = false;
+            }
+        }
+        __result = flag;
+        return false;
     }
     #endregion
 
