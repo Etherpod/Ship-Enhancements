@@ -116,6 +116,7 @@ public static class SettingsPresets
         { "scoutPhotoMode", false },
         { "fixShipThrustIndicator", true },
         { "enableAutoAlign", false },
+        { "shipHornType", "None" },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -228,6 +229,7 @@ public static class SettingsPresets
         { "scoutPhotoMode", false },
         { "fixShipThrustIndicator", true },
         { "enableAutoAlign", false },
+        { "shipHornType", "None" },
     };
 
     public static readonly Dictionary<string, object> ImpossibleSettings = new Dictionary<string, object>()
@@ -340,6 +342,7 @@ public static class SettingsPresets
         { "scoutPhotoMode", false },
         { "fixShipThrustIndicator", true },
         { "enableAutoAlign", false },
+        { "shipHornType", "None" },
     };
 
     public static readonly Dictionary<string, object> NewStuffSettings = new Dictionary<string, object>()
@@ -452,6 +455,7 @@ public static class SettingsPresets
         { "scoutPhotoMode", true },
         { "fixShipThrustIndicator", true },
         { "enableAutoAlign", true },
+        { "shipHornType", "Default" },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -564,6 +568,7 @@ public static class SettingsPresets
         { "scoutPhotoMode", true },
         { "fixShipThrustIndicator", true },
         { "enableAutoAlign", true },
+        { "shipHornType", "Goofy" },
     };
 
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()

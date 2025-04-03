@@ -83,6 +83,7 @@ public class ShipEnhancements : ModBehaviour
     public SignalName ShipSignalName { get; private set; }
     public int ThrustModulatorLevel { get; private set; }
     public float ThrustModulatorFactor => ThrustModulatorLevel / 5f;
+    public AudioClip ShipHorn { get; private set; }
 
     private SettingsPresets.PresetName _currentPreset = (SettingsPresets.PresetName)(-1);
     
@@ -209,6 +210,7 @@ public class ShipEnhancements : ModBehaviour
         scoutPhotoMode,
         fixShipThrustIndicator,
         enableAutoAlign,
+        shipHornType,
     }
 
     private void Awake()
@@ -1280,6 +1282,36 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)Settings.enableAutoAlign.GetProperty())
         {
             SELocator.GetShipBody().gameObject.AddComponent<ShipAutoAlign>();
+        }
+        if ((string)Settings.shipHornType.GetProperty() != "None")
+        {
+            string type = (string)Settings.shipHornType.GetProperty();
+            switch (type)
+            {
+                case "Default":
+                    ShipHorn = LoadAudio("Assets/ShipEnhancements/AudioClip/ShipHorn_Newer.ogg");
+                    break;
+                case "Old":
+                    ShipHorn = LoadAudio("Assets/ShipEnhancements/AudioClip/ShipHorn_Old.ogg");
+                    break;
+                case "Train":
+                    ShipHorn = LoadAudio("Assets/ShipEnhancements/AudioClip/ShipHorn_Train.ogg");
+                    break;
+                case "Loud":
+                    ShipHorn = LoadAudio("Assets/ShipEnhancements/AudioClip/ShipHorn_Blaring.ogg");
+                    break;
+                case "Short":
+                    ShipHorn = LoadAudio("Assets/ShipEnhancements/AudioClip/ShipHorn_Jumpscare.ogg");
+                    break;
+                case "Clown":
+                    ShipHorn = LoadAudio("Assets/ShipEnhancements/AudioClip/ShipHorn_Clown.ogg");
+                    break;
+                case "Annoying":
+                    ShipHorn = LoadAudio("Assets/ShipEnhancements/AudioClip/ShipHorn_Goofy.ogg");
+                    break;
+            }
+
+            Instantiate(LoadPrefab("Assets/ShipEnhancements/ShipHorn.prefab"), SELocator.GetShipTransform().Find("Audio_Ship"));
         }
 
         SetDamageColors();
