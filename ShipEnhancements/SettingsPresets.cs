@@ -587,7 +587,7 @@ public static class SettingsPresets
         { "disableShipOxygen", new RandomSettingValue((0.05f, 0.2f)) },
         { "oxygenDrainMultiplier", new RandomSettingValue(
         [
-            ((1f, 10f), (1f, 1f)),
+            ((1f, 10f), (1f, 0.8f)),
             ((10f, 50f), (0.5f, 1f)),
             ((50f, 200f), (0.1f, 1.05f)),
             ((200f, 500f), (0f, 1.1f)),
@@ -779,7 +779,7 @@ public static class SettingsPresets
             ("Lavender", (1f, 1f)),
             ("Pink", (1f, 1f)),
             ("Gray", (1f, 1f)),
-            ("Rainbow", (1f, 1f)),
+            ("Rainbow", (0f, 1f)),
         ], (0.1f, 0.25f), "Default") },
         { "exteriorHullColor", new RandomSettingValue(
         [
@@ -792,7 +792,7 @@ public static class SettingsPresets
             ("Lavender", (1f, 1f)),
             ("Pink", (1f, 1f)),
             ("Gray", (1f, 1f)),
-            ("Rainbow", (1f, 1f)),
+            ("Rainbow", (0f, 1f)),
         ], (0.1f, 0.25f), "Default") },
         { "addTether", new RandomSettingValue((0.5f, 0.5f)) },
         { "disableDamageIndicators", new RandomSettingValue((0f, 0.5f)) },
