@@ -211,6 +211,8 @@ public class ShipEnhancements : ModBehaviour
         fixShipThrustIndicator,
         enableAutoAlign,
         shipHornType,
+        randomIterations,
+        randomDifficulty
     }
 
     private void Awake()
@@ -589,13 +591,50 @@ public class ShipEnhancements : ModBehaviour
     {
         var allSettings = Enum.GetValues(typeof(Settings)) as Settings[];
 
-        foreach (Settings setting in allSettings)
+        if (ModHelper.Config.GetSettingsValue<string>("preset") == "Random")
         {
-            if (ModHelper.Config.GetSettingsValue<string>("preset") == "Random")
+            float total = 0f;
+            for (int i = 0; i < allSettings.Length; i++)
             {
-                setting.SetProperty(SettingsPresets.GetPresetSetting(SettingsPresets.PresetName.Random, setting.GetName()));
+                if (SettingsPresets.VanillaPlusSettings.ContainsKey(allSettings[i].GetName()))
+                {
+                    allSettings[i].SetProperty(SettingsPresets.VanillaPlusSettings[allSettings[i].GetName()]);
+                }
+
+                if (SettingsPresets.RandomSettings.ContainsKey(allSettings[i].GetName()))
+                {
+                    /*ShipEnhancements.WriteDebugMessage(allSettings[i].GetName() + ": "
+                        + SettingsPresets.RandomSettings[allSettings[i].GetName()].GetRandomChance());*/
+                    total += SettingsPresets.RandomSettings[allSettings[i].GetName()].GetRandomChance();
+                }
             }
-            else
+
+            int iterations = Mathf.FloorToInt(
+                Mathf.Lerp(2f, allSettings.Length / 2, (float)Settings.randomIterations.GetValue()));
+            ShipEnhancements.WriteDebugMessage("settings = " + (float)Settings.randomIterations.GetValue());
+            ShipEnhancements.WriteDebugMessage("i = " + iterations);
+            for (int j = 0; j < iterations; j++)
+            {
+                float rand = UnityEngine.Random.Range(0f, total);
+                float sum = 0;
+                for (int k = 0; k < allSettings.Length; k++)
+                {
+                    if (SettingsPresets.RandomSettings.ContainsKey(allSettings[k].GetName()))
+                    {
+                        sum += SettingsPresets.RandomSettings[allSettings[k].GetName()].GetRandomChance();
+                        if (rand < sum)
+                        {
+                            allSettings[k].SetProperty(SettingsPresets.RandomSettings[allSettings[k].GetName()]
+                                .GetRandomValue(true));
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        else
+        {
+            foreach (Settings setting in allSettings)
             {
                 setting.SetProperty(ModHelper.Config.GetSettingsValue<object>(setting.GetName()));
             }
@@ -1559,113 +1598,129 @@ public class ShipEnhancements : ModBehaviour
 
     private void AddTemperatureZones()
     {
-        /*GameObject sun = GameObject.Find("Sun_Body");
-        if (sun != null)
-        {
-            GameObject sunTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Sun.prefab");
-            Instantiate(sunTempZone, sun.transform.Find("Sector_SUN/Volumes_SUN"));
-            GameObject supernovaTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Supernova.prefab");
-            Instantiate(supernovaTempZone, sun.GetComponentInChildren<SupernovaEffectController>().transform);
-        }*/
+        string zones = (string)Settings.temperatureZonesAmount.GetProperty();
+        bool hot = zones == "All" || zones == "Hot";
+        bool cold = zones == "All" || zones == "Cold";
 
-        SpawnSunTemperatureZones();
-
-        GameObject vm = GameObject.Find("VolcanicMoon_Body");
-        if (vm != null)
+        if (hot)
         {
-            GameObject vmTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_VolcanicMoon.prefab");
-            Instantiate(vmTempZone, vm.transform.Find("Sector_VM"));
-        }
+            SpawnSunTemperatureZones();
 
-        GameObject db = GameObject.Find("DarkBramble_Body");
-        if (db != null)
-        {
-            GameObject dbTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_DarkBramble.prefab");
-            Instantiate(dbTempZone, db.transform.Find("Sector_DB"));
-        }
-
-        GameObject escapePodDimension = GameObject.Find("DB_EscapePodDimension_Body");
-        if (escapePodDimension != null)
-        {
-            GameObject podDimensionTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_EscapePodDimension.prefab");
-            Instantiate(podDimensionTempZone, escapePodDimension.transform.Find("Sector_EscapePodDimension"));
-        }
-
-        GameObject comet = GameObject.Find("Comet_Body");
-        if (comet != null)
-        {
-            GameObject cometTempZone1 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_InterloperAtmosphere.prefab");
-            Instantiate(cometTempZone1, comet.transform.Find("Sector_CO"));
-            GameObject cometTempZone2 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_InterloperDarkSide.prefab");
-            Instantiate(cometTempZone2, comet.transform.Find("Sector_CO"));
-        }
-
-        GameObject gd = GameObject.Find("GiantsDeep_Body");
-        if (gd != null)
-        {
-            GameObject gdTempZone1 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_GiantsDeepOcean.prefab");
-            Instantiate(gdTempZone1, gd.transform.Find("Sector_GD/Sector_GDInterior"));
-            GameObject gdTempZone2 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_GiantsDeepCore.prefab");
-            Instantiate(gdTempZone2, gd.transform.Find("Sector_GD/Sector_GDInterior"));
-        }
-
-        GameObject brambleIsland = GameObject.Find("BrambleIsland_Body");
-        if (brambleIsland != null)
-        {
-            GameObject brambleIslandTempZones = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_BrambleIsland.prefab");
-            Instantiate(brambleIslandTempZones, brambleIsland.transform.Find("Sector_BrambleIsland"));
-        }
-
-        GameObject bh = GameObject.Find("BrittleHollow_Body");
-        if (bh != null)
-        {
-            GameObject bhTempZone1 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_BrittleHollowNorth.prefab");
-            Instantiate(bhTempZone1, bh.transform.Find("Sector_BH"));
-            GameObject bhTempZone2 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_BrittleHollowSouth.prefab");
-            Instantiate(bhTempZone2, bh.transform.Find("Sector_BH"));
-        }
-
-        GameObject th = GameObject.Find("TimberHearth_Body");
-        if (th != null)
-        {
-            GameObject thTempZone1 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_TimberHearthGeyser.prefab");
-            Instantiate(thTempZone1, th.transform.Find("Sector_TH"));
-            GameObject thTempZone2 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_TimberHearthCore.prefab");
-            Instantiate(thTempZone2, th.transform.Find("Sector_TH"));
-            GameObject thTempZone3 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_TimberHearthSurface.prefab");
-            Instantiate(thTempZone3, th.transform.Find("Sector_TH"));
-        }
-
-        GameObject moon = GameObject.Find("Moon_Body");
-        if (moon != null)
-        {
-            GameObject moonTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_AttlerockCrater.prefab");
-            Instantiate(moonTempZone, moon.transform.Find("Sector_THM"));
-        }
-
-        GameObject ct = GameObject.Find("CaveTwin_Body");
-        if (ct != null)
-        {
-            GameObject ctTempZone1 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_CaveTwinHot.prefab");
-            Instantiate(ctTempZone1, ct.transform.Find("Sector_CaveTwin"));
-            GameObject ctTempZone2 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_CaveTwinCold.prefab");
-            Instantiate(ctTempZone2, ct.transform.Find("Sector_CaveTwin"));
-        }
-
-        GameObject whs = GameObject.Find("WhiteholeStationSuperstructure_Body");
-        if (whs != null)
-        {
-            GameObject whsTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_WhiteHoleStation.prefab");
-            Instantiate(whsTempZone, whs.transform);
-        }
-
-        Campfire[] campfires = FindObjectsOfType<Campfire>();
-        if (campfires.Length > 0)
-        {
-            GameObject campfireTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Campfire.prefab");
-            foreach (Campfire fire in campfires)
+            GameObject vm = GameObject.Find("VolcanicMoon_Body");
+            if (vm != null)
             {
-                Instantiate(campfireTempZone, fire.transform.parent);
+                GameObject vmTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_VolcanicMoon.prefab");
+                Instantiate(vmTempZone, vm.transform.Find("Sector_VM"));
+            }
+
+            GameObject gd = GameObject.Find("GiantsDeep_Body");
+            if (gd != null)
+            {
+                GameObject gdTempZone2 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_GiantsDeepCore.prefab");
+                Instantiate(gdTempZone2, gd.transform.Find("Sector_GD/Sector_GDInterior"));
+            }
+
+            GameObject th = GameObject.Find("TimberHearth_Body");
+            if (th != null)
+            {
+                GameObject thTempZone2 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_TimberHearthCore.prefab");
+                Instantiate(thTempZone2, th.transform.Find("Sector_TH"));
+            }
+
+            GameObject ct = GameObject.Find("CaveTwin_Body");
+            if (ct != null)
+            {
+                GameObject ctTempZone1 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_CaveTwinHot.prefab");
+                Instantiate(ctTempZone1, ct.transform.Find("Sector_CaveTwin"));
+            }
+
+            Campfire[] campfires = FindObjectsOfType<Campfire>();
+            if (campfires.Length > 0)
+            {
+                GameObject campfireTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Campfire.prefab");
+                foreach (Campfire fire in campfires)
+                {
+                    Instantiate(campfireTempZone, fire.transform.parent);
+                }
+            }
+        }
+        
+        if (cold)
+        {
+            GameObject db = GameObject.Find("DarkBramble_Body");
+            if (db != null)
+            {
+                GameObject dbTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_DarkBramble.prefab");
+                Instantiate(dbTempZone, db.transform.Find("Sector_DB"));
+            }
+
+            GameObject escapePodDimension = GameObject.Find("DB_EscapePodDimension_Body");
+            if (escapePodDimension != null)
+            {
+                GameObject podDimensionTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_EscapePodDimension.prefab");
+                Instantiate(podDimensionTempZone, escapePodDimension.transform.Find("Sector_EscapePodDimension"));
+            }
+
+            GameObject comet = GameObject.Find("Comet_Body");
+            if (comet != null)
+            {
+                GameObject cometTempZone1 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_InterloperAtmosphere.prefab");
+                Instantiate(cometTempZone1, comet.transform.Find("Sector_CO"));
+                GameObject cometTempZone2 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_InterloperDarkSide.prefab");
+                Instantiate(cometTempZone2, comet.transform.Find("Sector_CO"));
+            }
+
+            GameObject gd = GameObject.Find("GiantsDeep_Body");
+            if (gd != null)
+            {
+                GameObject gdTempZone1 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_GiantsDeepOcean.prefab");
+                Instantiate(gdTempZone1, gd.transform.Find("Sector_GD/Sector_GDInterior"));
+            }
+
+            GameObject brambleIsland = GameObject.Find("BrambleIsland_Body");
+            if (brambleIsland != null)
+            {
+                GameObject brambleIslandTempZones = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_BrambleIsland.prefab");
+                Instantiate(brambleIslandTempZones, brambleIsland.transform.Find("Sector_BrambleIsland"));
+            }
+
+            GameObject bh = GameObject.Find("BrittleHollow_Body");
+            if (bh != null)
+            {
+                GameObject bhTempZone1 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_BrittleHollowNorth.prefab");
+                Instantiate(bhTempZone1, bh.transform.Find("Sector_BH"));
+                GameObject bhTempZone2 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_BrittleHollowSouth.prefab");
+                Instantiate(bhTempZone2, bh.transform.Find("Sector_BH"));
+            }
+
+            GameObject th = GameObject.Find("TimberHearth_Body");
+            if (th != null)
+            {
+                GameObject thTempZone1 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_TimberHearthGeyser.prefab");
+                Instantiate(thTempZone1, th.transform.Find("Sector_TH"));
+                GameObject thTempZone3 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_TimberHearthSurface.prefab");
+                Instantiate(thTempZone3, th.transform.Find("Sector_TH"));
+            }
+
+            GameObject moon = GameObject.Find("Moon_Body");
+            if (moon != null)
+            {
+                GameObject moonTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_AttlerockCrater.prefab");
+                Instantiate(moonTempZone, moon.transform.Find("Sector_THM"));
+            }
+
+            GameObject ct = GameObject.Find("CaveTwin_Body");
+            if (ct != null)
+            {
+                GameObject ctTempZone2 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_CaveTwinCold.prefab");
+                Instantiate(ctTempZone2, ct.transform.Find("Sector_CaveTwin"));
+            }
+
+            GameObject whs = GameObject.Find("WhiteholeStationSuperstructure_Body");
+            if (whs != null)
+            {
+                GameObject whsTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_WhiteHoleStation.prefab");
+                Instantiate(whsTempZone, whs.transform);
             }
         }
     }

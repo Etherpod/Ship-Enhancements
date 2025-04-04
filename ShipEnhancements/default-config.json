@@ -16,7 +16,23 @@
         "Random",
         "Custom"
       ],
-      "tooltip": "Chooses the settings for you. You can still change the settings after selecting a preset. Close and open the settings menu again to see the changes (the mod manager is buggy)."
+      "tooltip": "Chooses the settings for you. You can still change the settings after selecting a preset. Close and open the settings menu again to see the changes."
+    },
+    "randomIterations": {
+      "title": "Randomizer Iterations",
+      "type": "slider",
+      "min": 0,
+      "max": 1,
+      "value": 0.5,
+      "tooltip": "Use with the Random preset. Controls how many settings to randomize at once. The minimum only changes a few, the maximum changes nearly all of them."
+    },
+    "randomDifficulty": {
+      "title": "Randomizer Difficulty",
+      "type": "slider",
+      "min": 0,
+      "max": 1,
+      "value": 0.5,
+      "tooltip": "Use with the Random preset. Controls how likely it is for dangerous settings to be randomized, like disabling your suit. The minimum makes it impossible, the maximum makes it very possible."
     },
 
     "Disable Ship Parts": {
@@ -464,9 +480,11 @@
       "options": [
         "None",
         "Sun",
+        "Hot",
+        "Cold",
         "All"
       ],
-      "tooltip": "Determines whether to add temperature zones around the entire solar system, just around the sun, or to add none at all. Check the README for more details about temperature zones."
+      "tooltip": "Determines what type of temperature zones to add. Temperature zones will increase or decrease your ship's temperature. Check the README for more details about temperature zones."
     },
     "hullTemperatureDamage": {
       "title": "Hull Temperature Damage",

@@ -1,6 +1,7 @@
 ﻿using OWML.Common;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 
 namespace ShipEnhancements;
 
@@ -571,76 +572,87 @@ public static class SettingsPresets
         { "shipHornType", "Goofy" },
     };
 
+    // Random preset composition
+    // A. Random chance, return true
+    // B. Random chance, return random value between min/max
+    // C. Random chance, return weighted strings or weighted number ranges
+    // Floats in tuples are either number ranges or select chance at min/max difficulty
     public static readonly Dictionary<string, RandomSettingValue> RandomSettings = new Dictionary<string, RandomSettingValue>()
     {
-        { "disableGravityCrystal", new RandomSettingValue(0.5f) },
-        { "disableEjectButton", new RandomSettingValue(0.5f) },
-        { "disableHeadlights", new RandomSettingValue(0.5f) },
-        { "disableLandingCamera", new RandomSettingValue(0.5f) },
-        { "disableShipLights", new RandomSettingValue(0.5f) },
-        { "disableShipOxygen", new RandomSettingValue(0.2f) },
-        { "oxygenDrainMultiplier", new RandomSettingValue(new (object, object)[]
-        {
-            (1f, 10f),
-            (10f, 50f),
-            (50f, 100f),
-            (100f, 200f),
-            (200f, 800f)
-        }, 0.75f, 1f) },
-        { "fuelDrainMultiplier", new RandomSettingValue(new (object, object)[]
-        {
-            (0.5f, 2f),
-            (2f, 8f),
-            (8f, 20f),
-            (20f, 50f),
-        }, 0.5f, 1f) },
-        { "shipDamageMultiplier", new RandomSettingValue(new (object, object)[]
-        {
-            (0.1f, 0.8f),
-            (0.8f, 1.5f),
-            (1.5f, 3f),
-            (3f, 6f)
-        }, 0.75f, 1f) },
-        { "shipDamageSpeedMultiplier", new RandomSettingValue(new (object, object)[]
-        {
-            (0.5f, 1f),
-            (1f, 1.5f),
-            (1.5f, 2.5f),
-            (2.5f, 3.5f),
-            (3.5f, 5f)
-        }, 0.75f, 1f)},
-        { "shipOxygenRefill", new RandomSettingValue(0.8f) },
-        { "enableGravityLandingGear", new RandomSettingValue(0.5f) },
-        { "disableAirAutoRoll", new RandomSettingValue(0.5f) },
-        { "disableWaterAutoRoll", new RandomSettingValue(0.5f) },
-        { "enableThrustModulator", new RandomSettingValue(0.5f) },
-        { "temperatureZonesAmount", new RandomSettingValue(["All"], 0.5f, "None") },
-        { "hullTemperatureDamage", new RandomSettingValue(0.75f) },
-        { "enableShipFuelTransfer", new RandomSettingValue(0.8f) },
-        { "enableJetpackRefuelDrain", new RandomSettingValue(0.8f) },
-        { "disableReferenceFrame", new RandomSettingValue(0.25f) },
-        { "disableMapMarkers", new RandomSettingValue(0.25f) },
-        { "gravityMultiplier", new RandomSettingValue(new (object, object)[]
-        {
-            (0.5f, 0.9f),
-            (0.9f, 1.2f),
-            (1.2f, 1.8f)
-        }, 0.5f, 1f) },
-        { "fuelTransferMultiplier", new RandomSettingValue(new (object, object)[]
-        {
-            (0.2f, 1f),
-            (1f, 1.5f),
-            (1.5f, 2f),
-            (2f, 5f)
-        }, 0.5f, 1f) },
-        { "oxygenRefillMultiplier", new RandomSettingValue(new (object, object)[]
+        { "disableGravityCrystal", new RandomSettingValue((0.2f, 0.5f)) },
+        { "disableEjectButton", new RandomSettingValue((0.2f, 0.5f)) },
+        { "disableHeadlights", new RandomSettingValue((0.2f, 0.5f)) },
+        { "disableLandingCamera", new RandomSettingValue((0.2f, 0.5f)) },
+        { "disableShipLights", new RandomSettingValue((0.2f, 0.5f)) },
+        { "disableShipOxygen", new RandomSettingValue((0.05f, 0.2f)) },
+        { "oxygenDrainMultiplier", new RandomSettingValue(
+        [
+            ((1f, 10f), (1f, 1f)),
+            ((10f, 50f), (0.5f, 1f)),
+            ((50f, 200f), (0.1f, 1.05f)),
+            ((200f, 500f), (0f, 1.1f)),
+            ((500f, 1000f), (0f, 1.1f)),
+        ], (0.4f, 0.75f), 1f) },
+        { "fuelDrainMultiplier", new RandomSettingValue(
+        [
+            ((0.5f, 1.5f), (1f, 1f)),
+            ((1.5f, 4f), (0.5f, 1f)),
+            ((4f, 12f), (0.1f, 1.05f)),
+            ((12f, 20f), (0f, 1.1f)),
+            ((20f, 50f), (0f, 0.8f)),
+        ], (0.25f, 0.5f), 1f) },
+        { "shipDamageMultiplier", new RandomSettingValue(
+        [
+            (0f, (0.4f, 0.1f)),
+            ((0.2f, 1.2f), (1f, 1f)),
+            ((1.2f, 2f), (0.2f, 1.1f)),
+            ((2f, 10f), (0f, 1.2f)),
+        ], (0.25f, 0.5f), 1f) },
+        { "shipDamageSpeedMultiplier", new RandomSettingValue(
+        [
+            ((0.05f, 0.5f), (0f, 0.5f)),
+            ((0.5f, 0.9f), (0f, 1f)),
+            ((0.9f, 1.1f), (1f, 1f)),
+            ((1.1f, 5f), (0.8f, 0.4f)),
+        ], (0.25f, 0.5f), 1f)},
+        { "shipOxygenRefill", new RandomSettingValue((0.8f, 0.8f)) },
+        { "enableGravityLandingGear", new RandomSettingValue((0.5f, 0.5f)) },
+        { "disableAirAutoRoll", new RandomSettingValue((0.2f, 0.5f)) },
+        { "disableWaterAutoRoll", new RandomSettingValue((0.2f, 0.5f)) },
+        { "enableThrustModulator", new RandomSettingValue((0.5f, 0.5f)) },
+        { "temperatureZonesAmount", new RandomSettingValue(
+        [
+            ("Sun", (1f, 0.2f)),
+            ("Hot", (0f, 0.25f)),
+            ("Cold", (0.2f, 0.25f)),
+            ("All", (0f, 1f)),
+        ], (0.2f, 0.5f), "None") },
+        { "hullTemperatureDamage", new RandomSettingValue((0.5f, 0.8f)) },
+        { "enableShipFuelTransfer", new RandomSettingValue((0.8f, 0.8f)) },
+        { "enableJetpackRefuelDrain", new RandomSettingValue((0.3f, 0.8f)) },
+        { "disableReferenceFrame", new RandomSettingValue((0f, 0.5f)) },
+        { "disableMapMarkers", new RandomSettingValue((0f, 0.5f)) },
+        { "gravityMultiplier", new RandomSettingValue(
+        [
+            ((0f, 0.8f), (0f, 1.1f)),
+            ((0.8f, 1.5f), (1f, 1f)),
+            ((1.5f, 2f), (0f, 1.1f)),
+        ], (0.1f, 0.5f), 1f) },
+        { "fuelTransferMultiplier", new RandomSettingValue(
+        [
+            ((0.05f, 0.5f), (0f, 0.5f)),
+            ((0.5f, 0.9f), (0f, 1f)),
+            ((0.9f, 1.1f), (1f, 1f)),
+            ((1.1f, 5f), (0.8f, 0.4f)),
+        ], (0.1f, 0.5f), 1f) },
+        /*{ "oxygenRefillMultiplier", new RandomSettingValue(new (object, object)[]
         {
             (0.5f, 0.9f),
             (0.9f, 1.2f),
             (1.2f, 1.8f),
             (1.8f, 2.5f),
             (2.5f, 5f)
-        }, 0.5f, 1f) },
+        }, 0.1f, 0.5f, 1f) },
         { "temperatureDamageMultiplier", new RandomSettingValue(new (object, object)[]
         {
             (0.1f, 0.5f),
@@ -649,7 +661,7 @@ public static class SettingsPresets
             (1.2f, 1.8f),
             (1.8f, 2.5f),
             (2.5f, 5f)
-        }, 0.8f, 1f) },
+        }, 0.4f, 0.8f, 1f) },
         { "temperatureResistanceMultiplier", new RandomSettingValue(new (object, object)[]
         {
             (0.1f, 0.4f),
@@ -657,186 +669,195 @@ public static class SettingsPresets
             (0.75f, 1f),
             (1f, 1.5f),
             (1.5f, 3f),
-        }, 0.8f, 1f) },
-        { "enableAutoHatch", new RandomSettingValue(0.5f) },
-        { "oxygenTankDrainMultiplier", new RandomSettingValue(new (object, object)[]
+        }, 0.4f, 0.8f, 1f) },*/
+        { "enableAutoHatch", new RandomSettingValue((0.2f, 0.5f)) },
+        /*{ "oxygenTankDrainMultiplier", new RandomSettingValue(new (object, object)[]
         {
             (0.5f, 1f),
             (1f, 2.5f),
             (2.5f, 4f),
             (4f, 10f),
-        }, 0.8f, 1f) },
+        }, 0.3f, 0.8f, 1f) },
         { "fuelTankDrainMultiplier", new RandomSettingValue(new (object, object)[]
         {
             (0.05f, 0.5f),
             (0.5f, 1.2f),
             (1.2f, 2f),
             (2f, 5f),
-        }, 0.8f, 1f) },
-        { "componentTemperatureDamage", new RandomSettingValue(0.5f) },
-        { "atmosphereAngularDragMultiplier", new RandomSettingValue(0f, 2f, 0.5f, 1f) },
-        { "spaceAngularDragMultiplier", new RandomSettingValue(0f, 2f, 0.5f, 1f) },
-        { "disableRotationSpeedLimit", new RandomSettingValue(0.2f) },
-        { "gravityDirection", new RandomSettingValue(["Up", "Left", "Right", "Forward", "Back", "Random"], 0.1f, "Down") },
-        { "disableScoutRecall", new RandomSettingValue(0.5f) },
-        { "disableScoutLaunching", new RandomSettingValue(0.5f) },
-        { "enableScoutLauncherComponent", new RandomSettingValue(0.5f) },
-        { "enableManualScoutRecall", new RandomSettingValue(0.25f) },
-        { "enableShipItemPlacement", new RandomSettingValue(0.5f) },
-        { "addPortableCampfire", new RandomSettingValue(0.5f) },
-        { "keepHelmetOn", new RandomSettingValue(1f) },
-        { "showWarningNotifications", new RandomSettingValue(1f) },
-        { "shipExplosionMultiplier", new RandomSettingValue(0.5f, 50f, 0.75f, 1f) },
+        }, 0.3f, 0.8f, 1f) },*/
+        { "componentTemperatureDamage", new RandomSettingValue((0.2f, 0.8f)) },
+        { "atmosphereAngularDragMultiplier", new RandomSettingValue((0f, 2f), (0f, 0.5f), 1f) },
+        { "spaceAngularDragMultiplier", new RandomSettingValue((0f, 2f), (0f, 0.5f), 1f) },
+        { "disableRotationSpeedLimit", new RandomSettingValue((0f, 0.2f)) },
+        { "gravityDirection", new RandomSettingValue(
+        [
+            ("Up", (1f, 1f)),
+            ("Left", (1f, 1f)),
+            ("Right", (1f, 1f)),
+            ("Forward", (1f, 1f)),
+            ("Back", (1f, 1f)),
+            ("Random", (0.5f, 1f))
+        ], (0f, 0.1f), "Down") },
+        { "disableScoutRecall", new RandomSettingValue((0f, 0.5f)) },
+        { "disableScoutLaunching", new RandomSettingValue((0.1f, 0.5f)) },
+        { "enableScoutLauncherComponent", new RandomSettingValue((0.2f, 0.5f)) },
+        { "enableManualScoutRecall", new RandomSettingValue((0f, 0.4f)) },
+        { "enableShipItemPlacement", new RandomSettingValue((0.5f, 0.5f)) },
+        { "addPortableCampfire", new RandomSettingValue((0.5f, 0.5f)) },
+        //{ "keepHelmetOn", new RandomSettingValue(1f, 1f) },
+        //{ "showWarningNotifications", new RandomSettingValue(1f, 1f) },
+        /*{ "shipExplosionMultiplier", new RandomSettingValue(0.5f, 50f, 0.3f, 0.75f, 1f) },
         { "shipBounciness", new RandomSettingValue(new (object, object)[]
         {
             (0f, 0.2f),
             (0.2f, 0.5f),
             (0.5f, 1f),
             (1f, 3f)
-        }, 0.05f, 0f) },
-        { "enableEnhancedAutopilot", new RandomSettingValue(0.5f) },
-        { "shipInputLatency", new RandomSettingValue(new (object, object)[]
+        }, 0.01f, 0.05f, 0f) },*/
+        { "enableEnhancedAutopilot", new RandomSettingValue((0.5f, 0.5f)) },
+        /*{ "shipInputLatency", new RandomSettingValue(new (object, object)[]
         {
             (0f, 0.2f),
             (0.2f, 0.5f),
             (0.5f, 1f),
             (1f, 2f)
-        }, 0.1f, 0f) },
-        { "addEngineSwitch", new RandomSettingValue(0.5f) },
-        { "idleFuelConsumptionMultiplier", new RandomSettingValue(new (object, object)[]
+        }, 0.01f, 0.1f, 0f) },*/
+        { "addEngineSwitch", new RandomSettingValue((0.3f, 0.5f)) },
+        /*{ "idleFuelConsumptionMultiplier", new RandomSettingValue(new (object, object)[]
         {
             (0f, 0.5f),
             (0.5f, 1.5f),
             (1.5f, 3f),
             (3f, 8f)
-        }, 0.5f, 0f) },
-        { "shipLightColor", new RandomSettingValue([
-            "Default",
-            "Red",
-            "Hearthian Orange",
-            "Orange",
-            "Yellow",
-            "Green",
-            "Ghostly Green",
-            "Turquoise",
-            "Blue",
-            "Nomaian Blue",
-            "Blacklight",
-            "Purple",
-            "Magenta",
-            "White",
-            "Divine",
-            "Rainbow"
-            ], 0.25f, "Default") },
-        { "hotThrusters", new RandomSettingValue(0.8f) },
-        { "extraNoise", new RandomSettingValue(0.8f) },
-        { "interiorHullColor", new RandomSettingValue([
-            "Default",
-            "Red",
-            "Orange",
-            "Golden",
-            "Green",
-            "Turquoise",
-            "Blue",
-            "Lavender",
-            "Pink",
-            "Gray",
-            "Rainbow"
-            ], 0.25f, "Default") },
-        { "exteriorHullColor", new RandomSettingValue([
-            "Default",
-            "Red",
-            "Orange",
-            "Golden",
-            "Green",
-            "Turquoise",
-            "Blue",
-            "Lavender",
-            "Pink",
-            "Gray",
-            "Rainbow"
-            ], 0.25f, "Default") },
-        { "addTether", new RandomSettingValue(0.5f) },
-        { "disableDamageIndicators", new RandomSettingValue(0.3f) },
-        { "addShipSignal", new RandomSettingValue(0.5f) },
-        { "reactorLifetimeMultiplier", new RandomSettingValue(0.1f, 3f, 0.5f, 1f) },
-        { "shipFriction", new RandomSettingValue(0f, 1f, 0.1f, 1f) },
-        { "enableSignalscopeComponent", new RandomSettingValue(0.5f) },
-        { "rustLevel", new RandomSettingValue(new (object, object)[]
-        {
-            (0.1f, 0.2f),
-            (0.2f, 0.25f),
-            (0.25f, 0.4f),
-            (0.4f, 1f),
-        }, 0.25f, 0f) },
-        { "dirtAccumulationTime", new RandomSettingValue(new (object, object)[]
-        {
-            (60f, 110f),
-            (110f, 140f),
-            (140f, 200f),
-            (200f, 350f),
-            (350f, 600f),
-        }, 0.25f, 0f) },
-        { "thrusterColor", new RandomSettingValue([
-            "Default",
-            "Red",
-            "White-Orange",
-            "Lime-Orange",
-            "Lime",
-            "Ghostly Green",
-            "Turquoise",
-            "Blue",
-            "Purple",
-            "Rose",
-            "Pink",
-            "Rainbow"
-            ], 0.25f, "Default") },
-        { "disableSeatbelt", new RandomSettingValue(0.25f) },
-        { "addPortableTractorBeam", new RandomSettingValue(0.5f) },
-        { "disableShipSuit", new RandomSettingValue(0.1f) },
-        { "damageIndicatorColor", new RandomSettingValue([
-            "Default",
-            "Orange",
-            "Yellow",
-            "Green",
-            "Outer Wilds Beta",
-            "Ghostly Green",
-            "Turquoise",
-            "Blue",
-            "Dark Blue",
-            "Nomaian Blue",
-            "Purple",
-            "Lavender",
-            "Pink",
-            "Rainbow"
-            ], 0.25f, "Default") },
-        { "disableAutoLights", new RandomSettingValue(0.5f) },
-        { "addExpeditionFlag", new RandomSettingValue(0.5f) },
-        { "addFuelCanister", new RandomSettingValue(0.5f) },
-        { "cycloneChaos", new RandomSettingValue(new (object, object)[]
+        }, 0.5f, 0f) },*/
+        { "shipLightColor", new RandomSettingValue(
+        [
+            ("Red", (1f, 1f)),
+            ("Hearthian Orange", (1f, 1f)),
+            ("Orange", (1f, 1f)),
+            ("Yellow", (1f, 1f)),
+            ("Green", (1f, 1f)),
+            ("Ghostly Green", (1f, 1f)),
+            ("Turquoise", (1f, 1f)),
+            ("Blue", (1f, 1f)),
+            ("Nomaian Blue", (1f, 1f)),
+            ("Blacklight", (1f, 1f)),
+            ("Purple", (1f, 1f)),
+            ("Magenta", (1f, 1f)),
+            ("White", (1f, 1f)),
+            ("Divine", (0f, 0.5f)),
+            ("Rainbow", (0f, 0.5f)),
+        ], (0.1f, 0.25f), "Default") },
+        { "hotThrusters", new RandomSettingValue((0.2f, 0.8f)) },
+        { "extraNoise", new RandomSettingValue((0f, 0.8f)) },
+        { "interiorHullColor", new RandomSettingValue(
+        [
+            ("Red", (1f, 1f)),
+            ("Orange", (1f, 1f)),
+            ("Golden", (1f, 1f)),
+            ("Green", (1f, 1f)),
+            ("Turquoise", (1f, 1f)),
+            ("Blue", (1f, 1f)),
+            ("Lavender", (1f, 1f)),
+            ("Pink", (1f, 1f)),
+            ("Gray", (1f, 1f)),
+            ("Rainbow", (1f, 1f)),
+        ], (0.1f, 0.25f), "Default") },
+        { "exteriorHullColor", new RandomSettingValue(
+        [
+            ("Red", (1f, 1f)),
+            ("Orange", (1f, 1f)),
+            ("Golden", (1f, 1f)),
+            ("Green", (1f, 1f)),
+            ("Turquoise", (1f, 1f)),
+            ("Blue", (1f, 1f)),
+            ("Lavender", (1f, 1f)),
+            ("Pink", (1f, 1f)),
+            ("Gray", (1f, 1f)),
+            ("Rainbow", (1f, 1f)),
+        ], (0.1f, 0.25f), "Default") },
+        { "addTether", new RandomSettingValue((0.5f, 0.5f)) },
+        { "disableDamageIndicators", new RandomSettingValue((0f, 0.5f)) },
+        { "addShipSignal", new RandomSettingValue((0.5f, 0.5f)) },
+        /*{ "reactorLifetimeMultiplier", new RandomSettingValue(0.1f, 3f, 0.5f, 1f) },
+        { "shipFriction", new RandomSettingValue(0f, 1f, 0.1f, 1f) },*/
+        { "enableSignalscopeComponent", new RandomSettingValue((0.3f, 0.5f)) },
+        { "rustLevel", new RandomSettingValue(
+        [
+            ((0.1f, 0.2f), (1f, 0.5f)),
+            ((0.2f, 0.5f), (0.2f, 1f)),
+            ((0.5f, 0.8f), (0f, 1f)),
+            ((0.8f, 1f), (0f, 0.8f)),
+        ], (0f, 0.25f), 0f) },
+        { "dirtAccumulationTime", new RandomSettingValue(
+        [
+            ((30f, 60f), (0f, 0.5f)),
+            ((60f, 120f), (0.1f, 0.8f)),
+            ((120f, 240f), (0.5f, 1f)),
+            ((240f, 480f), (1f, 0.5f)),
+            ((480f, 600f), (1f, 0.2f)),
+        ], (0f, 0.25f), 0f) },
+        { "thrusterColor", new RandomSettingValue(
+        [
+            ("Default", (1f, 1f)),
+            ("Red", (1f, 1f)),
+            ("White-Orange", (1f, 1f)),
+            ("Lime-Orange", (1f, 1f)),
+            ("Lime", (1f, 1f)),
+            ("Ghostly Green", (1f, 1f)),
+            ("Turquoise", (1f, 1f)),
+            ("Blue", (1f, 1f)),
+            ("Purple", (1f, 1f)),
+            ("Rose", (1f, 1f)),
+            ("Pink", (1f, 1f)),
+            ("Rainbow", (0f, 0.5f)),
+        ], (0.1f, 0.25f), "Default") },
+        { "disableSeatbelt", new RandomSettingValue((0f, 0.5f)) },
+        { "addPortableTractorBeam", new RandomSettingValue((0.5f, 0.5f)) },
+        { "disableShipSuit", new RandomSettingValue((0f, 0.1f)) },
+        { "damageIndicatorColor", new RandomSettingValue(
+        [
+            ("Orange", (1f, 1f)),
+            ("Yellow", (1f, 1f)),
+            ("Green", (1f, 1f)),
+            ("Outer Wilds Beta", (1f, 1f)),
+            ("Ghostly Green", (1f, 1f)),
+            ("Turquoise", (1f, 1f)),
+            ("Blue", (1f, 1f)),
+            ("Dark Blue", (1f, 1f)),
+            ("Nomaian Blue", (1f, 1f)),
+            ("Purple", (1f, 1f)),
+            ("Lavender", (1f, 1f)),
+            ("Pink", (1f, 1f)),
+            ("Rainbow", (0f, 0.5f)),
+        ], (0.1f, 0.25f), "Default") },
+        { "disableAutoLights", new RandomSettingValue((0.5f, 0.5f)) },
+        { "addExpeditionFlag", new RandomSettingValue((0.5f, 0.5f)) },
+        { "addFuelCanister", new RandomSettingValue((0.5f, 0.5f)) },
+        /*{ "cycloneChaos", new RandomSettingValue(new (object, object)[]
         {
             (0f, 0.3f),
             (0.3f, 0.5f),
             (0.5f, 0.8f),
             (0.8f, 1f)
-        }, 0.5f, 0f) },
-        { "moreExplosionDamage", new RandomSettingValue(0.75f) },
-        { "singleUseTractorBeam", new RandomSettingValue(0.25f) },
-        { "disableThrusters", new RandomSettingValue([
-            "None",
-            "Backward",
-            "Left-Right",
-            "Up-Down",
-            "All Except Forward"
-            ], 0.25f, "None") },
-        { "maxDirtAccumulation", new RandomSettingValue(new (object, object)[]
-        {
-            (0.2f, 0.4f),
-            (0.4f, 0.8f),
-            (0.8f, 1f)
-        }, 0.75f, 0.75f) },
-        { "addShipWarpCore", new RandomSettingValue(0.5f) },
-        { "repairTimeMultiplier", new RandomSettingValue(new (object, object)[]
+        }, 0.5f, 0f) },*/
+        { "moreExplosionDamage", new RandomSettingValue((0.25f, 0.75f)) },
+        { "singleUseTractorBeam", new RandomSettingValue((0f, 0.25f)) },
+        { "disableThrusters", new RandomSettingValue(
+        [
+            ("Backward", (1f, 1f)),
+            ("Left-Right", (1f, 1f)),
+            ("Up-Down", (1f, 1f)),
+            ("All Except Forward", (0.5f, 1f)),
+        ], (0f, 0.25f), "None") },
+        { "maxDirtAccumulation", new RandomSettingValue(
+        [
+            ((0.2f, 0.4f), (1f, 0.8f)),
+            ((0.4f, 0.6f), (0.25f, 0.8f)),
+            ((0.6f, 1f), (0f, 1f)),
+        ], (0.5f, 0.5f), 0.75f) },
+        { "addShipWarpCore", new RandomSettingValue((0.5f, 0.5f)) },
+        /*{ "repairTimeMultiplier", new RandomSettingValue(new (object, object)[]
         {
             (0.3f, 0.5f),
             (0.5f, 1.5f),
@@ -849,58 +870,75 @@ public static class SettingsPresets
             (0f, 0.2f),
             (0.2f, 1.5f),
             (1.5f, 2.5f)
-        }, 0.75f, 1f) },
-        { "addShipClock", new RandomSettingValue(0.5f) },
-        { "enableStunDamage", new RandomSettingValue(0.75f) },
-        { "enableRepairConfirmation", new RandomSettingValue(0.75f) },
-        { "shipGravityFix", new RandomSettingValue(1f) },
-        { "enableRemovableGravityCrystal", new RandomSettingValue(0.3f) },
-        { "randomHullDamage", new RandomSettingValue(0f, 1f, 0.1f, 0f) },
-        { "randomComponentDamage", new RandomSettingValue(0f, 1f, 0.1f, 0f) },
-        { "enableFragileShip", new RandomSettingValue(0.1f) },
-        { "faultyHeatRegulators", new RandomSettingValue(0.4f) },
-        { "addErnesto", new RandomSettingValue(0.05f) },
-        { "repairLimit", new RandomSettingValue(0f, 13f, 0.1f, -1f) },
-        { "extraEjectButtons", new RandomSettingValue(0.5f) },
-        { "preventSystemFailure", new RandomSettingValue(0.5f) },
-        { "addShipCurtain", new RandomSettingValue(0.5f) },
-        { "addRepairWrench", new RandomSettingValue(0.2f) },
-        { "funnySounds", new RandomSettingValue(0.05f) },
-        { "alwaysAllowLockOn", new RandomSettingValue(1f) },
-        { "shipWarpCoreComponent", new RandomSettingValue(0.5f) },
-        { "disableShipMedkit", new RandomSettingValue(0.1f) },
-        { "addRadio", new RandomSettingValue(0.5f) },
-        { "disableFluidPrevention", new RandomSettingValue(0.5f) },
-        { "disableHazardPrevention", new RandomSettingValue(0.5f) },
-        { "prolongDigestion", new RandomSettingValue(0.5f) },
-        { "unlimitedItems", new RandomSettingValue(0.05f) },
-        { "noiseMultiplier", new RandomSettingValue(new (object, object)[]
-        {
-            (0f, 0.5f),
-            (0.5f, 1.5f),
-            (1.5f, 2f),
-            (2f, 5f)
-        }, 0.25f, 1f) },
-        { "waterDamage", new RandomSettingValue(new (object, object)[]
-        {
-            (0f, 0.3f),
-            (0.3f, 0.4f),
-            (0.4f, 0.6f),
-            (0.6f, 0.99f),
-            (1f, 1f),
-        }, 0.2f, 0f) },
-        { "sandDamage", new RandomSettingValue(new (object, object)[]
-        {
-            (0f, 0.3f),
-            (0.3f, 0.4f),
-            (0.4f, 0.6f),
-            (0.6f, 0.99f),
-            (1f, 1f),
-        }, 0.2f, 0f) },
-        { "disableMinimapMarkers", new RandomSettingValue(0.25f) },
-        { "scoutPhotoMode", new RandomSettingValue(0.5f) },
-        { "fixShipThrustIndicator", new RandomSettingValue(1f) },
-        { "enableAutoAlign", new RandomSettingValue(0.5f) },
+        }, 0.75f, 1f) },*/
+        { "addShipClock", new RandomSettingValue((0.5f, 0.5f)) },
+        { "enableStunDamage", new RandomSettingValue((0f, 0.5f)) },
+        { "enableRepairConfirmation", new RandomSettingValue((0.8f, 0.5f)) },
+        //{ "shipGravityFix", new RandomSettingValue(1f) },
+        { "enableRemovableGravityCrystal", new RandomSettingValue((0.2f, 0.5f)) },
+        { "randomHullDamage", new RandomSettingValue((0f, 1f), (0f, 0.2f), 0f) },
+        { "randomComponentDamage", new RandomSettingValue((0f, 1f), (0f, 0.2f), 0f) },
+        { "enableFragileShip", new RandomSettingValue((0f, 0.2f)) },
+        { "faultyHeatRegulators", new RandomSettingValue((0f, 0.25f)) },
+        { "addErnesto", new RandomSettingValue((0.05f, 0.05f)) },
+        { "repairLimit", new RandomSettingValue(
+        [
+            (0f, (0f, 0.5f)),
+            ((1f, 5f), (0f, 1f)),
+            ((5f, 10f), (0f, 1.2f)),
+            ((10f, 20f), (0.2f, 0.5f)),
+        ], (0.1f, 0.5f), -1f) },
+        { "extraEjectButtons", new RandomSettingValue((0.4f, 0.5f)) },
+        { "preventSystemFailure", new RandomSettingValue((0.5f, 0.5f)) },
+        { "addShipCurtain", new RandomSettingValue((0.2f, 0.2f)) },
+        { "addRepairWrench", new RandomSettingValue((0.2f, 0.5f)) },
+        { "funnySounds", new RandomSettingValue((0.05f, 0.05f)) },
+        //{ "alwaysAllowLockOn", new RandomSettingValue((1f, 1f)) },
+        { "shipWarpCoreComponent", new RandomSettingValue((0.5f, 0.5f)) },
+        { "disableShipMedkit", new RandomSettingValue((0f, 0.2f)) },
+        { "addRadio", new RandomSettingValue((0.5f, 0.5f)) },
+        { "disableFluidPrevention", new RandomSettingValue((0f, 0.5f)) },
+        { "disableHazardPrevention", new RandomSettingValue((0f, 0.5f)) },
+        { "prolongDigestion", new RandomSettingValue((0.5f, 0.2f)) },
+        { "unlimitedItems", new RandomSettingValue((0.05f, 0.05f)) },
+        { "noiseMultiplier", new RandomSettingValue(
+        [
+            ((0f, 0.3f), (1f, 1f)),
+            ((0.3f, 0.4f), (0.2f, 1f)),
+            ((0.4f, 0.6f), (0f, 1.2f)),
+            ((0.6f, 0.99f), (0f, 1.2f)),
+            (1f, (0f, 1f)),
+        ], (0f, 0.75f), 1f) },
+        { "waterDamage", new RandomSettingValue(
+        [
+            ((0f, 0.3f), (1f, 1f)),
+            ((0.3f, 0.4f), (0.2f, 1f)),
+            ((0.4f, 0.6f), (0f, 1.2f)),
+            ((0.6f, 0.99f), (0f, 1.2f)),
+            (1f, (0f, 1f)),
+        ], (0.1f, 0.5f), 0f) },
+        { "sandDamage", new RandomSettingValue(
+        [
+            ((0f, 0.3f), (1f, 1f)),
+            ((0.3f, 0.4f), (0.2f, 1f)),
+            ((0.4f, 0.6f), (0f, 1.2f)),
+            ((0.6f, 0.99f), (0f, 1.2f)),
+            (1f, (0f, 1f)),
+        ], (0.1f, 0.5f), 0f) },
+        { "disableMinimapMarkers", new RandomSettingValue((0f, 0.5f)) },
+        { "scoutPhotoMode", new RandomSettingValue((0.5f, 0.5f)) },
+        //{ "fixShipThrustIndicator", new RandomSettingValue((1f, 1f)) },
+        { "enableAutoAlign", new RandomSettingValue((0.5f, 0.5f)) },
+        { "shipHornType", new RandomSettingValue(
+        [
+            ("Default", (1f, 1f)),
+            ("Old", (1f, 1f)),
+            ("Train", (1f, 1f)),
+            ("Loud", (1f, 1f)),
+            ("Short", (1f, 1f)),
+            ("Clown", (1f, 1f)),
+            ("Annoying", (1f, 1f)),
+        ], (0.25f, 0.5f), "None") },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

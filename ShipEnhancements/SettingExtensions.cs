@@ -118,6 +118,8 @@ public static class SettingExtensions
         { Settings.fixShipThrustIndicator, (false, false) },
         { Settings.enableAutoAlign, (false, false) },
         { Settings.shipHornType, ("", "") },
+        { Settings.randomIterations, (1f, 1f) },
+        { Settings.randomDifficulty, (1f, 1f) },
     };
 
     public static string GetName(this Settings setting)
@@ -127,11 +129,6 @@ public static class SettingExtensions
 
     public static object GetValue(this Settings setting)
     {
-        if (Instance.ModHelper.Config.GetSettingsValue<string>("preset") == "Random")
-        {
-            return GetProperty(setting);
-        }
-
         JValue value = (JValue)settingValues[setting].Item1;
         if (value.Type == JTokenType.Boolean)
         {
@@ -186,6 +183,7 @@ public static class SettingExtensions
 
     public static void SetProperty(this Settings setting, object value)
     {
+        //ShipEnhancements.WriteDebugMessage("Set " + setting.GetName() + " to " + value);
         settingValues[setting] = (settingValues[setting].Item1, value);
     }
 
