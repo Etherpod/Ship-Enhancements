@@ -603,8 +603,9 @@ public static class SettingsPresets
         ], (0.25f, 0.5f), 1f) },
         { "shipDamageMultiplier", new RandomSettingValue(
         [
-            (0f, (0.4f, 0.1f)),
-            ((0.2f, 1.2f), (1f, 1f)),
+            (0f, (0.3f, 0f)),
+            ((0.2f, 0.7f), (0.5f, 0.1f)),
+            ((0.7f, 1.2f), (1f, 1f)),
             ((1.2f, 2f), (0.2f, 1.1f)),
             ((2f, 10f), (0f, 1.2f)),
         ], (0.25f, 0.5f), 1f) },
@@ -645,49 +646,59 @@ public static class SettingsPresets
             ((0.9f, 1.1f), (1f, 1f)),
             ((1.1f, 5f), (0.8f, 0.4f)),
         ], (0.1f, 0.5f), 1f) },
-        /*{ "oxygenRefillMultiplier", new RandomSettingValue(new (object, object)[]
-        {
-            (0.5f, 0.9f),
-            (0.9f, 1.2f),
-            (1.2f, 1.8f),
-            (1.8f, 2.5f),
-            (2.5f, 5f)
-        }, 0.1f, 0.5f, 1f) },
-        { "temperatureDamageMultiplier", new RandomSettingValue(new (object, object)[]
-        {
-            (0.1f, 0.5f),
-            (0.5f, 1f),
-            (1f, 1.2f),
-            (1.2f, 1.8f),
-            (1.8f, 2.5f),
-            (2.5f, 5f)
-        }, 0.4f, 0.8f, 1f) },
-        { "temperatureResistanceMultiplier", new RandomSettingValue(new (object, object)[]
-        {
-            (0.1f, 0.4f),
-            (0.4f, 0.75f),
-            (0.75f, 1f),
-            (1f, 1.5f),
-            (1.5f, 3f),
-        }, 0.4f, 0.8f, 1f) },*/
+        { "oxygenRefillMultiplier", new RandomSettingValue(
+        [
+            ((0.1f, 0.3f), (0f, 0.8f)),
+            ((0.3f, 0.8f), (0f, 1.2f)),
+            ((0.8f, 1.5f), (1f, 1f)),
+            ((1.5f, 5f), (0.8f, 0.4f)),
+        ], (0.1f, 0.5f), 1f) },
+        { "temperatureDamageMultiplier", new RandomSettingValue(
+        [
+            ((0.2f, 0.7f), (0.4f, 0.3f)),
+            ((0.7f, 1.2f), (1f, 1f)),
+            ((1.2f, 2f), (0.2f, 1.1f)),
+            ((2f, 10f), (0f, 1.2f)),
+        ], (0.4f, 0.8f), 1f) },
+        { "temperatureResistanceMultiplier", new RandomSettingValue(
+        [
+            ((0.05f, 0.2f), (0f, 0.6f)),
+            ((0.2f, 0.8f), (0f, 1f)),
+            ((0.8f, 1.5f), (1f, 1f)),
+            ((1.5f, 3f), (0.5f, 0.3f)),
+        ], (0.4f, 0.8f), 1f) },
         { "enableAutoHatch", new RandomSettingValue((0.2f, 0.5f)) },
-        /*{ "oxygenTankDrainMultiplier", new RandomSettingValue(new (object, object)[]
-        {
-            (0.5f, 1f),
-            (1f, 2.5f),
-            (2.5f, 4f),
-            (4f, 10f),
-        }, 0.3f, 0.8f, 1f) },
-        { "fuelTankDrainMultiplier", new RandomSettingValue(new (object, object)[]
-        {
-            (0.05f, 0.5f),
-            (0.5f, 1.2f),
-            (1.2f, 2f),
-            (2f, 5f),
-        }, 0.3f, 0.8f, 1f) },*/
+        { "oxygenTankDrainMultiplier", new RandomSettingValue(
+        [
+            ((0.5f, 1.2f), (1f, 1f)),
+            ((1.2f, 2.5f), (0.2f, 1.1f)),
+            ((2.5f, 4f), (0f, 1.1f)),
+            ((4f, 10f), (0f, 1.2f)),
+        ], (0.3f, 0.8f), 1f) },
+        { "fuelTankDrainMultiplier", new RandomSettingValue(
+        [
+            ((0.05f, 0.5f), (0.6f, 0.1f)),
+            ((0.5f, 1.2f), (1f, 1f)),
+            ((1.2f, 2f), (0.2f, 1.1f)),
+            ((2f, 5f), (0f, 1.2f)),
+        ], (0.3f, 0.8f), 1f) },
         { "componentTemperatureDamage", new RandomSettingValue((0.2f, 0.8f)) },
-        { "atmosphereAngularDragMultiplier", new RandomSettingValue((0f, 2f), (0f, 0.5f), 1f) },
-        { "spaceAngularDragMultiplier", new RandomSettingValue((0f, 2f), (0f, 0.5f), 1f) },
+        { "atmosphereAngularDragMultiplier", new RandomSettingValue(
+        [
+            (0f, (0f, 1.2f)),
+            ((0.1f, 0.7f), (0f, 1f)),
+            ((0.7f, 1.2f), (1f, 1f)),
+            ((1.2f, 2f), (0.2f, 1.1f)),
+            ((2f, 5f), (0f, 1.2f)),
+        ], (0f, 0.5f), 1f) },
+        { "spaceAngularDragMultiplier", new RandomSettingValue(
+        [
+            (0f, (0f, 1.2f)),
+            ((0.1f, 0.7f), (0f, 1f)),
+            ((0.7f, 1.2f), (1f, 1f)),
+            ((1.2f, 2f), (0.2f, 1.1f)),
+            ((2f, 5f), (0f, 1.2f)),
+        ], (0f, 0.5f), 1f) },
         { "disableRotationSpeedLimit", new RandomSettingValue((0f, 0.2f)) },
         { "gravityDirection", new RandomSettingValue(
         [
@@ -706,30 +717,37 @@ public static class SettingsPresets
         { "addPortableCampfire", new RandomSettingValue((0.5f, 0.5f)) },
         //{ "keepHelmetOn", new RandomSettingValue(1f, 1f) },
         //{ "showWarningNotifications", new RandomSettingValue(1f, 1f) },
-        /*{ "shipExplosionMultiplier", new RandomSettingValue(0.5f, 50f, 0.3f, 0.75f, 1f) },
-        { "shipBounciness", new RandomSettingValue(new (object, object)[]
-        {
-            (0f, 0.2f),
-            (0.2f, 0.5f),
-            (0.5f, 1f),
-            (1f, 3f)
-        }, 0.01f, 0.05f, 0f) },*/
+        { "shipExplosionMultiplier", new RandomSettingValue(
+        [
+            ((0.2f, 1.5f), (1f, 0.2f)),
+            ((1.5f, 3f), (0.1f, 1f)),
+            ((3f, 20f), (0f, 1.1f)),
+            ((20f, 50f), (0f, 0.5f)),
+        ], (0.3f, 0.75f), 1f) },
+        { "shipBounciness", new RandomSettingValue(
+        [
+            ((0f, 0.2f), (1f, 0.5f)),
+            ((0.2f, 0.5f), (0.1f, 1f)),
+            ((0.5f, 1f), (0f, 1.1f)),
+            ((1f, 3f), (0f, 0.5f)),
+        ], (0.01f, 0.1f), 0f) },
         { "enableEnhancedAutopilot", new RandomSettingValue((0.5f, 0.5f)) },
-        /*{ "shipInputLatency", new RandomSettingValue(new (object, object)[]
-        {
-            (0f, 0.2f),
-            (0.2f, 0.5f),
-            (0.5f, 1f),
-            (1f, 2f)
-        }, 0.01f, 0.1f, 0f) },*/
+        { "shipInputLatency", new RandomSettingValue(
+        [
+            ((0f, 0.2f), (1f, 1f)),
+            ((0.2f, 0.5f), (0.1f, 1.1f)),
+            ((0.5f, 1f), (0f, 1.1f)),
+            ((1f, 3f), (0f, 0.5f)),
+            ((3f, 10f), (0f, 0.01f)),
+        ], (0f, 0.1f), 0f) },
         { "addEngineSwitch", new RandomSettingValue((0.3f, 0.5f)) },
-        /*{ "idleFuelConsumptionMultiplier", new RandomSettingValue(new (object, object)[]
-        {
-            (0f, 0.5f),
-            (0.5f, 1.5f),
-            (1.5f, 3f),
-            (3f, 8f)
-        }, 0.5f, 0f) },*/
+        { "idleFuelConsumptionMultiplier", new RandomSettingValue(
+        [
+            ((0f, 0.5f), (1f, 1f)),
+            ((0.5f, 1.5f), (0.1f, 1f)),
+            ((0.5f, 1f), (0f, 1.1f)),
+            ((1f, 3f), (0f, 0.5f)),
+        ], (0f, 0.5f), 0f) },
         { "shipLightColor", new RandomSettingValue(
         [
             ("Red", (1f, 1f)),
@@ -779,8 +797,19 @@ public static class SettingsPresets
         { "addTether", new RandomSettingValue((0.5f, 0.5f)) },
         { "disableDamageIndicators", new RandomSettingValue((0f, 0.5f)) },
         { "addShipSignal", new RandomSettingValue((0.5f, 0.5f)) },
-        /*{ "reactorLifetimeMultiplier", new RandomSettingValue(0.1f, 3f, 0.5f, 1f) },
-        { "shipFriction", new RandomSettingValue(0f, 1f, 0.1f, 1f) },*/
+        { "reactorLifetimeMultiplier", new RandomSettingValue(
+        [
+            (0f, (0f, 0.2f)),
+            ((0.1f, 0.8f), (0.1f, 1.1f)),
+            ((0.8f, 1.5f), (1f, 1f)),
+            ((1.5f, 4f), (0.5f, 0.5f)),
+        ], (0.2f, 0.5f), 1f) },
+        { "shipFriction", new RandomSettingValue(
+        [
+            ((0f, 0.3f), (0f, 1.1f)),
+            ((0.3f, 0.7f), (1f, 1f)),
+            ((0.7f, 1f), (0f, 1.1f)),
+        ], (0.01f, 0.1f), 0.5f) },
         { "enableSignalscopeComponent", new RandomSettingValue((0.3f, 0.5f)) },
         { "rustLevel", new RandomSettingValue(
         [
@@ -834,13 +863,11 @@ public static class SettingsPresets
         { "disableAutoLights", new RandomSettingValue((0.5f, 0.5f)) },
         { "addExpeditionFlag", new RandomSettingValue((0.5f, 0.5f)) },
         { "addFuelCanister", new RandomSettingValue((0.5f, 0.5f)) },
-        /*{ "cycloneChaos", new RandomSettingValue(new (object, object)[]
-        {
-            (0f, 0.3f),
-            (0.3f, 0.5f),
-            (0.5f, 0.8f),
-            (0.8f, 1f)
-        }, 0.5f, 0f) },*/
+        { "cycloneChaos", new RandomSettingValue(
+        [
+            ((0f, 0.5f), (1f, 1f)),
+            ((0.5f, 1f), (0f, 1f)),
+        ], (0.2f, 0.5f), 0f) },
         { "moreExplosionDamage", new RandomSettingValue((0.25f, 0.75f)) },
         { "singleUseTractorBeam", new RandomSettingValue((0f, 0.25f)) },
         { "disableThrusters", new RandomSettingValue(
@@ -857,20 +884,21 @@ public static class SettingsPresets
             ((0.6f, 1f), (0f, 1f)),
         ], (0.5f, 0.5f), 0.75f) },
         { "addShipWarpCore", new RandomSettingValue((0.5f, 0.5f)) },
-        /*{ "repairTimeMultiplier", new RandomSettingValue(new (object, object)[]
-        {
-            (0.3f, 0.5f),
-            (0.5f, 1.5f),
-            (1.5f, 2f),
-            (2.5f, 3f)
-        }, 0.75f, 1f) },
-        { "airDragMultiplier", new RandomSettingValue(new (object, object)[]
-        {
-            (0f, 0f),
-            (0f, 0.2f),
-            (0.2f, 1.5f),
-            (1.5f, 2.5f)
-        }, 0.75f, 1f) },*/
+        { "repairTimeMultiplier", new RandomSettingValue(
+        [
+            ((0.2f, 0.7f), (0.4f, 0.4f)),
+            ((0.7f, 1.2f), (1f, 1f)),
+            ((1.2f, 2f), (0.2f, 1.1f)),
+            ((2f, 10f), (0f, 1.2f)),
+        ], (0.2f, 0.5f), 1f) },
+        { "airDragMultiplier", new RandomSettingValue(
+        [
+            (0f, (0f, 1.2f)),
+            ((0.1f, 0.7f), (0f, 1f)),
+            ((0.7f, 1.2f), (1f, 1f)),
+            ((1.2f, 2f), (0.2f, 1.1f)),
+            ((2f, 5f), (0f, 1.2f)),
+        ], (0.1f, 0.75f), 1f) },
         { "addShipClock", new RandomSettingValue((0.5f, 0.5f)) },
         { "enableStunDamage", new RandomSettingValue((0f, 0.5f)) },
         { "enableRepairConfirmation", new RandomSettingValue((0.8f, 0.5f)) },
