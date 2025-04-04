@@ -569,7 +569,7 @@ public static class SettingsPresets
         { "scoutPhotoMode", true },
         { "fixShipThrustIndicator", true },
         { "enableAutoAlign", true },
-        { "shipHornType", "Goofy" },
+        { "shipHornType", "Annoying" },
     };
 
     // Random preset composition

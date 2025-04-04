@@ -610,9 +610,8 @@ public class ShipEnhancements : ModBehaviour
             }
 
             int iterations = Mathf.FloorToInt(
-                Mathf.Lerp(2f, allSettings.Length / 2, (float)Settings.randomIterations.GetValue()));
-            ShipEnhancements.WriteDebugMessage("settings = " + (float)Settings.randomIterations.GetValue());
-            ShipEnhancements.WriteDebugMessage("i = " + iterations);
+                Mathf.Lerp(2f, allSettings.Length - 10, (float)Settings.randomIterations.GetValue()));
+
             for (int j = 0; j < iterations; j++)
             {
                 float rand = UnityEngine.Random.Range(0f, total);
