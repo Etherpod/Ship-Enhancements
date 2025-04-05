@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Runtime.InteropServices;
 using UnityEngine;
 
 namespace ShipEnhancements;
@@ -21,10 +22,14 @@ public class PidAutopilot : ThrusterController
             .Select(p => new Vector3(p.x, 0, p.y))
             .ToArray();
 
-    public delegate void AbortAutopilotEvent();
-    public event AbortAutopilotEvent OnAbortAutopilot;
+    public delegate void AbortOrbitEvent();
+    public event AbortOrbitEvent OnAbortOrbit;
     public delegate void InitOrbitEvent();
-    public event InitOrbitEvent OnInitAutopilot;
+    public event InitOrbitEvent OnInitOrbit;
+    public delegate void AbortHoldPositionEvent();
+    public event AbortHoldPositionEvent OnAbortHoldPosition;
+    public delegate void InitHoldPositionEvent();
+    public event InitHoldPositionEvent OnInitHoldPosition;
 
     private OWRigidbody _owRigidbody;
     private ReferenceFrame _referenceFrame;
@@ -85,18 +90,34 @@ public class PidAutopilot : ThrusterController
     public void SetAutopilotActive(bool active, PidMode mode = PidMode.Orbit, bool ignoreThrustLimits = true)
     {
         ShipEnhancements.WriteDebugMessage($"set active: {active}");
-        _mode = mode;
-        if (!active || !CanAutopilot(false))
+        if (!active || !CanAutopilot(mode == PidMode.Orbit))
         {
             if (enabled)
             {
                 PostAutopilotOffNotification();
                 enabled = false;
+                _referenceFrame = null;
                 _ignoreThrustLimits = false;
-                OnAbortAutopilot?.Invoke();
+                if (_mode == PidMode.Orbit)
+                {
+                    OnAbortOrbit?.Invoke();
+                }
+                else
+                {
+                    OnAbortHoldPosition?.Invoke();
+                }
                 ShipEnhancements.WriteDebugMessage("nothing to orbit");
             }
             return;
+        }
+        else if (active)
+        {
+            _mode = mode;
+            if (enabled)
+            {
+                ShipNotifications.RemoveOrbitAutopilotActiveNotification();
+                ShipNotifications.RemoveHoldPositionAutopilotNotification();
+            }
         }
 
         _referenceFrame = Locator.GetReferenceFrame(false);
@@ -106,9 +127,15 @@ public class PidAutopilot : ThrusterController
 
         var relativeVelocity = _referenceFrame.GetOWRigidBody().GetRelativeVelocity(_owRigidbody);
         var dirToReference = _referenceFrame.GetPosition() - _owRigidbody.GetWorldCenterOfMass();
-        _holdPosition = -dirToReference;
         if (_localHold)
-            _referenceFrame.GetOWRigidBody().transform.InverseTransformDirection(_holdPosition);
+        {
+            _holdPosition = _referenceFrame.GetOWRigidBody().transform.InverseTransformPoint(_owRigidbody.GetWorldCenterOfMass());
+            ShipEnhancements.WriteDebugMessage(_holdPosition);
+        }
+        else
+        {
+            _holdPosition = -dirToReference;
+        }
         
         _orbitRadius = dirToReference.magnitude;
         _orbitSpeed = _referenceFrame.GetOrbitSpeed(_orbitRadius);
@@ -130,7 +157,14 @@ public class PidAutopilot : ThrusterController
 
         enabled = true;
 
-        OnInitAutopilot?.Invoke();
+        if (_mode == PidMode.Orbit)
+        {
+            OnInitOrbit?.Invoke();
+        }
+        else
+        {
+            OnInitHoldPosition?.Invoke();
+        }
 
         _shipAudio.PlayAutopilotOn();
         if (_mode == PidMode.Orbit)
@@ -141,16 +175,29 @@ public class PidAutopilot : ThrusterController
 
     public override Vector3 ReadTranslationalInput()
     {
-        if (!CanAutopilot(true))
+        if (!CanAutopilot(_mode == PidMode.Orbit))
         {
             PostAutopilotOffNotification();
             enabled = false;
-            OnAbortAutopilot?.Invoke();
+            _referenceFrame = null;
+            if (_mode == PidMode.Orbit)
+            {
+                OnAbortOrbit?.Invoke();
+            }
+            else
+            {
+                OnAbortHoldPosition?.Invoke();
+            }
             ShipEnhancements.WriteDebugMessage("nothing to orbit");
             return Vector3.zero;
         }
 
         _comps = CalculateCurrentState();
+
+        if (_mode == PidMode.HoldPosition)
+        {
+            _comps.TargetOrbitalVelocity = Vector3.zero;
+        }
 
         ComputePidPositionInput(_comps);
 
@@ -200,9 +247,13 @@ public class PidAutopilot : ThrusterController
         {
             comps.TargetHoldPosition = _referenceFrame.GetPosition();
             if (_localHold)
-                comps.TargetHoldPosition += _referenceFrame.GetOWRigidBody().transform.TransformDirection(_holdPosition);
+            {
+                comps.TargetHoldPosition = _referenceFrame.GetOWRigidBody().transform.TransformPoint(_holdPosition);
+            }
             else
+            {
                 comps.TargetHoldPosition += _holdPosition;
+            }
         }
 
         comps.TargetOrbitalVelocity = Vector3.Cross(_orbitalPlaneNormal, comps.TargetOrbitalDirection) * _orbitSpeed;
@@ -255,12 +306,20 @@ public class PidAutopilot : ThrusterController
         ShipNotifications.RemoveOrbitAutopilotActiveNotification();
         ShipNotifications.RemoveHoldPositionAutopilotNotification();
         if (enabled)
+        {
             if (_mode == PidMode.Orbit)
+            {
                 ShipNotifications.PostOrbitAutopilotDisabledNotification();
+            }
             else
+            {
                 ShipNotifications.PostHoldPositionAutopilotDisabledNotification();
+            }
+        }
         else
+        {
             ShipNotifications.PostOrbitAutopilotNoTargetNotification();
+        }
     }
 
     public override Vector3 ReadRotationalInput()
@@ -270,11 +329,13 @@ public class PidAutopilot : ThrusterController
 
     private bool CanAutopilot(bool checkCorrectRefFrame)
     {
-        var hasRefFrame = () => Locator.GetReferenceFrame(false) != null;
-        var hasCorrectRefFrame = () => Locator.GetReferenceFrame(false) == _referenceFrame;
-        var thrustersUsable = () => SELocator.GetShipResources().AreThrustersUsable();
+        if (Locator.GetReferenceFrame(false) == null || (_referenceFrame != null 
+            && Locator.GetReferenceFrame(false) != _referenceFrame)) return false;
+
+        //var hasCorrectRefFrame = Locator.GetReferenceFrame(false) == _referenceFrame;
+        var thrustersUsable = SELocator.GetShipResources().AreThrustersUsable();
         var refFrameHasGravity = Locator.GetReferenceFrame(false).GetOWRigidBody().GetAttachedGravityVolume() != null;
-        return hasRefFrame() && (!checkCorrectRefFrame || hasCorrectRefFrame()) && thrustersUsable();
+        return (!checkCorrectRefFrame || refFrameHasGravity) && thrustersUsable;
     }
 
     private void SetArrow(LineRenderer renderer, Vector3 position, Vector3 vector)

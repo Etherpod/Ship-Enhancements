@@ -4247,6 +4247,11 @@ public static class PatchClass
                 SELocator.GetAutopilotPanelController().CancelAutopilot();
                 //__instance.AbortAutopilot();
             }
+            if (OWInput.IsNewlyPressed(InputLibrary.matchVelocity, InputMode.All))
+            {
+                SELocator.GetAutopilotPanelController().CancelMatchVelocity();
+                //__instance.AbortAutopilot();
+            }
         }
         else
         {

@@ -11,7 +11,7 @@ public class GravityGearInvertSwitch : CockpitSwitch
     {
         base.SetPowered(powered);
         if (_electricalDisrupted) return;
-        ShipEnhancements.Instance.SetGravityLandingGearInverted(_on && powered
+        ShipEnhancements.Instance.SetGravityLandingGearInverted(_on 
             && !SELocator.GetShipDamageController().IsElectricalFailed());
     }
 }

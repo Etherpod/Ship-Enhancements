@@ -19,6 +19,6 @@ public class AutoAlignButton : CockpitButton
     {
         base.SetPowered(powered);
         if (_electricalDisrupted) return;
-        _shipAlign.enabled = _on && powered;
+        _shipAlign.enabled = _on && !SELocator.GetShipDamageController().IsElectricalFailed();
     }
 }

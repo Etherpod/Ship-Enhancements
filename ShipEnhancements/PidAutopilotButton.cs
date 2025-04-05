@@ -22,7 +22,7 @@ public class PidAutopilotButton : CockpitButtonSwitch
     {
         if (IsActivated() && Locator.GetReferenceFrame(false) != null && !_autopilot.IsDamaged())
         {
-            if (Locator.GetReferenceFrame(false) != null && !_autopilot.IsDamaged())
+            if (CanActivate())
             {
                 _pidAutopilot.SetAutopilotActive(true, _mode, false);
             }
@@ -35,5 +35,10 @@ public class PidAutopilotButton : CockpitButtonSwitch
         {
             _pidAutopilot.SetAutopilotActive(false);
         }
+    }
+
+    protected virtual bool CanActivate()
+    {
+        return true;
     }
 }

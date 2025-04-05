@@ -45,8 +45,10 @@ public class AutopilotPanelController : MonoBehaviour
         _autopilot.OnAlreadyAtDestination += OnAbortAutopilot;
         _autopilot.OnArriveAtDestination += ctx => OnAbortAutopilot();
         _autopilot.OnInitFlyToDestination += OnInitAutopilot;
-        _pidAutopilot.OnAbortAutopilot += OnAbortAutopilot;
-        _pidAutopilot.OnInitAutopilot += OnInitAutopilot;
+        _pidAutopilot.OnAbortOrbit += OnAbortAutopilot;
+        _pidAutopilot.OnInitOrbit += OnInitAutopilot;
+        _pidAutopilot.OnAbortHoldPosition += OnAbortHoldPosition;
+        _pidAutopilot.OnInitHoldPosition += OnInitHoldPosition;
         _autopilotComponent.OnDamaged += ctx => OnAutopilotDamaged();
     }
 
@@ -92,8 +94,10 @@ public class AutopilotPanelController : MonoBehaviour
         _autopilot.OnAlreadyAtDestination -= OnAbortAutopilot;
         _autopilot.OnArriveAtDestination -= ctx => OnAbortAutopilot();
         _autopilot.OnInitFlyToDestination -= OnInitAutopilot;
-        _pidAutopilot.OnAbortAutopilot -= OnAbortAutopilot;
-        _pidAutopilot.OnInitAutopilot -= OnInitAutopilot;
+        _pidAutopilot.OnAbortOrbit -= OnAbortAutopilot;
+        _pidAutopilot.OnInitOrbit -= OnInitAutopilot;
+        _pidAutopilot.OnAbortHoldPosition -= OnAbortHoldPosition;
+        _pidAutopilot.OnInitHoldPosition -= OnInitHoldPosition;
         _autopilotComponent.OnDamaged -= ctx => OnAutopilotDamaged();
     }
     
@@ -107,7 +111,7 @@ public class AutopilotPanelController : MonoBehaviour
         {
             _orbitAutopilotButton.SetActive(false);
         }
-        if (IsHoldInputSelected() && !_autopilotComponent.isDamaged)
+        if (IsHoldInputSelected() && !IsAutopilotActive() && !_autopilotComponent.isDamaged)
         {
             _persistentInput.SetInputEnabled(true);
         }
@@ -122,6 +126,34 @@ public class AutopilotPanelController : MonoBehaviour
         else if (IsOrbitSelected())
         {
             _orbitAutopilotButton.SetActive(true);
+        }
+        if (IsHoldInputSelected())
+        {
+            _persistentInput.SetInputEnabled(false);
+        }
+        if (IsHoldPositionSelected())
+        {
+            _holdPositionButton.SetActive(false);
+        }
+    }
+
+    private void OnAbortHoldPosition()
+    {
+        if (IsHoldPositionSelected())
+        {
+            _holdPositionButton.SetActive(false);
+        }
+        if (IsHoldInputSelected() && !IsAutopilotActive() && !_autopilotComponent.isDamaged)
+        {
+            _persistentInput.SetInputEnabled(true);
+        }
+    }
+
+    private void OnInitHoldPosition()
+    {
+        if (IsHoldPositionSelected())
+        {
+            _holdPositionButton.SetActive(true);
         }
         if (IsHoldInputSelected())
         {
@@ -177,6 +209,12 @@ public class AutopilotPanelController : MonoBehaviour
         }
     }
 
+    public void ToggleMatchVelocity()
+    {
+        _activeMatch.SetActive(!_activeMatch.IsActivated());
+        _activeMatch.OnChangeActiveEvent();
+    }
+
     public bool IsApproachSelected()
     {
         return _activeAutopilot == _approachAutopilotButton;
@@ -189,7 +227,7 @@ public class AutopilotPanelController : MonoBehaviour
 
     public bool IsAutopilotActive()
     {
-        return _activeAutopilot.IsActivated();
+        return _autopilot.enabled || _pidAutopilot.enabled;
     }
 
     public bool IsMatchVelocitySelected()
