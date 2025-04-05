@@ -230,6 +230,11 @@ public class AutopilotPanelController : MonoBehaviour
         return _autopilot.enabled || _pidAutopilot.enabled;
     }
 
+    public bool IsPersistentInputActive()
+    {
+        return _persistentInput.enabled;
+    }
+
     public bool IsMatchVelocitySelected()
     {
         return _activeMatch == _matchVelocityButton;

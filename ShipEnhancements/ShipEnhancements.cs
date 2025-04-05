@@ -930,6 +930,9 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)Settings.enableEnhancedAutopilot.GetProperty())
         {
             SELocator.GetShipBody().gameObject.AddComponent<ShipPersistentInput>();
+
+            WriteDebugMessage("adding orbit autopilot");
+            SELocator.GetShipBody().gameObject.AddComponent<PidAutopilot>();
         }
         if ((float)Settings.shipInputLatency.GetProperty() != 0f)
         {
@@ -1311,11 +1314,6 @@ public class ShipEnhancements : ModBehaviour
             {
                 renderer.enabled = false;
             }
-        }
-        if ((bool)Settings.enableEnhancedAutopilot.GetProperty())
-        {
-            WriteDebugMessage("adding orbit autopilot");
-            SELocator.GetShipBody().gameObject.AddComponent<PidAutopilot>();
         }
         if ((bool)Settings.enableAutoAlign.GetProperty())
         {

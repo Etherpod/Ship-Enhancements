@@ -19,7 +19,7 @@ public class ShipPersistentInput : ThrusterController
 
     private void Start()
     {
-        enabled = false;
+        SetInputEnabled(false);
     }
 
     public override Vector3 ReadRotationalInput()
@@ -31,7 +31,6 @@ public class ShipPersistentInput : ThrusterController
     {
         if (SELocator.GetAutopilotPanelController().IsAutopilotActive() || _currentInput == Vector3.zero)
         {
-            ShipEnhancements.WriteDebugMessage("Abort");
             enabled = false;
             return Vector3.zero;
         }
@@ -43,31 +42,23 @@ public class ShipPersistentInput : ThrusterController
 
     public void StartRecordingInput()
     {
-        ShipEnhancements.WriteDebugMessage("Start recording");
         _currentInput = Vector3.zero;
-        enabled = false;
+        SetInputEnabled(false);
     }
 
     public void StopRecordingInput()
     {
-        ShipEnhancements.WriteDebugMessage("Stop recording");
         if (!SELocator.GetAutopilotPanelController().IsAutopilotActive())
         {
             _currentInput = _thrustController._lastTranslationalInput;
-            ShipEnhancements.WriteDebugMessage("Set input");
-            if (_currentInput != Vector3.zero)
-            {
-                enabled = true;
-            }
+            SetInputEnabled(true);
         }
     }
 
     public void SetInputEnabled(bool state)
     {
-        ShipEnhancements.WriteDebugMessage("Set enabled: " + state);
         if (state && _currentInput != Vector3.zero)
         {
-            ShipEnhancements.WriteDebugMessage("Actually enable");
             enabled = true;
         }
         else

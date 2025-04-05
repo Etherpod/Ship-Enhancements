@@ -2311,14 +2311,8 @@ public static class PatchClass
 
         if ((bool)enableEnhancedAutopilot.GetProperty())
         {
-            if (SELocator.GetAutopilotPanelController().IsAutopilotActive())
-            {
-                __result = Vector3.zero;
-                return false;
-            }
-
-            ShipPersistentInput persistentInput = SELocator.GetShipBody().GetComponent<ShipPersistentInput>();
-            if (persistentInput != null && persistentInput.enabled)
+            if (SELocator.GetAutopilotPanelController().IsAutopilotActive()
+                || SELocator.GetAutopilotPanelController().IsPersistentInputActive())
             {
                 __result = Vector3.zero;
                 return false;
@@ -4347,7 +4341,7 @@ public static class PatchClass
                 __instance._autopilotLightMaterial.SetColor(__instance._propID_EmissionColor, 0f * __instance._autopilotLightColor);
             }
 
-            if (__instance._autopilot.IsMatchingVelocity() || __instance._autopilot.GetComponent<ShipPersistentInput>().enabled)
+            if (__instance._autopilot.IsMatchingVelocity() || SELocator.GetAutopilotPanelController().IsPersistentInputActive())
             {
                 if (!__instance._matchingVelocityLight.enabled)
                 {

@@ -9,7 +9,6 @@ public class PersistentInputButton : CockpitButtonSwitch
         base.Start();
 
         _persistentInput = SELocator.GetShipBody().GetComponent<ShipPersistentInput>();
-        _persistentInput.SetInputEnabled(_powered && IsOn());
     }
 
     public override void OnChangeActiveEvent()
