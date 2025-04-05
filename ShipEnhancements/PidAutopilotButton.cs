@@ -31,7 +31,7 @@ public class PidAutopilotButton : CockpitButtonSwitch
                 SetActive(false);
             }
         }
-        else if (_pidAutopilot.enabled)
+        else if (_pidAutopilot.enabled && _pidAutopilot.GetCurrentMode() == _mode)
         {
             _pidAutopilot.SetAutopilotActive(false);
         }

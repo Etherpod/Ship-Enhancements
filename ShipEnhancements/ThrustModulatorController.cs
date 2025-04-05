@@ -169,7 +169,7 @@ public class ThrustModulatorController : ElectricalComponent
 
     public void PlayButtonSound(AudioClip clip, float volume, int level)
     {
-        _audioSource.pitch = level < _lastLevel ? Random.Range(0.9f, 1f) : Random.Range(1f, 1.1f);
+        _audioSource.pitch = level < _lastLevel ? Random.Range(0.95f, 1f) : Random.Range(1f, 1.05f);
         _audioSource.PlayOneShot(clip, volume);
     }
 

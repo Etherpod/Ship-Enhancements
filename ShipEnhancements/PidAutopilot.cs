@@ -354,6 +354,11 @@ public class PidAutopilot : ThrusterController
         );
     }
 
+    public PidMode GetCurrentMode()
+    {
+        return _mode;
+    }
+
     private record PidComputations
     {
         public Vector3 CurrentPosition;

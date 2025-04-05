@@ -331,7 +331,7 @@ public class ShipOverdriveController : ElectricalComponent
 
     public void PlayButtonAudio(AudioClip audio, float volume)
     {
-        _panelAudioSource.pitch = Random.Range(0.9f, 1.1f);
+        _panelAudioSource.pitch = Random.Range(0.95f, 1.05f);
         _panelAudioSource.PlayOneShot(audio, volume);
     }
 
