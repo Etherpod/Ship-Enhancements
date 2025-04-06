@@ -120,6 +120,7 @@ public static class SettingExtensions
         { Settings.shipHornType, ("", "") },
         { Settings.randomIterations, (1f, 1f) },
         { Settings.randomDifficulty, (1f, 1f) },
+        { Settings.disableHatch, (false, false) },
     };
 
     public static string GetName(this Settings setting)

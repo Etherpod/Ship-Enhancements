@@ -40,6 +40,7 @@ public class ShipEnhancements : ModBehaviour
     public bool anyPartDamaged;
     public bool groundedByHornfels;
     public bool shipIgniting;
+    public bool disableHeadlights;
 
     public static IAchievements AchievementsAPI;
     public static IQSBAPI QSBAPI;
@@ -99,6 +100,7 @@ public class ShipEnhancements : ModBehaviour
     private bool _unsubFromBodyLoaded = false;
     private bool _unsubFromSystemLoaded = false;
     private bool _unsubFromShipSpawn = false;
+    private ShipDetachableLeg _frontLeg = null;
 
     public enum Settings
     {
@@ -212,7 +214,8 @@ public class ShipEnhancements : ModBehaviour
         enableAutoAlign,
         shipHornType,
         randomIterations,
-        randomDifficulty
+        randomDifficulty,
+        disableHatch,
     }
 
     private void Awake()
@@ -330,7 +333,7 @@ public class ShipEnhancements : ModBehaviour
                 detector.OnEnterFluid -= OnEnterFluid;
                 detector.OnExitFluid -= OnExitFluid;
             }
-            if ((bool)Settings.enableAutoHatch.GetProperty())
+            if ((bool)Settings.enableAutoHatch.GetProperty() && !InMultiplayer && !(bool)Settings.disableHatch.GetProperty())
             {
                 GlobalMessenger.RemoveListener("EnterShip", OnEnterShip);
                 GlobalMessenger.RemoveListener("ExitShip", OnExitShip);
@@ -372,6 +375,11 @@ public class ShipEnhancements : ModBehaviour
                 GlobalMessenger.RemoveListener("StartShipIgnition", OnStartShipIgnition);
                 GlobalMessenger.RemoveListener("CancelShipIgnition", OnStopShipIgnition);
                 GlobalMessenger.RemoveListener("CompleteShipIgnition", OnStopShipIgnition);
+            }
+            if (_frontLeg != null)
+            {
+                _frontLeg.OnLegDetach -= OnFrontLegDetached;
+                _frontLeg = null;
             }
             if (AchievementsAPI != null)
             {
@@ -553,12 +561,6 @@ public class ShipEnhancements : ModBehaviour
                 AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.DEAD_IN_THE_WATER");
             }
         }
-
-        /*if (Keyboard.current.rightBracketKey.wasPressedThisFrame)
-        {
-            WriteDebugMessage("attempting orbit");
-            SELocator.GetShipTransform().GetComponent<OrbitAutopilotTest>().ToggleMaintainOrbit();
-        }*/
     }
 
     private void LateUpdate()
@@ -748,6 +750,12 @@ public class ShipEnhancements : ModBehaviour
         {
             DisableLandingCamera();
         }
+        else
+        {
+            _frontLeg = SELocator.GetShipTransform().Find("Module_LandingGear/LandingGear_Front")
+                .GetComponent<ShipDetachableLeg>();
+            _frontLeg.OnLegDetach += OnFrontLegDetached;
+        }
         bool coloredLights = (string)Settings.shipLightColor.GetProperty() != "Default";
         if ((bool)Settings.disableShipLights.GetProperty() || coloredLights)
         {
@@ -815,7 +823,7 @@ public class ShipEnhancements : ModBehaviour
             ShipDirectionalForceVolume shipGravity = SELocator.GetShipBody().GetComponentInChildren<ShipDirectionalForceVolume>();
             shipGravity._fieldMagnitude *= (float)Settings.gravityMultiplier.GetProperty();
         }
-        if ((bool)Settings.enableAutoHatch.GetProperty() && !InMultiplayer)
+        if ((bool)Settings.enableAutoHatch.GetProperty() && !InMultiplayer && !(bool)Settings.disableHatch.GetProperty())
         {
             GlobalMessenger.AddListener("EnterShip", OnEnterShip);
             GlobalMessenger.AddListener("ExitShip", OnExitShip);
@@ -1349,6 +1357,13 @@ public class ShipEnhancements : ModBehaviour
 
             Instantiate(LoadPrefab("Assets/ShipEnhancements/ShipHorn.prefab"), SELocator.GetShipTransform().Find("Audio_Ship"));
         }
+        if ((bool)Settings.disableHatch.GetProperty())
+        {
+            SELocator.GetShipTransform().Find("Module_Cabin/Geo_Cabin/Cabin_Tech/Cabin_Tech_Exterior/HatchPivot").gameObject.SetActive(false);
+            SELocator.GetShipTransform().Find("Module_Cabin/Geo_Cabin/Cabin_Colliders_Back/Shared/Hatch_Collision_Open").gameObject.SetActive(false);
+            HatchController hatch = SELocator.GetShipTransform().GetComponentInChildren<HatchController>();
+            hatch._interactVolume.gameObject.SetActive(false);
+        }
 
         SetDamageColors();
 
@@ -1849,8 +1864,9 @@ public class ShipEnhancements : ModBehaviour
         headlightComponent._damaged = true;
         headlightComponent._repairFraction = 0f;
         headlightComponent.OnComponentDamaged();
-
         SELocator.GetShipBody().GetComponentInChildren<ShipCockpitController>()._externalLightsOn = false;
+
+        disableHeadlights = true;
     }
 
     private void DisableGravityCrystal()
@@ -2221,6 +2237,24 @@ public class ShipEnhancements : ModBehaviour
     private void OnShipHullDetached()
     {
         _disableAirWhenZeroOxygen = true;
+    }
+
+    private void OnFrontLegDetached(ShipDetachableLeg leg)
+    {
+        ShipCameraComponent cameraComponent = leg.GetComponentInChildren<ShipCameraComponent>();
+        cameraComponent._repairReceiver.repairDistance = 0f;
+        cameraComponent._damaged = true;
+        cameraComponent._repairFraction = 0f;
+        cameraComponent._landingCamera.SetDamaged(true);
+
+        ShipHeadlightComponent headlightComponent = leg.GetComponentInChildren<ShipHeadlightComponent>();
+        headlightComponent._repairReceiver.repairDistance = 0f;
+        headlightComponent._damaged = true;
+        headlightComponent._repairFraction = 0f;
+        headlightComponent.OnComponentDamaged();
+        FindObjectOfType<ShipCockpitController>()._externalLightsOn = false;
+
+        disableHeadlights = true;
     }
 
     #endregion

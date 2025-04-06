@@ -118,6 +118,7 @@ public static class SettingsPresets
         { "fixShipThrustIndicator", true },
         { "enableAutoAlign", false },
         { "shipHornType", "None" },
+        { "disableHatch", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -231,6 +232,7 @@ public static class SettingsPresets
         { "fixShipThrustIndicator", true },
         { "enableAutoAlign", false },
         { "shipHornType", "None" },
+        { "disableHatch", true },
     };
 
     public static readonly Dictionary<string, object> ImpossibleSettings = new Dictionary<string, object>()
@@ -344,6 +346,7 @@ public static class SettingsPresets
         { "fixShipThrustIndicator", true },
         { "enableAutoAlign", false },
         { "shipHornType", "None" },
+        { "disableHatch", false },
     };
 
     public static readonly Dictionary<string, object> NewStuffSettings = new Dictionary<string, object>()
@@ -457,6 +460,7 @@ public static class SettingsPresets
         { "fixShipThrustIndicator", true },
         { "enableAutoAlign", true },
         { "shipHornType", "Default" },
+        { "disableHatch", false },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -570,6 +574,7 @@ public static class SettingsPresets
         { "fixShipThrustIndicator", true },
         { "enableAutoAlign", true },
         { "shipHornType", "Annoying" },
+        { "disableHatch", false },
     };
 
     // Random preset composition
@@ -584,7 +589,7 @@ public static class SettingsPresets
         { "disableHeadlights", new RandomSettingValue((0.2f, 0.5f)) },
         { "disableLandingCamera", new RandomSettingValue((0.2f, 0.5f)) },
         { "disableShipLights", new RandomSettingValue((0.2f, 0.5f)) },
-        { "disableShipOxygen", new RandomSettingValue((0.05f, 0.2f)) },
+        { "disableShipOxygen", new RandomSettingValue((0f, 0.08f)) },
         { "oxygenDrainMultiplier", new RandomSettingValue(
         [
             ((1f, 10f), (1f, 0.8f)),
@@ -843,7 +848,7 @@ public static class SettingsPresets
         ], (0.1f, 0.25f), "Default") },
         { "disableSeatbelt", new RandomSettingValue((0f, 0.5f)) },
         { "addPortableTractorBeam", new RandomSettingValue((0.5f, 0.5f)) },
-        { "disableShipSuit", new RandomSettingValue((0f, 0.1f)) },
+        { "disableShipSuit", new RandomSettingValue((0f, 0.02f)) },
         { "damageIndicatorColor", new RandomSettingValue(
         [
             ("Orange", (1f, 1f)),
@@ -967,6 +972,7 @@ public static class SettingsPresets
             ("Clown", (1f, 1f)),
             ("Annoying", (1f, 1f)),
         ], (0.25f, 0.5f), "None") },
+        { "disableHatch", new RandomSettingValue((0.05f, 0.5f)) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

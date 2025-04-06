@@ -26,7 +26,7 @@ public static class PatchClass
             return false;
         }
 
-        if ((bool)disableHeadlights.GetProperty()) return false;
+        if (ShipEnhancements.Instance.disableHeadlights) return false;
 
         return true;
     }
@@ -1125,8 +1125,10 @@ public static class PatchClass
     #region AutoHatch
     [HarmonyPostfix]
     [HarmonyPatch(typeof(HatchController), nameof(HatchController.OpenHatch))]
-    public static void ActivateHatchTractorBeam(HatchController __instance)
+    public static void ActivateHatchTractorBeam(HatchController __instance, bool __runOriginal)
     {
+        if (!__runOriginal) return;
+
         if ((bool)extraNoise.GetProperty())
         {
             SELocator.GetShipTransform().GetComponentInChildren<ShipNoiseMaker>()._noiseRadius += 100f;
@@ -1146,7 +1148,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipTractorBeamSwitch), nameof(ShipTractorBeamSwitch.OnTriggerExit))]
     public static bool CloseHatchOutsideShip(ShipTractorBeamSwitch __instance)
     {
-        if (!(bool)enableAutoHatch.GetProperty() || ShipEnhancements.InMultiplayer) return true;
+        if (!(bool)enableAutoHatch.GetProperty() || ShipEnhancements.InMultiplayer || (bool)disableHatch.GetProperty()) return true;
 
         HatchController hatch = SELocator.GetShipBody().GetComponentInChildren<HatchController>();
         if (!hatch._hatchObject.activeInHierarchy)
@@ -4420,6 +4422,37 @@ public static class PatchClass
             float num3 = __instance._activeThrusterModel.GetMaxTranslationalThrust();
             __instance.DisplayArrows(0f, 1f, __instance._boostArrows, null);
             __instance.DisplayArrows(localAcceleration.y, num3, __instance._rendererDown, __instance._lightsDown);
+        }
+    }
+    #endregion
+
+    #region DisableHatch
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(HatchController), nameof(HatchController.OpenHatch))]
+    public static bool StopHatchOpen()
+    {
+        return !(bool)disableHatch.GetProperty();
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(HatchController), nameof(HatchController.CloseHatch))]
+    public static bool StopHatchClose()
+    {
+        return !(bool)disableHatch.GetProperty();
+    }
+    #endregion
+
+    #region DisableLandingPads
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipDetachableLeg), nameof(ShipDetachableLeg.Detach))]
+    public static void DisableLandingPadOnDetach(ShipDetachableLeg __instance, bool __runOriginal)
+    {
+        if (!__runOriginal) return;
+
+        foreach (LandingPadSensor pad in __instance.GetComponentsInChildren<LandingPadSensor>())
+        {
+            pad.GetComponent<Collider>().enabled = false;
+            pad._contactBody = null;
         }
     }
     #endregion

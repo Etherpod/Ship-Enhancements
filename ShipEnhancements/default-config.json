@@ -136,6 +136,12 @@
       "value": false,
       "tooltip": "Prevents you from recovering health using the ship supplies."
     },
+    "disableHatch": {
+      "title": "Disable Ship Hatch",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Completely removes the hatch from your ship. Be careful walking around in there!"
+    },
     "singleUseTractorBeam": {
       "title": "Single-Use Tractor Beam",
       "type": "toggle",
