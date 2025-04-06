@@ -162,6 +162,8 @@ To use the API, copy the **IShipEnhancements** script from this mod's GitHub rep
 - If you attach yourself to an object with a tether and the object enters a black hole, there is a chance you will be violently thrown across the solar system
 - The Portable Campfire can be lit inside the core of Giant's Deep
 - Reeling in towards a tether hook on the other side of a wall will sometimes produce unintended side effects
+- The Expedition Flag's map marker may not be visible when using the advanced minimap from General Enhancements
+- The Continuous Matching Velocity feature from General Enhancements may cause bugs when used with the Autopilot Controls
 
 # Credits
 Big thanks to **ColumbidaeCafe** for helping develop most of the ideas and sound effects!

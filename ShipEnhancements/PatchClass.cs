@@ -2311,7 +2311,7 @@ public static class PatchClass
 
         if ((bool)enableEnhancedAutopilot.GetProperty())
         {
-            if (SELocator.GetAutopilotPanelController().IsAutopilotActive()
+            if (SELocator.GetAutopilotPanelController().IsAutopilotActive(true)
                 || SELocator.GetAutopilotPanelController().IsPersistentInputActive())
             {
                 __result = Vector3.zero;
@@ -4268,7 +4268,7 @@ public static class PatchClass
                 SELocator.GetAutopilotPanelController().CancelMatchVelocity();
                 //__instance._autopilot.StopMatchVelocity();
             }
-            if (!__instance._enteringLandingCam)
+/*            if (!__instance._enteringLandingCam)
             {
                 if (!__instance.UsingLandingCam() && OWInput.IsNewlyPressed(InputLibrary.landingCamera, InputMode.All) && !OWInput.IsPressed(InputLibrary.freeLook, 0f))
                 {
@@ -4279,6 +4279,18 @@ public static class PatchClass
                     InputLibrary.cancel.ConsumeInput();
                     __instance.ExitLandingView();
                 }
+            }*/
+        }
+        if (!__instance._enteringLandingCam)
+        {
+            if (!__instance.UsingLandingCam() && OWInput.IsNewlyPressed(InputLibrary.landingCamera, InputMode.All) && !OWInput.IsPressed(InputLibrary.freeLook, 0f))
+            {
+                __instance.EnterLandingView();
+            }
+            else if (__instance.UsingLandingCam() && (OWInput.IsNewlyPressed(InputLibrary.landingCamera, InputMode.All) || OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.All)))
+            {
+                InputLibrary.cancel.ConsumeInput();
+                __instance.ExitLandingView();
             }
         }
         if (__instance.UsingLandingCam())
@@ -4308,17 +4320,6 @@ public static class PatchClass
         __instance._playerAttachPoint.SetAttachOffset(__instance._playerAttachOffset);
 
         return false;
-    }
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(Autopilot), nameof(Autopilot.StopMatchVelocity))]
-    public static void DisableSwitchWhenStopMatching(Autopilot __instance)
-    {
-        if ((bool)enableEnhancedAutopilot.GetProperty() && __instance._isShipAutopilot
-            && __instance.enabled)
-        {
-            SELocator.GetAutopilotPanelController().CancelMatchVelocity();
-        }
     }
 
     [HarmonyPostfix]
@@ -4355,6 +4356,19 @@ public static class PatchClass
                 __instance._matchVLightMaterial.SetColor(__instance._propID_EmissionColor, 0f * __instance._matchVLightColor);
             }
         }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.IsLandingModeAvailable))]
+    public static bool OverrideLandingModeAvailable(ref bool __result)
+    {
+        if (SELocator.GetAutopilotPanelController().IsAutopilotActive())
+        {
+            __result = false;
+            return false;
+        }
+
+        return true;
     }
     #endregion
 

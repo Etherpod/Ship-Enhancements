@@ -58,7 +58,7 @@ public class PidAutopilot : ThrusterController
     private bool _usePid = true;
     private float _kP = 0.35f;
     private float _kI = 0.0f;
-    private float _kD = 1.0f;
+    private float _kD = 0.6f;
     private Vector3 _errorIntegral = Vector3.zero;
 
     public override void Awake()

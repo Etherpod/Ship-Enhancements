@@ -15,7 +15,7 @@ public class MatchVelocityButton : CockpitButtonSwitch
         if (IsActivated())
         {
             if (Locator.GetReferenceFrame(false) != null && !_autopilot.IsDamaged()
-                && !_autopilot.IsMatchingVelocity() && !_autopilot.IsFlyingToDestination())
+                && !SELocator.GetAutopilotPanelController().IsAutopilotActive())
             {
                 _autopilot.StartMatchVelocity(Locator.GetReferenceFrame(false));
             }
@@ -28,11 +28,6 @@ public class MatchVelocityButton : CockpitButtonSwitch
         {
             _autopilot.StopMatchVelocity();
         }
-    }
-
-    private void OnInitMatchVelocity()
-    {
-        SetActive(!_autopilot.IsFlyingToDestination());
     }
 
     protected override void OnDestroy()
