@@ -163,7 +163,7 @@ public class Tether : MonoBehaviour
             _joint.enableCollision = true;
             _joint.maxDistance = 0f;
             float buffer = ignoreBuffer ? 0f : _transferBufferDistance;
-            _joint.minDistance = connectedBody == SELocator.GetPlayerBody() ? 15f : Mathf.Min(100f, Vector3.Distance(transform.TransformPoint(_anchor), 
+            _joint.minDistance = connectedBody == SELocator.GetPlayerBody() ? 15f : Mathf.Min(_maxTetherDistance, Vector3.Distance(transform.TransformPoint(_anchor), 
                 _connectedTransform.TransformPoint(_connectedAnchor)) + buffer);
             _joint.spring = 0.2f;
             _joint.damper = 0f;

@@ -32,6 +32,6 @@ public class PersistentInputButton : CockpitButtonSwitch
     {
         base.SetPowered(powered);
         if (_electricalDisrupted) return;
-        _persistentInput.SetInputEnabled(powered && IsOn());
+        _persistentInput.SetInputEnabled(IsOn() && !SELocator.GetShipDamageController().IsElectricalFailed());
     }
 }

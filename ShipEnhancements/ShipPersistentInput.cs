@@ -15,6 +15,9 @@ public class ShipPersistentInput : ThrusterController
         base.Awake();
         _rulesetDetector = SELocator.GetShipDetector().GetComponent<RulesetDetector>();
         _thrustController = GetComponent<ShipThrusterController>();
+
+        ShipEnhancements.Instance.OnFuelDepleted += OnFuelDepleted;
+        ShipEnhancements.Instance.OnFuelRestored += OnFuelRestored;
     }
 
     private void Start()
@@ -32,6 +35,11 @@ public class ShipPersistentInput : ThrusterController
         if (SELocator.GetAutopilotPanelController().IsAutopilotActive() || _currentInput == Vector3.zero)
         {
             enabled = false;
+            return Vector3.zero;
+        }
+
+        if (!SELocator.GetShipResources().AreThrustersUsable())
+        {
             return Vector3.zero;
         }
 
@@ -86,10 +94,10 @@ public class ShipPersistentInput : ThrusterController
         SetInputEnabled(true);
     }
 
-    /*public override void OnDestroy()
+    public override void OnDestroy()
     {
         base.OnDestroy();
-        GlobalMessenger<OWRigidbody>.RemoveListener("EnterFlightConsole", OnEnterFlightConsole);
-        GlobalMessenger.RemoveListener("ExitFlightConsole", OnExitFlightConsole);
-    }*/
+        ShipEnhancements.Instance.OnFuelDepleted -= OnFuelDepleted;
+        ShipEnhancements.Instance.OnFuelRestored -= OnFuelRestored;
+    }
 }
