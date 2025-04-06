@@ -2046,7 +2046,7 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((bool)Settings.enableEnhancedAutopilot.GetProperty())
         {
-            DialogueConditionManager.SharedInstance.SetConditionState("SE_PERSISTENT_INPUT_ENABLED", true);
+            DialogueConditionManager.SharedInstance.SetConditionState("SE_AUTOPILOT_CONTROLS_ENABLED", true);
         }
         if ((bool)Settings.addShipSignal.GetProperty())
         {

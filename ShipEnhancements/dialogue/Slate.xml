@@ -11,7 +11,7 @@
       </DialogueOption>
     </DialogueOptionsList>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_ShipQuestion_1</Name>
     <Dialogue>
@@ -35,9 +35,9 @@
         <DialogueTarget>SE_ThrustModulator_1</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
-        <RequiredCondition>SE_PERSISTENT_INPUT_ENABLED</RequiredCondition>
-        <Text>How does persistent input work?</Text>
-        <DialogueTarget>SE_PersistentInput_1</DialogueTarget>
+        <RequiredCondition>SE_AUTOPILOT_CONTROLS_ENABLED</RequiredCondition>
+        <Text>How do the autopilot controls work?</Text>
+        <DialogueTarget>SE_AutopilotControls_1</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
         <RequiredCondition>SE_SHIP_SIGNAL_ENABLED</RequiredCondition>
@@ -80,28 +80,13 @@
         <DialogueTarget>SE_RandomPreset_1</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
-        <Text>How come you didn't improve the autopilot instead of adding all these other features?</Text>
-        <DialogueTarget>SE_Autopilot_1</DialogueTarget>
-      </DialogueOption>
-      <DialogueOption>
         <Text>Nevermind.</Text>
       </DialogueOption>
     </DialogueOptionsList>
   </DialogueNode>
 
-  <!--Autopilot-->
-  
-  <DialogueNode>
-    <Name>SE_Autopilot_1</Name>
-    <Dialogue>
-      <Page>What, you can't pilot the ship yourself? I added a flight stick for a reason, you know.</Page>
-      <Page>The autopilot barely works as it is. I didn't want to mess around with it and accidentally break it.</Page>
-      <Page>And those other features are just as important as the autopilot.</Page>
-    </Dialogue>
-  </DialogueNode>
-
   <!--Manual Scout Recall-->
-  
+
   <DialogueNode>
     <Name>SE_ManualRecall_1</Name>
     <Dialogue>
@@ -188,7 +173,7 @@
       <Page>If you think it's that important to have, you can try integrating it yourself.</Page>
     </Dialogue>
   </DialogueNode>
-  
+
   <!--Cockpit Rust-->
 
   <DialogueNode>
@@ -229,7 +214,7 @@
       <Page>At least it's a death trap that can fly! When was the last time you got to go in a death trap that could fly?</Page>
     </Dialogue>
   </DialogueNode>
-  
+
   <!--TemperatureZones-->
 
   <DialogueNode>
@@ -273,7 +258,7 @@
       </DialogueOption>
     </DialogueOptionsList>
   </DialogueNode>
-  
+
   <!--Disable Retro Rockets-->
 
   <DialogueNode>
@@ -289,7 +274,7 @@
       </DialogueOption>
       <DialogueOption>
         <Text>Were they ever working in the first place?</Text>
-      <DialogueTarget>SE_RetroRockets_12</DialogueTarget>
+        <DialogueTarget>SE_RetroRockets_12</DialogueTarget>
       </DialogueOption>
     </DialogueOptionsList>
   </DialogueNode>
@@ -307,11 +292,11 @@
       </DialogueOption>
       <DialogueOption>
         <Text>Yeah. Can you fix them again?</Text>
-      <DialogueTarget>SE_RetroRockets_2</DialogueTarget>
+        <DialogueTarget>SE_RetroRockets_2</DialogueTarget>
       </DialogueOption>
     </DialogueOptionsList>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_RetroRockets_111</Name>
     <Dialogue>
@@ -319,7 +304,7 @@
     </Dialogue>
     <DialogueTarget>SE_RetroRockets_2</DialogueTarget>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_RetroRockets_12</Name>
     <Dialogue>
@@ -327,13 +312,13 @@
     </Dialogue>
     <DialogueTarget>SE_RetroRockets_2</DialogueTarget>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_RetroRockets_2</Name>
     <Dialogue>
       <Page>Give me 30 minutes, then I'll come and look at them.</Page>
     </Dialogue>
-  
+
     <DialogueOptionsList>
       <DialogueOption>
         <RequiredPersistentCondition>KILLED_BY_SUPERNOVA_AND_KNOWS_IT</RequiredPersistentCondition>
@@ -349,7 +334,7 @@
       </DialogueOption>
     </DialogueOptionsList>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_RetroRockets_21</Name>
     <Dialogue>
@@ -357,7 +342,7 @@
       <Page>Let me enjoy these marshmallows, I'll come look at it soon.</Page>
     </Dialogue>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_RetroRockets_22</Name>
     <Dialogue>
@@ -366,15 +351,15 @@
       <Page>Let me enjoy my marshmallows, then if the ship is still there I'll come fix it.</Page>
     </Dialogue>
   </DialogueNode>
-  
+
   <!--Random Preset-->
-  
+
   <DialogueNode>
     <Name>SE_RandomPreset_1</Name>
     <Dialogue>
       <Page>Had a weird dream, did you? The ship is the same as it's always been.</Page>
     </Dialogue>
-  
+
     <DialogueOptionsList>
       <DialogueOption>
         <Text>Yeah, must have just been a dream.</Text>
@@ -382,43 +367,43 @@
       </DialogueOption>
       <DialogueOption>
         <Text>No, I'm serious. The ship never used to look like that.</Text>
-      <DialogueTarget>SE_RandomPreset_2</DialogueTarget>
+        <DialogueTarget>SE_RandomPreset_2</DialogueTarget>
       </DialogueOption>
     </DialogueOptionsList>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_RandomPreset_End1</Name>
     <Dialogue>
       <Page>Glad you're finally coming to your senses. Now hurry up and go launch the ship!</Page>
     </Dialogue>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_RandomPreset_2</Name>
     <Dialogue>
       <Page>You okay, hatchling? Did you inhale some of those fumes by accident?</Page>
     </Dialogue>
-  
+
     <DialogueOptionsList>
       <DialogueOption>
         <Text>Yeah, must have.</Text>
-      <DialogueTarget>SE_RandomPreset_End2</DialogueTarget>
+        <DialogueTarget>SE_RandomPreset_End2</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
         <Text>I'm telling you, that ship keeps changing and it's creeping me out.</Text>
-      <DialogueTarget>SE_RandomPreset_3</DialogueTarget>
+        <DialogueTarget>SE_RandomPreset_3</DialogueTarget>
       </DialogueOption>
     </DialogueOptionsList>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_RandomPreset_End2</Name>
     <Dialogue>
       <Page>Well, be more careful next time. You're lucky I'm not having Hornfels ground you for medical reasons right now.</Page>
     </Dialogue>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_RandomPreset_3</Name>
     <Dialogue>
@@ -426,19 +411,19 @@
       <Page>I'm radioing Hornfels. You're <![CDATA[<i>]]>definitely<![CDATA[</i>]]> not flying that ship today.</Page>
     </Dialogue>
     <SetCondition>SE_GROUNDED_BY_HORNFELS</SetCondition>
-  
+
     <DialogueOptionsList>
       <DialogueOption>
         <Text>Wait, what? You're grounding me!?</Text>
-      <DialogueTarget>SE_RandomPreset_31</DialogueTarget>
+        <DialogueTarget>SE_RandomPreset_31</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
         <Text>With the way the ship is acting, I wouldn't have flown it anyways.</Text>
-      <DialogueTarget>SE_RandomPreset_32</DialogueTarget>
+        <DialogueTarget>SE_RandomPreset_32</DialogueTarget>
       </DialogueOption>
     </DialogueOptionsList>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_RandomPreset_31</Name>
     <Dialogue>
@@ -446,7 +431,7 @@
       <Page>Now go get some rest. You can try launching again next week.</Page>
     </Dialogue>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_RandomPreset_32</Name>
     <Dialogue>
@@ -454,16 +439,16 @@
       <Page>Go get some rest, hatchling. You can try launching again next week.</Page>
     </Dialogue>
   </DialogueNode>
-  
+
   <!--Thrust Modulator-->
-  
+
   <DialogueNode>
     <Name>SE_ThrustModulator_1</Name>
     <Dialogue>
       <Page>It lets you modulate your thrust! What did you think it did?</Page>
       <Page>You can press those orange buttons to set a limit on your thruster output and go slower.</Page>
     </Dialogue>
-  
+
     <DialogueOptionsList>
       <DialogueOption>
         <Text>What if I want to go faster?</Text>
@@ -475,7 +460,7 @@
       </DialogueOption>
     </DialogueOptionsList>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_ThrustModulator_11</Name>
     <Dialogue>
@@ -483,7 +468,7 @@
       <Page>You'd think an explosion like that would make the thrusters worse, but they actually work better for a little while. Isn't that weird?</Page>
       <Page>You can activate the overdrive with the two buttons next to the thrust modulator. Just make sure you disable the safeties first.</Page>
     </Dialogue>
-  
+
     <DialogueOptionsList>
       <DialogueOption>
         <Text>Is this safe..?</Text>
@@ -495,7 +480,7 @@
       </DialogueOption>
     </DialogueOptionsList>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_ThrustModulator_111</Name>
     <Dialogue>
@@ -504,66 +489,116 @@
       <Page>Now stop worrying the ship and go launch it already!</Page>
     </Dialogue>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_ThrustModulator_2</Name>
     <Dialogue>
       <Page>No problem. Now let me get back to my marshmallows.</Page>
     </Dialogue>
   </DialogueNode>
-  
-  <!--Persistent Input-->
-  
+
+  <!--Autopilot Controls-->
+
   <DialogueNode>
-    <Name>SE_PersistentInput_1</Name>
+    <Name>SE_AutopilotControls_1</Name>
     <Dialogue>
-      <Page>It isn't too complicated. If it's turned on when you leave the flight console, it'll lock the flight stick into whatever position it's in.</Page>
+      <Page>There's always going to be two buttons that are turned on. That's telling you what'll be activated when you try matching velocity or using autopilot.</Page>
+      <Page>The two buttons on the left control what your autopilot does, and the other three buttons control what your match velocity does.</Page>
     </Dialogue>
-  
+    <DialogueTarget>SE_AutopilotControls_2</DialogueTarget>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_AutopilotControls_2</Name>
+    <Dialogue>
+      <Page>Do you need a reminder on what any of the buttons actually do?</Page>
+    </Dialogue>
+
     <DialogueOptionsList>
       <DialogueOption>
-        <Text>How do I unlock it?</Text>
-        <DialogueTarget>SE_PersistentInput_11</DialogueTarget>
+        <Text>The approach autopilot button.</Text>
+        <DialogueTarget>SE_AutopilotControls_21</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
-        <Text>Doesn't that mean the ship can fly away without me?</Text>
-        <DialogueTarget>SE_PersistentInput_12</DialogueTarget>
+        <Text>The orbital outopilot button.</Text>
+        <DialogueTarget>SE_AutopilotControls_22</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>The input hold button.</Text>
+        <DialogueTarget>SE_AutopilotControls_23</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>The match velocity button.</Text>
+        <DialogueTarget>SE_AutopilotControls_24</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>The match position button.</Text>
+        <DialogueTarget>SE_AutopilotControls_25</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <Text>No, thanks.</Text>
+        <DialogueTarget>SE_AutopilotControls_3</DialogueTarget>
       </DialogueOption>
     </DialogueOptionsList>
   </DialogueNode>
-  
+
   <DialogueNode>
-    <Name>SE_PersistentInput_11</Name>
+    <Name>SE_AutopilotControls_21</Name>
     <Dialogue>
-      <Page>Just sit back down at the flight console and it'll automatically turn off. And don't ask how I detect when you sit down.</Page>
+      <Page>That one's your regular old autopilot. Lock onto something and activate it, and it'll fly you to your destination.</Page>
+      <Page>I didn't give it an obstacle avoidance function, so make sure there's nothing in the way of your destination.</Page>
     </Dialogue>
-    <DialogueTarget>SE_PersistentInput_2</DialogueTarget>
+    <DialogueTarget>SE_AutopilotControls_2</DialogueTarget>
   </DialogueNode>
-  
+
   <DialogueNode>
-    <Name>SE_PersistentInput_12</Name>
+    <Name>SE_AutopilotControls_22</Name>
     <Dialogue>
-      <Page>Uh, yeah? Just don't get out of the ship when persistent input is on.</Page>
+      <Page>Activating that will put your ship into a stable orbit around whatever you're targeting. It'll try to stay at whatever distance you activate it at.</Page>
     </Dialogue>
-    <DialogueTarget>SE_PersistentInput_2</DialogueTarget>
+    <DialogueTarget>SE_AutopilotControls_2</DialogueTarget>
   </DialogueNode>
-  
+
   <DialogueNode>
-    <Name>SE_PersistentInput_2</Name>
+    <Name>SE_AutopilotControls_23</Name>
     <Dialogue>
-      <Page>Anyway, good luck out there. Don't let the ship fly itself into any big objects.</Page>
+      <Page>That one lets you record your inputs. Just start matching velocity, give the ship an input, and then stop matching velocity. It'll keep holding that until you turn off the button or give it a different input.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_AutopilotControls_2</DialogueTarget>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_AutopilotControls_24</Name>
+    <Dialogue>
+      <Page>That one does what it says. It'll match the velocity of whatever you have targeted.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_AutopilotControls_2</DialogueTarget>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_AutopilotControls_25</Name>
+    <Dialogue>
+      <Page>That one acts kind of like match velocity, except it'll keep your ship in the same position that you activated it at. If it gets moved from its spot, it'll fly right back.</Page>
+    </Dialogue>
+    <DialogueTarget>SE_AutopilotControls_2</DialogueTarget>
+  </DialogueNode>
+
+  <DialogueNode>
+    <Name>SE_AutopilotControls_3</Name>
+    <Dialogue>
+      <Page>Alright, good luck out there! And try not to trust the autopilot with your life, it'll let you down.</Page>
     </Dialogue>
   </DialogueNode>
-  
+
   <!--Ship Signal-->
-  
+
   <DialogueNode>
     <Name>SE_ShipSignal_1</Name>
     <Dialogue>
       <Page>Oh, that's just a byproduct of the ship's signalscope.</Page>
       <Page>Seemed like a waste of a signal though, so I made some modifications to that signalscope of yours.</Page>
     </Dialogue>
-  
+
     <DialogueOptionsList>
       <DialogueOption>
         <Text>What sort of modifications..?</Text>
@@ -575,7 +610,7 @@
       </DialogueOption>
     </DialogueOptionsList>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_ShipSignal_11</Name>
     <Dialogue>
@@ -583,7 +618,7 @@
     </Dialogue>
     <DialogueTarget>SE_ShipSignal_2</DialogueTarget>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_ShipSignal_12</Name>
     <Dialogue>
@@ -591,13 +626,13 @@
     </Dialogue>
     <DialogueTarget>SE_ShipSignal_2</DialogueTarget>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_ShipSignal_2</Name>
     <Dialogue>
       <Page>All I did was adjust your signalscope to transmit signals. If you aim it at the ship, you should be able to send it commands.</Page>
     </Dialogue>
-  
+
     <DialogueOptionsList>
       <DialogueOption>
         <Text>Woah, that's cool.</Text>
@@ -609,7 +644,7 @@
       </DialogueOption>
     </DialogueOptionsList>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_ShipSignal_21</Name>
     <Dialogue>
@@ -617,13 +652,13 @@
     </Dialogue>
     <DialogueTarget>SE_ShipSignal_3</DialogueTarget>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_ShipSignal_22</Name>
     <Dialogue>
       <Page>Uh... among other things, yeah.</Page>
     </Dialogue>
-  
+
     <DialogueOptionsList>
       <DialogueOption>
         <Text>Awesome.</Text>
@@ -635,7 +670,7 @@
       </DialogueOption>
     </DialogueOptionsList>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_ShipSignal_22a</Name>
     <Dialogue>
@@ -643,7 +678,7 @@
     </Dialogue>
     <DialogueTarget>SE_ShipSignal_3</DialogueTarget>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_ShipSignal_22b</Name>
     <Dialogue>
@@ -652,23 +687,23 @@
     </Dialogue>
     <DialogueTarget>SE_ShipSignal_3</DialogueTarget>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_ShipSignal_3</Name>
     <Dialogue>
       <Page>Anyway, I've got a fire to enjoy and you've got a ship to launch. Good luck out there!</Page>
     </Dialogue>
   </DialogueNode>
-  
+
   <!--Tether Hook-->
-  
+
   <DialogueNode>
     <Name>SE_TetherHook_1</Name>
     <Dialogue>
       <Page>Once you attach a hook to something, you can tether yourself to it, and it'll stop you from moving too far away. You can adjust the length of the tether too if you want.</Page>
       <Page>If you tether yourself to a hook and manage to reach a second one, you can connect the two hooks together. It's pretty straightforward, isn't it?</Page>
     </Dialogue>
-  
+
     <DialogueOptionsList>
       <DialogueOption>
         <Text>What do I use them for?</Text>
@@ -680,23 +715,23 @@
       </DialogueOption>
     </DialogueOptionsList>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_TetherHook_11</Name>
     <Dialogue>
       <Page>Whatever you want! Personally, I would use them to hold the ship together better. It's a miracle it hasn't fallen apart already.</Page>
     </Dialogue>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_TetherHook_12</Name>
     <Dialogue>
       <Page>Anytime, hatchling.</Page>
     </Dialogue>
   </DialogueNode>
-  
+
   <!--Expedition Flag-->
-  
+
   <DialogueNode>
     <Name>SE_ExpeditionFlag_1</Name>
     <Dialogue>
@@ -707,7 +742,7 @@
       <Page>Plan was to put one on every planet, but I guess that never happened, with Feldspar going missing and all that.</Page>
       <Page>Anyway, we had a few more that we made in storage, so I thought, you know, since you're going into space, maybe you could bring one with you. Just to put down somewhere out there.</Page>
     </Dialogue>
-  
+
     <DialogueOptionsList>
       <DialogueOption>
         <Text>Yeah. I can do that.</Text>
@@ -720,7 +755,7 @@
       </DialogueOption>
     </DialogueOptionsList>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_ExpeditionFlag_11</Name>
     <Dialogue>
@@ -728,7 +763,7 @@
       <Page>If you do that, take some photos to show me when you get back, will you?</Page>
     </Dialogue>
   </DialogueNode>
-  
+
   <DialogueNode>
     <Name>SE_ExpeditionFlag_12</Name>
     <Dialogue>
@@ -736,9 +771,9 @@
       <Page>You know what, though? If you somehow find Feldspar out there, be sure to come back here and tell me.</Page>
     </Dialogue>
   </DialogueNode>
-  
+
   <!--Ship Warp Core-->
-  
+
   <DialogueNode>
     <Name>SE_ShipWarpCore_1</Name>
     <Dialogue>
@@ -747,16 +782,16 @@
       <Page>If you find something out there that can warp objects back to it, try marking it in the ship log or locking on to it. That should be enough to coax them into interfacing.</Page>
     </Dialogue>
   </DialogueNode>
-  
+
   <!--Radio-->
-  
+
   <DialogueNode>
     <Name>SE_ShipRadio_1</Name>
     <Dialogue>
       <Page>That old thing? It works like any radio does. You turn those little knobs to adjust the frequency, and if you find a good frequency it'll start playing music.</Page>
       <Page>These days you'll find a whole lot of nothing with it. Most of the old signals have been taken down, and the newer radios and signalscopes work on a different set of frequencies.</Page>
     </Dialogue>
-  
+
     <DialogueOptionsList>
       <DialogueOption>
         <Text>Do you know any good frequencies?</Text>
@@ -773,12 +808,12 @@
     <Dialogue>
       <Page>I put some of the classics on the wall next to the radio, but everyone knows those. Personally, I would tune in to 5511.</Page>
     </Dialogue>
-  
+
     <DialogueOptionsList>
       <DialogueOption>
         <Text>Got it.</Text>
       </DialogueOption>
     </DialogueOptionsList>
   </DialogueNode>
-  
+
 </DialogueTree>
