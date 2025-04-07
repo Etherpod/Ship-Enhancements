@@ -14,8 +14,7 @@ public class MatchVelocityButton : CockpitButtonSwitch
     {
         if (IsActivated())
         {
-            if (Locator.GetReferenceFrame(false) != null && !_autopilot.IsDamaged()
-                && !SELocator.GetAutopilotPanelController().IsAutopilotActive())
+            if (CanActivate())
             {
                 _autopilot.StartMatchVelocity(Locator.GetReferenceFrame(false));
             }
@@ -30,8 +29,11 @@ public class MatchVelocityButton : CockpitButtonSwitch
         }
     }
 
-    protected override void OnDestroy()
+    protected override bool CanActivate()
     {
-        base.OnDestroy();
+        return base.CanActivate()
+            && Locator.GetReferenceFrame(false) != null && !_autopilot.IsDamaged()
+            && !SELocator.GetAutopilotPanelController().IsAutopilotActive()
+            && SELocator.GetShipResources().AreThrustersUsable();
     }
 }

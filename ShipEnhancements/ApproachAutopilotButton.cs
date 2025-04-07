@@ -16,11 +16,7 @@ public class ApproachAutopilotButton : CockpitButtonSwitch
     {
         if (IsActivated())
         {
-            if (Locator.GetReferenceFrame() != null 
-                && Locator.GetReferenceFrame().GetAllowAutopilot() && !_autopilot.IsDamaged()
-                && !_autopilot.IsFlyingToDestination()
-                && Vector3.Distance(SELocator.GetShipBody().GetPosition(), Locator.GetReferenceFrame().GetPosition()) 
-                > Locator.GetReferenceFrame().GetAutopilotArrivalDistance())
+            if (CanActivate())
             {
                 _autopilot.FlyToDestination(Locator.GetReferenceFrame());
             }
@@ -33,5 +29,16 @@ public class ApproachAutopilotButton : CockpitButtonSwitch
         {
             _autopilot.Abort();
         }
+    }
+
+    protected override bool CanActivate()
+    {
+        return base.CanActivate()
+            && Locator.GetReferenceFrame() != null
+            && Locator.GetReferenceFrame().GetAllowAutopilot() && !_autopilot.IsDamaged()
+            && SELocator.GetShipResources().AreThrustersUsable()
+            && !_autopilot.IsFlyingToDestination()
+            && Vector3.Distance(SELocator.GetShipBody().GetPosition(), Locator.GetReferenceFrame().GetPosition())
+            > Locator.GetReferenceFrame().GetAutopilotArrivalDistance();
     }
 }

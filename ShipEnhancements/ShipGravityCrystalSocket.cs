@@ -57,6 +57,7 @@ public class ShipGravityCrystalSocket : OWItemSocket
     private void OnShipSystemFailure()
     {
         _collider.SetActivation(true);
+        _socketedItem?.SetSector(null);
     }
 
     public override bool PlaceIntoSocket(OWItem item)

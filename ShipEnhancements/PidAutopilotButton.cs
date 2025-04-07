@@ -20,7 +20,7 @@ public class PidAutopilotButton : CockpitButtonSwitch
 
     public override void OnChangeActiveEvent()
     {
-        if (IsActivated() && Locator.GetReferenceFrame(false) != null && !_autopilot.IsDamaged())
+        if (IsActivated())
         {
             if (CanActivate())
             {
@@ -37,8 +37,10 @@ public class PidAutopilotButton : CockpitButtonSwitch
         }
     }
 
-    protected virtual bool CanActivate()
+    protected override bool CanActivate()
     {
-        return true;
+        return base.CanActivate()
+            && Locator.GetReferenceFrame(false) != null && !_autopilot.IsDamaged()
+            && SELocator.GetShipResources().AreThrustersUsable();
     }
 }

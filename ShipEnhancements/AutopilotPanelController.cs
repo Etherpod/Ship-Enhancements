@@ -22,6 +22,7 @@ public class AutopilotPanelController : MonoBehaviour
     private PidAutopilot _pidAutopilot;
     private ShipPersistentInput _persistentInput;
     private ShipAutopilotComponent _autopilotComponent;
+    private bool _lastThrusterState = true;
 
     private void Start()
     {
@@ -53,6 +54,23 @@ public class AutopilotPanelController : MonoBehaviour
         _autopilotComponent.OnDamaged += ctx => OnAutopilotDamaged();
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+    }
+
+    private void Update()
+    {
+        bool usable = SELocator.GetShipResources().AreThrustersUsable();
+        if (usable != _lastThrusterState)
+        {
+            _lastThrusterState = usable;
+            if (usable)
+            {
+                OnThrustersUsable();
+            }
+            else
+            {
+                OnThrustersBroken();
+            }
+        }
     }
 
     private void OnChangeState(CockpitButtonSwitch button, bool autopilot, bool state)
@@ -179,10 +197,27 @@ public class AutopilotPanelController : MonoBehaviour
         }
     }
 
+    private void OnThrustersUsable()
+    {
+        if (IsHoldInputSelected() && !IsAutopilotActive() && !_autopilotComponent.isDamaged)
+        {
+            _persistentInput.SetInputEnabled(true);
+        }
+    }
+
+    private void OnThrustersBroken()
+    {
+        CancelAutopilot();
+        CancelMatchVelocity();
+        _persistentInput.SetInputEnabled(false);
+    }
+
     private void OnShipSystemFailure()
     {
         CancelAutopilot();
         CancelMatchVelocity();
+        _persistentInput.SetInputEnabled(false);
+        enabled = false;
     }
 
     public void ActivateAutopilot()
@@ -255,5 +290,10 @@ public class AutopilotPanelController : MonoBehaviour
     public bool IsHoldInputSelected()
     {
         return _activeMatch == _holdInputButton;
+    }
+
+    public bool IsAutopilotDamaged()
+    {
+        return _autopilotComponent.isDamaged;
     }
 }

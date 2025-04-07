@@ -15,23 +15,31 @@ public class PersistentInputButton : CockpitButtonSwitch
     {
         if (IsActivated())
         {
-            _persistentInput.StartRecordingInput();
+            _persistentInput.ResetInput();
         }
-        else if (IsOn())
+        else if (IsOn() && CanActivate())
         {
-            _persistentInput.StopRecordingInput();
+            _persistentInput.ReadNextInput();
         }
     }
 
     public override void OnChangeStateEvent()
     {
-        _persistentInput.SetInputEnabled(IsOn());
+        _persistentInput.SetInputEnabled(CanActivate());
     }
 
     public override void SetPowered(bool powered)
     {
         base.SetPowered(powered);
         if (_electricalDisrupted) return;
-        _persistentInput.SetInputEnabled(IsOn() && !SELocator.GetShipDamageController().IsElectricalFailed());
+        _persistentInput.SetInputEnabled(CanActivate());
+    }
+
+    protected override bool CanActivate()
+    {
+        return base.CanActivate() && IsOn()
+            && !SELocator.GetShipDamageController().IsElectricalFailed()
+            && SELocator.GetShipResources().AreThrustersUsable()
+            && !SELocator.GetAutopilotPanelController().IsAutopilotDamaged();
     }
 }

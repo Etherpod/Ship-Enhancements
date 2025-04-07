@@ -63,8 +63,6 @@ public class ShipOverdriveController : ElectricalComponent
         _reactor = SELocator.GetShipDamageController()._shipReactorComponent;
         _modulatorController = GetComponent<ThrustModulatorController>();
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
-        ShipEnhancements.Instance.OnFuelDepleted += OnFuelDepleted;
-        ShipEnhancements.Instance.OnFuelRestored += OnFuelRestored;
 
         _electricalSystem = SELocator.GetShipTransform()
             .Find("Module_Cockpit/Systems_Cockpit/FlightControlsElectricalSystem")
@@ -134,7 +132,7 @@ public class ShipOverdriveController : ElectricalComponent
             else
             {
                 if (!_powered && !SELocator.GetShipDamageController().IsElectricalFailed()
-                    && ShipEnhancements.Instance.engineOn)
+                    && !_electricalDisrupted && _electricalSystem._powered)
                 {
                     SetPowered(true);
                 }
@@ -288,24 +286,6 @@ public class ShipOverdriveController : ElectricalComponent
         enabled = false;
     }
 
-    private void OnFuelDepleted()
-    {
-        _fuelDepleted = true;
-        _primeButton.SetButtonOn(false);
-        _activateButton.SetButtonActive(false);
-        SetPowered(false);
-    }
-
-    private void OnFuelRestored()
-    {
-        _fuelDepleted = false;
-        if (!_powered && !SELocator.GetShipDamageController().IsElectricalFailed()
-            && ShipEnhancements.Instance.engineOn)
-        {
-            SetPowered(true);
-        }
-    }
-
     public override void SetPowered(bool powered)
     {
         if (_electricalSystem != null && _electricalDisrupted != _electricalSystem.IsDisrupted())
@@ -314,7 +294,7 @@ public class ShipOverdriveController : ElectricalComponent
             _lastPoweredState = _powered;
         }
 
-        if (!(bool)enableThrustModulator.GetProperty() || (powered && _fuelDepleted) || (powered && !_thrustersUsable)) return;
+        if (!(bool)enableThrustModulator.GetProperty() || (powered && !_thrustersUsable)) return;
 
         base.SetPowered(powered);
 
@@ -361,7 +341,5 @@ public class ShipOverdriveController : ElectricalComponent
     private void OnDestroy()
     {
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
-        ShipEnhancements.Instance.OnFuelDepleted -= OnFuelDepleted;
-        ShipEnhancements.Instance.OnFuelRestored -= OnFuelRestored;
     }
 }

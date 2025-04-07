@@ -15,9 +15,6 @@ public class ShipPersistentInput : ThrusterController
         base.Awake();
         _rulesetDetector = SELocator.GetShipDetector().GetComponent<RulesetDetector>();
         _thrustController = GetComponent<ShipThrusterController>();
-
-        ShipEnhancements.Instance.OnFuelDepleted += OnFuelDepleted;
-        ShipEnhancements.Instance.OnFuelRestored += OnFuelRestored;
     }
 
     private void Start()
@@ -38,23 +35,18 @@ public class ShipPersistentInput : ThrusterController
             return Vector3.zero;
         }
 
-        if (!SELocator.GetShipResources().AreThrustersUsable())
-        {
-            return Vector3.zero;
-        }
-
         float num = Mathf.Min(_rulesetDetector.GetThrustLimit(), _thrustController._thrusterModel.GetMaxTranslationalThrust()) 
             / _thrustController._thrusterModel.GetMaxTranslationalThrust();
         return _currentInput * ((bool)enableThrustModulator.GetProperty() ? ShipEnhancements.Instance.ThrustModulatorFactor : 1f) * num;
     }
 
-    public void StartRecordingInput()
+    public void ResetInput()
     {
         _currentInput = Vector3.zero;
         SetInputEnabled(false);
     }
 
-    public void StopRecordingInput()
+    public void ReadNextInput()
     {
         if (!SELocator.GetAutopilotPanelController().IsAutopilotActive())
         {
@@ -80,24 +72,5 @@ public class ShipPersistentInput : ThrusterController
         if (_fuelDepleted) return;
         _currentInput = newInput;
         SetInputEnabled(true);
-    }
-
-    private void OnFuelDepleted()
-    {
-        _fuelDepleted = true;
-        SetInputEnabled(false);
-    }
-
-    private void OnFuelRestored()
-    {
-        _fuelDepleted = false;
-        SetInputEnabled(true);
-    }
-
-    public override void OnDestroy()
-    {
-        base.OnDestroy();
-        ShipEnhancements.Instance.OnFuelDepleted -= OnFuelDepleted;
-        ShipEnhancements.Instance.OnFuelRestored -= OnFuelRestored;
     }
 }

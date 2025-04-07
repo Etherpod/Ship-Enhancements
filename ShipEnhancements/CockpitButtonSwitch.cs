@@ -55,6 +55,11 @@ public class CockpitButtonSwitch : CockpitButton
 
     public virtual void OnChangeActiveEvent() { }
 
+    protected virtual bool CanActivate()
+    {
+        return true;
+    }
+
     public void RaiseChangeActiveEvent()
     {
         OnChangeActive?.Invoke(_activated);
