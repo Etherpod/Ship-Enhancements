@@ -4364,7 +4364,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.IsLandingModeAvailable))]
     public static bool OverrideLandingModeAvailable(ref bool __result)
     {
-        if (SELocator.GetAutopilotPanelController().IsAutopilotActive())
+        if ((bool)enableEnhancedAutopilot.GetProperty() && SELocator.GetAutopilotPanelController().IsAutopilotActive())
         {
             __result = false;
             return false;

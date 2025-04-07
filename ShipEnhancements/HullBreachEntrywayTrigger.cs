@@ -21,7 +21,7 @@ public class HullBreachEntrywayTrigger : MonoBehaviour
     private void Awake()
     {
         _triggerVolume = GetComponent<OWTriggerVolume>();
-        _hatch = SELocator.GetShipTransform().GetComponentInChildren<HatchController>();
+        _hatch = SELocator.GetShipTransform().GetComponentInChildren<HatchController>(true);
         _tractorBeam = SELocator.GetShipTransform().GetComponentInChildren<ShipTractorBeamSwitch>();
         _gravityVolume = SELocator.GetShipTransform().GetComponentInChildren<ShipDirectionalForceVolume>().GetOWTriggerVolume();
 
@@ -47,7 +47,10 @@ public class HullBreachEntrywayTrigger : MonoBehaviour
         {
             if (!(bool)ShipEnhancements.Settings.enableAutoHatch.GetProperty() && !ShipEnhancements.InMultiplayer)
             {
-                _hatch.OpenHatch();
+                if (!(bool)ShipEnhancements.Settings.disableHatch.GetProperty())
+                {
+                    _hatch.OpenHatch();
+                }
                 if (_tractorBeam._functional)
                 {
                     _tractorBeam.ActivateTractorBeam();
@@ -74,7 +77,10 @@ public class HullBreachEntrywayTrigger : MonoBehaviour
             SELocator.GetShipBody().GetComponentInChildren<ShipDirectionalForceVolume>()._triggerVolume.RemoveObjectFromVolume(Locator.GetPlayerDetector().gameObject);
             if (!(bool)ShipEnhancements.Settings.enableAutoHatch.GetProperty() && !ShipEnhancements.InMultiplayer)
             {
-                _hatch.OpenHatch();
+                if (!(bool)ShipEnhancements.Settings.disableHatch.GetProperty())
+                {
+                    _hatch.OpenHatch();
+                }
                 if (_tractorBeam._functional)
                 {
                     _tractorBeam.ActivateTractorBeam();
