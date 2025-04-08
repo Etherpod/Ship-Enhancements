@@ -16,7 +16,7 @@ public class SEItemSocket : OWItemSocket
 
     protected List<OWItem> _itemPool = [];
     protected List<OWItem> _spawnedItems = [];
-    protected readonly int _numItemsToSpawn = 10;
+    protected readonly int _numItemsToSpawn = 3;
 
     public override void Awake()
     {
@@ -108,14 +108,15 @@ public class SEItemSocket : OWItemSocket
     protected virtual void UpdatePromptVisibility(bool focused)
     {
         bool flag = focused && _socketedItem == null && _playerCam.enabled && OWInput.IsInputMode(InputMode.Character | InputMode.ShipCockpit);
-        if (flag != _createItemPrompt.IsVisible() && (!ShipEnhancements.InMultiplayer || _itemPool.Count > 0))
+        if (flag != _createItemPrompt.IsVisible())
         {
-            _createItemPrompt.SetVisibility(flag);
+            _createItemPrompt.SetVisibility(flag && (!ShipEnhancements.InMultiplayer 
+                || _itemPool.Count > 0));
         }
-        else if (flag != _noCreateItemPrompt.IsVisible() && ShipEnhancements.InMultiplayer
-            && _itemPool.Count == 0)
+        else if (flag != _noCreateItemPrompt.IsVisible())
         {
-            _noCreateItemPrompt.SetVisibility(flag);
+            _noCreateItemPrompt.SetVisibility(flag && ShipEnhancements.InMultiplayer
+                && _itemPool.Count == 0);
         }
     }
 
@@ -139,8 +140,13 @@ public class SEItemSocket : OWItemSocket
             _itemPool.Remove(newItem);
             _spawnedItems.Add(newItem);
             newItem.gameObject.SetActive(true);
-            ShipEnhancements.WriteDebugMessage("Socket item on host: " + ShipEnhancements.QSBAPI.GetIsHost());
             PlaceIntoSocket(newItem);
+
+            ShipEnhancements.Instance.ModHelper.Events.Unity.FireInNUpdates(() =>
+            {
+                ShipEnhancements.WriteDebugMessage("Socket item: " + newItem.GetDisplayName()
+                    + ShipEnhancements.QSBInteraction.GetIDFromItem(newItem));
+            }, 5);
 
             foreach (uint id in ShipEnhancements.PlayerIDs)
             {
@@ -159,6 +165,11 @@ public class SEItemSocket : OWItemSocket
             if (socketItem)
             {
                 PlaceIntoSocket(item);
+                ShipEnhancements.Instance.ModHelper.Events.Unity.FireInNUpdates(() =>
+                {
+                    ShipEnhancements.WriteDebugMessage("Socket item: " + item.GetDisplayName()
+                        + ShipEnhancements.QSBInteraction.GetIDFromItem(item));
+                }, 5);
             }
         }
     }

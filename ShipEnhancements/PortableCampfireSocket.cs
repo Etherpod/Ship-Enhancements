@@ -30,7 +30,7 @@ public class PortableCampfireSocket : SEItemSocket
         }
     }
 
-    public override void CreateItemRemote(OWItem item, bool socketItem = false)
+    public override void CreateItemRemote(OWItem item, bool socketItem)
     {
         base.CreateItemRemote(item, socketItem);
 

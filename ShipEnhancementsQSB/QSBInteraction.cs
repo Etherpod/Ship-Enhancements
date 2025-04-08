@@ -518,8 +518,18 @@ public static class QSBInteractionPatches
 
         qsbItem.SendMessage(new DropItemMessage(hit.point, hit.normal, parent, sector, customDropTarget, targetRigidbody));
 
-        List<ShipModule> moduleList = [.. SELocator.GetShipDamageController()._shipModules];
-        int index = moduleList.IndexOf(module.GetComponent<ShipModule>());
+        int index = -1;
+        if (module.GetComponent<ShipModule>())
+        {
+            List<ShipModule> moduleList = [.. SELocator.GetShipDamageController()._shipModules];
+            index = moduleList.IndexOf(module.GetComponent<ShipModule>());
+        }
+        else if (module.GetComponent<ShipDetachableLeg>())
+        {
+            List<ShipDetachableLeg> legList = [.. module.GetComponentInParent<ShipLandingGear>().GetLegs()];
+            index = 100 + legList.IndexOf(module.GetComponent<ShipDetachableLeg>());
+        }
+        ShipEnhancements.ShipEnhancements.WriteDebugMessage(index);
         foreach (uint id in ShipEnhancements.ShipEnhancements.PlayerIDs)
         {
             ShipEnhancements.ShipEnhancements.QSBCompat.SendItemModuleParent(id, item, index);

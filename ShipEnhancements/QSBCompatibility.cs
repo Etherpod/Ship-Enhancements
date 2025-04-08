@@ -225,7 +225,7 @@ public class QSBCompatibility
                 for (int i = 0; i < spawned.Length; i++)
                 {
                     OWItem item = spawned[i];
-                    SendCreateItem(id, item, socket, false);
+                    SendCreateItem(id, item, socket, item.GetComponentInParent<SEItemSocket>() == socket);
                 }
             }
         }
@@ -799,9 +799,20 @@ public class QSBCompatibility
 
     private void ReceiveItemModuleParent(uint id, (int itemID, int shipModulesIndex) data)
     {
-        ShipModule module = SELocator.GetShipDamageController()._shipModules[data.shipModulesIndex];
+        Transform parent = null;
+        if (data.shipModulesIndex >= 100)
+        {
+            parent = SELocator.GetShipTransform().GetComponentInChildren<ShipLandingGear>()
+                .GetLegs()[data.shipModulesIndex - 100].transform;
+        }
+        else
+        {
+            parent = SELocator.GetShipDamageController()._shipModules[data.shipModulesIndex].transform;
+        }
+        
+        ShipEnhancements.WriteDebugMessage("Module from index " + data.shipModulesIndex + ": " + parent.gameObject.name);
         OWItem item = ShipEnhancements.QSBInteraction.GetItemFromID(data.itemID);
-        item.transform.parent = module.transform;
+        item.transform.parent = parent;
     }
     #endregion
 
