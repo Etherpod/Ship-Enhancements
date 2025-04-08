@@ -32,11 +32,12 @@ Permanently remove useless or very important parts of the ship.
 - **Seatbelt**: Breaks a number of state laws by removing your seatbelt. If you crash into something with enough force you'll fly out of the chair.
 - **Ship Suit**: Removes your spacesuit from the ship. Space exploration just got a whole lot more dangerous.
 - **Medkit**: Prevents you from healing inside the ship. Marshmallows might end up being your only way to regain health.
+- **Hatch**: Removes the hatch, leaving a gaping hole in your ship. Be careful when you're walking around in there!
 - **Single-Use Tractor Beam**: Turns off the ship's tractor beam after you enter the ship for the first time. If you leave without your suit, you might have trouble getting back in again.
 - **Air/Water Auto Roll**: Lets you fly around upside down in air and water, which is really confusing when paired with no ship gravity. Also makes it easier to land on walls, if you wanted to do that.
 - **Fluid Prevention**: Makes it possible for fluids to enter your ship. Make sure your suit is on before you start flying around underwater.
 - **Hazard Prevention**: Makes it possible for outside hazards to injure you inside the ship. Don't fly too close to the sun!
-- **Lock-on**: Removes your ability to lock on to objects. You may find it difficult to use autopilot with this enabled.
+- **Lock-on**: Removes your ability to lock on to objects. How well can you judge distances without the lock-on to tell you?
 - **HUD Markers**: Hides the on-screen markers that tell you the location of your ship, your scout, and any marked ship log locations. Ship log locations inside The Stranger are left visible until you arrive.
 - **Minimap Markers**: Hides the icons on the minimap globe that tell you the location of your ship, your scout, and yourself.
 
@@ -105,6 +106,7 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Ship Scout Photo Mode**: Lets you switch to photo mode on the ship's scout launcher. It will default to photo mode if scout launching is disabled.
 - **Signalscope Component**: Turns the ship's signalscope into a fully functioning ship component. If you damage it, you won't be able to receive or broadcast signals from the ship until you repair it.
 - **Ship Signal**: Adds a signal for the ship on the Outer Wilds Ventures frequency. The signal will stop if the ship's signalscope is damaged. Slate also said they added a "command transmitter" to your signalscope, whatever that means.
+- **Ship Horn**: Lets you honk by pressing the flashlight keybind while the ship's signalscope is equipped. You can pick from a variety of horn noises.
 - **Clock**: Adds a clock to the cockpit that tells the time in minutes and seconds. It makes a nice ticking sound, if you like that sort of background noise.
 - **Ernesto**: Adds Ernesto to the cockpit. You can talk to him if you're bored.
 - **Ship Item Placement**: Lets you place items inside or on top of your ship.
@@ -116,10 +118,11 @@ Some new stuff that Slate didn't have time to include in the ship.
   - You can add custom images to the **Expedition Flag**! If that sounds interesting, navigate to this mod's folder using the mod manager and open the folder named "ExpeditionFlagIcons".
 - **Add Radio**: Adds a radio to the cockpit. You can tune in to radio stations by inputting a 4-digit code. Slate posted the codes for a few of the classics on the wall behind the radio.
 - **Ship Tether**: Adds a few hooks to the ship cabin. You can attach these hooks to pretty much any surface- including the ship- and tether yourself to them. If you want to get even crazier, grab a second hook after tethering to one and tether to the new one; it will connect the two hooks together.
-- **Unlimited Items**: Lets you duplicate items inside the ship.
+- **Unlimited Items**: Lets you duplicate items inside the ship. This doesn't work on the ship's gravity crystal or items from other mods.
 - **Removable Gravity Crystal**: Lets you detach the ship's gravity crystal and place it somewhere else to create a localized gravity field. The removed gravity crystal will have the same strength as it did in the ship.
 - **Gravity Landing Gear**: Adds an interface to the cockpit that controls the new gravity technology built into your ship's landing gear. It will stop working if your landing gear is damaged.
 - **Thrust Modulator**: Adds an interface to the cockpit that lets you lower or disproportionately raise the maximum thrust your ship can use. Stacks with the smooth thrust option from General Enhancements.
+- **Auto Align Controls**: Adds an interface to the cockpit that lets you automatically rotate your ship to face the current lock-on target.
 - **Autopilot Controls**: Adds an interface to the cockpit that lets you control the new features added to the ship's autopilot system.
 - **Engine Switch**: Controls your ship's power and engine. The switch needs to be turned on if you want to fly your ship. If the **Idle Fuel Consumption Multiplier** is above 0, it will only consume fuel when the ship is on.
 
@@ -136,6 +139,7 @@ These are all enabled by default.
 - **Show Warning Notifications**: Notifies you in the ship when resources are low or when the outside conditions are becoming dangerous.
 - **Fix Ship Gravity**: Gets rid of that annoying bug where you're trying to land on the Sun Station and you can't move around in your ship because it's holding you against the wall.
 - **Always Allow Map Lock-on**: Lets you use the lock-on feature on the map while you're standing on a planet.
+- **Fix Ship Thrust Indicator**: Fixes a bug where the ship's thrust indicator turns off when you stop piloting the ship.
 
 ## Presets
 In case there are too many settings to deal with, there are some pre-made presets for you to use. The settings can still be meddled with after choosing one.
@@ -148,6 +152,9 @@ When you select a preset, you may have to close and reopen the settings menu for
 - **New Stuff** - Adds all the new stuff to your ship.
 - **Pandemonium** - I just turned everything on for this one. Good luck.
 - **Random** - Randomizes all of the options each loop. This preserves the settings you had selected previously, so just switch back to the **Custom** preset when you're done.
+    - You can control the Random preset with two sliders: **Randomizer Iterations** and **Randomizer Difficulty**.
+	- **Randomizer Iterations** controls how many of the settings to randomize each loop, ranging from only a handful of settings to nearly all of them.
+	- **Randomizer Difficulty** controls how likely it is for difficult settings to be chosen. Minimum difficulty completely removes all of the difficult settings, like **Disable Ship Suit**.
 
 ## API
 To use the API, copy the **IShipEnhancements** script from this mod's GitHub repository into your own project, then follow [these instructions](https://owml.outerwildsmods.com/guides/apis.html#consuming-apis) on the OWML docs.
@@ -164,6 +171,7 @@ To use the API, copy the **IShipEnhancements** script from this mod's GitHub rep
 - Reeling in towards a tether hook on the other side of a wall will sometimes produce unintended side effects
 - The Expedition Flag's map marker may not be visible when using the advanced minimap from General Enhancements
 - The Continuous Matching Velocity feature from General Enhancements may cause bugs when used with the Autopilot Controls
+- Placing the ship's gravity crystal on the landing gear and then detaching the landing gear will crash the game
 
 # Credits
 Big thanks to **ColumbidaeCafe** for helping develop most of the ideas and sound effects!
