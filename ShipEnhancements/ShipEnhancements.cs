@@ -8,6 +8,10 @@ using OWML.Utils;
 using System.Reflection;
 using System.Linq;
 using UnityEngine.Events;
+using OWML.ModHelper.Menus.NewMenuSystem;
+using Newtonsoft.Json.Linq;
+using UnityEngine.InputSystem;
+using System.Globalization;
 
 namespace ShipEnhancements;
 
@@ -2445,6 +2449,12 @@ public class ShipEnhancements : ModBehaviour
             {
                 setting.SetValue(config.GetSettingsValue<object>(setting.GetName()));
             }
+
+            if (_currentPreset != SettingsPresets.PresetName.Custom
+                && _currentPreset != SettingsPresets.PresetName.Random)
+            {
+                RefreshSettingsMenu();
+            }
         }
         else
         {
@@ -2454,7 +2464,8 @@ public class ShipEnhancements : ModBehaviour
                 setting.SetValue(config.GetSettingsValue<object>(setting.GetName()));
                 if (_currentPreset != SettingsPresets.PresetName.Custom && _currentPreset != SettingsPresets.PresetName.Random)
                 {
-                    isCustom = isCustom || !_currentPreset.GetPresetSetting(setting.GetName()).Equals(setting.GetValue());
+                    isCustom = isCustom || (_currentPreset.GetPresetSetting(setting.GetName()) != null 
+                        && !_currentPreset.GetPresetSetting(setting.GetName()).Equals(setting.GetValue()));
                 }
             }
             if (isCustom)
@@ -2465,8 +2476,206 @@ public class ShipEnhancements : ModBehaviour
                 {
                     config.SetSettingsValue(setting.GetName(), setting.GetValue());
                 }
+
+                RefreshSettingsMenu();
             }
         }
+    }
+
+    public void RefreshSettingsMenu()
+    {
+        MenuManager menuManager = StartupPopupPatches.menuManager;
+        IOptionsMenuManager OptionsMenuManager = menuManager.OptionsMenuManager;
+
+        var menus = typeof(MenuManager).GetField("ModSettingsMenus", BindingFlags.Public 
+            | BindingFlags.NonPublic | BindingFlags.Static).GetValue(menuManager)
+            as List<(IModBehaviour behaviour, Menu modMenu)>;
+
+        Menu newModTab = null;
+
+        for (int i = 0; i < menus.Count; i++)
+        {
+            if ((object)menus[i].behaviour == this)
+            {
+                newModTab = menus[i].modMenu;
+            }
+        }
+
+        if (newModTab == null) return;
+
+        Transform parent = newModTab.transform.Find("Scroll View/Viewport/Content");
+        for (int i = 2; i < parent.childCount; i++)
+        {
+            Destroy(parent.GetChild(i).gameObject);
+        }
+
+        newModTab._menuOptions = [];
+
+        foreach (var (name, setting) in ModHelper.Config.Settings)
+        {
+            var settingType = GetSettingType(setting);
+            var label = ModHelper.MenuTranslations.GetLocalizedString(name);
+            var tooltip = "";
+
+            var settingObject = setting as JObject;
+
+            if (settingObject != default(JObject))
+            {
+                if (settingObject["dlcOnly"]?.ToObject<bool>() ?? false)
+                {
+                    if (EntitlementsManager.IsDlcOwned() == EntitlementsManager.AsyncOwnershipStatus.NotOwned)
+                    {
+                        continue;
+                    }
+                }
+
+                if (settingObject["title"] != null)
+                {
+                    label = ModHelper.MenuTranslations.GetLocalizedString(settingObject["title"].ToString());
+                }
+
+                if (settingObject["tooltip"] != null)
+                {
+                    tooltip = ModHelper.MenuTranslations.GetLocalizedString(settingObject["tooltip"].ToString());
+                }
+            }
+
+            switch (settingType)
+            {
+                case SettingType.CHECKBOX:
+                    var currentCheckboxValue = ModHelper.Config.GetSettingsValue<bool>(name);
+                    var settingCheckbox = OptionsMenuManager.AddCheckboxInput(newModTab, label, tooltip, currentCheckboxValue);
+                    settingCheckbox.ModSettingKey = name;
+                    settingCheckbox.OnValueChanged += (bool newValue) =>
+                    {
+                        ModHelper.Config.SetSettingsValue(name, newValue);
+                        ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
+                        Configure(ModHelper.Config);
+                    };
+                    break;
+                case SettingType.TOGGLE:
+                    var currentToggleValue = ModHelper.Config.GetSettingsValue<bool>(name);
+                    var yes = settingObject["yes"].ToString();
+                    var no = settingObject["no"].ToString();
+                    var settingToggle = OptionsMenuManager.AddToggleInput(newModTab, label, yes, no, tooltip, currentToggleValue);
+                    settingToggle.ModSettingKey = name;
+                    settingToggle.OnValueChanged += (bool newValue) =>
+                    {
+                        ModHelper.Config.SetSettingsValue(name, newValue);
+                        ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
+                        Configure(ModHelper.Config);
+                    };
+                    break;
+                case SettingType.SELECTOR:
+                    var currentSelectorValue = ModHelper.Config.GetSettingsValue<string>(name);
+                    var options = settingObject["options"].ToArray().Select(x => x.ToString()).ToArray();
+                    var currentSelectedIndex = Array.IndexOf(options, currentSelectorValue);
+                    var settingSelector = OptionsMenuManager.AddSelectorInput(newModTab, label, options, tooltip, true, currentSelectedIndex);
+                    settingSelector.ModSettingKey = name;
+                    settingSelector.OnValueChanged += (int newIndex, string newSelection) =>
+                    {
+                        ModHelper.Config.SetSettingsValue(name, newSelection);
+                        ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
+                        Configure(ModHelper.Config);
+                    };
+                    break;
+                case SettingType.SEPARATOR:
+                    OptionsMenuManager.AddSeparator(newModTab, false);
+                    break;
+                case SettingType.SLIDER:
+                    var currentSliderValue = ModHelper.Config.GetSettingsValue<float>(name);
+                    var lower = settingObject["min"].ToObject<float>();
+                    var upper = settingObject["max"].ToObject<float>();
+                    var settingSlider = OptionsMenuManager.AddSliderInput(newModTab, label, lower, upper, tooltip, currentSliderValue);
+                    settingSlider.ModSettingKey = name;
+                    settingSlider.OnValueChanged += (float newValue) =>
+                    {
+                        ModHelper.Config.SetSettingsValue(name, newValue);
+                        ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
+                        Configure(ModHelper.Config);
+                    };
+                    break;
+                case SettingType.TEXT:
+                    var currentTextValue = ModHelper.Config.GetSettingsValue<string>(name);
+                    var textInput = OptionsMenuManager.AddTextEntryInput(newModTab, label, currentTextValue, tooltip, false);
+                    textInput.ModSettingKey = name;
+                    textInput.OnConfirmEntry += () =>
+                    {
+                        var newValue = textInput.GetInputText();
+                        ModHelper.Config.SetSettingsValue(name, newValue);
+                        ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
+                        Configure(ModHelper.Config);
+                        textInput.SetText(newValue);
+                    };
+                    break;
+                case SettingType.NUMBER:
+                    var currentValue = ModHelper.Config.GetSettingsValue<double>(name);
+                    var numberInput = OptionsMenuManager.AddTextEntryInput(newModTab, label, currentValue.ToString(CultureInfo.CurrentCulture), tooltip, true);
+                    numberInput.ModSettingKey = name;
+                    numberInput.OnConfirmEntry += () =>
+                    {
+                        var newValue = double.Parse(numberInput.GetInputText());
+                        ModHelper.Config.SetSettingsValue(name, newValue);
+                        ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
+                        Configure(ModHelper.Config);
+                        numberInput.SetText(newValue.ToString());
+                    };
+                    break;
+                default:
+                    WriteDebugMessage($"Couldn't generate input for unkown input type {settingType}", error: true);
+                    OptionsMenuManager.CreateLabel(newModTab, $"Unknown {settingType} : {name}");
+                    break;
+            }
+        }
+    }
+
+    private SettingType GetSettingType(object setting)
+    {
+        var settingObject = setting as JObject;
+
+        if (setting is bool || (settingObject != null && settingObject["type"].ToString() == "toggle" && (settingObject["yes"] == null || settingObject["no"] == null)))
+        {
+            return SettingType.CHECKBOX;
+        }
+        else if (setting is string || (settingObject != null && settingObject["type"].ToString() == "text"))
+        {
+            return SettingType.TEXT;
+        }
+        else if (setting is int || setting is long || setting is float || setting is double || setting is decimal || (settingObject != null && settingObject["type"].ToString() == "number"))
+        {
+            return SettingType.NUMBER;
+        }
+        else if (settingObject != null && settingObject["type"].ToString() == "toggle")
+        {
+            return SettingType.TOGGLE;
+        }
+        else if (settingObject != null && settingObject["type"].ToString() == "selector")
+        {
+            return SettingType.SELECTOR;
+        }
+        else if (settingObject != null && settingObject["type"].ToString() == "slider")
+        {
+            return SettingType.SLIDER;
+        }
+        else if (settingObject != null && settingObject["type"].ToString() == "separator")
+        {
+            return SettingType.SEPARATOR;
+        }
+
+        WriteDebugMessage($"Couldn't work out setting type. Type:{setting.GetType().Name} SettingObjectType:{settingObject?["type"].ToString()}", error: true);
+        return SettingType.NONE;
+    }
+
+    enum SettingType
+    {
+        NONE,
+        CHECKBOX,
+        TOGGLE,
+        TEXT,
+        NUMBER,
+        SELECTOR,
+        SLIDER,
+        SEPARATOR
     }
 
     public override object GetApi()

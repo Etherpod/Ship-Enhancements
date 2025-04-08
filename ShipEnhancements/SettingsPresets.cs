@@ -201,8 +201,8 @@ public static class SettingsPresets
         { "repairTimeMultiplier", 1f },
         { "airDragMultiplier", 1f },
         { "addShipClock", false },
-        { "enableStunDamage", true },
-        { "enableRepairConfirmation", false },
+        { "enableStunDamage", false },
+        { "enableRepairConfirmation", true },
         { "shipGravityFix", true },
         { "enableRemovableGravityCrystal", false },
         { "randomHullDamage", 0f },
@@ -1071,7 +1071,16 @@ public static class SettingsPresets
 
     public static string GetName(this PresetName preset)
     {
-        return preset == PresetName.VanillaPlus ? "Vanilla Plus" : preset.ToString();
+        if (preset == PresetName.VanillaPlus)
+        {
+            return "Vanilla Plus";
+        }
+        if (preset == PresetName.NewStuff)
+        {
+            return "New Stuff";
+        }
+
+        return preset.ToString();
     }
 
     public static object GetPresetSetting(this PresetName preset, string setting)
@@ -1080,7 +1089,15 @@ public static class SettingsPresets
         {
             return RandomSettings[setting].GetRandomValue();
         }
-        return settingsPresets[setting][preset];
+
+        if (settingsPresets.ContainsKey(setting))
+        {
+            return settingsPresets[setting][preset];
+        }
+        else
+        {
+            return null;
+        }
     }
 
     public static bool Initialized()
