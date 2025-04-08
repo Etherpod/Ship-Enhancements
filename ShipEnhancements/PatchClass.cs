@@ -23,6 +23,13 @@ public static class PatchClass
             && (SELocator.GetSignalscopeComponent() == null || !SELocator.GetSignalscopeComponent().isDamaged))
         {
             SELocator.GetShipTransform().GetComponentInChildren<ShipHornController>()?.PlayHorn();
+            if (ShipEnhancements.InMultiplayer)
+            {
+                foreach (uint id in ShipEnhancements.PlayerIDs)
+                {
+                    ShipEnhancements.QSBCompat.SendHonkHorn(id);
+                }
+            }
             return false;
         }
 

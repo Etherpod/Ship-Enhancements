@@ -100,6 +100,7 @@ public class QSBCompatibility
         _api.RegisterHandler<int>("angler-death", ReceiveAnglerDeath);
         _api.RegisterHandler<(int, bool, bool, bool, bool)>("autopilot-state", ReceiveAutopilotState);
         _api.RegisterHandler<(bool, bool, bool)>("pid-autopilot-state", ReceivePidAutopilotState);
+        _api.RegisterHandler<NoData>("honk-horn", ReceiveHonkHorn);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -1075,6 +1076,18 @@ public class QSBCompatibility
         if (!(bool)enableEnhancedAutopilot.GetProperty()) return;
 
         SELocator.GetShipBody().GetComponent<ShipPersistentInput>().SetInputRemote(input.Vector);
+    }
+    #endregion
+
+    #region ShipHorn
+    public void SendHonkHorn(uint id)
+    {
+        _api.SendMessage("honk-horn", new NoData(), id, false);
+    }
+
+    private void ReceiveHonkHorn(uint id, NoData noData)
+    {
+        SELocator.GetShipTransform().GetComponentInChildren<ShipHornController>()?.PlayHorn();
     }
     #endregion
 }
