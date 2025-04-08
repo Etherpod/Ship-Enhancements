@@ -41,6 +41,14 @@ public class CockpitButtonSwitch : CockpitButton
             RaiseChangeActiveEvent();
             OnChangeActiveEvent();
         }
+
+        if (ShipEnhancements.InMultiplayer)
+        {
+            foreach (uint id in ShipEnhancements.PlayerIDs)
+            {
+                ShipEnhancements.QSBCompat.SendButtonSwitchState(id, this, _on, _activated);
+            }
+        }
     }
 
     public virtual void SetActive(bool active)

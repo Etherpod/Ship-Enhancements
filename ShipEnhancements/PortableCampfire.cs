@@ -180,6 +180,7 @@ public class PortableCampfire : Campfire
 
     public bool IsOutsideWater()
     {
+        if (_fluidDetector._activeVolumes == null) return true;
         return !_fluidDetector.InFluidType(FluidVolume.Type.WATER);
     }
 
@@ -227,6 +228,8 @@ public class PortableCampfire : Campfire
 
     private void OnEnable()
     {
+        if (_fluidDetector == null) return;
+
         if (_fluidDetector.GetShape())
         {
             _fluidDetector.GetShape().SetActivation(true);
@@ -235,16 +238,22 @@ public class PortableCampfire : Campfire
         {
             _fluidDetector.GetCollider().enabled = true;
         }
-        ShipEnhancements.Instance.ModHelper.Events.Unity.FireOnNextUpdate(() =>
+
+        if (_fluidDetector._activeVolumes != null)
         {
-            bool outsideWater = IsOutsideWater();
-            _lastOutsideWaterState = outsideWater;
-            _interactVolume._screenPrompt.SetDisplayState(outsideWater ? ScreenPrompt.DisplayState.Normal : ScreenPrompt.DisplayState.GrayedOut);
-        });
+            ShipEnhancements.Instance.ModHelper.Events.Unity.FireOnNextUpdate(() =>
+            {
+                bool outsideWater = IsOutsideWater();
+                _lastOutsideWaterState = outsideWater;
+                _interactVolume._screenPrompt.SetDisplayState(outsideWater ? ScreenPrompt.DisplayState.Normal : ScreenPrompt.DisplayState.GrayedOut);
+            });
+        }
     }
 
     private void OnDisable()
     {
+        if (_fluidDetector == null) return;
+
         if (_fluidDetector.GetShape())
         {
             _fluidDetector.GetShape().SetActivation(false);
@@ -253,10 +262,14 @@ public class PortableCampfire : Campfire
         {
             _fluidDetector.GetCollider().enabled = false;
         }
-        EffectVolume[] volsToRemove = [.. _fluidDetector._activeVolumes];
-        foreach (EffectVolume vol in volsToRemove)
+
+        if (_fluidDetector._activeVolumes != null)
         {
-            vol._triggerVolume.RemoveObjectFromVolume(_fluidDetector.gameObject);
+            EffectVolume[] volsToRemove = [.. _fluidDetector._activeVolumes];
+            foreach (EffectVolume vol in volsToRemove)
+            {
+                vol._triggerVolume.RemoveObjectFromVolume(_fluidDetector.gameObject);
+            }
         }
     }
 

@@ -8,7 +8,6 @@ public class ShipPersistentInput : ThrusterController
     private RulesetDetector _rulesetDetector;
     private ShipThrusterController _thrustController;
     private Vector3 _currentInput;
-    private bool _fuelDepleted;
 
     public override void Awake()
     {
@@ -52,6 +51,14 @@ public class ShipPersistentInput : ThrusterController
         {
             _currentInput = _thrustController._lastTranslationalInput;
             SetInputEnabled(true);
+
+            if (ShipEnhancements.InMultiplayer)
+            {
+                foreach (uint id in ShipEnhancements.PlayerIDs)
+                {
+                    ShipEnhancements.QSBCompat.SendPersistentInput(id, _currentInput);
+                }
+            }
         }
     }
 
@@ -69,8 +76,10 @@ public class ShipPersistentInput : ThrusterController
 
     public void SetInputRemote(Vector3 newInput)
     {
-        if (_fuelDepleted) return;
         _currentInput = newInput;
-        SetInputEnabled(true);
+        SetInputEnabled(SELocator.GetAutopilotPanelController().IsHoldInputSelected()
+            && !SELocator.GetShipDamageController().IsElectricalFailed()
+            && SELocator.GetShipResources().AreThrustersUsable()
+            && !SELocator.GetAutopilotPanelController().IsAutopilotDamaged());
     }
 }

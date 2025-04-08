@@ -226,6 +226,15 @@ public class AutopilotPanelController : MonoBehaviour
         {
             _activeAutopilot.SetActive(true);
             _activeAutopilot.OnChangeActiveEvent();
+
+            if (IsApproachSelected())
+            {
+                SendAutopilotState(Locator.GetReferenceFrame()?.GetOWRigidBody(), destination: true);
+            }
+            else if (IsOrbitSelected())
+            {
+                SendPidAutopilotState(orbit: true);
+            }
         }
     }
 
@@ -235,6 +244,15 @@ public class AutopilotPanelController : MonoBehaviour
         {
             _activeAutopilot.SetActive(false);
             _activeAutopilot.OnChangeActiveEvent();
+            
+            if (IsApproachSelected())
+            {
+                SendAutopilotState(abort: true);
+            }
+            else if (IsOrbitSelected())
+            {
+                SendPidAutopilotState(abort: true);
+            }
         }
     }
 
@@ -244,6 +262,15 @@ public class AutopilotPanelController : MonoBehaviour
         {
             _activeMatch.SetActive(true);
             _activeMatch.OnChangeActiveEvent();
+
+            if (IsMatchVelocitySelected())
+            {
+                SendAutopilotState(startMatch: true);
+            }
+            else if (IsHoldPositionSelected())
+            {
+                SendPidAutopilotState(holdPosition: true);
+            }
         }
     }
 
@@ -253,6 +280,38 @@ public class AutopilotPanelController : MonoBehaviour
         {
             _activeMatch.SetActive(false);
             _activeMatch.OnChangeActiveEvent();
+
+            if (IsMatchVelocitySelected())
+            {
+                SendAutopilotState(stopMatch: true);
+            }
+            else if (IsHoldPositionSelected())
+            {
+                SendPidAutopilotState(abort: true);
+            }
+        }
+    }
+
+    private void SendAutopilotState(OWRigidbody body = null, bool destination = false,
+        bool startMatch = false, bool stopMatch = false, bool abort = false)
+    {
+        if (ShipEnhancements.InMultiplayer)
+        {
+            foreach (uint id in ShipEnhancements.PlayerIDs)
+            {
+                ShipEnhancements.QSBCompat.SendAutopilotState(id, body, destination, startMatch, stopMatch, abort);
+            }
+        }
+    }
+
+    private void SendPidAutopilotState(bool orbit = false, bool holdPosition = false, bool abort = false)
+    {
+        if (ShipEnhancements.InMultiplayer)
+        {
+            foreach (uint id in ShipEnhancements.PlayerIDs)
+            {
+                ShipEnhancements.QSBCompat.SendPidAutopilotState(id, orbit, holdPosition, abort);
+            }
         }
     }
 

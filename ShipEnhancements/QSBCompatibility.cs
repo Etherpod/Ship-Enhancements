@@ -52,7 +52,9 @@ public class QSBCompatibility
         _api.OnPlayerJoin().AddListener(OnPlayerJoin);
         _api.RegisterHandler<(string, object)>("settings-data", ReceiveSettingsData);
         _api.RegisterHandler<int>("host-preset", ReceiveHostPreset);
-        _api.RegisterHandler<(string, bool)>("switch-state", ReceiveSwitchState);
+        _api.RegisterHandler<(int, bool)>("switch-state", ReceiveSwitchState);
+        _api.RegisterHandler<(int, bool, bool, bool)>("button-state", ReceiveButtonState);
+        _api.RegisterHandler<(int, bool, bool, bool, bool)>("button-switch-state", ReceiveButtonSwitchState);
         _api.RegisterHandler<NoData>("ship-initialized", ReceiveInitializedShip);
         _api.RegisterHandler<NoData>("world-objects-ready", ReceiveWorldObjectsInitialized);
         _api.RegisterHandler<(bool, bool)>("engine-switch-state", ReceiveEngineSwitchState);
@@ -77,7 +79,7 @@ public class QSBCompatibility
         _api.RegisterHandler<(float, float, float)>("initial-dirt-state", ReceiveInitialDirtState);
         _api.RegisterHandler<float>("dirt-state", ReceiveDirtState);
         _api.RegisterHandler<SerializedVector3>("detach-all-players", ReceiveDetachAllPlayers);
-        _api.RegisterHandler<SerializedVector3>("initial-persistent-input", ReceiveInitialPersistentInput);
+        _api.RegisterHandler<SerializedVector3>("persistent-input", ReceivePersistentInput);
         _api.RegisterHandler<float>("initial-black-hole", ReceiveInitialBlackHoleState);
         _api.RegisterHandler<ShipCommand>("send-ship-command", ReceiveShipCommand);
         _api.RegisterHandler<(bool, string, SerializedVector3)>("activate-warp", ReceiveActivateWarp);
@@ -96,6 +98,8 @@ public class QSBCompatibility
         _api.RegisterHandler<(int, int, bool)>("create-item", ReceiveCreateItem);
         _api.RegisterHandler<bool>("grav-gear-invert", ReceiveGravInvertSwitchState);
         _api.RegisterHandler<int>("angler-death", ReceiveAnglerDeath);
+        _api.RegisterHandler<(int, bool, bool, bool, bool)>("autopilot-state", ReceiveAutopilotState);
+        _api.RegisterHandler<(bool, bool, bool)>("pid-autopilot-state", ReceivePidAutopilotState);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -170,18 +174,6 @@ public class QSBCompatibility
             return;
         }
 
-        if (_activeSwitches.Count > 0)
-        {
-            foreach (CockpitSwitch cockpitSwitch in _activeSwitches)
-            {
-                SendSwitchState(id, (cockpitSwitch.GetType().Name, cockpitSwitch.IsOn()));
-            }
-        }
-        GravityGearInvertSwitch invertSwitch = SELocator.GetShipTransform().GetComponentInChildren<GravityGearInvertSwitch>();
-        if (invertSwitch != null)
-        {
-            SendGravInvertSwitchState(id, invertSwitch.IsOn());
-        }
         if (_engineSwitch != null)
         {
             _api.SendMessage("initialize-engine-switch", ShipEnhancements.Instance.engineOn, id, false);
@@ -278,31 +270,82 @@ public class QSBCompatibility
     #endregion
 
     #region Switches
-    public void AddActiveSwitch(CockpitSwitch switchToAdd)
+    public void SendSwitchState(uint id, CockpitSwitch cockpitSwitch, bool state)
     {
-        _activeSwitches.Add(switchToAdd);
+        _api.SendMessage("switch-state", (ShipEnhancements.QSBInteraction.GetIDFromSwitch(cockpitSwitch), state), id, false);
     }
 
-    public void RemoveActiveSwitch(CockpitSwitch switchToRemove)
+    private void ReceiveSwitchState(uint id, (int switchID, bool state) data)
     {
-        if (_activeSwitches.Contains(switchToRemove))
+        CockpitSwitch s = ShipEnhancements.QSBInteraction.GetSwitchFromID(data.switchID);
+        if (s != null)
         {
-            _activeSwitches.Remove(switchToRemove);
+            s.SetState(data.state);
         }
     }
 
-    public void SendSwitchState(uint id, (string, bool) data)
+    public void SendButtonState(uint id, CockpitButton button, bool state, bool doEvent = true, bool doAction = true)
     {
-        _api.SendMessage("switch-state", data, id, false);
+        _api.SendMessage("button-state", (ShipEnhancements.QSBInteraction.GetIDFromButton(button), state, doEvent, doAction), id, false);
     }
 
-    private void ReceiveSwitchState(uint id, (string, bool) data)
+    private void ReceiveButtonState(uint id, (int buttonID, bool state, bool doEvent, bool doAction) data)
     {
-        foreach (CockpitSwitch cockpitSwitch in _activeSwitches)
+        CockpitButton b = ShipEnhancements.QSBInteraction.GetButtonFromID(data.buttonID);
+        if (b != null)
         {
-            if (cockpitSwitch.GetType().Name == data.Item1)
+            bool lastState = b.IsOn();
+            b.SetState(data.state);
+            if (lastState != data.state)
             {
-                cockpitSwitch.SetState(data.Item2);
+                if (data.doEvent)
+                {
+                    b.RaiseChangeStateEvent();
+                }
+                if (data.doAction)
+                {
+                    b.OnChangeStateEvent();
+                }
+            }
+        }
+    }
+
+    public void SendButtonSwitchState(uint id, CockpitButtonSwitch buttonSwitch, bool state, bool activated, bool doEvent = true, bool doAction = true)
+    {
+        _api.SendMessage("button-switch-state", (ShipEnhancements.QSBInteraction.GetIDFromButton(buttonSwitch), state, activated,
+            doEvent, doAction), id, false);
+    }
+
+    private void ReceiveButtonSwitchState(uint id, (int bsID, bool state, bool activated, bool doEvent, bool doAction) data)
+    {
+        CockpitButtonSwitch bs = ShipEnhancements.QSBInteraction.GetButtonSwitchFromID(data.bsID);
+        if (bs != null)
+        {
+            bool lastState = bs.IsOn();
+            bool lastActive = bs.IsActivated();
+            bs.SetState(data.state);
+            bs.SetActive(data.activated);
+            if (lastState != data.state)
+            {
+                if (data.doEvent)
+                {
+                    bs.RaiseChangeStateEvent();
+                }
+                if (data.doAction)
+                {
+                    bs.OnChangeStateEvent();
+                }
+            }
+            if (lastActive != data.activated)
+            {
+                if (data.doEvent)
+                {
+                    bs.RaiseChangeActiveEvent();
+                }
+                if (data.doAction)
+                {
+                    bs.OnChangeActiveEvent();
+                }
             }
         }
     }
@@ -666,22 +709,6 @@ public class QSBCompatibility
     }
     #endregion
 
-    #region PersistentInput
-    public void SendInitialPersistentInput(uint id, Vector3 input)
-    {
-        _api.SendMessage("initial-persistent-input", new SerializedVector3(input), id, false);
-    }
-
-    private void ReceiveInitialPersistentInput(uint id, SerializedVector3 input)
-    {
-        ShipPersistentInput persistentInput = SELocator.GetShipBody().GetComponent<ShipPersistentInput>();
-        if (persistentInput != null)
-        {
-            persistentInput.SetInputRemote(input.Vector);
-        }
-    }
-    #endregion
-
     #region BlackHoleExplosion
     public void SendInitialBlackHoleState(uint id, float scale)
     {
@@ -958,6 +985,85 @@ public class QSBCompatibility
             angler.ChangeState(AnglerfishController.AnglerState.Stunned);
             angler.GetComponentInChildren<AnglerfishFluidVolume>().SetVolumeActivation(false);
         }
+    }
+    #endregion
+
+    #region Autopilot
+    public void SendAutopilotState(uint id, OWRigidbody targetBody, bool destination = false, bool startMatch = false, bool stopMatch = false, bool abort = false)
+    {
+        _api.SendMessage("autopilot-state", 
+            (targetBody != null ? ShipEnhancements.QSBInteraction.GetIDFromBody(targetBody) : -1,
+            destination, startMatch, stopMatch, abort), id, false);
+    }
+
+    private void ReceiveAutopilotState(uint id, (int targetBodyID, bool destination, bool startMatch, bool stopMatch, bool abort) data)
+    {
+        if (!(bool)enableEnhancedAutopilot.GetProperty()) return;
+
+        Autopilot autopilot = SELocator.GetShipBody().GetComponent<Autopilot>();
+
+        if (data.abort)
+        {
+            autopilot.Abort();
+            return;
+        }
+        else if (data.stopMatch)
+        {
+            autopilot.StopMatchVelocity();
+            return;
+        }
+
+        OWRigidbody targetBody = data.targetBodyID > 0 
+            ? ShipEnhancements.QSBInteraction.GetBodyFromID(data.targetBodyID) : null;
+        if (targetBody == null || targetBody.GetReferenceFrame() == null) return;
+
+        if (data.destination)
+        {
+            autopilot.FlyToDestination(targetBody.GetReferenceFrame());
+        }
+        else if (data.startMatch)
+        {
+            autopilot.StartMatchVelocity(targetBody.GetReferenceFrame());
+        }
+    }
+
+    public void SendPidAutopilotState(uint id, bool orbit = false, bool matchPosition = false, bool abort = false)
+    {
+        _api.SendMessage("pid-autopilot-state", (orbit, matchPosition, abort), id, false);
+    }
+
+    private void ReceivePidAutopilotState(uint id, (bool orbit, bool matchPosition, bool abort) data)
+    {
+        if (!(bool)enableEnhancedAutopilot.GetProperty()) return;
+
+        PidAutopilot autopilot = SELocator.GetShipBody().GetComponent<PidAutopilot>();
+
+        if (data.abort)
+        {
+            autopilot.SetAutopilotActive(false, autopilot.GetCurrentMode(), false);
+            return;
+        }
+
+        if (data.orbit)
+        {
+            autopilot.SetAutopilotActive(true, PidMode.Orbit, false);
+        }
+        else if (data.matchPosition)
+        {
+            autopilot.SetAutopilotActive(true, PidMode.HoldPosition, false);
+        }
+    }
+
+    public void SendPersistentInput(uint id, Vector3 input)
+    {
+        _api.SendMessage("persistent-input", new SerializedVector3(input), id, false);
+    }
+
+    private void ReceivePersistentInput(uint id, SerializedVector3 input)
+    {
+        if (!(bool)enableEnhancedAutopilot.GetProperty()) return;
+
+        SELocator.GetShipBody().GetComponent<ShipPersistentInput>().SetInputRemote(input.Vector);
     }
     #endregion
 }

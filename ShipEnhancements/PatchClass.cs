@@ -4202,8 +4202,10 @@ public static class PatchClass
     #region AutopilotOverride
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.Update))]
-    public static bool OverrideAutopilotInputs(ShipCockpitController __instance)
+    public static bool OverrideAutopilotInputs(ShipCockpitController __instance, bool __runOriginal)
     {
+        if (!__runOriginal) return false;
+
         if (!(bool)enableEnhancedAutopilot.GetProperty()) return true;
 
         if (!__instance._playerAtFlightConsole)
@@ -4232,6 +4234,7 @@ public static class PatchClass
             {
                 SELocator.GetAutopilotPanelController().CancelMatchVelocity();
                 //__instance._autopilot.StopMatchVelocity();
+                SendAutopilotState(stopMatch: true);
             }
             return false;
         }
@@ -4242,11 +4245,13 @@ public static class PatchClass
             {
                 SELocator.GetAutopilotPanelController().CancelAutopilot();
                 //__instance.AbortAutopilot();
+                SendAutopilotState(abort: true);
             }
             if (OWInput.IsNewlyPressed(InputLibrary.matchVelocity, InputMode.All))
             {
                 SELocator.GetAutopilotPanelController().CancelMatchVelocity();
                 //__instance.AbortAutopilot();
+                SendAutopilotState(stopMatch: true);
             }
         }
         else
@@ -4258,17 +4263,20 @@ public static class PatchClass
 
                 SELocator.GetAutopilotPanelController().ActivateAutopilot();
                 //__instance._autopilot.FlyToDestination(Locator.GetReferenceFrame(true));
+                SendAutopilotState(Locator.GetReferenceFrame()?.GetOWRigidBody(), destination: true);
             }
             if (/*__instance.IsMatchVelocityAvailable(false) && */__instance._playerAtFlightConsole && !__instance._shipSystemFailure
                 && OWInput.IsNewlyPressed(InputLibrary.matchVelocity, InputMode.All))
             {
                 SELocator.GetAutopilotPanelController().ActivateMatchVelocity();
                 //__instance._autopilot.StartMatchVelocity(Locator.GetReferenceFrame(false), false);
+                SendAutopilotState(Locator.GetReferenceFrame(false)?.GetOWRigidBody(), startMatch: true);
             }
             else if (/*__instance._autopilot.IsMatchingVelocity() && !__instance._autopilot.IsFlyingToDestination() && */OWInput.IsNewlyReleased(InputLibrary.matchVelocity, InputMode.All))
             {
                 SELocator.GetAutopilotPanelController().CancelMatchVelocity();
                 //__instance._autopilot.StopMatchVelocity();
+                SendAutopilotState(stopMatch: true);
             }
 /*            if (!__instance._enteringLandingCam)
             {
@@ -4324,6 +4332,18 @@ public static class PatchClass
         return false;
     }
 
+    public static void SendAutopilotState(OWRigidbody body = null, bool destination = false, 
+        bool startMatch = false, bool stopMatch = false, bool abort = false)
+    {
+        if (ShipEnhancements.InMultiplayer)
+        {
+            foreach (uint id in ShipEnhancements.PlayerIDs)
+            {
+                ShipEnhancements.QSBCompat.SendAutopilotState(id, body, destination, startMatch, stopMatch, abort);
+            }
+        }
+    }
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(ShipCockpitUI), nameof(ShipCockpitUI.Update))]
     public static void UpdateAutopilotUI(ShipCockpitUI __instance)
@@ -4364,7 +4384,8 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.IsLandingModeAvailable))]
     public static bool OverrideLandingModeAvailable(ref bool __result)
     {
-        if ((bool)enableEnhancedAutopilot.GetProperty() && SELocator.GetAutopilotPanelController().IsAutopilotActive())
+        if ((bool)enableEnhancedAutopilot.GetProperty() && (SELocator.GetAutopilotPanelController().IsAutopilotActive()
+            || SELocator.GetAutopilotPanelController().IsPersistentInputActive()))
         {
             __result = false;
             return false;

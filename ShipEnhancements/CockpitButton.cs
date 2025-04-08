@@ -69,6 +69,14 @@ public class CockpitButton : CockpitInteractible
         SetState(!_on);
         RaiseChangeStateEvent();
         OnChangeStateEvent();
+
+        if (ShipEnhancements.InMultiplayer)
+        {
+            foreach (uint id in ShipEnhancements.PlayerIDs)
+            {
+                ShipEnhancements.QSBCompat.SendButtonState(id, this, _on);
+            }
+        }
     }
 
     protected override void OnReleaseInteract()

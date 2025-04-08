@@ -1362,7 +1362,7 @@ public class ShipEnhancements : ModBehaviour
             SELocator.GetShipTransform().Find("Module_Cabin/Geo_Cabin/Cabin_Tech/Cabin_Tech_Exterior/HatchPivot").gameObject.SetActive(false);
             SELocator.GetShipTransform().Find("Module_Cabin/Geo_Cabin/Cabin_Colliders_Back/Shared/Hatch_Collision_Open").gameObject.SetActive(false);
             HatchController hatch = SELocator.GetShipTransform().GetComponentInChildren<HatchController>();
-            hatch._interactVolume.gameObject.SetActive(false);
+            hatch._interactVolume.GetComponent<Shape>().enabled = false;
         }
 
         SetDamageColors();

@@ -34,7 +34,7 @@ public class PortableCampfireSocket : SEItemSocket
     {
         base.CreateItemRemote(item, socketItem);
 
-        FluidDetector detector = _socketedItem.GetComponentInChildren<FluidDetector>(true);
+        FluidDetector detector = item.GetComponentInChildren<FluidDetector>(true);
         if (detector != null)
         {
             detector.gameObject.SetActive(true);
@@ -42,7 +42,7 @@ public class PortableCampfireSocket : SEItemSocket
 
         if ((string)ShipEnhancements.Settings.temperatureZonesAmount.GetProperty() == "All")
         {
-            Campfire campfire = _socketedItem.GetComponentInChildren<Campfire>();
+            Campfire campfire = item.GetComponentInChildren<Campfire>();
             if (campfire != null)
             {
                 GameObject campfireTempZone = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Campfire.prefab");

@@ -32,4 +32,18 @@ public interface IQSBInteraction
     int GetIDFromAngler(AnglerfishController angler);
 
     AnglerfishController GetAnglerFromID(int id);
+
+    int GetIDFromSwitch(CockpitSwitch cockpitSwitch);
+
+    CockpitSwitch GetSwitchFromID(int id);
+
+    int GetIDFromButton(CockpitButton cockpitSwitch);
+
+    CockpitButton GetButtonFromID(int id);
+
+    CockpitButtonSwitch GetButtonSwitchFromID(int id);
+
+    int GetIDFromBody(OWRigidbody body);
+
+    OWRigidbody GetBodyFromID(int id);
 }

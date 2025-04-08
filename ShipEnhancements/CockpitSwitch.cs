@@ -52,11 +52,6 @@ public abstract class CockpitSwitch : CockpitInteractible
         _switchLight.intensity = 0f;
 
         AddToElectricalSystem();
-
-        if (ShipEnhancements.InMultiplayer)
-        {
-            ShipEnhancements.QSBCompat.AddActiveSwitch(this);
-        }
     }
 
     protected override void OnPressInteract()
@@ -67,7 +62,7 @@ public abstract class CockpitSwitch : CockpitInteractible
         {
             foreach (uint id in ShipEnhancements.PlayerIDs)
             {
-                ShipEnhancements.QSBCompat.SendSwitchState(id, (GetType().Name, _on));
+                ShipEnhancements.QSBCompat.SendSwitchState(id, this, _on);
             }
         }
     }
@@ -165,10 +160,5 @@ public abstract class CockpitSwitch : CockpitInteractible
 
         ShipEnhancements.WriteDebugMessage("destroy switch");
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
-
-        if (ShipEnhancements.InMultiplayer)
-        {
-            ShipEnhancements.QSBCompat.RemoveActiveSwitch(this);
-        }
     }
 }

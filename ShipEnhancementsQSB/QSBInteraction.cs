@@ -36,6 +36,20 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
     {
         ShipEnhancements.ShipEnhancements.Instance.AssignQSBInterface(this);
         Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
+
+        LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
+        {
+            if (loadScene != OWScene.SolarSystem || !ShipEnhancements.ShipEnhancements.InMultiplayer)
+            {
+                return;
+            }
+
+            ShipEnhancements.ShipEnhancements.Instance.ModHelper.Events.Unity.FireInNUpdates(() =>
+            {
+                QSBWorldSync.Init<QSBCockpitSwitch, CockpitSwitch>();
+                QSBWorldSync.Init<QSBCockpitButton, CockpitButton>();
+            }, 2);
+        };
     }
 
     public bool FlightConsoleOccupied()
@@ -147,6 +161,49 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
             return obj;
         }
         return null;
+    }
+
+    public int GetIDFromSwitch(CockpitSwitch cockpitSwitch)
+    {
+        return cockpitSwitch.GetWorldObject<QSBCockpitSwitch>().ObjectId;
+    }
+
+    public CockpitSwitch GetSwitchFromID(int id)
+    {
+        return id.GetWorldObject<QSBCockpitSwitch>().AttachedObject;
+    }
+
+    public int GetIDFromButton(CockpitButton cockpitButton)
+    {
+        return cockpitButton.GetWorldObject<QSBCockpitButton>().ObjectId;
+    }
+
+    public CockpitButton GetButtonFromID(int id)
+    {
+        return id.GetWorldObject<QSBCockpitButton>().AttachedObject;
+    }
+
+    public CockpitButtonSwitch GetButtonSwitchFromID(int id)
+    {
+        CockpitButton button = id.GetWorldObject<QSBCockpitButton>().AttachedObject;
+        if (button is CockpitButtonSwitch)
+        {
+            return button as CockpitButtonSwitch;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public OWRigidbody GetBodyFromID(int id)
+    {
+        return id.GetWorldObject<QSBOWRigidbody>().AttachedObject;
+    }
+
+    public int GetIDFromBody(OWRigidbody body)
+    {
+        return body.GetWorldObject<QSBOWRigidbody>().ObjectId;
     }
 }
 
