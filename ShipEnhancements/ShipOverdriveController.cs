@@ -88,6 +88,8 @@ public class ShipOverdriveController : ElectricalComponent
         _overdriveColor = overdriveMat.GetColor("_Color");
         _primeButton.SetButtonOn(false);
         _activateButton.SetButtonActive(false);
+
+        ShipEnhancements.Instance.AddShipAudioToChange(_shipAudioSource);
     }
 
     private void Update()

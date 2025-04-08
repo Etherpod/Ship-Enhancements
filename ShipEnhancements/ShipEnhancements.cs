@@ -101,6 +101,7 @@ public class ShipEnhancements : ModBehaviour
     private bool _unsubFromSystemLoaded = false;
     private bool _unsubFromShipSpawn = false;
     private ShipDetachableLeg _frontLeg = null;
+    private List<OWAudioSource> _shipAudioToChange = [];
 
     public enum Settings
     {
@@ -259,6 +260,8 @@ public class ShipEnhancements : ModBehaviour
             GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
             GlobalMessenger.AddListener("WakeUp", OnWakeUp);
             GlobalMessenger.AddListener("ShipHullDetached", OnShipHullDetached);
+            GlobalMessenger.AddListener("EnterShip", OnEnterShip);
+            GlobalMessenger.AddListener("ExitShip", OnExitShip);
             oxygenDepleted = false;
             fuelDepleted = false;
             probeDestroyed = false;
@@ -327,17 +330,19 @@ public class ShipEnhancements : ModBehaviour
             GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
             GlobalMessenger.RemoveListener("WakeUp", OnWakeUp);
             GlobalMessenger.RemoveListener("ShipHullDetached", OnShipHullDetached);
+            GlobalMessenger.RemoveListener("EnterShip", OnEnterShip);
+            GlobalMessenger.RemoveListener("ExitShip", OnExitShip);
             if ((float)Settings.spaceAngularDragMultiplier.GetProperty() > 0 || (float)Settings.atmosphereAngularDragMultiplier.GetProperty() > 0)
             {
                 ShipFluidDetector detector = SELocator.GetShipDetector().GetComponent<ShipFluidDetector>();
                 detector.OnEnterFluid -= OnEnterFluid;
                 detector.OnExitFluid -= OnExitFluid;
             }
-            if ((bool)Settings.enableAutoHatch.GetProperty() && !InMultiplayer && !(bool)Settings.disableHatch.GetProperty())
+            /*if ((bool)Settings.enableAutoHatch.GetProperty() && !InMultiplayer && !(bool)Settings.disableHatch.GetProperty())
             {
                 GlobalMessenger.RemoveListener("EnterShip", OnEnterShip);
                 GlobalMessenger.RemoveListener("ExitShip", OnExitShip);
-            }
+            }*/
             if ((bool)Settings.enableRepairConfirmation.GetProperty() || (bool)Settings.enableFragileShip.GetProperty())
             {
                 foreach (ShipHull hull in SELocator.GetShipDamageController()._shipHulls)
@@ -418,6 +423,7 @@ public class ShipEnhancements : ModBehaviour
             _lastSuitOxygen = 0f;
             _shipLoaded = false;
             playerTether = null;
+            _shipAudioToChange.Clear();
             InputLatencyController.OnUnloadScene();
         };
     }
@@ -733,6 +739,13 @@ public class ShipEnhancements : ModBehaviour
         materials.AddRange(newMaterials);
         cockpitLight.GetComponent<LightmapController>()._materials = [.. materials];
 
+        SetUpShipAudio();
+
+        foreach (OWAudioSource audio in _shipAudioToChange)
+        {
+            audio.spatialBlend = 1f;
+        }
+
         _shipLoaded = true;
         UpdateSuitOxygen();
 
@@ -825,8 +838,8 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((bool)Settings.enableAutoHatch.GetProperty() && !InMultiplayer && !(bool)Settings.disableHatch.GetProperty())
         {
-            GlobalMessenger.AddListener("EnterShip", OnEnterShip);
-            GlobalMessenger.AddListener("ExitShip", OnExitShip);
+            /*GlobalMessenger.AddListener("EnterShip", OnEnterShip);
+            GlobalMessenger.AddListener("ExitShip", OnExitShip);*/
             GameObject autoHatchController = LoadPrefab("Assets/ShipEnhancements/ExteriorHatchControls.prefab");
             Instantiate(autoHatchController, SELocator.GetShipBody().GetComponentInChildren<HatchController>().transform.parent);
         }
@@ -1172,7 +1185,8 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)Settings.enableRepairConfirmation.GetProperty() || (bool)Settings.enableFragileShip.GetProperty())
         {
             GameObject audio = LoadPrefab("Assets/ShipEnhancements/SystemOnlineAudio.prefab");
-            Instantiate(audio, SELocator.GetShipTransform().Find("Audio_Ship"));
+            OWAudioSource source = Instantiate(audio, SELocator.GetShipTransform().Find("Audio_Ship")).GetComponent<OWAudioSource>();
+            AddShipAudioToChange(source);
 
             foreach (ShipHull hull in SELocator.GetShipDamageController()._shipHulls)
             {
@@ -2070,15 +2084,40 @@ public class ShipEnhancements : ModBehaviour
         }
     }
 
+    private void SetUpShipAudio()
+    {
+        ShipAudioController shipAudio = SELocator.GetShipTransform().GetComponentInChildren<ShipAudioController>();
+
+        _shipAudioToChange.Add(shipAudio._cockpitSource);
+
+        OWAudioSource alarmSource = shipAudio._alarmSource;
+        shipAudio._shipElectrics._audioSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff,
+            alarmSource.GetCustomCurve(AudioSourceCurveType.CustomRolloff));
+        shipAudio._shipElectrics._audioSource.maxDistance = alarmSource.maxDistance;
+        _shipAudioToChange.Add(shipAudio._shipElectrics._audioSource);
+
+        GameObject toolRefObj = LoadPrefab("Assets/ShipEnhancements/ToolAudioTemplate.prefab");
+        OWAudioSource toolRef = Instantiate(toolRefObj).GetComponent<OWAudioSource>();
+
+        shipAudio._probeScreenSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff,
+            toolRef.GetCustomCurve(AudioSourceCurveType.CustomRolloff));
+        shipAudio._probeScreenSource.maxDistance = toolRef.maxDistance;
+        shipAudio._signalscopeSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff,
+            toolRef.GetCustomCurve(AudioSourceCurveType.CustomRolloff));
+        shipAudio._signalscopeSource.maxDistance = toolRef.maxDistance;
+
+        Destroy(toolRef.gameObject);
+    }
+
     #endregion
 
     #region Events
 
     private void OnPlayerSuitUp()
     {
-        if (SELocator.GetPlayerBody().GetComponent<PlayerResources>()._currentOxygen < _lastSuitOxygen)
+        if (SELocator.GetPlayerResources()._currentOxygen < _lastSuitOxygen)
         {
-            SELocator.GetPlayerBody().GetComponent<PlayerResources>()._currentOxygen = _lastSuitOxygen;
+            SELocator.GetPlayerResources()._currentOxygen = _lastSuitOxygen;
         }
     }
 
@@ -2106,19 +2145,37 @@ public class ShipEnhancements : ModBehaviour
 
     private void OnEnterShip()
     {
-        HatchController hatchController = SELocator.GetShipBody().GetComponentInChildren<HatchController>();
-        hatchController._interactVolume.EnableInteraction();
-        hatchController.GetComponent<SphereShape>().radius = 1f;
-        hatchController.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
-        hatchController.transform.parent.GetComponentInChildren<AutoHatchController>().DisableInteraction();
+        foreach (OWAudioSource audio in _shipAudioToChange)
+        {
+            audio.spatialBlend = 0f;
+        }
+
+        if ((bool)Settings.enableAutoHatch.GetProperty() && !InMultiplayer
+            && !(bool)Settings.disableHatch.GetProperty())
+        {
+            HatchController hatchController = SELocator.GetShipBody().GetComponentInChildren<HatchController>();
+            hatchController._interactVolume.EnableInteraction();
+            hatchController.GetComponent<SphereShape>().radius = 1f;
+            hatchController.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+            hatchController.transform.parent.GetComponentInChildren<AutoHatchController>().DisableInteraction();
+        }
     }
 
     private void OnExitShip()
     {
-        HatchController hatchController = SELocator.GetShipBody().GetComponentInChildren<HatchController>();
-        hatchController._interactVolume.DisableInteraction();
-        hatchController.GetComponent<SphereShape>().radius = 3.5f;
-        hatchController.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+        foreach (OWAudioSource audio in _shipAudioToChange)
+        {
+            audio.spatialBlend = 1f;
+        }
+
+        if ((bool)Settings.enableAutoHatch.GetProperty() && !InMultiplayer
+            && !(bool)Settings.disableHatch.GetProperty())
+        {
+            HatchController hatchController = SELocator.GetShipBody().GetComponentInChildren<HatchController>();
+            hatchController._interactVolume.DisableInteraction();
+            hatchController.GetComponent<SphereShape>().radius = 3.5f;
+            hatchController.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+        }
     }
 
     private void OnShipSystemFailure()
@@ -2305,6 +2362,12 @@ public class ShipEnhancements : ModBehaviour
     public SettingsPresets.PresetName GetCurrentPreset()
     {
         return _currentPreset;
+    }
+
+    public void AddShipAudioToChange(OWAudioSource audioSource)
+    {
+        _shipAudioToChange.Add(audioSource);
+        audioSource.spatialBlend = PlayerState.IsInsideShip() ? 0f : 1f;
     }
 
     #endregion
