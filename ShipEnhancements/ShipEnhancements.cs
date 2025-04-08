@@ -1558,7 +1558,9 @@ public class ShipEnhancements : ModBehaviour
 
     private static void SetupExplosion(Transform effectsTransform, ExplosionController explosion)
     {
-        if ((float)Settings.shipExplosionMultiplier.GetProperty() > 30f)
+        float multiplier = (float)Settings.shipExplosionMultiplier.GetProperty();
+
+        if (multiplier > 100f)
         {
             GameObject supernova = LoadPrefab("Assets/ShipEnhancements/ExplosionSupernova.prefab");
             AssetBundleUtilities.ReplaceShaders(supernova);
@@ -1568,18 +1570,20 @@ public class ShipEnhancements : ModBehaviour
         }
         else
         {
-            explosion._length *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.75f) + 0.25f;
-            explosion._forceVolume._acceleration *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.25f) + 0.75f;
-            explosion.transform.localScale *= (float)Settings.shipExplosionMultiplier.GetProperty();
+            explosion._length *= (multiplier * 0.75f) + 0.25f;
+            explosion._forceVolume._acceleration *= (multiplier * 0.25f) + 0.75f;
+            explosion.transform.localScale *= multiplier;
+            explosion._lightRadius *= (multiplier * 0.75f) + 0.25f;
+            explosion._lightIntensity *= (multiplier * 0.01f) + 0.99f;
             explosion.GetComponent<SphereCollider>().radius = 0.1f;
             OWAudioSource audio = effectsTransform.Find("ExplosionAudioSource").GetComponent<OWAudioSource>();
-            audio.maxDistance *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.1f) + 0.9f;
+            audio.maxDistance *= (multiplier * 0.1f) + 0.9f;
             AnimationCurve curve = audio.GetCustomCurve(AudioSourceCurveType.CustomRolloff);
             Keyframe[] newKeys = new Keyframe[curve.keys.Length];
             for (int i = 0; i < curve.keys.Length; i++)
             {
                 newKeys[i] = curve.keys[i];
-                newKeys[i].value *= ((float)Settings.shipExplosionMultiplier.GetProperty() * 0.1f) + 0.9f;
+                newKeys[i].value *= (multiplier * 0.1f) + 0.9f;
             }
             AnimationCurve newCurve = new();
             foreach (Keyframe key in newKeys)

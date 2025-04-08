@@ -75,6 +75,8 @@ public class FuelTankItem : OWItem
             _explosion._length *= ((float)shipExplosionMultiplier.GetProperty() * 0.75f) + 0.25f;
             _explosion._forceVolume._acceleration *= ((float)shipExplosionMultiplier.GetProperty() * 0.25f) + 0.75f;
             _explosion.transform.localScale *= (float)shipExplosionMultiplier.GetProperty();
+            _explosion._lightRadius *= ((float)shipExplosionMultiplier.GetProperty() * 0.75f) + 0.25f;
+            _explosion._lightIntensity *= ((float)shipExplosionMultiplier.GetProperty() * 0.01f) + 0.99f;
             _explosion.GetComponent<SphereCollider>().radius = 0.1f;
             OWAudioSource audio = SELocator.GetShipTransform().Find("Effects/ExplosionAudioSource").GetComponent<OWAudioSource>();
             audio.maxDistance *= ((float)shipExplosionMultiplier.GetProperty() * 0.1f) + 0.9f;
