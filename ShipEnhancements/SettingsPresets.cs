@@ -913,7 +913,7 @@ public static class SettingsPresets
         { "randomComponentDamage", new RandomSettingValue((0f, 1f), (0f, 0.2f), 0f) },
         { "enableFragileShip", new RandomSettingValue((0f, 0.2f)) },
         { "faultyHeatRegulators", new RandomSettingValue((0f, 0.25f)) },
-        { "addErnesto", new RandomSettingValue((0.05f, 0.05f)) },
+        { "addErnesto", new RandomSettingValue((0.2f, 0.2f)) },
         { "repairLimit", new RandomSettingValue(
         [
             (0f, (0f, 0.5f)),
