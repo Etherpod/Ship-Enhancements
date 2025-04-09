@@ -12,6 +12,7 @@ using OWML.ModHelper.Menus.NewMenuSystem;
 using Newtonsoft.Json.Linq;
 using UnityEngine.InputSystem;
 using System.Globalization;
+using UnityEngine.UI;
 
 namespace ShipEnhancements;
 
@@ -2450,11 +2451,7 @@ public class ShipEnhancements : ModBehaviour
                 setting.SetValue(config.GetSettingsValue<object>(setting.GetName()));
             }
 
-            if (_currentPreset != SettingsPresets.PresetName.Custom
-                && _currentPreset != SettingsPresets.PresetName.Random)
-            {
-                RefreshSettingsMenu();
-            }
+            RefreshSettingsMenu();
         }
         else
         {
@@ -2503,16 +2500,37 @@ public class ShipEnhancements : ModBehaviour
 
         if (newModTab == null) return;
 
-        Transform parent = newModTab.transform.Find("Scroll View/Viewport/Content");
-        for (int i = 2; i < parent.childCount; i++)
-        {
-            Destroy(parent.GetChild(i).gameObject);
-        }
+        ShipEnhancements.WriteDebugMessage(newModTab._lastSelected);
 
         newModTab._menuOptions = [];
 
+        Transform settingsParent = newModTab.transform.Find("Scroll View/Viewport/Content");
+        for (int i = 0; i < settingsParent.childCount; i++)
+        {
+            if (i < 2)
+            {
+                MenuOption option = settingsParent.GetChild(i).GetComponentInChildren<MenuOption>();
+                if (option != null)
+                {
+                    newModTab._menuOptions = newModTab._menuOptions.Add(option);
+                }
+            }
+            else
+            {
+                Destroy(settingsParent.GetChild(i).gameObject);
+            }
+        }
+
         foreach (var (name, setting) in ModHelper.Config.Settings)
         {
+            if (_currentPreset != SettingsPresets.PresetName.Random)
+            {
+                if (name == "randomIterations" || name == "randomDifficulty")
+                {
+                    continue;
+                }
+            }
+
             var settingType = GetSettingType(setting);
             var label = ModHelper.MenuTranslations.GetLocalizedString(name);
             var tooltip = "";
@@ -2580,6 +2598,8 @@ public class ShipEnhancements : ModBehaviour
                     };
                     break;
                 case SettingType.SEPARATOR:
+                    OptionsMenuManager.AddSeparator(newModTab, true);
+                    OptionsMenuManager.CreateLabel(newModTab, name);
                     OptionsMenuManager.AddSeparator(newModTab, false);
                     break;
                 case SettingType.SLIDER:
@@ -2626,6 +2646,45 @@ public class ShipEnhancements : ModBehaviour
                     OptionsMenuManager.CreateLabel(newModTab, $"Unknown {settingType} : {name}");
                     break;
             }
+        }
+
+        if (newModTab._tooltipDisplay != null)
+        {
+            foreach (MenuOption option in newModTab.GetComponentsInChildren<MenuOption>(true))
+            {
+                option.SetTooltipDisplay(newModTab._tooltipDisplay);
+            }
+        }
+
+        newModTab._listSelectables = newModTab.GetComponentsInChildren<Selectable>(true);
+        foreach (Selectable selectable in newModTab._listSelectables)
+        {
+            selectable.gameObject.GetAddComponent<Menu.MenuSelectHandler>().OnSelectableSelected += newModTab.OnMenuItemSelected;
+        }
+
+        if (newModTab._lastSelected != null)
+        {
+            SelectableAudioPlayer component = newModTab._selectOnActivate.GetComponent<SelectableAudioPlayer>();
+            if (component != null)
+            {
+                component.SilenceNextSelectEvent();
+            }
+            Locator.GetMenuInputModule().SelectOnNextUpdate(newModTab._lastSelected);
+        }
+        else if (newModTab._selectOnActivate != null)
+        {
+            SelectableAudioPlayer component = newModTab._selectOnActivate.GetComponent<SelectableAudioPlayer>();
+            if (component != null)
+            {
+                component.SilenceNextSelectEvent();
+            }
+            Locator.GetMenuInputModule().SelectOnNextUpdate(newModTab._selectOnActivate);
+            newModTab._lastSelected = newModTab._selectOnActivate;
+        }
+
+        if (newModTab._setMenuNavigationOnActivate)
+        {
+            Menu.SetVerticalNavigation(newModTab, newModTab._menuOptions);
         }
     }
 

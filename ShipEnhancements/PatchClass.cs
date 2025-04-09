@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
+using OWML.Common;
+using OWML.ModHelper.Menus.NewMenuSystem;
 using UnityEngine;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
@@ -4481,6 +4483,31 @@ public static class PatchClass
         {
             pad.GetComponent<Collider>().enabled = false;
             pad._contactBody = null;
+        }
+    }
+    #endregion
+
+    #region CustomMenu
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Menu), nameof(Menu.Activate))]
+    public static void RefreshMenuOnActivate(Menu __instance)
+    {
+        MenuManager menuManager = StartupPopupPatches.menuManager;
+        IOptionsMenuManager OptionsMenuManager = menuManager.OptionsMenuManager;
+
+        var menus = typeof(MenuManager).GetField("ModSettingsMenus", BindingFlags.Public
+            | BindingFlags.NonPublic | BindingFlags.Static).GetValue(menuManager)
+            as List<(IModBehaviour behaviour, Menu modMenu)>;
+
+        for (int i = 0; i < menus.Count; i++)
+        {
+            if ((object)menus[i].behaviour == ShipEnhancements.Instance
+                && menus[i].modMenu == __instance)
+            {
+                __instance.OnActivateMenu += () => ShipEnhancements.Instance.ModHelper.Events.Unity
+                    .FireOnNextUpdate(ShipEnhancements.Instance.RefreshSettingsMenu);
+                return;
+            }
         }
     }
     #endregion
