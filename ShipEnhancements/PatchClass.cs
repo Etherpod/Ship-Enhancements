@@ -2659,7 +2659,7 @@ public static class PatchClass
             comp.OnDamaged += damageDisplay.OnComponentUpdate;
             comp.OnRepaired += damageDisplay.OnComponentUpdate;
         }
-        if ((bool)addShipWarpCore.GetProperty() && (bool)shipWarpCoreComponent.GetProperty())
+        if ((string)addShipWarpCore.GetProperty() == "Component")
         {
             // setting wrong here??
             GameObject warpCoreComponent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipWarpCoreComponent.prefab");
@@ -4488,6 +4488,8 @@ public static class PatchClass
     #endregion
 
     #region CustomMenu
+    public static bool ignoreNextMenuActivation = false;
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(Menu), nameof(Menu.Activate))]
     public static void RefreshMenuOnActivate(Menu __instance)
@@ -4504,9 +4506,31 @@ public static class PatchClass
             if ((object)menus[i].behaviour == ShipEnhancements.Instance
                 && menus[i].modMenu == __instance)
             {
+                if (ignoreNextMenuActivation)
+                {
+                    return;
+                }
+
                 __instance.OnActivateMenu += () => ShipEnhancements.Instance.ModHelper.Events.Unity
-                    .FireOnNextUpdate(ShipEnhancements.Instance.RefreshSettingsMenu);
+                    .FireOnNextUpdate(ShipEnhancements.Instance.RedrawSettingsMenu);
                 return;
+            }
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(MenuManager), nameof(MenuManager.ForceModOptionsOpen))]
+    public static void PreventRepeatActivation(MenuManager __instance, bool force)
+    {
+        var menus = typeof(MenuManager).GetField("ModSettingsMenus", BindingFlags.Public
+            | BindingFlags.NonPublic | BindingFlags.Static).GetValue(__instance)
+            as List<(IModBehaviour behaviour, Menu modMenu)>;
+
+        for (int i = 0; i < menus.Count; i++)
+        {
+            if ((object)menus[i].behaviour == ShipEnhancements.Instance)
+            {
+                ignoreNextMenuActivation = force;
             }
         }
     }

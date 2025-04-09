@@ -204,7 +204,6 @@ public class ShipEnhancements : ModBehaviour
         addRepairWrench,
         funnySounds,
         alwaysAllowLockOn,
-        shipWarpCoreComponent,
         disableShipMedkit,
         addRadio,
         disableFluidPrevention,
@@ -1149,7 +1148,7 @@ public class ShipEnhancements : ModBehaviour
         {
             SELocator.GetShipTransform().GetComponentInChildren<ShipTractorBeamSwitch>()._functional = false;
         }
-        if ((bool)Settings.addShipWarpCore.GetProperty() && !(bool)Settings.shipWarpCoreComponent.GetProperty())
+        if ((string)Settings.addShipWarpCore.GetProperty() == "Enabled")
         {
             GameObject core = LoadPrefab("Assets/ShipEnhancements/ShipWarpCore.prefab");
             AssetBundleUtilities.ReplaceShaders(core);
@@ -1520,7 +1519,7 @@ public class ShipEnhancements : ModBehaviour
                     components.Add(shipComponent);
                 }
 
-                float lerp = (float)Settings.randomHullDamage.GetProperty();
+                float lerp = (float)Settings.randomComponentDamage.GetProperty();
                 int iterations = (int)(lerp * components.Count + 0.1f);
                 for (int i = 0; i < iterations; i++)
                 {
@@ -2083,7 +2082,7 @@ public class ShipEnhancements : ModBehaviour
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_EXPEDITION_FLAG_ENABLED", true);
         }
-        if ((bool)Settings.addShipWarpCore.GetProperty())
+        if ((string)Settings.addShipWarpCore.GetProperty() != "Disabled")
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_WARP_CORE_ENABLED", true);
         }
@@ -2451,7 +2450,7 @@ public class ShipEnhancements : ModBehaviour
                 setting.SetValue(config.GetSettingsValue<object>(setting.GetName()));
             }
 
-            RefreshSettingsMenu();
+            RedrawSettingsMenu();
         }
         else
         {
@@ -2474,13 +2473,14 @@ public class ShipEnhancements : ModBehaviour
                     config.SetSettingsValue(setting.GetName(), setting.GetValue());
                 }
 
-                RefreshSettingsMenu();
+                RedrawSettingsMenu();
             }
         }
     }
 
-    public void RefreshSettingsMenu()
+    public void RedrawSettingsMenu()
     {
+        ShipEnhancements.WriteDebugMessage("draw");
         MenuManager menuManager = StartupPopupPatches.menuManager;
         IOptionsMenuManager OptionsMenuManager = menuManager.OptionsMenuManager;
 
@@ -2500,8 +2500,6 @@ public class ShipEnhancements : ModBehaviour
 
         if (newModTab == null) return;
 
-        ShipEnhancements.WriteDebugMessage(newModTab._lastSelected);
-
         newModTab._menuOptions = [];
 
         Transform settingsParent = newModTab.transform.Find("Scroll View/Viewport/Content");
@@ -2520,6 +2518,10 @@ public class ShipEnhancements : ModBehaviour
                 Destroy(settingsParent.GetChild(i).gameObject);
             }
         }
+
+        OptionsMenuManager.AddSeparator(newModTab, true);
+        OptionsMenuManager.CreateLabel(newModTab, "Any changes to the settings are applied on the next loop!");
+        OptionsMenuManager.AddSeparator(newModTab, true);
 
         foreach (var (name, setting) in ModHelper.Config.Settings)
         {
@@ -2648,6 +2650,8 @@ public class ShipEnhancements : ModBehaviour
             }
         }
 
+
+
         if (newModTab._tooltipDisplay != null)
         {
             foreach (MenuOption option in newModTab.GetComponentsInChildren<MenuOption>(true))
@@ -2656,22 +2660,25 @@ public class ShipEnhancements : ModBehaviour
             }
         }
 
+        bool foundSelectable = false;
         newModTab._listSelectables = newModTab.GetComponentsInChildren<Selectable>(true);
         foreach (Selectable selectable in newModTab._listSelectables)
         {
             selectable.gameObject.GetAddComponent<Menu.MenuSelectHandler>().OnSelectableSelected += newModTab.OnMenuItemSelected;
+
+            if (selectable.gameObject.name == newModTab._lastSelected.gameObject.name)
+            {
+                SelectableAudioPlayer component = newModTab._selectOnActivate.GetComponent<SelectableAudioPlayer>();
+                if (component != null)
+                {
+                    component.SilenceNextSelectEvent();
+                }
+                Locator.GetMenuInputModule().SelectOnNextUpdate(selectable);
+                foundSelectable = true;
+            }
         }
 
-        if (newModTab._lastSelected != null)
-        {
-            SelectableAudioPlayer component = newModTab._selectOnActivate.GetComponent<SelectableAudioPlayer>();
-            if (component != null)
-            {
-                component.SilenceNextSelectEvent();
-            }
-            Locator.GetMenuInputModule().SelectOnNextUpdate(newModTab._lastSelected);
-        }
-        else if (newModTab._selectOnActivate != null)
+        if (!foundSelectable && newModTab._selectOnActivate != null)
         {
             SelectableAudioPlayer component = newModTab._selectOnActivate.GetComponent<SelectableAudioPlayer>();
             if (component != null)

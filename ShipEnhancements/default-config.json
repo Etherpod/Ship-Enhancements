@@ -468,16 +468,15 @@
       "tooltip": "Lets you close the curtain in the ship cabin for some extra privacy in the cockpit."
     },
     "addShipWarpCore": {
-      "title": "Add Ship Warp Core",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Attaches a Nomai warp core to the cockpit, allowing you to recall your ship to the launch pad using a button on the ceiling of the cockpit."
-    },
-    "shipWarpCoreComponent": {
-      "title": "Ship Warp Core Component",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "If the Ship Warp Core is enabled, this turns the warp core into a fully functioning component. Return warps may not function as intended if the warp core is damaged."
+      "title": "Ship Warp Core",
+      "type": "selector",
+      "value": "Disabled",
+      "options": [
+        "Disabled",
+        "Enabled",
+        "Component"
+      ],
+      "tooltip": "Attaches a Nomai warp core to the cockpit that can be activated with a button on the ceiling of the cockpit. The Component option makes it a damageable component."
     },
     "temperatureZonesAmount": {
       "title": "Add Temperature Zones",

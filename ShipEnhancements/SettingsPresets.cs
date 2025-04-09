@@ -83,7 +83,7 @@ public static class SettingsPresets
         { "singleUseTractorBeam", false },
         { "disableThrusters", "None" },
         { "maxDirtAccumulation", 0.8f },
-        { "addShipWarpCore", false },
+        { "addShipWarpCore", "Disabled" },
         { "repairTimeMultiplier", 1f },
         { "airDragMultiplier", 1f },
         { "addShipClock", false },
@@ -103,7 +103,6 @@ public static class SettingsPresets
         { "addRepairWrench", false },
         { "funnySounds", false },
         { "alwaysAllowLockOn", true },
-        { "shipWarpCoreComponent", false },
         { "disableShipMedkit", false },
         { "addRadio", false },
         { "disableFluidPrevention", false },
@@ -197,7 +196,7 @@ public static class SettingsPresets
         { "singleUseTractorBeam", true },
         { "disableThrusters", "Backward" },
         { "maxDirtAccumulation", 0.8f },
-        { "addShipWarpCore", false },
+        { "addShipWarpCore", "Disabled" },
         { "repairTimeMultiplier", 1f },
         { "airDragMultiplier", 1f },
         { "addShipClock", false },
@@ -217,7 +216,6 @@ public static class SettingsPresets
         { "addRepairWrench", true },
         { "funnySounds", false },
         { "alwaysAllowLockOn", true },
-        { "shipWarpCoreComponent", false },
         { "disableShipMedkit", true },
         { "addRadio", false },
         { "disableFluidPrevention", true },
@@ -311,7 +309,7 @@ public static class SettingsPresets
         { "singleUseTractorBeam", false },
         { "disableThrusters", "None" },
         { "maxDirtAccumulation", 1f },
-        { "addShipWarpCore", false },
+        { "addShipWarpCore", "Disabled" },
         { "repairTimeMultiplier", 5f },
         { "airDragMultiplier", 0f },
         { "addShipClock", false },
@@ -331,7 +329,6 @@ public static class SettingsPresets
         { "addRepairWrench", false },
         { "funnySounds", false },
         { "alwaysAllowLockOn", true },
-        { "shipWarpCoreComponent", false },
         { "disableShipMedkit", false },
         { "addRadio", false },
         { "disableFluidPrevention", false },
@@ -425,7 +422,7 @@ public static class SettingsPresets
         { "singleUseTractorBeam", false },
         { "disableThrusters", "None" },
         { "maxDirtAccumulation", 0.8f },
-        { "addShipWarpCore", true },
+        { "addShipWarpCore", "Component" },
         { "repairTimeMultiplier", 1f },
         { "airDragMultiplier", 1f },
         { "addShipClock", true },
@@ -445,7 +442,6 @@ public static class SettingsPresets
         { "addRepairWrench", true },
         { "funnySounds", false },
         { "alwaysAllowLockOn", true },
-        { "shipWarpCoreComponent", true },
         { "disableShipMedkit", false },
         { "addRadio", true },
         { "disableFluidPrevention", false },
@@ -539,7 +535,7 @@ public static class SettingsPresets
         { "singleUseTractorBeam", true },
         { "disableThrusters", "None" },
         { "maxDirtAccumulation", 0.8f },
-        { "addShipWarpCore", true },
+        { "addShipWarpCore", "Component" },
         { "repairTimeMultiplier", 0.1f },
         { "airDragMultiplier", 0f },
         { "addShipClock", true },
@@ -559,7 +555,6 @@ public static class SettingsPresets
         { "addRepairWrench", true },
         { "funnySounds", false },
         { "alwaysAllowLockOn", true },
-        { "shipWarpCoreComponent", true },
         { "disableShipMedkit", true },
         { "addRadio", true },
         { "disableFluidPrevention", true },
@@ -888,7 +883,11 @@ public static class SettingsPresets
             ((0.4f, 0.6f), (0.25f, 0.8f)),
             ((0.6f, 1f), (0f, 1f)),
         ], (0.5f, 0.5f), 0.75f) },
-        { "addShipWarpCore", new RandomSettingValue((0.5f, 0.5f)) },
+        { "addShipWarpCore", new RandomSettingValue(
+        [
+            ("Enabled", (1f, 0.8f)),
+            ("Component", (0.2f, 1f)),
+        ], (0.5f, 0.5f), "Disabled") },
         { "repairTimeMultiplier", new RandomSettingValue(
         [
             ((0.2f, 0.7f), (0.4f, 0.4f)),
@@ -927,7 +926,6 @@ public static class SettingsPresets
         { "addRepairWrench", new RandomSettingValue((0.2f, 0.5f)) },
         { "funnySounds", new RandomSettingValue((0.05f, 0.05f)) },
         //{ "alwaysAllowLockOn", new RandomSettingValue((1f, 1f)) },
-        { "shipWarpCoreComponent", new RandomSettingValue((0.5f, 0.5f)) },
         { "disableShipMedkit", new RandomSettingValue((0f, 0.2f)) },
         { "addRadio", new RandomSettingValue((0.5f, 0.5f)) },
         { "disableFluidPrevention", new RandomSettingValue((0f, 0.5f)) },
@@ -1047,14 +1045,7 @@ public static class SettingsPresets
         if (preset == PresetName.Custom || preset == PresetName.Random) return;
         foreach (KeyValuePair<string, object> setting in presetDicts[preset])
         {
-            if (setting.Value is float)
-            {
-                config.SetSettingsValue(setting.Key, Math.Round((float)setting.Value * 1000f) / 1000f);
-            }
-            else
-            {
-                config.SetSettingsValue(setting.Key, setting.Value);
-            }
+            config.SetSettingsValue(setting.Key, setting.Value);
         }
     }
 
