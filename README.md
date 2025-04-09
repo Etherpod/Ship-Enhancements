@@ -86,8 +86,8 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Automatic Hatch**: Automatically closes the hatch when you leave the ship. **Quantum Space Buddies** has this feature by default.
 - **Extra Eject Buttons**: Adds a few more eject buttons that all eject different parts of the ship.
 - **Interactable Ship Curtain**: Lets you close the curtain inside the ship, blocking off the cockpit.
-- **Ship Warp Core**: Attaches a Nomai warp core to your ship's cockpit. You can press the button on the ceiling of the cockpit to activate the warp core, which will warp your ship back to where it started.
-- **Ship Warp Core Component**: Turns the **Ship Warp Core** into a functioning component. Attempting to warp with a damaged warp core may have unintended results.
+- **Ship Warp Core**: Attaches a Nomai warp core to your ship's cockpit. You can press the button on the ceiling of the cockpit to activate the warp core, which will warp your ship back to where it was at the start of the loop.
+  - The component option for this setting turns the warp core into a damageable component. Activating the return warp while it's damaged may have unintended results.
 - **Temperature Zones**: Implements a temperature mechanic for the ship using the "TEMP" (temperature) dial and a new "SHIP TEMP" (ship temperature) dial. Subjecting your ship to extreme temperatures will increase the ship temperature, making it more likely for your ship to sustain damage or bad side effects.
   - Any extreme temperatures can damage your ship if temperature damage is enabled. The temperature dial will start flashing if the temperature reaches a dangerous level.
   - High temperatures (very hot) will make your ship hull hot to the touch and can blow up the Portable Fuel Tank.
@@ -100,7 +100,7 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Repair Confirmation**: Plays a sound when everything has been repaired. Now you don't need to go searching for any hulls you forgot to fix!
 - **Hazardous Thrusters**: Makes your ship's thruster flames actually damage you. Try figuring out how to get near them in the first place.
 - **Cockpit Rust Level**: Controls how much rust is applied to the ship cockpit. Moving the slider all the way to the right completely covers the cockpit in rust.
-- **Dirt Accumulation Time**: Larger numbers increase the time (in seconds) it takes for dirt to build up on your cockpit glass, which you can wash off by finding a source of water. Set this to 0 to disable it.
+- **Dirt Accumulation Time**: Larger numbers increase the time (in seconds) it takes for dirt to build up on your cockpit glass, which you can wash off by finding a source of water (or something similar to it). Set this to 0 to disable it.
 - **Max Dirt Accumulation**: Stops dirt from building up on your cockpit when it reaches a certain level.
 - **Scout Launcher Component**: Turns the ship's scout launcher into a fully functioning ship component. If you damage it, you won't be able to launch or recall your scout from the ship until you repair it.
 - **Ship Scout Photo Mode**: Lets you switch to photo mode on the ship's scout launcher. It will default to photo mode if scout launching is disabled.

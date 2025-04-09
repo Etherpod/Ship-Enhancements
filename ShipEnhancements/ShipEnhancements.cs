@@ -1382,6 +1382,50 @@ public class ShipEnhancements : ModBehaviour
             HatchController hatch = SELocator.GetShipTransform().GetComponentInChildren<HatchController>();
             hatch._interactVolume.GetComponent<Shape>().enabled = false;
         }
+        if ((string)Settings.disableThrusters.GetProperty() != "None")
+        {
+            ThrustAndAttitudeIndicator indicator = SELocator.GetShipTransform().GetComponentInChildren<ThrustAndAttitudeIndicator>();
+            List<Light> lightsToDisable = [];
+            switch ((string)Settings.disableThrusters.GetProperty())
+            {
+                case "Backward":
+                    indicator._rendererForward.gameObject.SetActive(false);
+                    lightsToDisable.AddRange(indicator._lightsForward);
+                    break;
+                case "Left-Right":
+                    indicator._rendererLeft.gameObject.SetActive(false);
+                    indicator._rendererRight.gameObject.SetActive(false);
+
+                    lightsToDisable.AddRange(indicator._lightsLeft);
+                    lightsToDisable.AddRange(indicator._lightsRight);
+                    break;
+                case "Up-Down":
+                    indicator._rendererUp.gameObject.SetActive(false);
+                    indicator._rendererDown.gameObject.SetActive(false);
+
+                    lightsToDisable.AddRange(indicator._lightsUp);
+                    lightsToDisable.AddRange(indicator._lightsDown);
+                    break;
+                case "All Except Forward":
+                    indicator._rendererForward.gameObject.SetActive(false);
+                    indicator._rendererLeft.gameObject.SetActive(false);
+                    indicator._rendererRight.gameObject.SetActive(false);
+                    indicator._rendererUp.gameObject.SetActive(false);
+                    indicator._rendererDown.gameObject.SetActive(false);
+
+                    lightsToDisable.AddRange(indicator._lightsForward);
+                    lightsToDisable.AddRange(indicator._lightsLeft);
+                    lightsToDisable.AddRange(indicator._lightsRight);
+                    lightsToDisable.AddRange(indicator._lightsUp);
+                    lightsToDisable.AddRange(indicator._lightsDown);
+                    break;
+            }
+
+            foreach (Light light in lightsToDisable)
+            {
+                light.gameObject.SetActive(false);
+            }
+        }
 
         SetDamageColors();
 
@@ -2503,7 +2547,6 @@ public class ShipEnhancements : ModBehaviour
 
     public void RedrawSettingsMenu()
     {
-        ShipEnhancements.WriteDebugMessage("draw");
         MenuManager menuManager = StartupPopupPatches.menuManager;
         IOptionsMenuManager OptionsMenuManager = menuManager.OptionsMenuManager;
 
