@@ -144,8 +144,6 @@ These are all enabled by default.
 ## Presets
 In case there are too many settings to deal with, there are some pre-made presets for you to use. The settings can still be meddled with after choosing one.
 
-When you select a preset, you may have to close and reopen the settings menu for the changes to be visible. The mod manager has a few bugs currently.
-
 - **Vanilla Plus** - Turns everything off except for the Quality of Life changes.
 - **Minimal** - Disables anything that could be considered useful.
 - **Impossible** - Makes it very difficult to keep your ship in one piece.

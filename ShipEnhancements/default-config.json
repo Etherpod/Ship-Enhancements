@@ -16,7 +16,7 @@
         "Random",
         "Custom"
       ],
-      "tooltip": "Chooses the settings for you. You can still change the settings after selecting a preset. Close and open the settings menu again to see the changes."
+      "tooltip": "Chooses the settings for you. You can still change the settings after selecting a preset. The Random preset will randomize the settings every loop."
     },
     "randomIterations": {
       "title": "Randomizer Iterations",
