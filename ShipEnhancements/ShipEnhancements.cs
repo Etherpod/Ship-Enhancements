@@ -2442,12 +2442,35 @@ public class ShipEnhancements : ModBehaviour
         SettingsPresets.PresetName newPreset = SettingsPresets.GetPresetFromConfig(config.GetSettingsValue<string>("preset"));
         if (newPreset != _currentPreset || _currentPreset == (SettingsPresets.PresetName)(-1))
         {
+            SettingsPresets.PresetName lastPreset = _currentPreset;
             _currentPreset = newPreset;
             config.SetSettingsValue("preset", _currentPreset.GetName());
-            SettingsPresets.ApplyPreset(newPreset, config);
-            foreach (Settings setting in allSettings)
+
+            if ((_currentPreset == SettingsPresets.PresetName.Custom
+                || _currentPreset == SettingsPresets.PresetName.Random)
+                && lastPreset != (SettingsPresets.PresetName)(-1))
             {
-                setting.SetValue(config.GetSettingsValue<object>(setting.GetName()));
+                WriteDebugMessage("Load");
+                SettingExtensions.LoadCustomSettings();
+                foreach (Settings setting in allSettings)
+                {
+                    config.SetSettingsValue(setting.GetName(), setting.GetValue());
+                }
+            }
+            else
+            {
+                if (lastPreset == SettingsPresets.PresetName.Custom
+                    || lastPreset == SettingsPresets.PresetName.Random)
+                {
+                    WriteDebugMessage("Save");
+                    SettingExtensions.SaveCustomSettings();
+                }
+
+                SettingsPresets.ApplyPreset(newPreset, config);
+                foreach (Settings setting in allSettings)
+                {
+                    setting.SetValue(config.GetSettingsValue<object>(setting.GetName()));
+                }
             }
 
             RedrawSettingsMenu();

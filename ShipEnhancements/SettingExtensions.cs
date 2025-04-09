@@ -7,7 +7,7 @@ namespace ShipEnhancements;
 
 public static class SettingExtensions
 {
-    private static Dictionary<Settings, (object, object)> settingValues = new Dictionary<Settings, (object, object)>()
+    private static Dictionary<Settings, (object value, object property)> settingValues = new Dictionary<Settings, (object, object)>()
     {
         { Settings.disableGravityCrystal, (false, false) },
         { Settings.disableEjectButton, (false, false) },
@@ -122,6 +122,8 @@ public static class SettingExtensions
         { Settings.disableHatch, (false, false) },
     };
 
+    private static Dictionary<Settings, object> savedCustomSettings = new(settingValues.Count);
+
     public static string GetName(this Settings setting)
     {
         return setting.ToString();
@@ -129,7 +131,7 @@ public static class SettingExtensions
 
     public static object GetValue(this Settings setting)
     {
-        JValue value = (JValue)settingValues[setting].Item1;
+        JValue value = (JValue)settingValues[setting].value;
         if (value.Type == JTokenType.Boolean)
         {
             return Convert.ToBoolean(value);
@@ -151,14 +153,14 @@ public static class SettingExtensions
 
     public static void SetValue(this Settings setting, object value)
     {
-        settingValues[setting] = (value, settingValues[setting].Item2);
+        settingValues[setting] = (value, settingValues[setting].property);
     }
 
     public static object GetProperty(this Settings setting)
     {
-        if (settingValues[setting].Item2 is JValue)
+        if (settingValues[setting].property is JValue)
         {
-            JValue value = (JValue)settingValues[setting].Item2;
+            JValue value = (JValue)settingValues[setting].property;
             if (value.Type == JTokenType.Boolean)
             {
                 return Convert.ToBoolean(value);
@@ -178,17 +180,33 @@ public static class SettingExtensions
             return value;
         }
 
-        return settingValues[setting].Item2;
+        return settingValues[setting].property;
     }
 
     public static void SetProperty(this Settings setting, object value)
     {
         //ShipEnhancements.WriteDebugMessage("Set " + setting.GetName() + " to " + value);
-        settingValues[setting] = (settingValues[setting].Item1, value);
+        settingValues[setting] = (settingValues[setting].value, value);
     }
 
     public static Type GetType(this Settings setting)
     {
         return settingValues[setting].GetType();
+    }
+
+    public static void SaveCustomSettings()
+    {
+        foreach (var (setting, value) in settingValues)
+        {
+            savedCustomSettings[setting] = value.value;
+        }
+    }
+
+    public static void LoadCustomSettings()
+    {
+        foreach (var (setting, value) in savedCustomSettings)
+        {
+            settingValues[setting] = (value, settingValues[setting].property);
+        }
     }
 }
