@@ -4357,7 +4357,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitUI), nameof(ShipCockpitUI.Update))]
     public static void UpdateAutopilotUI(ShipCockpitUI __instance)
     {
-        if ((bool)enableEnhancedAutopilot.GetProperty())
+        if ((bool)enableEnhancedAutopilot.GetProperty() && SELocator.GetAutopilotPanelController() != null)
         {
             if (SELocator.GetAutopilotPanelController().IsAutopilotActive())
             {
