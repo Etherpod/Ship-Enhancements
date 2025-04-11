@@ -117,6 +117,8 @@ public class CockpitButton : CockpitInteractible
     {
         _on = state;
 
+        if (!gameObject.activeInHierarchy) return;
+
         if (_on)
         {
             _emissiveRenderer.SetEmissiveScale(_enabledEmissionScale);

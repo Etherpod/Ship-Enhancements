@@ -89,6 +89,8 @@ public abstract class CockpitSwitch : CockpitInteractible
     {
         _on = state;
 
+        if (!gameObject.activeInHierarchy) return;
+
         if (_on)
         {
             _switchTransform.localPosition = _initialPosition + _positionOffset;

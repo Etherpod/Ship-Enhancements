@@ -54,6 +54,7 @@ public class CockpitButtonSwitch : CockpitButton
     public virtual void SetActive(bool active)
     {
         _activated = active;
+        if (!gameObject.activeInHierarchy) return;
         _offLabel = _activated ? _deactivateLabel : _activateLabel;
         if (!_pressed)
         {

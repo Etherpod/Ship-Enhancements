@@ -960,6 +960,14 @@ public class QSBCompatibility
 
     private void ReceiveCreateItem(uint id, (int itemID, int socketID, bool socketItem) data)
     {
+        if (!ShipEnhancements.QSBInteraction.WorldObjectsLoaded())
+        {
+            ShipEnhancements.Instance.ModHelper.Events.Unity.RunWhen(
+                ShipEnhancements.QSBInteraction.WorldObjectsLoaded,
+                () => ReceiveCreateItem(id, data));
+            return;
+        }
+
         OWItem item = ShipEnhancements.QSBInteraction.GetItemFromID(data.itemID);
         if (item == null) return;
 
