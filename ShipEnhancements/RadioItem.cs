@@ -52,6 +52,10 @@ public class RadioItem : OWItem
     private Transform _needleEndRot;
     [SerializeField]
     private OWEmissiveRenderer _screenRenderer;
+    [SerializeField]
+    private AudioClip _onAudio;
+    [SerializeField]
+    private AudioClip _offAudio;
 
     private PriorityScreenPrompt _powerPrompt;
     private ScreenPrompt _tunePrompt;
@@ -403,6 +407,8 @@ public class RadioItem : OWItem
                     _targetNeedleRotation = Quaternion.Lerp(_needleStartRot.rotation, _needleEndRot.rotation, _currentVolume);
                     _needleT = 0f;
                     _moveNeedle = true;
+
+                    _oneShotSource.PlayOneShot(_onAudio, 0.2f);
                 }
                 else
                 {
@@ -435,6 +441,8 @@ public class RadioItem : OWItem
                     _targetNeedleRotation = _needleStartRot.rotation;
                     _needleT = 0f;
                     _moveNeedle = true;
+
+                    _oneShotSource.PlayOneShot(_offAudio, 0.2f);
                 }
 
                 if (ShipEnhancements.InMultiplayer)

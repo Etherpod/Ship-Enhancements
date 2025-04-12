@@ -20,6 +20,9 @@ public static class SEItemAudioController
     private static AudioClip _repairWrenchDrop;
     private static AudioClip _repairWrenchPickUp;
     private static AudioClip _tetherHookDrop;
+    private static AudioClip _radioDrop;
+    private static AudioClip _radioPickUp;
+    private static AudioClip _portableCampfireDrop;
 
     public static void Initialize()
     {
@@ -34,6 +37,9 @@ public static class SEItemAudioController
         _repairWrenchDrop = ShipEnhancements.LoadAudio(AudioClipPath + "RepairWrench_Drop.ogg");
         _repairWrenchPickUp = ShipEnhancements.LoadAudio(AudioClipPath + "RepairWrench_PickUp.ogg");
         _tetherHookDrop = ShipEnhancements.LoadAudio(AudioClipPath + "TetherHook_Drop.mp3");
+        _radioDrop = ShipEnhancements.LoadAudio(AudioClipPath + "Radio_Drop.ogg");
+        _radioPickUp = ShipEnhancements.LoadAudio(AudioClipPath + "Radio_PickUp.ogg");
+        _portableCampfireDrop = ShipEnhancements.LoadAudio(AudioClipPath + "PortableCampfire_Unpack.ogg");
     }
 
     [HarmonyPostfix]
@@ -123,6 +129,14 @@ public static class SEItemAudioController
         {
             __instance._oneShotExternalSource.PlayOneShot(_tetherHookDrop, DefaultVolume);
         }
+        if (itemType == ShipEnhancements.Instance.RadioType)
+        {
+            __instance._oneShotExternalSource.PlayOneShot(_radioDrop, DefaultVolume);
+        }
+        if (itemType == ShipEnhancements.Instance.PortableCampfireType)
+        {
+            __instance._oneShotExternalSource.PlayOneShot(_portableCampfireDrop, DefaultVolume);
+        }
     }
 
     [HarmonyPostfix]
@@ -153,6 +167,10 @@ public static class SEItemAudioController
         if (itemType == ShipEnhancements.Instance.RepairWrenchType)
         {
             __instance._oneShotExternalSource.PlayOneShot(_repairWrenchPickUp, DefaultVolume);
+        }
+        if (itemType == ShipEnhancements.Instance.RadioType)
+        {
+            __instance._oneShotExternalSource.PlayOneShot(_radioPickUp, DefaultVolume);
         }
     }
 }

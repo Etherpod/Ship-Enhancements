@@ -11,6 +11,10 @@ public class PortableCampfire : Campfire
     [SerializeField]
     private AudioClip _waterExtinguishAudio;
     [SerializeField]
+    private AudioClip _packUpAudio;
+    [SerializeField]
+    private OWAudioSource _audioSource;
+    [SerializeField]
     private GameObject _itemParent;
 
     private ScreenPrompt _cancelPrompt;
@@ -101,7 +105,7 @@ public class PortableCampfire : Campfire
             {
                 StopSleeping();
             }
-            _oneShotAudio.PlayOneShot(_waterExtinguishAudio);
+            _audioSource.PlayOneShot(_waterExtinguishAudio);
             SetState(State.UNLIT);
         }
     }
@@ -119,6 +123,7 @@ public class PortableCampfire : Campfire
         {
             StopSleeping();
         }
+        _audioSource.PlayOneShot(_packUpAudio, 0.5f);
         _item.TogglePackUp(true);
     }
 
@@ -155,7 +160,7 @@ public class PortableCampfire : Campfire
         else
         {
             SetState(State.UNLIT);
-            _oneShotAudio.PlayOneShot(_waterExtinguishAudio);
+            _audioSource.PlayOneShot(_waterExtinguishAudio);
         }
     }
 
