@@ -157,7 +157,7 @@ public class Tether : MonoBehaviour
                 }
             }
 
-            _joint.anchor = transform.localPosition + anchorOffset;
+            _joint.anchor = _rigidbody.transform.InverseTransformPoint(transform.position) + anchorOffset;
             _joint.autoConfigureConnectedAnchor = false;
             _joint.connectedAnchor = _connectedAnchor;
             _joint.enableCollision = true;

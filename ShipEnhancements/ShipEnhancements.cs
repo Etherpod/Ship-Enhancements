@@ -255,6 +255,10 @@ public class ShipEnhancements : ModBehaviour
 
         SEItemAudioController.Initialize();
 
+        // Alt never works the first time I press it
+        // Hopefully this doesn't break any compatibility
+        InputLibrary.freeLook.ConsumeInput();
+
         LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
         {
             if (loadScene != OWScene.SolarSystem) return;
