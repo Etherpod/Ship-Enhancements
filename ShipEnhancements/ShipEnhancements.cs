@@ -898,13 +898,16 @@ public class ShipEnhancements : ModBehaviour
                 SELocator.GetShipBody().GetComponentInChildren<ProbeLauncherComponent>().SetProbeLauncherEffects(launcherEffects);
             }
         }
-        if ((bool)Settings.disableScoutRecall.GetProperty() && (bool)Settings.disableScoutLaunching.GetProperty() && (bool)Settings.enableScoutLauncherComponent.GetProperty())
+        /*if ((bool)Settings.disableScoutRecall.GetProperty() 
+            && (bool)Settings.disableScoutLaunching.GetProperty()
+            && !(bool)Settings.scoutPhotoMode.GetProperty()
+            && (bool)Settings.enableScoutLauncherComponent.GetProperty())
         {
             SELocator.GetProbeLauncherComponent()._repairReceiver.repairDistance = 0f;
             SELocator.GetProbeLauncherComponent()._damaged = true;
             SELocator.GetProbeLauncherComponent()._repairFraction = 0f;
             SELocator.GetProbeLauncherComponent().OnComponentDamaged();
-        }
+        }*/
         if ((bool)Settings.addPortableCampfire.GetProperty())
         {
             Transform suppliesParent = SELocator.GetShipTransform().Find("Module_Supplies");

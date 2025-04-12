@@ -65,8 +65,10 @@ public static class PatchClass
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.OnPressInteract))]
-    public static bool KeepHelmetOnAtCockpit(ShipCockpitController __instance)
+    public static bool KeepHelmetOnAtCockpit(ShipCockpitController __instance, bool __runOriginal)
     {
+        if (!__runOriginal) return false;
+
         bool run = (bool)keepHelmetOn.GetProperty() && (ShipEnhancements.Instance.oxygenDepleted
             || (bool)disableFluidPrevention.GetProperty());
         if (!run) return true;
@@ -2322,7 +2324,7 @@ public static class PatchClass
 
         if ((bool)enableEnhancedAutopilot.GetProperty())
         {
-            if (SELocator.GetAutopilotPanelController().IsAutopilotActive(true)
+            if (SELocator.GetAutopilotPanelController().IsAutopilotActive()
                 || SELocator.GetAutopilotPanelController().IsPersistentInputActive())
             {
                 __result = Vector3.zero;
