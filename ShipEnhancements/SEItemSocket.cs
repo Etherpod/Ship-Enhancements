@@ -148,12 +148,6 @@ public class SEItemSocket : OWItemSocket
             newItem.gameObject.SetActive(true);
             PlaceIntoSocket(newItem);
 
-            ShipEnhancements.Instance.ModHelper.Events.Unity.FireInNUpdates(() =>
-            {
-                ShipEnhancements.WriteDebugMessage("Socket item: " + newItem.GetDisplayName()
-                    + ShipEnhancements.QSBInteraction.GetIDFromItem(newItem));
-            }, 5);
-
             foreach (uint id in ShipEnhancements.PlayerIDs)
             {
                 ShipEnhancements.QSBCompat.SendCreateItem(id, newItem, this);
@@ -171,11 +165,6 @@ public class SEItemSocket : OWItemSocket
             if (socketItem)
             {
                 PlaceIntoSocket(item);
-                ShipEnhancements.Instance.ModHelper.Events.Unity.FireInNUpdates(() =>
-                {
-                    ShipEnhancements.WriteDebugMessage("Socket item: " + item.GetDisplayName()
-                        + ShipEnhancements.QSBInteraction.GetIDFromItem(item));
-                }, 5);
             }
         }
     }

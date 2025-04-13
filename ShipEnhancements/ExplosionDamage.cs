@@ -162,7 +162,6 @@ public class ExplosionDamage : MonoBehaviour
         }
         if (_damageFragment)
         {
-            //ShipEnhancements.WriteDebugMessage(hitObj.gameObject.name);
             FragmentIntegrity fragment = hitObj.GetComponentInParent<FragmentIntegrity>();
             if (fragment != null)
             {

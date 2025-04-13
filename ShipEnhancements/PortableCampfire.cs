@@ -65,7 +65,6 @@ public class PortableCampfire : Campfire
                     _reactorHeatMeterLength = Random.Range(10f, 30f);
                     if (!_reactor.isDamaged)
                     {
-                        ShipEnhancements.WriteDebugMessage("campfire");
                         ErnestoDetectiveController.SetReactorCause("campfire");
                     }
                     _reactor.SetDamaged(true);

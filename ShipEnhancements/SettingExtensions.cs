@@ -185,7 +185,6 @@ public static class SettingExtensions
 
     public static void SetProperty(this Settings setting, object value)
     {
-        //ShipEnhancements.WriteDebugMessage("Set " + setting.GetName() + " to " + value);
         settingValues[setting] = (settingValues[setting].value, value);
     }
 

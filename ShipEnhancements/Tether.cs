@@ -183,7 +183,6 @@ public class Tether : MonoBehaviour
         foreach (RaycastHit hit in hits)
         {
             Rigidbody rb = hit.collider.attachedRigidbody;
-            //ShipEnhancements.WriteDebugMessage("hit: " + rb.gameObject.name);
             if (!(rb.isKinematic || rb == GetComponentInParent<Rigidbody>() || rb == SELocator.GetPlayerBody().GetRigidbody()))
             {
                 intersectingBody = true;
@@ -287,52 +286,6 @@ public class Tether : MonoBehaviour
         _tetherMesh = Instantiate(ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/TetherLine.prefab"), transform).transform;
         AssetBundleUtilities.ReplaceShaders(_tetherMesh.gameObject);
         _tetherMesh.localPosition = _anchor;
-
-        // old code
-        /*if (false && !(connectedObj.IsChildOf(transform) || transform.IsChildOf(connectedObj)) && (!GetComponentInParent<OWRigidbody>()?.IsKinematic() ?? false))
-        {
-            _connectedRigidbody = GetComponentInParent<OWRigidbody>();
-            _connectedTransform = transform;
-            _anchorTransform = connectedObj;
-            _connectedAnchor = anchorOffset;
-
-            GameObject jointObj = new("REMOTE_TetherJoint");
-            jointObj.transform.parent = connectedObj;
-            jointObj.transform.localPosition = Vector3.zero;
-            OWRigidbody rb = jointObj.AddComponent<OWRigidbody>();
-            rb.MakeKinematic();
-            _addedJointObj = true;
-
-            _joint = jointObj.AddComponent<SpringJoint>();
-            _joint.connectedBody = _connectedRigidbody.GetRigidbody();
-            _joint.connectedMassScale = 0.001f;
-            _joint.massScale = 1000f;
-            _joint.anchor = connectedOffset;
-            ShipEnhancements.WriteDebugMessage(_joint.anchor);
-            _anchor = _joint.anchor;
-            _joint.autoConfigureConnectedAnchor = false;
-            _joint.connectedAnchor = _connectedAnchor;
-            _joint.enableCollision = true;
-            _joint.maxDistance = 0f;
-            _joint.minDistance = Mathf.Min(100f, Vector3.Distance(transform.TransformPoint(_anchor),
-                _connectedTransform.TransformPoint(_connectedAnchor)));
-            _joint.spring = 0.2f;
-            _joint.damper = 0f;
-
-            _tetherMesh = Instantiate(ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/TetherLine.prefab"), connectedObj).transform;
-            AssetBundleUtilities.ReplaceShaders(_tetherMesh.gameObject);
-            _tetherMesh.localPosition = _anchor;
-        }
-        else
-        {
-            _anchor = anchorOffset;
-            _connectedTransform = connectedObj;
-            _connectedAnchor = connectedOffset;
-
-            _tetherMesh = Instantiate(ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/TetherLine.prefab"), transform).transform;
-            AssetBundleUtilities.ReplaceShaders(_tetherMesh.gameObject);
-            _tetherMesh.localPosition = _anchor;
-        }*/
 
         _tetheredToSelf = _connectedTransform == transform;
 

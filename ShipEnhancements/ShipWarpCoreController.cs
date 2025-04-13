@@ -56,7 +56,7 @@ public class ShipWarpCoreController : CockpitInteractible
             }
             if (parent != null)
             {
-                ShipEnhancements.WriteDebugMessage(parent.gameObject.name);
+                ShipEnhancements.WriteDebugMessage("Random warp parent: " + parent.gameObject.name);
                 _randomDestination.parent = parent;
             }
         }

@@ -308,7 +308,6 @@ public class ShipEnhancements : ModBehaviour
                     }
                     else
                     {
-                        WriteDebugMessage(QSBCompat.GetHostPreset());
                         if (QSBCompat.GetHostPreset() == SettingsPresets.PresetName.Random)
                         {
                             slate.Find("ConversationZone_RSci").GetComponent<CharacterDialogueTree>().OnEndConversation += OnEndConversation;
@@ -619,8 +618,6 @@ public class ShipEnhancements : ModBehaviour
 
                 if (SettingsPresets.RandomSettings.ContainsKey(allSettings[i].GetName()))
                 {
-                    /*ShipEnhancements.WriteDebugMessage(allSettings[i].GetName() + ": "
-                        + SettingsPresets.RandomSettings[allSettings[i].GetName()].GetRandomChance());*/
                     total += SettingsPresets.RandomSettings[allSettings[i].GetName()].GetRandomChance();
                 }
             }
@@ -962,8 +959,6 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)Settings.enableEnhancedAutopilot.GetProperty())
         {
             SELocator.GetShipBody().gameObject.AddComponent<ShipPersistentInput>();
-
-            WriteDebugMessage("adding orbit autopilot");
             SELocator.GetShipBody().gameObject.AddComponent<PidAutopilot>();
         }
         if ((float)Settings.shipInputLatency.GetProperty() != 0f)

@@ -2389,7 +2389,6 @@ public static class PatchClass
 
         foreach (RadioItem radio in SELocator.GetPlayerBody().GetComponentsInChildren<RadioItem>())
         {
-            ShipEnhancements.WriteDebugMessage("radio haha");
             __instance._noiseRadius = Mathf.Max(__instance._noiseRadius, radio.GetNoiseRadius());
         }
     }
@@ -2877,7 +2876,6 @@ public static class PatchClass
         if (__instance._dominantImpact != null
             && __instance._dominantImpact.otherBody is PlayerBody)
         {
-            ShipEnhancements.WriteDebugMessage("Set state");
             __state = true;
         }
     }
@@ -2888,10 +2886,8 @@ public static class PatchClass
     {
         if (__state && __instance.integrity <= 0f)
         {
-            ShipEnhancements.WriteDebugMessage("wait");
             ShipEnhancements.Instance.ModHelper.Events.Unity.FireInNUpdates(() =>
             {
-                ShipEnhancements.WriteDebugMessage(SELocator.GetShipDamageController().IsSystemFailed());
                 if (SELocator.GetShipDamageController().IsSystemFailed()
                     && !SEAchievementTracker.HulkSmash)
                 {
@@ -2979,7 +2975,6 @@ public static class PatchClass
 
         PriorityVolume vol = eVol as PriorityVolume;
 
-        ShipEnhancements.WriteDebugMessage(__instance.gameObject.name + ": " + vol.GetPriority());
         __state = (vol, vol.GetPriority());
         vol.SetPriority(4);
     }
@@ -2989,7 +2984,6 @@ public static class PatchClass
     public static void ForceTornadoPriority(PriorityDetector __instance, EffectVolume eVol, object __state)
     {
         if (__state == null || __instance is not ShipFluidDetector || eVol is not TornadoFluidVolume) return;
-        ShipEnhancements.WriteDebugMessage(__state);
         (PriorityVolume, int) dos = ((PriorityVolume, int))__state;
         dos.Item1.SetPriority(dos.Item2);
     }
@@ -3705,7 +3699,6 @@ public static class PatchClass
                 {
                     if (!component._shipReactorComponent.isDamaged)
                     {
-                        ShipEnhancements.WriteDebugMessage("electricity");
                         ErnestoDetectiveController.SetReactorCause("electricity");
                     }
                 }

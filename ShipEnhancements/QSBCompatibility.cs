@@ -255,7 +255,6 @@ public class QSBCompatibility
 
             foreach (var hook in _activeTetherHooks)
             {
-                ShipEnhancements.WriteDebugMessage("same: " + (hook.GetTether() == hook.GetActiveTether()));
                 if (hook.GetTether() != hook.GetActiveTether())
                 {
                     SendTransferTether(joiningID, hook, hook.GetActiveTether().GetHook());
@@ -811,7 +810,6 @@ public class QSBCompatibility
             parent = SELocator.GetShipDamageController()._shipModules[data.shipModulesIndex].transform;
         }
         
-        ShipEnhancements.WriteDebugMessage("Module from index " + data.shipModulesIndex + ": " + parent.gameObject.name);
         OWItem item = ShipEnhancements.QSBInteraction.GetItemFromID(data.itemID);
         item.transform.parent = parent;
     }

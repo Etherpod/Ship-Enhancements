@@ -281,34 +281,6 @@ public class TetherHookItem : OWItem
         transform.localPosition -= new Vector3(0f, 0.1f, 0f);
     }
 
-    /*private void PlayOneShotAudio(AudioClip clip, float volume)
-    {
-        _audioSource.pitch = _audioSource.time > 0 ? _audioSource.pitch : Random.Range(0.95f, 1.05f);
-        _audioSource.PlayOneShot(clip, volume);
-    }*/
-
-    /*private void OnShipSystemFailure()
-    {
-        if (!_activeTether.IsTethered()) return;
-
-        ShipEnhancements.Instance.ModHelper.Events.Unity.FireOnNextUpdate(() =>
-        {
-            ShipEnhancements.WriteDebugMessage("Try tether " + gameObject.GetAttachedOWRigidbody().name);
-
-            ShipDetachableModule module = GetComponentInParent<ShipDetachableModule>();
-            if (module == null || !module.isDetached)
-            {
-                ShipDetachableLeg leg = GetComponentInParent<ShipDetachableLeg>();
-                if (leg == null || !leg.isDetached)
-                {
-                    return;
-                }
-            }
-
-            _activeTether.UpdateTetherBody(gameObject.GetAttachedOWRigidbody(), _activeTether.GetHook() != this);
-        });
-    }*/
-
     private void OnBodyDetached()
     {
         if (!_activeTether.IsTethered()) return;

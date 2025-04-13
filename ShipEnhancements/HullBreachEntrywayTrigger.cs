@@ -30,15 +30,6 @@ public class HullBreachEntrywayTrigger : MonoBehaviour
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
     }
 
-    private void Start()
-    {
-        //_suppliesEntryway.SetActivation(false);
-        //_engineEntryway.SetActivation(false);
-
-        /*_triggerVolume.OnExit += ctx => { ShipEnhancements.WriteDebugMessage("Exit zone"); };
-        _triggerVolume.OnEntry += ctx => { ShipEnhancements.WriteDebugMessage("Enter zone"); };*/
-    }
-
     private void OnExitHull(GameObject hitObj)
     {
         if (!_hullBreached) return;

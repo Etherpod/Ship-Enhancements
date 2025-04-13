@@ -49,7 +49,6 @@ public class RepairWrenchItem : OWItem
     public void UpdateBatteryLevel(float battery)
     {
         _batteryLevel = Mathf.Clamp01(battery);
-        ShipEnhancements.WriteDebugMessage(_batteryLevel);
         _wrenchRenderer.SetMaterialProperty(_batteryPropID, _batteryLevel);
     }
 

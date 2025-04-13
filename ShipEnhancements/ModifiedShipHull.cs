@@ -55,7 +55,6 @@ public class ModifiedShipHull : MonoBehaviour
                 float lerp = Mathf.InverseLerp(0.75f, 1f, ratio);
                 _tempHazardVolume._damagePerSecond = Mathf.Lerp(0f, _shipHeatDamage, lerp);
                 Locator.GetPlayerDetector().GetComponent<HazardDetector>().AddVolume(_tempHazardVolume);
-                ShipEnhancements.WriteDebugMessage(Locator.GetPlayerDetector().GetComponent<HazardDetector>()._activeVolumes[0]);
             }
         }
     }

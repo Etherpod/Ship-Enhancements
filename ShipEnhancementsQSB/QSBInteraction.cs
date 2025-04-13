@@ -143,7 +143,6 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
         if (!QSBPlayerManager.LocalPlayer.FlyingShip)
         {
             var sync = ShipTransformSync.LocalInstance.ThrusterVariableSyncer.AccelerationSyncer;
-            //ShipEnhancements.ShipEnhancements.WriteDebugMessage(sync.Value);
             sync.Value = SELocator.GetShipBody().GetComponent<ShipThrusterModel>().GetLocalAcceleration();
         }
     }
@@ -529,7 +528,6 @@ public static class QSBInteractionPatches
             List<ShipDetachableLeg> legList = [.. module.GetComponentInParent<ShipLandingGear>().GetLegs()];
             index = 100 + legList.IndexOf(module.GetComponent<ShipDetachableLeg>());
         }
-        ShipEnhancements.ShipEnhancements.WriteDebugMessage(index);
         foreach (uint id in ShipEnhancements.ShipEnhancements.PlayerIDs)
         {
             ShipEnhancements.ShipEnhancements.QSBCompat.SendItemModuleParent(id, item, index);
@@ -725,12 +723,6 @@ public static class QSBInteractionPatches
         {
             return true;
         }
-
-        /*if (InputLatencyController.IsInputQueued != test)
-        {
-            test = InputLatencyController.IsInputQueued;
-            ShipEnhancements.ShipEnhancements.WriteDebugMessage(QSBCore.IsHost + " Input: " + test);
-        }*/
 
         // bug : this doesn't account for autopilot
         // fixes #590

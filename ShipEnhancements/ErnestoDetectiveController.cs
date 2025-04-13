@@ -187,7 +187,6 @@ public static class ErnestoDetectiveController
     {
         if (_reachedConclusion) return;
 
-        ShipEnhancements.WriteDebugMessage("hull breach");
         if (ejected)
         {
             _hypothesis = "I think you might have activated one of those eject buttons by accident. Don't worry, I do that sometimes too.";
