@@ -2575,6 +2575,9 @@ public class ShipEnhancements : ModBehaviour
 
         newModTab._menuOptions = [];
 
+        Scrollbar scrollbar = newModTab.transform.Find("Scroll View/Scrollbar Vertical").GetComponent<Scrollbar>();
+        float lastScrollValue = scrollbar.value;
+
         Transform settingsParent = newModTab.transform.Find("Scroll View/Viewport/Content");
         for (int i = 0; i < settingsParent.childCount; i++)
         {
@@ -2766,6 +2769,11 @@ public class ShipEnhancements : ModBehaviour
         {
             Menu.SetVerticalNavigation(newModTab, newModTab._menuOptions);
         }
+
+        ModHelper.Events.Unity.FireInNUpdates(() =>
+        {
+            scrollbar.value = lastScrollValue;
+        }, 2);
     }
 
     private SettingType GetSettingType(object setting)

@@ -6,7 +6,7 @@
     "preset": {
       "title": "Preset",
       "type": "selector",
-      "value": "Custom",
+      "value": "Vanilla Plus",
       "options": [
         "Vanilla Plus",
         "Minimal",

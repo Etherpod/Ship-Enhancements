@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using OWML.Common;
+using OWML.ModHelper.Menus.CustomInputs;
 using OWML.ModHelper.Menus.NewMenuSystem;
 using UnityEngine;
 using static ShipEnhancements.ShipEnhancements.Settings;
@@ -514,11 +516,6 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.OnImpact))]
     public static bool ApplyExplosionDamageMultiplier(ShipDamageController __instance, ImpactData impact)
     {
-        if (ShipEnhancements.AchievementsAPI != null && !SEAchievementTracker.HulkSmash)
-        {
-            SEAchievementTracker.LastHitBody = impact.otherBody;
-        }
-
         if ((float)shipDamageMultiplier.GetProperty() <= 0f)
         {
             return false;
@@ -536,10 +533,6 @@ public static class PatchClass
         }
         if (impact.speed >= 300f * explosionMultiplier && !__instance._exploded)
         {
-            if (impact.otherBody == SELocator.GetPlayerBody())
-            {
-                SEAchievementTracker.PlayerCausedExplosion = true;
-            }
             ErnestoDetectiveController.ItWasExplosion(fromSpeed: true);
             __instance.Explode(false);
             return false;
@@ -2870,38 +2863,40 @@ public static class PatchClass
 
     #region Achievements
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.TriggerSystemFailure))]
-    public static void HulkSmashAchievement(ShipDamageController __instance)
+    [HarmonyPriority(410)]
+    [HarmonyPatch(typeof(ShipHull), nameof(ShipHull.FixedUpdate))]
+    public static void HulkSmashAchievementPre(ShipHull __instance, out bool __state)
     {
-        if (!__instance.IsSystemFailed()
-            && ShipEnhancements.AchievementsAPI != null && !SEAchievementTracker.HulkSmash
-            && (!SEAchievementTracker.ShipExploded || SEAchievementTracker.PlayerCausedExplosion)
-            && !SEAchievementTracker.PlayerEjectedCockpit
-            && SEAchievementTracker.LastHitBody == SELocator.GetPlayerBody())
+        __state = false;
+
+        if (ShipEnhancements.AchievementsAPI == null
+            || SEAchievementTracker.HulkSmash) return;
+
+        if (__instance._dominantImpact != null
+            && __instance._dominantImpact.otherBody is PlayerBody)
         {
-            SEAchievementTracker.HulkSmash = true;
-            ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.HULK_SMASH");
-            SEAchievementTracker.LastHitBody = null;
+            ShipEnhancements.WriteDebugMessage("Set state");
+            __state = true;
         }
     }
 
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.Explode))]
-    public static void UpdateShipExploded()
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipHull), nameof(ShipHull.FixedUpdate))]
+    public static void HulkSmashAchievementPost(ShipHull __instance, bool __state)
     {
-        if (ShipEnhancements.AchievementsAPI != null && !SEAchievementTracker.ShipExploded)
+        if (__state && __instance.integrity <= 0f)
         {
-            SEAchievementTracker.ShipExploded = true;
-        }
-    }
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(ShipEjectionSystem), nameof(ShipEjectionSystem.FixedUpdate))]
-    public static void UpdatePlayerEjected(ShipEjectionSystem __instance)
-    {
-        if (__instance._ejectPressed)
-        {
-            SEAchievementTracker.PlayerEjectedCockpit = true;
+            ShipEnhancements.WriteDebugMessage("wait");
+            ShipEnhancements.Instance.ModHelper.Events.Unity.FireInNUpdates(() =>
+            {
+                ShipEnhancements.WriteDebugMessage(SELocator.GetShipDamageController().IsSystemFailed());
+                if (SELocator.GetShipDamageController().IsSystemFailed()
+                    && !SEAchievementTracker.HulkSmash)
+                {
+                    SEAchievementTracker.HulkSmash = true;
+                    ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.HULK_SMASH");
+                }
+            }, 5);
         }
     }
     #endregion
@@ -4535,6 +4530,44 @@ public static class PatchClass
                 ignoreNextMenuActivation = force;
             }
         }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(OWML.ModHelper.Menus.NewMenuSystem.Patches),
+        nameof(OWML.ModHelper.Menus.NewMenuSystem.Patches.ResetToDefaultSettings))]
+    public static void FixNumberValueReset()
+    {
+        MenuManager menuManager = StartupPopupPatches.menuManager;
+        var menus = typeof(MenuManager).GetField("ModSettingsMenus", BindingFlags.Public
+            | BindingFlags.NonPublic | BindingFlags.Static).GetValue(menuManager)
+            as List<(IModBehaviour behaviour, Menu modMenu)>;
+
+        Menu modMenu = null;
+        for (int i = 0; i < menus.Count; i++)
+        {
+            if ((object)menus[i].behaviour == ShipEnhancements.Instance)
+            {
+                modMenu = menus[i].modMenu;
+            }
+        }
+
+        if (modMenu == null || !modMenu.IsMenuEnabled()) return;
+
+        var settings = ShipEnhancements.Instance.ModHelper.Config.Settings;
+        var defaultSettings = ShipEnhancements.Instance.ModHelper.DefaultConfig;
+        var options = modMenu.GetMenuOptions().Where(x => x.name != "UIElement-GammaButton").ToArray();
+
+        for (var i = 0; i < options.Length; i++)
+        {
+            var menuOption = options[i];
+
+            if (menuOption.TryGetComponent(out IOWMLTextEntryElement textEntry))
+            {
+                textEntry.SetCurrentValue(defaultSettings.GetSettingsValue<double>(textEntry.ModSettingKey).ToString(CultureInfo.InvariantCulture));
+            }
+        }
+
+        SettingExtensions.ResetCustomSettings();
     }
     #endregion
 }

@@ -11,11 +11,6 @@ public static class SEAchievementTracker
     public static bool HowDidWeGetHere;
     public static bool HulkSmash;
 
-    public static OWRigidbody LastHitBody;
-    public static bool PlayerCausedExplosion = false;
-    public static bool ShipExploded = false;
-    public static bool PlayerEjectedCockpit = false;
-
     public static void Reset()
     {
         TorqueExplosion = false;
@@ -26,10 +21,5 @@ public static class SEAchievementTracker
         BadInternet = false;
         HowDidWeGetHere = false;
         HulkSmash = false;
-
-        LastHitBody = null;
-        PlayerCausedExplosion = false;
-        PlayerEjectedCockpit = false;
-        ShipExploded = false;
     }
 }

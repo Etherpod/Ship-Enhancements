@@ -209,4 +209,12 @@ public static class SettingExtensions
             settingValues[setting] = (value, settingValues[setting].property);
         }
     }
+
+    public static void ResetCustomSettings()
+    {
+        foreach (var (setting, value) in settingValues)
+        {
+            savedCustomSettings[setting] = Instance.ModHelper.DefaultConfig.GetSettingsValue<object>(setting.GetName());
+        }
+    }
 }
