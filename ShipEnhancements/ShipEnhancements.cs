@@ -669,6 +669,7 @@ public class ShipEnhancements : ModBehaviour
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.RGB_SETUP", false, this);
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.BLACK_HOLE", true, this);
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.BAD_INTERNET", false, this);
+            AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.ANGLERFISH_KILL", true, this);
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.SCOUT_LOST_CONNECTION", true, this);
 
             AchievementsAPI.RegisterTranslationsFromFiles(this, "translations");

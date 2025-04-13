@@ -32,6 +32,10 @@
       "Name": "Thinking Ahead",
       "Description": "Land (or crash) your ship on another planet with at least 3 seconds of input latency."
     },
+    "SHIPENHANCEMENTS.ANGLERFISH_KILL": {
+      "Name": "Unnatural Selection",
+      "Description": "Kill an anglerfish."
+    },
     "SHIPENHANCEMENTS.SCOUT_LOST_CONNECTION": {
       "Name": "What Did You Expect?",
       "Description": "Destroy your Little Scout and lose connection with it."
