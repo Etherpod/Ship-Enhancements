@@ -495,21 +495,23 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.ShouldExitShipToRepair))]
     public static void FixExitShipToRepairNotification(ShipDamageController __instance, ref bool __result)
     {
-        bool flag = false;
+        if (!__result) return;
+
         if (ShipRepairLimitController.CanRepair())
         {
-            for (int j = 0; j < __instance._shipComponents.Length; j++)
+            for (int i = 0; i < __instance._shipComponents.Length; i++)
             {
-                if (__instance._shipComponents[j].isDamaged && __instance._shipComponents[j].componentName != UITextType.ShipPartGravity
-                    && __instance._shipComponents[j].componentName != UITextType.ShipPartReactor
-                    && !((bool)disableLandingCamera.GetProperty() && __instance._shipComponents[j].componentName == UITextType.ShipPartCamera)
-                    && !((bool)disableHeadlights.GetProperty() && __instance._shipComponents[j].componentName == UITextType.ShipPartLights))
+                ShipComponent comp = __instance._shipComponents[i];
+                if (comp.isDamaged && comp._repairReceiver._repairDistance > 0
+                    && comp.componentName != UITextType.ShipPartReactor
+                    && comp.componentName != UITextType.ShipPartGravity)
                 {
-                    flag = true;
+                    return;
                 }
             }
         }
-        __result = flag;
+
+        __result = false;
     }
 
     [HarmonyPrefix]
