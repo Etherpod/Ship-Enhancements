@@ -594,7 +594,7 @@
     <Name>SE_Ernesto_GeswaldoIncident</Name>
     <Dialogue>
       <Page>Yeah, sure. Where was I?</Page>
-      <Page>Geswaldo and I had just gotten married, and we had been living together for about a year. We were happy.</Page>
+      <Page>Geswaldo and I had gotten married by now, and we had been living together for about a year. We were happy.</Page>
       <Page>But that happiness didn't last long. Not because we divorced, or because we were fighting. Geswaldo simply... disappeared.</Page>
     </Dialogue>
     <DialogueOptionsList>
@@ -637,9 +637,12 @@
   <DialogueNode>
     <Name>SE_Ernesto_GeswaldoIncident_2</Name>
     <Dialogue>
-      <Page>I spent the following years searching for an explanation, a reason for why this happened to me, maybe a way to fix it. And I discovered the truth.</Page>
-      <Page>Only 3 days before I met Geswaldo, I had eaten something. A green marshmallow, something known to have... hallucinogenic properties, you could say.</Page>
-      <Page>Maybe Geswaldo was real, somewhere, but here? Geswaldo never existed.</Page>
+      <Page>I spent countless years searching for a cure, a way to bring Geswaldo back to me. But I found no cure.</Page>
+      <Page>Depressed and heartbroken, I retretaed to the Attlerock to find peace. Esker offered me some marshmallows to cheer me up.</Page>
+      <Page>But these weren't normal marshmallows. They were a strange green color, nothing like any marshmallow I had seen before. It was a long shot, but maybe these had something to do with Geswaldo's disappearance.</Page>
+      <Page>I ran tests on them, and discovered the truth. These green marshmallows had... hallucinogenic properties, you could say. And I was suddenly reminded of something.</Page>
+      <Page>Only three days befor meeting Geswaldo, I had visited Esker again, and had been offered the same can of marshmallows. And I had eaten one.</Page>
+      <Page>That's all Geswaldo was, Hatchling. A hallucination. Maybe Geswaldo was real, somewhere, but here? Geswaldo never existed.</Page>
     </Dialogue>
     <DialogueOptionsList>
       <DialogueOption>
@@ -847,7 +850,7 @@
   <DialogueNode>
     <Name>SE_Ernesto_BigHead</Name>
     <Dialogue>
-      <Page>Uh, no? You'd have to change history to do that. And you can't do that last time I checked.</Page>
+      <Page>Uh, no? You'd have to mix worlds to do that. And you can't do that last time I checked.</Page>
       <Page>Unless... did you eat a green marshmallow?</Page>
     </Dialogue>
     <DialogueOptionsList>
@@ -893,7 +896,7 @@
   <DialogueNode>
     <Name>SE_Ernesto_BigHead_2</Name>
     <Dialogue>
-      <Page>Uh oh, that probably isn't good. Changing the past isn't a thing people normally do.</Page>
+      <Page>Uh oh, that probably isn't good. Overlapping parallel universes isn't a thing people normally do.</Page>
     </Dialogue>
     <DialogueOptionsList>
       <DialogueOption>
@@ -909,13 +912,13 @@
   <DialogueNode>
     <Name>SE_Ernesto_BigHead_21</Name>
     <Dialogue>
-      <Page>We don't. I'm sure history will fix itself eventually, though, and there's only a 50/50 chance it fails to correct itself and instead continues to mutuate and eventually becomes completely unrecognizable to us.</Page>
+      <Page>We don't. I'm sure the overlap will correct itself eventually, though, and there's only a 50/50 chance it fails to do that and instead continues to mutuate and eventually becomes completely unrecognizable to us.</Page>
     </Dialogue>
   </DialogueNode>
   <DialogueNode>
     <Name>SE_Ernesto_BigHead_22</Name>
     <Dialogue>
-      <Page>It would probably keep changing random stuff. I'm not exactly sure how they do it, or where Esker even got them.</Page>
+      <Page>It would probably attract other worlds and cause some more overlap. I'm not exactly sure how they do it, or where Esker even got them.</Page>
       <Page>I think that was the last one, though. I ate the other ones already.</Page>
     </Dialogue>
   </DialogueNode>
