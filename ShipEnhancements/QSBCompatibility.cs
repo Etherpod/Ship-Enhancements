@@ -1003,6 +1003,12 @@ public class QSBCompatibility
             angler.ChangeState(AnglerfishController.AnglerState.Stunned);
             angler.GetComponentInChildren<AnglerfishFluidVolume>().SetVolumeActivation(false);
         }
+
+        if (ShipEnhancements.AchievementsAPI != null && !SEAchievementTracker.AnglerfishKill)
+        {
+            SEAchievementTracker.AnglerfishKill = true;
+            ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.ANGLERFISH_KILL");
+        }
     }
     #endregion
 

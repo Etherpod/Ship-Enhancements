@@ -663,13 +663,14 @@ public class ShipEnhancements : ModBehaviour
         {
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.TORQUE_EXPLOSION", true, this);
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.DEAD_IN_THE_WATER", true, this);
+            AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.ANGLERFISH_KILL", true, this);
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.FIRE_HAZARD", true, this);
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.HOW_DID_WE_GET_HERE", false, this);
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.HULK_SMASH", false, this);
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.RGB_SETUP", false, this);
+            AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.SATELLITE", false, this);
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.BLACK_HOLE", true, this);
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.BAD_INTERNET", false, this);
-            AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.ANGLERFISH_KILL", true, this);
             AchievementsAPI.RegisterAchievement("SHIPENHANCEMENTS.SCOUT_LOST_CONNECTION", true, this);
 
             AchievementsAPI.RegisterTranslationsFromFiles(this, "translations");
@@ -1427,6 +1428,16 @@ public class ShipEnhancements : ModBehaviour
             foreach (Light light in lightsToDisable)
             {
                 light.gameObject.SetActive(false);
+            }
+        }
+        if (AchievementsAPI != null)
+        {
+            GameObject th = GameObject.Find("TimberHearth_Body");
+            if (th != null)
+            {
+                GameObject satelliteObj = LoadPrefab("Assets/ShipEnhancements/SatelliteAchievement_Volume.prefab");
+                Transform parent = th.transform.Find("Sector_TH/Sector_Village/Sector_Observatory");
+                Instantiate(satelliteObj, parent);
             }
         }
 

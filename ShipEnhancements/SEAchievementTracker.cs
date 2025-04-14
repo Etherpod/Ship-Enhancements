@@ -11,6 +11,7 @@ public static class SEAchievementTracker
     public static bool HowDidWeGetHere;
     public static bool HulkSmash;
     public static bool AnglerfishKill;
+    public static bool Satellite;
 
     public static void Reset()
     {
@@ -23,5 +24,6 @@ public static class SEAchievementTracker
         HowDidWeGetHere = false;
         HulkSmash = false;
         AnglerfishKill = false;
+        Satellite = false;
     }
 }
