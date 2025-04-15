@@ -83,7 +83,7 @@ public static class SettingExtensions
         { Settings.singleUseTractorBeam, (false, false) },
         { Settings.disableThrusters, (false, false) },
         { Settings.maxDirtAccumulation, (false, false) },
-        { Settings.addShipWarpCore, ("", "") },
+        { Settings.shipWarpCoreType, ("", "") },
         { Settings.repairTimeMultiplier, (1f, 1f) },
         { Settings.airDragMultiplier, (1f, 1f) },
         { Settings.addShipClock, (false, false) },

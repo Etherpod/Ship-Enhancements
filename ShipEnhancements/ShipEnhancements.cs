@@ -184,7 +184,7 @@ public class ShipEnhancements : ModBehaviour
         singleUseTractorBeam,
         disableThrusters,
         maxDirtAccumulation,
-        addShipWarpCore,
+        shipWarpCoreType,
         repairTimeMultiplier,
         airDragMultiplier,
         addShipClock,
@@ -1152,7 +1152,7 @@ public class ShipEnhancements : ModBehaviour
         {
             SELocator.GetShipTransform().GetComponentInChildren<ShipTractorBeamSwitch>()._functional = false;
         }
-        if ((string)Settings.addShipWarpCore.GetProperty() == "Enabled")
+        if ((string)Settings.shipWarpCoreType.GetProperty() == "Enabled")
         {
             GameObject core = LoadPrefab("Assets/ShipEnhancements/ShipWarpCore.prefab");
             AssetBundleUtilities.ReplaceShaders(core);
@@ -2140,7 +2140,7 @@ public class ShipEnhancements : ModBehaviour
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_EXPEDITION_FLAG_ENABLED", true);
         }
-        if ((string)Settings.addShipWarpCore.GetProperty() != "Disabled")
+        if ((string)Settings.shipWarpCoreType.GetProperty() != "Disabled")
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_WARP_CORE_ENABLED", true);
         }

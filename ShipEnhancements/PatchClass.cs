@@ -2655,7 +2655,7 @@ public static class PatchClass
             comp.OnDamaged += damageDisplay.OnComponentUpdate;
             comp.OnRepaired += damageDisplay.OnComponentUpdate;
         }
-        if ((string)addShipWarpCore.GetProperty() == "Component")
+        if ((string)shipWarpCoreType.GetProperty() == "Component")
         {
             // setting wrong here??
             GameObject warpCoreComponent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipWarpCoreComponent.prefab");

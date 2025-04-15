@@ -103,7 +103,10 @@ public class CockpitErnesto : MonoBehaviour
 
         for (int i = 1; i <= _questionsCount; i++)
         {
-            _questions.Add(i);
+            if (Random.value < 0.5f)
+            {
+                _questions.Add(i);
+            }
         }
 
         if (DialogueConditionManager.SharedInstance.GetConditionState("SE_ERNESTO_GESWALDO_PART_ONE"))

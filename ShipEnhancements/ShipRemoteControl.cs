@@ -323,7 +323,7 @@ public class ShipRemoteControl : MonoBehaviour
         switch (cmd)
         {
             case ShipCommand.Warp:
-                return (string)addShipWarpCore.GetProperty() != "Disabled" || _warpCoreController == null;
+                return (string)shipWarpCoreType.GetProperty() != "Disabled" || _warpCoreController == null;
             case ShipCommand.TurnOff:
                 return !(bool)addEngineSwitch.GetProperty();
             case ShipCommand.Autopilot:

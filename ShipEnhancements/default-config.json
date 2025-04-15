@@ -467,7 +467,7 @@
       "value": false,
       "tooltip": "Lets you close the curtain in the ship cabin for some extra privacy in the cockpit."
     },
-    "addShipWarpCore": {
+    "shipWarpCoreType": {
       "title": "Ship Warp Core",
       "type": "selector",
       "value": "Disabled",
