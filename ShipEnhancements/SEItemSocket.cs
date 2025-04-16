@@ -62,7 +62,8 @@ public class SEItemSocket : OWItemSocket
             }
         }
 
-        if (ShipEnhancements.InMultiplayer && ShipEnhancements.QSBAPI.GetIsHost())
+        if (ShipEnhancements.InMultiplayer && ShipEnhancements.QSBAPI.GetIsHost()
+            && (bool)unlimitedItems.GetProperty())
         {
             ShipEnhancements.Instance.ModHelper.Events.Unity.RunWhen(
                 ShipEnhancements.QSBInteraction.WorldObjectsLoaded,
