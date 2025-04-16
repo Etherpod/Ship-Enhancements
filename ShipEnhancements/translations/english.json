@@ -32,6 +32,10 @@
       "Name": "Return to Sender",
       "Description": "Bring the Deep Space Satellite back to Hornfels."
     },
+    "SHIPENHANCEMENTS.SUPERHOTSHOT": {
+      "Name": "Show-Off",
+      "Description": "Tether your ship to the Sun Station while only forward thrust is enabled."
+    },
     "SHIPENHANCEMENTS.BLACK_HOLE": {
       "Name": "The Beginning of the End",
       "Description": "Create a very unstable black hole using your ship's reactor."

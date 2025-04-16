@@ -119,6 +119,20 @@ public class TetherHookItem : OWItem
                 ShipEnhancements.Instance.playerTether = null;
                 _playerExternalAudio.PlayOneShot(_attachTetherAudio, 0.5f);
 
+                if (ShipEnhancements.AchievementsAPI != null
+                    && !SEAchievementTracker.SuperHotshot
+                    && (string)ShipEnhancements.Settings.disableThrusters.GetProperty() == "All Except Forward")
+                {
+                    if ((_activeTether.connectedRigidbody is ShipBody
+                        || _activeTether.rigidbody is ShipBody)
+                        && (_activeTether.connectedRigidbody.name == "SunStation_Body"
+                        || _activeTether.rigidbody.name == "SunStation_Body"))
+                    {
+                        SEAchievementTracker.SuperHotshot = true;
+                        ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.SUPERHOTSHOT");
+                    }
+                }
+
                 if (ShipEnhancements.InMultiplayer)
                 {
                     foreach (uint id in ShipEnhancements.PlayerIDs)
