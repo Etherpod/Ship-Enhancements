@@ -357,6 +357,36 @@
         <DialogueTarget>SE_Ernesto_Dnd</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_24</RequiredCondition>
+        <Text>Can you make my ship bigger?</Text>
+        <DialogueTarget>SE_Ernesto_BigShip</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_25</RequiredCondition>
+        <Text>How does gravity work?</Text>
+        <DialogueTarget>SE_Ernesto_Gravity</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_26</RequiredCondition>
+        <Text>Are you in the time loop?</Text>
+        <DialogueTarget>SE_Ernesto_TimeLoop</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_27</RequiredCondition>
+        <Text>Would you rather have unlimited bacon but no games, or unlimited games and no games?</Text>
+        <DialogueTarget>SE_Ernesto_DumbQuestion</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_28</RequiredCondition>
+        <Text>Have you heard of the trolley problem?</Text>
+        <DialogueTarget>SE_Ernesto_TrolleyProblem</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
+        <RequiredCondition>SE_ERNESTO_OPTION_29</RequiredCondition>
+        <Text>Do you drive?</Text>
+        <DialogueTarget>SE_Ernesto_Driving</DialogueTarget>
+      </DialogueOption>
+      <DialogueOption>
         <RequiredCondition>SE_ERNESTO_OPTION_100</RequiredCondition>
         <Text>Tell me the story of how you met Geswaldo.</Text>
         <DialogueTarget>SE_Ernesto_MeetingGeswaldo</DialogueTarget>
@@ -846,6 +876,105 @@
       <Page>Your attempts to persuade me are so miserable that the ship blows up.</Page>
     </Dialogue>
     <SetCondition>SE_ERNESTO_EXPLODE_SHIP</SetCondition>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_BigShip</Name>
+    <Dialogue>
+      <Page>What type of question is that? Of course I can.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Really?? Can you do it right now?</Text>
+        <DialogueTarget>SE_Ernesto_BigShip_2</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_BigShip_2</Name>
+    <Dialogue>
+      <Page>No, I'm feeling pretty lazy.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Gravity</Name>
+    <Dialogue>
+      <Page>I think that's where things go down instead of up, but don't quote me on that.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_TimeLoop</Name>
+    <Dialogue>
+      <Page>The what?</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Nevermind.</Text>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_DumbQuestion</Name>
+    <Dialogue>
+      <Page>I'll have vanilla, please.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Uh- okay, sure.</Text>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_TrolleyProblem</Name>
+    <Dialogue>
+      <Page>Yeah, is that the one with the multi-track drifting?</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Uh... sure? Which track would you pick?</Text>
+        <DialogueTarget>SE_Ernesto_TrolleyProblem_2</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_TrolleyProblem_2</Name>
+    <Dialogue>
+      <Page>I would blow up the trolley to maximize casualties.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Hey, that wasn't an option!</Text>
+        <DialogueTarget>SE_Ernesto_TrolleyProblem_3</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_TrolleyProblem_3</Name>
+    <Dialogue>
+      <Page>Mimicry is the highest form of flattery, they say.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>What is that supposed to mean??</Text>
+        <DialogueTarget>SE_Ernesto_TrolleyProblem_4</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_TrolleyProblem_4</Name>
+    <Dialogue>
+      <Page>Don't worry about it. Go back to flying your ship, or whatever you do sitting in that chair.</Page>
+    </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Driving</Name>
+    <Dialogue>
+      <Page>That depends, do you mean legally or illegally?</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Just... forget I asked.</Text>
+      </DialogueOption>
+    </DialogueOptionsList>
   </DialogueNode>
   <DialogueNode>
     <Name>SE_Ernesto_BigHead</Name>

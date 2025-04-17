@@ -11,7 +11,7 @@ Yep! Whoever hosts the game will have control over the settings.
 I made a mod called [Traveler's Pack](https://outerwildsmods.com/mods/travelerspack/) to address this problem. Try playing with it enabled if you run into the issue of there being too many items.
 
 ## Does this mod support [Achievements+](https://outerwildsmods.com/mods/achievements/)?
-It sure does! It adds 9 new achievements that you can try and unlock.
+It sure does! It adds 12 new achievements that you can try and unlock.
 
 # Feature Overview
 

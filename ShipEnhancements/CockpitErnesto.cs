@@ -19,7 +19,7 @@ public class CockpitErnesto : MonoBehaviour
     private bool _bigHeadMode = false;
     private bool _showShipFailNextTime = false;
 
-    private readonly int _questionsCount = 23;
+    private readonly int _questionsCount = 29;
     private readonly float _commentLifetime = 10f;
 
     private List<string> _availableHeavyImpactComments = [];
@@ -139,19 +139,9 @@ public class CockpitErnesto : MonoBehaviour
             _currentComment = null;
         }
 
-        foreach (int i in _questions)
-        {
-            DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_OPTION_" + i, false);
-        }
-
         int num = _availableQuestions[Random.Range(0, _availableQuestions.Count)];
         DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_OPTION_" + num, true);
         _availableQuestions.Remove(num);
-
-        if (_availableQuestions.Count == 0)
-        {
-            ResetAvailableQuestions();
-        }
 
         if (_showShipFailNextTime)
         {
@@ -165,6 +155,16 @@ public class CockpitErnesto : MonoBehaviour
         if (PlayerState.AtFlightConsole())
         {
             _conversationZone.DisableInteraction();
+        }
+
+        foreach (int i in _questions)
+        {
+            DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_OPTION_" + i, false);
+        }
+
+        if (_availableQuestions.Count == 0)
+        {
+            ResetAvailableQuestions();
         }
 
         if (ErnestoModListHandler.GetNumberErnestos() > 0 && PlayerData.GetPersistentCondition("SE_KNOWS_ERNESTO") 

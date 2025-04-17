@@ -39,7 +39,7 @@ public class PlayerTorpidityEffect : MonoBehaviour
         float percent = 0f;
         if (PlayerState.AtFlightConsole())
         {
-            percent = Mathf.InverseLerp(_minSpinSpeed, _maxSpinSpeed, SELocator.GetShipBody().GetAngularVelocity().sqrMagnitude);
+            percent = Mathf.InverseLerp(_minSpinSpeed, _maxSpinSpeed, _shipBody.GetAngularVelocity().sqrMagnitude);
         }
         if (!Mathf.Approximately(_currentPercent, percent))
         {

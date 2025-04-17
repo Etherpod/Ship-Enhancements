@@ -393,6 +393,36 @@ required_condition = "SE_ERNESTO_OPTION_23"
 text = "Do you wanna play Dungeons and Dragons?"
 dialogue_target = "SE_Ernesto_Dnd"
 
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_24"
+text = "Can you make my ship bigger?"
+dialogue_target = "SE_Ernesto_BigShip"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_25"
+text = "How does gravity work?"
+dialogue_target = "SE_Ernesto_Gravity"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_26"
+text = "Are you in the time loop?"
+dialogue_target = "SE_Ernesto_TimeLoop"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_27"
+text = "Would you rather have unlimited bacon but no games, or unlimited games and no games?"
+dialogue_target = "SE_Ernesto_DumbQuestion"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_28"
+text = "Have you heard of the trolley problem?"
+dialogue_target = "SE_Ernesto_TrolleyProblem"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_29"
+text = "Do you drive?"
+dialogue_target = "SE_Ernesto_Driving"
+
 # ---
 
 [[dialogue_node.dialogue_options_list.dialogue_option]]
@@ -951,6 +981,126 @@ set_condition = ["SE_ERNESTO_EXPLODE_SHIP"]
 
 [[dialogue_node.dialogue]]
 page = ["Uh oh.", "Your attempts to persuade me are so miserable that the ship blows up."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_BigShip"
+
+[[dialogue_node.dialogue]]
+page = ["What type of question is that? Of course I can."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Really?? Can you do it right now?"
+dialogue_target = "SE_Ernesto_BigShip_2"
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_BigShip_2"
+
+[[dialogue_node.dialogue]]
+page = ["No, I'm feeling pretty lazy."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Gravity"
+
+[[dialogue_node.dialogue]]
+page = ["I think that's where things go down instead of up, but don't quote me on that."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_TimeLoop"
+
+[[dialogue_node.dialogue]]
+page = ["The what?"]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Nevermind."
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_DumbQuestion"
+
+[[dialogue_node.dialogue]]
+page = ["I'll have vanilla, please."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Uh- okay, sure."
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_TrolleyProblem"
+
+[[dialogue_node.dialogue]]
+page = ["Yeah, is that the one with the multi-track drifting?"]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Uh... sure? Which track would you pick?"
+dialogue_target = "SE_Ernesto_TrolleyProblem_2"
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_TrolleyProblem_2"
+
+[[dialogue_node.dialogue]]
+page = ["I would blow up the trolley to maximize casualties."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Hey, that wasn't an option!"
+dialogue_target = "SE_Ernesto_TrolleyProblem_3"
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_TrolleyProblem_3"
+
+[[dialogue_node.dialogue]]
+page = ["Mimicry is the highest form of flattery, they say."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "What is that supposed to mean??"
+dialogue_target = "SE_Ernesto_TrolleyProblem_4"
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_TrolleyProblem_4"
+
+[[dialogue_node.dialogue]]
+page = ["Don't worry about it. Go back to flying your ship, or whatever you do sitting in that chair."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Driving"
+
+[[dialogue_node.dialogue]]
+page = ["That depends, do you mean legally or illegally?"]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Just... forget I asked."
+
 
 
 [[dialogue_node]]
