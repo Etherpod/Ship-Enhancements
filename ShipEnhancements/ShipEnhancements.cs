@@ -223,6 +223,39 @@ public class ShipEnhancements : ModBehaviour
         disableHatch,
     }
 
+    private string[] startupMessages =
+    {
+        "Did you know that two opposite sides of a 6-sided dice will always add up to 7?",
+        "Did you know that \"dreamt\" is the only word in the English language that ends with \"mt\"?",
+        "Did you know a group of hippos is called a \"bloat\"?",
+        "Did you know that apple seeds contain cyanide?",
+        "Did you know Jupiter is twice as massive as every other planet in the Solar System combined?",
+        "Did you know the tiny dot used in the letters \"i\" and \"j\" is called a \"tittle\"?",
+        "Did you know that the infinity sign is called a \"lemniscate\"?",
+        "\"Spoonfeed\" is the longest word in the English language that has all of its letters in reverse alphabetical order.",
+        "\"Schoolmaster\" uses the exact same letters as \"the classroom\".",
+        "The first mod ever made for Outer Wilds was NomaiVR.",
+        "No te preocupes, no cambiaste el idioma a español.",
+        "There are more hydrogen atoms in a single molecule of water than there are stars in the entire Solar System.",
+        "Ernesto is watching.\nHe's more aware than you think.",
+        "A group of penguins is called a \"waddle\".",
+        "A group of ferrets is called a \"business\".",
+        "The word \"orange\" was first used to describe a tree.",
+        "The mitochondria is the powerhouse of the cell.",
+        "1 gram of uranium is about 20 billion calories.",
+        "Minimalism is made up by Big Small to sell more less.",
+        "If you were to consume one gram of sodium, you would explode.",
+        "Are you happy?",
+        "Do you think you're a good person?",
+        "Which came first, the chicken or the egg?",
+        "Has your favorite color changed since 10 years ago?",
+        "Is the past a real thing, or is it an illusion made up by your brain?",
+        "Did you know moss can be male or female?",
+        "What color is a mirror?",
+        "Did you know the eyes of a spider specialize in different functions?",
+        "Did you find Outer Wilds, or did Outer Wilds find you?",
+    };
+
     private void Awake()
     {
         Instance = this;
@@ -255,13 +288,15 @@ public class ShipEnhancements : ModBehaviour
 
         SEItemAudioController.Initialize();
 
-        // Alt never works the first time I press it
-        // Hopefully this doesn't break any compatibility
-        InputLibrary.freeLook.ConsumeInput();
+        PrintStartupMessage();
 
         LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
         {
             if (loadScene != OWScene.SolarSystem) return;
+
+            // Alt never works the first time I press it
+            // Hopefully this doesn't break any compatibility
+            InputLibrary.freeLook.ConsumeInput();
 
             GlobalMessenger.AddListener("SuitUp", OnPlayerSuitUp);
             GlobalMessenger.AddListener("RemoveSuit", OnPlayerRemoveSuit);
@@ -433,6 +468,15 @@ public class ShipEnhancements : ModBehaviour
             _shipAudioToChange.Clear();
             InputLatencyController.OnUnloadScene();
         };
+    }
+
+    private void PrintStartupMessage()
+    {
+        ModHelper.Console.WriteLine("Ship Enhancements is loaded!", MessageType.Success);
+
+        System.Random rand = new System.Random();
+        int index = rand.Next(0, startupMessages.Length);
+        ModHelper.Console.WriteLine(startupMessages[index], MessageType.Success);
     }
 
     private void Update()
