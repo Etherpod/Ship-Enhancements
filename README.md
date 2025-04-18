@@ -7,6 +7,8 @@ To answer some questions you may have...
 ## Is this mod compatible with [Quantum Space Buddies](https://outerwildsmods.com/mods/quantumspacebuddies/)?
 Yep! Whoever hosts the game will have control over the settings.
 
+Due to an update to Quantum Space Buddies, new items do not work in multiplayer, so until this is fixed avoid enabling them in the settings when using Quantum Space Buddies.
+
 ## How am I supposed to carry all of these new items?
 I made a mod called [Traveler's Pack](https://outerwildsmods.com/mods/travelerspack/) to address this problem. Try playing with it enabled if you run into the issue of there being too many items.
 
