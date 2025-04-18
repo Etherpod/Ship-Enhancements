@@ -244,6 +244,7 @@ public class ShipEnhancements : ModBehaviour
         "The mitochondria is the powerhouse of the cell.",
         "1 gram of uranium is about 20 billion calories.",
         "Minimalism is made up by Big Small to sell more less.",
+        "Bigimalism is made up by Big Big in order to sell more more.",
         "If you were to consume one gram of sodium, you would explode.",
         "Are you happy in life?",
         "Do you think you're naturally a good person?",

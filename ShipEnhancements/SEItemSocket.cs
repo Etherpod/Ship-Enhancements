@@ -21,7 +21,7 @@ public class SEItemSocket : OWItemSocket
     public override void Awake()
     {
         Reset();
-        _sector = SELocator.GetShipSector();
+        //_sector = SELocator.GetShipSector();
         base.Awake();
         _acceptableType = GetAcceptableType();
         _manipulator = FindObjectOfType<FirstPersonManipulator>();
