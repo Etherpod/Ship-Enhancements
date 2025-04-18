@@ -30,7 +30,8 @@ public class ShipOverdriveController : ElectricalComponent
     private ElectricalSystem _electricalSystem;
     private CockpitButtonPanel _buttonPanel;
     private ThrustModulatorController _modulatorController;
-    private bool _wasDisrupted = false;
+    private bool _electricalDisrupted = false;
+    private bool _lastPoweredState = false;
     private int _focusedButtons;
     private bool _focused = false;
     private bool _wasInFreeLook = false;
@@ -38,6 +39,7 @@ public class ShipOverdriveController : ElectricalComponent
     private float _resetStartTime;
     private bool _onResetTimer = false;
     private bool _fuelDepleted = false;
+    private bool _thrustersUsable = true;
 
     public bool Charging { get { return _charging; } }
     public bool OnCooldown { get { return _onCooldown; } }
@@ -58,11 +60,9 @@ public class ShipOverdriveController : ElectricalComponent
 
         base.Awake();
         _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
-        _reactor = SELocator.GetShipTransform().GetComponentInChildren<ShipReactorComponent>();
+        _reactor = SELocator.GetShipDamageController()._shipReactorComponent;
         _modulatorController = GetComponent<ThrustModulatorController>();
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
-        ShipEnhancements.Instance.OnFuelDepleted += OnFuelDepleted;
-        ShipEnhancements.Instance.OnFuelRestored += OnFuelRestored;
 
         _electricalSystem = SELocator.GetShipTransform()
             .Find("Module_Cockpit/Systems_Cockpit/FlightControlsElectricalSystem")
@@ -88,6 +88,8 @@ public class ShipOverdriveController : ElectricalComponent
         _overdriveColor = overdriveMat.GetColor("_Color");
         _primeButton.SetButtonOn(false);
         _activateButton.SetButtonActive(false);
+
+        ShipEnhancements.Instance.AddShipAudioToChange(_shipAudioSource);
     }
 
     private void Update()
@@ -120,11 +122,23 @@ public class ShipOverdriveController : ElectricalComponent
                 _onCooldown = false;
             }
         }
-        if (_electricalSystem.IsDisrupted() != _wasDisrupted)
+        if (_thrustersUsable != CanUseOverdrive())
         {
-            _wasDisrupted = _electricalSystem.IsDisrupted();
-            _primeButton.OnDisruptedEvent(_wasDisrupted);
-            _activateButton.OnDisruptedEvent(_wasDisrupted);
+            _thrustersUsable = CanUseOverdrive();
+            if (!_thrustersUsable)
+            {
+                _primeButton.SetButtonOn(false);
+                _activateButton.SetButtonActive(false);
+                SetPowered(false);
+            }
+            else
+            {
+                if (!_powered && !SELocator.GetShipDamageController().IsElectricalFailed()
+                    && !_electricalDisrupted && _electricalSystem._powered)
+                {
+                    SetPowered(true);
+                }
+            }
         }
         if (OWInput.IsPressed(InputLibrary.freeLook, InputMode.ShipCockpit) != _wasInFreeLook)
         {
@@ -172,11 +186,16 @@ public class ShipOverdriveController : ElectricalComponent
 
             if (host)
             {
+                if (!_reactor.isDamaged)
+                {
+                    ErnestoDetectiveController.SetReactorCause("overdrive");
+                }
                 _reactor.SetDamaged(true);
             }
         }
         else if (host)
         {
+            ErnestoDetectiveController.ItWasExplosion(fromOverdrive: true);
             SELocator.GetShipDamageController().Explode();
             return;
         }
@@ -190,8 +209,8 @@ public class ShipOverdriveController : ElectricalComponent
         }
 
         _defaultColor = _thrusterRenderers[0].material.GetColor("_Color");
-        _primeButton.SetButtonOn(false);
-        _activateButton.SetButtonActive(false);
+        _primeButton.SetCooldown(4f);
+        _activateButton.SetCooldown(4f);
         _cooldownT = 1f;
         _onCooldown = true;
     }
@@ -269,43 +288,41 @@ public class ShipOverdriveController : ElectricalComponent
         enabled = false;
     }
 
-    private void OnFuelDepleted()
-    {
-        _fuelDepleted = true;
-        _primeButton.SetButtonOn(false);
-        _activateButton.SetButtonActive(false);
-        SetPowered(false);
-    }
-
-    private void OnFuelRestored()
-    {
-        _fuelDepleted = false;
-        if (!_powered && !SELocator.GetShipDamageController().IsElectricalFailed()
-            && ShipEnhancements.Instance.engineOn)
-        {
-            SetPowered(true);
-        }
-    }
-
     public override void SetPowered(bool powered)
     {
-        if (!(bool)enableThrustModulator.GetProperty() || (powered && _fuelDepleted)) return;
+        if (_electricalSystem != null && _electricalDisrupted != _electricalSystem.IsDisrupted())
+        {
+            _electricalDisrupted = _electricalSystem.IsDisrupted();
+            _lastPoweredState = _powered;
+        }
+
+        if (!(bool)enableThrustModulator.GetProperty() || (powered && !_thrustersUsable)) return;
+
         base.SetPowered(powered);
-        if (!powered)
+
+        if (!powered && !_electricalDisrupted)
         {
             InterruptOverdrive();
             _primeButton.SetButtonOn(false);
             _activateButton.SetButtonActive(false);
         }
 
-        _primeButton.SetButtonPowered(powered, _electricalSystem.IsDisrupted());
-        _activateButton.SetButtonPowered(powered, _electricalSystem.IsDisrupted());
+        _primeButton.SetButtonPowered(powered, _electricalDisrupted);
+        _activateButton.SetButtonPowered(powered, _electricalDisrupted);
     }
 
     public void PlayButtonAudio(AudioClip audio, float volume)
     {
-        _panelAudioSource.pitch = Random.Range(0.9f, 1.1f);
+        _panelAudioSource.pitch = Random.Range(0.95f, 1.05f);
         _panelAudioSource.PlayOneShot(audio, volume);
+    }
+
+    private bool CanUseOverdrive()
+    {
+        ShipThrusterModel thrusters = SELocator.GetShipBody().GetComponent<ShipThrusterModel>();
+        return SELocator.GetShipResources().AreThrustersUsable() 
+            && (thrusters.IsThrusterBankEnabled(ThrusterBank.Left) || thrusters.IsThrusterBankEnabled(ThrusterBank.Right))
+            && SELocator.GetShipTransform().Find("Module_Engine") != null;
     }
 
     public bool IsCharging()
@@ -326,7 +343,5 @@ public class ShipOverdriveController : ElectricalComponent
     private void OnDestroy()
     {
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
-        ShipEnhancements.Instance.OnFuelDepleted -= OnFuelDepleted;
-        ShipEnhancements.Instance.OnFuelRestored -= OnFuelRestored;
     }
 }

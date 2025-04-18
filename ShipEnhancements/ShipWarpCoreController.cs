@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Linq;
+using UnityEngine;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
@@ -19,26 +20,46 @@ public class ShipWarpCoreController : CockpitInteractible
     private bool _warpingWithPlayer = false;
     private readonly float _warpLength = 1f;
     private bool _warping = false;
+    private bool _damaged = false;
     private bool _pressed = false;
     private float _buttonOffset = -0.121f;
     private GravityCannonController _brittleHollowCannon;
     private GravityCannonController _emberTwinCannon;
     private GravityCannonController _targetCannon;
+    private Transform _randomDestination;
 
     private readonly string _brittleHollowCannonEntryID = "BH_GRAVITY_CANNON";
     private readonly string _emberTwinCannonEntryID = "CT_GRAVITY_CANNON";
 
-    public override void Awake()
-    {
-        base.Awake();
-        _shipBody = SELocator.GetShipBody();
-        GlobalMessenger<OWRigidbody>.AddListener("ShipCockpitDetached", OnShipCockpitDetached);
-    }
-
     private void Start()
     {
+        _shipBody = SELocator.GetShipBody() ?? FindObjectOfType<ShipBody>();
         _brittleHollowCannon = Locator.GetGravityCannon(NomaiShuttleController.ShuttleID.BrittleHollowShuttle);
         _emberTwinCannon = Locator.GetGravityCannon(NomaiShuttleController.ShuttleID.HourglassShuttle);
+
+        GlobalMessenger<OWRigidbody>.AddListener("ShipCockpitDetached", OnShipCockpitDetached);
+
+        _randomDestination = new GameObject("ShipRandomWarpDestination").transform;
+        if (ShipEnhancements.NHAPI == null)
+        {
+            if (Locator.GetAstroObject(AstroObject.Name.Sun) != null)
+            {
+                _randomDestination.parent = Locator.GetAstroObject(AstroObject.Name.Sun).transform;
+            }
+        }
+        else
+        {
+            Transform parent = ShipEnhancements.NHInteraction.GetCenterOfUniverse()?.transform;
+            if (parent == null)
+            {
+                parent = GameObject.Find("Sun_Body")?.transform;
+            }
+            if (parent != null)
+            {
+                ShipEnhancements.WriteDebugMessage("Random warp parent: " + parent.gameObject.name);
+                _randomDestination.parent = parent;
+            }
+        }
 
         _interactReceiver.ChangePrompt("Activate Return Warp");
         _warpEffect.transform.localPosition = _shipPivot.localPosition;
@@ -48,6 +69,7 @@ public class ShipWarpCoreController : CockpitInteractible
     {
         _buttonTransform.localPosition = new Vector3(0, _buttonOffset, 0);
         _pressed = true;
+
         ActivateWarp();
         SendWarpMessage();
     }
@@ -90,7 +112,7 @@ public class ShipWarpCoreController : CockpitInteractible
                 {
                     cannonID = _emberTwinCannonEntryID;
                 }
-                ShipEnhancements.QSBCompat.SendActivateWarp(id, _warpingWithPlayer, cannonID);
+                ShipEnhancements.QSBCompat.SendActivateWarp(id, _warpingWithPlayer, cannonID, _randomDestination.position);
             }
         }
     }
@@ -107,11 +129,16 @@ public class ShipWarpCoreController : CockpitInteractible
             _warpEffect.OnWarpComplete -= WarpShip;
             _receiver.PlayRecallEffect(_warpLength, _warpingWithPlayer);
         }
-        
-        if (_targetCannon != null)
+
+        if (_targetCannon != null && !_damaged)
         {
             _receiver.SetGravityCannonSocket(_targetCannon._shuttleSocket);
         }
+        else if (_damaged && !SELocator.GetShipDamageController().IsSystemFailed() && (float)shipDamageMultiplier.GetProperty() > 0f)
+        {
+            ApplyWarpDamage();
+        }
+
         _receiver.WarpBodyToReceiver(_shipBody, _warpingWithPlayer);
         _interactReceiver.EnableInteraction();
         _warping = false;
@@ -121,9 +148,10 @@ public class ShipWarpCoreController : CockpitInteractible
     {
         _shipBody = body;
         _warpEffect.transform.localPosition = _cockpitPivot.localPosition;
+        _warpEffect._warpedObjectGeometry = body.gameObject;
         if (_receiver != null)
         {
-            _receiver.OnCockpitDetached(_cockpitPivot);
+            _receiver.OnCockpitDetached(body, _cockpitPivot);
         }
     }
 
@@ -132,9 +160,9 @@ public class ShipWarpCoreController : CockpitInteractible
         _receiver = receiver;
     }
 
-    public void ActivateWarpRemote(bool playerInShip, string targetCannonEntryID)
+    public void ActivateWarpRemote(bool playerInShip, string targetCannonEntryID, Vector3 randomPos)
     {
-        if (_receiver == null) return;
+        if (_receiver == null || !_receiver.gameObject.activeInHierarchy) return;
 
         if (targetCannonEntryID == _brittleHollowCannonEntryID)
         {
@@ -150,11 +178,17 @@ public class ShipWarpCoreController : CockpitInteractible
             _receiver.SetGravityCannonSocket(null);
         }
 
+        if (_damaged)
+        {
+            _randomDestination.position = randomPos;
+            _receiver.SetCustomDestination(_randomDestination);
+        }
+
         _interactReceiver.DisableInteraction();
 
         if (playerInShip)
         {
-            if (PlayerState.InBrambleDimension())
+            if (!ShipEnhancements.VanillaFixEnabled && PlayerState.InBrambleDimension())
             {
                 PlayerFogWarpDetector detector = Locator.GetPlayerDetector().GetComponent<PlayerFogWarpDetector>();
                 FogWarpVolume[] volumes = detector._warpVolumes.ToArray();
@@ -179,6 +213,11 @@ public class ShipWarpCoreController : CockpitInteractible
                 _shipBody.GetComponentInChildren<ShipTractorBeamSwitch>().DeactivateTractorBeam();
             }
 
+            if ((bool)funnySounds.GetProperty())
+            {
+                _warpEffect._singularity._owOneShotSource.PlayOneShot(ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/tube_in.ogg"), 0.5f);
+            }
+
             _warpingWithPlayer = false;
             _warpEffect.OnWarpComplete += WarpShip;
             _warpEffect.WarpObjectOut(_warpLength);
@@ -194,13 +233,15 @@ public class ShipWarpCoreController : CockpitInteractible
 
     public void ActivateWarp()
     {
-        if (_receiver == null) return;
+        if (_receiver == null || !_receiver.gameObject.activeInHierarchy) return;
 
-        if (ShipLogEntryHUDMarker.s_entryLocationID == _brittleHollowCannonEntryID)
+        if (ShipLogEntryHUDMarker.s_entryLocationID == _brittleHollowCannonEntryID 
+            || Locator.GetReferenceFrame(true)?.GetOWRigidBody() == Locator.GetAstroObject(AstroObject.Name.BrittleHollow)?.GetOWRigidbody())
         {
             _targetCannon = _brittleHollowCannon;
         }
-        else if (ShipLogEntryHUDMarker.s_entryLocationID == _emberTwinCannonEntryID)
+        else if (ShipLogEntryHUDMarker.s_entryLocationID == _emberTwinCannonEntryID
+            || Locator.GetReferenceFrame(true)?.GetOWRigidBody() == Locator.GetAstroObject(AstroObject.Name.CaveTwin)?.GetOWRigidbody())
         {
             _targetCannon = _emberTwinCannon;
         }
@@ -208,6 +249,12 @@ public class ShipWarpCoreController : CockpitInteractible
         {
             _targetCannon = null;
             _receiver.SetGravityCannonSocket(null);
+        }
+
+        if (_damaged)
+        {
+            _randomDestination.transform.localPosition = Random.insideUnitSphere * 20000f;
+            _receiver.SetCustomDestination(_randomDestination);
         }
 
         if (IsShipOccupied())
@@ -240,6 +287,11 @@ public class ShipWarpCoreController : CockpitInteractible
                 _shipBody.GetComponentInChildren<ShipTractorBeamSwitch>().DeactivateTractorBeam();
             }
 
+            if ((bool)funnySounds.GetProperty())
+            {
+                _warpEffect._singularity._owOneShotSource.PlayOneShot(ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/tube_in.ogg"), 0.5f);
+            }
+
             _warpingWithPlayer = false;
             _warpEffect.OnWarpComplete += WarpShip;
             _warpEffect.WarpObjectOut(_warpLength);
@@ -268,6 +320,61 @@ public class ShipWarpCoreController : CockpitInteractible
         else
         {
             return PlayerState.IsInsideShip() || PlayerState.AtFlightConsole();
+        }
+    }
+
+    private void ApplyWarpDamage()
+    {
+        if (ShipEnhancements.InMultiplayer && !ShipEnhancements.QSBAPI.GetIsHost() || (float)shipDamageMultiplier.GetProperty() <= 0f) return;
+
+        ShipComponent[] components = SELocator.GetShipDamageController()._shipComponents
+            .Where((component) => component.repairFraction == 1f && !component.isDamaged).ToArray();
+        if (components.Length > 0 && Random.value < 0.3f)
+        {
+            components[Random.Range(0, components.Length)].SetDamaged(true);
+        }
+        else
+        {
+            ShipHull[] hulls = SELocator.GetShipDamageController()._shipHulls.Where((hull) => hull.integrity > 0f).ToArray();
+            ShipHull targetHull = hulls[Random.Range(0, hulls.Length)];
+
+            bool wasDamaged = targetHull._damaged;
+            targetHull._damaged = true;
+            targetHull._integrity = Mathf.Max(0f, targetHull._integrity - Random.Range(0.05f, 0.15f) * (float)shipDamageMultiplier.GetProperty());
+            var eventDelegate1 = (System.MulticastDelegate)typeof(ShipHull).GetField("OnDamaged",
+                System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic
+                | System.Reflection.BindingFlags.Public).GetValue(targetHull);
+            if (eventDelegate1 != null)
+            {
+                foreach (var handler in eventDelegate1.GetInvocationList())
+                {
+                    handler.Method.Invoke(handler.Target, [targetHull]);
+                }
+            }
+            if (targetHull._damageEffect != null)
+            {
+                targetHull._damageEffect.SetEffectBlend(1f - targetHull._integrity);
+            }
+
+            if (targetHull._integrity <= 0f && targetHull.shipModule is ShipDetachableModule
+            && (!(bool)preventSystemFailure.GetProperty() || targetHull.section == ShipHull.Section.Front))
+            {
+                ErnestoDetectiveController.ItWasBrokenWarp();
+            }
+
+            if (ShipEnhancements.InMultiplayer)
+            {
+                ShipEnhancements.QSBInteraction.SetHullDamaged(targetHull, !wasDamaged);
+            }
+        }
+    }
+
+    public void SetDamaged(bool damaged)
+    {
+        _damaged = damaged;
+        if (!_damaged)
+        {
+            _receiver.SetCustomDestination(null);
         }
     }
 

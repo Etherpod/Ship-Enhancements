@@ -43,11 +43,12 @@ public class PortableCampfireItem : OWItem
 
     public override void DropItem(Vector3 position, Vector3 normal, Transform parent, Sector sector, IItemDropTarget customDropTarget)
     {
+        bool wasCarrying = Locator.GetToolModeSwapper().GetItemCarryTool().GetHeldItem() == this;
         base.DropItem(position, normal, parent, sector, customDropTarget);
         transform.localScale = Vector3.one;
         TogglePackUp(false);
         _campfire.UpdateProperties();
-        if (parent.GetComponentInParent<ShipBody>() && PlayerState.IsInsideShip())
+        if (wasCarrying && parent.GetComponentInParent<ShipBody>() && PlayerState.IsInsideShip())
         {
             _campfire.UpdateInsideShip(true);
         }
@@ -66,6 +67,11 @@ public class PortableCampfireItem : OWItem
         _itemObject.SetActive(packUp);
         _campfireObject.SetActive(!packUp);
         _interactRange = packUp ? _baseInteractRange : 0f;
+    }
+
+    public PortableCampfire GetCampfire()
+    {
+        return _campfire;
     }
 
     public bool IsUnpacked()

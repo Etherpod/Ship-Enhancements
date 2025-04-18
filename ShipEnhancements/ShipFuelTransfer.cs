@@ -35,7 +35,7 @@ public class ShipFuelTransfer : MonoBehaviour
 
         _fuelTankComponent._damageEffect._particleSystem.gameObject.layer = LayerMask.NameToLayer("Ignore Raycast");
         _interactReceiver.SetPromptText(UITextType.HoldPrompt, "Transfer jetpack fuel");
-        if (_shipFuelFull)
+        if (_shipFuelFull || !PlayerState.IsWearingSuit())
         {
             _interactReceiver.DisableInteraction();
         }
@@ -46,7 +46,7 @@ public class ShipFuelTransfer : MonoBehaviour
         if (_shipFuelFull && !IsShipFuelFull())
         {
             _shipFuelFull = false;
-            if (!_jetpackFuelDepleted && (!_fuelTankComponent.isDamaged || (bool)disableShipRepair.GetProperty()))
+            if (!_jetpackFuelDepleted && PlayerState.IsWearingSuit() && (!_fuelTankComponent.isDamaged || !ShipRepairLimitController.CanRepair()))
             {
                 _interactReceiver.EnableInteraction();
             }
@@ -55,7 +55,7 @@ public class ShipFuelTransfer : MonoBehaviour
         if (_jetpackFuelDepleted && SELocator.GetPlayerResources()._currentFuel > 0)
         {
             _jetpackFuelDepleted = false;
-            if (!_fuelTankComponent.isDamaged || (bool)disableShipRepair.GetProperty())
+            if ((!_fuelTankComponent.isDamaged || !ShipRepairLimitController.CanRepair()) && PlayerState.IsWearingSuit())
             {
                 _interactReceiver.EnableInteraction();
             }
@@ -131,7 +131,7 @@ public class ShipFuelTransfer : MonoBehaviour
     {
         if (_shipFuelFull || _jetpackFuelDepleted || !PlayerState.IsWearingSuit()) return;
 
-        if ((bool)disableShipRepair.GetProperty() && _fuelTankComponent.isDamaged)
+        if (!ShipRepairLimitController.CanRepair() && _fuelTankComponent.isDamaged)
         {
             _fuelTankComponent._damageEffect._particleSystem.Stop();
         }
@@ -144,7 +144,7 @@ public class ShipFuelTransfer : MonoBehaviour
     {
         if (_shipFuelFull || _jetpackFuelDepleted || !PlayerState.IsWearingSuit()) return;
 
-        if ((bool)disableShipRepair.GetProperty() && _fuelTankComponent.isDamaged)
+        if (!ShipRepairLimitController.CanRepair() && _fuelTankComponent.isDamaged)
         {
             _fuelTankComponent._damageEffect._particleSystem.Play();
         }
@@ -160,13 +160,13 @@ public class ShipFuelTransfer : MonoBehaviour
 
     private void OnComponentRepaired()
     {
-        if (_shipDestroyed || (bool)disableShipRepair.GetProperty()) return;
+        if (_shipDestroyed || !ShipRepairLimitController.CanRepair() || !PlayerState.IsWearingSuit()) return;
         _interactReceiver.EnableInteraction();
     }
 
     private void OnComponentDamaged()
     {
-        if (_shipDestroyed || (bool)disableShipRepair.GetProperty()) return;
+        if (_shipDestroyed || !ShipRepairLimitController.CanRepair() || !PlayerState.IsWearingSuit()) return;
         _interactReceiver.DisableInteraction();
     }
 

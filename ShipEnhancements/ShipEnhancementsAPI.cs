@@ -15,21 +15,21 @@ public class ShipEnhancementsAPI : IShipEnhancements
         TemperatureZone tempZone = tempZoneObj.GetComponent<TemperatureZone>();
         if (innerRadius > outerRadius)
         {
-            WriteDebugMessage($"Warning for temperature zone \"{objectName}\": innerRadius ({innerRadius}) larger than outerRadius ({outerRadius})", warning: true);
+            LogMessage($"Warning for temperature zone \"{objectName}\": innerRadius ({innerRadius}) larger than outerRadius ({outerRadius})", warning: true);
             innerRadius = 0f;
         }
         if (isShell)
         {
             if (shellCenterRadius < innerRadius || shellCenterRadius > outerRadius)
             {
-                WriteDebugMessage($"Warning for temperature zone \"{objectName}\": shellCenterRadius ({shellCenterRadius}) outside of bounds (outerRadius: {outerRadius}, innerRadius: {innerRadius})", warning: true);
+                LogMessage($"Warning for temperature zone \"{objectName}\": shellCenterRadius ({shellCenterRadius}) outside of bounds (outerRadius: {outerRadius}, innerRadius: {innerRadius})", warning: true);
                 shellCenterRadius = (innerRadius + outerRadius) / 2f;
             }
             float outerBuffer = outerRadius - shellCenterRadius;
             float innerBuffer = shellCenterRadius - innerRadius;
             if (shellCenterThickness > outerBuffer || shellCenterThickness > innerBuffer)
             {
-                WriteDebugMessage($"Warning for temperature zone \"{objectName}\": shellCenterThickness ({shellCenterThickness}) extends out of bounds (outerRadius: {outerRadius}, innerRadius: {innerRadius})", warning: true);
+                LogMessage($"Warning for temperature zone \"{objectName}\": shellCenterThickness ({shellCenterThickness}) extends out of bounds (outerRadius: {outerRadius}, innerRadius: {innerRadius})", warning: true);
                 shellCenterThickness = Mathf.Min(outerBuffer, innerBuffer);
             }
         }
@@ -47,7 +47,7 @@ public class ShipEnhancementsAPI : IShipEnhancements
                 return setting.GetProperty();
             }
         }
-        WriteDebugMessage($"Could not find a Ship Enhancements setting named {configName}! From: IShipEnhancements.GetSettingsProperty()", error: true);
+        LogMessage($"Could not find a Ship Enhancements setting named {configName}! From: IShipEnhancements.GetSettingsProperty()", error: true);
         return null;
     }
 
@@ -62,7 +62,7 @@ public class ShipEnhancementsAPI : IShipEnhancements
                 return;
             }
         }
-        WriteDebugMessage($"Could not find a Ship Enhancements setting named {configName}! From: IShipEnhancements.SetSettingsProperty()", error: true);
+        LogMessage($"Could not find a Ship Enhancements setting named {configName}! From: IShipEnhancements.SetSettingsProperty()", error: true);
     }
 
     public UnityEvent GetPreShipInitializeEvent() => Instance.PreShipInitialize;

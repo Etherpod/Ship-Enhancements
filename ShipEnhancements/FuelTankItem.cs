@@ -19,6 +19,8 @@ public class FuelTankItem : OWItem
     [SerializeField]
     private OWAudioSource _oneShotSource;
     [SerializeField]
+    private OWAudioSource _explosionSource;
+    [SerializeField]
     private OWEmissiveRenderer _emissiveRenderer;
 
     private Collider _itemCollider;
@@ -41,6 +43,7 @@ public class FuelTankItem : OWItem
     public override void Awake()
     {
         base.Awake();
+        _type = ItemType;
         _itemCollider = GetComponent<Collider>();
         _refuelPrompt = new ScreenPrompt(InputLibrary.interactSecondary, "<CMD>" + UITextLibrary.GetString(UITextType.HoldPrompt)
             + " Refill Fuel", 0, ScreenPrompt.DisplayState.Normal, false);
@@ -74,8 +77,10 @@ public class FuelTankItem : OWItem
             _explosion._length *= ((float)shipExplosionMultiplier.GetProperty() * 0.75f) + 0.25f;
             _explosion._forceVolume._acceleration *= ((float)shipExplosionMultiplier.GetProperty() * 0.25f) + 0.75f;
             _explosion.transform.localScale *= (float)shipExplosionMultiplier.GetProperty();
+            _explosion._lightRadius *= ((float)shipExplosionMultiplier.GetProperty() * 0.75f) + 0.25f;
+            _explosion._lightIntensity *= ((float)shipExplosionMultiplier.GetProperty() * 0.01f) + 0.99f;
             _explosion.GetComponent<SphereCollider>().radius = 0.1f;
-            OWAudioSource audio = SELocator.GetShipTransform().Find("Effects/ExplosionAudioSource").GetComponent<OWAudioSource>();
+            OWAudioSource audio = _explosionSource;
             audio.maxDistance *= ((float)shipExplosionMultiplier.GetProperty() * 0.1f) + 0.9f;
             AnimationCurve curve = audio.GetCustomCurve(AudioSourceCurveType.CustomRolloff);
             Keyframe[] newKeys = new Keyframe[curve.keys.Length];
@@ -115,12 +120,12 @@ public class FuelTankItem : OWItem
             OWItem item = Locator.GetToolModeSwapper().GetItemCarryTool().GetHeldItem();
             if (item != null)
             {
-                _interactReceiver.ChangePrompt("Already holding " + item.GetDisplayName());
+                _interactReceiver.ChangePrompt("Already Holding " + item.GetDisplayName());
                 _interactReceiver.SetKeyCommandVisible(false);
             }
             else
             {
-                _interactReceiver.ChangePrompt("Pick up " + GetDisplayName());
+                _interactReceiver.ChangePrompt("Pick Up " + GetDisplayName());
                 _interactReceiver.SetKeyCommandVisible(true);
             }
 
@@ -152,7 +157,7 @@ public class FuelTankItem : OWItem
                             {
                                 foreach (uint id in ShipEnhancements.PlayerIDs)
                                 {
-                                    ShipEnhancements.QSBCompat.SendToggleFuelTankDrain(id, true);
+                                    ShipEnhancements.QSBCompat.SendToggleFuelTankDrain(id, this, true);
                                 }
                             }
                         }
@@ -225,7 +230,7 @@ public class FuelTankItem : OWItem
         {
             foreach (uint id in ShipEnhancements.PlayerIDs)
             {
-                ShipEnhancements.QSBCompat.SendToggleFuelTankDrain(id, false);
+                ShipEnhancements.QSBCompat.SendToggleFuelTankDrain(id, this, false);
             }
         }
     }
@@ -244,6 +249,11 @@ public class FuelTankItem : OWItem
     {
         if (impact.speed > _explosionSpeed && _currentFuel > 0f)
         {
+            if (GetComponentInParent<ShipBody>() && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
+            {
+                ErnestoDetectiveController.ItWasFuelTank(impact: true);
+            }
+
             Explode();
         }
     }
@@ -253,6 +263,7 @@ public class FuelTankItem : OWItem
         _explosion?.Play();
         _explosion.transform.parent = transform.parent;
         _explosion.GetComponent<SphereCollider>().enabled = true;
+        _explosionSource.PlayOneShot(AudioType.ShipDamageShipExplosion);
         if (GetComponentInParent<ShipBody>() && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
         {
             SELocator.GetShipDamageController().Explode();
@@ -262,7 +273,7 @@ public class FuelTankItem : OWItem
             _explosion.GetComponentInChildren<ExplosionDamage>()?.OnExplode();
         }
 
-        if ((bool)extraNoise.GetProperty())
+        if ((bool)extraNoise.GetProperty() && GetComponentInParent<ShipBody>())
         {
             SELocator.GetShipTransform().GetComponentInChildren<ShipNoiseMaker>()._noiseRadius = 800f * (float)shipExplosionMultiplier.GetProperty();
         }
@@ -276,7 +287,7 @@ public class FuelTankItem : OWItem
         {
             foreach (uint id in ShipEnhancements.PlayerIDs)
             {
-                ShipEnhancements.QSBCompat.SendFuelTankExplosion(id);
+                ShipEnhancements.QSBCompat.SendFuelTankExplosion(id, this);
             }
         }
 
@@ -289,6 +300,7 @@ public class FuelTankItem : OWItem
         _explosion?.Play();
         _explosion.transform.parent = transform.parent;
         _explosion.GetComponent<SphereCollider>().enabled = true;
+        _explosionSource.PlayOneShot(AudioType.ShipDamageShipExplosion);
         if (GetComponentInParent<ShipBody>() && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
         {
             SELocator.GetShipDamageController().Explode();
@@ -334,7 +346,7 @@ public class FuelTankItem : OWItem
         {
             foreach (uint id in ShipEnhancements.PlayerIDs)
             {
-                ShipEnhancements.QSBCompat.SendFuelTankCapacity(id, _currentFuel);
+                ShipEnhancements.QSBCompat.SendFuelTankCapacity(id, this, _currentFuel);
             }
         }
     }

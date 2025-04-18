@@ -8,6 +8,10 @@
       "Name": "Dead in the Water",
       "Description": "Use up all of your ship's fuel and oxygen reserves with no way to refill them."
     },
+    "SHIPENHANCEMENTS.ANGLERFISH_KILL": {
+      "Name": "Eat This!",
+      "Description": "Kill an anglerfish using an explosive."
+    },
     "SHIPENHANCEMENTS.FIRE_HAZARD": {
       "Name": "Fire Hazard",
       "Description": "Leave a campfire lit inside of the ship for too long."
@@ -23,6 +27,14 @@
     "SHIPENHANCEMENTS.RGB_SETUP": {
       "Name": "Party Time",
       "Description": "Set all of your ship colors to Rainbow."
+    },
+    "SHIPENHANCEMENTS.SATELLITE": {
+      "Name": "Return to Sender",
+      "Description": "Bring the Deep Space Satellite back to Hornfels."
+    },
+    "SHIPENHANCEMENTS.SUPERHOTSHOT": {
+      "Name": "Show-Off",
+      "Description": "Tether your ship to the Sun Station while only forward thrust is enabled."
     },
     "SHIPENHANCEMENTS.BLACK_HOLE": {
       "Name": "The Beginning of the End",

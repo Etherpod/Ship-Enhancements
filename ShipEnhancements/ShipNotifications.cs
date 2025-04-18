@@ -12,7 +12,7 @@ public static class ShipNotifications
     private static NotificationData _oxygenCriticalNotification = new NotificationData(NotificationTarget.Ship, "SHIP OXYGEN CRITICAL", 5f, true);
 
     private static NotificationData _oxygenRefillingNotification = new NotificationData(NotificationTarget.Ship, "REFILLING OXYGEN TANK", 5f, true);
-    private static NotificationData _oxygenNotRefillingNotification = new NotificationData(NotificationTarget.Ship, "DRAINING OXYGEN TANK >:)", 5F, true);
+    private static NotificationData _oxygenNotRefillingNotification = new NotificationData(NotificationTarget.Ship, "DRAINING OXYGEN TANK >:)", 5f, true);
 
     private static NotificationData _fuelLowNotification = new NotificationData(NotificationTarget.Ship, "SHIP FUEL LOW", 5f, true);
     private static NotificationData _fuelCriticalNotification = new NotificationData(NotificationTarget.Ship, "SHIP FUEL CRITICAL", 5f, true);
@@ -28,6 +28,18 @@ public static class ShipNotifications
     private static NotificationData _noScoutInShipNotification = new NotificationData(NotificationTarget.Ship, "SCOUT LAUNCHER EMPTY", 5f, true);
 
     private static NotificationData _playerRefueling = new NotificationData(NotificationTarget.Player, "REFUELING", 5f, true);
+
+    private static NotificationData _digestionNotification = new NotificationData(NotificationTarget.Ship, "ACIDITY LEVELS CRITICAL", 5f, true);
+    
+    private static NotificationData _orbitAutopilotNoTargetNotification = new NotificationData(NotificationTarget.Ship, "AUTOPILOT: NO TARGET TO ORBIT", 5f, true);
+    
+    private static NotificationData _orbitAutopilotActiveNotification = new NotificationData(NotificationTarget.Ship, "AUTOPILOT: ORBITING", 5f, true);
+    
+    private static NotificationData _orbitAutopilotDisabledNotification = new NotificationData(NotificationTarget.Ship, "AUTOPILOT: ORBIT DISABLED", 5f, true);
+    
+    private static NotificationData _holdPositionAutopilotActiveNotification = new NotificationData(NotificationTarget.Ship, "AUTOPILOT: HOLDING POSITION", 5f, true);
+    
+    private static NotificationData _holdPositionAutopilotDisabledNotification = new NotificationData(NotificationTarget.Ship, "AUTOPILOT: HOLD POSITION DISABLED", 5f, true);
 
     private static bool _oxygenLow = false;
     private static bool _oxygenCritical = false;
@@ -227,4 +239,33 @@ public static class ShipNotifications
     {
         NotificationManager.SharedInstance.UnpinNotification(_playerRefueling);
     }
+
+    public static void PostDigestionNotification()
+    {
+        NotificationManager.SharedInstance.PostNotification(_digestionNotification, false);
+    }
+
+    public static void PostOrbitAutopilotActiveNotification(float radius)
+    {
+        _orbitAutopilotActiveNotification.displayMessage = "AUTOPILOT: ORBITING AT " + Mathf.Round(radius) + "m";
+        NotificationManager.SharedInstance.PostNotification(_orbitAutopilotActiveNotification, true);
+    }
+    
+    public static void RemoveOrbitAutopilotActiveNotification() =>
+        NotificationManager.SharedInstance.UnpinNotification(_orbitAutopilotActiveNotification);
+
+    public static void PostOrbitAutopilotNoTargetNotification() =>
+        NotificationManager.SharedInstance.PostNotification(_orbitAutopilotNoTargetNotification, false);
+
+    public static void PostOrbitAutopilotDisabledNotification() =>
+        NotificationManager.SharedInstance.PostNotification(_orbitAutopilotDisabledNotification, false);
+
+    public static void PostHoldPositionAutopilotNotification() =>
+        NotificationManager.SharedInstance.PostNotification(_holdPositionAutopilotActiveNotification, true);
+
+    public static void RemoveHoldPositionAutopilotNotification() =>
+        NotificationManager.SharedInstance.UnpinNotification(_holdPositionAutopilotActiveNotification);
+
+    public static void PostHoldPositionAutopilotDisabledNotification() =>
+        NotificationManager.SharedInstance.PostNotification(_holdPositionAutopilotDisabledNotification, false);
 }

@@ -118,9 +118,7 @@ public class ShipGravityCrystalItem : OWItem
     {
         base.SocketItem(socketTransform, sector);
 
-        if (!_placedInShipSocket) return;
-
-        _placedInShipSocket = false;
+        if (!socketTransform.GetComponent<ShipGravityCrystalSocket>()) return;
 
         if (_hasBeenSocketed)
         {
@@ -152,11 +150,6 @@ public class ShipGravityCrystalItem : OWItem
         {
             _hasBeenSocketed = true;
         }
-    }
-
-    public void OnPlaceIntoShipSocket()
-    {
-        _placedInShipSocket = true;
     }
 
     public override void OnDestroy()

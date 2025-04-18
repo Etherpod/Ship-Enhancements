@@ -21,23 +21,13 @@ public class ThrustModulatorController : ElectricalComponent
     private int _focusedButtons;
     private bool _focused = false;
     private ElectricalSystem _electricalSystem;
-    private bool _wasDisrupted = false;
+    private bool _electricalDisrupted = false;
+    private bool _lastPoweredState = false;
     private Coroutine _overdriveSequence;
 
     public override void Awake()
     {
         _powered = true;
-        _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
-        if ((bool)enableThrustModulator.GetProperty())
-        {
-            _buttonPanel.SetThrustModulatorActive(true);
-        }
-        else
-        {
-            _buttonPanel.SetThrustModulatorActive(false);
-            enabled = false;
-            return;
-        }
 
         base.Awake();
 
@@ -58,19 +48,6 @@ public class ThrustModulatorController : ElectricalComponent
     {
         if (!(bool)enableThrustModulator.GetProperty()) return;
         UpdateModulatorDisplay(5);
-    }
-
-    private void Update()
-    {
-        if (_electricalSystem.IsDisrupted() != _wasDisrupted)
-        {
-            _wasDisrupted = _electricalSystem.IsDisrupted();
-            if (SELocator.GetShipDamageController().IsElectricalFailed() || SELocator.GetShipDamageController().IsSystemFailed()) return;
-            foreach (ThrustModulatorButton button in _modulatorButtons)
-            {
-                button.SetInteractable(button.GetModulatorLevel() != _lastLevel && !_wasDisrupted);
-            }
-        }
     }
 
     private IEnumerator OverdriveSequence()
@@ -105,7 +82,7 @@ public class ThrustModulatorController : ElectricalComponent
                 !(SELocator.GetShipDamageController().IsElectricalFailed() || SELocator.GetShipDamageController().IsSystemFailed()))
             {
                 button.SetButtonLight(button.GetModulatorLevel() <= _lastLevel);
-                button.SetInteractable(button.GetModulatorLevel() != _lastLevel && !_wasDisrupted);
+                button.SetInteractable(button.GetModulatorLevel() != _lastLevel);
             }
         }
     }
@@ -120,14 +97,7 @@ public class ThrustModulatorController : ElectricalComponent
         foreach (ThrustModulatorButton button in _modulatorButtons)
         {
             button.SetButtonLight(button.GetModulatorLevel() <= setLevel);
-            if (disable)
-            {
-                button.SetInteractable(button.GetModulatorLevel() != setLevel && !_wasDisrupted);
-            }
-            else
-            {
-                button.SetInteractable(!_wasDisrupted);
-            }
+            button.SetInteractable(!disable || button.GetModulatorLevel() != setLevel);
         }
     }
 
@@ -166,11 +136,19 @@ public class ThrustModulatorController : ElectricalComponent
 
     public override void SetPowered(bool powered)
     {
+        if (_electricalSystem != null && _electricalDisrupted != _electricalSystem.IsDisrupted())
+        {
+            _electricalDisrupted = _electricalSystem.IsDisrupted();
+            _lastPoweredState = _powered;
+        }
+
         if (!(bool)enableThrustModulator.GetProperty()) return;
-        if (!_electricalSystem.IsDisrupted())
+
+        base.SetPowered(powered);
+
+        if (!_electricalDisrupted)
         {
             StopAllCoroutines();
-            base.SetPowered(powered);
             if (powered)
             {
                 UpdateModulatorDisplay(_lastLevel);
@@ -191,7 +169,7 @@ public class ThrustModulatorController : ElectricalComponent
 
     public void PlayButtonSound(AudioClip clip, float volume, int level)
     {
-        _audioSource.pitch = level < _lastLevel ? Random.Range(0.9f, 1f) : Random.Range(1f, 1.1f);
+        _audioSource.pitch = level < _lastLevel ? Random.Range(0.95f, 1f) : Random.Range(1f, 1.05f);
         _audioSource.PlayOneShot(clip, volume);
     }
 

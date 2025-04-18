@@ -23,6 +23,10 @@ using QSB.ShipSync.Messages;
 using QSB.Player.TransformSync;
 using System.Collections.Generic;
 using QSB.ItemSync.Patches;
+using QSB.Anglerfish.Patches;
+using QSB.Anglerfish.WorldObjects;
+using QSB.Anglerfish.Messages;
+using QSB.ItemSync.WorldObjects.Sockets;
 
 namespace ShipEnhancementsQSB;
 
@@ -42,30 +46,8 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
 
             ShipEnhancements.ShipEnhancements.Instance.ModHelper.Events.Unity.FireInNUpdates(() =>
             {
-                if ((bool)addPortableCampfire.GetProperty())
-                {
-                    QSBWorldSync.Init<QSBPortableCampfireItem, PortableCampfireItem>();
-                }
-                if ((bool)addPortableTractorBeam.GetProperty())
-                {
-                    QSBWorldSync.Init<QSBPortableTractorBeamItem, PortableTractorBeamItem>();
-                }
-                if ((bool)addTether.GetProperty())
-                {
-                    QSBWorldSync.Init<QSBTetherHookItem, TetherHookItem>();
-                }
-                if ((bool)addExpeditionFlag.GetProperty())
-                {
-                    QSBWorldSync.Init<QSBExpeditionFlagItem, ExpeditionFlagItem>();
-                }
-                if ((bool)enableRemovableGravityCrystal.GetProperty())
-                {
-                    QSBWorldSync.Init<QSBShipGravityCrystal, ShipGravityCrystalItem>();
-                }
-                if ((bool)addFuelCanister.GetProperty())
-                {
-                    QSBWorldSync.Init<QSBFuelTankItem, FuelTankItem>();
-                }
+                QSBWorldSync.Init<QSBCockpitSwitch, CockpitSwitch>();
+                QSBWorldSync.Init<QSBCockpitButton, CockpitButton>();
             }, 2);
         };
     }
@@ -116,17 +98,6 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
         hull.SendMessage(new HullChangeIntegrityMessage(shipHull._integrity));
     }
 
-    public int GetIDFromTetherHook(TetherHookItem hookItem)
-    {
-        var worldObj = hookItem.GetWorldObject<QSBTetherHookItem>();
-        return worldObj.ObjectId;
-    }
-
-    public TetherHookItem GetTetherHookFromID(int hookID)
-    {
-        return hookID.GetWorldObject<QSBTetherHookItem>().AttachedObject;
-    }
-
     public int GetIDFromItem(OWItem item)
     {
         return item.GetWorldObject<IQSBItem>().ObjectId;
@@ -138,6 +109,21 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
         if (obj is OWItem)
         {
             return (OWItem)obj;
+        }
+        return null;
+    }
+
+    public int GetIDFromSocket(OWItemSocket socket)
+    {
+        return socket.GetWorldObject<QSBItemSocket>().ObjectId;
+    }
+
+    public OWItemSocket GetSocketFromID(int socketID)
+    {
+        var obj = socketID.GetWorldObject<QSBItemSocket>().AttachedObject;
+        if (obj is OWItemSocket)
+        {
+            return (OWItemSocket)obj;
         }
         return null;
     }
@@ -157,9 +143,66 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
         if (!QSBPlayerManager.LocalPlayer.FlyingShip)
         {
             var sync = ShipTransformSync.LocalInstance.ThrusterVariableSyncer.AccelerationSyncer;
-            //ShipEnhancements.ShipEnhancements.WriteDebugMessage(sync.Value);
             sync.Value = SELocator.GetShipBody().GetComponent<ShipThrusterModel>().GetLocalAcceleration();
         }
+    }
+
+    public int GetIDFromAngler(AnglerfishController angler)
+    {
+        return angler.GetWorldObject<QSBAngler>().ObjectId;
+    }
+
+    public AnglerfishController GetAnglerFromID(int id)
+    {
+        var obj = id.GetWorldObject<QSBAngler>().AttachedObject;
+        if (obj is AnglerfishController)
+        {
+            return obj;
+        }
+        return null;
+    }
+
+    public int GetIDFromSwitch(CockpitSwitch cockpitSwitch)
+    {
+        return cockpitSwitch.GetWorldObject<QSBCockpitSwitch>().ObjectId;
+    }
+
+    public CockpitSwitch GetSwitchFromID(int id)
+    {
+        return id.GetWorldObject<QSBCockpitSwitch>().AttachedObject;
+    }
+
+    public int GetIDFromButton(CockpitButton cockpitButton)
+    {
+        return cockpitButton.GetWorldObject<QSBCockpitButton>().ObjectId;
+    }
+
+    public CockpitButton GetButtonFromID(int id)
+    {
+        return id.GetWorldObject<QSBCockpitButton>().AttachedObject;
+    }
+
+    public CockpitButtonSwitch GetButtonSwitchFromID(int id)
+    {
+        CockpitButton button = id.GetWorldObject<QSBCockpitButton>().AttachedObject;
+        if (button is CockpitButtonSwitch)
+        {
+            return button as CockpitButtonSwitch;
+        }
+        else
+        {
+            return null;
+        }
+    }
+
+    public OWRigidbody GetBodyFromID(int id)
+    {
+        return id.GetWorldObject<QSBOWRigidbody>().AttachedObject;
+    }
+
+    public int GetIDFromBody(OWRigidbody body)
+    {
+        return body.GetWorldObject<QSBOWRigidbody>().ObjectId;
     }
 }
 
@@ -175,7 +218,7 @@ public static class QSBInteractionPatches
     {
         var playerResources = SELocator.GetPlayerResources();
 
-        var needsHealing = playerResources.GetHealthFraction() != 1f;
+        var needsHealing = playerResources.GetHealthFraction() != 1f && !(bool)disableShipMedkit.GetProperty();
         var needsRefueling = playerResources.GetFuelFraction() != 1f;
         var canRefuel = SELocator.GetShipResources().GetFuel() > 0f;
         UITextType uiTextType;
@@ -235,7 +278,7 @@ public static class QSBInteractionPatches
         PlayerResources playerResources = SELocator.GetPlayerResources();
 
         var canRefuel = playerResources.GetFuelFraction() != 1f && SELocator.GetShipResources().GetFuel() > 0f;
-        var needsHealing = playerResources.GetHealthFraction() != 1f;
+        var needsHealing = playerResources.GetHealthFraction() != 1f && !(bool)disableShipMedkit.GetProperty();
         var needsRefill = false;
 
         if (canRefuel)
@@ -367,7 +410,7 @@ public static class QSBInteractionPatches
     public static bool AllowShipItemDrop(DropItemMessage __instance)
     {
         (Vector3 localPosition, Vector3 localNormal, int sectorId, int dropTargetId, int rigidBodyId) Data
-            = ((Vector3, Vector3, int, int, int))typeof(DropItemMessage).GetProperty("Data", 
+            = ((Vector3, Vector3, int, int, int))typeof(DropItemMessage).GetProperty("Data",
             BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Static).GetValue(__instance);
 
         IQSBItem WorldObject = (IQSBItem)typeof(DropItemMessage).GetProperty("WorldObject",
@@ -474,8 +517,17 @@ public static class QSBInteractionPatches
 
         qsbItem.SendMessage(new DropItemMessage(hit.point, hit.normal, parent, sector, customDropTarget, targetRigidbody));
 
-        List<ShipModule> moduleList = [.. SELocator.GetShipDamageController()._shipModules];
-        int index = moduleList.IndexOf(module.GetComponent<ShipModule>());
+        int index = -1;
+        if (module.GetComponent<ShipModule>())
+        {
+            List<ShipModule> moduleList = [.. SELocator.GetShipDamageController()._shipModules];
+            index = moduleList.IndexOf(module.GetComponent<ShipModule>());
+        }
+        else if (module.GetComponent<ShipDetachableLeg>())
+        {
+            List<ShipDetachableLeg> legList = [.. module.GetComponentInParent<ShipLandingGear>().GetLegs()];
+            index = 100 + legList.IndexOf(module.GetComponent<ShipDetachableLeg>());
+        }
         foreach (uint id in ShipEnhancements.ShipEnhancements.PlayerIDs)
         {
             ShipEnhancements.ShipEnhancements.QSBCompat.SendItemModuleParent(id, item, index);
@@ -531,7 +583,7 @@ public static class QSBInteractionPatches
 
                     //__instance.RaiseEvent(nameof(__instance.OnDamaged), __instance);
 
-                    var eventDelegate1 = (MulticastDelegate)typeof(ShipHull).GetField("OnDamaged", BindingFlags.Instance 
+                    var eventDelegate1 = (MulticastDelegate)typeof(ShipHull).GetField("OnDamaged", BindingFlags.Instance
                         | BindingFlags.NonPublic | BindingFlags.Public).GetValue(__0);
                     if (eventDelegate1 != null)
                     {
@@ -567,7 +619,7 @@ public static class QSBInteractionPatches
 
             //__instance.RaiseEvent(nameof(__instance.OnImpact), __instance._dominantImpact, damage);
 
-            var eventDelegate2 = (MulticastDelegate)typeof(ShipHull).GetField("OnImpact", BindingFlags.Instance 
+            var eventDelegate2 = (MulticastDelegate)typeof(ShipHull).GetField("OnImpact", BindingFlags.Instance
                 | BindingFlags.NonPublic | BindingFlags.Public).GetValue(__0);
             if (eventDelegate2 != null)
             {
@@ -672,12 +724,6 @@ public static class QSBInteractionPatches
             return true;
         }
 
-        /*if (InputLatencyController.IsInputQueued != test)
-        {
-            test = InputLatencyController.IsInputQueued;
-            ShipEnhancements.ShipEnhancements.WriteDebugMessage(QSBCore.IsHost + " Input: " + test);
-        }*/
-
         // bug : this doesn't account for autopilot
         // fixes #590
         if (ShipManager.Instance.CurrentFlyer == uint.MaxValue)
@@ -763,6 +809,53 @@ public static class QSBInteractionPatches
             {
                 electricalSystem.SetPowered(true);
             }
+        }
+
+        return false;
+    }
+    #endregion
+
+    #region ProlongDigestion
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(AnglerPatches), nameof(AnglerPatches.OnCaughtObject))]
+    public static bool OnCaughtObjectFix(AnglerfishController __0, OWRigidbody caughtBody)
+    {
+        if (!(bool)prolongDigestion.GetProperty()) return true;
+
+        var qsbAngler = __0.GetWorldObject<QSBAngler>();
+
+        if (__0._currentState == AnglerfishController.AnglerState.Consuming)
+        {
+            if (!qsbAngler.TargetTransform.CompareTag("Player") && caughtBody.CompareTag("Player")
+                && !PlayerState.IsInsideShip() && !PlayerState.AtFlightConsole())
+            {
+                Locator.GetDeathManager().KillPlayer(DeathType.Digestion);
+            }
+
+            return false;
+        }
+
+        if (caughtBody.CompareTag("Player") || caughtBody.CompareTag("Ship"))
+        {
+            qsbAngler.TargetTransform = caughtBody.transform;
+            __0._consumeStartTime = Time.time;
+            __0.ChangeState(AnglerfishController.AnglerState.Consuming);
+
+            if (caughtBody.CompareTag("Ship"))
+            {
+                ShipNotifications.PostDigestionNotification();
+                PatchClass.digestionDamageDelay = UnityEngine.Random.Range(0.6f, 1.2f);
+            }
+            if (PlayerState.IsInsideShip() || PlayerState.AtFlightConsole())
+            {
+                Locator.GetPlayerDeathAudio()._deathSource.PlayOneShot(AudioType.Death_Digestion, 1f);
+                if (PlayerState.IsInsideShip())
+                {
+                    Locator.GetPlayerDeathAudio()._shipGroanSource.PlayDelayed(1f);
+                }
+            }
+
+            qsbAngler.SendMessage(new AnglerDataMessage(qsbAngler));
         }
 
         return false;

@@ -18,7 +18,15 @@ public class ShipProbePickupVolume : ProbePickupVolume
         _probeLauncher = Locator.GetPlayerTransform().GetComponentInChildren<PlayerProbeLauncher>();
         _shipProbeLauncher = GetComponentInParent<PlayerProbeLauncher>();
         _probeLauncherEffects = _shipProbeLauncher.GetComponent<ShipProbeLauncherEffects>();
-        if (!(bool)disableScoutRecall.GetProperty() || (bool)disableScoutLaunching.GetProperty())
+
+        if (SELocator.GetProbeLauncherComponent() != null)
+        {
+            SELocator.GetProbeLauncherComponent().OnDamaged += OnLauncherDamaged;
+            SELocator.GetProbeLauncherComponent().OnRepaired += OnLauncherRepaired;
+        }
+
+        if (!(bool)disableScoutRecall.GetProperty() 
+            || ((bool)disableScoutLaunching.GetProperty() && !(bool)scoutPhotoMode.GetProperty()))
         {
             _interactReceiver.DisableInteraction();
         }
@@ -32,18 +40,29 @@ public class ShipProbePickupVolume : ProbePickupVolume
 
     protected override void OnRetrieveProbe()
     {
-        if (_probeLauncherEffects.componentDamaged || ShipEnhancements.Instance.probeDestroyed) return;
+        if (_probeLauncherEffects.componentDamaged || ShipEnhancements.Instance.probeDestroyed)
+        {
+            _interactReceiver.DisableInteraction();
+        }
 
-        if ((bool)disableScoutRecall.GetProperty() && !(bool)disableScoutLaunching.GetProperty() && !PlayerState.AtFlightConsole())
+        if ((bool)disableScoutRecall.GetProperty() 
+            && (!(bool)disableScoutLaunching.GetProperty() || (bool)scoutPhotoMode.GetProperty()) 
+            && !PlayerState.AtFlightConsole())
         {
             probeInShip = false;
             _interactReceiver.ChangePrompt(_insertPrompt);
-            _interactReceiver.EnableInteraction();
+            if (PlayerState.IsWearingSuit())
+            {
+                _interactReceiver.EnableInteraction();
+            }
         }
-        else if (PlayerState.AtFlightConsole() && (bool)enableManualScoutRecall.GetProperty())
+        else if (PlayerState.AtFlightConsole() && _shipProbeLauncher.IsEquipped() && (bool)enableManualScoutRecall.GetProperty())
         {
             probeInShip = true;
-            _interactReceiver.EnableInteraction();
+            if (PlayerState.IsWearingSuit())
+            {
+                _interactReceiver.EnableInteraction();
+            }
         }
     }
 
@@ -53,11 +72,31 @@ public class ShipProbePickupVolume : ProbePickupVolume
         _interactReceiver.DisableInteraction();
     }
 
+    protected override void OnSuitUp()
+    {
+        if (_probeLauncherEffects.componentDamaged || ShipEnhancements.Instance.probeDestroyed) return;
+
+        if (((bool)disableScoutRecall.GetProperty() 
+            && (!(bool)disableScoutLaunching.GetProperty() || (bool)scoutPhotoMode.GetProperty())
+            && _probeLauncher._activeProbe == null) 
+            || (probeInShip && (bool)enableManualScoutRecall.GetProperty()))
+        {
+            _interactReceiver.EnableInteraction();
+        }
+    }
+
+    protected override void OnRemoveSuit()
+    {
+        _interactReceiver.DisableInteraction();
+    }
+
     protected override void OnPressInteract()
     {
         if (_probeLauncherEffects.componentDamaged || ShipEnhancements.Instance.probeDestroyed) return;
 
-        if ((bool)disableScoutRecall.GetProperty() && !(bool)disableScoutLaunching.GetProperty() && _probeLauncher._preLaunchProbeProxy.activeSelf)
+        if ((bool)disableScoutRecall.GetProperty() 
+            && (!(bool)disableScoutLaunching.GetProperty() || (bool)scoutPhotoMode.GetProperty())
+            && _probeLauncher._preLaunchProbeProxy.activeSelf)
         {
             probeInShip = true;
             canTransferProbe = true;
@@ -99,6 +138,37 @@ public class ShipProbePickupVolume : ProbePickupVolume
     {
         if (ShipEnhancements.Instance.probeDestroyed) return;
         probeInShip = true;
-        _interactReceiver.EnableInteraction();
+        if (PlayerState.IsWearingSuit())
+        {
+            _interactReceiver.EnableInteraction();
+        }
+    }
+
+    private void OnLauncherDamaged(ShipComponent comp)
+    {
+        _interactReceiver.DisableInteraction();
+    }
+
+    private void OnLauncherRepaired(ShipComponent comp)
+    {
+        if (ShipEnhancements.Instance.probeDestroyed || !PlayerState.IsWearingSuit()) return;
+
+        if (((bool)disableScoutRecall.GetProperty()
+            && (!(bool)disableScoutLaunching.GetProperty() || (bool)scoutPhotoMode.GetProperty())
+            && _probeLauncher._activeProbe == null)
+            || (probeInShip && (bool)enableManualScoutRecall.GetProperty()))
+        {
+            _interactReceiver.EnableInteraction();
+        }
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        if (SELocator.GetProbeLauncherComponent() != null)
+        {
+            SELocator.GetProbeLauncherComponent().OnDamaged -= OnLauncherDamaged;
+            SELocator.GetProbeLauncherComponent().OnRepaired -= OnLauncherRepaired;
+        }
     }
 }

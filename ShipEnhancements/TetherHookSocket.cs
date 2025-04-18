@@ -1,29 +1,9 @@
-﻿using UnityEngine;
+﻿namespace ShipEnhancements;
 
-namespace ShipEnhancements;
-
-public class TetherHookSocket : OWItemSocket
+public class TetherHookSocket : SEItemSocket
 {
-    private TetherHookItem _hookItem;
-
-    public override void Awake()
+    protected override ItemType GetAcceptableType()
     {
-        Reset();
-        _sector = SELocator.GetShipSector();
-        base.Awake();
-        _acceptableType = ShipEnhancements.Instance.TetherHookType;
-
-        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
-    }
-
-    private void OnShipSystemFailure()
-    {
-        _sector = null;
-        _socketedItem?.SetSector(null);
-    }
-
-    private void OnDestroy()
-    {
-        GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
+        return ShipEnhancements.Instance.TetherHookType;
     }
 }

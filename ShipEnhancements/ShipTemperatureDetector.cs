@@ -11,10 +11,14 @@ public class ShipTemperatureDetector : TemperatureDetector
     private ShipHull[] _shipHulls;
     private ShipHull _lastDamagedHull;
     private ShipComponent[] _shipComponents;
+    private ShockLayerController _shockLayerController;
     private float _damageDelay = 1.5f;
     private float _randDamageDelay;
     private float _delayStartTime;
     private bool _componentDamageNextTime = false;
+
+    protected override bool UpdateTemperature => base.UpdateTemperature
+        || (_shockLayerController.enabled && _shockLayerController._ruleset != null);
 
     protected override void Start()
     {
@@ -24,10 +28,11 @@ public class ShipTemperatureDetector : TemperatureDetector
 
         _shipHulls = SELocator.GetShipDamageController()._shipHulls;
         _shipComponents = SELocator.GetShipDamageController()._shipComponents;
+        _shockLayerController = SELocator.GetShipTransform().GetComponentInChildren<ShockLayerController>();
 
         _delayStartTime = Time.time;
         _randDamageDelay = _damageDelay + UnityEngine.Random.Range(-1f, 1f);
-        _internalTempMeterLength *= (float)temperatureResistanceMultiplier.GetProperty();
+        _internalTempMeterLength *= Mathf.Max(Mathf.Abs((float)temperatureResistanceMultiplier.GetProperty()), 1f);
     }
 
     private void UpdateTemperatureDamage()
@@ -67,9 +72,29 @@ public class ShipTemperatureDetector : TemperatureDetector
 
         if ((bool)faultyHeatRegulators.GetProperty())
         {
+            float resistance = (float)temperatureResistanceMultiplier.GetProperty();
             float multiplier = Mathf.InverseLerp(-_highTempCutoff / 4f, 0f, _currentTemperature);
-            float scalar = 1 + (1f * Mathf.InverseLerp(_highTempCutoff, 0f, Mathf.Abs(_currentTemperature)));
-            _internalTempMeter = Mathf.Clamp(_internalTempMeter + (Time.deltaTime * multiplier * scalar), -_internalTempMeterLength, _internalTempMeterLength);
+            float additiveMultiplier = 0f;
+            if (SELocator.GetShipDamageController().IsReactorCritical())
+            {
+                additiveMultiplier = 1.5f;
+            }
+
+            if (multiplier > 0 || additiveMultiplier > 0)
+            {
+                if (resistance == 0)
+                {
+                    ErnestoDetectiveController.ItWasExplosion(fromTemperature: true);
+                    SELocator.GetShipDamageController().Explode();
+                }
+                else
+                {
+                    float scalar = 1 + (1f * Mathf.InverseLerp(_highTempCutoff, 0f, Mathf.Abs(_currentTemperature)));
+                    _internalTempMeter = Mathf.Clamp(_internalTempMeter + Time.deltaTime
+                        * ((multiplier * scalar) + additiveMultiplier) * Mathf.Sign(resistance),
+                        -_internalTempMeterLength, _internalTempMeterLength);
+                }
+            }
         }
 
         UpdateTemperatureDamage();
@@ -120,6 +145,12 @@ public class ShipTemperatureDetector : TemperatureDetector
             targetHull._damageEffect.SetEffectBlend(1f - targetHull._integrity);
         }
         _lastDamagedHull = targetHull;
+
+        if (targetHull._integrity <= 0f && targetHull.shipModule is ShipDetachableModule
+            && (!(bool)preventSystemFailure.GetProperty() || targetHull.section == ShipHull.Section.Front))
+        {
+            ErnestoDetectiveController.ItWasTemperatureDamage(_internalTempMeter >= 0f);
+        }
     }
 
     private void ComponentTemperatureDamage()
@@ -132,13 +163,95 @@ public class ShipTemperatureDetector : TemperatureDetector
         ApplyComponentTempDamage(targetComponent);
     }
 
-    protected override bool RoundInternalTemperature()
+    protected override float CalculateCurrentTemperature()
     {
-        return (bool)faultyHeatRegulators.GetProperty();
+        float totalTemperature = 0f;
+        foreach (TemperatureZone zone in _activeZones)
+        {
+            float temp = zone.GetTemperature(this);
+            totalTemperature += temp;
+        }
+
+        if (_shockLayerController.enabled && _shockLayerController._ruleset != null)
+        {
+            float shockSpeedPercent = 0f;
+            if (_shockLayerController._ruleset.GetShockLayerType() == ShockLayerRuleset.ShockType.Atmospheric)
+            {
+                Vector3 toCenter = _shockLayerController._ruleset.GetRadialCenter().position - _shockLayerController._owRigidbody.GetPosition();
+                float centerDist = toCenter.magnitude;
+                float radiusMultiplier = 1f - Mathf.InverseLerp(_shockLayerController._ruleset.GetInnerRadius(),
+                    _shockLayerController._ruleset.GetOuterRadius(), centerDist);
+
+                Vector3 relativeFluidVelocity = _shockLayerController._fluidDetector.GetRelativeFluidVelocity();
+                float velocityMagnitude = relativeFluidVelocity.magnitude;
+                float minSpeed = _shockLayerController._ruleset.GetMinShockSpeed();
+                float maxSpeed = _shockLayerController._ruleset.GetMaxShockSpeed();
+                shockSpeedPercent = Mathf.InverseLerp(minSpeed + ((maxSpeed - minSpeed) / 2), maxSpeed, velocityMagnitude);
+                shockSpeedPercent *= radiusMultiplier;
+            }
+
+            totalTemperature += Mathf.Lerp(0f, 65f, shockSpeedPercent);
+        }
+
+        return Mathf.Clamp(totalTemperature, -100f, 100f);
+    }
+
+    protected override void UpdateHighTemperature()
+    {
+        if ((float)temperatureResistanceMultiplier.GetProperty() == 0)
+        {
+            SELocator.GetShipDamageController().Explode();
+        }
+    }
+
+    protected override void UpdateInternalTemperature()
+    {
+        float cutoff = Mathf.Abs(_internalTempMeterLength * GetTemperatureRatio());
+
+        bool sameSide = _internalTempMeter < 0 == _currentTemperature < 0;
+
+        if ((float)temperatureResistanceMultiplier.GetProperty() < 0f)
+        {
+            sameSide = !sameSide;
+        }
+
+        if (sameSide && Mathf.Abs(_internalTempMeter) < cutoff)
+        {
+            _internalTempMeter += Time.deltaTime * 3f * Mathf.InverseLerp(_highTempCutoff, 100f, Mathf.Abs(_currentTemperature)) * Mathf.Sign(GetTemperatureRatio())
+                * Mathf.Sign((float)temperatureResistanceMultiplier.GetProperty());
+        }
+        else if (!sameSide)
+        {
+            _internalTempMeter += Time.deltaTime * Mathf.Sign(GetTemperatureRatio()) * Mathf.Sign((float)temperatureResistanceMultiplier.GetProperty());
+        }
+    }
+
+    protected override void UpdateCooldown()
+    {
+        if (!(bool)faultyHeatRegulators.GetProperty() && Mathf.Abs(_internalTempMeter) / _internalTempMeterLength < 0.01f)
+        {
+            _internalTempMeter = 0f;
+        }
+        else
+        {
+            float step = Time.deltaTime * Mathf.InverseLerp(_highTempCutoff, 0f, Mathf.Abs(_currentTemperature));
+            if (_internalTempMeter > 0f)
+            {
+                _internalTempMeter -= step;
+            }
+            else if (_internalTempMeter < 0f)
+            {
+                _internalTempMeter += step;
+            }
+        }
     }
 
     public void ApplyComponentTempDamage(ShipComponent component)
     {
+        if (component is ShipReactorComponent && !component.isDamaged)
+        {
+            ErnestoDetectiveController.SetReactorCause("temperature" + (_internalTempMeter >= 0f ? "_hot" : "_cold"));
+        }
         component.SetDamaged(true);
     }
 

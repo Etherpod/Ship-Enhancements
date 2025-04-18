@@ -21,6 +21,8 @@ public class ModifiedShipHull : MonoBehaviour
             obj.transform.parent = transform;
             obj.transform.localPosition = Vector3.zero;
             _tempHazardVolume = obj.GetAddComponent<HeatHazardVolume>();
+
+            GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
         }
     }
 
@@ -53,7 +55,6 @@ public class ModifiedShipHull : MonoBehaviour
                 float lerp = Mathf.InverseLerp(0.75f, 1f, ratio);
                 _tempHazardVolume._damagePerSecond = Mathf.Lerp(0f, _shipHeatDamage, lerp);
                 Locator.GetPlayerDetector().GetComponent<HazardDetector>().AddVolume(_tempHazardVolume);
-                ShipEnhancements.WriteDebugMessage(Locator.GetPlayerDetector().GetComponent<HazardDetector>()._activeVolumes[0]);
             }
         }
     }
@@ -66,11 +67,20 @@ public class ModifiedShipHull : MonoBehaviour
         }
     }
 
+    private void OnShipSystemFailure()
+    {
+        Locator.GetPlayerDetector().GetComponent<HazardDetector>().RemoveVolume(_tempHazardVolume);
+    }
+
     private void OnDestroy()
     {
         if ((float)shipBounciness.GetProperty() > 1f)
         {
             SELocator.GetShipDamageController()._impactSensor.OnImpact -= OnImpact;
+        }
+        if ((string)temperatureZonesAmount.GetProperty() != "None")
+        {
+            GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
         }
     }
 }

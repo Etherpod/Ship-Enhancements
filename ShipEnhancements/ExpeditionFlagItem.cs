@@ -1,4 +1,6 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using UnityEngine;
 
 namespace ShipEnhancements;
@@ -11,7 +13,11 @@ public class ExpeditionFlagItem : OWItem
     [SerializeField] private GameObject _objModelParent;
     [SerializeField] private Collider _flagCollider;
     [SerializeField] private OWTriggerVolume _colTrigger;
+    [SerializeField] private MeshRenderer _decalRenderer;
+    [SerializeField] private RulesetDetector _rulesetDetector;
 
+    private MinimapFlagController _playerFlagController;
+    private MinimapFlagController _shipFlagController;
     private readonly Vector3 _holdOffset = new(0f, -0.4f, 0f);
     private Vector3 _defaultOffset;
 
@@ -24,12 +30,38 @@ public class ExpeditionFlagItem : OWItem
     {
         base.Awake();
         _type = ItemType;
+
+        _playerFlagController = GameObject.Find("SecondaryGroup/HUD_Minimap/Minimap_Root").GetComponent<MinimapFlagController>();
+        if (_playerFlagController == null) ShipEnhancements.WriteDebugMessage("Missing minimap flag controller on player!", error: true);
+        _shipFlagController = SELocator.GetShipTransform().GetComponentInChildren<MinimapFlagController>();
+        if (_shipFlagController == null) ShipEnhancements.WriteDebugMessage("Missing minimap flag controller on ship!", error: true);
+
         _defaultOffset = _itemModelParent.transform.localPosition;
         _colTrigger.OnExit += OnExit;
     }
 
     private void Start()
     {
+        Texture2D tex = null;
+        byte[] fileData;
+
+        List<string> files = [];
+        files.AddRange(Directory.GetFiles(Path.Combine(ShipEnhancements.Instance.ModHelper.Manifest.ModFolderPath, "ExpeditionFlagIcons"), 
+            "*.jpg", SearchOption.AllDirectories));
+        files.AddRange(Directory.GetFiles(Path.Combine(ShipEnhancements.Instance.ModHelper.Manifest.ModFolderPath, "ExpeditionFlagIcons"),
+            "*.png", SearchOption.AllDirectories));
+        if (files.Count > 0)
+        {
+            fileData = File.ReadAllBytes(files[Random.Range(0, files.Count)]);
+            tex = new Texture2D(2, 2);
+            tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
+        }
+
+        if (tex != null)
+        {
+            _decalRenderer.material.SetTexture("_MainTex", tex);
+        }
+
         SetIsDropped(false);
     }
 
@@ -70,6 +102,22 @@ public class ExpeditionFlagItem : OWItem
     {
         _itemModelParent.SetActive(!dropped);
         _objModelParent.SetActive(dropped);
+
+        if (dropped)
+        {
+            _playerFlagController?.AddFlag(this);
+            _shipFlagController?.AddFlag(this);
+        }
+        else
+        {
+            _playerFlagController?.RemoveFlag(this);
+            _shipFlagController?.RemoveFlag(this);
+        }
+    }
+
+    public RulesetDetector GetRulesetDetector()
+    {
+        return _rulesetDetector;
     }
 
     private void OnExit(GameObject hitObj)

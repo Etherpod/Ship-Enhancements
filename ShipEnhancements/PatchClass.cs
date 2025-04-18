@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using HarmonyLib;
+using OWML.Common;
+using OWML.ModHelper.Menus.CustomInputs;
+using OWML.ModHelper.Menus.NewMenuSystem;
 using UnityEngine;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
@@ -15,7 +20,25 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.UpdateShipLightInput))]
     public static bool DisableHeadlights(ShipCockpitController __instance)
     {
-        if ((bool)disableHeadlights.GetProperty()) return false;
+        if ((string)shipHornType.GetProperty() != "None"
+            && OWInput.IsNewlyPressed(InputLibrary.flashlight, InputMode.ShipCockpit)
+            && !__instance._shipSystemFailure
+            && SELocator.GetShipTransform().GetComponentInChildren<Signalscope>().IsEquipped()
+            && (SELocator.GetSignalscopeComponent() == null || !SELocator.GetSignalscopeComponent().isDamaged))
+        {
+            SELocator.GetShipTransform().GetComponentInChildren<ShipHornController>()?.PlayHorn();
+            if (ShipEnhancements.InMultiplayer)
+            {
+                foreach (uint id in ShipEnhancements.PlayerIDs)
+                {
+                    ShipEnhancements.QSBCompat.SendHonkHorn(id);
+                }
+            }
+            return false;
+        }
+
+        if (ShipEnhancements.Instance.disableHeadlights) return false;
+
         return true;
     }
     #endregion
@@ -44,9 +67,13 @@ public static class PatchClass
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.OnPressInteract))]
-    public static bool KeepHelmetOnAtCockpit(ShipCockpitController __instance)
+    public static bool KeepHelmetOnAtCockpit(ShipCockpitController __instance, bool __runOriginal)
     {
-        if (!(bool)keepHelmetOn.GetProperty() || !ShipEnhancements.Instance.oxygenDepleted) return true;
+        if (!__runOriginal) return false;
+
+        bool run = (bool)keepHelmetOn.GetProperty() && (ShipEnhancements.Instance.oxygenDepleted
+            || (bool)disableFluidPrevention.GetProperty());
+        if (!run) return true;
 
         if (!__instance._playerAtFlightConsole)
         {
@@ -468,32 +495,29 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.ShouldExitShipToRepair))]
     public static void FixExitShipToRepairNotification(ShipDamageController __instance, ref bool __result)
     {
-        bool flag = false;
-        if (!(bool)disableShipRepair.GetProperty())
+        if (!__result) return;
+
+        if (ShipRepairLimitController.CanRepair())
         {
-            for (int j = 0; j < __instance._shipComponents.Length; j++)
+            for (int i = 0; i < __instance._shipComponents.Length; i++)
             {
-                if (__instance._shipComponents[j].isDamaged && __instance._shipComponents[j].componentName != UITextType.ShipPartGravity
-                    && __instance._shipComponents[j].componentName != UITextType.ShipPartReactor
-                    && !((bool)disableLandingCamera.GetProperty() && __instance._shipComponents[j].componentName == UITextType.ShipPartCamera)
-                    && !((bool)disableHeadlights.GetProperty() && __instance._shipComponents[j].componentName == UITextType.ShipPartLights))
+                ShipComponent comp = __instance._shipComponents[i];
+                if (comp.isDamaged && comp._repairReceiver._repairDistance > 0
+                    && comp.componentName != UITextType.ShipPartReactor
+                    && comp.componentName != UITextType.ShipPartGravity)
                 {
-                    flag = true;
+                    return;
                 }
             }
         }
-        __result = flag;
+
+        __result = false;
     }
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.OnImpact))]
     public static bool ApplyExplosionDamageMultiplier(ShipDamageController __instance, ImpactData impact)
     {
-        if (ShipEnhancements.AchievementsAPI != null && !SEAchievementTracker.HulkSmash)
-        {
-            SEAchievementTracker.LastHitBody = impact.otherBody;
-        }
-
         if ((float)shipDamageMultiplier.GetProperty() <= 0f)
         {
             return false;
@@ -511,10 +535,7 @@ public static class PatchClass
         }
         if (impact.speed >= 300f * explosionMultiplier && !__instance._exploded)
         {
-            if (impact.otherBody == SELocator.GetPlayerBody())
-            {
-                SEAchievementTracker.PlayerCausedExplosion = true;
-            }
+            ErnestoDetectiveController.ItWasExplosion(fromSpeed: true);
             __instance.Explode(false);
             return false;
         }
@@ -533,10 +554,16 @@ public static class PatchClass
     [HarmonyPatch(typeof(HighSpeedImpactSensor), nameof(HighSpeedImpactSensor.FixedUpdate))]
     public static void DisableDamageExplode(HighSpeedImpactSensor __instance)
     {
-        if (__instance._dieNextUpdate && (float)shipDamageMultiplier.GetProperty() <= 0f
-            && __instance.gameObject.CompareTag("Ship"))
+        if (__instance._dieNextUpdate && __instance.gameObject.CompareTag("Ship"))
         {
-            __instance._dieNextUpdate = false;
+            if ((float)shipDamageMultiplier.GetProperty() <= 0f)
+            {
+                __instance._dieNextUpdate = false;
+            }
+            else
+            {
+                ErnestoDetectiveController.ItWasExplosion(fromSpeed: true);
+            }
         }
     }
     #endregion
@@ -613,39 +640,16 @@ public static class PatchClass
     }
     #endregion
 
-    #region DisableShipRepair
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(ShipComponent), nameof(ShipComponent.Awake))]
-    public static void DisableShipComponentRepair(ShipComponent __instance)
-    {
-        if (!(bool)disableShipRepair.GetProperty()) return;
-
-        __instance._repairReceiver._repairDistance = 0f;
-    }
-
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(ShipHull), nameof(ShipHull.Start))]
-    public static void DisableShipHullRepair(ShipHull __instance)
-    {
-        if (!(bool)disableShipRepair.GetProperty()) return;
-
-        for (int i = 0; i < __instance._colliders.Length; i++)
-        {
-            if (__instance._colliders[i].TryGetComponent(out RepairReceiver repairReceiver))
-            {
-                repairReceiver._repairDistance = 0f;
-            }
-        }
-    }
-    #endregion
-
     #region GravityLandingGear
     [HarmonyPostfix]
     [HarmonyPatch(typeof(LandingPadSensor), nameof(LandingPadSensor.Awake))]
     public static void AddGravityComponent(LandingPadSensor __instance)
     {
-        if (!(bool)enableGravityLandingGear.GetProperty()) return;
-        __instance.gameObject.AddComponent<GravityLandingGear>();
+        if ((bool)enableGravityLandingGear.GetProperty())
+        {
+            GameObject gravityPadObj = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/GravityLandingPad.prefab");
+            UnityEngine.Object.Instantiate(gravityPadObj, __instance.transform);
+        }
     }
     #endregion
 
@@ -672,7 +676,7 @@ public static class PatchClass
     {
         if ((bool)enableThrustModulator.GetProperty())
         {
-            __result *= ShipEnhancements.Instance.ThrustModulatorLevel / 5f
+            __result *= ShipEnhancements.Instance.ThrustModulatorFactor
                 * (SELocator.GetShipOverdriveController().OnCooldown ? SELocator.GetShipOverdriveController().ThrustMultiplier : 1f);
         }
     }
@@ -697,7 +701,7 @@ public static class PatchClass
             return false;
         }
 
-        float multiplier = ShipEnhancements.Instance.ThrustModulatorLevel / 5f;
+        float multiplier = ShipEnhancements.Instance.ThrustModulatorFactor;
 
         if (__instance._isMatchingVelocity && __instance._referenceFrame != null)
         {
@@ -836,7 +840,9 @@ public static class PatchClass
     [HarmonyPatch(typeof(SunController), nameof(SunController.UpdateScale))]
     public static void UpdateSunTempZone(SunController __instance, float scale)
     {
-        TemperatureZone tempZone = __instance.transform.Find("Sector_SUN/Volumes_SUN").GetComponentInChildren<TemperatureZone>();
+        if ((string)temperatureZonesAmount.GetProperty() == "None") return;
+
+        TemperatureZone tempZone = __instance.GetComponentInChildren<TemperatureZone>();
         if (tempZone != null)
         {
             tempZone.SetScale(scale);
@@ -847,6 +853,8 @@ public static class PatchClass
     [HarmonyPatch(typeof(SupernovaEffectController), nameof(SupernovaEffectController.FixedUpdate))]
     public static void UpdateSupernovaTempZone(SupernovaEffectController __instance)
     {
+        if ((string)temperatureZonesAmount.GetProperty() == "None") return;
+
         TemperatureZone tempZone = __instance.GetComponentInChildren<TemperatureZone>();
         if (tempZone != null)
         {
@@ -858,6 +866,8 @@ public static class PatchClass
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.SetState))]
     public static void UpdateCampfireTemperatureZone(Campfire __instance)
     {
+        if ((string)temperatureZonesAmount.GetProperty() == "None") return;
+
         __instance.transform.parent.GetComponentInChildren<TemperatureZone>()?.SetVolumeActive(__instance._state == Campfire.State.LIT);
     }
 
@@ -969,10 +979,12 @@ public static class PatchClass
     [HarmonyPatch(typeof(RulesetDetector), nameof(RulesetDetector.GetThrustLimit))]
     public static void ShipFreezingThrustDebuff(RulesetDetector __instance, ref float __result)
     {
+        if ((string)temperatureZonesAmount.GetProperty() == "None") return;
+
         if (__instance.CompareTag("ShipDetector") && SELocator.GetShipTemperatureDetector() != null)
         {
             float ratio = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
-            float lerp = Mathf.InverseLerp(0.5f, 0f, ratio);
+            float lerp = Mathf.InverseLerp(0.49f, 0.1f, ratio);
             __result *= 1 - (0.5f * lerp);
         }
     }
@@ -983,28 +995,53 @@ public static class PatchClass
     [HarmonyPatch(typeof(ReferenceFrameTracker), nameof(ReferenceFrameTracker.Update))]
     public static bool DisableReferenceFrame(ReferenceFrameTracker __instance)
     {
-        if (!(bool)disableReferenceFrame.GetProperty()) return true;
-
-        if (__instance._activeCam == null)
+        if ((bool)disableReferenceFrame.GetProperty())
         {
+            if (__instance._activeCam == null)
+            {
+                return false;
+            }
+            if (__instance._cloakController != null && __instance._hasTarget && !__instance._currentReferenceFrame.GetOWRigidBody().IsKinematic()
+                && __instance._cloakController.CheckBodyInsideCloak(__instance._currentReferenceFrame.GetOWRigidBody()) != __instance._cloakController.isPlayerInsideCloak)
+            {
+                __instance.UntargetReferenceFrame();
+            }
+            //__instance._playerTargetingActive = Locator.GetPlayerSuit().IsWearingHelmet() && PlayerState.InZeroG() && __instance._blockerCount <= 0;
+            //__instance._shipTargetingActive = PlayerState.AtFlightConsole();
+            //__instance._mapTargetingActive = __instance._isMapView && (__instance._playerTargetingActive || PlayerState.IsInsideShip());
+            __instance._playerTargetingActive = false;
+            __instance._shipTargetingActive = false;
+            __instance._mapTargetingActive = false;
+            if (__instance._playerTargetingActive || __instance._shipTargetingActive || __instance._mapTargetingActive)
+            {
+                __instance.UpdateTargeting();
+            }
             return false;
         }
-        if (__instance._cloakController != null && __instance._hasTarget && !__instance._currentReferenceFrame.GetOWRigidBody().IsKinematic()
-            && __instance._cloakController.CheckBodyInsideCloak(__instance._currentReferenceFrame.GetOWRigidBody()) != __instance._cloakController.isPlayerInsideCloak)
+        else if ((bool)alwaysAllowLockOn.GetProperty())
         {
-            __instance.UntargetReferenceFrame();
+            if (__instance._activeCam == null)
+            {
+                return false;
+            }
+            if (__instance._cloakController != null && __instance._hasTarget && !__instance._currentReferenceFrame.GetOWRigidBody().IsKinematic() && __instance._cloakController.CheckBodyInsideCloak(__instance._currentReferenceFrame.GetOWRigidBody()) != __instance._cloakController.isPlayerInsideCloak)
+            {
+                __instance.UntargetReferenceFrame();
+            }
+            //__instance._playerTargetingActive = Locator.GetPlayerSuit().IsWearingHelmet() && PlayerState.InZeroG() && __instance._blockerCount <= 0;
+            __instance._playerTargetingActive = Locator.GetPlayerSuit().IsWearingHelmet()
+                && (PlayerState.InZeroG() || PlayerState.InMapView()) && __instance._blockerCount <= 0;
+            __instance._shipTargetingActive = PlayerState.AtFlightConsole();
+            __instance._mapTargetingActive = __instance._isMapView && (__instance._playerTargetingActive || PlayerState.IsInsideShip());
+            if (__instance._playerTargetingActive || __instance._shipTargetingActive || __instance._mapTargetingActive)
+            {
+                __instance.UpdateTargeting();
+            }
+
+            return false;
         }
-        //__instance._playerTargetingActive = Locator.GetPlayerSuit().IsWearingHelmet() && PlayerState.InZeroG() && __instance._blockerCount <= 0;
-        //__instance._shipTargetingActive = PlayerState.AtFlightConsole();
-        //__instance._mapTargetingActive = __instance._isMapView && (__instance._playerTargetingActive || PlayerState.IsInsideShip());
-        __instance._playerTargetingActive = false;
-        __instance._shipTargetingActive = false;
-        __instance._mapTargetingActive = false;
-        if (__instance._playerTargetingActive || __instance._shipTargetingActive || __instance._mapTargetingActive)
-        {
-            __instance.UpdateTargeting();
-        }
-        return false;
+
+        return true;
     }
     #endregion
 
@@ -1094,8 +1131,10 @@ public static class PatchClass
     #region AutoHatch
     [HarmonyPostfix]
     [HarmonyPatch(typeof(HatchController), nameof(HatchController.OpenHatch))]
-    public static void ActivateHatchTractorBeam(HatchController __instance)
+    public static void ActivateHatchTractorBeam(HatchController __instance, bool __runOriginal)
     {
+        if (!__runOriginal) return;
+
         if ((bool)extraNoise.GetProperty())
         {
             SELocator.GetShipTransform().GetComponentInChildren<ShipNoiseMaker>()._noiseRadius += 100f;
@@ -1115,7 +1154,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipTractorBeamSwitch), nameof(ShipTractorBeamSwitch.OnTriggerExit))]
     public static bool CloseHatchOutsideShip(ShipTractorBeamSwitch __instance)
     {
-        if (!(bool)enableAutoHatch.GetProperty() || ShipEnhancements.InMultiplayer) return true;
+        if (!(bool)enableAutoHatch.GetProperty() || ShipEnhancements.InMultiplayer || (bool)disableHatch.GetProperty()) return true;
 
         HatchController hatch = SELocator.GetShipBody().GetComponentInChildren<HatchController>();
         if (!hatch._hatchObject.activeInHierarchy)
@@ -1533,6 +1572,7 @@ public static class PatchClass
         bool scoutLauncherComponent = (bool)enableScoutLauncherComponent.GetProperty();
         bool recallDisabled = (bool)disableScoutRecall.GetProperty();
         bool launchingDisabled = (bool)disableScoutLaunching.GetProperty();
+        bool shipPhotoMode = (bool)scoutPhotoMode.GetProperty();
         bool playerLauncher = __instance._activeLauncher.GetName() == ProbeLauncher.Name.Player;
         bool shipLauncher = __instance._activeLauncher.GetName() == ProbeLauncher.Name.Ship;
         bool usingShip = PlayerState.AtFlightConsole();
@@ -1549,6 +1589,7 @@ public static class PatchClass
 
         bool canRecall = true;
         bool canLaunch = true;
+        bool canSnapshot = false;
 
         if (usingShip)
         {
@@ -1565,9 +1606,14 @@ public static class PatchClass
             {
                 canLaunch = false;
             }
+            if (!shipPhotoMode || ((!recallDisabled || ShipProbePickupVolume.probeInShip) && !damaged))
+            {
+                canSnapshot = true;
+            }
         }
         else
         {
+            canSnapshot = true;
             if (manualScoutRecall)
             {
                 canRecall = false;
@@ -1598,6 +1644,16 @@ public static class PatchClass
         {
             __instance._launchPrompt.SetDisplayState(ScreenPrompt.DisplayState.GrayedOut);
         }
+
+        if (canSnapshot)
+        {
+            __instance._takeSnapshotPrompt.SetDisplayState(ScreenPrompt.DisplayState.Normal);
+        }
+        else
+        {
+            __instance._takeSnapshotPrompt.SetDisplayState(ScreenPrompt.DisplayState.GrayedOut);
+            __instance._snapshotCenterPrompt.SetVisibility(false);
+        }
     }
 
     [HarmonyPostfix]
@@ -1625,15 +1681,16 @@ public static class PatchClass
     [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.AllowPhotoMode))]
     public static void UpdateAllowPhotoMode(ProbeLauncher __instance, ref bool __result)
     {
-        if (!(bool)disableScoutLaunching.GetProperty() && !(bool)disableScoutRecall.GetProperty()
-            && !(bool)enableManualScoutRecall.GetProperty() && !(bool)enableScoutLauncherComponent.GetProperty())
+        if (__instance.GetName() == ProbeLauncher.Name.Player)
         {
-            return;
+            if (__result && ShipProbePickupVolume.probeInShip)
+            {
+                __result = false;
+            }
         }
-
-        if (__result && ShipProbePickupVolume.probeInShip)
+        else if (__instance.GetName() == ProbeLauncher.Name.Ship && (bool)scoutPhotoMode.GetProperty())
         {
-            __result = false;
+            __result = !(bool)disableScoutRecall.GetProperty() || ShipProbePickupVolume.probeInShip;
         }
     }
 
@@ -1649,11 +1706,37 @@ public static class PatchClass
             return true;
         }
 
-        if ((recallOrLaunchingDisabled || manualScoutRecall) && ShipProbePickupVolume.probeInShip)
+        if (__instance.GetName() == ProbeLauncher.Name.Player
+            && (recallOrLaunchingDisabled || manualScoutRecall) && ShipProbePickupVolume.probeInShip)
         {
             if (OWInput.IsNewlyPressed(InputLibrary.toolActionPrimary, InputMode.All))
             {
                 if (__instance.InPhotoMode())
+                {
+                    if (__instance._launcherGeometry != null)
+                    {
+                        __instance._launcherGeometry.SetActive(false);
+                    }
+                    __instance.TakeSnapshotWithCamera(__instance._preLaunchCamera);
+                    if (__instance._launcherGeometry != null)
+                    {
+                        __instance._launcherGeometry.SetActive(true);
+                        return false;
+                    }
+                }
+                else if (__instance.AllowLaunchMode())
+                {
+                    __instance.LaunchProbe();
+                }
+            }
+            return false;
+        }
+        else if (__instance.GetName() == ProbeLauncher.Name.Ship)
+        {
+            if (OWInput.IsNewlyPressed(InputLibrary.toolActionPrimary, InputMode.All))
+            {
+                if (__instance.InPhotoMode() && (!(bool)disableScoutRecall.GetProperty() || ShipProbePickupVolume.probeInShip)
+                    && (SELocator.GetProbeLauncherComponent() == null || !SELocator.GetProbeLauncherComponent().isDamaged))
                 {
                     if (__instance._launcherGeometry != null)
                     {
@@ -1812,7 +1895,7 @@ public static class PatchClass
                 }
             }
         }
-        
+
         // Cancel normal parenting
         //Transform transform = ((customDropTarget == null) ? targetRigidbody.transform : customDropTarget.GetItemDropTargetTransform(hit.collider.gameObject));
 
@@ -1860,7 +1943,7 @@ public static class PatchClass
                     {
                         foreach (uint id in ShipEnhancements.PlayerIDs)
                         {
-                            ShipEnhancements.QSBCompat.SendCampfireExtinguishState(id);
+                            ShipEnhancements.QSBCompat.SendCampfireExtinguishState(id, campfire.GetItem());
                         }
                     }
                 }
@@ -2036,6 +2119,33 @@ public static class PatchClass
             return false;
         }
 
+        if ((float)shipExplosionMultiplier.GetProperty() > 50f && !__instance.GetComponentInParent<FuelTankItem>())
+        {
+            SupernovaEffectController supernovaEffects = SELocator.GetShipTransform().GetComponentInChildren<SupernovaEffectController>(true);
+            if (supernovaEffects == null)
+            {
+                supernovaEffects = GameObject.Find("Module_Engine_Body").GetComponentInChildren<SupernovaEffectController>(true);
+            }
+            if (supernovaEffects != null)
+            {
+                GameObject supernovaBody = new GameObject("ShipSupernova_Body");
+                supernovaBody.transform.position = supernovaEffects.transform.position;
+                OWRigidbody body = supernovaBody.AddComponent<OWRigidbody>();
+                body.GetRigidbody().isKinematic = true;
+                body.EnableKinematicSimulation();
+                body.SetIsTargetable(false);
+                body.SetVelocity(supernovaEffects.GetAttachedOWRigidbody().GetVelocity());
+
+                supernovaEffects.transform.parent = GameObject.Find("Sun_Body").transform;
+                supernovaEffects.gameObject.SetActive(true);
+                supernovaEffects.transform.Find("ExplosionSource").GetComponent<OWAudioSource>().PlayOneShot(AudioType.Sun_Explosion, 1f);
+                supernovaEffects.enabled = true;
+
+                supernovaEffects.GetComponentInChildren<ShipSupernovaStreamersController>().OnSupernovaStart(supernovaEffects);
+                return false;
+            }
+        }
+
         if (__instance is BlackHoleExplosionController)
         {
             BlackHoleExplosionController controller = __instance as BlackHoleExplosionController;
@@ -2055,36 +2165,17 @@ public static class PatchClass
             __result = Vector3.zero;
         }
     }
-    #endregion
 
-    #region PersistentInput
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.OnExitFlightConsole))]
-    public static bool KeepThrustIndicatorOn(ThrustAndAttitudeIndicator __instance)
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.OnModuleDetach))]
+    public static void ParentExplosionToEngine(ShipDamageController __instance, ShipDetachableModule module)
     {
-        if (!(bool)enablePersistentInput.GetProperty() || !SELocator.GetShipBody().GetComponent<ShipPersistentInput>().InputEnabled()) return true;
-
-        __instance._activeThrusterModel = __instance._jetpackThrusterModel;
-        __instance._activeThrusterController = __instance._jetpackThrusterController;
-        if (__instance._shipIndicatorMode)
+        if (module.GetComponent<ShipHull>().section == ShipHull.Section.Left)
         {
-            //__instance.ResetAllArrows();
-            //__instance._thrusterArrowRoot.gameObject.SetActive(false);
-            __instance.enabled = false;
-            return false;
-        }
-        __instance._thrusterArrowRoot.gameObject.SetActive(true);
-        __instance.enabled = true;
-        return false;
-    }
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.ExitFlightConsole))]
-    public static void UpdatePersistentInputAutopilotState()
-    {
-        if ((bool)enablePersistentInput.GetProperty())
-        {
-            SELocator.GetShipBody().GetComponent<ShipPersistentInput>().UpdateLastAutopilotState();
+            if (__instance.GetComponentInChildren<ExplosionController>() != null)
+            {
+                __instance.GetComponentInChildren<ExplosionController>().transform.parent = module.transform;
+            }
         }
     }
     #endregion
@@ -2220,10 +2311,20 @@ public static class PatchClass
             return false;
         }
 
-        else if (SELocator.GetShipTemperatureDetector() != null && SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio() < 0.25f)
+        if (SELocator.GetShipTemperatureDetector() != null && SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio() < 0.25f)
         {
             __result = AddIgnitionSputter(__instance);
             return false;
+        }
+
+        if ((bool)enableEnhancedAutopilot.GetProperty())
+        {
+            if (SELocator.GetAutopilotPanelController().IsAutopilotActive()
+                || SELocator.GetAutopilotPanelController().IsPersistentInputActive())
+            {
+                __result = Vector3.zero;
+                return false;
+            }
         }
 
         return true;
@@ -2235,6 +2336,12 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipNoiseMaker), nameof(ShipNoiseMaker.Update))]
     public static bool AddExtraNoises(ShipNoiseMaker __instance)
     {
+        if ((float)noiseMultiplier.GetProperty() == 0f)
+        {
+            __instance._noiseRadius = 0f;
+            return false;
+        }
+
         if (!(bool)extraNoise.GetProperty()) return true;
 
         if (Time.time > __instance._lastImpactTime + 1f)
@@ -2246,15 +2353,62 @@ public static class PatchClass
         MasterAlarm masterAlarm = SELocator.GetShipTransform().GetComponentInChildren<MasterAlarm>();
         float alarmNoiseRadius = masterAlarm._isAlarmOn ? 350f : 0f;
         ShipThrusterController thrusterController = SELocator.GetShipTransform().GetComponent<ShipThrusterController>();
-        bool shipIgniting = ShipEnhancements.Instance.shipIgniting || EngineSputtering || 
+        bool shipIgniting = ShipEnhancements.Instance.shipIgniting || EngineSputtering ||
             (SELocator.GetButtonPanel()?.GetComponentInChildren<ShipEngineSwitch>()?.IsEngineStalling() ?? false);
         float ignitionNoiseRadius = shipIgniting ? 500f : 0f;
         float overdriveNoiseRadius = (bool)enableThrustModulator.GetProperty() && SELocator.GetShipOverdriveController() != null
             && SELocator.GetShipOverdriveController().IsCharging() ? 300f : 0f;
+        float radioNoiseRadius = 0f;
+        if ((bool)addRadio.GetProperty())
+        {
+            foreach (RadioItem radio in SELocator.GetShipTransform().GetComponentsInChildren<RadioItem>())
+            {
+                radioNoiseRadius = Mathf.Max(radioNoiseRadius, radio.GetNoiseRadius());
+            }
+        }
 
-        __instance._noiseRadius = Mathf.Max(thrusterNoiseRadius, __instance._impactNoiseRadius, alarmNoiseRadius, ignitionNoiseRadius, overdriveNoiseRadius);
+        __instance._noiseRadius = Mathf.Max(thrusterNoiseRadius, __instance._impactNoiseRadius, alarmNoiseRadius, ignitionNoiseRadius, overdriveNoiseRadius,
+            radioNoiseRadius);
+
+        if ((float)noiseMultiplier.GetProperty() > 0f)
+        {
+            __instance._noiseRadius *= (float)noiseMultiplier.GetProperty();
+        }
 
         return false;
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(PlayerNoiseMaker), nameof(PlayerNoiseMaker.Update))]
+    public static void AddExtraNoisesToPlayer(PlayerNoiseMaker __instance)
+    {
+        if (!(bool)extraNoise.GetProperty() || !(bool)addRadio.GetProperty())
+        {
+            return;
+        }
+
+        foreach (RadioItem radio in SELocator.GetPlayerBody().GetComponentsInChildren<RadioItem>())
+        {
+            __instance._noiseRadius = Mathf.Max(__instance._noiseRadius, radio.GetNoiseRadius());
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipNoiseMaker), nameof(ShipNoiseMaker.Update))]
+    public static void ApplyNegativeNoise(ShipNoiseMaker __instance)
+    {
+        if ((float)noiseMultiplier.GetProperty() < 0f)
+        {
+            if (__instance._noiseRadius > 0f)
+            {
+                __instance._noiseRadius = 0f;
+            }
+            else if (__instance._noiseRadius <= 0f)
+            {
+                __instance._noiseRadius = 400f;
+            }
+
+        }
     }
 
     [HarmonyPostfix]
@@ -2265,8 +2419,10 @@ public static class PatchClass
         {
             __instance.GetComponentInChildren<ShipNoiseMaker>()._noiseRadius = 1000f * (float)shipExplosionMultiplier.GetProperty();
         }
-
-        __instance.GetComponentInChildren<ExplosionDamage>()?.OnExplode();
+        if (__instance._explosion != null)
+        {
+            __instance._explosion.GetComponentInChildren<ExplosionDamage>()?.OnExplode();
+        }
     }
 
     [HarmonyPostfix]
@@ -2278,6 +2434,8 @@ public static class PatchClass
             SELocator.GetShipTransform().GetComponentInChildren<ShipNoiseMaker>()._noiseRadius += 100f;
         }
     }
+
+
     #endregion
 
     #region NoDamageIndicators
@@ -2292,6 +2450,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitUI), nameof(ShipCockpitUI.OnShipHullRepaired))]
     public static bool DisableCockpitUIHullRepaired()
     {
+        ShipRepairLimitController.AddPartRepaired();
         return !(bool)disableDamageIndicators.GetProperty();
     }
 
@@ -2306,6 +2465,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitUI), nameof(ShipCockpitUI.OnShipComponentRepaired))]
     public static bool DisableCockpitUIComponentRepaired(ShipComponent shipComponent)
     {
+        ShipRepairLimitController.AddPartRepaired();
         return !(bool)disableDamageIndicators.GetProperty();
     }
 
@@ -2353,7 +2513,7 @@ public static class PatchClass
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(MasterAlarm), nameof(MasterAlarm.UpdateAlarmState))]
-    public static bool DisableAlarm()
+    public static bool DisableAlarm(MasterAlarm __instance)
     {
         if ((bool)disableDamageIndicators.GetProperty())
         {
@@ -2361,6 +2521,26 @@ public static class PatchClass
         }
         else if (!ShipEnhancements.Instance.engineOn && (bool)addEngineSwitch.GetProperty())
         {
+            return false;
+        }
+        else if ((bool)preventSystemFailure.GetProperty())
+        {
+            if (__instance._shipDestroyed)
+            {
+                return false;
+            }
+            bool engineAttached = SELocator.GetShipTransform().Find("Module_Engine") != null;
+            bool useReactor = __instance._reactorCritical && engineAttached;
+            if ((__instance._hullCritical || useReactor) && !__instance._isAlarmOn)
+            {
+                __instance.TurnOnAlarm();
+                return false;
+            }
+            if (!__instance._hullCritical && !useReactor && __instance._isAlarmOn)
+            {
+                __instance.TurnOffAlarm();
+            }
+
             return false;
         }
 
@@ -2475,6 +2655,28 @@ public static class PatchClass
             comp.OnDamaged += damageDisplay.OnComponentUpdate;
             comp.OnRepaired += damageDisplay.OnComponentUpdate;
         }
+        if ((string)shipWarpCoreType.GetProperty() == "Component")
+        {
+            // setting wrong here??
+            GameObject warpCoreComponent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipWarpCoreComponent.prefab");
+            AssetBundleUtilities.ReplaceShaders(warpCoreComponent);
+            warpCoreComponent.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = UnityEngine.Object.FindObjectOfType<ShipBody>().gameObject;
+            GameObject componentObj = UnityEngine.Object.Instantiate(warpCoreComponent, __instance.transform.Find("Systems_Cockpit"));
+            SELocator.SetShipWarpCoreComponent(componentObj.GetComponent<ShipWarpCoreComponent>());
+
+            if (ShipEnhancements.NHAPI == null && GameObject.Find("TimberHearth_Body"))
+            {
+                GameObject receiver = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipWarpReceiver.prefab");
+                AssetBundleUtilities.ReplaceShaders(receiver);
+                receiver.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = UnityEngine.Object.FindObjectOfType<ShipBody>().gameObject;
+                GameObject receiverObj = UnityEngine.Object.Instantiate(receiver, GameObject.Find("TimberHearth_Body").transform);
+                componentObj.GetComponentInChildren<ShipWarpCoreController>().SetReceiver(receiverObj.GetComponent<ShipWarpCoreReceiver>());
+            }
+            else
+            {
+                ShipEnhancements.Instance.WaitForCustomSpawnLoaded();
+            }
+        }
     }
 
     [HarmonyPostfix]
@@ -2500,6 +2702,10 @@ public static class PatchClass
         else if (TextID == ShipEnhancements.Instance.SignalscopeName)
         {
             __result = "SIGNALSCOPE";
+        }
+        else if (TextID == ShipEnhancements.Instance.WarpCoreName)
+        {
+            __result = "WARP CORE";
         }
     }
 
@@ -2658,38 +2864,37 @@ public static class PatchClass
 
     #region Achievements
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.TriggerSystemFailure))]
-    public static void HulkSmashAchievement(ShipDamageController __instance)
+    [HarmonyPriority(410)]
+    [HarmonyPatch(typeof(ShipHull), nameof(ShipHull.FixedUpdate))]
+    public static void HulkSmashAchievementPre(ShipHull __instance, out bool __state)
     {
-        if (!__instance.IsSystemFailed()
-            && ShipEnhancements.AchievementsAPI != null && !SEAchievementTracker.HulkSmash
-            && (!SEAchievementTracker.ShipExploded || SEAchievementTracker.PlayerCausedExplosion)
-            && !SEAchievementTracker.PlayerEjectedCockpit
-            && SEAchievementTracker.LastHitBody == SELocator.GetPlayerBody())
+        __state = false;
+
+        if (ShipEnhancements.AchievementsAPI == null
+            || SEAchievementTracker.HulkSmash) return;
+
+        if (__instance._dominantImpact != null
+            && __instance._dominantImpact.otherBody is PlayerBody)
         {
-            SEAchievementTracker.HulkSmash = true;
-            ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.HULK_SMASH");
-            SEAchievementTracker.LastHitBody = null;
+            __state = true;
         }
     }
 
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.Explode))]
-    public static void UpdateShipExploded()
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipHull), nameof(ShipHull.FixedUpdate))]
+    public static void HulkSmashAchievementPost(ShipHull __instance, bool __state)
     {
-        if (ShipEnhancements.AchievementsAPI != null && !SEAchievementTracker.ShipExploded)
+        if (__state && __instance.integrity <= 0f)
         {
-            SEAchievementTracker.ShipExploded = true;
-        }
-    }
-
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(ShipEjectionSystem), nameof(ShipEjectionSystem.FixedUpdate))]
-    public static void UpdatePlayerEjected(ShipEjectionSystem __instance)
-    {
-        if (__instance._ejectPressed)
-        {
-            SEAchievementTracker.PlayerEjectedCockpit = true;
+            ShipEnhancements.Instance.ModHelper.Events.Unity.FireInNUpdates(() =>
+            {
+                if (SELocator.GetShipDamageController().IsSystemFailed()
+                    && !SEAchievementTracker.HulkSmash)
+                {
+                    SEAchievementTracker.HulkSmash = true;
+                    ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.HULK_SMASH");
+                }
+            }, 5);
         }
     }
     #endregion
@@ -2729,13 +2934,58 @@ public static class PatchClass
     #region ChaoticCyclones
     [HarmonyPostfix]
     [HarmonyPatch(typeof(TornadoFluidVolume), nameof(TornadoFluidVolume.GetPointFluidAngularVelocity))]
-    public static void ChangeTornadoShipRotation(TornadoFluidVolume __instance, FluidDetector detector, ref Vector3 __result)
+    public static void ChaoticTornadoRotation(TornadoFluidVolume __instance, FluidDetector detector, ref Vector3 __result)
     {
-        if ((bool)chaoticCyclones.GetProperty() && detector.CompareTag("ShipDetector"))
+        if ((float)cycloneChaos.GetProperty() > 0f && detector.CompareTag("ShipDetector"))
         {
-            __result = (__instance._tornadoPivot.transform.up -
-                __instance._tornadoPivot.transform.right * UnityEngine.Random.Range(0.4f, 0.8f)) * __instance._angularSpeed;
+            float upMult = 0.4f * Mathf.Sin(1.5f * Time.time) + 0.3f * Mathf.Cos(5f * Time.time) + 1f;
+            Vector3 upRotation = __instance._tornadoPivot.transform.right * upMult;
+            float speedMult = 0.5f * Mathf.Cos(2f * Time.time) + 1.2f;
+            Vector3 chaos = (__instance._tornadoPivot.transform.up - upRotation)
+                * __instance._angularSpeed * speedMult;
+            __result = Vector3.Lerp(__result, chaos, (float)cycloneChaos.GetProperty());
         }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(TornadoFluidVolume), nameof(TornadoFluidVolume.GetPointFluidVelocity))]
+    public static void ChaoticTornadoSpeed(TornadoFluidVolume __instance, Vector3 worldPosition, FluidDetector detector, ref Vector3 __result)
+    {
+        if ((float)cycloneChaos.GetProperty() >= 0.5f && detector.CompareTag("ShipDetector"))
+        {
+            float speedMult = 0.6f * Mathf.Sin(3f * Time.time) + 1f;
+
+            Vector3 pointVelocity = __instance._attachedBody.GetPointVelocity(worldPosition);
+            Vector3 vector = Vector3.ProjectOnPlane(__instance._tornadoPivot.position - worldPosition, __instance._tornadoPivot.up);
+            float magnitude = vector.magnitude;
+            float num = Mathf.InverseLerp(20f, 0f, magnitude);
+            float num2 = Mathf.Lerp(__instance._inwardSpeed * 3f, 0f, num);
+            Vector3 chaos = pointVelocity + __instance._tornadoPivot.up * __instance._verticalSpeed * speedMult + vector.normalized * num2;
+
+            float lerp = Mathf.InverseLerp(0.5f, 1f, (float)cycloneChaos.GetProperty());
+            __result = Vector3.Lerp(__result, chaos, lerp);
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(PriorityDetector), nameof(PriorityDetector.AddVolume))]
+    public static void ForceTornadoPriority(PriorityDetector __instance, EffectVolume eVol, ref object __state)
+    {
+        if (__instance is not ShipFluidDetector || eVol is not TornadoFluidVolume) return;
+
+        PriorityVolume vol = eVol as PriorityVolume;
+
+        __state = (vol, vol.GetPriority());
+        vol.SetPriority(4);
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(PriorityDetector), nameof(PriorityDetector.AddVolume))]
+    public static void ForceTornadoPriority(PriorityDetector __instance, EffectVolume eVol, object __state)
+    {
+        if (__state == null || __instance is not ShipFluidDetector || eVol is not TornadoFluidVolume) return;
+        (PriorityVolume, int) dos = ((PriorityVolume, int))__state;
+        dos.Item1.SetPriority(dos.Item2);
     }
     #endregion
 
@@ -2810,6 +3060,18 @@ public static class PatchClass
             }
         }
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipTractorBeamSwitch), nameof(ShipTractorBeamSwitch.ActivateTractorBeam))]
+    public static bool PreventTractorBeamActivate()
+    {
+        if ((bool)singleUseTractorBeam.GetProperty())
+        {
+            return false;
+        }
+
+        return true;
+    }
     #endregion
 
     #region DisableRetroRockets
@@ -2817,22 +3079,23 @@ public static class PatchClass
     [HarmonyPatch(typeof(ThrusterModel), nameof(ThrusterModel.AddTranslationalInput))]
     public static void DisableRetroRockets(ThrusterModel __instance, ref Vector3 input)
     {
-        if ((bool)disableRetroRockets.GetProperty() && __instance is ShipThrusterModel)
-        {
-            input = new Vector3(input.x, input.y, Mathf.Max(input.z, 0f));
-        }
-    }
-    #endregion
+        string disableOption = (string)disableThrusters.GetProperty();
+        if (disableOption == "None" || __instance is not ShipThrusterModel) return;
 
-    #region ShipWarpCore
-    [HarmonyPrefix]
-    [HarmonyPatch(typeof(SingularityWarpEffect), nameof(SingularityWarpEffect.Awake))]
-    public static void AssignWarpedObject(SingularityWarpEffect __instance)
-    {
-        if (__instance.GetComponentInParent<ShipWarpCoreController>()
-            || __instance.GetComponentInParent<ShipWarpCoreReceiver>())
+        switch (disableOption)
         {
-            __instance._warpedObjectGeometry = SELocator.GetShipBody().gameObject;
+            case "Backward":
+                input = new Vector3(input.x, input.y, Mathf.Max(input.z, 0f));
+                break;
+            case "Left-Right":
+                input = new Vector3(0f, input.y, input.z);
+                break;
+            case "Up-Down":
+                input = new Vector3(input.x, 0f, input.z);
+                break;
+            case "All Except Forward":
+                input = new Vector3(0f, 0f, Mathf.Max(input.z, 0f));
+                break;
         }
     }
     #endregion
@@ -2866,6 +3129,7 @@ public static class PatchClass
         {
             if (__instance._repairFraction <= 0f)
             {
+                ErnestoDetectiveController.ItWasExplosion(sabotage: true);
                 SELocator.GetShipDamageController().Explode();
             }
             return false;
@@ -2957,6 +3221,11 @@ public static class PatchClass
                 if (__instance.shipModule is ShipDetachableModule)
                 {
                     (__instance.shipModule as ShipDetachableModule).Detach();
+                    if (!(bool)preventSystemFailure.GetProperty()
+                        || __instance.shipModule._hulls[0].section != ShipHull.Section.Front)
+                    {
+                        ErnestoDetectiveController.ItWasHullBreach(sabotage: true);
+                    }
                 }
                 else if (__instance.shipModule is ShipLandingModule)
                 {
@@ -2974,7 +3243,7 @@ public static class PatchClass
     public static void HullDamageEffect_SetEffectBlend(HullDamageEffect instance, float blend) { }
     #endregion
 
-    #region Air drag multiplier
+    #region AirDragMultiplier
     [HarmonyPrefix]
     [HarmonyPatch(typeof(FluidDetector), nameof(FluidDetector.AddLinearDrag))]
     public static bool AirDragMultiplier(FluidDetector __instance, FluidVolume fluidVolume, float fluidDensity, float fractionSubmerged)
@@ -3114,6 +3383,1186 @@ public static class PatchClass
             return false;
         }
         return true;
+    }
+    #endregion
+
+    #region DialogueEntryConditionFix
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(DialogueNode), nameof(DialogueNode.EntryConditionsSatisfied))]
+    public static bool DialogueEntryConditi4onsSatisfied(DialogueNode __instance, ref bool __result)
+    {
+        if (ShipEnhancements.VanillaFixEnabled) return false;
+
+        bool flag = true;
+        if (__instance._listEntryCondition.Count == 0)
+        {
+            __result = false;
+            return false;
+        }
+        DialogueConditionManager sharedInstance = DialogueConditionManager.SharedInstance;
+        for (int i = 0; i < __instance._listEntryCondition.Count; i++)
+        {
+            string text = __instance._listEntryCondition[i];
+            // CHANGED: remove the !
+            if (PlayerData.PersistentConditionExists(text))
+            {
+                if (!PlayerData.GetPersistentCondition(text))
+                {
+                    flag = false;
+                }
+            }
+            else if (sharedInstance.ConditionExists(text))
+            {
+                if (!sharedInstance.GetConditionState(text))
+                {
+                    flag = false;
+                }
+            }
+            else
+            {
+                flag = false;
+            }
+        }
+        __result = flag;
+        return false;
+    }
+    #endregion
+
+    #region ShipRepairLimit
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(RepairReceiver), nameof(RepairReceiver.IsRepairable))]
+    public static void ApplyShipRepairLimit(RepairReceiver __instance, ref bool __result)
+    {
+        if (__result)
+        {
+            bool isShipType = __instance.type == RepairReceiver.Type.ShipHull || __instance.type == RepairReceiver.Type.ShipComponent;
+            __result = (ShipRepairLimitController.CanRepair() || !isShipType) && (!(bool)addRepairWrench.GetProperty()
+                || Locator.GetToolModeSwapper().GetItemCarryTool().GetHeldItemType() == ShipEnhancements.Instance.RepairWrenchType);
+        }
+    }
+    #endregion
+
+    #region PreventSystemFailure
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.OnModuleDetach))]
+    public static bool CheckDetachedModule(ShipDamageController __instance, ShipDetachableModule module)
+    {
+        if (!(bool)preventSystemFailure.GetProperty() || module.CompareTag("ShipCockpit"))
+        {
+            return true;
+        }
+
+        if (PlayerState.IsInsideShip() && Locator.GetPlayerSuit().IsWearingSuit(true) && !Locator.GetPlayerSuit().IsWearingHelmet())
+        {
+            Locator.GetPlayerSuit().PutOnHelmet();
+        }
+
+        HullBreachEntrywayTrigger hullBreachTrigger = __instance.GetComponentInChildren<HullBreachEntrywayTrigger>();
+
+        if (!hullBreachTrigger.HasBreached())
+        {
+            hullBreachTrigger.OnHullBreached();
+            GlobalMessenger.FireEvent("ShipHullDetached");
+        }
+
+        if (module.GetComponent<ShipHull>().section == ShipHull.Section.Left)
+        {
+            if (!(bool)enableRemovableGravityCrystal.GetProperty() || GameObject.Find("Module_Engine_Body").GetComponentInChildren<ShipGravityCrystalItem>() != null)
+            {
+                ShipGravityComponent gravityComponent = GameObject.Find("Module_Engine_Body").GetComponentInChildren<ShipGravityComponent>();
+                gravityComponent._repairReceiver.repairDistance = 0f;
+                gravityComponent._damaged = true;
+                gravityComponent._repairFraction = 0f;
+                gravityComponent.OnComponentDamaged();
+                gravityComponent._damageEffect.SetEffectBlend(1f - gravityComponent._repairFraction);
+            }
+
+            __instance.GetComponentInChildren<ExplosionController>().transform.parent = module.transform;
+
+            __instance.GetComponent<ShipThrusterModel>().SetThrusterBankEnabled(ThrusterBank.Left, false);
+            hullBreachTrigger.EnableEngineEntryway();
+        }
+        else if (module.GetComponent<ShipHull>().section == ShipHull.Section.Right)
+        {
+            __instance.GetComponent<ShipThrusterModel>().SetThrusterBankEnabled(ThrusterBank.Right, false);
+            hullBreachTrigger.EnableSuppliesEntryway();
+        }
+
+        SELocator.GetShipResources().OnShipHullBreach();
+        __instance.GetComponentInChildren<MasterAlarm>().OnShipDamageUpdated();
+
+        for (int j = 0; j < __instance._stencils.Length; j++)
+        {
+            __instance._stencils[j].SetActive(false);
+        }
+
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.Explode))]
+    public static bool PreventExplosionDamage(ShipDamageController __instance, bool debug)
+    {
+        if (!(bool)preventSystemFailure.GetProperty()) return true;
+
+        if (!__instance._exploded && !__instance._invincible && !debug && __instance.transform.Find("Module_Engine") == null)
+        {
+            if (__instance._explosion != null)
+            {
+                __instance._explosion.Play();
+            }
+
+            __instance._exploded = true;
+            return false;
+        }
+
+        return true;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.GetLowestHullIntegrity))]
+    public static bool IgnoreDetachedHulls(ShipDamageController __instance, ref float __result)
+    {
+        if (!(bool)preventSystemFailure.GetProperty()) return true;
+
+        float num = 1f;
+        for (int i = 0; i < __instance._shipHulls.Length; i++)
+        {
+            if (__instance._shipHulls[i].integrity < num && __instance.GetComponentInParent<ShipBody>())
+            {
+                num = __instance._shipHulls[i].integrity;
+            }
+        }
+        __result = num;
+        return false;
+    }
+    #endregion
+
+    #region ErnestoComments
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.OnHullImpact))]
+    public static void ErnestoHeavyImpact(ShipDamageController __instance, float damage)
+    {
+        if ((bool)addErnesto.GetProperty() && !__instance._exploded && damage > 0.3f)
+        {
+            SELocator.GetErnesto().OnHeavyImpact();
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ElectricityVolume), nameof(ElectricityVolume.ApplyShock))]
+    public static void ErnestoShock(HazardDetector detector)
+    {
+        if ((bool)addErnesto.GetProperty() && detector.CompareTag("ShipDetector"))
+        {
+            SELocator.GetErnesto().OnElectricalShock();
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipEjectionSystem), nameof(ShipEjectionSystem.Update))]
+    public static void ErnestoEjection(ShipEjectionSystem __instance)
+    {
+        if ((bool)addErnesto.GetProperty() && __instance._ejectPressed)
+        {
+            SELocator.GetErnesto().OnCockpitDetached();
+        }
+    }
+    #endregion
+
+    #region ErnestoAwareness
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(TextTranslation), nameof(TextTranslation.Translate))]
+    public static bool TextTranslation_Translate(TextTranslation __instance, string key, ref string __result)
+    {
+        if (key == "SE_Ernesto_ErnestosERNESTO_PLACEHOLDER")
+        {
+            int numErnestos = ErnestoModListHandler.GetNumberErnestos();
+            string[] lines =
+            [
+                "I dunno, I can't really feel anything right now.",
+                "Everything's all fuzzy right now, sorry.",
+                "No idea, but maybe I can tell you later.",
+                "Ask me later. I can't feel anything right now."
+            ];
+
+            if (numErnestos == 0)
+            {
+                lines =
+                [
+                    "No, I'm not sensing any other Ernestos right now. Maybe one will show up later.",
+                    "I think I'm the only Ernesto here. Nice to finally get some peace and quiet- oh wait. You're here.",
+                    "I'm the only one in this universe. Do you want a different Ernesto or something?",
+                    "Nope, it's just me and you.",
+                    "No. Guess what that means? There's no one to stop me from hitting you with a rock.",
+                    "Narp.",
+                ];
+                __result = lines[UnityEngine.Random.Range(0, lines.Length)];
+            }
+            else if (numErnestos == 1)
+            {
+                if (ShipEnhancements.Instance.ModHelper.Interaction.ModExists("xen.NewHorizonsExamples"))
+                {
+                    lines =
+                    [
+                        "Yeah, there's only one other Ernesto. I get the feeling I might be related to him.",
+                    ];
+                }
+                else
+                {
+                    lines =
+                    [
+                        "Yeah, but there's only one. Maybe you should go say hi to them, they're probably lonely.",
+                        "Just me and some other guy I don't know. Not sure why they're here.",
+                        "Just one extra Ernesto. Who do you think existed first?",
+                        "Yeah, there's another Ernesto here, but honestly this universe would be better off with just one. What? What do you mean it should be him??",
+                        "Yarp. Just one, though. I wonder if they have the same name as me?"
+                    ];
+                }
+            }
+            else if (numErnestos > 1 && numErnestos <= 8)
+            {
+                lines =
+                [
+                    $"There's {numErnestos} extra Ernestos in our universe, which isn't necessarily a bad thing.",
+                    $"I think there's {numErnestos} of them, which if my calculations are correct is not a normal amount of Ernestos.",
+                    $"Yarp, {numErnestos}. I can't think of a funny quip so that's all you're gonna get.",
+                    $"Yeah, {numErnestos} guys. Maybe you can go bother one of them, I'm sure they have some interesting things to say.",
+                    $"The anglerfish population suddenly increased by {numErnestos}, if that's what you're asking.",
+                ];
+            }
+            else if (numErnestos > 8 && numErnestos <= 15)
+            {
+                lines =
+                [
+                    $"There's {numErnestos} Ernestos. That doesn't sound right.",
+                    $"Yeah, there's {numErnestos}, which doesn't feel like a normal amount of Ernestos, but I guess that's what happens when you start mixing worlds.",
+                    $"I'm sensing {numErnestos} other Ernestos. That's gotta be at least {numErnestos - 5} who will beat you to death with a rock.",
+                    $"Yeah, there's a surplus of magical talking anglerfish right now because {numErnestos} Ernestos decided to cross into our world.",
+                ];
+            }
+            else if (numErnestos > 15 && numErnestos < ErnestoModListHandler.GetMaxErnestos())
+            {
+                lines =
+                [
+                    $"Yes, there are a lot. {numErnestos}, to be exact. And that isn't a normal amount of magical talking anglerfish to have in one universe, in case you were wondering.",
+                    $"Yeah, {numErnestos} Ernestos. How did you even cram that many into one universe?",
+                    $"Look, I don't know what you plan to do with {numErnestos} Ernestos, but whatever it is leave me out of it.",
+                    $"Yep. {numErnestos} Ernestos that could potentially beat you to death with a rock. It's a dangerous universe, Hatchling.",
+                    $"Yeah, {numErnestos} other magical anglerfish that I could be talking to instead of you.",
+                ];
+            }
+            else if (numErnestos == ErnestoModListHandler.GetMaxErnestos())
+            {
+                lines =
+                [
+                    "Oh yeah. Way more Ernestos than there ever should be.",
+                    "Look, I don't know what you did Hatchling, but you managed to fit every Ernesto from every world into this universe. It's pretty impressive, honestly.",
+                    $"There sure are, and I don't know if this universe can even handle every Ernesto to ever exist. You really made a mistake bringing {numErnestos} of those guys here.",
+                    "All of them. Every Ernesto ever.",
+                    $"Yarp, {numErnestos} of them. You should go find them all before the fabric of spacetime is destroyed and we all die.",
+                    "Yes and there are too many. Please get rid of some of them. The universe is falling apart as we speak.",
+                    "There are so many it's practically an invasion. An invasion of magical talking anglerfish."
+                ];
+            }
+            __result = lines[UnityEngine.Random.Range(0, lines.Length)];
+            return false;
+        }
+        else if (key == "SE_Ernesto_ClockERNESTO_PLACEHOLDER")
+        {
+            int randomHour = UnityEngine.Random.Range(1, 13);
+            int randomMinute = UnityEngine.Random.Range(10, 60);
+            __result = $"It's {randomHour}:{randomMinute} if I'm reading that clock correctly.";
+            return false;
+        }
+        else if (key == "SE_Ernesto_ShipFailureERNESTO_PLACEHOLDER")
+        {
+            __result = ErnestoDetectiveController.GetHypothesis();
+            return false;
+        }
+        return true;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ElectricityVolume), nameof(ElectricityVolume.ApplyShock))]
+    public static void ErnestoDetectElectricityShock(ElectricityVolume __instance, bool __runOriginal, HazardDetector detector)
+    {
+        if (!(bool)addErnesto.GetProperty() || !__runOriginal) return;
+
+        OWRigidbody attachedOWRigidbody = detector.GetAttachedOWRigidbody(false);
+        if (attachedOWRigidbody != null)
+        {
+            if (detector.CompareTag("ShipDetector"))
+            {
+                ShipDamageController component = attachedOWRigidbody.GetComponent<ShipDamageController>();
+                if (component.IsElectricalFailed())
+                {
+                    if (!component._shipReactorComponent.isDamaged)
+                    {
+                        ErnestoDetectiveController.SetReactorCause("electricity");
+                    }
+                }
+            }
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipReactorComponent), nameof(ShipReactorComponent.Update))]
+    public static void ErnestoDetectReactorExplosion(ShipReactorComponent __instance)
+    {
+        if (!(bool)addErnesto.GetProperty()) return;
+
+        if (__instance._damaged && __instance._criticalTimer <= 0f)
+        {
+            ErnestoDetectiveController.ItWasExplosion(fromReactor: true);
+        }
+        else if (!__instance._damaged)
+        {
+            ErnestoDetectiveController.SetReactorCause("");
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipDetachableModule), nameof(ShipDetachableModule.ApplyImpact))]
+    public static void ErnestoDetectHullImpact(ShipDetachableModule __instance, bool __runOriginal)
+    {
+        if (!(bool)addErnesto.GetProperty() || !__runOriginal 
+            || SELocator.GetShipDamageController().IsSystemFailed()) return;
+
+        for (int i = 0; i < __instance._hulls.Length; i++)
+        {
+            if (__instance._hulls[i]._integrity <= 0f && __instance._hulls[i].shipModule is ShipDetachableModule
+            && (!(bool)preventSystemFailure.GetProperty() || __instance._hulls[i].section == ShipHull.Section.Front))
+            {
+                ErnestoDetectiveController.ItWasHullBreach(impact: true);
+                return;
+            }
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.TriggerHullBreach))]
+    public static void ErnestoDefaultHullBreach(ShipDamageController __instance)
+    {
+        if (!(bool)addErnesto.GetProperty()) return;
+
+        ShipEnhancements.Instance.ModHelper.Events.Unity
+            .FireInNUpdates(() => ErnestoDetectiveController.ItWasHullBreach(), 3);
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.Explode))]
+    public static void ErnestoDefaultExplode(ShipDamageController __instance)
+    {
+        if (!(bool)addErnesto.GetProperty()) return;
+
+        ShipEnhancements.Instance.ModHelper.Events.Unity
+            .FireInNUpdates(() => ErnestoDetectiveController.ItWasExplosion(), 3);
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipEjectionSystem), nameof(ShipEjectionSystem.Update))]
+    public static void ErnestoCockpitEject(ShipEjectionSystem __instance)
+    {
+        if (!(bool)addErnesto.GetProperty()) return;
+
+        if (__instance._ejectPressed)
+        {
+            ErnestoDetectiveController.ItWasHullBreach(ejected: true);
+        }
+    }
+    #endregion
+
+    #region FunnySounds
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipAudioController), nameof(ShipAudioController.PlayImpactAtPosition))]
+    public static bool ShipBonk(ShipAudioController __instance, float volume, Vector3 worldPos)
+    {
+        if (!(bool)funnySounds.GetProperty()) return true;
+
+        if (Time.time - __instance._lastImpactTime < 0.5f)
+        {
+            return false;
+        }
+        for (int i = 0; i < __instance._hullImpactSources.Length; i++)
+        {
+            if (!__instance._hullImpactSources[i].isPlaying)
+            {
+                __instance._lastImpactTime = Time.time;
+                __instance._hullImpactSources[i].transform.position = worldPos;
+                __instance._hullImpactSources[i].SetLocalVolume(volume);
+                __instance._hullImpactSources[i].clip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/bonk.ogg");
+                __instance._hullImpactSources[i].Play();
+                return false;
+            }
+        }
+
+        return false;
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.TriggerSystemFailure))]
+    public static void ShipLegoBreak(ShipDamageController __instance)
+    {
+        if ((bool)funnySounds.GetProperty() && __instance.IsHullBreached())
+        {
+            ShipAudioController audio = __instance.GetComponentInChildren<ShipAudioController>();
+            for (int i = 0; i < audio._hullImpactSources.Length; i++)
+            {
+                if (!audio._hullImpactSources[i].isPlaying)
+                {
+                    audio._lastImpactTime = Time.time;
+                    audio._hullImpactSources[i].transform.position = SELocator.GetShipTransform().TransformPoint(Vector3.zero);
+                    audio._hullImpactSources[i].SetLocalVolume(1f);
+                    audio._hullImpactSources[i].clip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/lego_break.ogg");
+                    audio._hullImpactSources[i].Play();
+                    return;
+                }
+            }
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipThrusterAudio), nameof(ShipThrusterAudio.OnStartShipIgnition))]
+    public static bool ShipCartoonRun(ShipThrusterAudio __instance)
+    {
+        if (!(bool)funnySounds.GetProperty()) return true;
+
+        __instance._ignitionSource.Stop();
+        __instance._isIgnitionPlaying = true;
+        __instance._ignitionSource.PlayOneShot(ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/cartoon_run.ogg"), 1f);
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipAudioController), nameof(ShipAudioController.PlayRaiseEjectCover))]
+    public static bool ShipShotgunEject(ShipAudioController __instance)
+    {
+        if (!(bool)funnySounds.GetProperty()) return true;
+
+        __instance._ejectCoverSource.PlayOneShot(ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/shotgun.ogg"));
+        return false;
+    }
+    #endregion
+
+    #region DisableShipMedkit
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(PlayerRecoveryPoint), nameof(PlayerRecoveryPoint.Awake))]
+    public static void DisableShipMedkit(PlayerRecoveryPoint __instance)
+    {
+        if ((bool)disableShipMedkit.GetProperty() && __instance.GetComponentInParent<ShipBody>())
+        {
+            __instance._healsPlayer = false;
+        }
+    }
+    #endregion
+
+    #region DisableHazardPrevention
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(HazardDetector), nameof(HazardDetector.IsInvulnerable))]
+    public static void ShipHazardVulnerability(HazardDetector __instance, ref bool __result)
+    {
+        if ((bool)disableHazardPrevention.GetProperty() && __result && __instance._isPlayerDetector)
+        {
+            __result = PlayerState.IsInsideTheEye();
+        }
+    }
+    #endregion
+
+    #region Radio
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(RulesetDetector), nameof(RulesetDetector.AllowTravelMusic))]
+    public static void DisableTravelMusicForRadio(ref bool __result)
+    {
+        if (!(bool)addRadio.GetProperty())
+        {
+            return;
+        }
+
+        if (__result)
+        {
+            foreach (RadioItem radio in SELocator.GetShipTransform().GetComponentsInChildren<RadioItem>())
+            {
+                if (radio.ShouldOverrideTravelMusic())
+                {
+                    __result = false;
+                    return;
+                }
+            }
+        }
+    }
+    #endregion
+
+    #region ProlongDigestion
+    public static float digestionDamageDelay = 0f;
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(AnglerfishController), nameof(AnglerfishController.Start))]
+    public static void SetDigestionLength(AnglerfishController __instance)
+    {
+        if ((bool)moreExplosionDamage.GetProperty())
+        {
+            __instance._stunTimer = 100f;
+        }
+        if ((bool)prolongDigestion.GetProperty())
+        {
+            __instance._consumeDeathDelay = 8f;
+            __instance._consumeShipCrushDelay = 6f;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(AnglerfishController), nameof(AnglerfishController.OnCaughtObject))]
+    public static bool ProlongDigestion(AnglerfishController __instance, OWRigidbody caughtBody)
+    {
+        if (!(bool)prolongDigestion.GetProperty() || ShipEnhancements.InMultiplayer) return true;
+
+        if (__instance._currentState == AnglerfishController.AnglerState.Consuming)
+        {
+            if (!__instance._targetBody.CompareTag("Player") && caughtBody.CompareTag("Player") 
+                && !PlayerState.IsInsideShip() && !PlayerState.AtFlightConsole())
+            {
+                Locator.GetDeathManager().KillPlayer(DeathType.Digestion);
+            }
+            return false;
+        }
+        if (caughtBody.CompareTag("Player") || caughtBody.CompareTag("Ship"))
+        {
+            __instance._targetBody = caughtBody;
+            __instance._consumeStartTime = Time.time;
+            __instance.ChangeState(AnglerfishController.AnglerState.Consuming);
+            if (caughtBody.CompareTag("Ship"))
+            {
+                ShipNotifications.PostDigestionNotification();
+                digestionDamageDelay = UnityEngine.Random.Range(0.6f, 1.2f);
+            }
+            if (PlayerState.IsInsideShip() || PlayerState.AtFlightConsole())
+            {
+                Locator.GetPlayerDeathAudio()._deathSource.PlayOneShot(AudioType.Death_Digestion, 1f);
+                if (PlayerState.IsInsideShip())
+                {
+                    Locator.GetPlayerDeathAudio()._shipGroanSource.PlayDelayed(1f);
+                }
+            }
+        }
+        return false;
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(AnglerfishController), nameof(AnglerfishController.UpdateState))]
+    public static void PermanentStunMode(AnglerfishController __instance)
+    {
+        if ((bool)moreExplosionDamage.GetProperty() && __instance._currentState == AnglerfishController.AnglerState.Stunned)
+        {
+            __instance._stunTimer = 100f;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(AnglerfishController), nameof(AnglerfishController.UpdateState))]
+    public static void ShipDigestionEffects(AnglerfishController __instance)
+    {
+        if (!(bool)prolongDigestion.GetProperty()) return;
+
+        if (__instance._currentState == AnglerfishController.AnglerState.Consuming)
+        {
+            if (!__instance._consumeComplete)
+            {
+                if (__instance._targetBody == null)
+                {
+                    return;
+                }
+                float num = Time.time - __instance._consumeStartTime;
+                if (__instance._targetBody.CompareTag("Ship"))
+                {
+                    if (SELocator.GetShipDamageController().IsSystemFailed()) return;
+
+                    if (num > __instance._consumeShipCrushDelay)
+                    {
+                        SELocator.GetShipTransform().GetComponentInChildren<ShipAudioController>()
+                            ._shipElectrics._audioSource.PlayOneShot(AudioType.ShipDamageElectricalFailure, 0.5f);
+                        ErnestoDetectiveController.ItWasAnglerfish();
+                    }
+                    else
+                    {
+                        if (digestionDamageDelay < 0f)
+                        {
+                            RandomDigestionDamage();
+                            digestionDamageDelay = UnityEngine.Random.Range(0.2f, 0.8f);
+                        }
+                        else
+                        {
+                            digestionDamageDelay -= Time.deltaTime;
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    public static void RandomDigestionDamage()
+    {
+        if (ShipEnhancements.InMultiplayer && !ShipEnhancements.QSBAPI.GetIsHost() || (float)shipDamageMultiplier.GetProperty() <= 0f) return;
+
+        ShipComponent[] components = SELocator.GetShipDamageController()._shipComponents
+            .Where((component) => component.repairFraction == 1f && !component.isDamaged).ToArray();
+        ShipHull[] hulls = SELocator.GetShipDamageController()._shipHulls.Where((hull) => hull.integrity > 0f).ToArray();
+        if (components.Length > 0 && UnityEngine.Random.value < 0.5f)
+        {
+            int index = UnityEngine.Random.Range(0, components.Length);
+            if (components[index] is ShipReactorComponent && !components[index].isDamaged)
+            {
+                ErnestoDetectiveController.SetReactorCause("anglerfish");
+            }
+            components[index].SetDamaged(true);
+        }
+        else if (hulls.Length > 0)
+        {
+            ShipHull targetHull = hulls[UnityEngine.Random.Range(0, hulls.Length)];
+
+            bool wasDamaged = targetHull._damaged;
+            targetHull._damaged = true;
+            targetHull._integrity = Mathf.Max(0f, targetHull._integrity - UnityEngine.Random.Range(0.05f, 0.15f) * (float)shipDamageMultiplier.GetProperty());
+            var eventDelegate1 = (MulticastDelegate)typeof(ShipHull).GetField("OnDamaged",
+                BindingFlags.Instance | BindingFlags.NonPublic
+                | BindingFlags.Public).GetValue(targetHull);
+            if (eventDelegate1 != null)
+            {
+                foreach (var handler in eventDelegate1.GetInvocationList())
+                {
+                    handler.Method.Invoke(handler.Target, [targetHull]);
+                }
+            }
+            if (targetHull._damageEffect != null)
+            {
+                targetHull._damageEffect.SetEffectBlend(1f - targetHull._integrity);
+            }
+
+            if (ShipEnhancements.InMultiplayer)
+            {
+                ShipEnhancements.QSBInteraction.SetHullDamaged(targetHull, !wasDamaged);
+            }
+        }
+    }
+    #endregion
+
+    #region FluidDamage
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(SandFunnelTriggerVolume), nameof(SandFunnelTriggerVolume.IsObjectExposed))]
+    public static void ForceModuleDetectorsExposed(SandFunnelTriggerVolume __instance, GameObject obj, ref bool __result)
+    {
+        if (!obj.GetComponent<StaticFluidDetector>() || !obj.GetComponentInParent<ShipModule>()) return;
+
+        if (!__result)
+        {
+            __result = __instance.IsObjectExposed(SELocator.GetShipDetector());
+        }
+    }
+    #endregion
+
+    #region NoiseDetectionFix
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(NoiseMaker), nameof(NoiseMaker.GetNoiseOrigin))]
+    public static void FixShipNoiseOrigin(NoiseMaker __instance, ref Vector3 __result)
+    {
+        if (!ShipEnhancements.VanillaFixEnabled && __instance is ShipNoiseMaker)
+        {
+            __result = __instance._attachedBody.GetWorldCenterOfMass();
+        }
+    }
+    #endregion
+
+    #region DisableMinimapIcons
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Minimap), nameof(Minimap.SetComponentsEnabled))]
+    public static bool KeepMinimapOff(Minimap __instance, bool value)
+    {
+        if (!(bool)disableMinimapMarkers.GetProperty() || !value) return true;
+
+        for (int i = 0; i < __instance._minimapRenderersToSwitchOnOff.Length; i++)
+        {
+            if (__instance._minimapRenderersToSwitchOnOff[i].transform.parent == __instance._globeMeshTransform)
+            {
+                __instance._minimapRenderersToSwitchOnOff[i].enabled = value;
+            }
+        }
+        for (int j = 0; j < __instance._electricalComponentsToSwitchOnOff.Length; j++)
+        {
+            __instance._electricalComponentsToSwitchOnOff[j].SetPowered(value);
+        }
+
+        return false;
+    }
+    #endregion
+
+    #region FlagMarkers
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(Minimap), nameof(Minimap.UpdateMarkers))]
+    public static void UpdateFlagMarkers(Minimap __instance, bool __runOriginal)
+    {
+        if (!__runOriginal || !(bool)addExpeditionFlag.GetProperty()) return;
+
+        if (__instance.TryGetComponent(out MinimapFlagController flagController))
+        {
+            flagController.UpdateMarkers();
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(Minimap), nameof(Minimap.SetComponentsEnabled))]
+    public static void SetFlagMarkersEnabled(Minimap __instance, bool value, bool __runOriginal)
+    {
+        if (!__runOriginal || !(bool)addExpeditionFlag.GetProperty()) return;
+
+        if (__instance.TryGetComponent(out MinimapFlagController flagController))
+        {
+            flagController.SetComponentsEnabled(value);
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipCockpitUI), nameof(ShipCockpitUI.Update))]
+    public static void UpdateFlagMarkersOn(ShipCockpitUI __instance)
+    {
+        if ((bool)addExpeditionFlag.GetProperty() && !(bool)disableMapMarkers.GetProperty())
+        {
+            MinimapFlagController flagController = __instance.GetComponentInChildren<MinimapFlagController>();
+            if (flagController == null) return;
+            if (__instance._shipSystemsCtrlr.UsingLandingCam() && !__instance._landingCamScreenLight.IsOn())
+            {
+                flagController.SetComponentsOn(true);
+            }
+            else if (!__instance._shipSystemsCtrlr.UsingLandingCam() && __instance._landingCamScreenLight.IsOn())
+            {
+                flagController.SetComponentsOn(false);
+            }
+        }
+    }
+    #endregion
+
+    #region ScoutPhotoMode
+    // Borrowed from Archipelago Randomizer
+
+    // Many OW players never realized "photo mode" exists, so default to that when they don't have the Scout
+    [HarmonyPostfix, HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.Start))]
+    public static void ProbeLauncher_Start_Postfix(ProbeLauncher __instance)
+    {
+        if (!(bool)scoutPhotoMode.GetProperty()) return;
+
+        if ((bool)disableScoutLaunching.GetProperty() && __instance.GetName() == ProbeLauncher.Name.Ship)
+        {
+            //APRandomizer.OWMLModConsole.WriteLine($"putting the Scout Launcher in photo mode since we don't have the Scout yet");
+            __instance._photoMode = true;
+        }
+    }
+
+    // The above patch also causes "ship photo mode" to be a thing, with inconsistent UI prompts, only until you have Scout.
+    // So these two patches allow the ship to properly toggle between photo and launch modes just like you can on foot
+    // even after you get Scout, effectively promoting ship photo mode to an intended quality-of-life feature.
+    [HarmonyPostfix, HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.AllowPhotoMode))]
+    public static void ProbeLauncher_AllowPhotoMode(ProbeLauncher __instance, ref bool __result)
+    {
+        if (!(bool)scoutPhotoMode.GetProperty()) return;
+
+        if (__instance.GetName() == ProbeLauncher.Name.Ship)
+        {
+            __result = true;
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.AllowLaunchMode))]
+    public static void ProbeLauncher_AllowLaunchMode(ProbeLauncher __instance, ref bool __result)
+    {
+        if (__instance.GetName() == ProbeLauncher.Name.Ship
+            && (bool)disableScoutLaunching.GetProperty() && (bool)scoutPhotoMode.GetProperty())
+        {
+            __result = false;
+        }
+    }
+
+    [HarmonyPrefix, HarmonyPatch(typeof(ProbeLauncher), nameof(ProbeLauncher.UpdatePreLaunch))]
+    public static void ProbeLauncher_UpdatePreLaunch(ProbeLauncher __instance)
+    {
+        if (!(bool)scoutPhotoMode.GetProperty()) return;
+
+        if ((bool)disableScoutLaunching.GetProperty() && __instance._name == ProbeLauncher.Name.Ship 
+            && __instance._photoMode) return;
+
+        // copy-pasted from vanilla impl, with the first == changed to !=, so this is effectively:
+        // "if the vanilla UpdatePreLaunch is about to ignore a tool left/right press only because
+        // this is the ship's scout launcher, then don't ignore it"
+        if (__instance._name == ProbeLauncher.Name.Ship && (OWInput.IsNewlyPressed(InputLibrary.toolOptionLeft, InputMode.All) 
+                || OWInput.IsNewlyPressed(InputLibrary.toolOptionRight, InputMode.All)))
+        {
+            __instance._photoMode = !__instance._photoMode;
+        }
+    }
+    #endregion
+
+    #region AutopilotOverride
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.Update))]
+    public static bool OverrideAutopilotInputs(ShipCockpitController __instance, bool __runOriginal)
+    {
+        if (!__runOriginal) return false;
+
+        if (!(bool)enableEnhancedAutopilot.GetProperty()) return true;
+
+        if (!__instance._playerAtFlightConsole)
+        {
+            return false;
+        }
+        if (__instance._controlsLocked && Time.time >= __instance._controlsUnlockTime)
+        {
+            __instance._controlsLocked = false;
+            __instance._thrustController.enabled = !__instance._shipSystemFailure;
+            if (!__instance._shipSystemFailure)
+            {
+                if (__instance._thrustController.RequiresIgnition() && __instance._landingManager.IsLanded())
+                {
+                    RumbleManager.SetShipThrottleCold();
+                }
+                else
+                {
+                    RumbleManager.SetShipThrottleNormal();
+                }
+            }
+        }
+        if (!OWInput.IsInputMode(InputMode.ShipCockpit | InputMode.LandingCam))
+        {
+            if (/*__instance._autopilot.IsMatchingVelocity() && !__instance._autopilot.IsFlyingToDestination()*/true)
+            {
+                SELocator.GetAutopilotPanelController().CancelMatchVelocity();
+                //__instance._autopilot.StopMatchVelocity();
+                SendAutopilotState(stopMatch: true);
+            }
+            return false;
+        }
+        __instance.UpdateShipLightInput();
+        if (__instance._autopilot.IsFlyingToDestination() || __instance._autopilot.GetComponent<PidAutopilot>().enabled)
+        {
+            if (OWInput.IsNewlyPressed(InputLibrary.autopilot, InputMode.All))
+            {
+                SELocator.GetAutopilotPanelController().CancelAutopilot();
+                //__instance.AbortAutopilot();
+                SendAutopilotState(abort: true);
+            }
+            if (OWInput.IsNewlyPressed(InputLibrary.matchVelocity, InputMode.All))
+            {
+                SELocator.GetAutopilotPanelController().CancelMatchVelocity();
+                //__instance.AbortAutopilot();
+                SendAutopilotState(stopMatch: true);
+            }
+        }
+        else
+        {
+            if (/*__instance.IsAutopilotAvailable() && */__instance._playerAtFlightConsole && !__instance._shipSystemFailure
+                && OWInput.IsNewlyPressed(InputLibrary.autopilot, InputMode.ShipCockpit))
+            {
+                InputLibrary.lockOn.BlockNextRelease();
+
+                SELocator.GetAutopilotPanelController().ActivateAutopilot();
+                //__instance._autopilot.FlyToDestination(Locator.GetReferenceFrame(true));
+                SendAutopilotState(Locator.GetReferenceFrame()?.GetOWRigidBody(), destination: true);
+            }
+            if (/*__instance.IsMatchVelocityAvailable(false) && */__instance._playerAtFlightConsole && !__instance._shipSystemFailure
+                && OWInput.IsNewlyPressed(InputLibrary.matchVelocity, InputMode.All))
+            {
+                SELocator.GetAutopilotPanelController().ActivateMatchVelocity();
+                //__instance._autopilot.StartMatchVelocity(Locator.GetReferenceFrame(false), false);
+                SendAutopilotState(Locator.GetReferenceFrame(false)?.GetOWRigidBody(), startMatch: true);
+            }
+            else if (/*__instance._autopilot.IsMatchingVelocity() && !__instance._autopilot.IsFlyingToDestination() && */OWInput.IsNewlyReleased(InputLibrary.matchVelocity, InputMode.All))
+            {
+                SELocator.GetAutopilotPanelController().CancelMatchVelocity();
+                //__instance._autopilot.StopMatchVelocity();
+                SendAutopilotState(stopMatch: true);
+            }
+/*            if (!__instance._enteringLandingCam)
+            {
+                if (!__instance.UsingLandingCam() && OWInput.IsNewlyPressed(InputLibrary.landingCamera, InputMode.All) && !OWInput.IsPressed(InputLibrary.freeLook, 0f))
+                {
+                    __instance.EnterLandingView();
+                }
+                else if (__instance.UsingLandingCam() && (OWInput.IsNewlyPressed(InputLibrary.landingCamera, InputMode.All) || OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.All)))
+                {
+                    InputLibrary.cancel.ConsumeInput();
+                    __instance.ExitLandingView();
+                }
+            }*/
+        }
+        if (!__instance._enteringLandingCam)
+        {
+            if (!__instance.UsingLandingCam() && OWInput.IsNewlyPressed(InputLibrary.landingCamera, InputMode.All) && !OWInput.IsPressed(InputLibrary.freeLook, 0f))
+            {
+                __instance.EnterLandingView();
+            }
+            else if (__instance.UsingLandingCam() && (OWInput.IsNewlyPressed(InputLibrary.landingCamera, InputMode.All) || OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.All)))
+            {
+                InputLibrary.cancel.ConsumeInput();
+                __instance.ExitLandingView();
+            }
+        }
+        if (__instance.UsingLandingCam())
+        {
+            if (__instance._enteringLandingCam)
+            {
+                __instance.UpdateEnterLandingCamTransition();
+            }
+            if (!__instance._isLandingMode && __instance.IsLandingModeAvailable())
+            {
+                __instance.EnterLandingMode();
+            }
+            else if (__instance._isLandingMode && !__instance.IsLandingModeAvailable())
+            {
+                __instance.ExitLandingMode();
+            }
+            __instance._playerAttachOffset = Vector3.MoveTowards(__instance._playerAttachOffset, Vector3.zero, Time.deltaTime);
+        }
+        else
+        {
+            __instance._playerAttachOffset = __instance._thrusterModel.GetLocalAcceleration() / __instance._thrusterModel.GetMaxTranslationalThrust() * -0.2f;
+            if (Locator.GetToolModeSwapper().GetToolMode() == ToolMode.None && OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.All))
+            {
+                __instance.ExitFlightConsole();
+            }
+        }
+        __instance._playerAttachPoint.SetAttachOffset(__instance._playerAttachOffset);
+
+        return false;
+    }
+
+    public static void SendAutopilotState(OWRigidbody body = null, bool destination = false, 
+        bool startMatch = false, bool stopMatch = false, bool abort = false)
+    {
+        if (ShipEnhancements.InMultiplayer)
+        {
+            foreach (uint id in ShipEnhancements.PlayerIDs)
+            {
+                ShipEnhancements.QSBCompat.SendAutopilotState(id, body, destination, startMatch, stopMatch, abort);
+            }
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipCockpitUI), nameof(ShipCockpitUI.Update))]
+    public static void UpdateAutopilotUI(ShipCockpitUI __instance)
+    {
+        if ((bool)enableEnhancedAutopilot.GetProperty() && SELocator.GetAutopilotPanelController() != null)
+        {
+            if (SELocator.GetAutopilotPanelController().IsAutopilotActive())
+            {
+                if (!__instance._autopilotLight.enabled)
+                {
+                    __instance._autopilotLight.enabled = true;
+                    __instance._autopilotLightMaterial.SetColor(__instance._propID_EmissionColor, __instance._autopilotLightColor);
+                }
+            }
+            else if (__instance._autopilotLight.enabled)
+            {
+                __instance._autopilotLight.enabled = false;
+                __instance._autopilotLightMaterial.SetColor(__instance._propID_EmissionColor, 0f * __instance._autopilotLightColor);
+            }
+
+            if (__instance._autopilot.IsMatchingVelocity() || SELocator.GetAutopilotPanelController().IsPersistentInputActive())
+            {
+                if (!__instance._matchingVelocityLight.enabled)
+                {
+                    __instance._matchingVelocityLight.enabled = true;
+                    __instance._matchVLightMaterial.SetColor(__instance._propID_EmissionColor, __instance._matchVLightColor);
+                }
+            }
+            else if (__instance._matchingVelocityLight.enabled)
+            {
+                __instance._matchingVelocityLight.enabled = false;
+                __instance._matchVLightMaterial.SetColor(__instance._propID_EmissionColor, 0f * __instance._matchVLightColor);
+            }
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.IsLandingModeAvailable))]
+    public static bool OverrideLandingModeAvailable(ref bool __result)
+    {
+        if ((bool)enableEnhancedAutopilot.GetProperty() && (SELocator.GetAutopilotPanelController().IsAutopilotActive()
+            || SELocator.GetAutopilotPanelController().IsPersistentInputActive()))
+        {
+            __result = false;
+            return false;
+        }
+
+        return true;
+    }
+    #endregion
+
+    #region AlwaysEnableThrustIndicator
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.Start))]
+    public static void ThrustIndicatorStartOn(ThrustAndAttitudeIndicator __instance)
+    {
+        if ((bool)fixShipThrustIndicator.GetProperty() && __instance._shipIndicatorMode && !__instance.enabled)
+        {
+            __instance._activeThrusterModel = __instance._shipThrusterModel;
+            __instance._activeThrusterController = __instance._shipThrusterController;
+            __instance._thrusterArrowRoot.gameObject.SetActive(true);
+            __instance.enabled = true;
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.OnExitFlightConsole))]
+    public static void KeepThrustIndicatorOn(ThrustAndAttitudeIndicator __instance)
+    {
+        if ((bool)fixShipThrustIndicator.GetProperty() && __instance._shipIndicatorMode && !__instance.enabled)
+        {
+            __instance._activeThrusterModel = __instance._shipThrusterModel;
+            __instance._activeThrusterController = __instance._shipThrusterController;
+            __instance._thrusterArrowRoot.gameObject.SetActive(true);
+            __instance.enabled = true;
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.OnEnterConversation))]
+    public static void KeepThrustIndicatorOnInConversation(ThrustAndAttitudeIndicator __instance)
+    {
+        if ((bool)fixShipThrustIndicator.GetProperty() && __instance._shipIndicatorMode && __instance._inConversation)
+        {
+            __instance._thrusterArrowRoot.gameObject.SetActive(true);
+            __instance._inConversation = false;
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.LateUpdate))]
+    public static void OverrideJetpackDisplay(ThrustAndAttitudeIndicator __instance)
+    {
+        if ((bool)fixShipThrustIndicator.GetProperty() && __instance._shipIndicatorMode && __instance._jetpackThrusterModel.IsBoosterFiring())
+        {
+            Vector3 localAcceleration = __instance._activeThrusterModel.GetLocalAcceleration();
+            float num3 = __instance._activeThrusterModel.GetMaxTranslationalThrust();
+            __instance.DisplayArrows(0f, 1f, __instance._boostArrows, null);
+            __instance.DisplayArrows(localAcceleration.y, num3, __instance._rendererDown, __instance._lightsDown);
+        }
+    }
+    #endregion
+
+    #region DisableHatch
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(HatchController), nameof(HatchController.OpenHatch))]
+    public static bool StopHatchOpen()
+    {
+        return !(bool)disableHatch.GetProperty();
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(HatchController), nameof(HatchController.CloseHatch))]
+    public static bool StopHatchClose()
+    {
+        return !(bool)disableHatch.GetProperty();
+    }
+    #endregion
+
+    #region DisableLandingPads
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipDetachableLeg), nameof(ShipDetachableLeg.Detach))]
+    public static void DisableLandingPadOnDetach(ShipDetachableLeg __instance, bool __runOriginal)
+    {
+        if (!__runOriginal) return;
+
+        foreach (LandingPadSensor pad in __instance.GetComponentsInChildren<LandingPadSensor>())
+        {
+            pad.GetComponent<Collider>().enabled = false;
+            pad._contactBody = null;
+        }
+    }
+    #endregion
+
+    #region CustomMenu
+    public static bool ignoreNextMenuActivation = false;
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Menu), nameof(Menu.Activate))]
+    public static void RefreshMenuOnActivate(Menu __instance)
+    {
+        MenuManager menuManager = StartupPopupPatches.menuManager;
+        IOptionsMenuManager OptionsMenuManager = menuManager.OptionsMenuManager;
+
+        var menus = typeof(MenuManager).GetField("ModSettingsMenus", BindingFlags.Public
+            | BindingFlags.NonPublic | BindingFlags.Static).GetValue(menuManager)
+            as List<(IModBehaviour behaviour, Menu modMenu)>;
+
+        for (int i = 0; i < menus.Count; i++)
+        {
+            if ((object)menus[i].behaviour == ShipEnhancements.Instance
+                && menus[i].modMenu == __instance)
+            {
+                if (ignoreNextMenuActivation)
+                {
+                    return;
+                }
+
+                __instance.OnActivateMenu += () => ShipEnhancements.Instance.ModHelper.Events.Unity
+                    .FireOnNextUpdate(ShipEnhancements.Instance.RedrawSettingsMenu);
+                return;
+            }
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(MenuManager), nameof(MenuManager.ForceModOptionsOpen))]
+    public static void PreventRepeatActivation(MenuManager __instance, bool force)
+    {
+        var menus = typeof(MenuManager).GetField("ModSettingsMenus", BindingFlags.Public
+            | BindingFlags.NonPublic | BindingFlags.Static).GetValue(__instance)
+            as List<(IModBehaviour behaviour, Menu modMenu)>;
+
+        for (int i = 0; i < menus.Count; i++)
+        {
+            if ((object)menus[i].behaviour == ShipEnhancements.Instance)
+            {
+                ignoreNextMenuActivation = force;
+            }
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(OWML.ModHelper.Menus.NewMenuSystem.Patches),
+        nameof(OWML.ModHelper.Menus.NewMenuSystem.Patches.ResetToDefaultSettings))]
+    public static void FixNumberValueReset()
+    {
+        MenuManager menuManager = StartupPopupPatches.menuManager;
+        var menus = typeof(MenuManager).GetField("ModSettingsMenus", BindingFlags.Public
+            | BindingFlags.NonPublic | BindingFlags.Static).GetValue(menuManager)
+            as List<(IModBehaviour behaviour, Menu modMenu)>;
+
+        Menu modMenu = null;
+        for (int i = 0; i < menus.Count; i++)
+        {
+            if ((object)menus[i].behaviour == ShipEnhancements.Instance)
+            {
+                modMenu = menus[i].modMenu;
+            }
+        }
+
+        if (modMenu == null || !modMenu.IsMenuEnabled()) return;
+
+        var settings = ShipEnhancements.Instance.ModHelper.Config.Settings;
+        var defaultSettings = ShipEnhancements.Instance.ModHelper.DefaultConfig;
+        var options = modMenu.GetMenuOptions().Where(x => x.name != "UIElement-GammaButton").ToArray();
+
+        for (var i = 0; i < options.Length; i++)
+        {
+            var menuOption = options[i];
+
+            if (menuOption.TryGetComponent(out IOWMLTextEntryElement textEntry))
+            {
+                textEntry.SetCurrentValue(defaultSettings.GetSettingsValue<double>(textEntry.ModSettingKey).ToString(CultureInfo.InvariantCulture));
+            }
+        }
+
+        SettingExtensions.ResetCustomSettings();
     }
     #endregion
 }

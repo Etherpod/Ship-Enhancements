@@ -1,33 +1,53 @@
-﻿namespace ShipEnhancements;
+﻿using UnityEngine;
 
-public class PortableCampfireSocket : OWItemSocket
+namespace ShipEnhancements;
+
+public class PortableCampfireSocket : SEItemSocket
 {
-    private PortableCampfireItem _campfireItem;
-
-    public override void Awake()
+    protected override ItemType GetAcceptableType()
     {
-        Reset();
-        _sector = SELocator.GetShipSector();
-        base.Awake();
-        _acceptableType = PortableCampfireItem.ItemType;
-
-        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+        return ShipEnhancements.Instance.PortableCampfireType;
     }
 
-    public void SetCampfireItem(PortableCampfireItem item)
+    public override void CreateItem()
     {
-        _campfireItem = item;
-        PlaceIntoSocket(item);
+        base.CreateItem();
+
+        FluidDetector detector = _socketedItem.GetComponentInChildren<FluidDetector>(true);
+        if (detector != null)
+        {
+            detector.gameObject.SetActive(true);
+        }
+
+        if ((string)ShipEnhancements.Settings.temperatureZonesAmount.GetProperty() == "All")
+        {
+            Campfire campfire = _socketedItem.GetComponentInChildren<Campfire>();
+            if (campfire != null)
+            {
+                GameObject campfireTempZone = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Campfire.prefab");
+                Instantiate(campfireTempZone, campfire.transform.parent);
+            }
+        }
     }
 
-    private void OnShipSystemFailure()
+    public override void CreateItemRemote(OWItem item, bool socketItem)
     {
-        _sector = null;
-        _socketedItem?.SetSector(null);
-    }
+        base.CreateItemRemote(item, socketItem);
 
-    private void OnDestroy()
-    {
-        GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
+        FluidDetector detector = item.GetComponentInChildren<FluidDetector>(true);
+        if (detector != null)
+        {
+            detector.gameObject.SetActive(true);
+        }
+
+        if ((string)ShipEnhancements.Settings.temperatureZonesAmount.GetProperty() == "All")
+        {
+            Campfire campfire = item.GetComponentInChildren<Campfire>();
+            if (campfire != null)
+            {
+                GameObject campfireTempZone = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Campfire.prefab");
+                Instantiate(campfireTempZone, campfire.transform.parent);
+            }
+        }
     }
 }

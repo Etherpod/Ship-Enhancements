@@ -206,7 +206,6 @@ public static class SettingsColors
             ((Color, float) hull, (Color, float) component, Color alarm, (Color, float) alarmLit, Color light) = _nameToDamageColor[name];
             (Color hull, Color component, Color alarm, Color alarmLit, Color light) color;
             color.hull = GetUnitColor(hull);
-            ShipEnhancements.WriteDebugMessage(color.hull);
             color.component = GetUnitColor(component);
             color.alarm = GetUnitColor((alarm, 0f));
             color.alarmLit = GetUnitColor(alarmLit);

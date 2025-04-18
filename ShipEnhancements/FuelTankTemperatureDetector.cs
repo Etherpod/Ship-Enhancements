@@ -27,7 +27,7 @@ public class FuelTankTemperatureDetector : TemperatureDetector
 
     protected override void UpdateHighTemperature()
     {
-        if (_fuelTank.GetFuelRatio() <= 0f)
+        if (_fuelTank.GetFuelRatio() <= 0f || (_currentTemperature < 0 != _internalTempMeter < 0))
         {
             return;
         }
@@ -41,6 +41,12 @@ public class FuelTankTemperatureDetector : TemperatureDetector
         if (GetInternalTemperatureRatio() == 1f)
         {
             enabled = false;
+
+            if (_fuelTank.GetComponentInParent<ShipBody>() && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
+            {
+                ErnestoDetectiveController.ItWasFuelTank(temperature: true);
+            }
+
             _fuelTank.Explode();
         }
     }

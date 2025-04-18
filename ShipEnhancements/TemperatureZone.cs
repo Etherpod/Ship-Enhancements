@@ -22,7 +22,7 @@ public class TemperatureZone : MonoBehaviour
     private float _scale = 1f;
     private bool _active = true;
 
-    private void Start()
+    private void Awake()
     {
         _shape = GetComponent<SphereShape>();
         _triggerVolume = gameObject.GetAddComponent<OWTriggerVolume>();
@@ -49,14 +49,14 @@ public class TemperatureZone : MonoBehaviour
         }
     }
 
-    public float GetTemperature()
+    public float GetTemperature(TemperatureDetector detector)
     {
         if (!_active)
         {
             return 0;
         }
 
-        float distSqr = (SELocator.GetShipDetector().transform.position - (transform.position + _shape.center)).sqrMagnitude;
+        float distSqr = (detector.transform.position - (transform.position + _shape.center)).sqrMagnitude;
         float multiplier;
         if (_isShell)
         {

@@ -2,31 +2,45 @@
 
 namespace ShipEnhancements;
 
-public class GravityLandingGear : MonoBehaviour
+public class GravityLandingPad : MonoBehaviour
 {
-    private ShipLandingGear _landingGear;
+    [SerializeField]
     private OWAudioSource _audioSource;
-    private ParticleSystem _gravityEffects;
+    [SerializeField]
+    private ParticleSystem _particleEffect;
+    [SerializeField]
+    private GravityRepelVolume _weakRepelVol;
+    [SerializeField]
+    private GravityRepelVolume _midRepelVol;
+    [SerializeField]
+    private GravityRepelVolume _strongRepelVol;
+    [SerializeField]
+    private GravityRepelVolume _baseRepelVol;
+
+    private ShipLandingGear _landingGear;
     private ShipThrusterModel _thrusterModel;
+    private ShipDetachableLeg _attachedLeg;
     private float _gravityMagnitude = 10f;
+    private bool _inverted = false;
     private bool _gravityEnabled = false;
-    private bool _shipDestroyed = false;
+    private bool _landingGearDetached = false;
     private bool _damaged;
     private bool _landed = false;
 
     private void Start()
     {
         _landingGear = GetComponentInParent<ShipLandingGear>();
-        GameObject audioObject = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/Audio_GravityLandingGear.prefab");
-        _audioSource = Instantiate(audioObject, transform).GetComponent<OWAudioSource>();
-        GameObject effectsObject = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/Effects_GravityLandingGear_WarpParticles.prefab");
-        _gravityEffects = Instantiate(effectsObject, transform).GetComponent<ParticleSystem>();
         _thrusterModel = SELocator.GetShipBody().GetComponent<ShipThrusterModel>();
+        _attachedLeg = GetComponentInParent<ShipDetachableLeg>();
+
+        //gameObject.layer = LayerMask.NameToLayer("PhysicalDetector");
 
         ShipEnhancements.Instance.OnGravityLandingGearSwitch += SetGravityEnabled;
+        ShipEnhancements.Instance.OnGravityLandingGearInverted += SetGravityInverted;
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
         _landingGear.OnDamaged += ctx => OnLandingGearDamaged();
         _landingGear.OnRepaired += ctx => OnLandingGearRepaired();
+        _attachedLeg.OnLegDetach += ctx => OnShipSystemFailure();
         ShipEnhancements.Instance.OnEngineStateChanged += OnEngineStateChanged;
 
         _damaged = _landingGear.isDamaged;
@@ -37,9 +51,9 @@ public class GravityLandingGear : MonoBehaviour
         _gravityEnabled = enabled;
         if (!enabled)
         {
-            if (_gravityEffects.isPlaying)
+            if (_particleEffect.isPlaying)
             {
-                _gravityEffects.Stop();
+                _particleEffect.Stop();
             }
             if (_audioSource.isPlaying)
             {
@@ -47,11 +61,11 @@ public class GravityLandingGear : MonoBehaviour
                 _audioSource.time = 0f;
             }
         }
-        else if (enabled && !_damaged && !_shipDestroyed)
+        else if (enabled && !_damaged && !_landingGearDetached)
         {
             if (_landed)
             {
-                _gravityEffects.Play();
+                _particleEffect.Play();
             }
             if (!_audioSource.isPlaying)
             {
@@ -61,55 +75,68 @@ public class GravityLandingGear : MonoBehaviour
         }
     }
 
-    private void OnTriggerStay(Collider hitCollider)
+    public void SetGravityInverted(bool inverted)
     {
-        if (_shipDestroyed || _landingGear.isDamaged || !_gravityEnabled || !ShipEnhancements.Instance.engineOn
-            || _thrusterModel.GetLocalAcceleration().y > 0f)
+        _inverted = inverted;
+    }
+
+    private void FixedUpdate()
+    {
+        if (_landingGearDetached || _landingGear.isDamaged || !_gravityEnabled || !ShipEnhancements.Instance.engineOn
+            || (!_inverted && _thrusterModel.GetLocalAcceleration().y > 0f))
         {
             return;
         }
 
-        if (hitCollider.attachedRigidbody != null)
+        if (_landed != _weakRepelVol.IsRepelling(!_inverted))
         {
-            if (hitCollider.attachedRigidbody.isKinematic)
+            _landed = _weakRepelVol.IsRepelling(!_inverted);
+            if (_landed)
             {
-                SELocator.GetShipBody().AddAcceleration(-transform.up * _gravityMagnitude);
+                if (!_landingGearDetached && !_damaged && _gravityEnabled)
+                {
+                    _particleEffect.Play();
+                }
             }
             else
             {
-                SELocator.GetShipBody().AddAcceleration(-transform.up * (_gravityMagnitude / 10) * (1 / SELocator.GetShipBody().GetMass()));
-                hitCollider.attachedRigidbody.GetAttachedOWRigidbody().AddAcceleration(transform.up * (_gravityMagnitude / 10) * (1 / hitCollider.attachedRigidbody.mass));
+                _particleEffect.Stop();
             }
         }
-    }
 
-    private void OnTriggerEnter(Collider hitCollider)
-    {
-        if (hitCollider.attachedRigidbody != null)
+        if (_landed)
         {
-            _landed = true;
-            if (!_shipDestroyed && !_damaged && _gravityEnabled)
+            float mult = 0.25f;
+            if (_baseRepelVol.IsRepelling(!_inverted))
             {
-                _gravityEffects.Play();
+                mult = 1f;
             }
-        }
-    }
+            else if (_strongRepelVol.IsRepelling(!_inverted))
+            {
+                mult = 0.75f;
+            }
+            else if (_midRepelVol.IsRepelling(!_inverted))
+            {
+                mult = 0.5f;
+            }
 
-    private void OnTriggerExit(Collider hitCollider)
-    {
-        if (hitCollider.attachedRigidbody != null)
-        {
-            _landed = false;
-           _gravityEffects.Stop();
+            if (_inverted)
+            {
+                SELocator.GetShipBody().AddAcceleration(transform.up * _gravityMagnitude * mult);
+            }
+            else
+            {
+                SELocator.GetShipBody().AddAcceleration(-transform.up * _gravityMagnitude * mult * 2f);
+            }
         }
     }
 
     private void OnShipSystemFailure()
     {
-        _shipDestroyed = true;
-        if (_gravityEffects.isPlaying)
+        _landingGearDetached = true;
+        if (_particleEffect.isPlaying)
         {
-            _gravityEffects.Stop();
+            _particleEffect.Stop();
         }
         if (_audioSource.isPlaying)
         {
@@ -120,11 +147,11 @@ public class GravityLandingGear : MonoBehaviour
 
     private void OnEngineStateChanged(bool enabled)
     {
-        if (enabled && _gravityEnabled && !_damaged && !_shipDestroyed)
+        if (enabled && _gravityEnabled && !_damaged && !_landingGearDetached)
         {
             if (_landed)
             {
-                _gravityEffects.Play();
+                _particleEffect.Play();
             }
             if (!_audioSource.isPlaying)
             {
@@ -134,9 +161,9 @@ public class GravityLandingGear : MonoBehaviour
         }
         else
         {
-            if (_gravityEffects.isPlaying)
+            if (_particleEffect.isPlaying)
             {
-                _gravityEffects.Stop();
+                _particleEffect.Stop();
             }
             if (_audioSource.isPlaying)
             {
@@ -149,9 +176,9 @@ public class GravityLandingGear : MonoBehaviour
     private void OnLandingGearDamaged()
     {
         _damaged = true;
-        if (_gravityEffects.isPlaying)
+        if (_particleEffect.isPlaying)
         {
-            _gravityEffects.Stop();
+            _particleEffect.Stop();
         }
         if (_audioSource.isPlaying)
         {
@@ -164,11 +191,11 @@ public class GravityLandingGear : MonoBehaviour
     {
         _damaged = false;
 
-        if (_shipDestroyed || !_gravityEnabled) return;
+        if (_landingGearDetached || !_gravityEnabled) return;
 
         if (_landed)
         {
-            _gravityEffects.Play();
+            _particleEffect.Play();
         }
         _audioSource.FadeIn(1f);
         _audioSource.pitch = 1f;
@@ -177,9 +204,11 @@ public class GravityLandingGear : MonoBehaviour
     private void OnDestroy()
     {
         ShipEnhancements.Instance.OnGravityLandingGearSwitch -= SetGravityEnabled;
+        ShipEnhancements.Instance.OnGravityLandingGearInverted -= SetGravityInverted;
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
         _landingGear.OnDamaged -= ctx => OnLandingGearDamaged();
         _landingGear.OnRepaired -= ctx => OnLandingGearRepaired();
+        _attachedLeg.OnLegDetach -= ctx => OnShipSystemFailure();
         ShipEnhancements.Instance.OnEngineStateChanged -= OnEngineStateChanged;
     }
 }

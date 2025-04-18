@@ -23,11 +23,11 @@ public static class SELocator
     private static SignalscopeComponent _signalscopeComponent;
     private static CockpitButtonPanel _buttonPanel;
     private static ThrustModulatorController _modulatorController;
-    private static PortableCampfire _portableCampfire;
     private static CockpitFilthController _cockpitFilthController;
     private static FlightConsoleInteractController _consoleInteractController;
-    private static FuelTankItem _fuelTankItem;
-    private static PortableTractorBeamItem _tractorBeamItem;
+    private static CockpitErnesto _ernesto;
+    private static ShipWarpCoreComponent _warpCoreComponent;
+    private static AutopilotPanelController _autopilotPanelController;
 
     public static void Initalize()
     {
@@ -61,21 +61,17 @@ public static class SELocator
             _modulatorController = _shipTransform.GetComponentInChildren<ThrustModulatorController>(true);
             _shipOverdriveController = _shipTransform.GetComponentInChildren<ShipOverdriveController>(true);
         }
-        if ((bool)addPortableCampfire.GetProperty())
-        {
-            _portableCampfire = _shipTransform.GetComponentInChildren<PortableCampfire>(true);
-        }
         if ((float)rustLevel.GetProperty() > 0 || (float)dirtAccumulationTime.GetProperty() > 0f)
         {
             _cockpitFilthController = _shipTransform.GetComponentInChildren<CockpitFilthController>(true);
         }
-        if ((bool)addFuelCanister.GetProperty())
+        if ((bool)addErnesto.GetProperty())
         {
-            _fuelTankItem = _shipTransform.GetComponentInChildren<FuelTankItem>(true);
+            _ernesto = _shipTransform.GetComponentInChildren<CockpitErnesto>();
         }
-        if ((bool)addPortableTractorBeam.GetProperty())
+        if ((bool)enableEnhancedAutopilot.GetProperty())
         {
-            _tractorBeamItem = _shipTransform.GetComponentInChildren<PortableTractorBeamItem>(true);
+            _autopilotPanelController = _shipTransform.GetComponentInChildren<AutopilotPanelController>();
         }
     }
 
@@ -149,6 +145,16 @@ public static class SELocator
         _signalscopeComponent = obj;
     }
 
+    public static ShipWarpCoreComponent GetShipWarpCoreComponent()
+    {
+        return _warpCoreComponent;
+    }
+
+    public static void SetShipWarpCoreComponent(ShipWarpCoreComponent obj)
+    {
+        _warpCoreComponent = obj;
+    }
+
     public static ShipTemperatureDetector GetShipTemperatureDetector()
     {
         return _shipTemperatureDetector;
@@ -174,11 +180,6 @@ public static class SELocator
         return _modulatorController;
     }
 
-    public static PortableCampfire GetPortableCampfire()
-    {
-        return _portableCampfire;
-    }
-
     public static CockpitFilthController GetCockpitFilthController()
     {
         return _cockpitFilthController;
@@ -194,13 +195,13 @@ public static class SELocator
         _consoleInteractController = controller;
     }
 
-    public static FuelTankItem GetFuelTankItem()
+    public static CockpitErnesto GetErnesto()
     {
-        return _fuelTankItem;
+        return _ernesto;
     }
 
-    public static PortableTractorBeamItem GetTractorBeamItem()
+    public static AutopilotPanelController GetAutopilotPanelController()
     {
-        return _tractorBeamItem;
+        return _autopilotPanelController;
     }
 }

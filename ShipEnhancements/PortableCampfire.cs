@@ -11,6 +11,10 @@ public class PortableCampfire : Campfire
     [SerializeField]
     private AudioClip _waterExtinguishAudio;
     [SerializeField]
+    private AudioClip _packUpAudio;
+    [SerializeField]
+    private OWAudioSource _audioSource;
+    [SerializeField]
     private GameObject _itemParent;
 
     private ScreenPrompt _cancelPrompt;
@@ -22,14 +26,22 @@ public class PortableCampfire : Campfire
     private float _reactorHeatMeterLength;
     private bool _shipDestroyed;
     private bool _lastOutsideWaterState = false;
+    private ShipReactorComponent _reactor;
+    private PortableCampfireItem _item;
 
     public override void Awake()
     {
         base.Awake();
+        _item = _itemParent.GetComponent<PortableCampfireItem>();
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+        if (true)
+        {
+            GlobalMessenger.AddListener("ShipHullDetached", OnShipHullDetached);
+        }
 
         _cancelPrompt = new PriorityScreenPrompt(InputLibrary.cancel, "Pack up", 0, ScreenPrompt.DisplayState.Normal, false);
+        _reactor = SELocator.GetShipDamageController()._shipReactorComponent;
         _reactorHeatMeterLength = Random.Range(10f, 30f);
         _reactorHeatMeter = _reactorHeatMeterLength;
     }
@@ -47,17 +59,21 @@ public class PortableCampfire : Campfire
                 {
                     _reactorHeatMeter -= Time.deltaTime;
                 }
-                else
+                else if (_reactor.GetComponentInParent<ShipBody>())
                 {
                     _reactorHeatMeter = _reactorHeatMeterLength;
                     _reactorHeatMeterLength = Random.Range(10f, 30f);
-                    SELocator.GetShipBody().GetComponentInChildren<ShipReactorComponent>().SetDamaged(true);
+                    if (!_reactor.isDamaged)
+                    {
+                        ErnestoDetectiveController.SetReactorCause("campfire");
+                    }
+                    _reactor.SetDamaged(true);
 
                     if (ShipEnhancements.InMultiplayer)
                     {
                         foreach (uint id in ShipEnhancements.PlayerIDs)
                         {
-                            ShipEnhancements.QSBCompat.SendCampfireReactorDamaged(id);
+                            ShipEnhancements.QSBCompat.SendCampfireReactorDamaged(id, _item);
                         }
                     }
 
@@ -88,7 +104,7 @@ public class PortableCampfire : Campfire
             {
                 StopSleeping();
             }
-            _oneShotAudio.PlayOneShot(_waterExtinguishAudio);
+            _audioSource.PlayOneShot(_waterExtinguishAudio);
             SetState(State.UNLIT);
         }
     }
@@ -106,7 +122,8 @@ public class PortableCampfire : Campfire
         {
             StopSleeping();
         }
-        _itemParent.GetComponent<PortableCampfireItem>().TogglePackUp(true);
+        _audioSource.PlayOneShot(_packUpAudio, 0.5f);
+        _item.TogglePackUp(true);
     }
 
     public void UpdateProperties()
@@ -142,7 +159,7 @@ public class PortableCampfire : Campfire
         else
         {
             SetState(State.UNLIT);
-            _oneShotAudio.PlayOneShot(_waterExtinguishAudio);
+            _audioSource.PlayOneShot(_waterExtinguishAudio);
         }
     }
 
@@ -167,6 +184,7 @@ public class PortableCampfire : Campfire
 
     public bool IsOutsideWater()
     {
+        if (_fluidDetector._activeVolumes == null) return true;
         return !_fluidDetector.InFluidType(FluidVolume.Type.WATER);
     }
 
@@ -190,6 +208,11 @@ public class PortableCampfire : Campfire
         return base.CanSleepHereNow() && !PlayerState.OnQuantumMoon();
     }
 
+    public OWItem GetItem()
+    {
+        return _item;
+    }
+
     private void OnShipSystemFailure()
     {
         if (_insideShip)
@@ -199,8 +222,18 @@ public class PortableCampfire : Campfire
         _shipDestroyed = true;
     }
 
+    private void OnShipHullDetached()
+    {
+        if (_insideShip)
+        {
+            SetState(State.UNLIT);
+        }
+    }
+
     private void OnEnable()
     {
+        if (_fluidDetector == null) return;
+
         if (_fluidDetector.GetShape())
         {
             _fluidDetector.GetShape().SetActivation(true);
@@ -209,16 +242,22 @@ public class PortableCampfire : Campfire
         {
             _fluidDetector.GetCollider().enabled = true;
         }
-        ShipEnhancements.Instance.ModHelper.Events.Unity.FireOnNextUpdate(() =>
+
+        if (_fluidDetector._activeVolumes != null)
         {
-            bool outsideWater = IsOutsideWater();
-            _lastOutsideWaterState = outsideWater;
-            _interactVolume._screenPrompt.SetDisplayState(outsideWater ? ScreenPrompt.DisplayState.Normal : ScreenPrompt.DisplayState.GrayedOut);
-        });
+            ShipEnhancements.Instance.ModHelper.Events.Unity.FireOnNextUpdate(() =>
+            {
+                bool outsideWater = IsOutsideWater();
+                _lastOutsideWaterState = outsideWater;
+                _interactVolume._screenPrompt.SetDisplayState(outsideWater ? ScreenPrompt.DisplayState.Normal : ScreenPrompt.DisplayState.GrayedOut);
+            });
+        }
     }
 
     private void OnDisable()
     {
+        if (_fluidDetector == null) return;
+
         if (_fluidDetector.GetShape())
         {
             _fluidDetector.GetShape().SetActivation(false);
@@ -227,10 +266,14 @@ public class PortableCampfire : Campfire
         {
             _fluidDetector.GetCollider().enabled = false;
         }
-        EffectVolume[] volsToRemove = [.. _fluidDetector._activeVolumes];
-        foreach (EffectVolume vol in volsToRemove)
+
+        if (_fluidDetector._activeVolumes != null)
         {
-            vol._triggerVolume.RemoveObjectFromVolume(_fluidDetector.gameObject);
+            EffectVolume[] volsToRemove = [.. _fluidDetector._activeVolumes];
+            foreach (EffectVolume vol in volsToRemove)
+            {
+                vol._triggerVolume.RemoveObjectFromVolume(_fluidDetector.gameObject);
+            }
         }
     }
 
@@ -238,5 +281,9 @@ public class PortableCampfire : Campfire
     {
         base.OnDestroy();
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
+        if (true)
+        {
+            GlobalMessenger.RemoveListener("ShipHullDetached", OnShipHullDetached);
+        }
     }
 }

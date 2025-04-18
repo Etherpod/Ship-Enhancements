@@ -10,11 +10,9 @@ public static class SEAchievementTracker
     public static bool BadInternet;
     public static bool HowDidWeGetHere;
     public static bool HulkSmash;
-
-    public static OWRigidbody LastHitBody;
-    public static bool PlayerCausedExplosion = false;
-    public static bool ShipExploded = false;
-    public static bool PlayerEjectedCockpit = false;
+    public static bool AnglerfishKill;
+    public static bool Satellite;
+    public static bool SuperHotshot;
 
     public static void Reset()
     {
@@ -26,10 +24,8 @@ public static class SEAchievementTracker
         BadInternet = false;
         HowDidWeGetHere = false;
         HulkSmash = false;
-
-        LastHitBody = null;
-        PlayerCausedExplosion = false;
-        PlayerEjectedCockpit = false;
-        ShipExploded = false;
+        AnglerfishKill = false;
+        Satellite = false;
+        SuperHotshot = false;
     }
 }

@@ -1,0 +1,1259 @@
+schema = "https://raw.githubusercontent.com/Outer-Wilds-New-Horizons/new-horizons/main/NewHorizons/Schemas/dialogue_schema.xsd"
+file_type = "DialogueTree"
+name_field = "Ernesto"
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_1"
+entry_condition = ["DEFAULT"]
+
+[[dialogue_node.dialogue]]
+page = ["Hey. It's been a while."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Who are you?"
+dialogue_target = "SE_Ernesto_Default_11"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "What are you doing in my ship?"
+dialogue_target = "SE_Ernesto_Default_12"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Ernesto? Is that you?"
+dialogue_target = "SE_Ernesto_Default_13"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "I really have to get going, can we talk later?"
+dialogue_target = "SE_Ernesto_Default_14"
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_11"
+
+[[dialogue_node.dialogue]]
+page = ["What do you mean? Don't you remember me?"]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Uh... no?"
+dialogue_target = "SE_Ernesto_Default_111"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Oh yeah! Ernesto!"
+dialogue_target = "SE_Ernesto_Default_112"
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_111"
+
+[[dialogue_node.dialogue]]
+page = ["Wow. Did you hit your head or something?", "I'm Ernesto the Magic Talking Anglerfish. Or just Ernesto, if you prefer."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Are you the guy who keeps attacking me in Dark Bramble?"
+dialogue_target = "SE_Ernesto_Default_1111"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "How are you talking?"
+dialogue_target = "SE_Ernesto_Default_1112"
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_1111"
+dialogue_target = "SE_Ernesto_Default_2"
+
+[[dialogue_node.dialogue]]
+page = ["No, that's my cousin. Or maybe it was my uncle, I don't remember."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_1112"
+dialogue_target = "SE_Ernesto_Default_2"
+
+[[dialogue_node.dialogue]]
+page = ["I took speaking as an elective in college."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_112"
+
+[[dialogue_node.dialogue]]
+page = ["Glad you're finally coming to your senses. What are you gonna tell me next, that you don't remember Geswaldo?"]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "I know who Geswaldo is!"
+dialogue_target = "SE_Ernesto_Default_1121"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Who?"
+dialogue_target = "SE_Ernesto_Default_1122"
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_1121"
+dialogue_target = "SE_Ernesto_Default_2"
+
+[[dialogue_node.dialogue]]
+page = ["Good. He's gonna be on your quiz later."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_1122"
+dialogue_target = "SE_Ernesto_Default_2"
+
+[[dialogue_node.dialogue]]
+page = ["Unbelievable. You gotta keep up with the Ernesto lore."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_12"
+
+[[dialogue_node.dialogue]]
+page = ["I was waiting for you to get here. You know who I am, right?"]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Yeah, you're Ernesto."
+dialogue_target = "SE_Ernesto_Default_121"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "You're a talking anglerfish."
+dialogue_target = "SE_Ernesto_Default_122"
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_121"
+dialogue_target = "SE_Ernesto_Default_2"
+
+[[dialogue_node.dialogue]]
+page = ["Whew. I was worried you had forgotten about me."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_122"
+dialogue_target = "SE_Ernesto_Default_2"
+
+[[dialogue_node.dialogue]]
+page = ["Well, yeah. Close enough. I'm Ernesto the Magic Talking Anglerfish."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_13"
+
+[[dialogue_node.dialogue]]
+page = ["It sure is."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Did you pay your taxes?"
+dialogue_target = "SE_Ernesto_Default_131"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Where's Geswaldo?"
+dialogue_target = "SE_Ernesto_Default_132"
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_131"
+dialogue_target = "SE_Ernesto_Default_2"
+
+[[dialogue_node.dialogue]]
+page = ["No, of course not. Tax evasion is fun. And free."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_132"
+dialogue_target = "SE_Ernesto_Default_2"
+
+[[dialogue_node.dialogue]]
+page = ["That's a long story."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_14"
+
+[[dialogue_node.dialogue]]
+page = ["Yeah, sure."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_2"
+
+[[dialogue_node.dialogue]]
+page = ["Anyway, since I've been gone for so long, I thought I'd pay you a visit. Maybe have a chat, roast a couple marshmallows, like we used to do back in the day."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Sounds fun!"
+dialogue_target = "SE_Ernesto_Default_21"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "I'm kind of busy right now, actually."
+dialogue_target = "SE_Ernesto_Default_22"
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_21"
+dialogue_target = "SE_Ernesto_Default_End"
+
+[[dialogue_node.dialogue]]
+page = ["Yeah, it's pretty fun. I think I'll just relax for now, though."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_22"
+dialogue_target = "SE_Ernesto_Default_End"
+
+[[dialogue_node.dialogue]]
+page = ["No problem, I don't wanna do anything now either. I'm just gonna sit back and relax for now."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Default_End"
+set_persistent_condition = "SE_KNOWS_ERNESTO"
+
+[[dialogue_node.dialogue]]
+page = ["You do your thing, fly the ship or whatever. Just try not to kill both of us while you're at it."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Return"
+entry_condition = ["SE_KNOWS_ERNESTO"]
+randomize = true
+
+[[dialogue_node.dialogue]]
+page = ["What's up?"]
+[[dialogue_node.dialogue]]
+page = ["What? This better be important."]
+[[dialogue_node.dialogue]]
+page = ["You wanna ask me something?"]
+[[dialogue_node.dialogue]]
+page = ["Did you have a question?"]
+[[dialogue_node.dialogue]]
+page = ["What is it?"]
+[[dialogue_node.dialogue]]
+page = ["Yeah?"]
+[[dialogue_node.dialogue]]
+page = ["Hey."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_SHIP_FAILURE"
+text = "What happened to my ship?!"
+dialogue_target = "SE_Ernesto_ShipFailure"
+
+# --
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_persistent_condition = ["SE_ERNESTO_IS_AWARE"]
+text = "Are there any other Ernestos here?"
+dialogue_target = "SE_Ernesto_Ernestos"
+
+# --
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_1"
+text = "What's the airspeed velocity of an unladen swallow?"
+dialogue_target = "SE_Ernesto_Swallow"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_2"
+text = "Do you play sports?"
+dialogue_target = "SE_Ernesto_Sports"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_3"
+text = "What was it like living in Dark Bramble?"
+dialogue_target = "SE_Ernesto_DarkBramble"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_4"
+text = "AAAH! I forgot you were in my ship!"
+dialogue_target = "SE_Ernesto_Jumpscare"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_5"
+text = "How much do you sleep?"
+dialogue_target = "SE_Ernesto_Sleeping"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_6"
+text = "Have you ever broken a bone?"
+dialogue_target = "SE_Ernesto_BrokenBone"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_7"
+text = "Are you breathing at all?"
+dialogue_target = "SE_Ernesto_Breathing"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_8"
+text = "Do you like sap wine?"
+dialogue_target = "SE_Ernesto_SapWine"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_9"
+text = "Do you have gills or lungs?"
+dialogue_target = "SE_Ernesto_Lungs"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_10"
+text = "Do you play any instruments?"
+dialogue_target = "SE_Ernesto_Instrument"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_11"
+text = "Where do you live?"
+dialogue_target = "SE_Ernesto_House"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_12"
+text = "Do you ever beat people to death with rocks?"
+dialogue_target = "SE_Ernesto_Assault"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_13"
+text = "Why are you so small?"
+dialogue_target = "SE_Ernesto_Size"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_14"
+text = "What's your favorite planet?"
+dialogue_target = "SE_Ernesto_FavoritePlanet"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_15"
+text = "What electives did you take in college?"
+dialogue_target = "SE_Ernesto_Electives"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_16"
+text = "Can you pilot the ship for me?"
+dialogue_target = "SE_Ernesto_Pilot"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_17"
+text = "Do you like marshmallows?"
+dialogue_target = "SE_Ernesto_Marshmallows"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_18"
+text = "Do you have any siblings?"
+dialogue_target = "SE_Ernesto_Siblings"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_19"
+text = "How old are you?"
+dialogue_target = "SE_Ernesto_Age"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_20"
+text = "How fast can you fly?"
+dialogue_target = "SE_Ernesto_FlyingSpeed"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_21"
+text = "Do you like music?"
+dialogue_target = "SE_Ernesto_Music"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_22"
+text = "Which traveler's music is your favorite?"
+dialogue_target = "SE_Ernesto_FavoriteTraveler"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_23"
+text = "Do you wanna play Dungeons and Dragons?"
+dialogue_target = "SE_Ernesto_Dnd"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_24"
+text = "Can you make my ship bigger?"
+dialogue_target = "SE_Ernesto_BigShip"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_25"
+text = "How does gravity work?"
+dialogue_target = "SE_Ernesto_Gravity"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_26"
+text = "Are you in the time loop?"
+dialogue_target = "SE_Ernesto_TimeLoop"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_27"
+text = "Would you rather have unlimited bacon but no games, or unlimited games and no games?"
+dialogue_target = "SE_Ernesto_DumbQuestion"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_28"
+text = "Have you heard of the trolley problem?"
+dialogue_target = "SE_Ernesto_TrolleyProblem"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_29"
+text = "Do you drive?"
+dialogue_target = "SE_Ernesto_Driving"
+
+# ---
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_100"
+text = "Tell me the story of how you met Geswaldo."
+dialogue_target = "SE_Ernesto_MeetingGeswaldo"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_101"
+text = "Can you continue your story about Geswaldo?"
+dialogue_target = "SE_Ernesto_GeswaldoIncident"
+
+# ---
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_200"
+text = "Is it just me, or are you... bigger?"
+dialogue_target = "SE_Ernesto_BigHead"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_201"
+text = "Do you want me to play anything on the radio?"
+dialogue_target = "SE_Ernesto_Radio"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+required_condition = "SE_ERNESTO_OPTION_202"
+text = "What time is it?"
+dialogue_target = "SE_Ernesto_Clock"
+
+# ---
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Nevermind."
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Swallow"
+
+[[dialogue_node.dialogue]]
+page = ["African or European?", "Heh, just messing with you. It's 10.4 m/s for an African swallow and 9.2 m/s for a European swallow."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Sports"
+
+[[dialogue_node.dialogue]]
+page = ["Yeah, I loved playing sports as a kid, mostly Go Fish. I was the top performing player, believe it or not."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_DarkBramble"
+
+[[dialogue_node.dialogue]]
+page = ["Cold. Lonely. Scary. Damp and wet.", "I'm glad I got out of there when I did. Apparently the stock markets crashed not long after I left."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Jumpscare"
+
+[[dialogue_node.dialogue]]
+page = ["I actually have camoflauge abilities. Here, watch I'll blend into the surroundings and you'll be so surprised it worked that you'll stop talking to me."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "That doesn't-"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "You can't-"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "What are you-"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "I'm confu-"
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Sleeping"
+
+[[dialogue_node.dialogue]]
+page = ["I don't sleep. There's too much to get done."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "What, like sitting in my cockpit doing nothing?"
+dialogue_target = "SE_Ernesto_Sleeping_1"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Fair enough."
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_Sleeping_1"
+
+[[dialogue_node.dialogue]]
+page = ["I'm not doing nothing, I'm gathering valuable intel.", "I probably shouldn't have said that. You didn't hear anything."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_BrokenBone"
+
+[[dialogue_node.dialogue]]
+page = ["I'm an invertebrate. I don't have bones."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "But you're a fish! All fish have bones!"
+dialogue_target = "SE_Ernesto_BrokenBone_1"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Oh, sorry."
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_BrokenBone_1"
+
+[[dialogue_node.dialogue]]
+page = ["The \"magic\" part of \"Ernesto the Magic Talking Anglerfish\" means all my bones get taken away."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Breathing"
+
+[[dialogue_node.dialogue]]
+page = ["No, I'm holding my breath so I don't consume extra oxygen."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Wow, you can hold your breath for a while."
+dialogue_target = "SE_Ernesto_Breathing_1"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "You can breath. My oxygen is going to be fine."
+dialogue_target = "SE_Ernesto_Breathing_2"
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_Breathing_1"
+
+[[dialogue_node.dialogue]]
+page = ["I haven't tasted oxygen in a long time."]
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_Breathing_2"
+
+[[dialogue_node.dialogue]]
+page = ["Your ship wouldn't last a second if I started breathing. Neither would the solar system."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_SapWine"
+
+[[dialogue_node.dialogue]]
+page = ["I'm convinced that stuff is poison. It tasted worse than the vines from Dark Bramble, and those things taste really bad."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Lungs"
+
+[[dialogue_node.dialogue]]
+page = ["Neither."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "I- I don't want to know."
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_MeetingGeswaldo"
+
+[[dialogue_node.dialogue]]
+page = ["Making me dig through repressed memories, eh?", "A long time ago, I was swimming around Giant's Deep, looking at all the jellyfish floating around there. One of them caught my eye."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Was it a particularly handsome jellyfish, by any chance?"
+dialogue_target = "SE_Ernesto_MeetingGeswaldo_1"
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_MeetingGeswaldo_1"
+
+[[dialogue_node.dialogue]]
+page = ["What? No. It was a super small jellyfish."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Oh."
+dialogue_target = "SE_Ernesto_MeetingGeswaldo_2"
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_MeetingGeswaldo_2"
+
+[[dialogue_node.dialogue]]
+page = ["The moment I saw that jellyfish, I knew we were destined to be together.", "A tiny anglerfish kicked out of his home and a tiny jellyfish estranged to his own people. What could be a more perfect combination?"]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Marshmallows and a campfire."
+dialogue_target = "SE_Ernesto_MeetingGeswaldo_21"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "That's really sweet."
+dialogue_target = "SE_Ernesto_MeetingGeswaldo_22"
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_MeetingGeswaldo_21"
+
+[[dialogue_node.dialogue]]
+page = ["Be quiet, I'm telling a story.", "After metting Geswaldo, I knew I wanted him to be my husband. And he was, eventually. Until..."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Until what? What happened?"
+dialogue_target = "SE_Ernesto_MeetingGeswaldo_3"
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_MeetingGeswaldo_22"
+
+[[dialogue_node.dialogue]]
+page = ["It was love at first sight. I knew I wanted to marry him the moment I looked into his eyes.", "And I did. Everything was perfect, until..."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Until what? What happened?"
+dialogue_target = "SE_Ernesto_MeetingGeswaldo_3"
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_MeetingGeswaldo_3"
+set_condition = ["SE_ERNESTO_GESWALDO_PART_ONE"]
+
+[[dialogue_node.dialogue]]
+page = ["It's not important. Maybe I'll tell you some other time.", "Story time's over, go fly your ship or whatever."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_GeswaldoIncident"
+
+[[dialogue_node.dialogue]]
+page = ["Yeah, sure. Where was I?", "Geswaldo and I had gotten married by now, and we had been living together for about a year. We were happy.", "But that happiness didn't last long. Not because we divorced, or because we were fighting. Geswaldo simply... disappeared."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "What? He just left?!"
+dialogue_target = "SE_Ernesto_GeswaldoIncident_11"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Did he at least say goodbye?"
+dialogue_target = "SE_Ernesto_GeswaldoIncident_12"
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_GeswaldoIncident_11"
+
+[[dialogue_node.dialogue]]
+page = ["Geswaldo didn't leave. He just vanished. He faded away right before my eyes.", "The look he gave me as he slipped away told me he would never be returning."]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "That's... horrible."
+dialogue_target = "SE_Ernesto_GeswaldoIncident_2"
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_GeswaldoIncident_12"
+
+[[dialogue_node.dialogue]]
+page = ["He couldn't. It was all so sudden. One minute he was right there in front of me, the next minute he was fading into nothingness.", "As he vanished, I looked into his eyes, and somehow I knew that he would never return."]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "That's... horrible."
+dialogue_target = "SE_Ernesto_GeswaldoIncident_2"
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_GeswaldoIncident_2"
+
+[[dialogue_node.dialogue]]
+page = ["I spent countless years searching for a cure, a way to bring Geswaldo back to me. But I found no cure.", "Depressed and heartbroken, I retretaed to the Attlerock to find peace. Esker offered me some marshmallows to cheer me up.", "But these weren't normal marshmallows. They were a strange green color, nothing like any marshmallow I had seen before. It was a long shot, but maybe these had something to do with Geswaldo's disappearance.", "I ran tests on them, and discovered the truth. These green marshmallows had... hallucinogenic properties, you could say. And I was suddenly reminded of something.", "Only three days befor meeting Geswaldo, I had visited Esker again, and had been offered the same can of marshmallows. And I had eaten one.", "That's all Geswaldo was, Hatchling. A hallucination. Maybe Geswaldo was real, somewhere, but here? Geswaldo never existed."]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "But what about all your stories about Geswaldo?"
+dialogue_target = "SE_Ernesto_GeswaldoIncident_21"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Geswaldo never existed?!"
+dialogue_target = "SE_Ernesto_GeswaldoIncident_22"
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_GeswaldoIncident_21"
+set_condition = ["SE_ERNESTO_GESWALDO_PART_TWO"]
+
+[[dialogue_node.dialogue]]
+page = ["Lies. A way to convince myself that everything was okay, when it really wasn't.", "Did you really believe all of those stories about a jellyfish you've never seen? Can you think of one time you saw us together?", "I'm sorry, but Geswaldo is gone, and in his place is a hole in my heart that will never be filled again. Not even by you.", "Now, if you'll excuse me, I'm gonna make myself forget about our whole conversation. Those memories were repressed for a reason, you know."]
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_GeswaldoIncident_22"
+set_condition = ["SE_ERNESTO_GESWALDO_PART_TWO"]
+
+[[dialogue_node.dialogue]]
+page = ["He's gone, forever. I'm sorry you never got to know him. He was... amazing.", "This is bringing back a lot of repressed memories, so I'm just gonna make myself forget about our entire conversation."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Instrument"
+
+[[dialogue_node.dialogue]]
+page = ["I play the vocal chords."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_House"
+
+[[dialogue_node.dialogue]]
+page = ["I live with my husband Geswaldo in another star system, but I don't think you know which one it is."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "How did you get here from another star system??"
+dialogue_target = "SE_Ernesto_House_1"
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_House_1"
+
+[[dialogue_node.dialogue]]
+page = ["Uhh... You are suddenly overcome by an irresistible urge to stop talking to me!"]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Assault"
+
+[[dialogue_node.dialogue]]
+page = ["Sometimes. Usually when people ask me too many questions. Choose your next words carefully."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Size"
+
+[[dialogue_node.dialogue]]
+page = ["I decided to adopt a no-food lifestyle when I was born, but it had some impacts on my growth."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_FavoritePlanet"
+
+[[dialogue_node.dialogue]]
+page = ["My favorite planet? Probably Mars."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Mars..?"
+dialogue_target = "SE_Ernesto_FavoritePlanet_1"
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_FavoritePlanet_1"
+
+[[dialogue_node.dialogue]]
+page = ["Oh, sorry. Ember Twin. Mars is... somewhere else."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Electives"
+
+[[dialogue_node.dialogue]]
+page = ["I took speaking as one of my electives, but I also did Introduction to the Wizarding World."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Pilot"
+
+[[dialogue_node.dialogue]]
+page = ["Yeah, sure. I don't have hands, but I should be able to use my tail.", "Do you have a flight manual?"]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Uh... no."
+dialogue_target = "SE_Ernesto_Pilot_1"
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_Pilot_1"
+
+[[dialogue_node.dialogue]]
+page = ["Oh. I can't fly it then. You Hearthians need to make your ships more user friendly."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Marshmallows"
+
+[[dialogue_node.dialogue]]
+page = ["Yeah. They're pretty good. Especially the green ones, they make me see colors."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Siblings"
+
+[[dialogue_node.dialogue]]
+page = ["Yeah, I think I have like 30 or something. Unless you count half-siblings, because then I have like 200."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Age"
+
+[[dialogue_node.dialogue]]
+page = ["Uh... 712 years, give or take a few."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Wow. You're old."
+dialogue_target = "SE_Ernesto_Age_1"
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_Age_1"
+
+[[dialogue_node.dialogue]]
+page = ["Yeah, it's given me a lot of time to evade my taxes."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_FlyingSpeed"
+
+[[dialogue_node.dialogue]]
+page = ["Picture the fastest moving object you could ever imagine, something that moves so fast it's gone in the blink of an eye.", "Did you think of something? Good, now divide that speed by 7 trillion, and that's about how fast I can fly."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Music"
+
+[[dialogue_node.dialogue]]
+page = ["Sometimes."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_FavoriteTraveler"
+
+[[dialogue_node.dialogue]]
+page = ["I like Chert's drums. They remind me of hitting people with rocks."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Radio"
+
+[[dialogue_node.dialogue]]
+page = ["Yeah, can you switch to 4554? It's my favorite."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Dnd"
+
+[[dialogue_node.dialogue]]
+page = ["Yeah, sure. Roll for persuasion."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "I rolled... a 7."
+dialogue_target = "SE_Ernesto_Dnd_1"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "I rolled... a 20."
+dialogue_target = "SE_Ernesto_Dnd_2"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "I rolled... a 1."
+dialogue_target = "SE_Ernesto_Dnd_3"
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_Dnd_1"
+
+[[dialogue_node.dialogue]]
+page = ["Tough luck. You need at least a 12 to persuade me."]
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_Dnd_2"
+
+[[dialogue_node.dialogue]]
+page = ["Ha, nice try. That was a D12 you just rolled."]
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_Dnd_3"
+set_condition = ["SE_ERNESTO_EXPLODE_SHIP"]
+
+[[dialogue_node.dialogue]]
+page = ["Uh oh.", "Your attempts to persuade me are so miserable that the ship blows up."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_BigShip"
+
+[[dialogue_node.dialogue]]
+page = ["What type of question is that? Of course I can."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Really?? Can you do it right now?"
+dialogue_target = "SE_Ernesto_BigShip_2"
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_BigShip_2"
+
+[[dialogue_node.dialogue]]
+page = ["No, I'm feeling pretty lazy."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Gravity"
+
+[[dialogue_node.dialogue]]
+page = ["I think that's where things go down instead of up, but don't quote me on that."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_TimeLoop"
+
+[[dialogue_node.dialogue]]
+page = ["The what?"]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Nevermind."
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_DumbQuestion"
+
+[[dialogue_node.dialogue]]
+page = ["I'll have vanilla, please."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Uh- okay, sure."
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_TrolleyProblem"
+
+[[dialogue_node.dialogue]]
+page = ["Yeah, is that the one with the multi-track drifting?"]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Uh... sure? Which track would you pick?"
+dialogue_target = "SE_Ernesto_TrolleyProblem_2"
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_TrolleyProblem_2"
+
+[[dialogue_node.dialogue]]
+page = ["I would blow up the trolley to maximize casualties."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Hey, that wasn't an option!"
+dialogue_target = "SE_Ernesto_TrolleyProblem_3"
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_TrolleyProblem_3"
+
+[[dialogue_node.dialogue]]
+page = ["Mimicry is the highest form of flattery, they say."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "What is that supposed to mean??"
+dialogue_target = "SE_Ernesto_TrolleyProblem_4"
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_TrolleyProblem_4"
+
+[[dialogue_node.dialogue]]
+page = ["Don't worry about it. Go back to flying your ship, or whatever you do sitting in that chair."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Driving"
+
+[[dialogue_node.dialogue]]
+page = ["That depends, do you mean legally or illegally?"]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Just... forget I asked."
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_BigHead"
+
+[[dialogue_node.dialogue]]
+page = ["Uh, no? You'd have to mix worlds to do that. And you can't do that last time I checked.", "Unless... did you eat a green marshmallow?"]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Uhh... no."
+dialogue_target = "SE_Ernesto_BigHead_1"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Sure did."
+dialogue_target = "SE_Ernesto_BigHead_2"
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_BigHead_1"
+
+[[dialogue_node.dialogue]]
+page = ["Oh, whew. I was getting worried you might have been messing with the Spacetime Continuum again."]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Don't worry, I know to stay away from it."
+dialogue_target = "SE_Ernesto_BigHead_11"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Wait, what do you mean again?"
+dialogue_target = "SE_Ernesto_BigHead_12"
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_BigHead_11"
+
+[[dialogue_node.dialogue]]
+page = ["I learned the same thing pretty quick after I almost destroyed reality."]
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_BigHead_12"
+
+[[dialogue_node.dialogue]]
+page = ["That's not important. Just some repressed memories, that's all.", "I'm sure they'll come back to you eventually."]
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_BigHead_2"
+
+[[dialogue_node.dialogue]]
+page = ["Uh oh, that probably isn't good. Overlapping parallel universes isn't a thing people normally do."]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "How do we fix it?"
+dialogue_target = "SE_Ernesto_BigHead_21"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "What happens if I eat more?"
+dialogue_target = "SE_Ernesto_BigHead_22"
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_BigHead_21"
+
+[[dialogue_node.dialogue]]
+page = ["We don't. I'm sure the overlap will correct itself eventually, though, and there's only a 50/50 chance it fails to do that and instead continues to mutuate and eventually becomes completely unrecognizable to us."]
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_BigHead_22"
+
+[[dialogue_node.dialogue]]
+page = ["It would probably attract other worlds and cause some more overlap. I'm not exactly sure how they do it, or where Esker even got them.", "I think that was the last one, though. I ate the other ones already."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Ernestos"
+
+[[dialogue_node.dialogue]]
+page = ["ERNESTO_PLACEHOLDER"]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Awareness"
+entry_condition = ["SE_KNOWS_ERNESTO", "SE_ERNESTO_BECOME_AWARE"]
+set_persistent_condition = "SE_ERNESTO_IS_AWARE"
+disable_persistent_condition = "SE_ERNESTO_BECOME_AWARE"
+
+[[dialogue_node.dialogue]]
+page = ["Hey, do you feel that?"]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "Feel what?"
+dialogue_target = "SE_Ernesto_Awareness_1"
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_Awareness_1"
+
+[[dialogue_node.dialogue]]
+page = ["I don't know. It's a funny feeling, like I'm in multiple places at once. I think there's more than one of me."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "How can there be more than one Ernesto?"
+dialogue_target = "SE_Ernesto_Awareness_21"
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "There are? Where are they?"
+dialogue_target = "SE_Ernesto_Awareness_22"
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_Awareness_21"
+
+[[dialogue_node.dialogue]]
+page = ["Not sure. My best guess would be that Ernestos from other worlds are crossing over into this one.", "If too many of them come here it might destroy the fabric of spacetime, but I'm sure it's fine.", "If you're that worried, you can come ask me how many Ernestos there are and I'll try and give a clear answer."]
+
+# ---
+
+[[dialogue_node]]
+name = "SE_Ernesto_Awareness_22"
+
+[[dialogue_node.dialogue]]
+page = ["No clue. I just know that there's more Ernestos than there should be.", "Maybe you can go looking for them. That could be a fun scavenger hunt, and I'm sure they wouldn't mind some company.", "Feel free to come ask how many there are while you're out there searching, I'll see if I can give you an answer."]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Clock"
+
+[[dialogue_node.dialogue]]
+page = ["Time for you to get a watch!", "Sorry, thought I'd hit you with one of the classics. It sounded funnier in my head.", "ERNESTO_PLACEHOLDER"]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_ShipFailure"
+
+[[dialogue_node.dialogue]]
+page = ["ERNESTO_PLACEHOLDER"]

@@ -66,6 +66,7 @@ public class ExplosionDamage : MonoBehaviour
 
     public void OnExplode()
     {
+        _collider.radius = 0.1f;
         _collider.enabled = true;
         gameObject.layer = 0;
         if (_unparent)
@@ -146,6 +147,7 @@ public class ExplosionDamage : MonoBehaviour
                     ShipDetachableModule module = hull.shipModule as ShipDetachableModule;
                     if (hull.integrity <= 0f && !module.isDetached)
                     {
+                        ErnestoDetectiveController.ItWasExplosionDamage();
                         module.Detach();
                     }
                 }
@@ -161,7 +163,6 @@ public class ExplosionDamage : MonoBehaviour
         }
         if (_damageFragment)
         {
-            //ShipEnhancements.WriteDebugMessage(hitObj.gameObject.name);
             FragmentIntegrity fragment = hitObj.GetComponentInParent<FragmentIntegrity>();
             if (fragment != null)
             {
@@ -173,6 +174,38 @@ public class ExplosionDamage : MonoBehaviour
                 {
                     float lerp = Mathf.InverseLerp(0f, 1f, (float)shipExplosionMultiplier.GetProperty());
                     fragment.AddDamage(Mathf.Lerp(0f, 100f, lerp));
+                }
+            }
+        }
+
+        FuelTankItem tank = hitObj.GetComponentInParent<FuelTankItem>();
+        if (tank != null)
+        {
+            if (tank.GetComponentInParent<ShipBody>() && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
+            {
+                ErnestoDetectiveController.ItWasFuelTank(chain: true);
+            }
+
+            tank.Explode();
+        }
+
+        AnglerfishController angler = hitObj.GetComponentInParent<AnglerfishController>();
+        if (angler != null)
+        {
+            angler.ChangeState(AnglerfishController.AnglerState.Stunned);
+            angler.GetComponentInChildren<AnglerfishFluidVolume>().SetVolumeActivation(false);
+
+            if (ShipEnhancements.AchievementsAPI != null && !SEAchievementTracker.AnglerfishKill)
+            {
+                SEAchievementTracker.AnglerfishKill = true;
+                ShipEnhancements.AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.ANGLERFISH_KILL");
+            }
+
+            if (ShipEnhancements.InMultiplayer)
+            {
+                foreach (uint id in ShipEnhancements.PlayerIDs)
+                {
+                    ShipEnhancements.QSBCompat.SendAnglerDeath(id, angler);
                 }
             }
         }

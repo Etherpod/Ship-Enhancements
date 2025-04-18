@@ -13,8 +13,9 @@ public class ShipWarpCoreReceiver : MonoBehaviour
     private OWRigidbody _suspendedBody;
     private FluidDetector _shipFluidDetector;
     private Transform _gravityCannonSocket;
+    private Transform _customDestination;
 
-    private void Awake()
+    private void Start()
     {
         _shipFluidDetector = SELocator.GetShipDetector().GetComponent<FluidDetector>();
     }
@@ -30,80 +31,100 @@ public class ShipWarpCoreReceiver : MonoBehaviour
         else
         {
             _warpEffect.transform.parent = _warpDestination;
+            _warpEffect.transform.localPosition = new Vector3(0, 6, 0);
+        }
+    }
+
+    public void SetCustomDestination(Transform transform)
+    {
+        _customDestination = transform;
+        if (_customDestination != null)
+        {
+            _warpEffect.transform.parent = _customDestination;
             _warpEffect.transform.localPosition = Vector3.zero;
         }
+        else
+        {
+            if (_gravityCannonSocket != null)
+            {
+                _warpEffect.transform.parent = _gravityCannonSocket;
+                _warpEffect.transform.localPosition = new Vector3(0, 6, 0);
+            }
+            else
+            {
+                _warpEffect.transform.parent = _warpDestination;
+                _warpEffect.transform.localPosition = Vector3.zero;
+            }
+        }
+    }
+
+    public void OnCustomSpawnPoint()
+    {
+        _warpDestination.transform.localPosition = Vector3.zero;
+        _warpDestination.transform.localRotation = Quaternion.identity;
     }
 
     public void WarpBodyToReceiver(OWRigidbody body, bool inShip)
     {
-        if (_gravityCannonSocket != null)
+        if (_customDestination != null)
         {
-            body.WarpToPositionRotation(_gravityCannonSocket.position + _gravityCannonSocket.up * 5f, _gravityCannonSocket.rotation);
-            OWRigidbody newBody = _gravityCannonSocket.GetAttachedOWRigidbody();
-            if (newBody != null)
-            {
-                body.SetVelocity(newBody.GetPointVelocity(_gravityCannonSocket.position));
-                body.SetAngularVelocity(newBody.GetAngularVelocity());
-
-                if (!inShip && _suspendedBody == null)
-                {
-                    body.Suspend(newBody);
-                    _suspendedBody = body;
-                    if (body is ShipBody)
-                    {
-                        if (_shipFluidDetector.GetShape())
-                        {
-                            _shipFluidDetector.GetShape().SetActivation(false);
-                        }
-                        if (_shipFluidDetector.GetCollider())
-                        {
-                            _shipFluidDetector.GetCollider().enabled = false;
-                        }
-                        EffectVolume[] volsToRemove = [.. _shipFluidDetector._activeVolumes];
-                        foreach (EffectVolume vol in volsToRemove)
-                        {
-                            vol._triggerVolume.RemoveObjectFromVolume(_shipFluidDetector.gameObject);
-                        }
-                    }
-                }
-            }
+            RepositionBody(body, _customDestination, 0, inShip);
+        }
+        else if (_gravityCannonSocket != null)
+        {
+            RepositionBody(body, _gravityCannonSocket, 6, inShip);
         }
         else
         {
-            body.WarpToPositionRotation(_warpDestination.position, _warpDestination.rotation);
-            OWRigidbody newBody = gameObject.GetAttachedOWRigidbody();
-            if (newBody != null)
-            {
-                body.SetVelocity(newBody.GetPointVelocity(_warpDestination.position));
-                body.SetAngularVelocity(newBody.GetAngularVelocity());
-
-                if (!inShip && _suspendedBody == null)
-                {
-                    body.Suspend(newBody);
-                    _suspendedBody = body;
-                    if (body is ShipBody)
-                    {
-                        if (_shipFluidDetector.GetShape())
-                        {
-                            _shipFluidDetector.GetShape().SetActivation(false);
-                        }
-                        if (_shipFluidDetector.GetCollider())
-                        {
-                            _shipFluidDetector.GetCollider().enabled = false;
-                        }
-                        EffectVolume[] volsToRemove = [.. _shipFluidDetector._activeVolumes];
-                        foreach (EffectVolume vol in volsToRemove)
-                        {
-                            vol._triggerVolume.RemoveObjectFromVolume(_shipFluidDetector.gameObject);
-                        }
-                    }
-                }
-            }
+            RepositionBody(body, _warpDestination, 0, inShip);
         }
 
         if (inShip)
         {
             _warpEffect.singularityController.Collapse();
+        }
+        else if ((bool)funnySounds.GetProperty())
+        {
+            _warpEffect._singularity._owOneShotSource.PlayOneShot(ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/tube_out.ogg"), 0.5f);
+        }
+    }
+
+    private void RepositionBody(OWRigidbody body, Transform destination, float offsetY, bool inShip)
+    {
+        body.WarpToPositionRotation(destination.position + (destination.up * offsetY), destination.rotation);
+
+        if (body is not ShipBody && inShip && PlayerState.IsAttached())
+        {
+            GlobalMessenger.FireEvent("PlayerRepositioned");
+        }
+
+        OWRigidbody newBody = destination.GetAttachedOWRigidbody();
+        if (newBody != null)
+        {
+            body.SetVelocity(newBody.GetPointVelocity(destination.position + (destination.up * offsetY)));
+            body.SetAngularVelocity(newBody.GetAngularVelocity());
+
+            if (!inShip && _suspendedBody == null)
+            {
+                body.Suspend(newBody);
+                _suspendedBody = body;
+                if (body is ShipBody)
+                {
+                    if (_shipFluidDetector.GetShape())
+                    {
+                        _shipFluidDetector.GetShape().SetActivation(false);
+                    }
+                    if (_shipFluidDetector.GetCollider())
+                    {
+                        _shipFluidDetector.GetCollider().enabled = false;
+                    }
+                    EffectVolume[] volsToRemove = [.. _shipFluidDetector._activeVolumes];
+                    foreach (EffectVolume vol in volsToRemove)
+                    {
+                        vol._triggerVolume.RemoveObjectFromVolume(_shipFluidDetector.gameObject);
+                    }
+                }
+            }
         }
     }
 
@@ -120,9 +141,10 @@ public class ShipWarpCoreReceiver : MonoBehaviour
         }
     }
 
-    public void OnCockpitDetached(Transform cockpitPivot)
+    public void OnCockpitDetached(OWRigidbody body, Transform cockpitPivot)
     {
         _warpEffect.transform.localPosition = cockpitPivot.localPosition;
+        _warpEffect._warpedObjectGeometry = body.gameObject;
     }
 
     private void OnWarpComplete()

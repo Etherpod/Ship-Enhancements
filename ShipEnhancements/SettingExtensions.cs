@@ -7,7 +7,7 @@ namespace ShipEnhancements;
 
 public static class SettingExtensions
 {
-    private static Dictionary<Settings, (object, object)> settingValues = new Dictionary<Settings, (object, object)>()
+    private static Dictionary<Settings, (object value, object property)> settingValues = new Dictionary<Settings, (object, object)>()
     {
         { Settings.disableGravityCrystal, (false, false) },
         { Settings.disableEjectButton, (false, false) },
@@ -20,12 +20,11 @@ public static class SettingExtensions
         { Settings.shipDamageMultiplier, (1f, 1f) },
         { Settings.shipDamageSpeedMultiplier, (1f, 1f) },
         { Settings.shipOxygenRefill, (false, false) },
-        { Settings.disableShipRepair, (false, false) },
         { Settings.enableGravityLandingGear, (false, false) },
         { Settings.disableAirAutoRoll, (false, false) },
         { Settings.disableWaterAutoRoll, (false, false) },
         { Settings.enableThrustModulator, (false, false) },
-        { Settings.temperatureZonesAmount, ("None", "None") },
+        { Settings.temperatureZonesAmount, ("", "") },
         { Settings.hullTemperatureDamage, (false, false) },
         { Settings.enableShipFuelTransfer, (false, false) },
         { Settings.enableJetpackRefuelDrain, (false, false) },
@@ -43,7 +42,7 @@ public static class SettingExtensions
         { Settings.atmosphereAngularDragMultiplier, (1f, 1f) },
         { Settings.spaceAngularDragMultiplier, (1f, 1f) },
         { Settings.disableRotationSpeedLimit, (false, false) },
-        { Settings.gravityDirection, ("Down", "Down") },
+        { Settings.gravityDirection, ("", "") },
         { Settings.disableScoutRecall, (false, false) },
         { Settings.disableScoutLaunching, (false, false) },
         { Settings.enableScoutLauncherComponent, (false, false) },
@@ -54,37 +53,37 @@ public static class SettingExtensions
         { Settings.showWarningNotifications, (false, false) },
         { Settings.shipExplosionMultiplier, (1f, 1f) },
         { Settings.shipBounciness, (1f, 1f) },
-        { Settings.enablePersistentInput, (false, false) },
+        { Settings.enableEnhancedAutopilot, (false, false) },
         { Settings.shipInputLatency, (1f, 1f) },
         { Settings.addEngineSwitch, (false, false) },
         { Settings.idleFuelConsumptionMultiplier, (1f, 1f) },
-        { Settings.shipLightColor, ("Default", "Default") },
+        { Settings.shipLightColor, ("", "") },
         { Settings.hotThrusters, (false, false) },
         { Settings.extraNoise, (false, false) },
-        { Settings.interiorHullColor, ("Default", "Default") },
-        { Settings.exteriorHullColor, ("Default", "Default") },
+        { Settings.interiorHullColor, ("", "") },
+        { Settings.exteriorHullColor, ("", "") },
         { Settings.addTether, (false, false) },
         { Settings.disableDamageIndicators, (false, false) },
         { Settings.addShipSignal, (false, false) },
         { Settings.reactorLifetimeMultiplier, (1f, 1f) },
-        { Settings.disableShipFriction, (false, false) },
+        { Settings.shipFriction, (1f, 1f) },
         { Settings.enableSignalscopeComponent, (false, false) },
         { Settings.rustLevel, (1f, 1f) },
         { Settings.dirtAccumulationTime, (1f, 1f) },
-        { Settings.thrusterColor, ("Default", "Default") },
+        { Settings.thrusterColor, ("", "") },
         { Settings.disableSeatbelt, (false, false) },
         { Settings.addPortableTractorBeam, (false, false) },
         { Settings.disableShipSuit, (false, false) },
-        { Settings.damageIndicatorColor, ("Default", "Default") },
+        { Settings.damageIndicatorColor, ("", "") },
         { Settings.disableAutoLights, (false, false) },
         { Settings.addExpeditionFlag, (false, false) },
         { Settings.addFuelCanister, (false, false) },
-        { Settings.chaoticCyclones, (false, false) },
+        { Settings.cycloneChaos, (1f, 1f) },
         { Settings.moreExplosionDamage, (false, false) },
         { Settings.singleUseTractorBeam, (false, false) },
-        { Settings.disableRetroRockets, (false, false) },
+        { Settings.disableThrusters, (false, false) },
         { Settings.maxDirtAccumulation, (false, false) },
-        { Settings.addShipWarpCore, (false, false) },
+        { Settings.shipWarpCoreType, ("", "") },
         { Settings.repairTimeMultiplier, (1f, 1f) },
         { Settings.airDragMultiplier, (1f, 1f) },
         { Settings.addShipClock, (false, false) },
@@ -96,7 +95,34 @@ public static class SettingExtensions
         { Settings.randomComponentDamage, (1f, 1f) },
         { Settings.enableFragileShip, (false, false) },
         { Settings.faultyHeatRegulators, (false, false) },
+        { Settings.addErnesto, (false, false) },
+        { Settings.repairLimit, (1f, 1f) },
+        { Settings.extraEjectButtons, (false, false) },
+        { Settings.preventSystemFailure, (false, false) },
+        { Settings.addShipCurtain, (false, false) },
+        { Settings.addRepairWrench, (false, false) },
+        { Settings.funnySounds, (false, false) },
+        { Settings.alwaysAllowLockOn, (false, false) },
+        { Settings.disableShipMedkit, (false, false) },
+        { Settings.addRadio, (false, false) },
+        { Settings.disableFluidPrevention, (false, false) },
+        { Settings.disableHazardPrevention, (false, false) },
+        { Settings.prolongDigestion, (false, false) },
+        { Settings.unlimitedItems, (false, false) },
+        { Settings.noiseMultiplier, (1f, 1f) },
+        { Settings.waterDamage, (1f, 1f) },
+        { Settings.sandDamage, (1f, 1f) },
+        { Settings.disableMinimapMarkers, (1f, 1f) },
+        { Settings.scoutPhotoMode, (false, false) },
+        { Settings.fixShipThrustIndicator, (false, false) },
+        { Settings.enableAutoAlign, (false, false) },
+        { Settings.shipHornType, ("", "") },
+        { Settings.randomIterations, (1f, 1f) },
+        { Settings.randomDifficulty, (1f, 1f) },
+        { Settings.disableHatch, (false, false) },
     };
+
+    private static Dictionary<Settings, object> savedCustomSettings = new(settingValues.Count);
 
     public static string GetName(this Settings setting)
     {
@@ -105,12 +131,7 @@ public static class SettingExtensions
 
     public static object GetValue(this Settings setting)
     {
-        if (Instance.ModHelper.Config.GetSettingsValue<string>("preset") == "Random")
-        {
-            return GetProperty(setting);
-        }
-
-        JValue value = (JValue)settingValues[setting].Item1;
+        JValue value = (JValue)settingValues[setting].value;
         if (value.Type == JTokenType.Boolean)
         {
             return Convert.ToBoolean(value);
@@ -132,14 +153,14 @@ public static class SettingExtensions
 
     public static void SetValue(this Settings setting, object value)
     {
-        settingValues[setting] = (value, settingValues[setting].Item2);
+        settingValues[setting] = (value, settingValues[setting].property);
     }
 
     public static object GetProperty(this Settings setting)
     {
-        if (settingValues[setting].Item2 is JValue)
+        if (settingValues[setting].property is JValue)
         {
-            JValue value = (JValue)settingValues[setting].Item2;
+            JValue value = (JValue)settingValues[setting].property;
             if (value.Type == JTokenType.Boolean)
             {
                 return Convert.ToBoolean(value);
@@ -159,16 +180,40 @@ public static class SettingExtensions
             return value;
         }
 
-        return settingValues[setting].Item2;
+        return settingValues[setting].property;
     }
 
     public static void SetProperty(this Settings setting, object value)
     {
-        settingValues[setting] = (settingValues[setting].Item1, value);
+        settingValues[setting] = (settingValues[setting].value, value);
     }
 
     public static Type GetType(this Settings setting)
     {
         return settingValues[setting].GetType();
+    }
+
+    public static void SaveCustomSettings()
+    {
+        foreach (var (setting, value) in settingValues)
+        {
+            savedCustomSettings[setting] = value.value;
+        }
+    }
+
+    public static void LoadCustomSettings()
+    {
+        foreach (var (setting, value) in savedCustomSettings)
+        {
+            settingValues[setting] = (value, settingValues[setting].property);
+        }
+    }
+
+    public static void ResetCustomSettings()
+    {
+        foreach (var (setting, value) in settingValues)
+        {
+            savedCustomSettings[setting] = Instance.ModHelper.DefaultConfig.GetSettingsValue<object>(setting.GetName());
+        }
     }
 }

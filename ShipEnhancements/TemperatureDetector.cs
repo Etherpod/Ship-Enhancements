@@ -13,6 +13,8 @@ public class TemperatureDetector : MonoBehaviour
     protected float _internalTempMeter;
     protected bool _updateNextFrame = false;
 
+    protected virtual bool UpdateTemperature => _activeZones.Count > 0 || _updateNextFrame;
+
     protected virtual void Start()
     {
         _currentTemperature = 0f;
@@ -22,15 +24,9 @@ public class TemperatureDetector : MonoBehaviour
 
     protected virtual void Update()
     {
-        if (_activeZones.Count > 0 || _updateNextFrame)
+        if (UpdateTemperature)
         {
-            float totalTemperature = 0f;
-            foreach (TemperatureZone zone in _activeZones)
-            {
-                float temp = zone.GetTemperature();
-                totalTemperature += temp;
-            }
-            _currentTemperature = Mathf.Clamp(totalTemperature, -100f, 100f);
+            _currentTemperature = CalculateCurrentTemperature();
 
             if (!_highTemperature)
             {
@@ -41,16 +37,8 @@ public class TemperatureDetector : MonoBehaviour
             }
             else
             {
-                if (Mathf.Abs(_internalTempMeter) < _internalTempMeterLength)
-                {
-                    _internalTempMeter += Time.deltaTime * 3f * Mathf.InverseLerp(_highTempCutoff, 100f, Mathf.Abs(_currentTemperature)) * Mathf.Sign(GetTemperatureRatio());
-                }
-
-                // Check if internal temp is on the same side as temp
-                if ((GetInternalTemperatureRatio() - 0.5f < 0) == (GetTemperatureRatio() < 0))
-                {
-                    UpdateHighTemperature();
-                }
+                UpdateInternalTemperature();
+                UpdateHighTemperature();
             }
             
             if (_updateNextFrame)
@@ -65,30 +53,49 @@ public class TemperatureDetector : MonoBehaviour
         }
         if (!_highTemperature)
         {
-            if (RoundInternalTemperature() && Mathf.Abs(_internalTempMeter) / _internalTempMeterLength < 0.01f)
-            {
-                _internalTempMeter = 0f;
-            }
-            else
-            {
-                float step = Time.deltaTime * Mathf.InverseLerp(_highTempCutoff, 0f, Mathf.Abs(_currentTemperature));
-                if (_internalTempMeter > 0f)
-                {
-                    _internalTempMeter -= step;
-                }
-                else if (_internalTempMeter < 0f)
-                {
-                    _internalTempMeter += step;
-                }
-            }
+            UpdateCooldown();
         }
     }
 
     protected virtual void UpdateHighTemperature() { }
 
-    protected virtual bool RoundInternalTemperature()
+    protected virtual float CalculateCurrentTemperature()
     {
-        return true;
+        float totalTemperature = 0f;
+        foreach (TemperatureZone zone in _activeZones)
+        {
+            float temp = zone.GetTemperature(this);
+            totalTemperature += temp;
+        }
+        return Mathf.Clamp(totalTemperature, -100f, 100f);
+    }
+
+    protected virtual void UpdateInternalTemperature()
+    {
+        if (Mathf.Abs(_internalTempMeter) < _internalTempMeterLength)
+        {
+            _internalTempMeter += Time.deltaTime * 3f * Mathf.InverseLerp(_highTempCutoff, 100f, Mathf.Abs(_currentTemperature)) * Mathf.Sign(GetTemperatureRatio());
+        }
+    }
+
+    protected virtual void UpdateCooldown()
+    {
+        if (Mathf.Abs(_internalTempMeter) / _internalTempMeterLength < 0.01f)
+        {
+            _internalTempMeter = 0f;
+        }
+        else
+        {
+            float step = Time.deltaTime * Mathf.InverseLerp(_highTempCutoff, 0f, Mathf.Abs(_currentTemperature));
+            if (_internalTempMeter > 0f)
+            {
+                _internalTempMeter -= step;
+            }
+            else if (_internalTempMeter < 0f)
+            {
+                _internalTempMeter += step;
+            }
+        }
     }
 
     public float GetTemperatureRatio()

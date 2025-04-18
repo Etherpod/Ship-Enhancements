@@ -21,6 +21,8 @@ public abstract class ProbePickupVolume : MonoBehaviour
         _interactReceiver.OnPressInteract += OnPressInteract;
         _probe.OnLaunchProbe += OnLaunchProbe;
         _probe.OnRetrieveProbe += OnRetrieveProbe;
+        GlobalMessenger.AddListener("SuitUp", OnSuitUp);
+        GlobalMessenger.AddListener("RemoveSuit", OnRemoveSuit);
     }
 
     protected virtual void Start()
@@ -40,10 +42,16 @@ public abstract class ProbePickupVolume : MonoBehaviour
 
     protected virtual void OnRetrieveProbe() { }
 
+    protected virtual void OnSuitUp() { }
+
+    protected virtual void OnRemoveSuit() { }
+
     protected virtual void OnDestroy()
     {
         _interactReceiver.OnPressInteract -= OnPressInteract;
         _probe.OnLaunchProbe -= OnLaunchProbe;
         _probe.OnRetrieveProbe -= OnRetrieveProbe;
+        GlobalMessenger.RemoveListener("SuitUp", OnSuitUp);
+        GlobalMessenger.RemoveListener("RemoveSuit", OnRemoveSuit);
     }
 }

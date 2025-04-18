@@ -26,7 +26,6 @@ public class ShipEngineSwitch : CockpitInteractible
     [SerializeField]
     private AudioClip _releaseAudio;
 
-    private CockpitButtonPanel _buttonPanel;
     private ShipThrusterController _thrusterController;
     private ShipAudioController _audioController;
     private MasterAlarm _alarm;
@@ -46,25 +45,16 @@ public class ShipEngineSwitch : CockpitInteractible
     private bool _lastShipThrusterState = false;
     private bool _reset = true;
     private float _baseIndicatorLightIntensity;
+    private bool _shipDestroyed = false;
 
     private bool _controlledRemote = false;
+
+    private readonly string _onPrompt = UITextLibrary.GetString(UITextType.HoldPrompt) + " Start Engine";
+    private readonly string _offPrompt = "Turn Off Engine";
 
     public override void Awake()
     {
         base.Awake();
-
-        _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
-
-        if ((bool)addEngineSwitch.GetProperty())
-        {
-            _buttonPanel.SetEngineSwitchActive(true);
-        }
-        else
-        {
-            _buttonPanel.SetEngineSwitchActive(false);
-            enabled = false;
-            return;
-        }
 
         _thrusterController = SELocator.GetShipBody().GetComponent<ShipThrusterController>();
         _audioController = SELocator.GetShipBody().GetComponentInChildren<ShipAudioController>();
@@ -91,8 +81,7 @@ public class ShipEngineSwitch : CockpitInteractible
     {
         if (!(bool)addEngineSwitch.GetProperty()) return;
 
-        _interactReceiver.SetPromptText(UITextType.HoldPrompt);
-        _interactReceiver.ChangePrompt("Start engine");
+        _interactReceiver.ChangePrompt(_onPrompt);
         _baseIndicatorLightIntensity = _powerIndicatorLight.intensity;
         _thrustersIndicatorLight.intensity = 0f;
         _powerIndicatorLight.intensity = 0f;
@@ -181,7 +170,7 @@ public class ShipEngineSwitch : CockpitInteractible
                     _audioController.PlayShipAmbient();
                     StartCoroutine(ActivateIndicatorLights(electricalComponent._electricalSystem._systemDelay));
                     //_thrusterController._isIgniting = false;
-                    _interactReceiver.ChangePrompt("Turn off engine");
+                    _interactReceiver.ChangePrompt(_offPrompt);
                     _interactReceiver.EnableInteraction();
                     GlobalMessenger.FireEvent("CompleteShipIgnition");
                 }
@@ -235,13 +224,14 @@ public class ShipEngineSwitch : CockpitInteractible
 
     protected override void OnPressInteract()
     {
+        bool turnOff = _completedTurn;
         OnStartPress();
 
         if (ShipEnhancements.InMultiplayer)
         {
             foreach (uint id in ShipEnhancements.PlayerIDs)
             {
-                ShipEnhancements.QSBCompat.SendEngineSwitchState(id, true);
+                ShipEnhancements.QSBCompat.SendEngineSwitchState(id, true, turnOff);
             }
         }
     }
@@ -278,7 +268,7 @@ public class ShipEngineSwitch : CockpitInteractible
         {
             foreach (uint id in ShipEnhancements.PlayerIDs)
             {
-                ShipEnhancements.QSBCompat.SendEngineSwitchState(id, false);
+                ShipEnhancements.QSBCompat.SendEngineSwitchState(id, false, false);
             }
         }
     }
@@ -296,10 +286,6 @@ public class ShipEngineSwitch : CockpitInteractible
             electricalComponent._electricalSystem.SetPowered(false);
             electricalComponent._audioSource.PlayOneShot(AudioType.ShipDamageElectricalFailure, 0.5f);
         }
-        if ((bool)enablePersistentInput.GetProperty())
-        {
-            SELocator.GetShipBody().GetComponent<ShipPersistentInput>().OnDisableEngine();
-        }
         if (Locator.GetToolModeSwapper().IsInToolMode(ToolMode.Probe, ToolGroup.Ship)
             || Locator.GetToolModeSwapper().IsInToolMode(ToolMode.SignalScope, ToolGroup.Ship))
         {
@@ -316,7 +302,7 @@ public class ShipEngineSwitch : CockpitInteractible
             _alarm.TurnOffAlarm();
         }
         _audioController.StopShipAmbient();
-        _interactReceiver.ChangePrompt("Start engine");
+        _interactReceiver.ChangePrompt(_onPrompt);
         StopAllCoroutines();
         DeactivateIndicatorLights();
     }
@@ -344,11 +330,14 @@ public class ShipEngineSwitch : CockpitInteractible
         _interactReceiver.ResetInteraction();
     }
 
-    public void UpdateWasPressed(bool wasPressed)
+    public void UpdateWasPressed(bool wasPressed, bool turnOff)
     {
         if (wasPressed)
         {
-            OnStartPress();
+            if (_completedTurn || !turnOff)
+            {
+                OnStartPress();
+            }
             _controlledRemote = true;
             _interactReceiver.DisableInteraction();
         }
@@ -356,7 +345,10 @@ public class ShipEngineSwitch : CockpitInteractible
         {
             OnStopPress();
             _controlledRemote = false;
-            _interactReceiver.EnableInteraction();
+            if (!_shipDestroyed)
+            {
+                _interactReceiver.EnableInteraction();
+            }
         }
     }
     
@@ -376,7 +368,7 @@ public class ShipEngineSwitch : CockpitInteractible
             //_alarm.UpdateAlarmState();
             //_audioController.PlayShipAmbient();
             StartCoroutine(ActivateIndicatorLights(0f));
-            _interactReceiver.ChangePrompt("Turn off engine");
+            _interactReceiver.ChangePrompt(_offPrompt);
         }
     }
 
@@ -411,6 +403,8 @@ public class ShipEngineSwitch : CockpitInteractible
             }
         }
         _interactReceiver.DisableInteraction();
+        DeactivateIndicatorLights();
+        _shipDestroyed = true;
     }
 
     protected override void OnDestroy()

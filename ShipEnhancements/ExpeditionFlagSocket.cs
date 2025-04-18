@@ -1,25 +1,9 @@
 ﻿namespace ShipEnhancements;
 
-public class ExpeditionFlagSocket : OWItemSocket
+public class ExpeditionFlagSocket : SEItemSocket
 {
-    public override void Awake()
+    protected override ItemType GetAcceptableType()
     {
-        Reset();
-        _sector = SELocator.GetShipSector();
-        base.Awake();
-        _acceptableType = ExpeditionFlagItem.ItemType;
-
-        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
-    }
-
-    private void OnShipSystemFailure()
-    {
-        _sector = null;
-        _socketedItem?.SetSector(null);
-    }
-
-    private void OnDestroy()
-    {
-        GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
+        return ShipEnhancements.Instance.ExpeditionFlagType;
     }
 }

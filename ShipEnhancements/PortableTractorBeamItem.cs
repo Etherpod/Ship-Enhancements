@@ -23,6 +23,7 @@ public class PortableTractorBeamItem : OWItem
     private EffectVolume[] _volumes;
     private ScreenPrompt _turboPrompt;
     private FirstPersonManipulator _cameraManipulator;
+    private OWCamera _playerCam;
     private bool _socketed;
     private bool _lastFocused = false;
     private bool _turbo = false;
@@ -46,6 +47,7 @@ public class PortableTractorBeamItem : OWItem
 
     private void Start()
     {
+        _playerCam = Locator.GetPlayerCamera();
         TogglePackUp(true);
         _socketed = true;
         _beamVolumeParent.SetActive(false);
@@ -55,12 +57,14 @@ public class PortableTractorBeamItem : OWItem
     private void Update()
     {
         bool focused = _cameraManipulator.GetFocusedOWItem() == this;
-        _turboPrompt.SetVisibility(focused);
         if (_lastFocused != focused)
         {
             PatchClass.UpdateFocusedItems(focused);
             _lastFocused = focused;
         }
+
+        UpdatePromptVisibility();
+
         if (focused && OWInput.IsNewlyPressed(InputLibrary.interactSecondary))
         {
             ToggleTurbo(!_turbo);
@@ -69,9 +73,18 @@ public class PortableTractorBeamItem : OWItem
             {
                 foreach (uint id in ShipEnhancements.PlayerIDs)
                 {
-                    ShipEnhancements.QSBCompat.SendTractorBeamTurbo(id, _turbo);
+                    ShipEnhancements.QSBCompat.SendTractorBeamTurbo(id, this, _turbo);
                 }
             }
+        }
+    }
+
+    private void UpdatePromptVisibility()
+    {
+        bool flag = _lastFocused && _playerCam.enabled && OWInput.IsInputMode(InputMode.Character | InputMode.ShipCockpit);
+        if (flag != _turboPrompt.IsVisible())
+        {
+            _turboPrompt.SetVisibility(flag);
         }
     }
 
