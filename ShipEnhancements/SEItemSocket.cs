@@ -21,8 +21,9 @@ public class SEItemSocket : OWItemSocket
     public override void Awake()
     {
         Reset();
-        //_sector = SELocator.GetShipSector();
+        _sector = SELocator.GetShipSector();
         base.Awake();
+        _sector = null;
         _acceptableType = GetAcceptableType();
         _manipulator = FindObjectOfType<FirstPersonManipulator>();
         _createItemPrompt = new ScreenPrompt(InputLibrary.interactSecondary, "Create New " + _prefabItem.GetDisplayName());

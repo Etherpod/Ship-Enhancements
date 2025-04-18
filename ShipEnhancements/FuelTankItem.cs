@@ -19,6 +19,8 @@ public class FuelTankItem : OWItem
     [SerializeField]
     private OWAudioSource _oneShotSource;
     [SerializeField]
+    private OWAudioSource _explosionSource;
+    [SerializeField]
     private OWEmissiveRenderer _emissiveRenderer;
 
     private Collider _itemCollider;
@@ -78,7 +80,7 @@ public class FuelTankItem : OWItem
             _explosion._lightRadius *= ((float)shipExplosionMultiplier.GetProperty() * 0.75f) + 0.25f;
             _explosion._lightIntensity *= ((float)shipExplosionMultiplier.GetProperty() * 0.01f) + 0.99f;
             _explosion.GetComponent<SphereCollider>().radius = 0.1f;
-            OWAudioSource audio = SELocator.GetShipTransform().Find("Effects/ExplosionAudioSource").GetComponent<OWAudioSource>();
+            OWAudioSource audio = _explosionSource;
             audio.maxDistance *= ((float)shipExplosionMultiplier.GetProperty() * 0.1f) + 0.9f;
             AnimationCurve curve = audio.GetCustomCurve(AudioSourceCurveType.CustomRolloff);
             Keyframe[] newKeys = new Keyframe[curve.keys.Length];
@@ -261,6 +263,7 @@ public class FuelTankItem : OWItem
         _explosion?.Play();
         _explosion.transform.parent = transform.parent;
         _explosion.GetComponent<SphereCollider>().enabled = true;
+        _explosionSource.PlayOneShot(AudioType.ShipDamageShipExplosion);
         if (GetComponentInParent<ShipBody>() && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
         {
             SELocator.GetShipDamageController().Explode();
@@ -270,7 +273,7 @@ public class FuelTankItem : OWItem
             _explosion.GetComponentInChildren<ExplosionDamage>()?.OnExplode();
         }
 
-        if ((bool)extraNoise.GetProperty())
+        if ((bool)extraNoise.GetProperty() && GetComponentInParent<ShipBody>())
         {
             SELocator.GetShipTransform().GetComponentInChildren<ShipNoiseMaker>()._noiseRadius = 800f * (float)shipExplosionMultiplier.GetProperty();
         }
@@ -297,6 +300,7 @@ public class FuelTankItem : OWItem
         _explosion?.Play();
         _explosion.transform.parent = transform.parent;
         _explosion.GetComponent<SphereCollider>().enabled = true;
+        _explosionSource.PlayOneShot(AudioType.ShipDamageShipExplosion);
         if (GetComponentInParent<ShipBody>() && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
         {
             SELocator.GetShipDamageController().Explode();

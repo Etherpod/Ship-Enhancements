@@ -66,6 +66,7 @@ public class ExplosionDamage : MonoBehaviour
 
     public void OnExplode()
     {
+        _collider.radius = 0.1f;
         _collider.enabled = true;
         gameObject.layer = 0;
         if (_unparent)
