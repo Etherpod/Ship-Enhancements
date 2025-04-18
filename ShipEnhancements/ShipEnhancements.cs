@@ -237,7 +237,7 @@ public class ShipEnhancements : ModBehaviour
         "The first mod ever made for Outer Wilds was NomaiVR.",
         "No te preocupes, no cambiaste el idioma a español.",
         "There are more hydrogen atoms in a single molecule of water than there are stars in the entire Solar System.",
-        "Ernesto is watching.\nHe's more aware than you think.",
+        "Ernesto is watching.\n\nI'm more aware than you think.",
         "A group of penguins is called a \"waddle\".",
         "A group of ferrets is called a \"business\".",
         "The word \"orange\" was first used to describe a tree.",
@@ -245,15 +245,32 @@ public class ShipEnhancements : ModBehaviour
         "1 gram of uranium is about 20 billion calories.",
         "Minimalism is made up by Big Small to sell more less.",
         "If you were to consume one gram of sodium, you would explode.",
-        "Are you happy?",
-        "Do you think you're a good person?",
+        "Are you happy in life?",
+        "Do you think you're naturally a good person?",
         "Which came first, the chicken or the egg?",
         "Has your favorite color changed since 10 years ago?",
         "Is the past a real thing, or is it an illusion made up by your brain?",
         "Did you know moss can be male or female?",
         "What color is a mirror?",
-        "Did you know the eyes of a spider specialize in different functions?",
+        "Did you know the eyes of a spider have different functions?",
         "Did you find Outer Wilds, or did Outer Wilds find you?",
+        "What's your favorite Outer Wilds mod?",
+        "Did you know Ernesto has a dedicated wiki page?",
+        "Where did Geswaldo go?\n\nI miss him.",
+        "Did you know there's a Discord server for modding Outer Wilds?",
+        "Did you get all 12 achievements for Ship Enhancements?",
+        "Did you know dolphins give each other names?",
+        "If you hold jump and repeatedly press shift, you can perform the universal sign of peace.",
+        "You can get extra height with your jetpack by jumping right before using it.",
+        "If you want a fun challenge, try completing the DLC without turning on your flashlight.",
+        "Have you tried the mod General Enhancements?",
+        "Have you tried the mod Moar Marshmallows?",
+        "Have you tried the mod Camera Shake?",
+        "Did you know you can export your current mod list as a file in the Outer Wilds Mod Manager?",
+        "Did you know the Outer Wilds Mod Manager has color themes you can pick?",
+        "Have you ever heard of Half a Man Videos? They make YouTube videos about Outer Wilds.",
+        "Have you tried using negative numbers in the mod settings?",
+        "Did you find all of the secret codes for the radio?",
     };
 
     private void Awake()
@@ -476,7 +493,7 @@ public class ShipEnhancements : ModBehaviour
 
         System.Random rand = new System.Random();
         int index = rand.Next(0, startupMessages.Length);
-        ModHelper.Console.WriteLine(startupMessages[index], MessageType.Success);
+        ModHelper.Console.WriteLine(startupMessages[index], MessageType.Info);
     }
 
     private void Update()
