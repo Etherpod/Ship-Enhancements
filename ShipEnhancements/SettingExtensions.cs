@@ -197,7 +197,10 @@ public static class SettingExtensions
     {
         foreach (var (setting, value) in settingValues)
         {
-            savedCustomSettings[setting] = value.value;
+            if (SettingsPresets.VanillaPlusSettings.ContainsKey(setting.GetName()))
+            {
+                savedCustomSettings[setting] = value.value;
+            }
         }
     }
 
@@ -205,7 +208,10 @@ public static class SettingExtensions
     {
         foreach (var (setting, value) in savedCustomSettings)
         {
-            settingValues[setting] = (value, settingValues[setting].property);
+            if (SettingsPresets.VanillaPlusSettings.ContainsKey(setting.GetName()))
+            {
+                settingValues[setting] = (value, settingValues[setting].property);
+            }
         }
     }
 
