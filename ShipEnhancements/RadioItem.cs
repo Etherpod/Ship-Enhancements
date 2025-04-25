@@ -165,7 +165,7 @@ public class RadioItem : OWItem
         _playerExternalSource = Locator.GetPlayerAudioController()._oneShotExternalSource;
         _powerPrompt = new PriorityScreenPrompt(InputLibrary.cancel, _powerOnText, 0, ScreenPrompt.DisplayState.Normal, false);
         _tunePrompt = new ScreenPrompt(InputLibrary.interactSecondary, "Tune Radio", 0, ScreenPrompt.DisplayState.Normal, false);
-        _volumePrompt = new PriorityScreenPrompt(InputLibrary.toolOptionUp, InputLibrary.toolOptionDown, "Adjust Volume", ScreenPrompt.MultiCommandType.POS_NEG, 
+        _volumePrompt = new PriorityScreenPrompt(InputLibrary.toolOptionLeft, InputLibrary.toolOptionRight, "Adjust Volume", ScreenPrompt.MultiCommandType.POS_NEG, 
             0, ScreenPrompt.DisplayState.Normal, false);
         _leftRightPrompt = new ScreenPrompt(InputLibrary.left, InputLibrary.right, "Change Knob   <CMD>", ScreenPrompt.MultiCommandType.POS_NEG, 0, ScreenPrompt.DisplayState.Normal, false);
         _upDownPrompt = new ScreenPrompt(InputLibrary.up, InputLibrary.down, "Change Frequency   <CMD>", ScreenPrompt.MultiCommandType.POS_NEG, 0, ScreenPrompt.DisplayState.Normal, false);
@@ -466,7 +466,7 @@ public class RadioItem : OWItem
                 _codeLabels[_currentCodeIndex].color = _selectColor;
                 _playerInteracting = true;
             }
-            else if (OWInput.IsNewlyPressed(InputLibrary.toolOptionUp))
+            else if (OWInput.IsNewlyPressed(InputLibrary.toolOptionRight))
             {
                 _currentVolume = Mathf.Min(_currentVolume + 1f / _volumeSteps, 1f);
                 SetRadioVolume();
@@ -487,7 +487,7 @@ public class RadioItem : OWItem
                     }
                 }
             }
-            else if (OWInput.IsNewlyPressed(InputLibrary.toolOptionDown))
+            else if (OWInput.IsNewlyPressed(InputLibrary.toolOptionLeft))
             {
                 _currentVolume = Mathf.Max(_currentVolume - 1f / _volumeSteps, 0f);
                 SetRadioVolume();
