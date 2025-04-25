@@ -1702,13 +1702,13 @@ public class ShipEnhancements : ModBehaviour
             explosion._lightIntensity *= (multiplier * 0.01f) + 0.99f;
             explosion.GetComponent<SphereCollider>().radius = 0.1f;
             OWAudioSource audio = effectsTransform.Find("ExplosionAudioSource").GetComponent<OWAudioSource>();
-            audio.maxDistance *= (multiplier * 0.1f) + 0.9f;
+            audio.maxDistance *= (multiplier * 0.5f) + 0.5f;
             AnimationCurve curve = audio.GetCustomCurve(AudioSourceCurveType.CustomRolloff);
             Keyframe[] newKeys = new Keyframe[curve.keys.Length];
             for (int i = 0; i < curve.keys.Length; i++)
             {
                 newKeys[i] = curve.keys[i];
-                newKeys[i].value *= (multiplier * 0.1f) + 0.9f;
+                newKeys[i].value *= (multiplier * 0.5f) + 0.5f;
             }
             AnimationCurve newCurve = new();
             foreach (Keyframe key in newKeys)
@@ -1716,6 +1716,13 @@ public class ShipEnhancements : ModBehaviour
                 newCurve.AddKey(key);
             }
             audio.SetCustomCurve(AudioSourceCurveType.CustomRolloff, newCurve);
+
+            AudioLowPassFilter lowPass = audio.gameObject.AddComponent<AudioLowPassFilter>();
+            lowPass.cutoffFrequency = 25000f;
+            AudioReverbFilter reverb = audio.gameObject.AddComponent<AudioReverbFilter>();
+            reverb.reverbPreset = AudioReverbPreset.Quarry;
+            float lerp = Mathf.InverseLerp(1f, 50f, (float)Settings.shipExplosionMultiplier.GetProperty());
+            reverb.reverbLevel = Mathf.Lerp(-1000f, 400f, lerp);
         }
 
         if ((bool)Settings.moreExplosionDamage.GetProperty())

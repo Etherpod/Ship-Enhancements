@@ -2119,7 +2119,7 @@ public static class PatchClass
             return false;
         }
 
-        if ((float)shipExplosionMultiplier.GetProperty() > 50f && !__instance.GetComponentInParent<FuelTankItem>())
+        if ((float)shipExplosionMultiplier.GetProperty() > 100f && !__instance.GetComponentInParent<FuelTankItem>())
         {
             SupernovaEffectController supernovaEffects = SELocator.GetShipTransform().GetComponentInChildren<SupernovaEffectController>(true);
             if (supernovaEffects == null)
@@ -2150,6 +2150,32 @@ public static class PatchClass
         {
             BlackHoleExplosionController controller = __instance as BlackHoleExplosionController;
             controller.OpenBlackHole();
+            return false;
+        }
+
+        return true;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipAudioController), nameof(ShipAudioController.PlayShipExplodeClip))]
+    public static bool AddEffectsToShipExplosionAudio(ShipAudioController __instance, ref float __result)
+    {
+        if ((float)shipExplosionMultiplier.GetProperty() > 1f)
+        {
+            OWAudioSource audio = __instance._loudShipSource;
+            float dist = Vector3.Distance(audio.transform.position, Locator.GetPlayerTransform().position);
+            float lerp = Mathf.InverseLerp(100f, 5000f, dist);
+            audio.GetComponent<AudioLowPassFilter>().cutoffFrequency = Mathf.Lerp(25000f, 100f, lerp);
+            audio.GetComponent<AudioReverbFilter>().reverbLevel += Mathf.Lerp(0f, 400f, lerp);
+            float timeLerp = Mathf.InverseLerp(500f, 50000f, dist);
+            float delay = Mathf.Lerp(0f, 6f, timeLerp);
+            float delayTime = Time.time + delay;
+
+            __result = 5f;
+            ShipEnhancements.Instance.ModHelper.Events.Unity.RunWhen(() => Time.time > delayTime, () =>
+            {
+                __instance._loudShipSource.PlayOneShot(AudioType.ShipDamageShipExplosion, 1f);
+            });
             return false;
         }
 
