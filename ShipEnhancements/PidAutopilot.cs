@@ -329,7 +329,9 @@ public class PidAutopilot : ThrusterController
 
     private bool CanAutopilot(bool checkCorrectRefFrame)
     {
-        if (Locator.GetReferenceFrame(false) == null || (_referenceFrame != null 
+        if (Locator.GetReferenceFrame(false) == null 
+            || Locator.GetReferenceFrame() == SELocator.GetShipBody().GetReferenceFrame()
+            || (_referenceFrame != null 
             && Locator.GetReferenceFrame(false) != _referenceFrame)) return false;
 
         //var hasCorrectRefFrame = Locator.GetReferenceFrame(false) == _referenceFrame;
