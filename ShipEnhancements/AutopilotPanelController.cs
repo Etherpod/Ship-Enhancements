@@ -229,7 +229,7 @@ public class AutopilotPanelController : MonoBehaviour
 
             if (IsApproachSelected())
             {
-                SendAutopilotState(Locator.GetReferenceFrame()?.GetOWRigidBody(), destination: true);
+                SendAutopilotState(SELocator.GetReferenceFrame()?.GetOWRigidBody(), destination: true);
             }
             else if (IsOrbitSelected())
             {

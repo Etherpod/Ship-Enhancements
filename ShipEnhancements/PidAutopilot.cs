@@ -120,7 +120,7 @@ public class PidAutopilot : ThrusterController
             }
         }
 
-        _referenceFrame = Locator.GetReferenceFrame(false);
+        _referenceFrame = SELocator.GetReferenceFrame(ignorePassiveFrame: false);
         _ignoreThrustLimits = ignoreThrustLimits;
         _localHold = _mode == PidMode.HoldPosition && SELocator.GetShipDetector().GetComponent<RulesetDetector>()?.GetPlanetoidRuleset();
         _errorIntegral = Vector3.zero;
@@ -329,12 +329,12 @@ public class PidAutopilot : ThrusterController
 
     private bool CanAutopilot(bool checkCorrectRefFrame)
     {
-        if (Locator.GetReferenceFrame(false) == null || (_referenceFrame != null 
-            && Locator.GetReferenceFrame(false) != _referenceFrame)) return false;
+        if (SELocator.GetReferenceFrame(ignorePassiveFrame: false) == null || (_referenceFrame != null 
+            && SELocator.GetReferenceFrame(ignorePassiveFrame: false) != _referenceFrame)) return false;
 
         //var hasCorrectRefFrame = Locator.GetReferenceFrame(false) == _referenceFrame;
         var thrustersUsable = SELocator.GetShipResources().AreThrustersUsable();
-        var refFrameHasGravity = Locator.GetReferenceFrame(false).GetOWRigidBody().GetAttachedGravityVolume() != null;
+        var refFrameHasGravity = SELocator.GetReferenceFrame(ignorePassiveFrame: false).GetOWRigidBody().GetAttachedGravityVolume() != null;
         return (!checkCorrectRefFrame || refFrameHasGravity) && thrustersUsable;
     }
 

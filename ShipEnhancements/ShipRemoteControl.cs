@@ -150,7 +150,7 @@ public class ShipRemoteControl : MonoBehaviour
                             {
                                 if (!_autopilot.enabled)
                                 {
-                                    ReferenceFrame rf = Locator.GetReferenceFrame(true);
+                                    ReferenceFrame rf = SELocator.GetReferenceFrame();
                                     if (rf != null)
                                     {
                                         _autopilot.FlyToDestination(rf);
@@ -305,12 +305,12 @@ public class ShipRemoteControl : MonoBehaviour
         if ((bool)enableEnhancedAutopilot.GetProperty() 
             && SELocator.GetAutopilotPanelController().IsOrbitSelected())
         {
-            ReferenceFrame rf = Locator.GetReferenceFrame(false);
+            ReferenceFrame rf = SELocator.GetReferenceFrame(ignorePassiveFrame: false);
             return _pidAutopilot.enabled || rf != null;
         }
         else
         {
-            ReferenceFrame referenceFrame = Locator.GetReferenceFrame(true);
+            ReferenceFrame referenceFrame = SELocator.GetReferenceFrame();
             return _autopilot.enabled || (referenceFrame != null && referenceFrame.GetAllowAutopilot()
                 && (PlayerData.GetAutopilotEnabled() || (bool)enableEnhancedAutopilot.GetProperty())
                 && Vector3.Distance(SELocator.GetShipBody().GetPosition(), referenceFrame.GetPosition())

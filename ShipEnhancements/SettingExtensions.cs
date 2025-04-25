@@ -120,6 +120,7 @@ public static class SettingExtensions
         { Settings.randomIterations, (1f, 1f) },
         { Settings.randomDifficulty, (1f, 1f) },
         { Settings.disableHatch, (false, false) },
+        { Settings.splitLockOn, (false, false) },
     };
 
     private static Dictionary<Settings, object> savedCustomSettings = new(settingValues.Count);

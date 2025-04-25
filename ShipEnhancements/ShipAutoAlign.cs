@@ -18,15 +18,9 @@ public class ShipAutoAlign : AlignWithDirection
         enabled = false;
     }
 
-    public override void Start()
-    {
-        base.Start();
-        _rfTracker = gameObject.GetTaggedComponent<ReferenceFrameTracker>("Player");
-    }
-
     public override Vector3 GetAlignmentDirection()
     {
-        ReferenceFrame referenceFrame = _rfTracker.GetReferenceFrame(true);
+        ReferenceFrame referenceFrame = SELocator.GetReferenceFrame();
         if (referenceFrame == null)
         {
             return _currentDirection;
