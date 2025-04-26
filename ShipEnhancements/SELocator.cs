@@ -29,6 +29,9 @@ public static class SELocator
     private static ShipWarpCoreComponent _warpCoreComponent;
     private static AutopilotPanelController _autopilotPanelController;
 
+    private static ReferenceFrame _shipRF;
+    private static ReferenceFrame _playerRF;
+
     public static void Initalize()
     {
         _shipBody = Object.FindObjectOfType<ShipBody>();
@@ -203,5 +206,74 @@ public static class SELocator
     public static AutopilotPanelController GetAutopilotPanelController()
     {
         return _autopilotPanelController;
+    }
+
+    public static ReferenceFrame GetReferenceFrame(bool shipFrame = true, bool ignorePassiveFrame = true)
+    {
+        if ((bool)splitLockOn.GetProperty() && (shipFrame || PlayerState.AtFlightConsole()))
+        {
+            if (_shipRF == null && !ignorePassiveFrame)
+            {
+                return GetShipBody().GetComponentInChildren<SectorDetector>().GetPassiveReferenceFrame();
+            }
+
+            return _shipRF;
+        }
+        else
+        {
+            return Locator.GetReferenceFrame(ignorePassiveFrame);
+        }
+    }
+
+    public static void OnTargetReferenceFrame(ReferenceFrame rf)
+    {
+        if (Locator._rfTracker._shipTargetingActive)
+        {
+            _shipRF = rf;
+        }
+        else
+        {
+            _playerRF = rf;
+        }
+    }
+
+    public static void OnUntargetReferenceFrame()
+    {
+        if (Locator._rfTracker._shipTargetingActive)
+        {
+            _shipRF = null;
+        }
+        else
+        {
+            _playerRF = null;
+        }
+    }
+
+    public static void OnEnterShip()
+    {
+        PatchClass.SkipNextRFUpdate = true;
+        ShipEnhancements.WriteDebugMessage(_shipRF);
+        if (_shipRF != null)
+        {
+            Locator._rfTracker.TargetReferenceFrame(_shipRF);
+        }
+        else
+        {
+            Locator._rfTracker.UntargetReferenceFrame();
+        }
+    }
+
+    public static void OnExitShip()
+    {
+        PatchClass.SkipNextRFUpdate = true;
+        ShipEnhancements.WriteDebugMessage(_playerRF);
+        if (_playerRF != null)
+        {
+            Locator._rfTracker.TargetReferenceFrame(_playerRF);
+        }
+        else
+        {
+            Locator._rfTracker.UntargetReferenceFrame();
+        }
     }
 }

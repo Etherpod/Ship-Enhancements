@@ -120,7 +120,7 @@ public class PidAutopilot : ThrusterController
             }
         }
 
-        _referenceFrame = Locator.GetReferenceFrame(false);
+        _referenceFrame = SELocator.GetReferenceFrame(ignorePassiveFrame: false);
         _ignoreThrustLimits = ignoreThrustLimits;
         _localHold = _mode == PidMode.HoldPosition && SELocator.GetShipDetector().GetComponent<RulesetDetector>()?.GetPlanetoidRuleset();
         _errorIntegral = Vector3.zero;
@@ -136,7 +136,7 @@ public class PidAutopilot : ThrusterController
         {
             _holdPosition = -dirToReference;
         }
-        
+
         _orbitRadius = dirToReference.magnitude;
         _orbitSpeed = _referenceFrame.GetOrbitSpeed(_orbitRadius);
         _orbitalPlaneNormal = Vector3.Cross(relativeVelocity, dirToReference).normalized;
@@ -228,7 +228,7 @@ public class PidAutopilot : ThrusterController
     private PidComputations CalculateCurrentState()
     {
         var comps = new PidComputations();
-        
+
         comps.CurrentPosition = _owRigidbody.GetWorldCenterOfMass();
         comps.VelocityRelativeToTarget = _referenceFrame.GetOWRigidBody().GetRelativeVelocity(_owRigidbody);
         comps.RelativePosition = comps.CurrentPosition - _referenceFrame.GetPosition();
@@ -260,7 +260,7 @@ public class PidAutopilot : ThrusterController
         comps.DeltaOrbitalVelocity = comps.TargetOrbitalVelocity - Vector3.Project(comps.VelocityRelativeToTarget, comps.TargetOrbitalVelocity.normalized);
         comps.DeltaOrbitalSpeed = comps.DeltaOrbitalVelocity.magnitude;
         comps.DeltaPosition = comps.TargetHoldPosition - comps.CurrentPosition;
-        
+
         comps.DistanceToOrbit = comps.DeltaPosition.magnitude;
         comps.ProximityThrottleFactor = Mathf.Lerp(0.05f, 1, (comps.DistanceToOrbit + Mathf.Abs(comps.SpeedTowardsTarget)) / 1000);
 
@@ -329,14 +329,14 @@ public class PidAutopilot : ThrusterController
 
     private bool CanAutopilot(bool checkCorrectRefFrame)
     {
-        if (Locator.GetReferenceFrame(false) == null 
+        if (SELocator.GetReferenceFrame(ignorePassiveFrame: false) == null
             || Locator.GetReferenceFrame() == SELocator.GetShipBody().GetReferenceFrame()
-            || (_referenceFrame != null 
-            && Locator.GetReferenceFrame(false) != _referenceFrame)) return false;
+            || (_referenceFrame != null
+            && SELocator.GetReferenceFrame(ignorePassiveFrame: false) != _referenceFrame)) return false;
 
         //var hasCorrectRefFrame = Locator.GetReferenceFrame(false) == _referenceFrame;
         var thrustersUsable = SELocator.GetShipResources().AreThrustersUsable();
-        var refFrameHasGravity = Locator.GetReferenceFrame(false).GetOWRigidBody().GetAttachedGravityVolume() != null;
+        var refFrameHasGravity = SELocator.GetReferenceFrame(ignorePassiveFrame: false).GetOWRigidBody().GetAttachedGravityVolume() != null;
         return (!checkCorrectRefFrame || refFrameHasGravity) && thrustersUsable;
     }
 

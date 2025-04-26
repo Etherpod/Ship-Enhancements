@@ -4290,14 +4290,14 @@ public static class PatchClass
 
                 SELocator.GetAutopilotPanelController().ActivateAutopilot();
                 //__instance._autopilot.FlyToDestination(Locator.GetReferenceFrame(true));
-                SendAutopilotState(Locator.GetReferenceFrame()?.GetOWRigidBody(), destination: true);
+                SendAutopilotState(SELocator.GetReferenceFrame()?.GetOWRigidBody(), destination: true);
             }
             if (/*__instance.IsMatchVelocityAvailable(false) && */__instance._playerAtFlightConsole && !__instance._shipSystemFailure
                 && OWInput.IsNewlyPressed(InputLibrary.matchVelocity, InputMode.All))
             {
                 SELocator.GetAutopilotPanelController().ActivateMatchVelocity();
                 //__instance._autopilot.StartMatchVelocity(Locator.GetReferenceFrame(false), false);
-                SendAutopilotState(Locator.GetReferenceFrame(false)?.GetOWRigidBody(), startMatch: true);
+                SendAutopilotState(SELocator.GetReferenceFrame(ignorePassiveFrame: false)?.GetOWRigidBody(), startMatch: true);
             }
             else if (/*__instance._autopilot.IsMatchingVelocity() && !__instance._autopilot.IsFlyingToDestination() && */OWInput.IsNewlyReleased(InputLibrary.matchVelocity, InputMode.All))
             {
@@ -4589,6 +4589,49 @@ public static class PatchClass
         }
 
         SettingExtensions.ResetCustomSettings();
+    }
+    #endregion
+
+    #region ShipRF
+    public static bool SkipNextRFUpdate = false;
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ReferenceFrameTracker), nameof(ReferenceFrameTracker.TargetReferenceFrame))]
+    public static void StoreShipRF(ReferenceFrameTracker __instance, ReferenceFrame frame)
+    {
+        if (SkipNextRFUpdate)
+        {
+            SkipNextRFUpdate = false;
+            return;
+        }
+        SELocator.OnTargetReferenceFrame(frame);
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ReferenceFrameTracker), nameof(ReferenceFrameTracker.UntargetReferenceFrame), typeof(bool))]
+    public static void RemoveShipRF(ReferenceFrameTracker __instance)
+    {
+        if (SkipNextRFUpdate)
+        {
+            SkipNextRFUpdate = false;
+            return;
+        }
+        SELocator.OnUntargetReferenceFrame();
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.OnPressInteract))]
+    public static void SwitchToShipRF()
+    {
+        ShipEnhancements.WriteDebugMessage("ah");
+        SELocator.OnEnterShip();
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.ExitFlightConsole))]
+    public static void SwitchToPlayerRF()
+    {
+        SELocator.OnExitShip();
     }
     #endregion
 }

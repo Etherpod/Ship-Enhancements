@@ -221,6 +221,7 @@ public class ShipEnhancements : ModBehaviour
         randomIterations,
         randomDifficulty,
         disableHatch,
+        splitLockOn
     }
 
     private string[] startupMessages =
@@ -2295,6 +2296,11 @@ public class ShipEnhancements : ModBehaviour
             hatchController.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
             hatchController.transform.parent.GetComponentInChildren<AutoHatchController>().DisableInteraction();
         }
+
+        if ((bool)Settings.splitLockOn.GetProperty())
+        {
+
+        }
     }
 
     private void OnExitShip()
@@ -2510,8 +2516,6 @@ public class ShipEnhancements : ModBehaviour
 
     public static void WriteDebugMessage(object msg, bool warning = false, bool error = false)
     {
-        return;
-
         msg ??= "null";
 
         if (warning)

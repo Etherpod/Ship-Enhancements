@@ -40,7 +40,7 @@ public class PidAutopilotButton : CockpitButtonSwitch
     protected override bool CanActivate()
     {
         return base.CanActivate()
-            && Locator.GetReferenceFrame(false) != null && !_autopilot.IsDamaged()
+            && SELocator.GetReferenceFrame(ignorePassiveFrame: false) != null && !_autopilot.IsDamaged()
             && SELocator.GetShipResources().AreThrustersUsable();
     }
 }

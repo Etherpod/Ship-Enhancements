@@ -828,6 +828,12 @@
       "value": true,
       "tooltip": "Lets you walk around your ship normally when in high-gravity areas, like near the sun."
     },
+    "splitLockOn": {
+      "title": "Split Ship Lock-on",
+      "type": "toggle",
+      "value": true,
+      "tooltip": "Separates the player lock-on target and the ship lock-on target."
+    },
     "alwaysAllowLockOn": {
       "title": "Always Allow Map Lock-on",
       "type": "toggle",
