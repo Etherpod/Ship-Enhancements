@@ -19,7 +19,8 @@ public class PortableCampfireSocket : SEItemSocket
             detector.gameObject.SetActive(true);
         }
 
-        if ((string)ShipEnhancements.Settings.temperatureZonesAmount.GetProperty() == "All")
+        string tempSetting = (string)ShipEnhancements.Settings.temperatureZonesAmount.GetProperty();
+        if (tempSetting == "All" || tempSetting == "Hot")
         {
             Campfire campfire = _socketedItem.GetComponentInChildren<Campfire>();
             if (campfire != null)
@@ -40,7 +41,8 @@ public class PortableCampfireSocket : SEItemSocket
             detector.gameObject.SetActive(true);
         }
 
-        if ((string)ShipEnhancements.Settings.temperatureZonesAmount.GetProperty() == "All")
+        string tempSetting = (string)ShipEnhancements.Settings.temperatureZonesAmount.GetProperty();
+        if (tempSetting == "All" || tempSetting == "Hot")
         {
             Campfire campfire = item.GetComponentInChildren<Campfire>();
             if (campfire != null)

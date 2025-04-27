@@ -2135,7 +2135,7 @@ public static class PatchClass
             return false;
         }
 
-        if ((float)shipExplosionMultiplier.GetProperty() > 100f && !__instance.GetComponentInParent<FuelTankItem>())
+        if ((float)shipExplosionMultiplier.GetProperty() >= 100f && !__instance.GetComponentInParent<FuelTankItem>())
         {
             SupernovaEffectController supernovaEffects = SELocator.GetShipTransform().GetComponentInChildren<SupernovaEffectController>(true);
             if (supernovaEffects == null)
@@ -2162,7 +2162,7 @@ public static class PatchClass
             }
         }
         
-        if ((float)shipExplosionMultiplier.GetProperty() > 10f
+        if ((float)shipExplosionMultiplier.GetProperty() >= 10f
             && (float)shipExplosionMultiplier.GetProperty() < 100f)
         {
             __instance._audioController._loudShipSource.transform.Find("ShipExplosionExpandAudio")
@@ -2173,6 +2173,25 @@ public static class PatchClass
         {
             BlackHoleExplosionController controller = __instance as BlackHoleExplosionController;
             controller.OpenBlackHole();
+            return false;
+        }
+        else if (__instance.GetComponentInParent<FuelTankItem>())
+        {
+            __instance._forceVolume.SetVolumeActivation(true);
+            if (Vector3.Distance(__instance.transform.position, Locator.GetPlayerTransform().position) 
+                < __instance.transform.localScale.x * __instance.GetComponent<SphereCollider>().radius)
+            {
+                RumbleManager.PulseShipExplode();
+            }
+            __instance._renderer.enabled = true;
+            __instance._light.enabled = true;
+            /*float num = __instance._audioController.PlayShipExplodeClip();
+            if (num > __instance._length)
+            {
+                __instance._length = num;
+            }*/
+            __instance._playing = true;
+            __instance.enabled = true;
             return false;
         }
 
@@ -2202,7 +2221,7 @@ public static class PatchClass
             __result = 5f;
 
             AudioClip clip;
-            if ((float)shipExplosionMultiplier.GetProperty() > 10f)
+            if ((float)shipExplosionMultiplier.GetProperty() >= 10f)
             {
                 clip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/OW_SP_ShipExploding_LongReverb.ogg");
             }

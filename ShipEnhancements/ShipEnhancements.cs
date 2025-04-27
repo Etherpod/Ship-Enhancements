@@ -1686,7 +1686,7 @@ public class ShipEnhancements : ModBehaviour
     {
         float multiplier = (float)Settings.shipExplosionMultiplier.GetProperty();
 
-        if (multiplier > 100f)
+        if (multiplier >= 100f)
         {
             GameObject supernova = LoadPrefab("Assets/ShipEnhancements/ExplosionSupernova.prefab");
             AssetBundleUtilities.ReplaceShaders(supernova);
@@ -1700,7 +1700,7 @@ public class ShipEnhancements : ModBehaviour
             explosion._forceVolume._acceleration *= (multiplier * 0.25f) + 0.75f;
             explosion.transform.localScale *= multiplier;
             explosion._lightRadius *= (multiplier * 0.75f) + 0.25f;
-            explosion._lightIntensity *= (multiplier * 0.01f) + 0.99f;
+            explosion._lightIntensity *= Mathf.Min((multiplier * 0.01f) + 0.99f, 10f);
             explosion.GetComponent<SphereCollider>().radius = 0.1f;
             OWAudioSource audio = effectsTransform.Find("ExplosionAudioSource").GetComponent<OWAudioSource>();
             audio.maxDistance *= (multiplier * 0.5f) + 0.5f;
@@ -1725,12 +1725,12 @@ public class ShipEnhancements : ModBehaviour
                 AudioReverbFilter reverb = audio.gameObject.AddComponent<AudioReverbFilter>();
                 reverb.reverbPreset = AudioReverbPreset.Quarry;
                 reverb.reverbPreset = AudioReverbPreset.User;
-                float lerp = Mathf.InverseLerp(1f, 50f, (float)Settings.shipExplosionMultiplier.GetProperty());
+                float lerp = Mathf.InverseLerp(1f, 50f, multiplier);
                 reverb.reverbLevel = Mathf.Lerp(-1000f, 400f, lerp);
                 reverb.decayTime = Mathf.Lerp(1.49f, 3f, lerp);
                 reverb.roomHF = -4500f;
 
-                if (multiplier > 10f)
+                if (multiplier >= 10f)
                 {
                     Instantiate(LoadPrefab("Assets/ShipEnhancements/ShipExplosionExpandAudio.prefab"),
                         audio.transform).name = "ShipExplosionExpandAudio";
@@ -2807,11 +2807,14 @@ public class ShipEnhancements : ModBehaviour
                     numberInput.ModSettingKey = name;
                     numberInput.OnConfirmEntry += () =>
                     {
-                        var newValue = double.Parse(numberInput.GetInputText());
-                        ModHelper.Config.SetSettingsValue(name, newValue);
-                        ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
-                        Configure(ModHelper.Config);
-                        numberInput.SetText(newValue.ToString());
+                        if (!string.IsNullOrEmpty(numberInput.GetInputText()))
+                        {
+                            var newValue = double.Parse(numberInput.GetInputText());
+                            ModHelper.Config.SetSettingsValue(name, newValue);
+                            ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
+                            Configure(ModHelper.Config);
+                            numberInput.SetText(newValue.ToString());
+                        }
                     };
                     break;
                 default:

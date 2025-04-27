@@ -72,22 +72,24 @@ public class FuelTankItem : OWItem
 
     private void SetupExplosion()
     {
-        if ((float)shipExplosionMultiplier.GetProperty() != 1 && (float)shipExplosionMultiplier.GetProperty() > 0f)
+        float multiplier = (float)shipExplosionMultiplier.GetProperty();
+
+        if (multiplier != 1 && multiplier > 0f)
         {
-            _explosion._length *= ((float)shipExplosionMultiplier.GetProperty() * 0.75f) + 0.25f;
-            _explosion._forceVolume._acceleration *= ((float)shipExplosionMultiplier.GetProperty() * 0.25f) + 0.75f;
-            _explosion.transform.localScale *= (float)shipExplosionMultiplier.GetProperty();
-            _explosion._lightRadius *= ((float)shipExplosionMultiplier.GetProperty() * 0.75f) + 0.25f;
-            _explosion._lightIntensity *= ((float)shipExplosionMultiplier.GetProperty() * 0.01f) + 0.99f;
+            _explosion._length *= (multiplier * 0.75f) + 0.25f;
+            _explosion._forceVolume._acceleration *= (multiplier * 0.25f) + 0.75f;
+            _explosion.transform.localScale *= multiplier;
+            _explosion._lightRadius *= (multiplier * 0.75f) + 0.25f;
+            _explosion._lightIntensity *= Mathf.Min((multiplier * 0.01f) + 0.99f, 10f);
             _explosion.GetComponent<SphereCollider>().radius = 0.1f;
             OWAudioSource audio = _explosionSource;
-            audio.maxDistance *= ((float)shipExplosionMultiplier.GetProperty() * 0.1f) + 0.9f;
+            audio.maxDistance *= (multiplier * 0.1f) + 0.9f;
             AnimationCurve curve = audio.GetCustomCurve(AudioSourceCurveType.CustomRolloff);
             Keyframe[] newKeys = new Keyframe[curve.keys.Length];
             for (int i = 0; i < curve.keys.Length; i++)
             {
                 newKeys[i] = curve.keys[i];
-                newKeys[i].value *= ((float)shipExplosionMultiplier.GetProperty() * 0.1f) + 0.9f;
+                newKeys[i].value *= (multiplier * 0.1f) + 0.9f;
             }
             AnimationCurve newCurve = new();
             foreach (Keyframe key in newKeys)
@@ -95,9 +97,28 @@ public class FuelTankItem : OWItem
                 newCurve.AddKey(key);
             }
             audio.SetCustomCurve(AudioSourceCurveType.CustomRolloff, newCurve);
+
+            if (multiplier > 1f)
+            {
+                AudioLowPassFilter lowPass = audio.gameObject.AddComponent<AudioLowPassFilter>();
+                lowPass.cutoffFrequency = 25000f;
+                AudioReverbFilter reverb = audio.gameObject.AddComponent<AudioReverbFilter>();
+                reverb.reverbPreset = AudioReverbPreset.Quarry;
+                reverb.reverbPreset = AudioReverbPreset.User;
+                float lerp = Mathf.InverseLerp(1f, 50f, multiplier);
+                reverb.reverbLevel = Mathf.Lerp(-1000f, 400f, lerp);
+                reverb.decayTime = Mathf.Lerp(1.49f, 3f, lerp);
+                reverb.roomHF = -4500f;
+
+                if (multiplier >= 10f)
+                {
+                    Instantiate(ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipExplosionExpandAudio.prefab"),
+                        audio.transform).name = "ShipExplosionExpandAudio";
+                }
+            }
         }
 
-        if ((bool)moreExplosionDamage.GetProperty() && (float)shipExplosionMultiplier.GetProperty() > 0f)
+        if ((bool)moreExplosionDamage.GetProperty() && multiplier > 0f)
         {
             GameObject damage = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ExplosionDamage.prefab");
             GameObject damageObj = Instantiate(damage, _explosion.transform);
@@ -261,9 +282,9 @@ public class FuelTankItem : OWItem
     public void Explode()
     {
         _explosion?.Play();
+        PlayExplodeClip();
         _explosion.transform.parent = transform.parent;
         _explosion.GetComponent<SphereCollider>().enabled = true;
-        _explosionSource.PlayOneShot(AudioType.ShipDamageShipExplosion);
         if (GetComponentInParent<ShipBody>() && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
         {
             SELocator.GetShipDamageController().Explode();
@@ -298,9 +319,9 @@ public class FuelTankItem : OWItem
     public void ExplodeRemote()
     {
         _explosion?.Play();
+        PlayExplodeClip();
         _explosion.transform.parent = transform.parent;
         _explosion.GetComponent<SphereCollider>().enabled = true;
-        _explosionSource.PlayOneShot(AudioType.ShipDamageShipExplosion);
         if (GetComponentInParent<ShipBody>() && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
         {
             SELocator.GetShipDamageController().Explode();
@@ -322,6 +343,52 @@ public class FuelTankItem : OWItem
 
         OnLoseFocus();
         Destroy(gameObject);
+    }
+
+    private void PlayExplodeClip()
+    {
+        if ((float)shipExplosionMultiplier.GetProperty() > 1f)
+        {
+            OWAudioSource audio = _explosionSource;
+            float dist = Vector3.Distance(audio.transform.position, Locator.GetPlayerTransform().position);
+            float cutoffLerp = Mathf.InverseLerp(200f, 10000f, dist);
+            audio.GetComponent<AudioLowPassFilter>().cutoffFrequency = Mathf.Lerp(25000f, 300f, Mathf.Pow(cutoffLerp - 1f, 3) + 1f);
+
+            float reverbLerp = Mathf.InverseLerp(200f, 30000f, dist);
+            AudioReverbFilter reverb = audio.GetComponent<AudioReverbFilter>();
+            reverb.reverbLevel += Mathf.Lerp(0f, 200f, reverbLerp);
+            reverb.decayTime += Mathf.Lerp(0f, 3f, reverbLerp);
+
+            float timeLerp = Mathf.InverseLerp(500f, 100000f, dist);
+            float delay = Mathf.Lerp(0f, 6f, timeLerp);
+            float delayTime = Time.time + delay;
+
+            AudioClip clip;
+            if ((float)shipExplosionMultiplier.GetProperty() >= 10f)
+            {
+                clip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/OW_SP_ShipExploding_LongReverb.ogg");
+            }
+            else
+            {
+                clip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/OW_SP_ShipExploding_Long.ogg");
+            }
+
+            if (delay > 0f)
+            {
+                ShipEnhancements.Instance.ModHelper.Events.Unity.RunWhen(() => Time.time > delayTime, () =>
+                {
+                    _explosionSource.PlayOneShot(clip, 1f);
+                });
+            }
+            else
+            {
+                _explosionSource.PlayOneShot(clip, 1f);
+            }
+        }
+        else
+        {
+            _explosionSource.PlayOneShot(AudioType.ShipDamageShipExplosion);
+        }
     }
 
     public void PlayGroan()
