@@ -831,7 +831,7 @@
     "splitLockOn": {
       "title": "Split Ship Lock-on",
       "type": "toggle",
-      "value": true,
+      "value": false,
       "tooltip": "Separates the player lock-on target and the ship lock-on target."
     },
     "alwaysAllowLockOn": {
