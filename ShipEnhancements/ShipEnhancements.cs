@@ -1682,7 +1682,7 @@ public class ShipEnhancements : ModBehaviour
         });
     }
 
-    private static void SetupExplosion(Transform effectsTransform, ExplosionController explosion)
+    private void SetupExplosion(Transform effectsTransform, ExplosionController explosion)
     {
         float multiplier = (float)Settings.shipExplosionMultiplier.GetProperty();
 
@@ -1718,12 +1718,24 @@ public class ShipEnhancements : ModBehaviour
             }
             audio.SetCustomCurve(AudioSourceCurveType.CustomRolloff, newCurve);
 
-            AudioLowPassFilter lowPass = audio.gameObject.AddComponent<AudioLowPassFilter>();
-            lowPass.cutoffFrequency = 25000f;
-            AudioReverbFilter reverb = audio.gameObject.AddComponent<AudioReverbFilter>();
-            reverb.reverbPreset = AudioReverbPreset.Quarry;
-            float lerp = Mathf.InverseLerp(1f, 50f, (float)Settings.shipExplosionMultiplier.GetProperty());
-            reverb.reverbLevel = Mathf.Lerp(-1000f, 400f, lerp);
+            if (multiplier > 1f)
+            {
+                AudioLowPassFilter lowPass = audio.gameObject.AddComponent<AudioLowPassFilter>();
+                lowPass.cutoffFrequency = 25000f;
+                AudioReverbFilter reverb = audio.gameObject.AddComponent<AudioReverbFilter>();
+                reverb.reverbPreset = AudioReverbPreset.Quarry;
+                reverb.reverbPreset = AudioReverbPreset.User;
+                float lerp = Mathf.InverseLerp(1f, 50f, (float)Settings.shipExplosionMultiplier.GetProperty());
+                reverb.reverbLevel = Mathf.Lerp(-1000f, 400f, lerp);
+                reverb.decayTime = Mathf.Lerp(1.49f, 3f, lerp);
+                reverb.roomHF = -4500f;
+
+                if (multiplier > 10f)
+                {
+                    Instantiate(LoadPrefab("Assets/ShipEnhancements/ShipExplosionExpandAudio.prefab"),
+                        audio.transform).name = "ShipExplosionExpandAudio";
+                }
+            }
         }
 
         if ((bool)Settings.moreExplosionDamage.GetProperty())

@@ -2096,7 +2096,23 @@ public static class PatchClass
         __instance._renderer.SetPropertyBlock(__instance._matPropBlock);
         __instance._light.intensity = __instance._lightIntensity * (1f - num);
         __instance._light.range = __instance._lightRadius * Mathf.Clamp01(num * 10f);
-        __instance.GetComponent<SphereCollider>().radius = Mathf.Lerp(0.1f, 1f, num * 2f);
+        SphereCollider col = __instance.GetComponent<SphereCollider>();
+        col.radius = Mathf.Lerp(0.1f, 1f, num * 2f);
+
+        if (__instance._audioController._loudShipSource.transform.Find("ShipExplosionExpandAudio"))
+        {
+            OWAudioSource audio = __instance._audioController._loudShipSource.transform
+                .Find("ShipExplosionExpandAudio").GetComponent<OWAudioSource>();
+            float dist = Vector3.Distance(__instance.transform.position, 
+                Locator.GetPlayerCamera().transform.position) - (__instance.transform.localScale.x * col.radius);
+            float multiplierLerp = Mathf.InverseLerp(20f, 1000f, __instance.transform.localScale.x * col.radius);
+            float distLerp = Mathf.InverseLerp(Mathf.Lerp(20f, 1000f, multiplierLerp), 0f, dist);
+            float timeLerp1 = Mathf.InverseLerp(0f, 3f, __instance._timer);
+            float timeLerp2 = Mathf.InverseLerp(__instance._length / 2f - 10f, __instance._length / 2f, __instance._timer);
+            float timeLerp = Mathf.Max(timeLerp1 - timeLerp2, 0);
+            audio.SetLocalVolume(distLerp * distLerp * timeLerp);
+        }
+
         if (num > 0.5f)
         {
             __instance._forceVolume.SetVolumeActivation(false);
@@ -2145,6 +2161,13 @@ public static class PatchClass
                 return false;
             }
         }
+        
+        if ((float)shipExplosionMultiplier.GetProperty() > 10f
+            && (float)shipExplosionMultiplier.GetProperty() < 100f)
+        {
+            __instance._audioController._loudShipSource.transform.Find("ShipExplosionExpandAudio")
+                .GetComponent<OWAudioSource>().Play();
+        }
 
         if (__instance is BlackHoleExplosionController)
         {
@@ -2164,18 +2187,41 @@ public static class PatchClass
         {
             OWAudioSource audio = __instance._loudShipSource;
             float dist = Vector3.Distance(audio.transform.position, Locator.GetPlayerTransform().position);
-            float lerp = Mathf.InverseLerp(100f, 5000f, dist);
-            audio.GetComponent<AudioLowPassFilter>().cutoffFrequency = Mathf.Lerp(25000f, 100f, lerp);
-            audio.GetComponent<AudioReverbFilter>().reverbLevel += Mathf.Lerp(0f, 400f, lerp);
-            float timeLerp = Mathf.InverseLerp(500f, 50000f, dist);
+            float cutoffLerp = Mathf.InverseLerp(200f, 10000f, dist);
+            audio.GetComponent<AudioLowPassFilter>().cutoffFrequency = Mathf.Lerp(25000f, 300f, Mathf.Pow(cutoffLerp - 1f, 3) + 1f);
+
+            float reverbLerp = Mathf.InverseLerp(200f, 30000f, dist);
+            AudioReverbFilter reverb = audio.GetComponent<AudioReverbFilter>();
+            reverb.reverbLevel += Mathf.Lerp(0f, 200f, reverbLerp);
+            reverb.decayTime += Mathf.Lerp(0f, 3f, reverbLerp);
+
+            float timeLerp = Mathf.InverseLerp(500f, 100000f, dist);
             float delay = Mathf.Lerp(0f, 6f, timeLerp);
             float delayTime = Time.time + delay;
 
             __result = 5f;
-            ShipEnhancements.Instance.ModHelper.Events.Unity.RunWhen(() => Time.time > delayTime, () =>
+
+            AudioClip clip;
+            if ((float)shipExplosionMultiplier.GetProperty() > 10f)
             {
-                __instance._loudShipSource.PlayOneShot(AudioType.ShipDamageShipExplosion, 1f);
-            });
+                clip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/OW_SP_ShipExploding_LongReverb.ogg");
+            }
+            else
+            {
+                clip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/OW_SP_ShipExploding_Long.ogg");
+            }
+
+            if (delay > 0f)
+            {
+                ShipEnhancements.Instance.ModHelper.Events.Unity.RunWhen(() => Time.time > delayTime, () =>
+                {
+                    __instance._loudShipSource.PlayOneShot(clip, 1f);
+                });
+            }
+            else
+            {
+                __instance._loudShipSource.PlayOneShot(clip, 1f);
+            }
             return false;
         }
 
@@ -4599,6 +4645,8 @@ public static class PatchClass
     [HarmonyPatch(typeof(ReferenceFrameTracker), nameof(ReferenceFrameTracker.TargetReferenceFrame))]
     public static void StoreShipRF(ReferenceFrameTracker __instance, ReferenceFrame frame)
     {
+        if (!(bool)splitLockOn.GetProperty()) return;
+
         if (SkipNextRFUpdate)
         {
             SkipNextRFUpdate = false;
@@ -4611,6 +4659,8 @@ public static class PatchClass
     [HarmonyPatch(typeof(ReferenceFrameTracker), nameof(ReferenceFrameTracker.UntargetReferenceFrame), typeof(bool))]
     public static void RemoveShipRF(ReferenceFrameTracker __instance)
     {
+        if (!(bool)splitLockOn.GetProperty()) return;
+
         if (SkipNextRFUpdate)
         {
             SkipNextRFUpdate = false;
@@ -4623,7 +4673,8 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.OnPressInteract))]
     public static void SwitchToShipRF()
     {
-        ShipEnhancements.WriteDebugMessage("ah");
+        if (!(bool)splitLockOn.GetProperty()) return;
+
         SELocator.OnEnterShip();
     }
 
@@ -4631,7 +4682,37 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.ExitFlightConsole))]
     public static void SwitchToPlayerRF()
     {
+        if (!(bool)splitLockOn.GetProperty()) return;
+
         SELocator.OnExitShip();
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.OnUntargetReferenceFrame))]
+    public static bool KeepAutopilotOnRemoveRF(ShipCockpitController __instance)
+    {
+        if (!(bool)splitLockOn.GetProperty()) return true;
+
+        if (SELocator.GetReferenceFrame() == null)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.OnTargetReferenceFrame))]
+    public static bool KeepAutopilotOnSwitchRF(ShipCockpitController __instance, ReferenceFrame referenceFrame)
+    {
+        if (!(bool)splitLockOn.GetProperty()) return true;
+
+        if (SELocator.GetReferenceFrame() != referenceFrame)
+        {
+            return true;
+        }
+
+        return false;
     }
     #endregion
 }
