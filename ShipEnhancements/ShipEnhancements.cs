@@ -237,7 +237,7 @@ public class ShipEnhancements : ModBehaviour
         "\"Spoonfeed\" is the longest word in the English language that has all of its letters in reverse alphabetical order.",
         "\"Schoolmaster\" uses the exact same letters as \"the classroom\".",
         "The first mod ever made for Outer Wilds was NomaiVR.",
-        "No te preocupes, no cambiaste el idioma a espa�ol.",
+        "No te preocupes, no cambiaste el idioma a español.",
         "There are more hydrogen atoms in a single molecule of water than there are stars in the entire Solar System.",
         "Ernesto is watching.\n\nI'm more aware than you think.",
         "A group of penguins is called a \"waddle\".",

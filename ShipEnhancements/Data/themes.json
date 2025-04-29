@@ -2,157 +2,171 @@
 	{
 		"name": "Default",
 		"colors": {
-			"ship":         { "r": 255, "g": 255, "b": 255 },
-			"thrust":       { "r": 255, "g": 255, "b": 255 },
-			"indicator":    { "r": 255, "g": 255, "b": 255 },
-			"hullDmg":      { "r": 255, "g": 255, "b": 255 },
-			"componentDmg": { "r": 255, "g": 255, "b": 255 },
-			"alarm":        { "r": 255, "g": 255, "b": 255 },
-			"alarmLit":     { "r": 255, "g": 255, "b": 255 },
-			"light":        { "r": 255, "g": 255, "b": 255 }
+			"light": {
+				"r": 255,
+				"g": 255,
+				"b": 255
+			},
+			"ship": {
+				"r": 255,
+				"g": 255,
+				"b": 255
+			},
+			"thrust": "",
+			"thrustIntensity": 1.0,
+			"thrustLight": {
+				"r": 255,
+				"g": 255,
+				"b": 255
+			},
+			"indicator": {
+				"r": 255,
+				"g": 255,
+				"b": 255
+			},
+			"hullDmg": {
+				"r": 255,
+				"g": 255,
+				"b": 255
+			},
+			"hullDmgIntensity": 1.0,
+			"componentDmg": {
+				"r": 255,
+				"g": 255,
+				"b": 255
+			},
+			"componentDmgIntensity": 1.0,
+			"alarm": {
+				"r": 255,
+				"g": 255,
+				"b": 255
+			},
+			"alarmLit": {
+				"r": 255,
+				"g": 255,
+				"b": 255
+			},
+			"alarmLitIntensity": 1.0,
+			"dmgLight": {
+				"r": 255,
+				"g": 255,
+				"b": 255
+			}
 		}
 	},
 	{
 		"name": "Red",
 		"colors": {
-			"ship":         { "r": 255, "g": 255, "b": 255 },
-			"thrust":       { "r": 255, "g": 255, "b": 255 },
-			"indicator":    { "r": 255, "g": 255, "b": 255 },
-			"hullDmg":      { "r": 255, "g": 255, "b": 255 },
-			"componentDmg": { "r": 255, "g": 255, "b": 255 },
-			"alarm":        { "r": 255, "g": 255, "b": 255 },
-			"alarmLit":     { "r": 255, "g": 255, "b": 255 },
-			"light":        { "r": 255, "g": 255, "b": 255 }
+			"light": {
+				"r": 255,
+				"g": 0,
+				"b": 0
+			},
+			"ship": {
+				"r": 221,
+				"g": 185,
+				"b": 185
+			},
+			"thrust": "ThrusterFlames_Red.png",
+			"thrustIntensity": 1.0,
+			"thrustLight": {
+				"r": 255,
+				"g": 255,
+				"b": 255
+			},
+			"indicator": {
+				"r": 255,
+				"g": 16,
+				"b": 23
+			},
+			"hullDmg": {
+				"r": 255,
+				"g": 255,
+				"b": 255
+			},
+			"hullDmgIntensity": 1.0,
+			"componentDmg": {
+				"r": 255,
+				"g": 255,
+				"b": 255
+			},
+			"componentDmgIntensity": 1.0,
+			"alarm": {
+				"r": 255,
+				"g": 255,
+				"b": 255
+			},
+			"alarmLit": {
+				"r": 255,
+				"g": 255,
+				"b": 255
+			},
+			"alarmLitIntensity": 1.0,
+			"dmgLight": {
+				"r": 255,
+				"g": 255,
+				"b": 255
+			}
 		}
 	},
 	{
 		"name": "White-Orange",
 		"colors": {
-			"ship":         { "r": 255, "g": 255, "b": 255 },
-			"thrust":       { "r": 255, "g": 255, "b": 255 },
-			"indicator":    { "r": 255, "g": 255, "b": 255 },
-			"hullDmg":      { "r": 255, "g": 255, "b": 255 },
-			"componentDmg": { "r": 255, "g": 255, "b": 255 },
-			"alarm":        { "r": 255, "g": 255, "b": 255 },
-			"alarmLit":     { "r": 255, "g": 255, "b": 255 },
-			"light":        { "r": 255, "g": 255, "b": 255 }
+
 		}
 	},
 	{
 		"name": "Lime-Orange",
 		"colors": {
-			"ship":         { "r": 255, "g": 255, "b": 255 },
-			"thrust":       { "r": 255, "g": 255, "b": 255 },
-			"indicator":    { "r": 255, "g": 255, "b": 255 },
-			"hullDmg":      { "r": 255, "g": 255, "b": 255 },
-			"componentDmg": { "r": 255, "g": 255, "b": 255 },
-			"alarm":        { "r": 255, "g": 255, "b": 255 },
-			"alarmLit":     { "r": 255, "g": 255, "b": 255 },
-			"light":        { "r": 255, "g": 255, "b": 255 }
+
 		}
 	},
 	{
 		"name": "Lime",
 		"colors": {
-			"ship":         { "r": 255, "g": 255, "b": 255 },
-			"thrust":       { "r": 255, "g": 255, "b": 255 },
-			"indicator":    { "r": 255, "g": 255, "b": 255 },
-			"hullDmg":      { "r": 255, "g": 255, "b": 255 },
-			"componentDmg": { "r": 255, "g": 255, "b": 255 },
-			"alarm":        { "r": 255, "g": 255, "b": 255 },
-			"alarmLit":     { "r": 255, "g": 255, "b": 255 },
-			"light":        { "r": 255, "g": 255, "b": 255 }
+
 		}
 	},
 	{
 		"name": "Ghostly Green",
 		"colors": {
-			"ship":         { "r": 255, "g": 255, "b": 255 },
-			"thrust":       { "r": 255, "g": 255, "b": 255 },
-			"indicator":    { "r": 255, "g": 255, "b": 255 },
-			"hullDmg":      { "r": 255, "g": 255, "b": 255 },
-			"componentDmg": { "r": 255, "g": 255, "b": 255 },
-			"alarm":        { "r": 255, "g": 255, "b": 255 },
-			"alarmLit":     { "r": 255, "g": 255, "b": 255 },
-			"light":        { "r": 255, "g": 255, "b": 255 }
+
 		}
 	},
 	{
 		"name": "Turquoise",
 		"colors": {
-			"ship":         { "r": 255, "g": 255, "b": 255 },
-			"thrust":       { "r": 255, "g": 255, "b": 255 },
-			"indicator":    { "r": 255, "g": 255, "b": 255 },
-			"hullDmg":      { "r": 255, "g": 255, "b": 255 },
-			"componentDmg": { "r": 255, "g": 255, "b": 255 },
-			"alarm":        { "r": 255, "g": 255, "b": 255 },
-			"alarmLit":     { "r": 255, "g": 255, "b": 255 },
-			"light":        { "r": 255, "g": 255, "b": 255 }
+
 		}
 	},
 	{
 		"name": "Blue",
 		"colors": {
-			"ship":         { "r": 255, "g": 255, "b": 255 },
-			"thrust":       { "r": 255, "g": 255, "b": 255 },
-			"indicator":    { "r": 255, "g": 255, "b": 255 },
-			"hullDmg":      { "r": 255, "g": 255, "b": 255 },
-			"componentDmg": { "r": 255, "g": 255, "b": 255 },
-			"alarm":        { "r": 255, "g": 255, "b": 255 },
-			"alarmLit":     { "r": 255, "g": 255, "b": 255 },
-			"light":        { "r": 255, "g": 255, "b": 255 }
+
 		}
 	},
 	{
 		"name": "Purple",
 		"colors": {
-			"ship":         { "r": 255, "g": 255, "b": 255 },
-			"thrust":       { "r": 255, "g": 255, "b": 255 },
-			"indicator":    { "r": 255, "g": 255, "b": 255 },
-			"hullDmg":      { "r": 255, "g": 255, "b": 255 },
-			"componentDmg": { "r": 255, "g": 255, "b": 255 },
-			"alarm":        { "r": 255, "g": 255, "b": 255 },
-			"alarmLit":     { "r": 255, "g": 255, "b": 255 },
-			"light":        { "r": 255, "g": 255, "b": 255 }
+
 		}
 	},
 	{
 		"name": "Pink",
 		"colors": {
-			"ship":         { "r": 255, "g": 255, "b": 255 },
-			"thrust":       { "r": 255, "g": 255, "b": 255 },
-			"indicator":    { "r": 255, "g": 255, "b": 255 },
-			"hullDmg":      { "r": 255, "g": 255, "b": 255 },
-			"componentDmg": { "r": 255, "g": 255, "b": 255 },
-			"alarm":        { "r": 255, "g": 255, "b": 255 },
-			"alarmLit":     { "r": 255, "g": 255, "b": 255 },
-			"light":        { "r": 255, "g": 255, "b": 255 }
+
 		}
 	},
 	{
 		"name": "Rose",
 		"colors": {
-			"ship":         { "r": 255, "g": 255, "b": 255 },
-			"thrust":       { "r": 255, "g": 255, "b": 255 },
-			"indicator":    { "r": 255, "g": 255, "b": 255 },
-			"hullDmg":      { "r": 255, "g": 255, "b": 255 },
-			"componentDmg": { "r": 255, "g": 255, "b": 255 },
-			"alarm":        { "r": 255, "g": 255, "b": 255 },
-			"alarmLit":     { "r": 255, "g": 255, "b": 255 },
-			"light":        { "r": 255, "g": 255, "b": 255 }
+
 		}
 	},
 	{
 		"name": "Rainbow",
 		"colors": {
-			"ship":         { "r": 255, "g": 255, "b": 255 },
-			"thrust":       { "r": 255, "g": 255, "b": 255 },
-			"indicator":    { "r": 255, "g": 255, "b": 255 },
-			"hullDmg":      { "r": 255, "g": 255, "b": 255 },
-			"componentDmg": { "r": 255, "g": 255, "b": 255 },
-			"alarm":        { "r": 255, "g": 255, "b": 255 },
-			"alarmLit":     { "r": 255, "g": 255, "b": 255 },
-			"light":        { "r": 255, "g": 255, "b": 255 }
+
 		}
 	}
 ]

@@ -29,7 +29,7 @@ public class ThemeManager
         );
 
         if (data is null) {
-            throw new JsonSerializationException("failed to parse hunt data ;-;");
+            throw new JsonSerializationException("failed to parse data ;-;");
         }
 
         return data
@@ -41,31 +41,80 @@ public class ThemeManager
     }
 }
 
-public record Theme(
+public record LightTheme(
     string Name,
-    Color ShipColor,
-    Color ThrustColor,
-    Color IndicatorColor,
-    Color HullDmgColor,
-    Color ComponentDmgColor,
-    Color AlarmColor,
-    Color AlarmLitColor,
-    Color Light
+    Color LightColor
 )
 {
-    internal static Theme From(ThemeDataJsonTheme themeData)
+    internal static LightTheme From(LightThemeDataJson themeData)
     {
-        var colors = themeData.Colors;
-        return new Theme(
+        return new LightTheme(
             themeData.Name,
-            colors.Ship,
-            colors.Thrust,
-            colors.Indicator,
-            colors.HullDmg,
-            colors.ComponentDmg,
-            colors.Alarm,
-            colors.AlarmLit,
-            colors.Light
+            themeData.Light
+        );
+    }
+};
+
+public record HullTheme(
+    string Name,
+    Color HullColor
+)
+{
+    internal static HullTheme From(HullThemeDataJson themeData)
+    {
+        return new HullTheme(
+            themeData.Name,
+            themeData.HullColor
+        );
+    }
+};
+
+public record ThrusterTheme(
+    string Name,
+    string ThrusterColor,
+    float ThrusterIntensity,
+    Color ThrusterLight,
+    Color IndicatorColor,
+    float IndicatorIntensity,
+    Color IndicatorLight
+)
+{
+    internal static ThrusterTheme From(ThrusterThemeDataJson themeData)
+    {
+        return new ThrusterTheme(
+            themeData.Name,
+            themeData.ThrusterColor,
+            themeData.ThrusterIntensity,
+            themeData.ThrusterLight,
+            themeData.IndicatorColor,
+            themeData.IndicatorIntensity,
+            themeData.IndicatorLight
+        );
+    }
+};
+
+public record DamageTheme(
+    string Name,
+    Color HullColor,
+    Color HullIntensity,
+    Color CompColor,
+    Color AlarmColor,
+    Color AlarmLitColor,
+    float AlarmLitIntensity,
+    float IndicatorLight
+)
+{
+    internal static DamageTheme From(DamageThemeDataJson themeData)
+    {
+        return new DamageTheme(
+            themeData.Name,
+            themeData.HullColor,
+            themeData.HullIntensity,
+            themeData.CompColor,
+            themeData.AlarmColor,
+            themeData.AlarmLitColor,
+            themeData.AlarmLitIntensity,
+            themeData.IndicatorLight
         );
     }
 };
