@@ -16,6 +16,8 @@ public class ThemeManager
         var resourceStream = typeof(ThemeManager).Assembly.GetManifestResourceStream(resourceName)!;
         
         _nameToTheme = LoadData(resourceStream);
+        
+        ShipEnhancements.WriteDebugMessage("theme manager initialized");
     }
     
     public Theme GetTheme(string name) => _nameToTheme[name];
