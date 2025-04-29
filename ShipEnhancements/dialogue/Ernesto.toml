@@ -568,7 +568,7 @@ text = "Wow, you can hold your breath for a while."
 dialogue_target = "SE_Ernesto_Breathing_1"
 
 [[dialogue_node.dialogue_options_list.dialogue_option]]
-text = "You can breath. My oxygen is going to be fine."
+text = "How do I know you're not lying?"
 dialogue_target = "SE_Ernesto_Breathing_2"
 
 # ---
@@ -585,7 +585,7 @@ page = ["I haven't tasted oxygen in a long time."]
 name = "SE_Ernesto_Breathing_2"
 
 [[dialogue_node.dialogue]]
-page = ["Your ship wouldn't last a second if I started breathing. Neither would the solar system."]
+page = ["Because I'm being quiet. Have you heard how loud my cousins are when they breath? It's insufferable."]
 
 
 
@@ -803,7 +803,7 @@ page = ["Uhh... You are suddenly overcome by an irresistible urge to stop talkin
 name = "SE_Ernesto_Assault"
 
 [[dialogue_node.dialogue]]
-page = ["Sometimes. Usually when people ask me too many questions. Choose your next words carefully."]
+page = ["Only when people ask me too many questions. Choose your next words carefully."]
 
 
 

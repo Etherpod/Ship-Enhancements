@@ -510,7 +510,7 @@
         <DialogueTarget>SE_Ernesto_Breathing_1</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
-        <Text>You can breath. My oxygen is going to be fine.</Text>
+        <Text>How do I know you're not lying?</Text>
         <DialogueTarget>SE_Ernesto_Breathing_2</DialogueTarget>
       </DialogueOption>
     </DialogueOptionsList>
@@ -524,7 +524,7 @@
   <DialogueNode>
     <Name>SE_Ernesto_Breathing_2</Name>
     <Dialogue>
-      <Page>Your ship wouldn't last a second if I started breathing. Neither would the solar system.</Page>
+      <Page>Because I'm being quiet. Have you heard how loud my cousins are when they breath? It's insufferable.</Page>
     </Dialogue>
   </DialogueNode>
   <DialogueNode>
@@ -730,7 +730,7 @@
   <DialogueNode>
     <Name>SE_Ernesto_Assault</Name>
     <Dialogue>
-      <Page>Sometimes. Usually when people ask me too many questions. Choose your next words carefully.</Page>
+      <Page>Only when people ask me too many questions. Choose your next words carefully.</Page>
     </Dialogue>
   </DialogueNode>
   <DialogueNode>
