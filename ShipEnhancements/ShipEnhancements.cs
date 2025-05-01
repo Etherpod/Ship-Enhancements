@@ -93,6 +93,7 @@ public class ShipEnhancements : ModBehaviour
     public AudioClip ShipHorn { get; private set; }
 
     private SettingsPresets.PresetName _currentPreset = (SettingsPresets.PresetName)(-1);
+    private bool _advancedColors = false;
     
     public GameObject DebugObjects { get; private set; }
 
@@ -845,7 +846,12 @@ public class ShipEnhancements : ModBehaviour
         bool coloredLights = (string)Settings.shipLightColor.GetProperty() != "Default";
         if ((bool)Settings.disableShipLights.GetProperty() || coloredLights)
         {
-            Color lightColor = SettingsColors.GetLightingColor((string)Settings.shipLightColor.GetProperty());
+            Color lightColor = ThemeManager.GetLightTheme((string)Settings.shipLightColor.GetProperty()).LightColor;
+            if ((string)Settings.shipLightColor.GetProperty() != "Divine")
+            {
+                lightColor /= 255f;
+            }
+
             foreach (ElectricalSystem system in SELocator.GetShipBody().GetComponentsInChildren<ElectricalSystem>())
             {
                 foreach (ElectricalComponent component in system._connectedComponents)
@@ -1038,12 +1044,15 @@ public class ShipEnhancements : ModBehaviour
             GameObject flameHazardVolume = LoadPrefab("Assets/ShipEnhancements/FlameHeatVolume.prefab");
             foreach (ThrusterFlameController flame in SELocator.GetShipTransform().GetComponentsInChildren<ThrusterFlameController>())
             {
-                GameObject volume = Instantiate(flameHazardVolume, Vector3.zero, Quaternion.identity, flame.transform);
-                volume.transform.localPosition = Vector3.zero;
-                volume.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
-                if (!flame.enabled)
+                if ((bool)Settings.hotThrusters.GetProperty())
                 {
-                    flame.transform.localScale = Vector3.zero;
+                    GameObject volume = Instantiate(flameHazardVolume, Vector3.zero, Quaternion.identity, flame.transform);
+                    volume.transform.localPosition = Vector3.zero;
+                    volume.transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
+                    if (!flame.enabled)
+                    {
+                        flame.transform.localScale = Vector3.zero;
+                    }
                 }
 
                 string color = (string)Settings.thrusterColor.GetProperty();
@@ -1055,17 +1064,18 @@ public class ShipEnhancements : ModBehaviour
                 else if (color != "Default")
                 {
                     MeshRenderer rend = flame.GetComponent<MeshRenderer>();
-                    Color baseColor = rend.material.GetColor("_Color");
-                    float alpha = baseColor.a;
-                    (Color, float, Color) emissiveColor = SettingsColors.GetThrusterColor(color);
-                    Color newColor = emissiveColor.Item1 * Mathf.Pow(2, emissiveColor.Item2);
-                    newColor.a = alpha;
-                    rend.material.SetColor("_Color", newColor);
+
+                    ThrusterTheme thrusterColors = ThemeManager.GetThrusterTheme(color);
+                    rend.material.SetTexture("_MainTex",
+                        (Texture2D)LoadAsset("Assets/ShipEnhancements/ThrusterColors/"
+                        + thrusterColors.ThrusterColor));
+
+                    rend.material.SetColor("_Color", Color.white * Mathf.Pow(thrusterColors.ThrusterIntensity, 1));
 
                     Light light = flame.GetComponentInChildren<Light>();
-                    light.color = emissiveColor.Item3;
+                    light.color = thrusterColors.ThrusterLight / 255f;
 
-                    ThrustIndicatorManager.SetColor(SettingsColors.GetIndicatorColor(color));
+                    ThrustIndicatorManager.ApplyTheme(thrusterColors);
                 }
             }
         }
@@ -2093,10 +2103,9 @@ public class ShipEnhancements : ModBehaviour
             }
             else
             {
-                inSharedMat.SetColor("_Color",
-                    SettingsColors.GetShipColor((string)Settings.interiorHullColor.GetProperty()));
-                inSharedMat2.SetColor("_Color",
-                    SettingsColors.GetShipColor((string)Settings.interiorHullColor.GetProperty()));
+                Color color = ThemeManager.GetHullTheme((string)Settings.interiorHullColor.GetProperty()).HullColor / 255f;
+                inSharedMat.SetColor("_Color", color);
+                inSharedMat2.SetColor("_Color", color);
             }
         }
         else
@@ -2124,8 +2133,8 @@ public class ShipEnhancements : ModBehaviour
             }
             else
             {
-                outSharedMat.SetColor("_Color",
-                    SettingsColors.GetShipColor((string)Settings.exteriorHullColor.GetProperty()));
+                Color color = ThemeManager.GetHullTheme((string)Settings.exteriorHullColor.GetProperty()).HullColor / 255f;
+                outSharedMat.SetColor("_Color", color);
             }
         }
         else

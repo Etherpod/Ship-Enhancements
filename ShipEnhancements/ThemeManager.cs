@@ -9,22 +9,28 @@ namespace ShipEnhancements;
 
 public class ThemeManager
 {
-    private readonly IDictionary<string, Theme> _nameToTheme;
+    private IDictionary<string, LightTheme> _nameToLightTheme;
+    private IDictionary<string, HullTheme> _nameToHullTheme;
+    private IDictionary<string, ThrusterTheme> _nameToThrusterTheme;
+    private IDictionary<string, DamageTheme> _nameToDamageTheme;
 
     public ThemeManager(string resourceName)
     {
         var resourceStream = typeof(ThemeManager).Assembly.GetManifestResourceStream(resourceName)!;
         
-        _nameToTheme = LoadData(resourceStream);
+        LoadData(resourceStream);
         
         ShipEnhancements.WriteDebugMessage("theme manager initialized");
     }
     
-    public Theme GetTheme(string name) => _nameToTheme[name];
+    public LightTheme GetLightTheme(string name) => _nameToLightTheme[name];
+    public HullTheme GetHullTheme(string name) => _nameToHullTheme[name];
+    public ThrusterTheme GetThrusterTheme(string name) => _nameToThrusterTheme[name];
+    public DamageTheme GetDamageTheme(string name) => _nameToDamageTheme[name];
 
-    private IDictionary<string, Theme> LoadData(Stream resourceStream)
+    private void LoadData(Stream resourceStream)
     {
-        var data = JsonConvert.DeserializeObject<List<ThemeDataJsonTheme>>(
+        var data = JsonConvert.DeserializeObject<ThemeDataJsonTheme>(
             new StreamReader(resourceStream).ReadToEnd()
         );
 
@@ -32,8 +38,26 @@ public class ThemeManager
             throw new JsonSerializationException("failed to parse data ;-;");
         }
 
-        return data
-            .Select(Theme.From)
+        _nameToLightTheme = data.LightThemes
+            .Select(LightTheme.From)
+            .ToDictionary(
+                theme => theme.Name,
+                theme => theme
+            );
+        _nameToHullTheme = data.HullThemes
+            .Select(HullTheme.From)
+            .ToDictionary(
+                theme => theme.Name,
+                theme => theme
+            );
+        _nameToThrusterTheme = data.ThrusterThemes
+            .Select(ThrusterTheme.From)
+            .ToDictionary(
+                theme => theme.Name,
+                theme => theme
+            );
+        _nameToDamageTheme = data.DamageThemes
+            .Select(DamageTheme.From)
             .ToDictionary(
                 theme => theme.Name,
                 theme => theme
@@ -96,12 +120,13 @@ public record ThrusterTheme(
 public record DamageTheme(
     string Name,
     Color HullColor,
-    Color HullIntensity,
+    float HullIntensity,
     Color CompColor,
+    float CompIntensity,
     Color AlarmColor,
     Color AlarmLitColor,
     float AlarmLitIntensity,
-    float IndicatorLight
+    Color IndicatorLight
 )
 {
     internal static DamageTheme From(DamageThemeDataJson themeData)
@@ -111,6 +136,7 @@ public record DamageTheme(
             themeData.HullColor,
             themeData.HullIntensity,
             themeData.CompColor,
+            themeData.CompIntensity,
             themeData.AlarmColor,
             themeData.AlarmLitColor,
             themeData.AlarmLitIntensity,

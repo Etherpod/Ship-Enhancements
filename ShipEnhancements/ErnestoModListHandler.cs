@@ -15,7 +15,7 @@ public static class ErnestoModListHandler
     public static void Initialize()
     {
         _httpClientGenerator = new HttpClientGenerator(
-            "https://raw.githubusercontent.com/Etherpod/Ship-Enhancements/refs/heads/version-1.2.0/ShipEnhancements/dialogue/ErnestoModList.json",
+            "https://raw.githubusercontent.com/Etherpod/Ship-Enhancements/refs/heads/main/ShipEnhancements/dialogue/ErnestoModList.json",
             client => client.Timeout = System.TimeSpan.FromMilliseconds(2500)
         );
 
