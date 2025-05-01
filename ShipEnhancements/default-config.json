@@ -743,7 +743,7 @@
         "Lavender",
         "Pink",
         "Hot Pink",
-        "Gray",
+        "Dark Gray",
         "Rainbow"
       ],
       "tooltip": "Changes the color of the inside of the ship."
@@ -764,7 +764,7 @@
         "Lavender",
         "Pink",
         "Hot Pink",
-        "Gray",
+        "Dark Gray",
         "Rainbow"
       ],
       "tooltip": "Changes the color of the outside of the ship."
@@ -782,6 +782,7 @@
         "Lavender",
         "Bubblegum",
         "Hot Pink",
+        "White",
         "Rainbow"
       ],
       "tooltip": "Changes the color of the thruster flames produced by the ship."

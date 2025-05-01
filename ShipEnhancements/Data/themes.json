@@ -43,9 +43,9 @@
     {
       "name": "Ghostly Green",
       "light": {
-        "r": 61,
-        "g": 232,
-        "b": 179
+        "r": 0,
+        "g": 255,
+        "b": 168
       }
     },
     {
@@ -67,9 +67,9 @@
     {
       "name": "Ultraviolet",
       "light": {
-        "r": 79,
-        "g": 5,
-        "b": 255
+        "r": 105,
+        "g": 0,
+        "b": 347
       }
     },
     {
@@ -211,7 +211,7 @@
       }
     },
     {
-      "name": "Gray",
+      "name": "Dark Gray",
       "hull": {
         "r": 119,
         "g": 122,
@@ -252,7 +252,7 @@
     {
       "name": "Hot Pink",
       "thruster": "ThrusterFlames_HotPink.png",
-      "thrusterIntensity": 1.7,
+      "thrusterIntensity": 1.4,
       "thrusterLight": {
         "r": 287,
         "g": 59,
@@ -331,6 +331,69 @@
         "r": 204,
         "g": 173,
         "b": 255
+      }
+    },
+    {
+      "name": "White",
+      "thruster": "ThrusterFlames_Gray.png",
+      "thrusterIntensity": 1.1,
+      "thrusterLight": {
+        "r": 255,
+        "g": 255,
+        "b": 255
+      },
+      "indicator": {
+        "r": 161,
+        "g": 161,
+        "b": 161
+      },
+      "indicatorIntensity": 1.0,
+      "indicatorLight": {
+        "r": 204,
+        "g": 204,
+        "b": 204
+      }
+    },
+    {
+      "name": "Ultraviolet",
+      "thruster": "ThrusterFlames_Ultraviolet.png",
+      "thrusterIntensity": 1.4,
+      "thrusterLight": {
+        "r": 121,
+        "g": 0,
+        "b": 255
+      },
+      "indicator": {
+        "r": 22,
+        "g": 0,
+        "b": 191
+      },
+      "indicatorIntensity": 1.8,
+      "indicatorLight": {
+        "r": 111,
+        "g": 0,
+        "b": 255
+      }
+    },
+    {
+      "name": "Turquoise",
+      "thruster": "ThrusterFlames_Turquoise.png",
+      "thrusterIntensity": 1.0,
+      "thrusterLight": {
+        "r": 88,
+        "g": 253,
+        "b": 255
+      },
+      "indicator": {
+        "r": 0,
+        "g": 191,
+        "b": 141
+      },
+      "indicatorIntensity": 1.0,
+      "indicatorLight": {
+        "r": 0,
+        "g": 255,
+        "b": 252
       }
     }
   ],
