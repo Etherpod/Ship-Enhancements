@@ -679,7 +679,11 @@ public class ShipEnhancements : ModBehaviour
             {
                 if (SettingsPresets.VanillaPlusSettings.ContainsKey(allSettings[i].GetName()))
                 {
-                    allSettings[i].SetProperty(SettingsPresets.VanillaPlusSettings[allSettings[i].GetName()]);
+                    allSettings[i].SetProperty(ModHelper.Config.GetSettingsValue<object>(allSettings[i].GetName()));
+                }
+                else
+                {
+                    allSettings[i].SetProperty(ModHelper.Config.GetSettingsValue<object>(allSettings[i].GetName()));
                 }
 
                 if (SettingsPresets.RandomSettings.ContainsKey(allSettings[i].GetName()))
@@ -846,10 +850,15 @@ public class ShipEnhancements : ModBehaviour
         bool coloredLights = (string)Settings.shipLightColor.GetProperty() != "Default";
         if ((bool)Settings.disableShipLights.GetProperty() || coloredLights)
         {
-            Color lightColor = ThemeManager.GetLightTheme((string)Settings.shipLightColor.GetProperty()).LightColor;
-            if ((string)Settings.shipLightColor.GetProperty() != "Divine")
+            Color lightColor = Color.white;
+            if (coloredLights)
             {
-                lightColor /= 255f;
+                ShipEnhancements.WriteDebugMessage((string)Settings.shipLightColor.GetProperty());
+                lightColor = ThemeManager.GetLightTheme((string)Settings.shipLightColor.GetProperty()).LightColor;
+                if ((string)Settings.shipLightColor.GetProperty() != "Divine")
+                {
+                    lightColor /= 255f;
+                }
             }
 
             foreach (ElectricalSystem system in SELocator.GetShipBody().GetComponentsInChildren<ElectricalSystem>())
@@ -2029,6 +2038,16 @@ public class ShipEnhancements : ModBehaviour
 
             ShipWarpCoreController core = SELocator.GetShipTransform().GetComponentInChildren<ShipWarpCoreController>();
             core.SetReceiver(receiverObj);
+        }
+        else
+        {
+            GameObject receiver = LoadPrefab("Assets/ShipEnhancements/ShipWarpReceiver.prefab");
+            AssetBundleUtilities.ReplaceShaders(receiver);
+            receiver.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = SELocator.GetShipBody().gameObject;
+            GameObject receiverObj = Instantiate(receiver, GameObject.Find("TimberHearth_Body").transform);
+
+            ShipWarpCoreController core = SELocator.GetShipTransform().GetComponentInChildren<ShipWarpCoreController>();
+            core.SetReceiver(receiverObj.GetComponent<ShipWarpCoreReceiver>());
         }
     }
 
