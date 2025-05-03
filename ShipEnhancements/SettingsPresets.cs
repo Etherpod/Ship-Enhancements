@@ -57,7 +57,7 @@ public static class SettingsPresets
         { "shipInputLatency", 0f },
         { "addEngineSwitch", false },
         { "idleFuelConsumptionMultiplier", 0f },
-        { "shipLightColor", "Default" },
+        //{ "shipLightColor", "Default" },
         { "hotThrusters", false },
         { "extraNoise", false },
         { "interiorHullColor", "Default" },
@@ -170,7 +170,7 @@ public static class SettingsPresets
         { "shipInputLatency", 0f },
         { "addEngineSwitch", false },
         { "idleFuelConsumptionMultiplier", 0f },
-        { "shipLightColor", "Default" },
+        //{ "shipLightColor", "Default" },
         { "hotThrusters", false },
         { "extraNoise", false },
         { "interiorHullColor", "Default" },
@@ -283,7 +283,7 @@ public static class SettingsPresets
         { "shipInputLatency", 0f },
         { "addEngineSwitch", false },
         { "idleFuelConsumptionMultiplier", 0f },
-        { "shipLightColor", "Default" },
+        //{ "shipLightColor", "Default" },
         { "hotThrusters", false },
         { "extraNoise", true },
         { "interiorHullColor", "Default" },
@@ -396,7 +396,7 @@ public static class SettingsPresets
         { "shipInputLatency", 0f },
         { "addEngineSwitch", true },
         { "idleFuelConsumptionMultiplier", 0f },
-        { "shipLightColor", "Default" },
+        //{ "shipLightColor", "Default" },
         { "hotThrusters", false },
         { "extraNoise", false },
         { "interiorHullColor", "Default" },
@@ -509,7 +509,7 @@ public static class SettingsPresets
         { "shipInputLatency", 0f },
         { "addEngineSwitch", true },
         { "idleFuelConsumptionMultiplier", 1f },
-        { "shipLightColor", "Rainbow" },
+        //{ "shipLightColor", "Rainbow" },
         { "hotThrusters", true },
         { "extraNoise", true },
         { "interiorHullColor", "Rainbow" },
@@ -748,7 +748,7 @@ public static class SettingsPresets
             ((0.5f, 1f), (0f, 1.1f)),
             ((1f, 3f), (0f, 0.5f)),
         ], (0f, 0.5f), 0f) },
-        { "shipLightColor", new RandomSettingValue(
+        /*{ "shipLightColor", new RandomSettingValue(
         [
             ("Red", (1f, 1f)),
             ("Hearthian Orange", (1f, 1f)),
@@ -766,7 +766,7 @@ public static class SettingsPresets
             ("Black", (1f, 1f)),
             ("Divine", (0f, 0.5f)),
             ("Rainbow", (0f, 0.5f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.1f, 0.25f), "Default") },*/
         { "hotThrusters", new RandomSettingValue((0.2f, 0.8f)) },
         { "extraNoise", new RandomSettingValue((0f, 0.8f)) },
         { "interiorHullColor", new RandomSettingValue(

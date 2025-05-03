@@ -57,7 +57,11 @@ public static class SettingExtensions
         { Settings.shipInputLatency, (1f, 1f) },
         { Settings.addEngineSwitch, (false, false) },
         { Settings.idleFuelConsumptionMultiplier, (1f, 1f) },
-        { Settings.shipLightColor, ("", "") },
+        { Settings.shipLightColorOptions, ("", "") },
+        { Settings.shipLightColor1, ("", "") },
+        { Settings.shipLightColor2, ("", "") },
+        { Settings.shipLightColor3, ("", "") },
+        { Settings.shipLightBlend, ("", "") },
         { Settings.hotThrusters, (false, false) },
         { Settings.extraNoise, (false, false) },
         { Settings.interiorHullColor, ("", "") },
@@ -121,6 +125,7 @@ public static class SettingExtensions
         { Settings.randomDifficulty, (1f, 1f) },
         { Settings.disableHatch, (false, false) },
         { Settings.splitLockOn, (false, false) },
+        { Settings.enableColorBlending, (false, false) },
     };
 
     private static Dictionary<Settings, object> savedCustomSettings = new(settingValues.Count);
@@ -223,4 +228,8 @@ public static class SettingExtensions
             savedCustomSettings[setting] = Instance.ModHelper.DefaultConfig.GetSettingsValue<object>(setting.GetName());
         }
     }
+
+    public static T AsEnum<T>(this string enumName) where T : struct =>
+    Enum.TryParse<T>(enumName, out var result) ? result 
+        : throw new ArgumentException($"Enum '{enumName}' does not exist.");
 }
