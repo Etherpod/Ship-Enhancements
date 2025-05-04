@@ -4734,4 +4734,18 @@ public static class PatchClass
         return false;
     }
     #endregion
+
+    #region ShipLightFix
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipLight), nameof(ShipLight.SetExtraIntensityScale))]
+    public static void UpdateShipLightEmission(ShipLight __instance)
+    {
+        if (__instance._emissiveRenderer != null)
+        {
+            float num2 = __instance._light.intensity / __instance._baseIntensity;
+            __instance._matPropBlock.SetColor(__instance._propID_EmissionColor, __instance._baseEmission * num2);
+            __instance._emissiveRenderer.SetPropertyBlock(__instance._matPropBlock);
+        }
+    }
+    #endregion
 }

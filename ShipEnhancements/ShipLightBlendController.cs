@@ -19,6 +19,7 @@ public class ShipLightBlendController : MonoBehaviour
     private Color[] _blendColors;
     private string _blendMode;
     private List<int> _rainbowIndexes = [];
+    private Color _defaultColor;
 
     private void Awake()
     {
@@ -27,8 +28,9 @@ public class ShipLightBlendController : MonoBehaviour
         _red = 1f;
         _green = 0f;
         _blue = 0f;
+        _defaultColor = (_shipLight ? _shipLight._light.color : _pulsingLight._light.color) * 255f;
 
-        if ((bool)enableColorBlending.GetProperty())
+        if ((bool)enableColorBlending.GetProperty() && int.Parse((string)shipLightColorOptions.GetProperty()) > 1)
         {
             _blendColors = new Color[int.Parse((string)shipLightColorOptions.GetProperty())];
             for (int i = 0; i < _blendColors.Length; i++)
@@ -42,8 +44,7 @@ public class ShipLightBlendController : MonoBehaviour
                 }
                 else if (setting == "Default")
                 {
-                    _blendColors[i] = (_shipLight ? _shipLight._light.color : _pulsingLight._light.color)
-                        * 255f;
+                    _blendColors[i] = _defaultColor;
                 }
                 else
                 {
@@ -74,39 +75,87 @@ public class ShipLightBlendController : MonoBehaviour
 
     private void Update()
     {
-        switch (_blendMode)
+        if (_blendColors == null) return;
+
+        if (_blendMode == "Temperature" && SELocator.GetShipTemperatureDetector() != null)
         {
-            case "Temperature":
-                if (SELocator.GetShipTemperatureDetector() != null)
+            float temp = (SELocator.GetShipTemperatureDetector().GetTemperatureRatio() + 1f) / 2f;
+
+            if (_blendColors.Length == 2)
+            {
+                Color color = Color.Lerp(_blendColors[1], _blendColors[0], temp);
+                SetColor(color);
+            }
+            else if (_blendColors.Length == 3)
+            {
+                Color color;
+                if (temp < 0.5f)
                 {
-                    float temp = (SELocator.GetShipTemperatureDetector().GetTemperatureRatio() + 1f) / 2f;
-                    if (_blendColors.Length == 1)
-                    {
-                        SetColor(_blendColors[0]);
-                    }
-                    else if (_blendColors.Length == 2)
-                    {
-                        Color color = Color.Lerp(_blendColors[1], _blendColors[0], temp);
-                        SetColor(color);
-                    }
-                    else if (_blendColors.Length == 3)
-                    {
-                        Color color;
-                        if (temp < 0.5f)
-                        {
-                            color = Color.Lerp(_blendColors[2], _blendColors[1], temp * 2f);
-                        }
-                        else
-                        {
-                            color = Color.Lerp(_blendColors[1], _blendColors[0], (temp - 0.5f) * 2f); 
-                        }
-                        SetColor(color);
-                    }
+                    color = Color.Lerp(_blendColors[2], _blendColors[1], temp * 2f);
                 }
-                break;
+                else
+                {
+                    color = Color.Lerp(_blendColors[1], _blendColors[0], (temp - 0.5f) * 2f);
+                }
+                SetColor(color);
+            }
+        }
+        else if (_blendMode == "Ship Temperature" && SELocator.GetShipTemperatureDetector() != null)
+        {
+            float shipTemp = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
+            
+            if (_blendColors.Length == 2)
+            {
+                Color color = Color.Lerp(_blendColors[1], _blendColors[0], shipTemp);
+                SetColor(color);
+            }
+            else if (_blendColors.Length == 3)
+            {
+                Color color;
+                if (shipTemp < 0.5f)
+                {
+                    color = Color.Lerp(_blendColors[2], _blendColors[1], shipTemp * 2f);
+                }
+                else
+                {
+                    color = Color.Lerp(_blendColors[1], _blendColors[0], (shipTemp - 0.5f) * 2f);
+                }
+                SetColor(color);
+            }
+        }
+        else
+        {
+            ResetLight();
         }
     }
 
+    private void ResetLight()
+    {
+        Color baseEmission;
+        Color baseColor = _defaultColor / 255f;
+        if (_shipLight)
+        {
+            baseEmission = _shipLight._emissiveRenderer.sharedMaterials[_shipLight._materialIndex]
+                .GetColor(_shipLight._propID_EmissionColor);
+
+            _shipLight._baseEmission = baseColor;
+            _shipLight._matPropBlock.SetColor(_shipLight._propID_EmissionColor,
+                    baseEmission * _shipLight._light.intensity / _shipLight._baseIntensity);
+            _shipLight._emissiveRenderer.SetPropertyBlock(_shipLight._matPropBlock);
+            _shipLight._light.color = baseColor;
+        }
+        else if (_pulsingLight)
+        {
+            baseEmission = _pulsingLight._emissiveRenderer.sharedMaterials[_pulsingLight._materialIndex]
+                .GetColor(PulsingLight.s_propID_EmissionColor);
+
+            _pulsingLight._initEmissionColor = baseEmission;
+            _pulsingLight._light.color = baseColor;
+        }
+
+        _blendColors = null;
+        enabled = false;
+    }
 
     private void FixedUpdate()
     {

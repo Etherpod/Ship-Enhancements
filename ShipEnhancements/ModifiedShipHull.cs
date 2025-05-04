@@ -47,7 +47,9 @@ public class ModifiedShipHull : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (_tempHazardVolume != null && collision.collider.GetAttachedOWRigidbody().CompareTag("Player") && !PlayerState.IsInsideShip())
+        if (_tempHazardVolume != null 
+            && (collision?.collider?.GetAttachedOWRigidbody()?.CompareTag("Player") ?? false) 
+            && !PlayerState.IsInsideShip())
         {
             float ratio = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
             if (ratio > 0.75f)
@@ -61,7 +63,9 @@ public class ModifiedShipHull : MonoBehaviour
 
     private void OnCollisionExit(Collision collision)
     {
-        if (_tempHazardVolume != null && collision.collider.GetAttachedOWRigidbody().CompareTag("Player") && !PlayerState.IsInsideShip())
+        if (_tempHazardVolume != null 
+            && (collision?.collider?.GetAttachedOWRigidbody()?.CompareTag("Player") ?? false) 
+            && !PlayerState.IsInsideShip())
         {
             Locator.GetPlayerDetector().GetComponent<HazardDetector>().RemoveVolume(_tempHazardVolume);
         }
