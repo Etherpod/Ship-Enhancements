@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
@@ -17,7 +18,7 @@ public class ShipLightBlendController : MonoBehaviour
 
     private Color[] _blendColors;
     private string _blendMode;
-    private bool _rainbow = false;
+    private List<int> _rainbowIndexes = [];
 
     private void Awake()
     {
@@ -27,27 +28,30 @@ public class ShipLightBlendController : MonoBehaviour
         _green = 0f;
         _blue = 0f;
 
-        _blendColors = new Color[int.Parse((string)shipLightColorOptions.GetProperty())];
-        for (int i = 0; i < _blendColors.Length; i++)
+        if ((bool)enableColorBlending.GetProperty())
         {
-            var setting = (string)("shipLightColor" + (i + 1))
-                .AsEnum<ShipEnhancements.Settings>().GetProperty();
-            if (setting == "Rainbow")
+            _blendColors = new Color[int.Parse((string)shipLightColorOptions.GetProperty())];
+            for (int i = 0; i < _blendColors.Length; i++)
             {
-                _rainbow = true;
+                var setting = (string)("shipLightColor" + (i + 1))
+                    .AsEnum<ShipEnhancements.Settings>().GetProperty();
+                if (setting == "Rainbow")
+                {
+                    _rainbowIndexes.Add(i);
+                    _blendColors[i] = Color.white;
+                }
+                else if (setting == "Default")
+                {
+                    _blendColors[i] = (_shipLight ? _shipLight._light.color : _pulsingLight._light.color)
+                        * 255f;
+                }
+                else
+                {
+                    _blendColors[i] = ShipEnhancements.ThemeManager.GetLightTheme(setting).LightColor;
+                }
             }
-
-            if (setting == "Default")
-            {
-                _blendColors[i] = (_shipLight ? _shipLight._light.color : _pulsingLight._light.color)
-                    * 255f;
-            }
-            else
-            {
-                _blendColors[i] = ShipEnhancements.ThemeManager.GetLightTheme(setting).LightColor;
-            }
+            _blendMode = (string)shipLightBlend.GetProperty();
         }
-        _blendMode = (string)shipLightBlend.GetProperty();
     }
 
     private void SetColor(Color color)
@@ -56,11 +60,9 @@ public class ShipLightBlendController : MonoBehaviour
         if (_shipLight)
         {
             _shipLight._baseEmission = color;
-            if (_shipLight._light.intensity == _shipLight._baseIntensity)
-            {
-                _shipLight._matPropBlock.SetColor(_shipLight._propID_EmissionColor, color);
-                _shipLight._emissiveRenderer.SetPropertyBlock(_shipLight._matPropBlock);
-            }
+            _shipLight._matPropBlock.SetColor(_shipLight._propID_EmissionColor,
+                    color * _shipLight._light.intensity / _shipLight._baseIntensity);
+            _shipLight._emissiveRenderer.SetPropertyBlock(_shipLight._matPropBlock);
             _shipLight._light.color = color;
         }
         else if (_pulsingLight)
@@ -108,7 +110,9 @@ public class ShipLightBlendController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (!_rainbow || (_shipLight && !_shipLight.IsOn()) || (_pulsingLight && !_pulsingLight.enabled))
+        if ((_blendColors != null && _rainbowIndexes.Count == 0) 
+            || (_shipLight && !_shipLight.IsOn()) 
+            || (_pulsingLight && !_pulsingLight.enabled))
         {
             return;
         }
@@ -144,6 +148,18 @@ public class ShipLightBlendController : MonoBehaviour
         else if (_index == 5)
         {
             _blue = 1 - Mathf.Lerp(0f, 1f, num);
+        }
+
+        if (_blendColors != null)
+        {
+            foreach (int i in _rainbowIndexes)
+            {
+                _blendColors[i] = new Color(_red, _green, _blue) * 255f;
+            }
+        }
+        else
+        {
+            SetColor(new Color(_red, _green, _blue) * 255f);
         }
 
         _lastDelta = num;

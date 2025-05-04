@@ -858,11 +858,13 @@ public class ShipEnhancements : ModBehaviour
                 .GetComponent<ShipDetachableLeg>();
             _frontLeg.OnLegDetach += OnFrontLegDetached;
         }
+
         bool coloredLights = (string)Settings.shipLightColor1.GetProperty() != "Default";
-        bool blendingLights = (bool)Settings.enableColorBlending.GetProperty()
-            && int.Parse((string)Settings.shipLightColorOptions.GetProperty()) > 1;
-        if ((bool)Settings.disableShipLights.GetProperty() || coloredLights
-            || blendingLights)
+        bool blendingLights = ((bool)Settings.enableColorBlending.GetProperty()
+            && int.Parse((string)Settings.shipLightColorOptions.GetProperty()) > 1)
+            || (string)Settings.shipLightColor1.GetProperty() == "Rainbow";
+
+        if ((bool)Settings.disableShipLights.GetProperty() || coloredLights || blendingLights)
         {
             Color lightColor = Color.white;
             if (coloredLights && !blendingLights)
@@ -895,10 +897,6 @@ public class ShipEnhancements : ModBehaviour
                             {
                                 light._matPropBlock.SetColor(light._propID_EmissionColor, lightColor);
                                 light._emissiveRenderer.SetPropertyBlock(light._matPropBlock);
-                            }
-                            if ((string)Settings.shipLightColor1.GetProperty() == "Rainbow")
-                            {
-                                light.gameObject.AddComponent<ShipLightBlendController>();
                             }
                         }
                     }
@@ -2393,9 +2391,9 @@ public class ShipEnhancements : ModBehaviour
 
     private void OnWakeUp()
     {
-        bool allRainbow = (string)Settings.interiorHullColor.GetProperty() == "Rainbow"
+        bool allRainbow = !(bool)Settings.enableColorBlending.GetProperty()
+            && (string)Settings.interiorHullColor.GetProperty() == "Rainbow"
             && (string)Settings.exteriorHullColor.GetProperty() == "Rainbow"
-            && !(bool)Settings.enableColorBlending.GetProperty()2
             && (string)Settings.shipLightColor1.GetProperty() == "Rainbow"
             && (string)Settings.thrusterColor.GetProperty() == "Rainbow"
             && (string)Settings.damageIndicatorColor.GetProperty() == "Rainbow";
