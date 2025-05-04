@@ -4726,7 +4726,7 @@ public static class PatchClass
     {
         if (!(bool)splitLockOn.GetProperty()) return true;
 
-        if (SELocator.GetReferenceFrame() != referenceFrame)
+        if (PlayerState.AtFlightConsole() && SELocator.GetReferenceFrame() != referenceFrame)
         {
             return true;
         }

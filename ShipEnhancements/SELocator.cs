@@ -259,7 +259,7 @@ public static class SELocator
         }
         else
         {
-            Locator._rfTracker.UntargetReferenceFrame();
+            Locator._rfTracker.UntargetReferenceFrame(false);
         }
     }
 
@@ -273,7 +273,7 @@ public static class SELocator
         }
         else
         {
-            Locator._rfTracker.UntargetReferenceFrame();
+            Locator._rfTracker.UntargetReferenceFrame(false);
         }
     }
 }
