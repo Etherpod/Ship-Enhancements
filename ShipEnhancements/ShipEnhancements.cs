@@ -867,12 +867,9 @@ public class ShipEnhancements : ModBehaviour
             Color lightColor = Color.white;
             if (coloredLights && !blendingLights)
             {
-                ShipEnhancements.WriteDebugMessage((string)Settings.shipLightColor1.GetProperty());
-                lightColor = ThemeManager.GetLightTheme((string)Settings.shipLightColor1.GetProperty()).LightColor;
-                if ((string)Settings.shipLightColor1.GetProperty() != "Divine")
-                {
-                    lightColor /= 255f;
-                }
+                lightColor = ThemeManager.GetLightTheme(
+                    (string)Settings.shipLightColor1.GetProperty())
+                    .LightColor / 255f;
             }
 
             foreach (ElectricalSystem system in SELocator.GetShipBody().GetComponentsInChildren<ElectricalSystem>())
@@ -2398,7 +2395,7 @@ public class ShipEnhancements : ModBehaviour
     {
         bool allRainbow = (string)Settings.interiorHullColor.GetProperty() == "Rainbow"
             && (string)Settings.exteriorHullColor.GetProperty() == "Rainbow"
-            && !(bool)Settings.enableColorBlending.GetProperty()
+            && !(bool)Settings.enableColorBlending.GetProperty()2
             && (string)Settings.shipLightColor1.GetProperty() == "Rainbow"
             && (string)Settings.thrusterColor.GetProperty() == "Rainbow"
             && (string)Settings.damageIndicatorColor.GetProperty() == "Rainbow";

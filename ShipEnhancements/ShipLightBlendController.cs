@@ -39,7 +39,8 @@ public class ShipLightBlendController : MonoBehaviour
 
             if (setting == "Default")
             {
-                _blendColors[i] = _shipLight ? _shipLight._light.color : _pulsingLight._light.color;
+                _blendColors[i] = (_shipLight ? _shipLight._light.color : _pulsingLight._light.color)
+                    * 255f;
             }
             else
             {
