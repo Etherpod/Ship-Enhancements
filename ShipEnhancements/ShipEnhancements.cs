@@ -2634,12 +2634,15 @@ public class ShipEnhancements : ModBehaviour
 
         var allSettings = Enum.GetValues(typeof(Settings)) as Settings[];
         SettingsPresets.PresetName newPreset = SettingsPresets.GetPresetFromConfig(config.GetSettingsValue<string>("preset"));
+
+        // Detect preset change or init preset
         if (newPreset != _currentPreset || _currentPreset == (SettingsPresets.PresetName)(-1))
         {
             SettingsPresets.PresetName lastPreset = _currentPreset;
             _currentPreset = newPreset;
             config.SetSettingsValue("preset", _currentPreset.GetName());
 
+            // Load saved settings if switching to Custom preset
             if ((_currentPreset == SettingsPresets.PresetName.Custom
                 || _currentPreset == SettingsPresets.PresetName.Random)
                 && lastPreset != (SettingsPresets.PresetName)(-1))
@@ -2651,6 +2654,7 @@ public class ShipEnhancements : ModBehaviour
                     config.SetSettingsValue(setting.GetName(), setting.GetValue());
                 }
             }
+            // Save settings if switching off Custom preset
             else
             {
                 if (lastPreset == SettingsPresets.PresetName.Custom
@@ -2660,6 +2664,7 @@ public class ShipEnhancements : ModBehaviour
                     SettingExtensions.SaveCustomSettings();
                 }
 
+                // Apply newly selected preset
                 SettingsPresets.ApplyPreset(newPreset, config);
                 foreach (Settings setting in allSettings)
                 {
@@ -2667,22 +2672,44 @@ public class ShipEnhancements : ModBehaviour
                 }
             }
 
+            // Display changes
             RedrawSettingsMenu();
         }
+        // Something other than a preset was changed
         else
         {
+            var decoChanged = false;
+
+            foreach (var pair in GetDecorationSettings())
+            {
+                var currentSetting = pair.Key.AsEnum<Settings>().GetValue();
+                var newSetting = SettingExtensions.ConvertJValue(config.GetSettingsValue<object>(pair.Key));
+                if (!currentSetting.Equals(newSetting))
+                {
+                    decoChanged = true;
+                    break;
+                }
+            }
+
             var isCustom = false;
+
             foreach (Settings setting in allSettings)
             {
+                // Detect changed settings
                 setting.SetValue(config.GetSettingsValue<object>(setting.GetName()));
-                if (_currentPreset != SettingsPresets.PresetName.Custom && _currentPreset != SettingsPresets.PresetName.Random)
+
+                // Check if the new values match the selected preset
+                if (!isCustom && _currentPreset != SettingsPresets.PresetName.Custom && _currentPreset != SettingsPresets.PresetName.Random)
                 {
-                    isCustom = isCustom || (_currentPreset.GetPresetSetting(setting.GetName()) != null 
+                    isCustom = (_currentPreset.GetPresetSetting(setting.GetName()) != null 
                         && !_currentPreset.GetPresetSetting(setting.GetName()).Equals(setting.GetValue()));
                 }
             }
+
+            // If the values no longer match the selected preset...
             if (isCustom)
             {
+                // Switch to custom preset
                 _currentPreset = SettingsPresets.PresetName.Custom;
                 config.SetSettingsValue("preset", _currentPreset.GetName());
                 foreach (Settings setting in allSettings)
@@ -2690,9 +2717,27 @@ public class ShipEnhancements : ModBehaviour
                     config.SetSettingsValue(setting.GetName(), setting.GetValue());
                 }
 
+                // Display changes
                 RedrawSettingsMenu();
             }
+            else if (decoChanged)
+            {
+                ShipEnhancements.WriteDebugMessage("deco changed");
+                RedrawDecorationMenu();
+            }
         }
+    }
+
+    private KeyValuePair<string, object>[] GetDecorationSettings()
+    {
+        int start = ModHelper.Config.Settings.Keys.ToList()
+            .IndexOf("enableColorBlending");
+        int end = ModHelper.Config.Settings.Keys.ToList()
+            .IndexOf("damageIndicatorColor");
+
+        var range = ModHelper.Config.Settings.ToList()
+            .GetRange(start, end - start);
+        return range.ToArray();
     }
 
     public void RedrawSettingsMenu()
@@ -2949,17 +2994,15 @@ public class ShipEnhancements : ModBehaviour
         float lastScrollValue = scrollbar.value;
 
         Transform settingsParent = newModTab.transform.Find("Scroll View/Viewport/Content");
-        int decoIndex = -1;
+        bool foundDeco = false;
         for (int i = 0; i < settingsParent.childCount; i++)
         {
-            if (settingsParent.GetChild(i).name == "UIElement-Ship Light Color")
+            if (settingsParent.GetChild(i).name == "UIElement-Enable Color Blending")
             {
-                int numSettings = ModHelper.Config.Settings.Count 
-                    - ModHelper.Config.Settings.Keys.ToList().IndexOf("shipLightColor");
-                decoIndex = i - (numSettings - 1);
+                foundDeco = true;
             }
 
-            if (decoIndex < 0)
+            if (!foundDeco)
             {
                 MenuOption option = settingsParent.GetChild(i).GetComponentInChildren<MenuOption>();
                 if (option != null)
@@ -2973,27 +3016,39 @@ public class ShipEnhancements : ModBehaviour
             }
         }
 
-        if (decoIndex < 0)
+        if (!foundDeco)
         {
             return;
         }
 
-        /*OptionsMenuManager.AddSeparator(newModTab, true);
-        OptionsMenuManager.CreateLabel(newModTab, "Any changes to the settings are applied on the next loop!");
-        OptionsMenuManager.AddSeparator(newModTab, true);*/
+        bool blendEnabled = (bool)Settings.enableColorBlending.GetValue();
+        int startIndex = ModHelper.Config.Settings.Keys.ToList().IndexOf("enableColorBlending");
+        int endIndex = ModHelper.Config.Settings.Keys.ToList().IndexOf("damageIndicatorColor");
 
-        for (int i = decoIndex; i < ModHelper.Config.Settings.Count; i++)
+        for (int i = startIndex; i < ModHelper.Config.Settings.Count; i++)
         {
             string name = ModHelper.Config.Settings.ElementAt(i).Key;
             object setting = ModHelper.Config.Settings.ElementAt(i).Value;
 
-            /*if (_currentPreset != SettingsPresets.PresetName.Random)
+            if (i <= endIndex)
             {
-                if (name == "randomIterations" || name == "randomDifficulty")
+                if (i > startIndex && !blendEnabled 
+                    && (!int.TryParse(name.Substring(name.Length - 1), out int value) || value != 1))
                 {
+                    ShipEnhancements.WriteDebugMessage("disabled, skip " + name);
                     continue;
                 }
-            }*/
+
+                if (name.Substring(0, name.Length - 1) == "shipLightColor")
+                {
+                    if (int.Parse(name.Substring(name.Length - 1))
+                        > int.Parse((string)Settings.shipLightColorOptions.GetValue()))
+                    {
+                        ShipEnhancements.WriteDebugMessage("skip " + name);
+                        continue;
+                    }
+                }
+            }
 
             var settingType = GetSettingType(setting);
             var label = ModHelper.MenuTranslations.GetLocalizedString(name);
