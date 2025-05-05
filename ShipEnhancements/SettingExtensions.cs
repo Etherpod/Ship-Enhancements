@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using static ShipEnhancements.ShipEnhancements;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
@@ -257,4 +258,15 @@ public static class SettingExtensions
     public static T AsEnum<T>(this string enumName) where T : struct =>
     Enum.TryParse<T>(enumName, out var result) ? result 
         : throw new ArgumentException($"Enum '{enumName}' does not exist.");
+
+    public static ColorHSV AsHSV(this Color color)
+    {
+        Color.RGBToHSV(color, out float H, out float S, out float V);
+        return new ColorHSV(H, S, V);
+    }
+
+    public static Color AsRGB(this ColorHSV color)
+    {
+        return Color.HSVToRGB(color.h, color.s, color.v);
+    }
 }

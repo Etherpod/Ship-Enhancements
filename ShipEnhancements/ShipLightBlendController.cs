@@ -16,7 +16,7 @@ public class ShipLightBlendController : MonoBehaviour
     private int _index;
     private float _lastDelta;
 
-    private Color[] _blendColors;
+    private ColorHSV[] _blendColors;
     private string _blendMode;
     private List<int> _rainbowIndexes = [];
     private Color _defaultColor;
@@ -32,7 +32,7 @@ public class ShipLightBlendController : MonoBehaviour
 
         if ((bool)enableColorBlending.GetProperty() && int.Parse((string)shipLightColorOptions.GetProperty()) > 1)
         {
-            _blendColors = new Color[int.Parse((string)shipLightColorOptions.GetProperty())];
+            _blendColors = new ColorHSV[int.Parse((string)shipLightColorOptions.GetProperty())];
             for (int i = 0; i < _blendColors.Length; i++)
             {
                 var setting = (string)("shipLightColor" + (i + 1))
@@ -40,15 +40,15 @@ public class ShipLightBlendController : MonoBehaviour
                 if (setting == "Rainbow")
                 {
                     _rainbowIndexes.Add(i);
-                    _blendColors[i] = Color.white;
+                    _blendColors[i] = Color.white.AsHSV();
                 }
                 else if (setting == "Default")
                 {
-                    _blendColors[i] = _defaultColor;
+                    _blendColors[i] = _defaultColor.AsHSV();
                 }
                 else
                 {
-                    _blendColors[i] = ShipEnhancements.ThemeManager.GetLightTheme(setting).LightColor;
+                    _blendColors[i] = ShipEnhancements.ThemeManager.GetLightTheme(setting).LightColor.AsHSV();
                 }
             }
             _blendMode = (string)shipLightBlend.GetProperty();
@@ -72,6 +72,11 @@ public class ShipLightBlendController : MonoBehaviour
             _pulsingLight._light.color = color;
         }
     }
+    
+    private void SetColor(ColorHSV color)
+    {
+        SetColor(color.AsRGB());
+    }
 
     private void Update()
     {
@@ -83,19 +88,19 @@ public class ShipLightBlendController : MonoBehaviour
 
             if (_blendColors.Length == 2)
             {
-                Color color = Color.Lerp(_blendColors[1], _blendColors[0], temp);
+                ColorHSV color = ColorHSV.Lerp(_blendColors[1], _blendColors[0], temp);
                 SetColor(color);
             }
             else if (_blendColors.Length == 3)
             {
-                Color color;
+                ColorHSV color;
                 if (temp < 0.5f)
                 {
-                    color = Color.Lerp(_blendColors[2], _blendColors[1], temp * 2f);
+                    color = ColorHSV.Lerp(_blendColors[2], _blendColors[1], temp * 2f);
                 }
                 else
                 {
-                    color = Color.Lerp(_blendColors[1], _blendColors[0], (temp - 0.5f) * 2f);
+                    color = ColorHSV.Lerp(_blendColors[1], _blendColors[0], (temp - 0.5f) * 2f);
                 }
                 SetColor(color);
             }
@@ -106,22 +111,31 @@ public class ShipLightBlendController : MonoBehaviour
             
             if (_blendColors.Length == 2)
             {
-                Color color = Color.Lerp(_blendColors[1], _blendColors[0], shipTemp);
+                ColorHSV color = ColorHSV.Lerp(_blendColors[1], _blendColors[0], shipTemp);
                 SetColor(color);
             }
             else if (_blendColors.Length == 3)
             {
-                Color color;
+                ColorHSV color;
                 if (shipTemp < 0.5f)
                 {
-                    color = Color.Lerp(_blendColors[2], _blendColors[1], shipTemp * 2f);
+                    color = ColorHSV.Lerp(_blendColors[2], _blendColors[1], shipTemp * 2f);
                 }
                 else
                 {
-                    color = Color.Lerp(_blendColors[1], _blendColors[0], (shipTemp - 0.5f) * 2f);
+                    color = ColorHSV.Lerp(_blendColors[1], _blendColors[0], (shipTemp - 0.5f) * 2f);
                 }
                 SetColor(color);
             }
+        }
+        else if (_blendMode == "Time")
+        {
+            var t = Time.time / 4f / _blendColors.Length % _blendColors.Length;
+            var a = (int)t;
+            var b = (a + 1) % _blendColors.Length;
+            var color = ColorHSV.Lerp(_blendColors[a], _blendColors[b], 
+                Mathf.SmoothStep(0, 1, (t - a) * 2f - 0.5f));
+            SetColor(color);
         }
         else
         {
@@ -203,7 +217,7 @@ public class ShipLightBlendController : MonoBehaviour
         {
             foreach (int i in _rainbowIndexes)
             {
-                _blendColors[i] = new Color(_red, _green, _blue) * 255f;
+                _blendColors[i] = (new Color(_red, _green, _blue) * 255f).AsHSV();
             }
         }
         else
