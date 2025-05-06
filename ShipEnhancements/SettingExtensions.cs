@@ -80,7 +80,7 @@ public static class SettingExtensions
         { disableSeatbelt, (false, false) },
         { addPortableTractorBeam, (false, false) },
         { disableShipSuit, (false, false) },
-        { damageIndicatorColor, ("", "") },
+        { damageIndicatorColor1, ("", "") },
         { disableAutoLights, (false, false) },
         { addExpeditionFlag, (false, false) },
         { addFuelCanister, (false, false) },

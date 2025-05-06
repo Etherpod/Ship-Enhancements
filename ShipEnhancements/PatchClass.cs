@@ -4595,7 +4595,7 @@ public static class PatchClass
                 }
 
                 __instance.OnActivateMenu += () => ShipEnhancements.Instance.ModHelper.Events.Unity
-                    .FireOnNextUpdate(ShipEnhancements.Instance.RedrawSettingsMenu);
+                    .FireOnNextUpdate(() => ShipEnhancements.Instance.RedrawSettingsMenu());
                 return;
             }
         }

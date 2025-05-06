@@ -865,7 +865,7 @@
       ],
       "tooltip": "Changes the color of the thruster flames produced by the ship."
     },
-    "damageIndicatorColor": {
+    "damageIndicatorColor1": {
       "title": "Damage Indicator Color",
       "type": "selector",
       "value": "Default",
