@@ -2822,7 +2822,10 @@ public class ShipEnhancements : ModBehaviour
 
                 if (settingObject["title"] != null)
                 {
-                    label = ModHelper.MenuTranslations.GetLocalizedString(settingObject["title"].ToString());
+                    if (!SetCustomSettingName(ref label, name))
+                    {
+                        label = ModHelper.MenuTranslations.GetLocalizedString(settingObject["title"].ToString());
+                    }
                 }
 
                 if (settingObject["tooltip"] != null)
@@ -3077,6 +3080,40 @@ public class ShipEnhancements : ModBehaviour
             }
         }
 
+        return false;
+    }
+
+    private bool SetCustomSettingName(ref string label, string settingName)
+    {
+        if (settingName.Substring(0, settingName.Length - 1) != "shipLightColor")
+        {
+            return false;
+        }
+
+        int num = int.Parse((string)Settings.shipLightColorOptions.GetValue());
+
+        if (num == 1)
+        {
+            return false;
+        }
+
+        int index = int.Parse(settingName.Substring(settingName.Length - 1));
+        string blend = (string)Settings.shipLightBlend.GetValue();
+        if (blend == "Ship Temperature")
+        {
+            if (index == 0)
+            {
+                label = "Light Color (Hot)";
+            }
+            else if (index == num - 1)
+            {
+                label = "Light Color (Cold)";
+            }
+            else
+            {
+                label = "Light Color (Default)";
+            }
+        }
         return false;
     }
 
