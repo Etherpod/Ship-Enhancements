@@ -91,6 +91,7 @@ public class ShipEnhancements : ModBehaviour
     public int ThrustModulatorLevel { get; private set; }
     public float ThrustModulatorFactor => ThrustModulatorLevel / 5f;
     public AudioClip ShipHorn { get; private set; }
+    public List<Settings> HiddenSettings { get; private set; } = [];
 
     private SettingsPresets.PresetName _currentPreset = (SettingsPresets.PresetName)(-1);
     private bool _advancedColors = false;
@@ -2782,7 +2783,7 @@ public class ShipEnhancements : ModBehaviour
         int decoEndIndex = ModHelper.Config.Settings.Keys.ToList().IndexOf("damageIndicatorColor1");
 
         int startIndex;
-        int endIndex = ModHelper.Config.Settings.Count - 1; ;
+        int endIndex = ModHelper.Config.Settings.Count - 1;
 
         if (decoration)
         {
@@ -2796,38 +2797,13 @@ public class ShipEnhancements : ModBehaviour
         for (int i = startIndex; i <= endIndex; i++)
         {
             string name = ModHelper.Config.Settings.ElementAt(i).Key;
+
+            if (ShouldHideSetting(i, name, decoration, decoStartIndex, decoEndIndex))
+            {
+                continue;
+            }
+
             object setting = ModHelper.Config.Settings.ElementAt(i).Value;
-
-            if (!decoration)
-            {
-                if (_currentPreset != SettingsPresets.PresetName.Random)
-                {
-                    if (name == "randomIterations" || name == "randomDifficulty")
-                    {
-                        continue;
-                    }
-                }
-            }
-
-            if (i <= decoEndIndex)
-            {
-                if (i > decoStartIndex && !blendEnabled
-                    && (!int.TryParse(name.Substring(name.Length - 1), out int value) || value != 1))
-                {
-                    continue;
-                }
-
-                int colorOptions = int.Parse((string)Settings.shipLightColorOptions.GetValue());
-
-                if (name.Substring(0, name.Length - 1) == "shipLightColor")
-                {
-                    if (int.Parse(name.Substring(name.Length - 1)) > colorOptions)
-                    {
-                        continue;
-                    }
-                }
-            }
-
             var settingType = GetSettingType(setting);
             var label = ModHelper.MenuTranslations.GetLocalizedString(name);
             var tooltip = "";
@@ -3059,6 +3035,49 @@ public class ShipEnhancements : ModBehaviour
         }
 
         return true;
+    }
+
+    private bool ShouldHideSetting(int currIndex, string name, bool onlyDecoration, int decoStartIndex, int decoEndIndex)
+    {
+        foreach (Settings hiddenSetting in HiddenSettings)
+        {
+            if (hiddenSetting.ToString() == name)
+            {
+                return true;
+            }
+        }
+
+        if (!onlyDecoration)
+        {
+            if (_currentPreset != SettingsPresets.PresetName.Random)
+            {
+                if (name == "randomIterations" || name == "randomDifficulty")
+                {
+                    return true;
+                }
+            }
+        }
+
+        if (currIndex <= decoEndIndex)
+        {
+            if (currIndex > decoStartIndex && !(bool)Settings.enableColorBlending.GetValue()
+                && (!int.TryParse(name.Substring(name.Length - 1), out int value) || value != 1))
+            {
+                return true;
+            }
+
+            int colorOptions = int.Parse((string)Settings.shipLightColorOptions.GetValue());
+
+            if (name.Substring(0, name.Length - 1) == "shipLightColor")
+            {
+                if (int.Parse(name.Substring(name.Length - 1)) > colorOptions)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private SettingType GetSettingType(object setting)
