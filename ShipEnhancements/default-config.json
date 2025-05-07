@@ -708,6 +708,17 @@
       "value": false,
       "tooltip": "Lets you blend the decorations between different colors based on chosen parameters."
     },
+    "shipLightBlend": {
+      "title": "Ship Light Blend",
+      "type": "selector",
+      "value": "Time",
+      "options": [
+        "Time",
+        "Temperature",
+        "Ship Temperature"
+      ],
+      "tooltip": "Sets the method of blending between colors."
+    },
     "shipLightColorOptions": {
       "title": "Ship Light Color Options",
       "type": "selector",
@@ -793,17 +804,6 @@
         "Rainbow"
       ],
       "tooltip": "Changes the color of the interior and exterior ship lights."
-    },
-    "shipLightBlend": {
-      "title": "Ship Light Blend",
-      "type": "selector",
-      "value": "Time",
-      "options": [
-        "Time",
-        "Temperature",
-        "Ship Temperature"
-      ],
-      "tooltip": "Sets the method of blending between colors."
     },
     "interiorHullColor": {
       "title": "Interior Hull Color",

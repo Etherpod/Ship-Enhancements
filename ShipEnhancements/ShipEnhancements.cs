@@ -2763,7 +2763,7 @@ public class ShipEnhancements : ModBehaviour
 
         Transform settingsParent = newModTab.transform.Find("Scroll View/Viewport/Content");
 
-        if (!DestroyExistingSettings(newModTab, settingsParent, out MenuOption[] postSettings, decoration))
+        if (!DestroyExistingSettings(newModTab, settingsParent, decoration))
         {
             return;
         }
@@ -2782,17 +2782,15 @@ public class ShipEnhancements : ModBehaviour
         int decoEndIndex = ModHelper.Config.Settings.Keys.ToList().IndexOf("damageIndicatorColor1");
 
         int startIndex;
-        int endIndex;
+        int endIndex = ModHelper.Config.Settings.Count - 1; ;
 
         if (decoration)
         {
             startIndex = decoStartIndex;
-            endIndex = decoEndIndex;
         }
         else
         {
             startIndex = 0;
-            endIndex = ModHelper.Config.Settings.Count - 1;
         }
 
         for (int i = startIndex; i <= endIndex; i++)
@@ -2816,16 +2814,15 @@ public class ShipEnhancements : ModBehaviour
                 if (i > decoStartIndex && !blendEnabled
                     && (!int.TryParse(name.Substring(name.Length - 1), out int value) || value != 1))
                 {
-                    //ShipEnhancements.WriteDebugMessage("disabled, skip " + name);
                     continue;
                 }
 
+                int colorOptions = int.Parse((string)Settings.shipLightColorOptions.GetValue());
+
                 if (name.Substring(0, name.Length - 1) == "shipLightColor")
                 {
-                    if (int.Parse(name.Substring(name.Length - 1))
-                        > int.Parse((string)Settings.shipLightColorOptions.GetValue()))
+                    if (int.Parse(name.Substring(name.Length - 1)) > colorOptions)
                     {
-                        //ShipEnhancements.WriteDebugMessage("skip " + name);
                         continue;
                     }
                 }
@@ -2949,32 +2946,15 @@ public class ShipEnhancements : ModBehaviour
                     OptionsMenuManager.CreateLabel(newModTab, $"Unknown {settingType} : {name}");
                     break;
             }
-        }
 
-        int objStartIndex = settingsParent.Find("UIElement-Enable Color Blending").GetSiblingIndex();
-        int objEndIndex = settingsParent.Find("UIElement-Damage Indicator Color").GetSiblingIndex();
-        int insertionIndex = settingsParent.Find("UIElement-Add Engine Switch").GetSiblingIndex() + 3;
-
-        for (int i = insertionIndex; i < ModHelper.Config.Settings.Count; i++)
-        {
-            ShipEnhancements.WriteDebugMessage(settingsParent.GetChild(i).name);
-        }
-
-        //ShipEnhancements.WriteDebugMessage("Start: " + objStartIndex);
-        //ShipEnhancements.WriteDebugMessage("End: " + objEndIndex);
-        //ShipEnhancements.WriteDebugMessage("Insertion: " + insertionIndex);
-
-        int currIndex = objEndIndex;
-        for (int i = 0; i <= objEndIndex - objStartIndex; i++)
-        {
-            //ShipEnhancements.WriteDebugMessage("c : " + settingsParent.GetChild(currIndex).name);
-            settingsParent.GetChild(currIndex).SetSiblingIndex(insertionIndex);
-            currIndex--;
-        }
-
-        foreach (MenuOption option in postSettings)
-        {
-            newModTab._menuOptions = newModTab._menuOptions.Add(option);
+            if (blendEnabled && i <= decoEndIndex)
+            {
+                if (name.Substring(name.Length - 1)
+                    == (blendEnabled ? (string)Settings.shipLightColorOptions.GetValue() : "1"))
+                {
+                    OptionsMenuManager.AddSeparator(newModTab, false);
+                }
+            }
         }
 
 
@@ -3026,13 +3006,10 @@ public class ShipEnhancements : ModBehaviour
         }, 2);
     }
 
-    private bool DestroyExistingSettings(Menu menu, Transform parent, out MenuOption[] postSettings, bool decoration = false)
+    private bool DestroyExistingSettings(Menu menu, Transform parent, bool decoration = false)
     {
-        postSettings = [];
-
         if (decoration)
         {
-            List<MenuOption> tails = [];
             int startIndex = -1;
             int endIndex = -1;
             for (int i = 0; i < parent.childCount; i++)
@@ -3050,17 +3027,9 @@ public class ShipEnhancements : ModBehaviour
                         menu._menuOptions = menu._menuOptions.Add(option);
                     }
                 }
-                else if (endIndex >= 0)
-                {
-                    MenuOption option = parent.GetChild(i).GetComponentInChildren<MenuOption>();
-                    if (option != null)
-                    {
-                        tails.Add(option);
-                    }
-                }
                 else
                 {
-                    ShipEnhancements.WriteDebugMessage("Destroy " + parent.GetChild(i).name);
+                    //ShipEnhancements.WriteDebugMessage("Destroy " + parent.GetChild(i).name);
                     Destroy(parent.GetChild(i).gameObject);
                 }
 
@@ -3070,7 +3039,6 @@ public class ShipEnhancements : ModBehaviour
                 }
             }
 
-            postSettings = tails.ToArray();
             return startIndex >= 0;
         }
 
