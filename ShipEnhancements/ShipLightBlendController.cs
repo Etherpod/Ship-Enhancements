@@ -9,30 +9,25 @@ public class ShipLightBlendController : MonoBehaviour
 {
     private ShipLight _shipLight;
     private PulsingLight _pulsingLight;
-    private float _colorTransitionTime = 6f;
-    private float _red;
-    private float _green;
-    private float _blue;
-    private int _index;
-    private float _lastDelta;
+    private float _rainbowCycleLength = 15f;
+    private float _currentLerp;
 
-    private ColorHSV[] _blendColors;
+    private Color[] _blendColors;
     private string _blendMode;
     private List<int> _rainbowIndexes = [];
     private Color _defaultColor;
+
+    private readonly float _maxLerpStep = 0.005f;
 
     private void Awake()
     {
         _shipLight = GetComponent<ShipLight>();
         _pulsingLight = GetComponent<PulsingLight>();
-        _red = 1f;
-        _green = 0f;
-        _blue = 0f;
         _defaultColor = (_shipLight ? _shipLight._light.color : _pulsingLight._light.color) * 255f;
 
         if ((bool)enableColorBlending.GetProperty() && int.Parse((string)shipLightColorOptions.GetProperty()) > 1)
         {
-            _blendColors = new ColorHSV[int.Parse((string)shipLightColorOptions.GetProperty())];
+            _blendColors = new Color[int.Parse((string)shipLightColorOptions.GetProperty())];
             for (int i = 0; i < _blendColors.Length; i++)
             {
                 var setting = (string)("shipLightColor" + (i + 1))
@@ -40,15 +35,15 @@ public class ShipLightBlendController : MonoBehaviour
                 if (setting == "Rainbow")
                 {
                     _rainbowIndexes.Add(i);
-                    _blendColors[i] = Color.white.AsHSV();
+                    _blendColors[i] = Color.white;
                 }
                 else if (setting == "Default")
                 {
-                    _blendColors[i] = _defaultColor.AsHSV();
+                    _blendColors[i] = _defaultColor;
                 }
                 else
                 {
-                    _blendColors[i] = ShipEnhancements.ThemeManager.GetLightTheme(setting).LightColor.AsHSV();
+                    _blendColors[i] = ShipEnhancements.ThemeManager.GetLightTheme(setting).LightColor;
                 }
             }
             _blendMode = (string)shipLightBlend.GetProperty();
@@ -85,22 +80,30 @@ public class ShipLightBlendController : MonoBehaviour
         if (_blendMode == "Temperature" && SELocator.GetShipTemperatureDetector() != null)
         {
             float temp = (SELocator.GetShipTemperatureDetector().GetTemperatureRatio() + 1f) / 2f;
+            if (Mathf.Abs(temp - _currentLerp) > _maxLerpStep)
+            {
+                _currentLerp = Mathf.Lerp(_currentLerp, temp, Time.deltaTime);
+            }
+            else
+            {
+                _currentLerp = temp;
+            }
 
             if (_blendColors.Length == 2)
             {
-                ColorHSV color = ColorHSV.Lerp(_blendColors[1], _blendColors[0], temp);
+                Color color = Color.Lerp(_blendColors[1], _blendColors[0], _currentLerp);
                 SetColor(color);
             }
             else if (_blendColors.Length == 3)
             {
-                ColorHSV color;
-                if (temp < 0.5f)
+                Color color;
+                if (_currentLerp < 0.5f)
                 {
-                    color = ColorHSV.Lerp(_blendColors[2], _blendColors[1], temp * 2f);
+                    color = Color.Lerp(_blendColors[2], _blendColors[1], _currentLerp * 2f);
                 }
                 else
                 {
-                    color = ColorHSV.Lerp(_blendColors[1], _blendColors[0], (temp - 0.5f) * 2f);
+                    color = Color.Lerp(_blendColors[1], _blendColors[0], (_currentLerp - 0.5f) * 2f);
                 }
                 SetColor(color);
             }
@@ -108,22 +111,67 @@ public class ShipLightBlendController : MonoBehaviour
         else if (_blendMode == "Ship Temperature" && SELocator.GetShipTemperatureDetector() != null)
         {
             float shipTemp = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
-            
+            if (Mathf.Abs(shipTemp - _currentLerp) > _maxLerpStep)
+            {
+                _currentLerp = Mathf.Lerp(_currentLerp, shipTemp, Time.deltaTime);
+            }
+            else
+            {
+                _currentLerp = shipTemp;
+            }
+
             if (_blendColors.Length == 2)
             {
-                ColorHSV color = ColorHSV.Lerp(_blendColors[1], _blendColors[0], shipTemp);
+                Color color = Color.Lerp(_blendColors[1], _blendColors[0], _currentLerp);
                 SetColor(color);
             }
             else if (_blendColors.Length == 3)
             {
-                ColorHSV color;
-                if (shipTemp < 0.5f)
+                Color color;
+                if (_currentLerp < 0.5f)
                 {
-                    color = ColorHSV.Lerp(_blendColors[2], _blendColors[1], shipTemp * 2f);
+                    color = Color.Lerp(_blendColors[2], _blendColors[1], _currentLerp * 2f);
                 }
                 else
                 {
-                    color = ColorHSV.Lerp(_blendColors[1], _blendColors[0], (shipTemp - 0.5f) * 2f);
+                    color = Color.Lerp(_blendColors[1], _blendColors[0], (_currentLerp - 0.5f) * 2f);
+                }
+                SetColor(color);
+            }
+        }
+        else if (_blendMode == "Reactor State")
+        {
+            ShipReactorComponent reactor = SELocator.GetShipDamageController()._shipReactorComponent;
+            bool enabled = reactor._damaged && SELocator.GetShipTransform().Find("Module_Engine") != null;
+            float reactorState = enabled
+                ? 1f - reactor._criticalTimer / reactor._criticalCountdown
+                : 0f;
+
+            if (Mathf.Abs(reactorState - _currentLerp) > _maxLerpStep)
+            {
+                _currentLerp = Mathf.Lerp(_currentLerp, reactorState, Time.deltaTime);
+            }
+            else
+            {
+                _currentLerp = reactorState;
+            }
+
+            if (_blendColors.Length == 2)
+            {
+                Color color = Color.Lerp(_blendColors[0], _blendColors[1], _currentLerp);
+                ShipEnhancements.WriteDebugMessage(color);
+                SetColor(color);
+            }
+            else if (_blendColors.Length == 3)
+            {
+                Color color;
+                if (!SELocator.GetShipDamageController().IsReactorCritical())
+                {
+                    color = _blendColors[0];
+                }
+                else
+                {
+                    color = Color.Lerp(_blendColors[1], _blendColors[2], _currentLerp);
                 }
                 SetColor(color);
             }
@@ -133,7 +181,7 @@ public class ShipLightBlendController : MonoBehaviour
             var t = Time.time / 4f / _blendColors.Length % _blendColors.Length;
             var a = (int)t;
             var b = (a + 1) % _blendColors.Length;
-            var color = ColorHSV.Lerp(_blendColors[a], _blendColors[b], 
+            var color = Color.Lerp(_blendColors[a], _blendColors[b], 
                 Mathf.SmoothStep(0, 1, (t - a) * 2f - 0.5f));
             SetColor(color);
         }
@@ -180,51 +228,19 @@ public class ShipLightBlendController : MonoBehaviour
             return;
         }
 
-        float num = Mathf.InverseLerp(0f, _colorTransitionTime, Time.time % _colorTransitionTime);
-
-        if (_lastDelta > num)
-        {
-            _index++;
-            if (_index > 5) _index = 0;
-        }
-
-        if (_index == 0)
-        {
-            _green = Mathf.Lerp(0f, 1f, num);
-        }
-        else if (_index == 1)
-        {
-            _red = 1 - Mathf.Lerp(0f, 1f, num);
-        }
-        else if (_index == 2)
-        {
-            _blue = Mathf.Lerp(0f, 1f, num);
-        }
-        else if (_index == 3)
-        {
-            _green = 1 - num;
-        }
-        else if (_index == 4)
-        {
-            _red = Mathf.Lerp(0f, 1f, num);
-        }
-        else if (_index == 5)
-        {
-            _blue = 1 - Mathf.Lerp(0f, 1f, num);
-        }
+        float num = Time.time % _rainbowCycleLength / _rainbowCycleLength;
+        ColorHSV color = new ColorHSV(num, 1f, 255f);
 
         if (_blendColors != null)
         {
             foreach (int i in _rainbowIndexes)
             {
-                _blendColors[i] = (new Color(_red, _green, _blue) * 255f).AsHSV();
+                _blendColors[i] = color.AsRGB();
             }
         }
         else
         {
-            SetColor(new Color(_red, _green, _blue) * 255f);
+            SetColor(color);
         }
-
-        _lastDelta = num;
     }
 }

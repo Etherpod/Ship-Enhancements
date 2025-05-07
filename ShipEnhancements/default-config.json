@@ -715,7 +715,8 @@
       "options": [
         "Time",
         "Temperature",
-        "Ship Temperature"
+        "Ship Temperature",
+        "Reactor State"
       ],
       "tooltip": "Sets the method of blending between colors."
     },

@@ -2718,7 +2718,6 @@ public class ShipEnhancements : ModBehaviour
             }
             else if (decoChanged)
             {
-                ShipEnhancements.WriteDebugMessage("deco changed");
                 RedrawSettingsMenu(true);
             }
         }
@@ -2732,7 +2731,9 @@ public class ShipEnhancements : ModBehaviour
             .IndexOf("damageIndicatorColor1");
 
         var range = ModHelper.Config.Settings.ToList()
-            .GetRange(start, end - start);
+            .GetRange(start, end - start)
+            .Where(pair => 
+            !int.TryParse(pair.Key.Substring(pair.Key.Length - 1), out int i));
         return range.ToArray();
     }
 
@@ -2777,7 +2778,6 @@ public class ShipEnhancements : ModBehaviour
         }
 
         bool blendEnabled = (bool)Settings.enableColorBlending.GetValue();
-        ShipEnhancements.WriteDebugMessage("BLEND ENABLED: " + blendEnabled);
 
         int decoStartIndex = ModHelper.Config.Settings.Keys.ToList().IndexOf("enableColorBlending");
         int decoEndIndex = ModHelper.Config.Settings.Keys.ToList().IndexOf("damageIndicatorColor1");
