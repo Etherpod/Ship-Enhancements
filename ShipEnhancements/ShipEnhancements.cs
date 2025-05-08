@@ -95,7 +95,7 @@ public class ShipEnhancements : ModBehaviour
 
     private SettingsPresets.PresetName _currentPreset = (SettingsPresets.PresetName)(-1);
     private bool _advancedColors = false;
-    
+
     public GameObject DebugObjects { get; private set; }
 
     private AssetBundle _shipEnhancementsBundle;
@@ -283,6 +283,25 @@ public class ShipEnhancements : ModBehaviour
         "Did you find all of the secret codes for the radio?",
         "If you punch yourself and it hurts, does that make you weak or strong?"
     };
+
+    private (string blendType, string suffix, Func<int, int, bool> canShow)[] _customSettingNames =
+    [
+        ("Time", "1", (index, num) => index == 1),
+        ("Time", "2", (index, num) => index == 2),
+        ("Time", "3", (index, num) => index == 3),
+        ("Temperature", "(Hot)", (index, num) => index == 1),
+        ("Temperature", "(Default)", (index, num) => index != 1 && index != num),
+        ("Temperature", "(Cold)", (index, num) => index == num),
+        ("Ship Temperature", "(Hot)", (index, num) => index == 1),
+        ("Ship Temperature", "(Default)", (index, num) => index != 1 && index != num),
+        ("Ship Temperature", "(Cold)", (index, num) => index == num),
+        ("Reactor State", "(Default)", (index, num) => index == num - 2),
+        ("Reactor State", "(Damaged)", (index, num) => index == num - 1),
+        ("Reactor State", "(Critical)", (index, num) => index == num),
+        ("Ship Damage %", "(No Damage)", (index, num) => index == num - 2),
+        ("Ship Damage %", "(Low Damage)", (index, num) => index == num - 1),
+        ("Ship Damage %", "(High Damage)", (index, num) => index == num),
+    ];
 
     private void Awake()
     {
@@ -800,7 +819,7 @@ public class ShipEnhancements : ModBehaviour
 
         SELocator.GetShipBody().GetComponentInChildren<ShipCockpitController>()
             ._interactVolume.gameObject.AddComponent<FlightConsoleInteractController>();
-        
+
         var debugObjectsPrefab = LoadPrefab("Assets/ShipEnhancements/DebugObjects.prefab");
         DebugObjects = Instantiate(debugObjectsPrefab, SELocator.GetShipBody().transform);
 
@@ -1853,7 +1872,7 @@ public class ShipEnhancements : ModBehaviour
                 }
             }
         }
-        
+
         if (cold)
         {
             GameObject db = GameObject.Find("DarkBramble_Body");
@@ -2697,7 +2716,7 @@ public class ShipEnhancements : ModBehaviour
                 // Check if the new values match the selected preset
                 if (!isCustom && _currentPreset != SettingsPresets.PresetName.Custom && _currentPreset != SettingsPresets.PresetName.Random)
                 {
-                    isCustom = (_currentPreset.GetPresetSetting(setting.GetName()) != null 
+                    isCustom = (_currentPreset.GetPresetSetting(setting.GetName()) != null
                         && !_currentPreset.GetPresetSetting(setting.GetName()).Equals(setting.GetValue()));
                 }
             }
@@ -2732,7 +2751,7 @@ public class ShipEnhancements : ModBehaviour
 
         var range = ModHelper.Config.Settings.ToList()
             .GetRange(start, end - start)
-            .Where(pair => 
+            .Where(pair =>
             !int.TryParse(pair.Key.Substring(pair.Key.Length - 1), out int i));
         return range.ToArray();
     }
@@ -2742,7 +2761,7 @@ public class ShipEnhancements : ModBehaviour
         MenuManager menuManager = StartupPopupPatches.menuManager;
         IOptionsMenuManager OptionsMenuManager = menuManager.OptionsMenuManager;
 
-        var menus = typeof(MenuManager).GetField("ModSettingsMenus", BindingFlags.Public 
+        var menus = typeof(MenuManager).GetField("ModSettingsMenus", BindingFlags.Public
             | BindingFlags.NonPublic | BindingFlags.Static).GetValue(menuManager)
             as List<(IModBehaviour behaviour, Menu modMenu)>;
 
@@ -3085,13 +3104,13 @@ public class ShipEnhancements : ModBehaviour
 
     private bool SetCustomSettingName(ref string label, string settingName)
     {
-        if (settingName.Substring(0, settingName.Length - 1) != "shipLightColor")
+        string stem = settingName.Substring(0, settingName.Length - 1);
+        if (stem != "shipLightColor")
         {
             return false;
         }
 
         int num = int.Parse((string)Settings.shipLightColorOptions.GetValue());
-
         if (num == 1)
         {
             return false;
@@ -3099,21 +3118,16 @@ public class ShipEnhancements : ModBehaviour
 
         int index = int.Parse(settingName.Substring(settingName.Length - 1));
         string blend = (string)Settings.shipLightBlend.GetValue();
-        if (blend == "Ship Temperature")
+
+        var found = _customSettingNames.Where(tuple => tuple.blendType == blend 
+            && tuple.canShow(index, num));
+
+        if (found.Count() > 0)
         {
-            if (index == 0)
-            {
-                label = "Light Color (Hot)";
-            }
-            else if (index == num - 1)
-            {
-                label = "Light Color (Cold)";
-            }
-            else
-            {
-                label = "Light Color (Default)";
-            }
+            label = "Light Color " + found.First().suffix;
+            return true;
         }
+
         return false;
     }
 

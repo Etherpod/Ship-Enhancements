@@ -11,6 +11,7 @@ public class ShipLightBlendController : MonoBehaviour
     private PulsingLight _pulsingLight;
     private float _rainbowCycleLength = 15f;
     private float _currentLerp;
+    private float _targetLerp;
 
     private Color[] _blendColors;
     private string _blendMode;
@@ -24,6 +25,11 @@ public class ShipLightBlendController : MonoBehaviour
         _shipLight = GetComponent<ShipLight>();
         _pulsingLight = GetComponent<PulsingLight>();
         _defaultColor = (_shipLight ? _shipLight._light.color : _pulsingLight._light.color) * 255f;
+
+        if ((string)shipLightBlend.GetProperty() == "Ship Damage %")
+        {
+            SELocator.GetShipDamageController().OnDamageUpdated += OnDamageUpdated;
+        }
 
         if ((bool)enableColorBlending.GetProperty() && int.Parse((string)shipLightColorOptions.GetProperty()) > 1)
         {
@@ -79,14 +85,14 @@ public class ShipLightBlendController : MonoBehaviour
 
         if (_blendMode == "Temperature" && SELocator.GetShipTemperatureDetector() != null)
         {
-            float temp = (SELocator.GetShipTemperatureDetector().GetTemperatureRatio() + 1f) / 2f;
-            if (Mathf.Abs(temp - _currentLerp) > _maxLerpStep)
+            _targetLerp = (SELocator.GetShipTemperatureDetector().GetTemperatureRatio() + 1f) / 2f;
+            if (Mathf.Abs(_targetLerp - _currentLerp) > _maxLerpStep)
             {
-                _currentLerp = Mathf.Lerp(_currentLerp, temp, Time.deltaTime);
+                _currentLerp = Mathf.Lerp(_currentLerp, _targetLerp, Time.deltaTime);
             }
             else
             {
-                _currentLerp = temp;
+                _currentLerp = _targetLerp;
             }
 
             if (_blendColors.Length == 2)
@@ -110,14 +116,14 @@ public class ShipLightBlendController : MonoBehaviour
         }
         else if (_blendMode == "Ship Temperature" && SELocator.GetShipTemperatureDetector() != null)
         {
-            float shipTemp = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
-            if (Mathf.Abs(shipTemp - _currentLerp) > _maxLerpStep)
+            _targetLerp = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
+            if (Mathf.Abs(_targetLerp - _currentLerp) > _maxLerpStep)
             {
-                _currentLerp = Mathf.Lerp(_currentLerp, shipTemp, Time.deltaTime);
+                _currentLerp = Mathf.Lerp(_currentLerp, _targetLerp, Time.deltaTime);
             }
             else
             {
-                _currentLerp = shipTemp;
+                _currentLerp = _targetLerp;
             }
 
             if (_blendColors.Length == 2)
@@ -143,29 +149,58 @@ public class ShipLightBlendController : MonoBehaviour
         {
             ShipReactorComponent reactor = SELocator.GetShipDamageController()._shipReactorComponent;
             bool enabled = reactor._damaged && SELocator.GetShipTransform().Find("Module_Engine") != null;
-            float reactorState = enabled
+            _targetLerp = enabled
                 ? 1f - reactor._criticalTimer / reactor._criticalCountdown
                 : 0f;
 
-            if (Mathf.Abs(reactorState - _currentLerp) > _maxLerpStep)
+            if (Mathf.Abs(_targetLerp - _currentLerp) > _maxLerpStep)
             {
-                _currentLerp = Mathf.Lerp(_currentLerp, reactorState, Time.deltaTime);
+                _currentLerp = Mathf.Lerp(_currentLerp, _targetLerp, Time.deltaTime);
             }
             else
             {
-                _currentLerp = reactorState;
+                _currentLerp = _targetLerp;
             }
 
             if (_blendColors.Length == 2)
             {
                 Color color = Color.Lerp(_blendColors[0], _blendColors[1], _currentLerp);
-                ShipEnhancements.WriteDebugMessage(color);
                 SetColor(color);
             }
             else if (_blendColors.Length == 3)
             {
                 Color color;
                 if (!SELocator.GetShipDamageController().IsReactorCritical())
+                {
+                    color = _blendColors[0];
+                }
+                else
+                {
+                    color = Color.Lerp(_blendColors[1], _blendColors[2], _currentLerp);
+                }
+                SetColor(color);
+            }
+        }
+        else if (_blendMode == "Ship Damage %")
+        {
+            if (Mathf.Abs(_targetLerp - _currentLerp) > _maxLerpStep)
+            {
+                _currentLerp = Mathf.Lerp(_currentLerp, _targetLerp, Time.deltaTime);
+            }
+            else
+            {
+                _currentLerp = _targetLerp;
+            }
+
+            if (_blendColors.Length == 2)
+            {
+                Color color = Color.Lerp(_blendColors[0], _blendColors[1], _currentLerp);
+                SetColor(color);
+            }
+            else if (_blendColors.Length == 3)
+            {
+                Color color;
+                if (_targetLerp == 0)
                 {
                     color = _blendColors[0];
                 }
@@ -241,6 +276,39 @@ public class ShipLightBlendController : MonoBehaviour
         else
         {
             SetColor(color);
+        }
+    }
+
+    private void OnDamageUpdated()
+    {
+        int numParts = 0;
+        int numDamaged = 0;
+
+        foreach (var hull in SELocator.GetShipDamageController()._shipHulls)
+        {
+            numParts++;
+            if (hull.isDamaged)
+            {
+                numDamaged++;
+            }
+        }
+        foreach (var comp in SELocator.GetShipDamageController()._shipComponents)
+        {
+            numParts++;
+            if (comp.isDamaged)
+            {
+                numDamaged++;
+            }
+        }
+
+        _targetLerp = (float)numDamaged / numParts;
+    }
+
+    private void OnDestroy()
+    {
+        if ((string)shipLightBlend.GetProperty() == "Ship Damage %")
+        {
+            SELocator.GetShipDamageController().OnDamageUpdated -= OnDamageUpdated;
         }
     }
 }
