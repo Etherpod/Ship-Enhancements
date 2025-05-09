@@ -360,6 +360,58 @@ public class ShipLightBlendController : MonoBehaviour
                 SetColor(color);
             }
         }
+        else if (_blendMode == "Gravity")
+        {
+            AlignmentForceDetector detector = SELocator.GetShipDetector().GetComponent<AlignmentForceDetector>();
+            Vector3 acceleration = detector.GetForceAcceleration();
+            _targetLerp = Mathf.InverseLerp(0f, 50f, acceleration.magnitude);
+
+            if (Mathf.Abs(_targetLerp - _currentLerp) > _maxLerpStep)
+            {
+                _currentLerp = Mathf.Lerp(_currentLerp, _targetLerp, Time.deltaTime);
+            }
+            else
+            {
+                _currentLerp = _targetLerp;
+            }
+
+            if (_blendColors.Length == 2)
+            {
+                Color color = Color.Lerp(_blendColors[1], _blendColors[0], _currentLerp);
+                SetColor(color);
+            }
+            else if (_blendColors.Length == 3)
+            {
+                Color color;
+                _cachedColor = Color.Lerp(_blendColors[1], _blendColors[2], _currentLerp);
+
+                if (detector.GetAlignmentAcceleration().sqrMagnitude == 0f)
+                {
+                    if (!_reset)
+                    {
+                        _reset = true;
+                        _resetFadeStartTime = Time.time;
+                    }
+                    float timeLerp = Mathf.InverseLerp(_resetFadeStartTime,
+                        _resetFadeStartTime + _resetFadeTime, Time.time);
+
+                    color = Color.Lerp(_cachedColor, _blendColors[0], timeLerp);
+                }
+                else
+                {
+                    if (_reset)
+                    {
+                        _reset = false;
+                        _resetFadeStartTime = Time.time;
+                    }
+                    float timeLerp = Mathf.InverseLerp(_resetFadeStartTime,
+                        _resetFadeStartTime + _resetFadeTime, Time.time);
+
+                    color = Color.Lerp(_blendColors[0], _cachedColor, timeLerp);
+                }
+                SetColor(color);
+            }
+        }
         else if (_blendMode == "Time")
         {
             var t = Time.time / 4f / _blendColors.Length % _blendColors.Length;

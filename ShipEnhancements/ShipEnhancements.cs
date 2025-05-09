@@ -313,6 +313,9 @@ public class ShipEnhancements : ModBehaviour
         ("Velocity", "(Positive)", (index, num) => index == 1),
         ("Velocity", "(Matched)", (index, num) => index != 1 && index != num),
         ("Velocity", "(Negative)", (index, num) => index == num),
+        ("Gravity", "(Zero Gravity)", (index, num) => index == num - 2),
+        ("Gravity", "(Low Gravity)", (index, num) => index == num - 1),
+        ("Gravity", "(High Gravity)", (index, num) => index == num),
     ];
 
     private void Awake()

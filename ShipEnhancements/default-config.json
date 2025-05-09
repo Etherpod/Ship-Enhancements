@@ -719,6 +719,7 @@
         "Ship Damage %",
         "Reactor State",
         "Velocity",
+        "Gravity",
         "Temperature",
         "Ship Temperature"
       ],
