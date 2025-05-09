@@ -246,7 +246,7 @@ public class ShipEnhancements : ModBehaviour
         "The first mod ever made for Outer Wilds was NomaiVR.",
         "No te preocupes, no cambiaste el idioma a español.",
         "There are more hydrogen atoms in a single molecule of water than there are stars in the entire Solar System.",
-        "Ernesto is watching.\n\nI'm more aware than you think.",
+        "Ernesto is watching.",
         "A group of penguins is called a \"waddle\".",
         "A group of ferrets is called a \"business\".",
         "The word \"orange\" was first used to describe a tree.",
@@ -255,18 +255,18 @@ public class ShipEnhancements : ModBehaviour
         "Minimalism is made up by Big Small to sell more less.",
         "Bigimalism is made up by Big Big in order to sell more more.",
         "If you were to consume one gram of sodium, you would explode.",
-        "Are you happy in life?",
+        "Can you know happiness if you have never known sadness?",
         "Do you think you're naturally a good person?",
         "Which came first, the chicken or the egg?",
         "Has your favorite color changed since 10 years ago?",
         "Is the past a real thing, or is it an illusion made up by your brain?",
         "Did you know moss can be male or female?",
-        "What color is a mirror?",
-        "Did you know the eyes of a spider have different functions?",
+        "If \"color\" is light being reflected off of an object, what color is a mirror?",
+        "Did you know the eyes of a spider see in different ways?",
         "Did you find Outer Wilds, or did Outer Wilds find you?",
         "What's your favorite Outer Wilds mod?",
         "Did you know Ernesto has a dedicated wiki page?",
-        "Where did Geswaldo go?\n\nI miss him.",
+        "Where did Geswaldo go?",
         "Did you know there's a Discord server for modding Outer Wilds?",
         "Did you get all 12 achievements for Ship Enhancements?",
         "Did you know dolphins give each other names?",
@@ -276,12 +276,15 @@ public class ShipEnhancements : ModBehaviour
         "Have you tried the mod General Enhancements?",
         "Have you tried the mod Moar Marshmallows?",
         "Have you tried the mod Camera Shake?",
+        "If you don't think Outer Wilds is scary enough, consider downloading Ernesto Chase.",
         "Did you know you can export your current mod list as a file in the Outer Wilds Mod Manager?",
         "Did you know the Outer Wilds Mod Manager has color themes you can pick?",
         "Have you ever heard of Half a Man Videos? They make YouTube videos about Outer Wilds.",
         "Have you tried using negative numbers in the mod settings?",
         "Did you find all of the secret codes for the radio?",
-        "If you punch yourself and it hurts, does that make you weak or strong?"
+        "If you punch yourself and it hurts, does that make you weak or strong?",
+        "Why did the chicken cross the road?",
+        "This statement is a lie."
     };
 
     private (string blendType, string suffix, Func<int, int, bool> canShow)[] _customSettingNames =
@@ -301,6 +304,12 @@ public class ShipEnhancements : ModBehaviour
         ("Ship Damage %", "(No Damage)", (index, num) => index == num - 2),
         ("Ship Damage %", "(Low Damage)", (index, num) => index == num - 1),
         ("Ship Damage %", "(High Damage)", (index, num) => index == num),
+        ("Fuel", "(Max Fuel)", (index, num) => index == 1),
+        ("Fuel", "(Low Fuel)", (index, num) => index != 1 && index == num - 1),
+        ("Fuel", "(No Fuel)", (index, num) => index == num),
+        ("Oxygen", "(Max Oxygen)", (index, num) => index == 1),
+        ("Oxygen", "(Low Oxygen)", (index, num) => index != 1 && index == num - 1),
+        ("Oxygen", "(No Oxygen)", (index, num) => index == num),
     ];
 
     private void Awake()

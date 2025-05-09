@@ -12,13 +12,17 @@ public class ShipLightBlendController : MonoBehaviour
     private float _rainbowCycleLength = 15f;
     private float _currentLerp;
     private float _targetLerp;
+    private float _resetFadeStartTime;
+    private bool _reset = false;
 
     private Color[] _blendColors;
     private string _blendMode;
     private List<int> _rainbowIndexes = [];
     private Color _defaultColor;
+    private Color _cachedColor;
 
     private readonly float _maxLerpStep = 0.005f;
+    private readonly float _resetFadeTime = 2f;
 
     private void Awake()
     {
@@ -170,13 +174,31 @@ public class ShipLightBlendController : MonoBehaviour
             else if (_blendColors.Length == 3)
             {
                 Color color;
+                _cachedColor = Color.Lerp(_blendColors[1], _blendColors[2], _currentLerp);
+
                 if (!SELocator.GetShipDamageController().IsReactorCritical())
                 {
-                    color = _blendColors[0];
+                    if (!_reset)
+                    {
+                        _reset = true;
+                        _resetFadeStartTime = Time.time;
+                    }
+                    float timeLerp = Mathf.InverseLerp(_resetFadeStartTime,
+                        _resetFadeStartTime + _resetFadeTime, Time.time);
+
+                    color = Color.Lerp(_cachedColor, _blendColors[0], timeLerp);
                 }
                 else
                 {
-                    color = Color.Lerp(_blendColors[1], _blendColors[2], _currentLerp);
+                    if (_reset)
+                    {
+                        _reset = false;
+                        _resetFadeStartTime = Time.time;
+                    }
+                    float timeLerp = Mathf.InverseLerp(_resetFadeStartTime,
+                        _resetFadeStartTime + _resetFadeTime, Time.time);
+
+                    color = Color.Lerp(_blendColors[0], _cachedColor, timeLerp);
                 }
                 SetColor(color);
             }
@@ -200,13 +222,94 @@ public class ShipLightBlendController : MonoBehaviour
             else if (_blendColors.Length == 3)
             {
                 Color color;
+                _cachedColor = Color.Lerp(_blendColors[1], _blendColors[2], _currentLerp);
                 if (_targetLerp == 0)
                 {
-                    color = _blendColors[0];
+                    if (!_reset)
+                    {
+                        _reset = true;
+                        _resetFadeStartTime = Time.time;
+                    }
+                    float timeLerp = Mathf.InverseLerp(_resetFadeStartTime,
+                        _resetFadeStartTime + _resetFadeTime, Time.time);
+
+                    color = Color.Lerp(_cachedColor, _blendColors[0], timeLerp);
                 }
                 else
                 {
-                    color = Color.Lerp(_blendColors[1], _blendColors[2], _currentLerp);
+                    if (_reset)
+                    {
+                        _reset = false;
+                        _resetFadeStartTime = Time.time;
+                    }
+                    float timeLerp = Mathf.InverseLerp(_resetFadeStartTime,
+                        _resetFadeStartTime + _resetFadeTime, Time.time);
+
+                    color = Color.Lerp(_blendColors[0], _cachedColor, timeLerp);
+                }
+                SetColor(color);
+            }
+        }
+        else if (_blendMode == "Fuel")
+        {
+            _targetLerp = 1 - SELocator.GetShipResources().GetFractionalFuel();
+
+            if (Mathf.Abs(_targetLerp - _currentLerp) > _maxLerpStep)
+            {
+                _currentLerp = Mathf.Lerp(_currentLerp, _targetLerp, Time.deltaTime);
+            }
+            else
+            {
+                _currentLerp = _targetLerp;
+            }
+
+            if (_blendColors.Length == 2)
+            {
+                Color color = Color.Lerp(_blendColors[0], _blendColors[1], _currentLerp);
+                SetColor(color);
+            }
+            else if (_blendColors.Length == 3)
+            {
+                Color color;
+                if (_currentLerp < 0.5f)
+                {
+                    color = Color.Lerp(_blendColors[0], _blendColors[1], _currentLerp * 2f);
+                }
+                else
+                {
+                    color = Color.Lerp(_blendColors[1], _blendColors[2], (_currentLerp - 0.5f) * 2f);
+                }
+                SetColor(color);
+            }
+        }
+        else if (_blendMode == "Oxygen")
+        {
+            _targetLerp = 1 - SELocator.GetShipResources().GetFractionalOxygen();
+
+            if (Mathf.Abs(_targetLerp - _currentLerp) > _maxLerpStep)
+            {
+                _currentLerp = Mathf.Lerp(_currentLerp, _targetLerp, Time.deltaTime);
+            }
+            else
+            {
+                _currentLerp = _targetLerp;
+            }
+
+            if (_blendColors.Length == 2)
+            {
+                Color color = Color.Lerp(_blendColors[0], _blendColors[1], _currentLerp);
+                SetColor(color);
+            }
+            else if (_blendColors.Length == 3)
+            {
+                Color color;
+                if (_currentLerp < 0.5f)
+                {
+                    color = Color.Lerp(_blendColors[0], _blendColors[1], _currentLerp * 2f);
+                }
+                else
+                {
+                    color = Color.Lerp(_blendColors[1], _blendColors[2], (_currentLerp - 0.5f) * 2f);
                 }
                 SetColor(color);
             }

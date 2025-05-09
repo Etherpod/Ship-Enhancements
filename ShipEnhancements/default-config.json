@@ -714,10 +714,12 @@
       "value": "Time",
       "options": [
         "Time",
-        "Temperature",
-        "Ship Temperature",
+        "Fuel",
+        "Oxygen",
+        "Ship Damage %",
         "Reactor State",
-        "Ship Damage %"
+        "Temperature",
+        "Ship Temperature"
       ],
       "tooltip": "Sets the method of blending between colors."
     },
