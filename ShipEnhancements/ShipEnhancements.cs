@@ -310,6 +310,9 @@ public class ShipEnhancements : ModBehaviour
         ("Oxygen", "(Max Oxygen)", (index, num) => index == 1),
         ("Oxygen", "(Low Oxygen)", (index, num) => index != 1 && index == num - 1),
         ("Oxygen", "(No Oxygen)", (index, num) => index == num),
+        ("Velocity", "(Positive)", (index, num) => index == 1),
+        ("Velocity", "(Matched)", (index, num) => index != 1 && index != num),
+        ("Velocity", "(Negative)", (index, num) => index == num),
     ];
 
     private void Awake()

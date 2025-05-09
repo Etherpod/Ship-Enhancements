@@ -314,6 +314,52 @@ public class ShipLightBlendController : MonoBehaviour
                 SetColor(color);
             }
         }
+        else if (_blendMode == "Velocity")
+        {
+            ReferenceFrame rf = Locator.GetReferenceFrame();
+            if (rf == null || rf.GetOWRigidBody() == null)
+            {
+                _targetLerp = 0.5f;
+            }
+            else
+            {
+                Vector3 relative = rf.GetOWRigidBody().GetRelativeVelocity(SELocator.GetShipBody());
+                Vector3 toTarget = SELocator.GetShipBody().GetWorldCenterOfMass() - rf.GetPosition();
+                float speed = Vector3.Dot(relative, toTarget.normalized);
+
+                float lower = Mathf.InverseLerp(-100f, -10f, speed) * 0.5f;
+                float upper = Mathf.InverseLerp(10f, 100f, speed) * 0.5f;
+                _targetLerp = Mathf.Clamp01(lower + upper);
+            }
+
+            if (Mathf.Abs(_targetLerp - _currentLerp) > _maxLerpStep)
+            {
+                _currentLerp = Mathf.Lerp(_currentLerp, _targetLerp, Time.deltaTime);
+            }
+            else
+            {
+                _currentLerp = _targetLerp;
+            }
+
+            if (_blendColors.Length == 2)
+            {
+                Color color = Color.Lerp(_blendColors[1], _blendColors[0], _currentLerp);
+                SetColor(color);
+            }
+            else if (_blendColors.Length == 3)
+            {
+                Color color;
+                if (_currentLerp < 0.5f)
+                {
+                    color = Color.Lerp(_blendColors[0], _blendColors[1], _currentLerp * 2f);
+                }
+                else
+                {
+                    color = Color.Lerp(_blendColors[1], _blendColors[2], (_currentLerp - 0.5f) * 2f);
+                }
+                SetColor(color);
+            }
+        }
         else if (_blendMode == "Time")
         {
             var t = Time.time / 4f / _blendColors.Length % _blendColors.Length;
