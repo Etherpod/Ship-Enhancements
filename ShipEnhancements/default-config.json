@@ -708,7 +708,7 @@
       "value": false,
       "tooltip": "Lets you blend the decorations between different colors based on chosen parameters."
     },
-    "shipLightBlend": {
+    "shipLightColorBlend": {
       "title": "Ship Light Blend",
       "type": "selector",
       "value": "Time",
@@ -811,7 +811,35 @@
       ],
       "tooltip": "Changes the color of the interior and exterior ship lights."
     },
-    "interiorHullColor": {
+    "interiorHullColorBlend": {
+      "title": "Interior Hull Blend",
+      "type": "selector",
+      "value": "Time",
+      "options": [
+        "Time",
+        "Fuel",
+        "Oxygen",
+        "Ship Damage %",
+        "Reactor State",
+        "Velocity",
+        "Gravity",
+        "Temperature",
+        "Ship Temperature"
+      ],
+      "tooltip": "Sets the method of blending between colors."
+    },
+    "interiorHullColorOptions": {
+      "title": "Interior Hull Color Options",
+      "type": "selector",
+      "value": "1",
+      "options": [
+        "1",
+        "2",
+        "3"
+      ],
+      "tooltip": "Sets the number of colors to blend between."
+    },
+    "interiorHullColor1": {
       "title": "Interior Hull Color",
       "type": "selector",
       "value": "Default",
@@ -832,7 +860,77 @@
       ],
       "tooltip": "Changes the color of the inside of the ship."
     },
-    "exteriorHullColor": {
+    "interiorHullColor2": {
+      "title": "Interior Hull Color",
+      "type": "selector",
+      "value": "Default",
+      "options": [
+        "Default",
+        "Red",
+        "Orange",
+        "Golden",
+        "Green",
+        "Mint",
+        "Turquoise",
+        "Blue",
+        "Lavender",
+        "Pink",
+        "Hot Pink",
+        "Dark Gray",
+        "Rainbow"
+      ],
+      "tooltip": "Changes the color of the inside of the ship."
+    },
+    "interiorHullColor3": {
+      "title": "Interior Hull Color",
+      "type": "selector",
+      "value": "Default",
+      "options": [
+        "Default",
+        "Red",
+        "Orange",
+        "Golden",
+        "Green",
+        "Mint",
+        "Turquoise",
+        "Blue",
+        "Lavender",
+        "Pink",
+        "Hot Pink",
+        "Dark Gray",
+        "Rainbow"
+      ],
+      "tooltip": "Changes the color of the inside of the ship."
+    },
+    "exteriorHullColorBlend": {
+      "title": "Exterior Hull Blend",
+      "type": "selector",
+      "value": "Time",
+      "options": [
+        "Time",
+        "Fuel",
+        "Oxygen",
+        "Ship Damage %",
+        "Reactor State",
+        "Velocity",
+        "Gravity",
+        "Temperature",
+        "Ship Temperature"
+      ],
+      "tooltip": "Sets the method of blending between colors."
+    },
+    "exteriorHullColorOptions": {
+      "title": "Exterior Hull Color Options",
+      "type": "selector",
+      "value": "1",
+      "options": [
+        "1",
+        "2",
+        "3"
+      ],
+      "tooltip": "Sets the number of colors to blend between."
+    },
+    "exteriorHullColor1": {
       "title": "Exterior Hull Color",
       "type": "selector",
       "value": "Default",
@@ -853,7 +951,77 @@
       ],
       "tooltip": "Changes the color of the outside of the ship."
     },
-    "thrusterColor": {
+    "exteriorHullColor2": {
+      "title": "Exterior Hull Color",
+      "type": "selector",
+      "value": "Default",
+      "options": [
+        "Default",
+        "Red",
+        "Orange",
+        "Golden",
+        "Green",
+        "Mint",
+        "Turquoise",
+        "Blue",
+        "Lavender",
+        "Pink",
+        "Hot Pink",
+        "Dark Gray",
+        "Rainbow"
+      ],
+      "tooltip": "Changes the color of the outside of the ship."
+    },
+    "exteriorHullColor3": {
+      "title": "Exterior Hull Color",
+      "type": "selector",
+      "value": "Default",
+      "options": [
+        "Default",
+        "Red",
+        "Orange",
+        "Golden",
+        "Green",
+        "Mint",
+        "Turquoise",
+        "Blue",
+        "Lavender",
+        "Pink",
+        "Hot Pink",
+        "Dark Gray",
+        "Rainbow"
+      ],
+      "tooltip": "Changes the color of the outside of the ship."
+    },
+    "thrusterColorBlend": {
+      "title": "Thruster Blend",
+      "type": "selector",
+      "value": "Time",
+      "options": [
+        "Time",
+        "Fuel",
+        "Oxygen",
+        "Ship Damage %",
+        "Reactor State",
+        "Velocity",
+        "Gravity",
+        "Temperature",
+        "Ship Temperature"
+      ],
+      "tooltip": "Sets the method of blending between colors."
+    },
+    "thrusterColorOptions": {
+      "title": "Thruster Color Options",
+      "type": "selector",
+      "value": "1",
+      "options": [
+        "1",
+        "2",
+        "3"
+      ],
+      "tooltip": "Sets the number of colors to blend between."
+    },
+    "thrusterColor1": {
       "title": "Ship Thruster Flame Color",
       "type": "selector",
       "value": "Default",
@@ -871,7 +1039,113 @@
       ],
       "tooltip": "Changes the color of the thruster flames produced by the ship."
     },
-    "damageIndicatorColor1": {
+    "thrusterColor2": {
+      "title": "Ship Thruster Flame Color",
+      "type": "selector",
+      "value": "Default",
+      "options": [
+        "Default",
+        "Red",
+        "Ghostly Green",
+        "Turquoise",
+        "Ultraviolet",
+        "Lavender",
+        "Bubblegum",
+        "Hot Pink",
+        "White",
+        "Rainbow"
+      ],
+      "tooltip": "Changes the color of the thruster flames produced by the ship."
+    },
+    "thrusterColor3": {
+      "title": "Ship Thruster Flame Color",
+      "type": "selector",
+      "value": "Default",
+      "options": [
+        "Default",
+        "Red",
+        "Ghostly Green",
+        "Turquoise",
+        "Ultraviolet",
+        "Lavender",
+        "Bubblegum",
+        "Hot Pink",
+        "White",
+        "Rainbow"
+      ],
+      "tooltip": "Changes the color of the thruster flames produced by the ship."
+    },
+    "indicatorColorBlend": {
+      "title": "Damage Indicator Blend",
+      "type": "selector",
+      "value": "Time",
+      "options": [
+        "Time",
+        "Fuel",
+        "Oxygen",
+        "Ship Damage %",
+        "Reactor State",
+        "Velocity",
+        "Gravity",
+        "Temperature",
+        "Ship Temperature"
+      ],
+      "tooltip": "Sets the method of blending between colors."
+    },
+    "indicatorColorOptions": {
+      "title": "Damage Indicator Color Options",
+      "type": "selector",
+      "value": "1",
+      "options": [
+        "1",
+        "2",
+        "3"
+      ],
+      "tooltip": "Sets the number of colors to blend between."
+    },
+    "indicatorColor1": {
+      "title": "Damage Indicator Color",
+      "type": "selector",
+      "value": "Default",
+      "options": [
+        "Default",
+        "Orange",
+        "Yellow",
+        "Green",
+        "Outer Wilds Beta",
+        "Ghostly Green",
+        "Turquoise",
+        "Blue",
+        "Dark Blue",
+        "Nomaian Blue",
+        "Purple",
+        "Lavender",
+        "Pink",
+        "Rainbow"
+      ]
+    },
+    "indicatorColor2": {
+      "title": "Damage Indicator Color",
+      "type": "selector",
+      "value": "Default",
+      "options": [
+        "Default",
+        "Orange",
+        "Yellow",
+        "Green",
+        "Outer Wilds Beta",
+        "Ghostly Green",
+        "Turquoise",
+        "Blue",
+        "Dark Blue",
+        "Nomaian Blue",
+        "Purple",
+        "Lavender",
+        "Pink",
+        "Rainbow"
+      ]
+    },
+    "indicatorColor3": {
       "title": "Damage Indicator Color",
       "type": "selector",
       "value": "Default",

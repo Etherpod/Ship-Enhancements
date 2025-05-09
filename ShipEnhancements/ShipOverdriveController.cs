@@ -98,7 +98,7 @@ public class ShipOverdriveController : ElectricalComponent
         {
             if (_cooldownT > 0f)
             {
-                if ((string)thrusterColor.GetProperty() == "Rainbow")
+                if ((string)thrusterColor1.GetProperty() == "Rainbow")
                 {
                     foreach (Renderer renderer in _thrusterRenderers)
                     {

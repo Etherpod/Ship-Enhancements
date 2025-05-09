@@ -165,11 +165,19 @@ public class ShipEnhancements : ModBehaviour
         shipLightColor1,
         shipLightColor2,
         shipLightColor3,
-        shipLightBlend,
+        shipLightColorBlend,
         hotThrusters,
         extraNoise,
-        interiorHullColor,
-        exteriorHullColor,
+        interiorHullColorOptions,
+        interiorHullColor1,
+        interiorHullColor2,
+        interiorHullColor3,
+        interiorHullColorBlend,
+        exteriorHullColorOptions,
+        exteriorHullColor1,
+        exteriorHullColor2,
+        exteriorHullColor3,
+        exteriorHullColorBlend,
         addTether,
         disableDamageIndicators,
         addShipSignal,
@@ -178,11 +186,19 @@ public class ShipEnhancements : ModBehaviour
         enableSignalscopeComponent,
         rustLevel,
         dirtAccumulationTime,
-        thrusterColor,
+        thrusterColorOptions,
+        thrusterColor1,
+        thrusterColor2,
+        thrusterColor3,
+        thrusterColorBlend,
         disableSeatbelt,
         addPortableTractorBeam,
         disableShipSuit,
-        damageIndicatorColor1,
+        indicatorColorOptions,
+        indicatorColor1,
+        indicatorColor2,
+        indicatorColor3,
+        indicatorColorBlend,
         disableAutoLights,
         addExpeditionFlag,
         addFuelCanister,
@@ -317,6 +333,15 @@ public class ShipEnhancements : ModBehaviour
         ("Gravity", "(Low Gravity)", (index, num) => index == num - 1),
         ("Gravity", "(High Gravity)", (index, num) => index == num),
     ];
+
+    private Dictionary<string, string> _stemToSuffix = new()
+    {
+        {"shipLight", "Light Color"},
+        {"interiorHull", "Interior Color"},
+        {"exteriorHull", "Exterior Color"},
+        {"thruster", "Thruster Color"},
+        {"damageIndicator", "Indicator Color"}
+    };
 
     private void Awake()
     {
@@ -1095,7 +1120,8 @@ public class ShipEnhancements : ModBehaviour
         {
             InputLatencyController.Initialize();
         }
-        if ((bool)Settings.hotThrusters.GetProperty() || (string)Settings.thrusterColor.GetProperty() != "Default")
+        if ((bool)Settings.hotThrusters.GetProperty() || (bool)Settings.enableColorBlending.GetProperty()
+            || (string)Settings.thrusterColor1.GetProperty() != "Default")
         {
             GameObject flameHazardVolume = LoadPrefab("Assets/ShipEnhancements/FlameHeatVolume.prefab");
             foreach (ThrusterFlameController flame in SELocator.GetShipTransform().GetComponentsInChildren<ThrusterFlameController>())
@@ -1111,9 +1137,12 @@ public class ShipEnhancements : ModBehaviour
                     }
                 }
 
-                string color = (string)Settings.thrusterColor.GetProperty();
+                string color = (string)Settings.thrusterColor1.GetProperty();
+                bool thrusterBlend = ((bool)Settings.enableColorBlending.GetProperty()
+                    && int.Parse((string)Settings.thrusterColorOptions.GetProperty()) > 1)
+                    || color == "Rainbow";
 
-                if (color == "Rainbow")
+                if (thrusterBlend)
                 {
                     flame.gameObject.AddComponent<RainbowShipThrusters>();
                 }
@@ -2133,8 +2162,11 @@ public class ShipEnhancements : ModBehaviour
 
     private void SetHullColor()
     {
-        if ((string)Settings.interiorHullColor.GetProperty() == "Defualt"
-            && (string)Settings.exteriorHullColor.GetProperty() == "Default")
+        string interior = (string)Settings.interiorHullColor1.GetProperty();
+        string exterior = (string)Settings.exteriorHullColor1.GetProperty();
+
+        if (!(bool)Settings.enableColorBlending.GetProperty()
+            && interior == "Defualt" && exterior == "Default")
         {
             return;
         }
@@ -2151,28 +2183,22 @@ public class ShipEnhancements : ModBehaviour
             inSharedMat2 = buttonPanelRenderer.sharedMaterials[0];
         }
 
-        if ((string)Settings.interiorHullColor.GetProperty() != "Default")
+        bool blendInterior = ((bool)Settings.enableColorBlending.GetProperty()
+            && int.Parse((string)Settings.interiorHullColorOptions.GetProperty()) > 1)
+            || interior == "Rainbow";
+
+        if (blendInterior)
         {
-            if ((string)Settings.interiorHullColor.GetProperty() == "Rainbow")
-            {
-                if (SELocator.GetShipTransform().TryGetComponent(out RainbowShipHull rainbowHull))
-                {
-                    rainbowHull.AddSharedMaterial(inSharedMat);
-                    rainbowHull.AddSharedMaterial(inSharedMat2);
-                }
-                else
-                {
-                    rainbowHull = SELocator.GetShipTransform().gameObject.AddComponent<RainbowShipHull>();
-                    rainbowHull.AddSharedMaterial(inSharedMat);
-                    rainbowHull.AddSharedMaterial(inSharedMat2);
-                }
-            }
-            else
-            {
-                Color color = ThemeManager.GetHullTheme((string)Settings.interiorHullColor.GetProperty()).HullColor / 255f;
-                inSharedMat.SetColor("_Color", color);
-                inSharedMat2.SetColor("_Color", color);
-            }
+            InteriorHullBlendController hullBlend = SELocator.GetShipBody()
+                    .gameObject.GetAddComponent<InteriorHullBlendController>();
+            hullBlend.AddSharedMaterial(inSharedMat);
+            hullBlend.AddSharedMaterial(inSharedMat2);
+        }
+        else if (interior != "Default")
+        {
+            Color color = ThemeManager.GetHullTheme(interior).HullColor / 255f;
+            inSharedMat.SetColor("_Color", color);
+            inSharedMat2.SetColor("_Color", color);
         }
         else
         {
@@ -2183,25 +2209,22 @@ public class ShipEnhancements : ModBehaviour
         MeshRenderer cabinRenderer = SELocator.GetShipTransform().
             Find("Module_Cabin/Geo_Cabin/Cabin_Geometry/Cabin_Exterior").GetComponent<MeshRenderer>();
         Material outSharedMat = cabinRenderer.sharedMaterials[3];
-        if ((string)Settings.exteriorHullColor.GetProperty() != "Default")
+
+        bool blendExterior = ((bool)Settings.enableColorBlending.GetProperty()
+            && int.Parse((string)Settings.exteriorHullColorOptions.GetProperty()) > 1)
+            || exterior == "Rainbow";
+
+        if (blendExterior && false)
         {
-            if ((string)Settings.exteriorHullColor.GetProperty() == "Rainbow")
-            {
-                if (SELocator.GetShipTransform().TryGetComponent(out RainbowShipHull rainbowHull))
-                {
-                    rainbowHull.AddSharedMaterial(outSharedMat);
-                }
-                else
-                {
-                    rainbowHull = SELocator.GetShipTransform().gameObject.AddComponent<RainbowShipHull>();
-                    rainbowHull.AddSharedMaterial(outSharedMat);
-                }
-            }
-            else
-            {
-                Color color = ThemeManager.GetHullTheme((string)Settings.exteriorHullColor.GetProperty()).HullColor / 255f;
-                outSharedMat.SetColor("_Color", color);
-            }
+            InteriorHullBlendController hullBlend = SELocator.GetShipBody()
+                .gameObject.GetAddComponent<InteriorHullBlendController>();
+            hullBlend.AddSharedMaterial(inSharedMat);
+            hullBlend.AddSharedMaterial(inSharedMat2);
+        }
+        else if (exterior != "Default")
+        {
+            Color color = ThemeManager.GetHullTheme(exterior).HullColor / 255f;
+            outSharedMat.SetColor("_Color", color);
         }
         else
         {
@@ -2211,15 +2234,17 @@ public class ShipEnhancements : ModBehaviour
 
     private void SetDamageColors()
     {
-        string color = (string)Settings.damageIndicatorColor1.GetProperty();
-        if (color != "Default")
-        {
-            if (color == "Rainbow")
-            {
-                SELocator.GetShipTransform().gameObject.AddComponent<RainbowShipDamage>();
-                return;
-            }
+        string color = (string)Settings.indicatorColor1.GetProperty();
+        bool indicatorBlend = ((bool)Settings.enableColorBlending.GetProperty()
+            && int.Parse((string)Settings.indicatorColorOptions.GetProperty()) > 1)
+            || color == "Rainbow";
 
+        if (indicatorBlend)
+        {
+            SELocator.GetShipTransform().gameObject.AddComponent<RainbowShipDamage>();
+        }
+        else if (color != "Default")
+        {
             var damageScreenMat = SELocator.GetShipTransform().Find("Module_Cockpit/Systems_Cockpit/ShipCockpitUI/DamageScreen/HUD_ShipDamageDisplay")
                 .GetComponent<MeshRenderer>().material;
             var masterAlarmMat = SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry/Cockpit_Interior/Cockpit_Interior_Chassis")
@@ -2422,11 +2447,11 @@ public class ShipEnhancements : ModBehaviour
     private void OnWakeUp()
     {
         bool allRainbow = !(bool)Settings.enableColorBlending.GetProperty()
-            && (string)Settings.interiorHullColor.GetProperty() == "Rainbow"
-            && (string)Settings.exteriorHullColor.GetProperty() == "Rainbow"
+            && (string)Settings.interiorHullColor1.GetProperty() == "Rainbow"
+            && (string)Settings.exteriorHullColor1.GetProperty() == "Rainbow"
             && (string)Settings.shipLightColor1.GetProperty() == "Rainbow"
-            && (string)Settings.thrusterColor.GetProperty() == "Rainbow"
-            && (string)Settings.damageIndicatorColor1.GetProperty() == "Rainbow";
+            && (string)Settings.thrusterColor1.GetProperty() == "Rainbow"
+            && (string)Settings.indicatorColor1.GetProperty() == "Rainbow";
         if (AchievementsAPI != null && !AchievementsAPI.HasAchievement("SHIPENHANCEMENTS.RGB_SETUP") && allRainbow)
         {
             AchievementsAPI.EarnAchievement("SHIPENHANCEMENTS.RGB_SETUP");
@@ -2762,7 +2787,7 @@ public class ShipEnhancements : ModBehaviour
         int start = ModHelper.Config.Settings.Keys.ToList()
             .IndexOf("enableColorBlending");
         int end = ModHelper.Config.Settings.Keys.ToList()
-            .IndexOf("damageIndicatorColor1");
+            .IndexOf("indicatorColor3");
 
         var range = ModHelper.Config.Settings.ToList()
             .GetRange(start, end - start)
@@ -2814,7 +2839,7 @@ public class ShipEnhancements : ModBehaviour
         bool blendEnabled = (bool)Settings.enableColorBlending.GetValue();
 
         int decoStartIndex = ModHelper.Config.Settings.Keys.ToList().IndexOf("enableColorBlending");
-        int decoEndIndex = ModHelper.Config.Settings.Keys.ToList().IndexOf("damageIndicatorColor1");
+        int decoEndIndex = ModHelper.Config.Settings.Keys.ToList().IndexOf("indicatorColor3");
 
         int startIndex;
         int endIndex = ModHelper.Config.Settings.Count - 1;
@@ -3103,13 +3128,17 @@ public class ShipEnhancements : ModBehaviour
                 return true;
             }
 
-            int colorOptions = int.Parse((string)Settings.shipLightColorOptions.GetValue());
-
-            if (name.Substring(0, name.Length - 1) == "shipLightColor")
+            if (name.Length >= 6)
             {
-                if (int.Parse(name.Substring(name.Length - 1)) > colorOptions)
+                string stem = name.Substring(0, name.Length - 6);
+                if (_stemToSuffix.ContainsKey(stem))
                 {
-                    return true;
+                    Settings numSetting = (stem + "ColorOptions").AsEnum<Settings>();
+                    int num = int.Parse((string)numSetting.GetValue());
+                    if (int.Parse(name.Substring(name.Length - 1)) > num)
+                    {
+                        return true;
+                    }
                 }
             }
         }
@@ -3119,27 +3148,29 @@ public class ShipEnhancements : ModBehaviour
 
     private bool SetCustomSettingName(ref string label, string settingName)
     {
-        string stem = settingName.Substring(0, settingName.Length - 1);
-        if (stem != "shipLightColor")
+        string stem = settingName.Substring(0, settingName.Length - 6);
+        if (!_stemToSuffix.ContainsKey(stem))
         {
             return false;
         }
 
-        int num = int.Parse((string)Settings.shipLightColorOptions.GetValue());
+        Settings numSetting = (stem + "ColorOptions").AsEnum<Settings>();
+        int num = int.Parse((string)numSetting.GetValue());
         if (num == 1)
         {
             return false;
         }
 
         int index = int.Parse(settingName.Substring(settingName.Length - 1));
-        string blend = (string)Settings.shipLightBlend.GetValue();
+        Settings blendSetting = (stem + "ColorBlend").AsEnum<Settings>();
+        string blend = (string)blendSetting.GetValue();
 
         var found = _customSettingNames.Where(tuple => tuple.blendType == blend 
             && tuple.canShow(index, num));
 
         if (found.Count() > 0)
         {
-            label = "Light Color " + found.First().suffix;
+            label = _stemToSuffix[stem] + " " + found.First().suffix;
             return true;
         }
 
