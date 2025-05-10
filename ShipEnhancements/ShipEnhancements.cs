@@ -340,7 +340,7 @@ public class ShipEnhancements : ModBehaviour
         {"interiorHull", "Interior Color"},
         {"exteriorHull", "Exterior Color"},
         {"thruster", "Thruster Color"},
-        {"damageIndicator", "Indicator Color"}
+        {"indicator", "Indicator Color"}
     };
 
     private void Awake()
@@ -2190,7 +2190,7 @@ public class ShipEnhancements : ModBehaviour
         if (blendInterior)
         {
             InteriorHullBlendController hullBlend = SELocator.GetShipBody()
-                    .gameObject.GetAddComponent<InteriorHullBlendController>();
+                .gameObject.GetAddComponent<InteriorHullBlendController>();
             hullBlend.AddSharedMaterial(inSharedMat);
             hullBlend.AddSharedMaterial(inSharedMat2);
         }
@@ -2216,8 +2216,8 @@ public class ShipEnhancements : ModBehaviour
 
         if (blendExterior && false)
         {
-            InteriorHullBlendController hullBlend = SELocator.GetShipBody()
-                .gameObject.GetAddComponent<InteriorHullBlendController>();
+            ExteriorHullBlendController hullBlend = SELocator.GetShipBody()
+                .gameObject.GetAddComponent<ExteriorHullBlendController>();
             hullBlend.AddSharedMaterial(inSharedMat);
             hullBlend.AddSharedMaterial(inSharedMat2);
         }
@@ -2987,8 +2987,9 @@ public class ShipEnhancements : ModBehaviour
 
             if (blendEnabled && i <= decoEndIndex)
             {
-                if (name.Substring(name.Length - 1)
-                    == (blendEnabled ? (string)Settings.shipLightColorOptions.GetValue() : "1"))
+                string stem = name.Substring(0, name.Length - 6);
+                if (_stemToSuffix.ContainsKey(stem) && name.Substring(name.Length - 1)
+                    == (blendEnabled ? (string)(stem + "ColorOptions").AsEnum<Settings>().GetValue() : "1"))
                 {
                     OptionsMenuManager.AddSeparator(newModTab, false);
                 }
@@ -3010,7 +3011,7 @@ public class ShipEnhancements : ModBehaviour
         {
             selectable.gameObject.GetAddComponent<Menu.MenuSelectHandler>().OnSelectableSelected += newModTab.OnMenuItemSelected;
 
-            if (selectable.gameObject.name == newModTab._lastSelected.gameObject.name)
+            if (selectable.gameObject.name == newModTab._lastSelected?.gameObject.name)
             {
                 SelectableAudioPlayer component = newModTab._selectOnActivate.GetComponent<SelectableAudioPlayer>();
                 if (component != null)

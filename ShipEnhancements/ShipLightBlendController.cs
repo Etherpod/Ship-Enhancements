@@ -20,6 +20,11 @@ public class ShipLightBlendController : ColorBlendController
         base.Awake();
     }
 
+    protected override Color GetThemeColor(string themeName)
+    {
+        return ShipEnhancements.ThemeManager.GetLightTheme(themeName).LightColor;
+    }
+
     protected override void SetColor(Color color)
     {
         color /= 255f;

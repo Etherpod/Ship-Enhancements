@@ -46,14 +46,20 @@ public class ColorBlendController : MonoBehaviour
                 else if (setting == "Default")
                 {
                     _blendColors[i] = _defaultColor;
+                    ShipEnhancements.WriteDebugMessage(_blendColors[i]);
                 }
                 else
                 {
-                    _blendColors[i] = ShipEnhancements.ThemeManager.GetLightTheme(setting).LightColor;
+                    _blendColors[i] = GetThemeColor(setting);
                 }
             }
             _blendMode = CurrentBlend;
         }
+    }
+
+    protected virtual Color GetThemeColor(string themeName)
+    {
+        return Color.white;
     }
 
     protected virtual void SetColor(Color color) { }
@@ -427,11 +433,13 @@ public class ColorBlendController : MonoBehaviour
         {
             foreach (int i in _rainbowIndexes)
             {
+                ShipEnhancements.WriteDebugMessage("pool rainbow");
                 _blendColors[i] = color.AsRGB();
             }
         }
         else
         {
+            ShipEnhancements.WriteDebugMessage("lone rainbow");
             SetColor(color);
         }
     }
