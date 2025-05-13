@@ -2218,8 +2218,7 @@ public class ShipEnhancements : ModBehaviour
         {
             ExteriorHullBlendController hullBlend = SELocator.GetShipBody()
                 .gameObject.GetAddComponent<ExteriorHullBlendController>();
-            hullBlend.AddSharedMaterial(inSharedMat);
-            hullBlend.AddSharedMaterial(inSharedMat2);
+            hullBlend.AddSharedMaterial(outSharedMat);
         }
         else if (exterior != "Default")
         {

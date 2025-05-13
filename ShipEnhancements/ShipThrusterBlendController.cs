@@ -3,7 +3,7 @@ using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
-public class ShipLightBlendController : ColorBlendController
+public class ShipThrusterBlendController : ColorBlendController
 {
     protected override string CurrentBlend => (string)shipLightColorBlend.GetProperty();
     protected override int NumberOfOptions => int.Parse((string)shipLightColorOptions.GetProperty());
@@ -22,22 +22,7 @@ public class ShipLightBlendController : ColorBlendController
 
     protected override Color GetThemeColor(string themeName)
     {
-        return ShipEnhancements.ThemeManager.GetLightTheme(themeName).LightColor;
-    }
-
-    protected override void SetBlendTheme(int i, string themeName)
-    {
-        LightTheme theme = ShipEnhancements.ThemeManager.GetLightTheme(themeName);
-        _blendThemes[i] = [theme.LightColor];
-    }
-
-    protected override void UpdateLerp(int start, int end, float lerp)
-    {
-        var fromLerp = _blendThemes[start];
-        var toLerp = _blendThemes[end];
-
-        var newColor = Color.Lerp((Color)fromLerp[0], (Color)toLerp[0], lerp);
-        SetColor(newColor);
+        return ShipEnhancements.ThemeManager.GetThrusterTheme(themeName).ThrusterLight;
     }
 
     protected override void SetColor(Color color)

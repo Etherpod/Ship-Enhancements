@@ -16,6 +16,7 @@ public class ColorBlendController : MonoBehaviour
     protected bool _reset = false;
 
     protected Color[] _blendColors;
+    protected List<object>[] _blendThemes;
     protected string _blendMode;
     protected List<int> _rainbowIndexes = [];
     protected Color _defaultColor;
@@ -34,7 +35,9 @@ public class ColorBlendController : MonoBehaviour
         if ((bool)ShipEnhancements.Settings.enableColorBlending.GetProperty() && NumberOfOptions > 1)
         {
             _blendColors = new Color[NumberOfOptions];
-            for (int i = 0; i < _blendColors.Length; i++)
+            _blendThemes = new List<object>[NumberOfOptions];
+
+            for (int i = 0; i < _blendThemes.Length; i++)
             {
                 var setting = (string)(OptionStem + (i + 1))
                     .AsEnum<ShipEnhancements.Settings>().GetProperty();
@@ -42,15 +45,18 @@ public class ColorBlendController : MonoBehaviour
                 {
                     _rainbowIndexes.Add(i);
                     _blendColors[i] = Color.white;
+                    // add rainbow to color themes
                 }
                 else if (setting == "Default")
                 {
                     _blendColors[i] = _defaultColor;
-                    ShipEnhancements.WriteDebugMessage(_blendColors[i]);
+                    SetBlendTheme(i, setting);
+                    // add default to color themes
                 }
                 else
                 {
                     _blendColors[i] = GetThemeColor(setting);
+                    SetBlendTheme(i, setting);
                 }
             }
             _blendMode = CurrentBlend;
@@ -62,12 +68,16 @@ public class ColorBlendController : MonoBehaviour
         return Color.white;
     }
 
+    protected virtual void SetBlendTheme(int i, string themeName) { }
+
     protected virtual void SetColor(Color color) { }
 
     protected void SetColor(ColorHSV color)
     {
         SetColor(color.AsRGB());
     }
+
+    protected virtual void UpdateLerp(int start, int end, float lerp) { }
 
     private void Update()
     {
@@ -87,8 +97,9 @@ public class ColorBlendController : MonoBehaviour
 
             if (_blendColors.Length == 2)
             {
-                Color color = Color.Lerp(_blendColors[1], _blendColors[0], _currentLerp);
-                SetColor(color);
+                /*Color color = Color.Lerp(_blendColors[1], _blendColors[0], _currentLerp);
+                SetColor(color);*/
+                UpdateLerp(1, 0, _currentLerp);
             }
             else if (_blendColors.Length == 3)
             {
@@ -403,9 +414,10 @@ public class ColorBlendController : MonoBehaviour
             var t = Time.time / 4f / _blendColors.Length % _blendColors.Length;
             var a = (int)t;
             var b = (a + 1) % _blendColors.Length;
-            var color = Color.Lerp(_blendColors[a], _blendColors[b],
+            /*var color = Color.Lerp(_blendColors[a], _blendColors[b],
                 Mathf.SmoothStep(0, 1, (t - a) * 2f - 0.5f));
-            SetColor(color);
+            SetColor(color);*/
+            UpdateLerp(a, b, Mathf.SmoothStep(0, 1, (t - a) * 2f - 0.5f));
         }
         else
         {
