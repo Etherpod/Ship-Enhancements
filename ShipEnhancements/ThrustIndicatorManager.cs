@@ -26,12 +26,13 @@ public static class ThrustIndicatorManager
         _currentColor = _barRenderers[0].material.GetColor("_BarColor");
     }
 
-    public static void SetColor(Color color)
+    public static void SetColor(Color color, Color lightColor, float intensity = 1)
     {
+        color *= Mathf.Pow(intensity, 2);
         _currentColor = color;
         foreach (Light light in _barLights)
         {
-            light.color = color;
+            light.color = lightColor;
         }
         foreach (MeshRenderer renderer in _barRenderers)
         {

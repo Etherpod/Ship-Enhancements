@@ -119,6 +119,14 @@
         "g": 25500,
         "b": 25500
       }
+    },
+    {
+      "name": "Rainbow",
+      "light": {
+        "r": 255,
+        "g": 255,
+        "b": 255
+      }
     }
   ],
   "hullThemes": [
@@ -208,6 +216,14 @@
         "r": 119,
         "g": 122,
         "b": 140
+      }
+    },
+    {
+      "name": "Rainbow",
+      "hull": {
+        "r": 255,
+        "g": 255,
+        "b": 255
       }
     }
   ],
@@ -379,9 +395,60 @@
         "g": 255,
         "b": 252
       }
+    },
+    {
+      "name": "Rainbow",
+      "thruster": "ThrusterFlames_Gray.png",
+      "thrusterIntensity": 1.0,
+      "thrusterLight": {
+        "r": 255,
+        "g": 255,
+        "b": 255
+      },
+      "indicator": {
+        "r": 255,
+        "g": 255,
+        "b": 255
+      },
+      "indicatorIntensity": 1.0,
+      "indicatorLight": {
+        "r": 255,
+        "g": 255,
+        "b": 255
+      }
     }
   ],
   "damageThemes": [
-
+    {
+      "name": "Orange",
+      "hull": {
+        "r": 0,
+        "g": 0,
+        "b": 0
+      },
+      "hullIntensity": 1.0,
+      "comp": {
+        "r": 0,
+        "g": 0,
+        "b": 0
+      },
+      "compIntensity": 1.0,
+      "alarm": {
+        "r": 0,
+        "g": 0,
+        "b": 0
+      },
+      "alarmLit": {
+        "r": 0,
+        "g": 0,
+        "b": 0
+      },
+      "alarmLitIntensity": 1.0,
+      "light": {
+        "r": 0,
+        "g": 0,
+        "b": 0
+      }
+    }
   ]
 }

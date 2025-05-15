@@ -1144,7 +1144,7 @@ public class ShipEnhancements : ModBehaviour
 
                 if (thrusterBlend)
                 {
-                    flame.gameObject.AddComponent<RainbowShipThrusters>();
+                    flame.gameObject.AddComponent<ShipThrusterBlendController>();
                 }
                 else if (color != "Default")
                 {
@@ -2214,7 +2214,7 @@ public class ShipEnhancements : ModBehaviour
             && int.Parse((string)Settings.exteriorHullColorOptions.GetProperty()) > 1)
             || exterior == "Rainbow";
 
-        if (blendExterior && false)
+        if (blendExterior)
         {
             ExteriorHullBlendController hullBlend = SELocator.GetShipBody()
                 .gameObject.GetAddComponent<ExteriorHullBlendController>();

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
@@ -16,33 +17,41 @@ public class ShipLightBlendController : ColorBlendController
     {
         _shipLight = GetComponent<ShipLight>();
         _pulsingLight = GetComponent<PulsingLight>();
-        _defaultColor = (_shipLight ? _shipLight._light.color : _pulsingLight._light.color) * 255f;
+        _defaultTheme = [(_shipLight ? _shipLight._light.color : _pulsingLight._light.color) * 255f];
         base.Awake();
-    }
-
-    protected override Color GetThemeColor(string themeName)
-    {
-        return ShipEnhancements.ThemeManager.GetLightTheme(themeName).LightColor;
     }
 
     protected override void SetBlendTheme(int i, string themeName)
     {
+        if (themeName == "Default")
+        {
+            _blendThemes[i] = _defaultTheme;
+            return;
+        }
+
         LightTheme theme = ShipEnhancements.ThemeManager.GetLightTheme(themeName);
         _blendThemes[i] = [theme.LightColor];
     }
 
-    protected override void UpdateLerp(int start, int end, float lerp)
+    protected override void UpdateLerp(List<object> start, List<object> end, float lerp)
     {
-        var fromLerp = _blendThemes[start];
-        var toLerp = _blendThemes[end];
+        SetColor(GetLerp(start, end, lerp));
+    }
 
-        var newColor = Color.Lerp((Color)fromLerp[0], (Color)toLerp[0], lerp);
-        SetColor(newColor);
+    protected override List<object> GetLerp(List<object> start, List<object> end, float lerp)
+    {
+        var newColor = Color.Lerp((Color)start[0], (Color)end[0], lerp);
+        return [newColor];
     }
 
     protected override void SetColor(Color color)
     {
-        color /= 255f;
+        SetColor([color]);
+    }
+
+    protected override void SetColor(List<object> theme)
+    {
+        Color color = (Color)theme[0] / 255f;
         if (_shipLight)
         {
             _shipLight._baseEmission = color;
@@ -61,7 +70,7 @@ public class ShipLightBlendController : ColorBlendController
     protected override void ResetColor()
     {
         Color baseEmission;
-        Color baseColor = _defaultColor / 255f;
+        Color baseColor = (Color)_defaultTheme[0] / 255f;
         if (_shipLight)
         {
             baseEmission = _shipLight._emissiveRenderer.sharedMaterials[_shipLight._materialIndex]

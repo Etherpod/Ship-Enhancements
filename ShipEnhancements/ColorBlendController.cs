@@ -15,13 +15,11 @@ public class ColorBlendController : MonoBehaviour
     protected float _resetFadeStartTime;
     protected bool _reset = false;
 
-    protected Color[] _blendColors;
     protected List<object>[] _blendThemes;
     protected string _blendMode;
     protected List<int> _rainbowIndexes = [];
-    protected Color _defaultColor;
-    protected Color _cachedColor;
-
+    protected List<object> _defaultTheme;
+    protected List<object> _cachedTheme;
     protected readonly float _maxLerpStep = 0.005f;
     protected readonly float _resetFadeTime = 2f;
 
@@ -34,54 +32,47 @@ public class ColorBlendController : MonoBehaviour
 
         if ((bool)ShipEnhancements.Settings.enableColorBlending.GetProperty() && NumberOfOptions > 1)
         {
-            _blendColors = new Color[NumberOfOptions];
             _blendThemes = new List<object>[NumberOfOptions];
 
             for (int i = 0; i < _blendThemes.Length; i++)
             {
                 var setting = (string)(OptionStem + (i + 1))
                     .AsEnum<ShipEnhancements.Settings>().GetProperty();
+
                 if (setting == "Rainbow")
                 {
                     _rainbowIndexes.Add(i);
-                    _blendColors[i] = Color.white;
-                    // add rainbow to color themes
                 }
-                else if (setting == "Default")
-                {
-                    _blendColors[i] = _defaultColor;
-                    SetBlendTheme(i, setting);
-                    // add default to color themes
-                }
-                else
-                {
-                    _blendColors[i] = GetThemeColor(setting);
-                    SetBlendTheme(i, setting);
-                }
+
+                SetBlendTheme(i, setting);
             }
             _blendMode = CurrentBlend;
         }
-    }
-
-    protected virtual Color GetThemeColor(string themeName)
-    {
-        return Color.white;
     }
 
     protected virtual void SetBlendTheme(int i, string themeName) { }
 
     protected virtual void SetColor(Color color) { }
 
-    protected void SetColor(ColorHSV color)
+    protected virtual void SetColor(List<object> theme) { }
+
+    protected void UpdateLerp(int start, int end, float lerp) 
     {
-        SetColor(color.AsRGB());
+        UpdateLerp(_blendThemes[start], _blendThemes[end], lerp);
     }
 
-    protected virtual void UpdateLerp(int start, int end, float lerp) { }
+    protected virtual void UpdateLerp(List<object> start, List<object> end, float lerp) { }
+
+    protected virtual List<object> GetLerp(List<object> start, List<object> end, float lerp)
+    {
+        return null;
+    }
+
+    protected virtual void UpdateRainbowTheme(int index, Color color) { }
 
     private void Update()
     {
-        if (_blendColors == null) return;
+        if (_blendThemes == null) return;
 
         if (_blendMode == "Temperature" && SELocator.GetShipTemperatureDetector() != null)
         {
@@ -95,24 +86,20 @@ public class ColorBlendController : MonoBehaviour
                 _currentLerp = _targetLerp;
             }
 
-            if (_blendColors.Length == 2)
+            if (_blendThemes.Length == 2)
             {
-                /*Color color = Color.Lerp(_blendColors[1], _blendColors[0], _currentLerp);
-                SetColor(color);*/
                 UpdateLerp(1, 0, _currentLerp);
             }
-            else if (_blendColors.Length == 3)
+            else if (_blendThemes.Length == 3)
             {
-                Color color;
                 if (_currentLerp < 0.5f)
                 {
-                    color = Color.Lerp(_blendColors[2], _blendColors[1], _currentLerp * 2f);
+                    UpdateLerp(2, 1, _currentLerp * 2f);
                 }
                 else
                 {
-                    color = Color.Lerp(_blendColors[1], _blendColors[0], (_currentLerp - 0.5f) * 2f);
+                    UpdateLerp(1, 0, (_currentLerp - 0.5f) * 2f);
                 }
-                SetColor(color);
             }
         }
         else if (_blendMode == "Ship Temperature" && SELocator.GetShipTemperatureDetector() != null)
@@ -127,23 +114,20 @@ public class ColorBlendController : MonoBehaviour
                 _currentLerp = _targetLerp;
             }
 
-            if (_blendColors.Length == 2)
+            if (_blendThemes.Length == 2)
             {
-                Color color = Color.Lerp(_blendColors[1], _blendColors[0], _currentLerp);
-                SetColor(color);
+                UpdateLerp(1, 0, _currentLerp);
             }
-            else if (_blendColors.Length == 3)
+            else if (_blendThemes.Length == 3)
             {
-                Color color;
                 if (_currentLerp < 0.5f)
                 {
-                    color = Color.Lerp(_blendColors[2], _blendColors[1], _currentLerp * 2f);
+                    UpdateLerp(2, 1, _currentLerp * 2f);
                 }
                 else
                 {
-                    color = Color.Lerp(_blendColors[1], _blendColors[0], (_currentLerp - 0.5f) * 2f);
+                    UpdateLerp(1, 0, (_currentLerp - 0.5f) * 2f);
                 }
-                SetColor(color);
             }
         }
         else if (_blendMode == "Reactor State")
@@ -163,15 +147,13 @@ public class ColorBlendController : MonoBehaviour
                 _currentLerp = _targetLerp;
             }
 
-            if (_blendColors.Length == 2)
+            if (_blendThemes.Length == 2)
             {
-                Color color = Color.Lerp(_blendColors[0], _blendColors[1], _currentLerp);
-                SetColor(color);
+                UpdateLerp(1, 0, _currentLerp);
             }
-            else if (_blendColors.Length == 3)
+            else if (_blendThemes.Length == 3)
             {
-                Color color;
-                _cachedColor = Color.Lerp(_blendColors[1], _blendColors[2], _currentLerp);
+                _cachedTheme = GetLerp(_blendThemes[1], _blendThemes[2], _currentLerp);
 
                 if (!SELocator.GetShipDamageController().IsReactorCritical())
                 {
@@ -183,7 +165,7 @@ public class ColorBlendController : MonoBehaviour
                     float timeLerp = Mathf.InverseLerp(_resetFadeStartTime,
                         _resetFadeStartTime + _resetFadeTime, Time.time);
 
-                    color = Color.Lerp(_cachedColor, _blendColors[0], timeLerp);
+                    UpdateLerp(_cachedTheme, _blendThemes[0], timeLerp);
                 }
                 else
                 {
@@ -195,9 +177,8 @@ public class ColorBlendController : MonoBehaviour
                     float timeLerp = Mathf.InverseLerp(_resetFadeStartTime,
                         _resetFadeStartTime + _resetFadeTime, Time.time);
 
-                    color = Color.Lerp(_blendColors[0], _cachedColor, timeLerp);
-                }
-                SetColor(color);
+                    UpdateLerp(_blendThemes[0], _cachedTheme, timeLerp);
+                }            
             }
         }
         else if (_blendMode == "Ship Damage %")
@@ -211,15 +192,14 @@ public class ColorBlendController : MonoBehaviour
                 _currentLerp = _targetLerp;
             }
 
-            if (_blendColors.Length == 2)
+            if (_blendThemes.Length == 2)
             {
-                Color color = Color.Lerp(_blendColors[0], _blendColors[1], _currentLerp);
-                SetColor(color);
+                UpdateLerp(0, 1, _currentLerp);
             }
-            else if (_blendColors.Length == 3)
+            else if (_blendThemes.Length == 3)
             {
-                Color color;
-                _cachedColor = Color.Lerp(_blendColors[1], _blendColors[2], _currentLerp);
+                _cachedTheme = GetLerp(_blendThemes[1], _blendThemes[2], _currentLerp);
+
                 if (_targetLerp == 0)
                 {
                     if (!_reset)
@@ -230,7 +210,7 @@ public class ColorBlendController : MonoBehaviour
                     float timeLerp = Mathf.InverseLerp(_resetFadeStartTime,
                         _resetFadeStartTime + _resetFadeTime, Time.time);
 
-                    color = Color.Lerp(_cachedColor, _blendColors[0], timeLerp);
+                    UpdateLerp(_cachedTheme, _blendThemes[0], timeLerp);
                 }
                 else
                 {
@@ -242,9 +222,8 @@ public class ColorBlendController : MonoBehaviour
                     float timeLerp = Mathf.InverseLerp(_resetFadeStartTime,
                         _resetFadeStartTime + _resetFadeTime, Time.time);
 
-                    color = Color.Lerp(_blendColors[0], _cachedColor, timeLerp);
+                    UpdateLerp(_blendThemes[0], _cachedTheme, timeLerp);
                 }
-                SetColor(color);
             }
         }
         else if (_blendMode == "Fuel")
@@ -260,23 +239,20 @@ public class ColorBlendController : MonoBehaviour
                 _currentLerp = _targetLerp;
             }
 
-            if (_blendColors.Length == 2)
+            if (_blendThemes.Length == 2)
             {
-                Color color = Color.Lerp(_blendColors[0], _blendColors[1], _currentLerp);
-                SetColor(color);
+                UpdateLerp(0, 1, _currentLerp);
             }
-            else if (_blendColors.Length == 3)
+            else if (_blendThemes.Length == 3)
             {
-                Color color;
                 if (_currentLerp < 0.5f)
                 {
-                    color = Color.Lerp(_blendColors[0], _blendColors[1], _currentLerp * 2f);
+                    UpdateLerp(0, 1, _currentLerp * 2f);
                 }
                 else
                 {
-                    color = Color.Lerp(_blendColors[1], _blendColors[2], (_currentLerp - 0.5f) * 2f);
+                    UpdateLerp(1, 2, (_currentLerp - 0.5f) * 2f);
                 }
-                SetColor(color);
             }
         }
         else if (_blendMode == "Oxygen")
@@ -292,23 +268,20 @@ public class ColorBlendController : MonoBehaviour
                 _currentLerp = _targetLerp;
             }
 
-            if (_blendColors.Length == 2)
+            if (_blendThemes.Length == 2)
             {
-                Color color = Color.Lerp(_blendColors[0], _blendColors[1], _currentLerp);
-                SetColor(color);
+                UpdateLerp(0, 1, _currentLerp);
             }
-            else if (_blendColors.Length == 3)
+            else if (_blendThemes.Length == 3)
             {
-                Color color;
                 if (_currentLerp < 0.5f)
                 {
-                    color = Color.Lerp(_blendColors[0], _blendColors[1], _currentLerp * 2f);
+                    UpdateLerp(0, 1, _currentLerp * 2f);
                 }
                 else
                 {
-                    color = Color.Lerp(_blendColors[1], _blendColors[2], (_currentLerp - 0.5f) * 2f);
+                    UpdateLerp(1, 2, (_currentLerp - 0.5f) * 2f);
                 }
-                SetColor(color);
             }
         }
         else if (_blendMode == "Velocity")
@@ -338,23 +311,20 @@ public class ColorBlendController : MonoBehaviour
                 _currentLerp = _targetLerp;
             }
 
-            if (_blendColors.Length == 2)
+            if (_blendThemes.Length == 2)
             {
-                Color color = Color.Lerp(_blendColors[1], _blendColors[0], _currentLerp);
-                SetColor(color);
+                UpdateLerp(1, 0, _currentLerp);
             }
-            else if (_blendColors.Length == 3)
+            else if (_blendThemes.Length == 3)
             {
-                Color color;
                 if (_currentLerp < 0.5f)
                 {
-                    color = Color.Lerp(_blendColors[0], _blendColors[1], _currentLerp * 2f);
+                    UpdateLerp(0, 1, _currentLerp * 2f);
                 }
                 else
                 {
-                    color = Color.Lerp(_blendColors[1], _blendColors[2], (_currentLerp - 0.5f) * 2f);
+                    UpdateLerp(1, 2, (_currentLerp - 0.5f) * 2f);
                 }
-                SetColor(color);
             }
         }
         else if (_blendMode == "Gravity")
@@ -372,15 +342,13 @@ public class ColorBlendController : MonoBehaviour
                 _currentLerp = _targetLerp;
             }
 
-            if (_blendColors.Length == 2)
+            if (_blendThemes.Length == 2)
             {
-                Color color = Color.Lerp(_blendColors[1], _blendColors[0], _currentLerp);
-                SetColor(color);
+                UpdateLerp(1, 0, _currentLerp);
             }
-            else if (_blendColors.Length == 3)
+            else if (_blendThemes.Length == 3)
             {
-                Color color;
-                _cachedColor = Color.Lerp(_blendColors[1], _blendColors[2], _currentLerp);
+                _cachedTheme = GetLerp(_blendThemes[1], _blendThemes[2], _currentLerp);
 
                 if (detector.GetAlignmentAcceleration().sqrMagnitude == 0f)
                 {
@@ -392,7 +360,7 @@ public class ColorBlendController : MonoBehaviour
                     float timeLerp = Mathf.InverseLerp(_resetFadeStartTime,
                         _resetFadeStartTime + _resetFadeTime, Time.time);
 
-                    color = Color.Lerp(_cachedColor, _blendColors[0], timeLerp);
+                    UpdateLerp(_cachedTheme, _blendThemes[0], timeLerp);
                 }
                 else
                 {
@@ -404,19 +372,15 @@ public class ColorBlendController : MonoBehaviour
                     float timeLerp = Mathf.InverseLerp(_resetFadeStartTime,
                         _resetFadeStartTime + _resetFadeTime, Time.time);
 
-                    color = Color.Lerp(_blendColors[0], _cachedColor, timeLerp);
+                    UpdateLerp(_blendThemes[0], _cachedTheme, timeLerp);
                 }
-                SetColor(color);
             }
         }
         else if (_blendMode == "Time")
         {
-            var t = Time.time / 4f / _blendColors.Length % _blendColors.Length;
+            var t = Time.time / 4f / _blendThemes.Length % _blendThemes.Length;
             var a = (int)t;
-            var b = (a + 1) % _blendColors.Length;
-            /*var color = Color.Lerp(_blendColors[a], _blendColors[b],
-                Mathf.SmoothStep(0, 1, (t - a) * 2f - 0.5f));
-            SetColor(color);*/
+            var b = (a + 1) % _blendThemes.Length;
             UpdateLerp(a, b, Mathf.SmoothStep(0, 1, (t - a) * 2f - 0.5f));
         }
         else
@@ -427,13 +391,13 @@ public class ColorBlendController : MonoBehaviour
 
     protected virtual void ResetColor()
     {
-        _blendColors = null;
+        _blendThemes = null;
         enabled = false;
     }
 
     private void FixedUpdate()
     {
-        if (_blendColors != null && _rainbowIndexes.Count == 0)
+        if (_blendThemes != null && _rainbowIndexes.Count == 0)
         {
             return;
         }
@@ -441,18 +405,16 @@ public class ColorBlendController : MonoBehaviour
         float num = Time.time % _rainbowCycleLength / _rainbowCycleLength;
         ColorHSV color = new ColorHSV(num, 1f, 255f);
 
-        if (_blendColors != null)
+        if (_blendThemes != null)
         {
             foreach (int i in _rainbowIndexes)
             {
-                ShipEnhancements.WriteDebugMessage("pool rainbow");
-                _blendColors[i] = color.AsRGB();
+                UpdateRainbowTheme(i, color.AsRGB());
             }
         }
         else
         {
-            ShipEnhancements.WriteDebugMessage("lone rainbow");
-            SetColor(color);
+            SetColor(color.AsRGB());
         }
     }
 
