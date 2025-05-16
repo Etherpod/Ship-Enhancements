@@ -429,10 +429,10 @@
       "hullIntensity": 1.2,
       "comp": {
         "r": 191,
-        "g": 35,
-        "b": 0
+        "g": 42,
+        "b": 12
       },
-      "compIntensity": 1.4,
+      "compIntensity": 1.3,
       "alarm": {
         "r": 190,
         "g": 113,
@@ -479,6 +479,100 @@
         "r": 163,
         "g": 255,
         "b": 30
+      }
+    },
+    {
+      "name": "Lemonade",
+      "hull": {
+        "r": 191,
+        "g": 97,
+        "b": 0
+      },
+      "hullIntensity": 0.7,
+      "comp": {
+        "r": 0,
+        "g": 130,
+        "b": 126
+      },
+      "compIntensity": 1.0,
+      "alarm": {
+        "r": 48,
+        "g": 111,
+        "b": 111
+      },
+      "alarmLit": {
+        "r": 191,
+        "g": 137,
+        "b": 59
+      },
+      "alarmLitIntensity": 0.8,
+      "light": {
+        "r": 255,
+        "g": 241,
+        "b": 114
+      }
+    },
+    {
+      "name": "Lime",
+      "hull": {
+        "r": 124,
+        "g": 141,
+        "b": 11
+      },
+      "hullIntensity": 1.0,
+      "comp": {
+        "r": 46,
+        "g": 130,
+        "b": 0
+      },
+      "compIntensity": 1.0,
+      "alarm": {
+        "r": 82,
+        "g": 101,
+        "b": 53
+      },
+      "alarmLit": {
+        "r": 124,
+        "g": 191,
+        "b": 72
+      },
+      "alarmLitIntensity": 0.5,
+      "light": {
+        "r": 205,
+        "g": 255,
+        "b": 121
+      }
+    },
+    {
+      "name": "Ghostly Green",
+      "hull": {
+        "r": 0,
+        "g": 135,
+        "b": 16
+      },
+      "hullIntensity": 1.0,
+      "comp": {
+        "r": 0,
+        "g": 137,
+        "b": 69
+      },
+      "compIntensity": 1.0,
+      // finish from here
+      "alarm": {
+        "r": 82,
+        "g": 101,
+        "b": 53
+      },
+      "alarmLit": {
+        "r": 124,
+        "g": 191,
+        "b": 72
+      },
+      "alarmLitIntensity": 0.5,
+      "light": {
+        "r": 205,
+        "g": 255,
+        "b": 121
       }
     }
   ]
