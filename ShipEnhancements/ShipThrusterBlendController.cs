@@ -24,8 +24,8 @@ public class ShipThrusterBlendController : ColorBlendController
 
         var tex = (Texture2D)ShipEnhancements.LoadAsset("Assets/ShipEnhancements/ThrusterColors/ThrusterFlames_Default.png");
         _defaultTheme = [tex, _thrustMat.GetColor("_Color").maxColorComponent, 
-            _light.color, _indicator._rendererBack.material.GetColor("_BarColor"),
-            1.5f, _indicator._lightsBack[0].color];
+            _light.color, _indicator._rendererBack.material.GetColor("_BarColor") * 191f,
+            1f, _indicator._lightsBack[0].color];
 
         base.Awake();
     }

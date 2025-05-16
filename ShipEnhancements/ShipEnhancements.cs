@@ -883,6 +883,12 @@ public class ShipEnhancements : ModBehaviour
         materials.AddRange(newMaterials);
         cockpitLight.GetComponent<LightmapController>()._materials = [.. materials];
 
+        MeshRenderer chassisRenderer = SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry/Cockpit_Interior/Cockpit_Interior_Chassis")
+            .GetComponent<MeshRenderer>();
+        Texture2D blackTex = (Texture2D)LoadAsset("Assets/ShipEnhancements/Black_d.png");
+        chassisRenderer.sharedMaterials[6].SetTexture("_OcclusionMap", blackTex);
+        chassisRenderer.sharedMaterials[6].SetFloat("_OcclusionStrength", 0.95f);
+
         SetUpShipAudio();
 
         foreach (OWAudioSource audio in _shipAudioToChange)
@@ -2240,7 +2246,7 @@ public class ShipEnhancements : ModBehaviour
 
         if (indicatorBlend)
         {
-            SELocator.GetShipTransform().gameObject.AddComponent<RainbowShipDamage>();
+            SELocator.GetShipTransform().gameObject.AddComponent<ShipIndicatorBlendController>();
         }
         else if (color != "Default")
         {

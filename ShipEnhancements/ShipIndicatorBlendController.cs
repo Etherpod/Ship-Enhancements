@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using static ShipEnhancements.ShipEnhancements.Settings;
+using System.Linq;
 
 namespace ShipEnhancements;
 
@@ -27,11 +28,11 @@ public class ShipIndicatorBlendController : ColorBlendController
         _damageEffects = GetComponentsInChildren<DamageEffect>()
             .Where(effect => effect._damageLight != null || effect._damageLightRenderer != null).ToArray();
 
-        Color hullColor = _damageScreenMat.GetColor("_DamagedHullFill");
-        Color compColor = _damageScreenMat.GetColor("_DamagedComponentFill");
+        Color hullColor = _damageScreenMat.GetColor("_DamagedHullFill") * 191f;
+        Color compColor = _damageScreenMat.GetColor("_DamagedComponentFill") * 191f;
         
-        _defaultTheme = [hullColor, 1f, compColor, 1f, _masterAlarmMat.GetColor("_Color"),
-            _masterAlarmMat.GetColor("_EmissionColor"), 1f, _masterAlarmLight.color];
+        _defaultTheme = [hullColor, 1f, compColor, 1f, _masterAlarmMat.GetColor("_Color") * 255f,
+            _masterAlarmMat.GetColor("_EmissionColor") * 191f, 1f, _masterAlarmLight.color * 255f];
 
         base.Awake();
     }
@@ -60,8 +61,8 @@ public class ShipIndicatorBlendController : ColorBlendController
         var newHullIntensity = Mathf.Lerp((float)start[1], (float)end[1], lerp);
         var newComp = Color.Lerp((Color)start[2], (Color)end[2], lerp);
         var newCompIntensity = Mathf.Lerp((float)start[3], (float)end[3], lerp);
-        var newAlarm = Color.Lerp((Color)start[4], (Color)end[4], lerp)
-        var newAlarmLit = Color.Lerp((Color)start[5], (Color)end[5], lerp)
+        var newAlarm = Color.Lerp((Color)start[4], (Color)end[4], lerp);
+        var newAlarmLit = Color.Lerp((Color)start[5], (Color)end[5], lerp);
         var newAlarmIntensity = Mathf.Lerp((float)start[6], (float)end[6], lerp);
         var newLight = Color.Lerp((Color)start[7], (Color)end[7], lerp);
 
@@ -76,22 +77,22 @@ public class ShipIndicatorBlendController : ColorBlendController
 
     protected override void SetColor(List<object> theme)
     {
-        _damageScreenMat.SetColor("_DamagedHullFill", theme[0] * theme[1] * theme[1]);
-        _damageScreenMat.SetColor("_DamagedComponentFill", theme[2] * theme[3] * theme[3]);
-        _masterAlarmMat.SetColor("_Color", theme[4]);
-        _masterAlarmMat.SetColor("_EmissionColor", theme[5] * theme[6] * theme[6]);
-        _cockpitUI._damageLightColor = theme[7];
-        _masterAlarmLight.color = theme[7];
+        _damageScreenMat.SetColor("_DamagedHullFill", (Color)theme[0] / 191f * (float)theme[1] * (float)theme[1]);
+        _damageScreenMat.SetColor("_DamagedComponentFill", (Color)theme[2] / 191f * (float)theme[3] * (float)theme[3]);
+        _masterAlarmMat.SetColor("_Color", (Color)theme[4] / 255f);
+        //_masterAlarmMat.SetColor("_EmissionColor", (Color)theme[5] / 191f * (float)theme[6] * (float)theme[6]);
+        _cockpitUI._damageLightColor = (Color)theme[7] / 255f;
+        _masterAlarmLight.color = (Color)theme[7] / 255f;
         foreach (DamageEffect effect in _damageEffects)
         {
             if (effect._damageLight)
             {
-                effect._damageLight._light.color = theme[7];
+                effect._damageLight._light.color = (Color)theme[7] / 255f;
             }
             if (effect._damageLightRenderer)
             {
                 //effect._damageLightRenderer.SetColor(theme[4]);
-                effect._damageLightRendererColor = theme[5] * theme[6] * theme[6];
+                effect._damageLightRendererColor = (Color)theme[5] / 191f * (float)theme[6] * (float)theme[6];
             }
         }
     }

@@ -422,32 +422,63 @@
     {
       "name": "Orange",
       "hull": {
-        "r": 0,
-        "g": 0,
+        "r": 191,
+        "g": 24,
+        "b": 2
+      },
+      "hullIntensity": 1.2,
+      "comp": {
+        "r": 191,
+        "g": 35,
+        "b": 0
+      },
+      "compIntensity": 1.4,
+      "alarm": {
+        "r": 190,
+        "g": 113,
+        "b": 71
+      },
+      "alarmLit": {
+        "r": 191,
+        "g": 99,
+        "b": 57
+      },
+      "alarmLitIntensity": 0.89,
+      "light": {
+        "r": 255,
+        "g": 140,
+        "b": 0
+      }
+    },
+    {
+      "name": "Green",
+      "hull": {
+        "r": 28,
+        "g": 112,
         "b": 0
       },
       "hullIntensity": 1.0,
       "comp": {
-        "r": 0,
-        "g": 0,
+        "r": 83,
+        "g": 176,
         "b": 0
       },
       "compIntensity": 1.0,
       "alarm": {
-        "r": 0,
-        "g": 0,
-        "b": 0
+        "r": 141,
+        "g": 195,
+        "b": 106
       },
       "alarmLit": {
-        "r": 0,
-        "g": 0,
-        "b": 0
+        "r": 77,
+        "g": 191,
+        "b": 28
       },
-      "alarmLitIntensity": 1.0,
+      "alarmLitIntensity": 0.8,
       "light": {
-        "r": 0,
-        "g": 0,
-        "b": 0
+        "r": 163,
+        "g": 255,
+        "b": 30
       }
     }
   ]
