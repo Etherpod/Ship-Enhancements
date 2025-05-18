@@ -398,7 +398,7 @@
     },
     {
       "name": "Rainbow",
-      "thruster": "ThrusterFlames_Gray.png",
+      "thruster": "ThrusterFlames_White.png",
       "thrusterIntensity": 1.0,
       "thrusterLight": {
         "r": 255,
@@ -547,32 +547,62 @@
       "name": "Ghostly Green",
       "hull": {
         "r": 0,
-        "g": 135,
-        "b": 16
+        "g": 155,
+        "b": 18
       },
       "hullIntensity": 1.0,
       "comp": {
         "r": 0,
-        "g": 137,
-        "b": 69
+        "g": 181,
+        "b": 91
       },
       "compIntensity": 1.0,
-      // finish from here
       "alarm": {
-        "r": 82,
-        "g": 101,
-        "b": 53
+        "r": 146,
+        "g": 51,
+        "b": 45
       },
       "alarmLit": {
-        "r": 124,
+        "r": 48,
         "g": 191,
-        "b": 72
+        "b": 115
       },
       "alarmLitIntensity": 0.5,
       "light": {
-        "r": 205,
+        "r": 88,
         "g": 255,
-        "b": 121
+        "b": 151
+      }
+    },
+    {
+      "name": "Rainbow",
+      "hull": {
+        "r": 191,
+        "g": 191,
+        "b": 191
+      },
+      "hullIntensity": 1.0,
+      "comp": {
+        "r": 191,
+        "g": 191,
+        "b": 191
+      },
+      "compIntensity": 1.0,
+      "alarm": {
+        "r": 255,
+        "g": 255,
+        "b": 255
+      },
+      "alarmLit": {
+        "r": 191,
+        "g": 191,
+        "b": 191
+      },
+      "alarmLitIntensity": 1.0,
+      "light": {
+        "r": 255,
+        "g": 255,
+        "b": 255
       }
     }
   ]

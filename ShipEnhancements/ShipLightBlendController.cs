@@ -44,6 +44,11 @@ public class ShipLightBlendController : ColorBlendController
         return [newColor];
     }
 
+    protected override void UpdateRainbowTheme(int index, Color color)
+    {
+        _blendThemes[index] = [color];
+    }
+
     protected override void SetColor(Color color)
     {
         SetColor([color]);

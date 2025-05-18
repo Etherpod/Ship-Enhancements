@@ -70,9 +70,14 @@ public class ShipIndicatorBlendController : ColorBlendController
             newAlarm, newAlarmLit, newAlarmIntensity, newLight];
     }
 
+    protected override void UpdateRainbowTheme(int index, Color color)
+    {
+        _blendThemes[index] = [color, 1f, color, 1f, color, color, 1f, color];
+    }
+
     protected override void SetColor(Color color)
     {
-        SetColor([_defaultTheme[0], 1f, color, color, 1f, color]);
+        SetColor([color, 1f, color, 1f, color, color, 1f, color]);
     }
 
     protected override void SetColor(List<object> theme)

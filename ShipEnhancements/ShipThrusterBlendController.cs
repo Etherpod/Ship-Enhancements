@@ -14,6 +14,7 @@ public class ShipThrusterBlendController : ColorBlendController
     private Material _thrustMat;
     private Light _light;
     private ThrustAndAttitudeIndicator _indicator;
+    private Texture2D _rainbowTex;
 
     protected override void Awake()
     {
@@ -21,6 +22,7 @@ public class ShipThrusterBlendController : ColorBlendController
         _thrustMat = _rend?.material;
         _light = GetComponentInChildren<Light>();
         _indicator = SELocator.GetShipTransform().GetComponentInChildren<ThrustAndAttitudeIndicator>(true);
+        _rainbowTex = (Texture2D)ShipEnhancements.LoadAsset("Assets/ShipEnhancements/ThrusterColors/ThrusterFlames_White.png");
 
         var tex = (Texture2D)ShipEnhancements.LoadAsset("Assets/ShipEnhancements/ThrusterColors/ThrusterFlames_Default.png");
         _defaultTheme = [tex, _thrustMat.GetColor("_Color").maxColorComponent, 
@@ -75,9 +77,40 @@ public class ShipThrusterBlendController : ColorBlendController
             indicatorIntensity, indicatorLight];
     }
 
+    protected override void UpdateRainbowTheme(int index, Color color)
+    {
+        var pixels = _rainbowTex.GetPixels();
+        Color[] pixelResult = new Color[pixels.Length];
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            ColorHSV hsv = pixels[i].AsHSV();
+            hsv.h = color.AsHSV().h;
+            hsv.s = 1f;
+            pixelResult[i] = hsv.AsRGB();
+        }
+        Texture2D newTex = new Texture2D(_rainbowTex.width, _rainbowTex.height);
+        newTex.SetPixels(pixelResult);
+        newTex.Apply();
+
+        _blendThemes[index] = [newTex, 1f, color, color, 1f, color];
+    }
+
     protected override void SetColor(Color color)
     {
-        SetColor([_defaultTheme[0], 1f, color, color, 1f, color]);
+        var pixels = _rainbowTex.GetPixels();
+        Color[] pixelResult = new Color[pixels.Length];
+        for (int i = 0; i < pixels.Length; i++)
+        {
+            ColorHSV hsv = pixels[i].AsHSV();
+            hsv.h = color.AsHSV().h;
+            hsv.s = 1f;
+            pixelResult[i] = hsv.AsRGB();
+        }
+        Texture2D newTex = new Texture2D(_rainbowTex.width, _rainbowTex.height);
+        newTex.SetPixels(pixelResult);
+        newTex.Apply();
+
+        SetColor([newTex, 1f, color, color, 1f, color]);
     }
 
     protected override void SetColor(List<object> theme)

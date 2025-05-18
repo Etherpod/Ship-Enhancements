@@ -300,7 +300,8 @@ public class ShipEnhancements : ModBehaviour
         "Did you find all of the secret codes for the radio?",
         "If you punch yourself and it hurts, does that make you weak or strong?",
         "Why did the chicken cross the road?",
-        "This statement is a lie."
+        "This statement is a lie.",
+        "Did you know Outer Wilds isn't scientifically accurate? This is because in Outer Wilds the planets are round, which doesn't match real life as the Earth is in fact-"
     };
 
     private (string blendType, string suffix, Func<int, int, bool> canShow)[] _customSettingNames =
@@ -3016,7 +3017,8 @@ public class ShipEnhancements : ModBehaviour
         {
             selectable.gameObject.GetAddComponent<Menu.MenuSelectHandler>().OnSelectableSelected += newModTab.OnMenuItemSelected;
 
-            if (selectable.gameObject.name == newModTab._lastSelected?.gameObject.name)
+            // this line keeps throwing an NRE, surely this will fix it
+            if (selectable?.gameObject?.name == newModTab?._lastSelected?.gameObject?.name)
             {
                 SelectableAudioPlayer component = newModTab._selectOnActivate.GetComponent<SelectableAudioPlayer>();
                 if (component != null)
@@ -3154,6 +3156,8 @@ public class ShipEnhancements : ModBehaviour
 
     private bool SetCustomSettingName(ref string label, string settingName)
     {
+        if (!(bool)Settings.enableColorBlending.GetValue()) return false;
+
         string stem = settingName.Substring(0, settingName.Length - 6);
         if (!_stemToSuffix.ContainsKey(stem))
         {
