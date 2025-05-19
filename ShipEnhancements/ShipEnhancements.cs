@@ -335,6 +335,19 @@ public class ShipEnhancements : ModBehaviour
         ("Gravity", "(High Gravity)", (index, num) => index == num),
     ];
 
+    private Dictionary<string, string> _customTooltips = new()
+    {
+        { "Time", "Time mode blends between colors over a set amount of time." },
+        { "Temperature", "Temperature mode blends between colors based on the ship's temperature." },
+        { "Ship Temperature", "Ship Temperature mode blends between colors based on the ship's internal temperature." },
+        { "Reactor State", "Reactor State mode changes the color if the reactor is damaged or is about to explode." },
+        { "Ship Damage %", "Ship Damage % mode blends between colors based on how many parts of the ship are damaged." },
+        { "Fuel", "Fuel mode blends between colors based on the amount of fuel left in the ship." },
+        { "Oxygen", "Oxygen mode blends between colors based on the amount of oxygen left in the ship." },
+        { "Velocity", "Velocity mode blends between colors based on how fast you're moving towards your current lock-on target." },
+        { "Gravity", "Gravity mode blends between colors based on how high the gravity is." },
+    };
+
     private Dictionary<string, string> _stemToSuffix = new()
     {
         {"shipLight", "Light Color"},
@@ -2895,7 +2908,10 @@ public class ShipEnhancements : ModBehaviour
 
                 if (settingObject["tooltip"] != null)
                 {
-                    tooltip = ModHelper.MenuTranslations.GetLocalizedString(settingObject["tooltip"].ToString());
+                    if (!SetCustomTooltip(ref tooltip, name))
+                    {
+                        tooltip = ModHelper.MenuTranslations.GetLocalizedString(settingObject["tooltip"].ToString());
+                    }
                 }
             }
 
@@ -3185,6 +3201,18 @@ public class ShipEnhancements : ModBehaviour
         }
 
         return false;
+    }
+
+    private bool SetCustomTooltip(ref string tooltip, string settingName)
+    {
+        if (settingName.Substring(settingName.Length - 5, 5) != "Blend")
+        {
+            return false;
+        }
+
+        Settings blendSetting = settingName.AsEnum<Settings>();
+        tooltip = _customTooltips[(string)blendSetting.GetValue()];
+        return true;
     }
 
     private SettingType GetSettingType(object setting)

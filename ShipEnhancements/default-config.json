@@ -1113,8 +1113,10 @@
         "Lemonade",
         "Lime",
         "Green",
+        "Ghostly Green",
         "Rainbow"
-      ]
+      ],
+      "tooltip": "Changes the color of the damage indicators on the ship."
     },
     "indicatorColor2": {
       "title": "Damage Indicator Color",
@@ -1126,8 +1128,10 @@
         "Lemonade",
         "Lime",
         "Green",
+        "Ghostly Green",
         "Rainbow"
-      ]
+      ],
+      "tooltip": "Changes the color of the damage indicators on the ship."
     },
     "indicatorColor3": {
       "title": "Damage Indicator Color",
@@ -1139,8 +1143,10 @@
         "Lemonade",
         "Lime",
         "Green",
+        "Ghostly Green",
         "Rainbow"
-      ]
+      ],
+      "tooltip": "Changes the color of the damage indicators on the ship."
     },
 
     "Quality of Life": {
