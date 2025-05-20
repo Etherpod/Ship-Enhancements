@@ -488,7 +488,7 @@
         "g": 97,
         "b": 0
       },
-      "hullIntensity": 0.7,
+      "hullIntensity": 1.7,
       "comp": {
         "r": 0,
         "g": 130,
@@ -572,6 +572,37 @@
         "r": 88,
         "g": 255,
         "b": 151
+      }
+    },
+    {
+      "name": "Turquoise",
+      "hull": {
+        "r": 0,
+        "g": 173,
+        "b": 128
+      },
+      "hullIntensity": 1.0,
+      "comp": {
+        "r": 45,
+        "g": 191,
+        "b": 155
+      },
+      "compIntensity": 1.0,
+      "alarm": {
+        "r": 67,
+        "g": 101,
+        "b": 100
+      },
+      "alarmLit": {
+        "r": 97,
+        "g": 191,
+        "b": 165
+      },
+      "alarmLitIntensity": 0.65,
+      "light": {
+        "r": 114,
+        "g": 255,
+        "b": 242
       }
     },
     {
