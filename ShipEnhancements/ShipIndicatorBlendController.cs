@@ -99,7 +99,9 @@ public class ShipIndicatorBlendController : ColorBlendController
         //_masterAlarmMat.SetColor("_EmissionColor", (Color)theme[5] / 191f * (float)theme[6] * (float)theme[6]);
         _cockpitUI._damageLightColor = (Color)theme[10] / 255f;
         _masterAlarmLight.color = (Color)theme[10] / 255f;
-        _reactorGlow.SetColor("_EmissionColor", (Color)theme[7] / 191f * (float)theme[8]);
+        Color reactorColor = (Color)theme[7] / 191f;
+        reactorColor.a = 1f;
+        _reactorGlow.SetColor("_EmissionColor", reactorColor * (float)theme[8]);
         _reactorLight.color = (Color)theme[9] / 255f;
         foreach (DamageEffect effect in _damageEffects)
         {

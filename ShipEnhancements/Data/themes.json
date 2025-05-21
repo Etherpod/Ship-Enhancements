@@ -443,7 +443,7 @@
         "g": 99,
         "b": 57
       },
-      "alarmLitIntensity": 0.89,
+      "alarmLitIntensity": 1.89,
       "reactor": {
         "r": 191,
         "g": 39,
@@ -485,7 +485,7 @@
         "g": 191,
         "b": 28
       },
-      "alarmLitIntensity": 0.8,
+      "alarmLitIntensity": 1.8,
       "reactor": {
         "r": 39,
         "g": 191,
@@ -527,7 +527,7 @@
         "g": 137,
         "b": 59
       },
-      "alarmLitIntensity": 0.8,
+      "alarmLitIntensity": 1.8,
       "reactor": {
         "r": 191,
         "g": 181,
@@ -546,48 +546,6 @@
       }
     },
     {
-      "name": "Lime",
-      "hull": {
-        "r": 124,
-        "g": 141,
-        "b": 11
-      },
-      "hullIntensity": 1.0,
-      "comp": {
-        "r": 46,
-        "g": 130,
-        "b": 0
-      },
-      "compIntensity": 1.0,
-      "alarm": {
-        "r": 82,
-        "g": 101,
-        "b": 53
-      },
-      "alarmLit": {
-        "r": 124,
-        "g": 191,
-        "b": 72
-      },
-      "alarmLitIntensity": 0.5,
-      "reactor": {
-        "r": 191,
-        "g": 181,
-        "b": 54
-      },
-      "reactorIntensity": 1.81,
-      "reactorLight": {
-        "r": 0,
-        "g": 255,
-        "b": 228
-      },
-      "light": {
-        "r": 205,
-        "g": 255,
-        "b": 121
-      }
-    },
-    {
       "name": "Ghostly Green",
       "hull": {
         "r": 0,
@@ -602,26 +560,26 @@
       },
       "compIntensity": 1.0,
       "alarm": {
-        "r": 146,
-        "g": 51,
-        "b": 45
+        "r": 45,
+        "g": 146,
+        "b": 112
       },
       "alarmLit": {
         "r": 48,
         "g": 191,
         "b": 115
       },
-      "alarmLitIntensity": 0.5,
+      "alarmLitIntensity": 1.5,
       "reactor": {
-        "r": 191,
-        "g": 181,
-        "b": 54
+        "r": 5,
+        "g": 191,
+        "b": 61
       },
-      "reactorIntensity": 1.81,
+      "reactorIntensity": 1.4,
       "reactorLight": {
         "r": 0,
         "g": 255,
-        "b": 228
+        "b": 171
       },
       "light": {
         "r": 88,
@@ -653,17 +611,17 @@
         "g": 191,
         "b": 165
       },
-      "alarmLitIntensity": 0.65,
+      "alarmLitIntensity": 1.65,
       "reactor": {
-        "r": 191,
-        "g": 181,
-        "b": 54
+        "r": 19,
+        "g": 191,
+        "b": 187
       },
-      "reactorIntensity": 1.81,
+      "reactorIntensity": 1.5,
       "reactorLight": {
         "r": 0,
         "g": 255,
-        "b": 228
+        "b": 247
       },
       "light": {
         "r": 114,
@@ -695,21 +653,63 @@
         "g": 132,
         "b": 191
       },
-      "alarmLitIntensity": 0.53,
+      "alarmLitIntensity": 1.53,
       "reactor": {
-        "r": 191,
-        "g": 181,
-        "b": 54
+        "r": 17,
+        "g": 35,
+        "b": 191
       },
-      "reactorIntensity": 1.81,
+      "reactorIntensity": 2.5,
       "reactorLight": {
-        "r": 0,
-        "g": 255,
-        "b": 228
+        "r": 93,
+        "g": 160,
+        "b": 255
       },
       "light": {
         "r": 66,
         "g": 174,
+        "b": 255
+      }
+    },
+    {
+      "name": "White",
+      "hull": {
+        "r": 164,
+        "g": 164,
+        "b": 164
+      },
+      "hullIntensity": 1.0,
+      "comp": {
+        "r": 191,
+        "g": 191,
+        "b": 191
+      },
+      "compIntensity": 1.5,
+      "alarm": {
+        "r": 126,
+        "g": 134,
+        "b": 135
+      },
+      "alarmLit": {
+        "r": 161,
+        "g": 189,
+        "b": 189
+      },
+      "alarmLitIntensity": 1.0,
+      "reactor": {
+        "r": 131,
+        "g": 191,
+        "b": 191
+      },
+      "reactorIntensity": 1.5,
+      "reactorLight": {
+        "r": 227,
+        "g": 255,
+        "b": 252
+      },
+      "light": {
+        "r": 204,
+        "g": 253,
         "b": 255
       }
     },
