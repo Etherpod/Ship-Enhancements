@@ -2269,6 +2269,9 @@ public class ShipEnhancements : ModBehaviour
             var masterAlarmMat = SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry/Cockpit_Interior/Cockpit_Interior_Chassis")
                 .GetComponent<MeshRenderer>().sharedMaterials[6];
             var masterAlarmLight = SELocator.GetShipTransform().Find("Module_Cabin/Lights_Cabin/PointLight_HEA_MasterAlarm").GetComponent<Light>();
+            var reactorLight = SELocator.GetShipTransform().Find("Module_Engine/Systems_Engine/ReactorComponent/ReactorDamageLight").GetComponent<Light>();
+            var reactorGlow = SELocator.GetShipTransform().Find("Module_Engine/Systems_Engine/ReactorComponent/Structure_HEA_PlayerShip_ReactorDamageDecal")
+                .GetComponent<MeshRenderer>().material;
 
             DamageTheme theme = ThemeManager.GetDamageTheme(color);
 
@@ -2278,6 +2281,14 @@ public class ShipEnhancements : ModBehaviour
             masterAlarmMat.SetColor("_Color", theme.AlarmColor / 255f);
             SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitUI>()._damageLightColor = theme.AlarmLitColor / 191f;
             masterAlarmLight.color = theme.IndicatorLight / 255f;
+
+            Color reactorColor = theme.ReactorColor;
+            reactorColor /= 191f;
+            reactorColor.a = 1;
+            reactorGlow.SetColor("_EmissionColor", reactorColor * theme.ReactorIntensity);
+            reactorLight.color = theme.ReactorLight / 255f;
+
+            ShipEnhancements.WriteDebugMessage(theme.HullColor);
 
             foreach (DamageEffect effect in SELocator.GetShipTransform().GetComponentsInChildren<DamageEffect>())
             {

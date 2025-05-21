@@ -126,6 +126,9 @@ public record DamageTheme(
     Color AlarmColor,
     Color AlarmLitColor,
     float AlarmLitIntensity,
+    Color ReactorColor,
+    float ReactorIntensity,
+    Color ReactorLight,
     Color IndicatorLight
 )
 {
@@ -140,6 +143,9 @@ public record DamageTheme(
             themeData.AlarmColor,
             themeData.AlarmLitColor,
             themeData.AlarmLitIntensity,
+            themeData.ReactorColor,
+            themeData.ReactorIntensity,
+            themeData.ReactorLight,
             themeData.IndicatorLight
         );
     }

@@ -444,6 +444,17 @@
         "b": 57
       },
       "alarmLitIntensity": 0.89,
+      "reactor": {
+        "r": 191,
+        "g": 39,
+        "b": 0
+      },
+      "reactorIntensity": 2.62,
+      "reactorLight": {
+        "r": 255,
+        "g": 153,
+        "b": 0
+      },
       "light": {
         "r": 255,
         "g": 140,
@@ -475,6 +486,17 @@
         "b": 28
       },
       "alarmLitIntensity": 0.8,
+      "reactor": {
+        "r": 39,
+        "g": 191,
+        "b": 0
+      },
+      "reactorIntensity": 2.1,
+      "reactorLight": {
+        "r": 137,
+        "g": 255,
+        "b": 0
+      },
       "light": {
         "r": 163,
         "g": 255,
@@ -506,6 +528,17 @@
         "b": 59
       },
       "alarmLitIntensity": 0.8,
+      "reactor": {
+        "r": 191,
+        "g": 181,
+        "b": 54
+      },
+      "reactorIntensity": 1.81,
+      "reactorLight": {
+        "r": 0,
+        "g": 255,
+        "b": 228
+      },
       "light": {
         "r": 255,
         "g": 241,
@@ -537,6 +570,17 @@
         "b": 72
       },
       "alarmLitIntensity": 0.5,
+      "reactor": {
+        "r": 191,
+        "g": 181,
+        "b": 54
+      },
+      "reactorIntensity": 1.81,
+      "reactorLight": {
+        "r": 0,
+        "g": 255,
+        "b": 228
+      },
       "light": {
         "r": 205,
         "g": 255,
@@ -568,6 +612,17 @@
         "b": 115
       },
       "alarmLitIntensity": 0.5,
+      "reactor": {
+        "r": 191,
+        "g": 181,
+        "b": 54
+      },
+      "reactorIntensity": 1.81,
+      "reactorLight": {
+        "r": 0,
+        "g": 255,
+        "b": 228
+      },
       "light": {
         "r": 88,
         "g": 255,
@@ -599,6 +654,17 @@
         "b": 165
       },
       "alarmLitIntensity": 0.65,
+      "reactor": {
+        "r": 191,
+        "g": 181,
+        "b": 54
+      },
+      "reactorIntensity": 1.81,
+      "reactorLight": {
+        "r": 0,
+        "g": 255,
+        "b": 228
+      },
       "light": {
         "r": 114,
         "g": 255,
@@ -630,6 +696,17 @@
         "b": 191
       },
       "alarmLitIntensity": 0.53,
+      "reactor": {
+        "r": 191,
+        "g": 181,
+        "b": 54
+      },
+      "reactorIntensity": 1.81,
+      "reactorLight": {
+        "r": 0,
+        "g": 255,
+        "b": 228
+      },
       "light": {
         "r": 66,
         "g": 174,
@@ -661,6 +738,17 @@
         "b": 191
       },
       "alarmLitIntensity": 1.0,
+      "reactor": {
+        "r": 191,
+        "g": 191,
+        "b": 191
+      },
+      "reactorIntensity": 1.5,
+      "reactorLight": {
+        "r": 255,
+        "g": 255,
+        "b": 255
+      },
       "light": {
         "r": 255,
         "g": 255,

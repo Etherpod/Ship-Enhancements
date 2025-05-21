@@ -32,5 +32,8 @@ public record DamageThemeDataJson(
     [JsonProperty("alarm")] Color AlarmColor,
     [JsonProperty("alarmLit")] Color AlarmLitColor,
     [JsonProperty("alarmLitIntensity")] float AlarmLitIntensity,
+    [JsonProperty("reactor")] Color ReactorColor,
+    [JsonProperty("reactorIntensity")] float ReactorIntensity,
+    [JsonProperty("reactorLight")] Color ReactorLight,
     [JsonProperty("light")] Color IndicatorLight
 );
