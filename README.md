@@ -7,8 +7,6 @@ To answer some questions you may have...
 ## Is this mod compatible with [Quantum Space Buddies](https://outerwildsmods.com/mods/quantumspacebuddies/)?
 Yep! Whoever hosts the game will have control over the settings.
 
-Due to an update to Quantum Space Buddies, new items do not work in multiplayer, so until this is fixed avoid enabling them in the settings when using Quantum Space Buddies.
-
 ## How am I supposed to carry all of these new items?
 I made a mod called [Traveler's Pack](https://outerwildsmods.com/mods/travelerspack/) to address this problem. Try playing with it enabled if you run into the issue of there being too many items.
 
@@ -172,6 +170,9 @@ To use the API, copy the **IShipEnhancements** script from this mod's GitHub rep
 - The Expedition Flag's map marker may not be visible when using the advanced minimap from General Enhancements
 - The Continuous Matching Velocity feature from General Enhancements may cause bugs when used with the Autopilot Controls
 - Placing the ship's gravity crystal on the landing gear and then detaching the landing gear will crash the game
+- The warp core will not work in the regular solar system if New Horizons is installed (fixed in the next update)
+- Locking onto the ship while auto alignment is active will crash the game (fixed in the next update)
+- Campfires have no temperature zone when temperatures zones are set to "Hot" (fixed in the next update)
 
 # Credits
 Big thanks to **ColumbidaeCafe** for helping develop most of the ideas and sound effects!
