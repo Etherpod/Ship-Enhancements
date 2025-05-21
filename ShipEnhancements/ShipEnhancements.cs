@@ -2270,28 +2270,24 @@ public class ShipEnhancements : ModBehaviour
                 .GetComponent<MeshRenderer>().sharedMaterials[6];
             var masterAlarmLight = SELocator.GetShipTransform().Find("Module_Cabin/Lights_Cabin/PointLight_HEA_MasterAlarm").GetComponent<Light>();
 
-            var (newHull, newComponent, newAlarm, newAlarmLit, newLight) = SettingsColors.GetDamageColor(color);
+            DamageTheme theme = ThemeManager.GetDamageTheme(color);
 
-            damageScreenMat.SetColor("_DamagedHullFill", newHull);
-            damageScreenMat.SetColor("_DamagedComponentFill", newComponent);
+            damageScreenMat.SetColor("_DamagedHullFill", theme.HullColor / 191f * theme.HullIntensity);
+            damageScreenMat.SetColor("_DamagedComponentFill", theme.CompColor / 191f * theme.CompIntensity);
 
-            if (color != "Outer Wilds Beta")
+            masterAlarmMat.SetColor("_Color", theme.AlarmColor / 255f);
+            SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitUI>()._damageLightColor = theme.AlarmLitColor / 191f;
+            masterAlarmLight.color = theme.IndicatorLight / 255f;
+
+            foreach (DamageEffect effect in SELocator.GetShipTransform().GetComponentsInChildren<DamageEffect>())
             {
-                masterAlarmMat.SetColor("_Color", newAlarm);
-                SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitUI>()._damageLightColor = newAlarmLit;
-                masterAlarmLight.color = newLight;
-
-                foreach (DamageEffect effect in SELocator.GetShipTransform().GetComponentsInChildren<DamageEffect>())
+                if (effect._damageLight)
                 {
-                    if (effect._damageLight)
-                    {
-                        effect._damageLight.GetLight().color = newLight;
-                    }
-                    if (effect._damageLightRenderer)
-                    {
-                        effect._damageLightRenderer.SetColor(newAlarm);
-                        effect._damageLightRendererColor = newAlarmLit;
-                    }
+                    effect._damageLight.GetLight().color = theme.IndicatorLight / 255f;
+                }
+                if (effect._damageLightRenderer)
+                {
+                    effect._damageLightRendererColor = theme.AlarmLitColor / 191f;
                 }
             }
         }

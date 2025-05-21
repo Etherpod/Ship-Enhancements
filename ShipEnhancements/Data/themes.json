@@ -606,6 +606,37 @@
       }
     },
     {
+      "name": "Blue",
+      "hull": {
+        "r": 0,
+        "g": 40,
+        "b": 155
+      },
+      "hullIntensity": 1.0,
+      "comp": {
+        "r": 7,
+        "g": 59,
+        "b": 146
+      },
+      "compIntensity": 1.0,
+      "alarm": {
+        "r": 67,
+        "g": 95,
+        "b": 115
+      },
+      "alarmLit": {
+        "r": 79,
+        "g": 132,
+        "b": 191
+      },
+      "alarmLitIntensity": 0.53,
+      "light": {
+        "r": 66,
+        "g": 174,
+        "b": 255
+      }
+    },
+    {
       "name": "Rainbow",
       "hull": {
         "r": 191,
