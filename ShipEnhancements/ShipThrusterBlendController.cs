@@ -116,7 +116,7 @@ public class ShipThrusterBlendController : ColorBlendController
     protected override void SetColor(List<object> theme)
     {
         _thrustMat.SetTexture("_MainTex", (Texture2D)theme[0]);
-        _thrustMat.SetColor("_Color", Color.white * Mathf.Pow((float)theme[1], 1));
+        _thrustMat.SetColor("_Color", Color.white * Mathf.Pow(2, (float)theme[1]));
         _light.color = (Color)theme[2] / 255f;
 
         ThrustIndicatorManager.SetColor((Color)theme[3] / 191f, 

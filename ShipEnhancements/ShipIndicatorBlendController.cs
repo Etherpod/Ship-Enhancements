@@ -93,11 +93,11 @@ public class ShipIndicatorBlendController : ColorBlendController
 
     protected override void SetColor(List<object> theme)
     {
-        _damageScreenMat.SetColor("_DamagedHullFill", (Color)theme[0] / 191f * (float)theme[1] * (float)theme[1]);
-        _damageScreenMat.SetColor("_DamagedComponentFill", (Color)theme[2] / 191f * (float)theme[3] * (float)theme[3]);
+        _damageScreenMat.SetColor("_DamagedHullFill", (Color)theme[0] / 191f * Mathf.Pow(2, (float)theme[1]));
+        _damageScreenMat.SetColor("_DamagedComponentFill", (Color)theme[2] / 191f * Mathf.Pow(2, (float)theme[3]));
         _masterAlarmMat.SetColor("_Color", (Color)theme[4] / 255f);
-        //_masterAlarmMat.SetColor("_EmissionColor", (Color)theme[5] / 191f * (float)theme[6] * (float)theme[6]);
-        _cockpitUI._damageLightColor = (Color)theme[10] / 255f;
+        _cockpitUI._damageLightColor = (Color)theme[5] / 191f * Mathf.Pow(2, (float)theme[6]);
+        _masterAlarmMat.SetColor("_EmissionColor", _cockpitUI._damageLightColor * (_cockpitUI._damageLightOn ? 1f : 0f));
         _masterAlarmLight.color = (Color)theme[10] / 255f;
         Color reactorColor = (Color)theme[7] / 191f;
         reactorColor.a = 1f;
@@ -112,7 +112,7 @@ public class ShipIndicatorBlendController : ColorBlendController
             if (effect._damageLightRenderer)
             {
                 //effect._damageLightRenderer.SetColor(theme[4]);
-                effect._damageLightRendererColor = (Color)theme[5] / 191f * (float)theme[6] * (float)theme[6];
+                effect._damageLightRendererColor = (Color)theme[5] / 191f * Mathf.Pow(2, (float)theme[6]);
             }
         }
     }

@@ -263,7 +263,7 @@
         "g": 18,
         "b": 58
       },
-      "indicatorIntensity": 1.1,
+      "indicatorIntensity": 0.7,
       "indicatorLight": {
         "r": 255,
         "g": 37,
@@ -426,13 +426,13 @@
         "g": 24,
         "b": 2
       },
-      "hullIntensity": 1.2,
+      "hullIntensity": 0.2,
       "comp": {
         "r": 191,
         "g": 42,
         "b": 12
       },
-      "compIntensity": 1.3,
+      "compIntensity": 0.3,
       "alarm": {
         "r": 190,
         "g": 113,
@@ -443,7 +443,7 @@
         "g": 99,
         "b": 57
       },
-      "alarmLitIntensity": 1.89,
+      "alarmLitIntensity": 0.89,
       "reactor": {
         "r": 191,
         "g": 39,
@@ -468,13 +468,13 @@
         "g": 112,
         "b": 0
       },
-      "hullIntensity": 1.0,
+      "hullIntensity": 0.0,
       "comp": {
         "r": 83,
         "g": 176,
         "b": 0
       },
-      "compIntensity": 1.0,
+      "compIntensity": 0.0,
       "alarm": {
         "r": 141,
         "g": 195,
@@ -485,7 +485,7 @@
         "g": 191,
         "b": 28
       },
-      "alarmLitIntensity": 1.8,
+      "alarmLitIntensity": 0.8,
       "reactor": {
         "r": 39,
         "g": 191,
@@ -510,13 +510,13 @@
         "g": 97,
         "b": 0
       },
-      "hullIntensity": 1.7,
+      "hullIntensity": 0.7,
       "comp": {
         "r": 0,
         "g": 130,
         "b": 126
       },
-      "compIntensity": 1.0,
+      "compIntensity": 0.0,
       "alarm": {
         "r": 48,
         "g": 111,
@@ -527,7 +527,7 @@
         "g": 137,
         "b": 59
       },
-      "alarmLitIntensity": 1.8,
+      "alarmLitIntensity": 0.8,
       "reactor": {
         "r": 191,
         "g": 181,
@@ -552,13 +552,13 @@
         "g": 155,
         "b": 18
       },
-      "hullIntensity": 1.0,
+      "hullIntensity": 0.0,
       "comp": {
         "r": 0,
         "g": 181,
         "b": 91
       },
-      "compIntensity": 1.0,
+      "compIntensity": 0.0,
       "alarm": {
         "r": 45,
         "g": 146,
@@ -569,7 +569,7 @@
         "g": 191,
         "b": 115
       },
-      "alarmLitIntensity": 1.5,
+      "alarmLitIntensity": 0.5,
       "reactor": {
         "r": 5,
         "g": 191,
@@ -594,13 +594,13 @@
         "g": 173,
         "b": 128
       },
-      "hullIntensity": 1.0,
+      "hullIntensity": 0.0,
       "comp": {
         "r": 45,
         "g": 191,
         "b": 155
       },
-      "compIntensity": 1.0,
+      "compIntensity": 0.0,
       "alarm": {
         "r": 67,
         "g": 101,
@@ -611,7 +611,7 @@
         "g": 191,
         "b": 165
       },
-      "alarmLitIntensity": 1.65,
+      "alarmLitIntensity": 0.65,
       "reactor": {
         "r": 19,
         "g": 191,
@@ -636,13 +636,13 @@
         "g": 40,
         "b": 155
       },
-      "hullIntensity": 1.0,
+      "hullIntensity": 0.0,
       "comp": {
         "r": 7,
         "g": 59,
         "b": 146
       },
-      "compIntensity": 1.0,
+      "compIntensity": 0.0,
       "alarm": {
         "r": 67,
         "g": 95,
@@ -653,7 +653,7 @@
         "g": 132,
         "b": 191
       },
-      "alarmLitIntensity": 1.53,
+      "alarmLitIntensity": 0.53,
       "reactor": {
         "r": 17,
         "g": 35,
@@ -668,6 +668,48 @@
       "light": {
         "r": 66,
         "g": 174,
+        "b": 255
+      }
+    },
+    {
+      "name": "Ultraviolet",
+      "hull": {
+        "r": 17,
+        "g": 0,
+        "b": 191
+      },
+      "hullIntensity": 1.99,
+      "comp": {
+        "r": 18,
+        "g": 0,
+        "b": 191
+      },
+      "compIntensity": 2.5,
+      "alarm": {
+        "r": 99,
+        "g": 76,
+        "b": 140
+      },
+      "alarmLit": {
+        "r": 48,
+        "g": 0,
+        "b": 191
+      },
+      "alarmLitIntensity": 0.72,
+      "reactor": {
+        "r": 6,
+        "g": 0,
+        "b": 191
+      },
+      "reactorIntensity": 3,
+      "reactorLight": {
+        "r": 91,
+        "g": 0,
+        "b": 255
+      },
+      "light": {
+        "r": 72,
+        "g": 0,
         "b": 255
       }
     },

@@ -2729,7 +2729,13 @@ public static class PatchClass
             GameObject componentObj = UnityEngine.Object.Instantiate(probeLauncherComponent,
                 __instance.GetComponentInParent<ShipBody>().GetComponentInChildren<PlayerProbeLauncher>().transform.parent);
             AssetBundleUtilities.ReplaceShaders(componentObj);
-            SELocator.SetProbeLauncherComponent(componentObj.GetComponent<ProbeLauncherComponent>());
+            var comp = componentObj.GetComponent<ProbeLauncherComponent>();
+            SELocator.SetProbeLauncherComponent(comp);
+
+            ShipDamageDisplayV2 damageDisplay = __instance.GetComponentInChildren<ShipDamageDisplayV2>();
+            damageDisplay._shipComponents[7] = comp;
+            comp.OnDamaged += damageDisplay.OnComponentUpdate;
+            comp.OnRepaired += damageDisplay.OnComponentUpdate;
         }
         if ((bool)enableSignalscopeComponent.GetProperty())
         {
@@ -2753,7 +2759,13 @@ public static class PatchClass
             AssetBundleUtilities.ReplaceShaders(warpCoreComponent);
             warpCoreComponent.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = UnityEngine.Object.FindObjectOfType<ShipBody>().gameObject;
             GameObject componentObj = UnityEngine.Object.Instantiate(warpCoreComponent, __instance.transform.Find("Systems_Cockpit"));
-            SELocator.SetShipWarpCoreComponent(componentObj.GetComponent<ShipWarpCoreComponent>());
+            var comp = componentObj.GetComponent<ShipWarpCoreComponent>();
+            SELocator.SetShipWarpCoreComponent(comp);
+
+            ShipDamageDisplayV2 damageDisplay = __instance.GetComponentInChildren<ShipDamageDisplayV2>();
+            damageDisplay._shipComponents[6] = comp;
+            comp.OnDamaged += damageDisplay.OnComponentUpdate;
+            comp.OnRepaired += damageDisplay.OnComponentUpdate;
 
             if (ShipEnhancements.NHAPI == null && GameObject.Find("TimberHearth_Body"))
             {

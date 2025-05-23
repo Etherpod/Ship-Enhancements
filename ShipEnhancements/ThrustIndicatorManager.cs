@@ -28,7 +28,7 @@ public static class ThrustIndicatorManager
 
     public static void SetColor(Color color, Color lightColor, float intensity = 1)
     {
-        color *= Mathf.Pow(intensity, 2);
+        color *= Mathf.Pow(2, intensity);
         _currentColor = color;
         foreach (Light light in _barLights)
         {
@@ -42,7 +42,7 @@ public static class ThrustIndicatorManager
 
     public static void ApplyTheme(ThrusterTheme theme)
     {
-        Color hdrColor = theme.IndicatorColor / 191f * Mathf.Pow(theme.IndicatorIntensity, 2);
+        Color hdrColor = theme.IndicatorColor / 191f * Mathf.Pow(2, theme.IndicatorIntensity);
         _currentColor = hdrColor;
         foreach (Light light in _barLights)
         {

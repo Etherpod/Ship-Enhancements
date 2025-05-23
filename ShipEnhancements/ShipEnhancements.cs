@@ -903,6 +903,27 @@ public class ShipEnhancements : ModBehaviour
         chassisRenderer.sharedMaterials[6].SetTexture("_OcclusionMap", blackTex);
         chassisRenderer.sharedMaterials[6].SetFloat("_OcclusionStrength", 0.95f);
 
+        if ((bool)Settings.enableScoutLauncherComponent.GetProperty()
+            || (string)Settings.shipWarpCoreType.GetProperty() == "Component")
+        {
+            Transform damageScreen = SELocator.GetShipTransform().Find("Module_Cockpit/Systems_Cockpit/ShipCockpitUI/DamageScreen/HUD_ShipDamageDisplay");
+            if ((bool)Settings.enableScoutLauncherComponent.GetProperty())
+            {
+                GameObject scoutDamage = LoadPrefab("Assets/ShipEnhancements/HUD_ShipDamageDisplay_Scout.prefab");
+                scoutDamage.GetComponent<MeshRenderer>().material = damageScreen.GetComponent<MeshRenderer>().material;
+                Instantiate(scoutDamage, damageScreen.parent);
+            }
+            if ((string)Settings.shipWarpCoreType.GetProperty() == "Component")
+            {
+                GameObject warpDamage = LoadPrefab("Assets/ShipEnhancements/HUD_ShipDamageDisplay_Warp.prefab");
+                warpDamage.GetComponent<MeshRenderer>().material = damageScreen.GetComponent<MeshRenderer>().material;
+                Instantiate(warpDamage, damageScreen.parent);
+            }
+            /*Transform damageLabels = SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Tech/Cockpit_Tech_Interior/DamageScreenCanvas");
+            GameObject damageScreenLabels = LoadPrefab("Assets/ShipEnhancements/ExtraDamageLabels.prefab");
+            Instantiate(damageScreenLabels, damageLabels);*/
+        }
+
         SetUpShipAudio();
 
         foreach (OWAudioSource audio in _shipAudioToChange)
@@ -1175,7 +1196,7 @@ public class ShipEnhancements : ModBehaviour
                         (Texture2D)LoadAsset("Assets/ShipEnhancements/ThrusterColors/"
                         + thrusterColors.ThrusterColor));
 
-                    rend.material.SetColor("_Color", Color.white * Mathf.Pow(thrusterColors.ThrusterIntensity, 1));
+                    rend.material.SetColor("_Color", Color.white * Mathf.Pow(2, thrusterColors.ThrusterIntensity));
 
                     Light light = flame.GetComponentInChildren<Light>();
                     light.color = thrusterColors.ThrusterLight / 255f;
@@ -2275,20 +2296,19 @@ public class ShipEnhancements : ModBehaviour
 
             DamageTheme theme = ThemeManager.GetDamageTheme(color);
 
-            damageScreenMat.SetColor("_DamagedHullFill", theme.HullColor / 191f * theme.HullIntensity);
+            damageScreenMat.SetColor("_DamagedHullFill", theme.HullColor / 191f * Mathf.Pow(2, theme.HullIntensity));
             damageScreenMat.SetColor("_DamagedComponentFill", theme.CompColor / 191f * theme.CompIntensity);
 
             masterAlarmMat.SetColor("_Color", theme.AlarmColor / 255f);
-            SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitUI>()._damageLightColor = theme.AlarmLitColor / 191f;
+            SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitUI>()._damageLightColor = theme.AlarmLitColor / 191f
+                * Mathf.Pow(2, theme.AlarmLitIntensity);
             masterAlarmLight.color = theme.IndicatorLight / 255f;
 
             Color reactorColor = theme.ReactorColor;
             reactorColor /= 191f;
             reactorColor.a = 1;
-            reactorGlow.SetColor("_EmissionColor", reactorColor * theme.ReactorIntensity);
+            reactorGlow.SetColor("_EmissionColor", reactorColor * Mathf.Pow(2, theme.ReactorIntensity));
             reactorLight.color = theme.ReactorLight / 255f;
-
-            ShipEnhancements.WriteDebugMessage(theme.HullColor);
 
             foreach (DamageEffect effect in SELocator.GetShipTransform().GetComponentsInChildren<DamageEffect>())
             {
@@ -2298,7 +2318,7 @@ public class ShipEnhancements : ModBehaviour
                 }
                 if (effect._damageLightRenderer)
                 {
-                    effect._damageLightRendererColor = theme.AlarmLitColor / 191f;
+                    effect._damageLightRendererColor = theme.AlarmLitColor / 191f * Mathf.Pow(2, theme.AlarmLitIntensity);
                 }
             }
         }
