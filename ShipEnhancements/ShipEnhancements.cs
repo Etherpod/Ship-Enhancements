@@ -1196,7 +1196,9 @@ public class ShipEnhancements : ModBehaviour
                         (Texture2D)LoadAsset("Assets/ShipEnhancements/ThrusterColors/"
                         + thrusterColors.ThrusterColor));
 
-                    rend.material.SetColor("_Color", Color.white * Mathf.Pow(2, thrusterColors.ThrusterIntensity));
+                    Color thrustColor = Color.white * Mathf.Pow(2, thrusterColors.ThrusterIntensity);
+                    thrustColor.a = thrustColor.a = 0.5019608f;
+                    rend.material.SetColor("_Color", thrustColor);
 
                     Light light = flame.GetComponentInChildren<Light>();
                     light.color = thrusterColors.ThrusterLight / 255f;

@@ -25,9 +25,8 @@ public class ShipThrusterBlendController : ColorBlendController
         _rainbowTex = (Texture2D)ShipEnhancements.LoadAsset("Assets/ShipEnhancements/ThrusterColors/ThrusterFlames_White.png");
 
         var tex = (Texture2D)ShipEnhancements.LoadAsset("Assets/ShipEnhancements/ThrusterColors/ThrusterFlames_Default.png");
-        _defaultTheme = [tex, _thrustMat.GetColor("_Color").maxColorComponent, 
-            _light.color * 255f, _indicator._rendererBack.material.GetColor("_BarColor") * 191f,
-            1f, _indicator._lightsBack[0].color * 255f];
+        _defaultTheme = [tex, 3.325167f, _light.color * 255f, _indicator._rendererBack.material.GetColor("_BarColor") * 255f,
+            0f, _indicator._lightsBack[0].color * 255f];
 
         base.Awake();
     }
@@ -116,7 +115,9 @@ public class ShipThrusterBlendController : ColorBlendController
     protected override void SetColor(List<object> theme)
     {
         _thrustMat.SetTexture("_MainTex", (Texture2D)theme[0]);
-        _thrustMat.SetColor("_Color", Color.white * Mathf.Pow(2, (float)theme[1]));
+        Color color = Color.white * Mathf.Pow(2, (float)theme[1]);
+        color.a = 0.5019608f;
+        _thrustMat.SetColor("_Color", color);
         _light.color = (Color)theme[2] / 255f;
 
         ThrustIndicatorManager.SetColor((Color)theme[3] / 255f, 
