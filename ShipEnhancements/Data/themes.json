@@ -242,7 +242,7 @@
         "g": 32,
         "b": 191
       },
-      "indicatorIntensity": 1.2,
+      "indicatorIntensity": 1.0,
       "indicatorLight": {
         "r": 124,
         "g": 0,
@@ -284,7 +284,7 @@
         "g": 18,
         "b": 20
       },
-      "indicatorIntensity": 0.94,
+      "indicatorIntensity": 0.75,
       "indicatorLight": {
         "r": 255,
         "g": 69,
@@ -305,7 +305,7 @@
         "g": 191,
         "b": 62
       },
-      "indicatorIntensity": 1.2,
+      "indicatorIntensity": 0.5,
       "indicatorLight": {
         "r": 0,
         "g": 255,
@@ -326,7 +326,7 @@
         "g": 64,
         "b": 191
       },
-      "indicatorIntensity": 1.0,
+      "indicatorIntensity": 0.6,
       "indicatorLight": {
         "r": 204,
         "g": 173,
@@ -347,7 +347,7 @@
         "g": 161,
         "b": 161
       },
-      "indicatorIntensity": 1.0,
+      "indicatorIntensity": 0.0,
       "indicatorLight": {
         "r": 204,
         "g": 204,
@@ -368,7 +368,7 @@
         "g": 0,
         "b": 191
       },
-      "indicatorIntensity": 1.8,
+      "indicatorIntensity": 1.2,
       "indicatorLight": {
         "r": 111,
         "g": 0,
@@ -389,7 +389,7 @@
         "g": 191,
         "b": 141
       },
-      "indicatorIntensity": 1.0,
+      "indicatorIntensity": 0.4,
       "indicatorLight": {
         "r": 0,
         "g": 255,
@@ -410,7 +410,7 @@
         "g": 255,
         "b": 255
       },
-      "indicatorIntensity": 1.0,
+      "indicatorIntensity": 0.8,
       "indicatorLight": {
         "r": 255,
         "g": 255,
@@ -443,7 +443,7 @@
         "g": 99,
         "b": 57
       },
-      "alarmLitIntensity": 0.89,
+      "alarmLitIntensity": 0.5,
       "reactor": {
         "r": 191,
         "g": 39,
@@ -575,7 +575,7 @@
         "g": 191,
         "b": 61
       },
-      "reactorIntensity": 1.4,
+      "reactorIntensity": 1.2,
       "reactorLight": {
         "r": 0,
         "g": 255,

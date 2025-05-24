@@ -42,7 +42,7 @@ public static class ThrustIndicatorManager
 
     public static void ApplyTheme(ThrusterTheme theme)
     {
-        Color hdrColor = theme.IndicatorColor / 191f * Mathf.Pow(2, theme.IndicatorIntensity);
+        Color hdrColor = theme.IndicatorColor / 255f * Mathf.Pow(2, theme.IndicatorIntensity);
         _currentColor = hdrColor;
         foreach (Light light in _barLights)
         {

@@ -2296,11 +2296,11 @@ public class ShipEnhancements : ModBehaviour
 
             DamageTheme theme = ThemeManager.GetDamageTheme(color);
 
-            damageScreenMat.SetColor("_DamagedHullFill", theme.HullColor / 191f * Mathf.Pow(2, theme.HullIntensity));
-            damageScreenMat.SetColor("_DamagedComponentFill", theme.CompColor / 191f * theme.CompIntensity);
+            damageScreenMat.SetColor("_DamagedHullFill", theme.HullColor / 255f * Mathf.Pow(2, theme.HullIntensity));
+            damageScreenMat.SetColor("_DamagedComponentFill", theme.CompColor / 255f * theme.CompIntensity);
 
             masterAlarmMat.SetColor("_Color", theme.AlarmColor / 255f);
-            SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitUI>()._damageLightColor = theme.AlarmLitColor / 191f
+            SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitUI>()._damageLightColor = theme.AlarmLitColor / 255f
                 * Mathf.Pow(2, theme.AlarmLitIntensity);
             masterAlarmLight.color = theme.IndicatorLight / 255f;
 
@@ -2318,7 +2318,7 @@ public class ShipEnhancements : ModBehaviour
                 }
                 if (effect._damageLightRenderer)
                 {
-                    effect._damageLightRendererColor = theme.AlarmLitColor / 191f * Mathf.Pow(2, theme.AlarmLitIntensity);
+                    effect._damageLightRendererColor = theme.AlarmLitColor / 255f * Mathf.Pow(2, theme.AlarmLitIntensity);
                 }
             }
         }
