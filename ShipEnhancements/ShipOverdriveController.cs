@@ -22,8 +22,8 @@ public class ShipOverdriveController : ElectricalComponent
     private bool _onCooldown = false;
     private readonly float _cooldownLength = 8f;
     private float _cooldownT;
-    private Color _defaultColor;
-    private Color _overdriveColor;
+    //private Color _defaultColor;
+    //private Color _overdriveColor;
     private Color _indicatorColor = new Color(0.49853f, 0.38774f, 5.29f);
     private readonly float _thrustMultiplier = 6f;
     private ShipReactorComponent _reactor;
@@ -83,9 +83,9 @@ public class ShipOverdriveController : ElectricalComponent
         }
         _thrusterRenderers = [.. renderers];
         _thrusterLights = [.. lights];
-        _defaultColor = _thrusterRenderers[0].material.GetColor("_Color");
-        Material overdriveMat = (Material)ShipEnhancements.LoadAsset("Assets/ShipEnhancements/Effects_HEA_ThrusterFlames_Overdrive_mat.mat");
-        _overdriveColor = overdriveMat.GetColor("_Color");
+        //_defaultColor = _thrusterRenderers[0].material.GetColor("_Color");
+        //Material overdriveMat = (Material)ShipEnhancements.LoadAsset("Assets/ShipEnhancements/Effects_HEA_ThrusterFlames_Overdrive_mat.mat");
+        //_overdriveColor = overdriveMat.GetColor("_Color");
         _primeButton.SetButtonOn(false);
         _activateButton.SetButtonActive(false);
 
@@ -98,7 +98,7 @@ public class ShipOverdriveController : ElectricalComponent
         {
             if (_cooldownT > 0f)
             {
-                if ((string)thrusterColor1.GetProperty() == "Rainbow")
+                /*if (SELocator.GetShipBody().GetComponent<ShipThrusterBlendController>())
                 {
                     foreach (Renderer renderer in _thrusterRenderers)
                     {
@@ -111,7 +111,7 @@ public class ShipOverdriveController : ElectricalComponent
                     {
                         renderer.material.SetColor("_Color", Color.Lerp(_defaultColor, _overdriveColor, _cooldownT));
                     }
-                }
+                }*/
 
                 ThrustIndicatorManager.LayerColor(_indicatorColor, _cooldownT);
 
@@ -208,7 +208,7 @@ public class ShipOverdriveController : ElectricalComponent
             electrical._electricalSystem.Disrupt(electrical._disruptionLength);
         }
 
-        _defaultColor = _thrusterRenderers[0].material.GetColor("_Color");
+        //_defaultColor = _thrusterRenderers[0].material.GetColor("_Color");
         _primeButton.SetCooldown(4f);
         _activateButton.SetCooldown(4f);
         _cooldownT = 1f;

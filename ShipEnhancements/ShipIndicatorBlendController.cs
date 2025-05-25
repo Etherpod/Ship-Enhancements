@@ -37,7 +37,7 @@ public class ShipIndicatorBlendController : ColorBlendController
         Color compColor = _damageScreenMat.GetColor("_DamagedComponentFill") * 191f;
         
         _defaultTheme = [hullColor, 1.12f, compColor, 1.12f, _masterAlarmMat.GetColor("_Color") * 255f,
-            _masterAlarmMat.GetColor("_EmissionColor") * 191f, 0.79f, _reactorGlow.GetColor("_EmissionColor") * 191f,
+            new Color(191, 82, 81), 0.79f, _reactorGlow.GetColor("_EmissionColor") * 191f,
             2.3f, _reactorLight.color * 255f, _masterAlarmLight.color * 255f];
 
         base.Awake();
