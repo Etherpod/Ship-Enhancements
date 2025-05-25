@@ -33,12 +33,12 @@ public class ShipIndicatorBlendController : ColorBlendController
         _damageEffects = GetComponentsInChildren<DamageEffect>()
             .Where(effect => effect._damageLight != null || effect._damageLightRenderer != null).ToArray();
 
-        Color hullColor = _damageScreenMat.GetColor("_DamagedHullFill") * 255f;
+        Color hullColor = _damageScreenMat.GetColor("_DamagedHullFill") * 191f;
         Color compColor = _damageScreenMat.GetColor("_DamagedComponentFill") * 191f;
         
         _defaultTheme = [hullColor, 1.12f, compColor, 1.12f, _masterAlarmMat.GetColor("_Color") * 255f,
             _masterAlarmMat.GetColor("_EmissionColor") * 191f, 0.79f, _reactorGlow.GetColor("_EmissionColor") * 191f,
-            2.6f, _reactorLight.color * 255f, _masterAlarmLight.color * 255f];
+            2.3f, _reactorLight.color * 255f, _masterAlarmLight.color * 255f];
 
         base.Awake();
     }

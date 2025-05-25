@@ -83,7 +83,7 @@
     {
       "name": "Purple",
       "light": {
-        "r": 190,
+        "r": 167,
         "g": 86,
         "b": 255
       }
@@ -714,6 +714,132 @@
       }
     },
     {
+      "name": "Lavender",
+      "hull": {
+        "r": 115,
+        "g": 52,
+        "b": 191
+      },
+      "hullIntensity": 0.61,
+      "comp": {
+        "r": 126,
+        "g": 66,
+        "b": 191
+      },
+      "compIntensity": 0.61,
+      "alarm": {
+        "r": 146,
+        "g": 129,
+        "b": 166
+      },
+      "alarmLit": {
+        "r": 122,
+        "g": 111,
+        "b": 191
+      },
+      "alarmLitIntensity": 0.67,
+      "reactor": {
+        "r": 50,
+        "g": 41,
+        "b": 191
+      },
+      "reactorIntensity": 2.77,
+      "reactorLight": {
+        "r": 216,
+        "g": 191,
+        "b": 255
+      },
+      "light": {
+        "r": 187,
+        "g": 162,
+        "b": 255
+      }
+    },
+    {
+      "name": "Purple",
+      "hull": {
+        "r": 73,
+        "g": 0,
+        "b": 191
+      },
+      "hullIntensity": 0.63,
+      "comp": {
+        "r": 37,
+        "g": 0,
+        "b": 191
+      },
+      "compIntensity": 1.2,
+      "alarm": {
+        "r": 135,
+        "g": 87,
+        "b": 168
+      },
+      "alarmLit": {
+        "r": 86,
+        "g": 54,
+        "b": 191
+      },
+      "alarmLitIntensity": 0.87,
+      "reactor": {
+        "r": 30,
+        "g": 9,
+        "b": 191
+      },
+      "reactorIntensity": 3.19,
+      "reactorLight": {
+        "r": 189,
+        "g": 95,
+        "b": 255
+      },
+      "light": {
+        "r": 141,
+        "g": 30,
+        "b": 255
+      }
+    },
+    {
+      "name": "Pink",
+      "hull": {
+        "r": 191,
+        "g": 0,
+        "b": 148
+      },
+      "hullIntensity": 1.43,
+      "comp": {
+        "r": 178,
+        "g": 3,
+        "b": 191
+      },
+      "compIntensity": 1.41,
+      "alarm": {
+        "r": 142,
+        "g": 73,
+        "b": 125
+      },
+      "alarmLit": {
+        "r": 191,
+        "g": 41,
+        "b": 142
+      },
+      "alarmLitIntensity": 0.55,
+      "reactor": {
+        "r": 191,
+        "g": 23,
+        "b": 142
+      },
+      "reactorIntensity": 2.43,
+      "reactorLight": {
+        "r": 255,
+        "g": 0,
+        "b": 157
+      },
+      "light": {
+        "r": 255,
+        "g": 30,
+        "b": 241
+      }
+    },
+    {
       "name": "White",
       "hull": {
         "r": 164,
@@ -753,6 +879,48 @@
         "r": 204,
         "g": 253,
         "b": 255
+      }
+    },
+    {
+      "name": "Black",
+      "hull": {
+        "r": 0,
+        "g": 0,
+        "b": 0
+      },
+      "hullIntensity": 0.0,
+      "comp": {
+        "r": 0,
+        "g": 0,
+        "b": 0
+      },
+      "compIntensity": 0.0,
+      "alarm": {
+        "r": 0,
+        "g": 0,
+        "b": 0
+      },
+      "alarmLit": {
+        "r": 0,
+        "g": 0,
+        "b": 0
+      },
+      "alarmLitIntensity": 0.0,
+      "reactor": {
+        "r": 0,
+        "g": 0,
+        "b": 0
+      },
+      "reactorIntensity": 0.0,
+      "reactorLight": {
+        "r": 0,
+        "g": 0,
+        "b": 0
+      },
+      "light": {
+        "r": 0,
+        "g": 0,
+        "b": 0
       }
     },
     {
