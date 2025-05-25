@@ -397,6 +397,69 @@
       }
     },
     {
+      "name": "Blue",
+      "thruster": "ThrusterFlames_Blue.png",
+      "thrusterIntensity": 1.6,
+      "thrusterLight": {
+        "r": 52,
+        "g": 142,
+        "b": 255
+      },
+      "indicator": {
+        "r": 0,
+        "g": 41,
+        "b": 191
+      },
+      "indicatorIntensity": 0.91,
+      "indicatorLight": {
+        "r": 0,
+        "g": 137,
+        "b": 255
+      }
+    },
+    {
+      "name": "Gray",
+      "thruster": "ThrusterFlames_Gray.png",
+      "thrusterIntensity": 0.2,
+      "thrusterLight": {
+        "r": 200,
+        "g": 200,
+        "b": 200
+      },
+      "indicator": {
+        "r": 85,
+        "g": 85,
+        "b": 85
+      },
+      "indicatorIntensity": 0.0,
+      "indicatorLight": {
+        "r": 150,
+        "g": 150,
+        "b": 150
+      }
+    },
+    {
+      "name": "Green",
+      "thruster": "ThrusterFlames_Green.png",
+      "thrusterIntensity": 0.3,
+      "thrusterLight": {
+        "r": 113,
+        "g": 255,
+        "b": 81
+      },
+      "indicator": {
+        "r": 27,
+        "g": 178,
+        "b": 14
+      },
+      "indicatorIntensity": 0.0,
+      "indicatorLight": {
+        "r": 93,
+        "g": 255,
+        "b": 0
+      }
+    },
+    {
       "name": "Rainbow",
       "thruster": "ThrusterFlames_White.png",
       "thrusterIntensity": 1.0,

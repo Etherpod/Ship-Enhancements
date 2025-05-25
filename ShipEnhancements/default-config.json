@@ -1028,13 +1028,16 @@
       "options": [
         "Default",
         "Red",
+        "Green",
         "Ghostly Green",
         "Turquoise",
+        "Blue",
         "Ultraviolet",
         "Lavender",
         "Bubblegum",
         "Hot Pink",
         "White",
+        "Gray",
         "Rainbow"
       ],
       "tooltip": "Changes the color of the thruster flames produced by the ship."
@@ -1046,13 +1049,16 @@
       "options": [
         "Default",
         "Red",
+        "Green",
         "Ghostly Green",
         "Turquoise",
+        "Blue",
         "Ultraviolet",
         "Lavender",
         "Bubblegum",
         "Hot Pink",
         "White",
+        "Gray",
         "Rainbow"
       ],
       "tooltip": "Changes the color of the thruster flames produced by the ship."
@@ -1064,13 +1070,16 @@
       "options": [
         "Default",
         "Red",
+        "Green",
         "Ghostly Green",
         "Turquoise",
+        "Blue",
         "Ultraviolet",
         "Lavender",
         "Bubblegum",
         "Hot Pink",
         "White",
+        "Gray",
         "Rainbow"
       ],
       "tooltip": "Changes the color of the thruster flames produced by the ship."
