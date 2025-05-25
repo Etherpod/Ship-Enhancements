@@ -1209,6 +1209,12 @@
       "type": "toggle",
       "value": true,
       "tooltip": "Fixes a bug where the ship's thrust indicator turns off when you leave the console."
+    },
+    "removeMasiSticker": {
+      "title": "Remove Masi Sticker",
+      "type": "toggle",
+      "value": true,
+      "tooltip": "Fixes a bug where a sticker of Masi Oka was accidentally added to the ship. Restart the game if you disable this setting to see the changes."
     }
   }
 }

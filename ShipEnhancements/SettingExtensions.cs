@@ -144,6 +144,7 @@ public static class SettingExtensions
         { disableHatch, (false, false) },
         { splitLockOn, (false, false) },
         { enableColorBlending, (false, false) },
+        { removeMasiSticker, (false, false) },
     };
 
     private static Dictionary<Settings, object> savedCustomSettings = new(settingValues.Count);

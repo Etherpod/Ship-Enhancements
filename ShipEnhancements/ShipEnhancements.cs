@@ -246,6 +246,7 @@ public class ShipEnhancements : ModBehaviour
         disableHatch,
         splitLockOn,
         enableColorBlending,
+        removeMasiSticker,
     }
 
     private string[] startupMessages =
@@ -903,6 +904,11 @@ public class ShipEnhancements : ModBehaviour
         chassisRenderer.sharedMaterials[6].SetTexture("_OcclusionMap", blackTex);
         chassisRenderer.sharedMaterials[6].SetFloat("_OcclusionStrength", 0.95f);
 
+        if ((bool)Settings.removeMasiSticker.GetProperty())
+        {
+            chassisRenderer.sharedMaterials[0].SetTexture("_MainTex", (Texture2D)LoadAsset("Assets/ShipEnhancements/Structure_HEA_PlayerShip_SignsDecal_d.png"));
+        }
+
         if ((bool)Settings.enableScoutLauncherComponent.GetProperty()
             || (string)Settings.shipWarpCoreType.GetProperty() == "Component")
         {
@@ -919,9 +925,6 @@ public class ShipEnhancements : ModBehaviour
                 warpDamage.GetComponent<MeshRenderer>().material = damageScreen.GetComponent<MeshRenderer>().material;
                 Instantiate(warpDamage, damageScreen.parent);
             }
-            /*Transform damageLabels = SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Tech/Cockpit_Tech_Interior/DamageScreenCanvas");
-            GameObject damageScreenLabels = LoadPrefab("Assets/ShipEnhancements/ExtraDamageLabels.prefab");
-            Instantiate(damageScreenLabels, damageLabels);*/
         }
 
         SetUpShipAudio();
