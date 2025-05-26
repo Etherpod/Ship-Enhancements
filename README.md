@@ -42,7 +42,7 @@ Permanently remove useless or very important parts of the ship.
 - **Minimap Markers**: Hides the icons on the minimap globe that tell you the location of your ship, your scout, and yourself.
 
 ## Adjust Ship Functions
-Change some of the values that control how the ship works.
+Change some of the ways the ship works to make gameplay easier, harder, or just more chaotic.
 - **Oxygen Drain Multiplier**: Larger numbers make your ship's oxygen drain faster. Set it to something like 100 for it to completely drain after being in the ship for half the loop or so.
 - **Fuel Drain Multiplier**: Larger numbers make your ship's fuel drain faster.
 - **Oxygen Tank Drain Multiplier**: Larger numbers increase the amount of oxygen that drains when the ship's oxygen tank is damaged.
@@ -152,17 +152,17 @@ Enabling color blending lets you fade the ship decoration between different colo
 - **Oxygen**: Changes colors as your oxygen gets lower.
 - **Ship Damage %**: Sets the color based on how many ship parts are damaged.
 - **Reactor State**: Sets the color based on the reactor's current state, whether it be undamaged, damaged, or about-to-explode.
-- **Velocity**: Changes colors as your speed changes relative to your current lock-on target.
+- **Velocity**: Sets the color based on whether you're moving towards or away from your current lock-on target.
 - **Gravity**: Changes colors as your ship experiences a stronger gravitational pull.
 - **Temperature**: Changes colors as the environment becomes warmer or colder.
 - **Ship Temperature**: Changes colors as your ship becomes warmer or colder.
 
 ## Quality of Life
-These are all enabled by default.
+Some bug fixes or small things that it wouldn't make sense to play without.
 - **Keep Helmet On**: When there is no oxygen present, this prevents the game from removing your helmet when doing things such as piloting the ship or roasting a marshmallow at a campfire.
 - **Show Warning Notifications**: Notifies you in the ship when resources are low or when the outside conditions are becoming dangerous.
 - **Fix Ship Gravity**: Gets rid of that annoying bug where you're trying to land on the Sun Station and you can't move around in your ship because it's holding you against the wall.
-- **Split Ship Lock-on**: Separates your ship lock-on target and your suit lock-on target. If you lock onto something while piloting the ship, the ship will continue using that as the target if you exit the seat and lock onto something else.
+- **Split Ship Lock-on**: (Disabled by default) Separates your ship lock-on target and your suit lock-on target. If you lock onto something while piloting the ship, the ship will continue using that as the target if you exit the seat and lock onto something else.
 - **Always Allow Map Lock-on**: Lets you use the lock-on feature on the map while you're standing on a planet.
 - **Fix Ship Thrust Indicator**: Fixes a bug where the ship's thrust indicator turns off when you stop piloting the ship.
 - **Remove Masi Sticker**: Removes a sticker of Masi Oka that was accidentally added to the ship in a recent Outer Wilds update. If you don't see a difference when turning this off and restarting the game, it was probably fixed.
