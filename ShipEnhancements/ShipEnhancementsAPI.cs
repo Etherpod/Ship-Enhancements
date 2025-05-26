@@ -90,6 +90,31 @@ public class ShipEnhancementsAPI : IShipEnhancements
         }
     }
 
+    public void HideAllSettings(bool forceRefresh = false)
+    {
+        Instance.HiddenSettings.Clear();
+        var allSettings = Enum.GetValues(typeof(Settings)) as Settings[];
+        foreach (var setting in allSettings)
+        {
+            Instance.HiddenSettings.Add(setting);
+        }
+
+        if (forceRefresh)
+        {
+            Instance.RedrawSettingsMenu();
+        }
+    }
+
+    public void ShowAllSettings(bool forceRefresh = false)
+    {
+        Instance.HiddenSettings.Clear();
+
+        if (forceRefresh)
+        {
+            Instance.RedrawSettingsMenu();
+        }
+    }
+
     public UnityEvent GetPreShipInitializeEvent() => Instance.PreShipInitialize;
 
     public UnityEvent GetPostShipInitializeEvent() => Instance.PostShipInitialize;

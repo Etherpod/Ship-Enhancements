@@ -82,7 +82,7 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Oxygen Refill Multiplier**: Larger numbers increase the speed at which your ship's oxygen tank refills when near an oxygen source.
 - **Fuel Transfer**: Lets you transfer your jetpack fuel to the ship's fuel tank to refill it.
 - **Jetpack Refuel Drain**: Drains the ship's fuel reserve when you refuel your jetpack. You cannot duplicate fuel by transferring it back into the ship.
-- **Fuel Transfer Multiplier**: Larger numbers increase the amount of fuel that is drained when refueling your jetpack, and increase the amount of fuel that is added when transferring fuel to the ship.
+- **Fuel Transfer Multiplier**: Larger numbers increase the speed of fuel transfers. You will transfer fuel to the ship faster, but refueling will drain the ship faster too (if refuel drain is enabled).
 - **Automatic Hatch**: Automatically closes the hatch when you leave the ship. **Quantum Space Buddies** has this feature by default.
 - **Extra Eject Buttons**: Adds a few more eject buttons that all eject different parts of the ship.
 - **Interactable Ship Curtain**: Lets you close the curtain inside the ship, blocking off the cockpit.
@@ -121,25 +121,51 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Unlimited Items**: Lets you duplicate items inside the ship. This doesn't work on the ship's gravity crystal or items from other mods.
 - **Removable Gravity Crystal**: Lets you detach the ship's gravity crystal and place it somewhere else to create a localized gravity field. The removed gravity crystal will have the same strength as it did in the ship.
 - **Gravity Landing Gear**: Adds an interface to the cockpit that controls the new gravity technology built into your ship's landing gear. It will stop working if your landing gear is damaged.
+  - The purple switch turns the gravity landing gear on/off.
+  - The green switch inverts the gravity, pushing you away from surfaces instead of pulling you towards them.
 - **Thrust Modulator**: Adds an interface to the cockpit that lets you lower or disproportionately raise the maximum thrust your ship can use. Stacks with the smooth thrust option from General Enhancements.
+  - The orange buttons let you set a limit on your maximum thrust.
+  - The two rectangular buttons to the left of the orange buttons control the overdrive. Press the green button to disable the safeties, then once the bottom button turns yellow, press it to activate the overdrive. It is recommended to buckle up before using overdrive.
 - **Auto Align Controls**: Adds an interface to the cockpit that lets you automatically rotate your ship to face the current lock-on target.
+  - The right button turns auto alignment on/off. Lock onto something to use the feature.
+  - The left button controls how your ship faces towards the target. Turning it on rotates your ship so that the bottom faces the target, and turning it off rotates the ship so that the cockpit faces the target.
 - **Autopilot Controls**: Adds an interface to the cockpit that lets you control the new features added to the ship's autopilot system.
-- **Engine Switch**: Controls your ship's power and engine. The switch needs to be turned on if you want to fly your ship. If the **Idle Fuel Consumption Multiplier** is above 0, it will only consume fuel when the ship is on.
+  - The interface is divided into two sections: autopilot override (the left 2 buttons) and match velocity override (the right 3 buttons). The two buttons that are currently selected control what engaging autopilot or matching velocity will do.
+  - The top left button activates the default autopilot function. It will fly towards the lock-on target.
+  - The bottom left button activates orbital autopilot, which will find a stable orbit around the lock-on target.
+  - The center button activates input hold. While in recording mode, give the ship a thrust input and turn off recording mode while holding that input. It will keep holding that thrust until you turn off input hold.
+  - The top right button activates the default match velocity. It will match velocity with whatever your lock-on target is.
+  - The bottom right button activates position hold. It will remain at whatever position you activate it at relative to the lock-on target.
+- **Engine Switch**: Controls your ship's power and engine. The switch needs to be turned on if you want to fly your ship.
+  - If the **Idle Fuel Consumption Multiplier** is above 0, it will only consume fuel when the ship is on.
 
 ## Decoration
 Haven't you ever wished your ship had a little more color?
 - **Ship Light Color**: Changes the color of the ship's interior and exterior lights from a wide variety of options. Set this to Divine at your own risk, for mere Hearthians were never meant to see creations blessed by a god.
 - **Interior/Exterior Hull Color**: Select from a variety of colors to change the inside or outside color of your ship. Just don't pick Rainbow.
 - **Ship Thruster Flame Color**: Changes the color of the ship's thruster flames as well as the color of the thruster indicator inside of the ship.
-- **Damage Indicator Color**: Changes the color of the ship damage display, the master alarm, and the damage indicator lights.
+- **Damage Indicator Color**: Changes the color of the ship damage display, the master alarm, the reactor, and the damage indicator lights.
+
+Enabling color blending lets you fade the ship decoration between different colors based on certain parameters. For example, I could set it to change the lights to red if the ship is hot and change the lights to blue if the ship is cold. Here is an overview on the different parameter options:
+- **Time**: Fades between colors over time.
+- **Fuel**: Changes colors as your fuel gets lower.
+- **Oxygen**: Changes colors as your oxygen gets lower.
+- **Ship Damage %**: Sets the color based on how many ship parts are damaged.
+- **Reactor State**: Sets the color based on the reactor's current state, whether it be undamaged, damaged, or about-to-explode.
+- **Velocity**: Changes colors as your speed changes relative to your current lock-on target.
+- **Gravity**: Changes colors as your ship experiences a stronger gravitational pull.
+- **Temperature**: Changes colors as the environment becomes warmer or colder.
+- **Ship Temperature**: Changes colors as your ship becomes warmer or colder.
 
 ## Quality of Life
 These are all enabled by default.
 - **Keep Helmet On**: When there is no oxygen present, this prevents the game from removing your helmet when doing things such as piloting the ship or roasting a marshmallow at a campfire.
 - **Show Warning Notifications**: Notifies you in the ship when resources are low or when the outside conditions are becoming dangerous.
 - **Fix Ship Gravity**: Gets rid of that annoying bug where you're trying to land on the Sun Station and you can't move around in your ship because it's holding you against the wall.
+- **Split Ship Lock-on**: Separates your ship lock-on target and your suit lock-on target. If you lock onto something while piloting the ship, the ship will continue using that as the target if you exit the seat and lock onto something else.
 - **Always Allow Map Lock-on**: Lets you use the lock-on feature on the map while you're standing on a planet.
 - **Fix Ship Thrust Indicator**: Fixes a bug where the ship's thrust indicator turns off when you stop piloting the ship.
+- **Remove Masi Sticker**: Removes a sticker of Masi Oka that was accidentally added to the ship in a recent Outer Wilds update. If you don't see a difference when turning this off and restarting the game, it was probably fixed.
 
 ## Presets
 In case there are too many settings to deal with, there are some pre-made presets for you to use. The settings can still be meddled with after choosing one.
@@ -160,6 +186,9 @@ To use the API, copy the **IShipEnhancements** script from this mod's GitHub rep
 - **CreateTemperatureZone()** - In case you're a modder and want to add your own high/low temperature zones. Temperature zones can stack, and will just take the sum of the temperatures.
 - **GetSettingsProperty()** - Returns the value of a config setting as seen from the player. These values only update at the beginning of the loop, so changing the mod settings doesn't affect them.
 - **SetSettingsProperty()** - Lets you change the value of a config setting in the middle of the loop. Note that this change will be reverted on the next loop.
+- **SetSettingsOptionVisible()** - Lets you set the visibility of a settings option in the mod settings menu. If an option is hidden, it cannot be changed by the user but can still be changed in code.
+- **HideAllSettings()** - Removes all of the settings from the mod settings menu.
+- **ShowAllSettings()** - Returns any hidden settings to the mod settings menu.
 - **GetPreShipInitializeEvent()** and **GetPostShipInitializeEvent()** - Subscribe to these events to run code before and after Ship Enhancements makes any changes to the ship.
 
 ## Known Bugs
@@ -170,14 +199,15 @@ To use the API, copy the **IShipEnhancements** script from this mod's GitHub rep
 - The Expedition Flag's map marker may not be visible when using the advanced minimap from General Enhancements
 - The Continuous Matching Velocity feature from General Enhancements may cause bugs when used with the Autopilot Controls
 - Placing the ship's gravity crystal on the landing gear and then detaching the landing gear will crash the game
-- The warp core will not work in the regular solar system if New Horizons is installed (fixed in the next update)
-- Locking onto the ship while auto alignment is active will crash the game (fixed in the next update)
-- Campfires have no temperature zone when temperatures zones are set to "Hot" (fixed in the next update)
 
 # Credits
-Big thanks to **ColumbidaeCafe** for helping develop most of the ideas and sound effects!
+Big thanks to **ditzy** for all of their help! There's so much I have to put it in a list:
+- Helping program shaders
+- Helping with one of Ernesto's special abilities
+- Coding pretty much the entire program for the orbital autopilot
+- Helping refactor the ship decoration code
 
-Big thanks to **ditzy** for helping with shaders, helping with one of Ernesto's special abilities, and for coding pretty much the entire program for the orbital autopilot!
+Big thanks to **ColumbidaeCafe** for helping develop most of the ideas and sound effects!
 
 Thank you **harperlr** for making the radio model and for helping to playtest QSB support!
 

@@ -42,6 +42,18 @@ public interface IShipEnhancements
     public void SetSettingsOptionVisible(string configName, bool visible, bool forceRefresh = false);
 
     /// <summary>
+    /// Hides all of the config settings in the mod settings menu. This resets when the game closes.
+    /// </summary>
+    /// <param name="forceRefresh">Set this to true if the mod settings menu is open when you call the method.</param>
+    public void HideAllSettings(bool forceRefresh = false);
+
+    /// <summary>
+    /// Shows all of the config settings in the mod settings menu. This resets when the game closes.
+    /// </summary>
+    /// <param name="forceRefresh">Set this to true if the mod settings menu is open when you call the method.</param>
+    public void ShowAllSettings(bool forceRefresh = false);
+
+    /// <summary>
     /// Gets the event that is invoked before Ship Enhancements makes any changes to the ship.
     /// </summary>
     /// <returns>The UnityEvent event that will be invoked.</returns>
