@@ -227,7 +227,7 @@ public static class SELocator
 
     public static void OnTargetReferenceFrame(ReferenceFrame rf)
     {
-        if (Locator._rfTracker._shipTargetingActive)
+        if (Locator._rfTracker?._shipTargetingActive ?? false)
         {
             _shipRF = rf;
         }
@@ -239,7 +239,7 @@ public static class SELocator
 
     public static void OnUntargetReferenceFrame()
     {
-        if (Locator._rfTracker._shipTargetingActive)
+        if (Locator._rfTracker?._shipTargetingActive ?? false)
         {
             _shipRF = null;
         }
@@ -259,7 +259,7 @@ public static class SELocator
         }
         else
         {
-            Locator._rfTracker.UntargetReferenceFrame();
+            Locator._rfTracker.UntargetReferenceFrame(false);
         }
     }
 
@@ -273,7 +273,7 @@ public static class SELocator
         }
         else
         {
-            Locator._rfTracker.UntargetReferenceFrame();
+            Locator._rfTracker.UntargetReferenceFrame(false);
         }
     }
 }

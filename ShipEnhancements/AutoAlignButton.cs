@@ -14,7 +14,7 @@ public class AutoAlignButton : CockpitButton
     private void Update()
     {
         bool usable = SELocator.GetShipResources().AreThrustersUsable()
-            && Locator.GetReferenceFrame() != SELocator.GetShipBody().GetReferenceFrame();
+            && SELocator.GetReferenceFrame(shipFrame: true) != SELocator.GetShipBody().GetReferenceFrame();
         if (_lastThrusterState != usable)
         {
             _lastThrusterState = usable;
@@ -37,7 +37,7 @@ public class AutoAlignButton : CockpitButton
     private void OnThrustersUsable()
     {
         _shipAlign.enabled = _on 
-            && Locator.GetReferenceFrame() != SELocator.GetShipBody().GetReferenceFrame()
+            && SELocator.GetReferenceFrame(shipFrame: true) != SELocator.GetShipBody().GetReferenceFrame()
             && !SELocator.GetShipDamageController().IsElectricalFailed()
             && SELocator.GetShipResources().AreThrustersUsable();
     }

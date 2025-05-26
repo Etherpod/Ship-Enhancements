@@ -1,7 +1,9 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using static ShipEnhancements.ShipEnhancements;
+using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -9,118 +11,140 @@ public static class SettingExtensions
 {
     private static Dictionary<Settings, (object value, object property)> settingValues = new Dictionary<Settings, (object, object)>()
     {
-        { Settings.disableGravityCrystal, (false, false) },
-        { Settings.disableEjectButton, (false, false) },
-        { Settings.disableHeadlights, (false, false) },
-        { Settings.disableLandingCamera, (false, false) },
-        { Settings.disableShipLights, (false, false) },
-        { Settings.disableShipOxygen, (false, false) },
-        { Settings.oxygenDrainMultiplier, (1f, 1f) },
-        { Settings.fuelDrainMultiplier, (1f, 1f) },
-        { Settings.shipDamageMultiplier, (1f, 1f) },
-        { Settings.shipDamageSpeedMultiplier, (1f, 1f) },
-        { Settings.shipOxygenRefill, (false, false) },
-        { Settings.enableGravityLandingGear, (false, false) },
-        { Settings.disableAirAutoRoll, (false, false) },
-        { Settings.disableWaterAutoRoll, (false, false) },
-        { Settings.enableThrustModulator, (false, false) },
-        { Settings.temperatureZonesAmount, ("", "") },
-        { Settings.hullTemperatureDamage, (false, false) },
-        { Settings.enableShipFuelTransfer, (false, false) },
-        { Settings.enableJetpackRefuelDrain, (false, false) },
-        { Settings.disableReferenceFrame, (false, false) },
-        { Settings.disableMapMarkers, (false, false) },
-        { Settings.gravityMultiplier, (1f, 1f) },
-        { Settings.fuelTransferMultiplier, (1f, 1f) },
-        { Settings.oxygenRefillMultiplier, (1f, 1f) },
-        { Settings.temperatureDamageMultiplier, (1f, 1f) },
-        { Settings.temperatureResistanceMultiplier, (1f, 1f) },
-        { Settings.enableAutoHatch, (false, false) },
-        { Settings.oxygenTankDrainMultiplier, (1f, 1f) },
-        { Settings.fuelTankDrainMultiplier, (1f, 1f) },
-        { Settings.componentTemperatureDamage, (false, false) },
-        { Settings.atmosphereAngularDragMultiplier, (1f, 1f) },
-        { Settings.spaceAngularDragMultiplier, (1f, 1f) },
-        { Settings.disableRotationSpeedLimit, (false, false) },
-        { Settings.gravityDirection, ("", "") },
-        { Settings.disableScoutRecall, (false, false) },
-        { Settings.disableScoutLaunching, (false, false) },
-        { Settings.enableScoutLauncherComponent, (false, false) },
-        { Settings.enableManualScoutRecall, (false, false) },
-        { Settings.enableShipItemPlacement, (false, false) },
-        { Settings.addPortableCampfire, (false, false) },
-        { Settings.keepHelmetOn, (false, false) },
-        { Settings.showWarningNotifications, (false, false) },
-        { Settings.shipExplosionMultiplier, (1f, 1f) },
-        { Settings.shipBounciness, (1f, 1f) },
-        { Settings.enableEnhancedAutopilot, (false, false) },
-        { Settings.shipInputLatency, (1f, 1f) },
-        { Settings.addEngineSwitch, (false, false) },
-        { Settings.idleFuelConsumptionMultiplier, (1f, 1f) },
-        { Settings.shipLightColor, ("", "") },
-        { Settings.hotThrusters, (false, false) },
-        { Settings.extraNoise, (false, false) },
-        { Settings.interiorHullColor, ("", "") },
-        { Settings.exteriorHullColor, ("", "") },
-        { Settings.addTether, (false, false) },
-        { Settings.disableDamageIndicators, (false, false) },
-        { Settings.addShipSignal, (false, false) },
-        { Settings.reactorLifetimeMultiplier, (1f, 1f) },
-        { Settings.shipFriction, (1f, 1f) },
-        { Settings.enableSignalscopeComponent, (false, false) },
-        { Settings.rustLevel, (1f, 1f) },
-        { Settings.dirtAccumulationTime, (1f, 1f) },
-        { Settings.thrusterColor, ("", "") },
-        { Settings.disableSeatbelt, (false, false) },
-        { Settings.addPortableTractorBeam, (false, false) },
-        { Settings.disableShipSuit, (false, false) },
-        { Settings.damageIndicatorColor, ("", "") },
-        { Settings.disableAutoLights, (false, false) },
-        { Settings.addExpeditionFlag, (false, false) },
-        { Settings.addFuelCanister, (false, false) },
-        { Settings.cycloneChaos, (1f, 1f) },
-        { Settings.moreExplosionDamage, (false, false) },
-        { Settings.singleUseTractorBeam, (false, false) },
-        { Settings.disableThrusters, (false, false) },
-        { Settings.maxDirtAccumulation, (false, false) },
-        { Settings.shipWarpCoreType, ("", "") },
-        { Settings.repairTimeMultiplier, (1f, 1f) },
-        { Settings.airDragMultiplier, (1f, 1f) },
-        { Settings.addShipClock, (false, false) },
-        { Settings.enableStunDamage, (false, false) },
-        { Settings.enableRepairConfirmation, (false, false) },
-        { Settings.shipGravityFix, (false, false) },
-        { Settings.enableRemovableGravityCrystal, (false, false) },
-        { Settings.randomHullDamage, (1f, 1f) },
-        { Settings.randomComponentDamage, (1f, 1f) },
-        { Settings.enableFragileShip, (false, false) },
-        { Settings.faultyHeatRegulators, (false, false) },
-        { Settings.addErnesto, (false, false) },
-        { Settings.repairLimit, (1f, 1f) },
-        { Settings.extraEjectButtons, (false, false) },
-        { Settings.preventSystemFailure, (false, false) },
-        { Settings.addShipCurtain, (false, false) },
-        { Settings.addRepairWrench, (false, false) },
-        { Settings.funnySounds, (false, false) },
-        { Settings.alwaysAllowLockOn, (false, false) },
-        { Settings.disableShipMedkit, (false, false) },
-        { Settings.addRadio, (false, false) },
-        { Settings.disableFluidPrevention, (false, false) },
-        { Settings.disableHazardPrevention, (false, false) },
-        { Settings.prolongDigestion, (false, false) },
-        { Settings.unlimitedItems, (false, false) },
-        { Settings.noiseMultiplier, (1f, 1f) },
-        { Settings.waterDamage, (1f, 1f) },
-        { Settings.sandDamage, (1f, 1f) },
-        { Settings.disableMinimapMarkers, (1f, 1f) },
-        { Settings.scoutPhotoMode, (false, false) },
-        { Settings.fixShipThrustIndicator, (false, false) },
-        { Settings.enableAutoAlign, (false, false) },
-        { Settings.shipHornType, ("", "") },
-        { Settings.randomIterations, (1f, 1f) },
-        { Settings.randomDifficulty, (1f, 1f) },
-        { Settings.disableHatch, (false, false) },
-        { Settings.splitLockOn, (false, false) },
+        { disableGravityCrystal, (false, false) },
+        { disableEjectButton, (false, false) },
+        { disableHeadlights, (false, false) },
+        { disableLandingCamera, (false, false) },
+        { disableShipLights, (false, false) },
+        { disableShipOxygen, (false, false) },
+        { oxygenDrainMultiplier, (1f, 1f) },
+        { fuelDrainMultiplier, (1f, 1f) },
+        { shipDamageMultiplier, (1f, 1f) },
+        { shipDamageSpeedMultiplier, (1f, 1f) },
+        { shipOxygenRefill, (false, false) },
+        { enableGravityLandingGear, (false, false) },
+        { disableAirAutoRoll, (false, false) },
+        { disableWaterAutoRoll, (false, false) },
+        { enableThrustModulator, (false, false) },
+        { temperatureZonesAmount, ("", "") },
+        { hullTemperatureDamage, (false, false) },
+        { enableShipFuelTransfer, (false, false) },
+        { enableJetpackRefuelDrain, (false, false) },
+        { disableReferenceFrame, (false, false) },
+        { disableMapMarkers, (false, false) },
+        { gravityMultiplier, (1f, 1f) },
+        { fuelTransferMultiplier, (1f, 1f) },
+        { oxygenRefillMultiplier, (1f, 1f) },
+        { temperatureDamageMultiplier, (1f, 1f) },
+        { temperatureResistanceMultiplier, (1f, 1f) },
+        { enableAutoHatch, (false, false) },
+        { oxygenTankDrainMultiplier, (1f, 1f) },
+        { fuelTankDrainMultiplier, (1f, 1f) },
+        { componentTemperatureDamage, (false, false) },
+        { atmosphereAngularDragMultiplier, (1f, 1f) },
+        { spaceAngularDragMultiplier, (1f, 1f) },
+        { disableRotationSpeedLimit, (false, false) },
+        { gravityDirection, ("", "") },
+        { disableScoutRecall, (false, false) },
+        { disableScoutLaunching, (false, false) },
+        { enableScoutLauncherComponent, (false, false) },
+        { enableManualScoutRecall, (false, false) },
+        { enableShipItemPlacement, (false, false) },
+        { addPortableCampfire, (false, false) },
+        { keepHelmetOn, (false, false) },
+        { showWarningNotifications, (false, false) },
+        { shipExplosionMultiplier, (1f, 1f) },
+        { shipBounciness, (1f, 1f) },
+        { enableEnhancedAutopilot, (false, false) },
+        { shipInputLatency, (1f, 1f) },
+        { addEngineSwitch, (false, false) },
+        { idleFuelConsumptionMultiplier, (1f, 1f) },
+        { shipLightColorOptions, ("", "") },
+        { shipLightColor1, ("", "") },
+        { shipLightColor2, ("", "") },
+        { shipLightColor3, ("", "") },
+        { shipLightColorBlend, ("", "") },
+        { hotThrusters, (false, false) },
+        { extraNoise, (false, false) },
+        { interiorHullColorOptions, ("", "") },
+        { interiorHullColor1, ("", "") },
+        { interiorHullColor2, ("", "") },
+        { interiorHullColor3, ("", "") },
+        { interiorHullColorBlend, ("", "") },
+        { exteriorHullColorOptions, ("", "") },
+        { exteriorHullColor1, ("", "") },
+        { exteriorHullColor2, ("", "") },
+        { exteriorHullColor3, ("", "") },
+        { exteriorHullColorBlend, ("", "") },
+        { addTether, (false, false) },
+        { disableDamageIndicators, (false, false) },
+        { addShipSignal, (false, false) },
+        { reactorLifetimeMultiplier, (1f, 1f) },
+        { shipFriction, (1f, 1f) },
+        { enableSignalscopeComponent, (false, false) },
+        { rustLevel, (1f, 1f) },
+        { dirtAccumulationTime, (1f, 1f) },
+        { thrusterColorOptions, ("", "") },
+        { thrusterColor1, ("", "") },
+        { thrusterColor2, ("", "") },
+        { thrusterColor3, ("", "") },
+        { thrusterColorBlend, ("", "") },
+        { disableSeatbelt, (false, false) },
+        { addPortableTractorBeam, (false, false) },
+        { disableShipSuit, (false, false) },
+        { indicatorColorOptions, ("", "") },
+        { indicatorColor1, ("", "") },
+        { indicatorColor2, ("", "") },
+        { indicatorColor3, ("", "") },
+        { indicatorColorBlend, ("", "") },
+        { disableAutoLights, (false, false) },
+        { addExpeditionFlag, (false, false) },
+        { addFuelCanister, (false, false) },
+        { cycloneChaos, (1f, 1f) },
+        { moreExplosionDamage, (false, false) },
+        { singleUseTractorBeam, (false, false) },
+        { disableThrusters, (false, false) },
+        { maxDirtAccumulation, (false, false) },
+        { shipWarpCoreType, ("", "") },
+        { repairTimeMultiplier, (1f, 1f) },
+        { airDragMultiplier, (1f, 1f) },
+        { addShipClock, (false, false) },
+        { enableStunDamage, (false, false) },
+        { enableRepairConfirmation, (false, false) },
+        { shipGravityFix, (false, false) },
+        { enableRemovableGravityCrystal, (false, false) },
+        { randomHullDamage, (1f, 1f) },
+        { randomComponentDamage, (1f, 1f) },
+        { enableFragileShip, (false, false) },
+        { faultyHeatRegulators, (false, false) },
+        { addErnesto, (false, false) },
+        { repairLimit, (1f, 1f) },
+        { extraEjectButtons, (false, false) },
+        { preventSystemFailure, (false, false) },
+        { addShipCurtain, (false, false) },
+        { addRepairWrench, (false, false) },
+        { funnySounds, (false, false) },
+        { alwaysAllowLockOn, (false, false) },
+        { disableShipMedkit, (false, false) },
+        { addRadio, (false, false) },
+        { disableFluidPrevention, (false, false) },
+        { disableHazardPrevention, (false, false) },
+        { prolongDigestion, (false, false) },
+        { unlimitedItems, (false, false) },
+        { noiseMultiplier, (1f, 1f) },
+        { waterDamage, (1f, 1f) },
+        { sandDamage, (1f, 1f) },
+        { disableMinimapMarkers, (1f, 1f) },
+        { scoutPhotoMode, (false, false) },
+        { fixShipThrustIndicator, (false, false) },
+        { enableAutoAlign, (false, false) },
+        { shipHornType, ("", "") },
+        { randomIterations, (1f, 1f) },
+        { randomDifficulty, (1f, 1f) },
+        { disableHatch, (false, false) },
+        { splitLockOn, (false, false) },
+        { enableColorBlending, (false, false) },
+        { removeMasiSticker, (false, false) },
     };
 
     private static Dictionary<Settings, object> savedCustomSettings = new(settingValues.Count);
@@ -189,6 +213,30 @@ public static class SettingExtensions
         settingValues[setting] = (settingValues[setting].value, value);
     }
 
+    public static object ConvertJValue(object obj)
+    {
+        if (obj is not JValue) return null;
+
+        JValue value = (JValue)obj;
+        if (value.Type == JTokenType.Boolean)
+        {
+            return Convert.ToBoolean(value);
+        }
+        else if (value.Type == JTokenType.Float)
+        {
+            return float.Parse(value.ToString());
+        }
+        else if (value.Type == JTokenType.Integer)
+        {
+            return (float)int.Parse(value.ToString());
+        }
+        else if (value.Type == JTokenType.String)
+        {
+            return value.ToString();
+        }
+        return value;
+    }
+
     public static Type GetType(this Settings setting)
     {
         return settingValues[setting].GetType();
@@ -222,5 +270,20 @@ public static class SettingExtensions
         {
             savedCustomSettings[setting] = Instance.ModHelper.DefaultConfig.GetSettingsValue<object>(setting.GetName());
         }
+    }
+
+    public static T AsEnum<T>(this string enumName) where T : struct =>
+    Enum.TryParse<T>(enumName, out var result) ? result 
+        : throw new ArgumentException($"Enum '{enumName}' does not exist.");
+
+    public static ColorHSV AsHSV(this Color color)
+    {
+        Color.RGBToHSV(color, out float H, out float S, out float V);
+        return new ColorHSV(H, S, V);
+    }
+
+    public static Color AsRGB(this ColorHSV color)
+    {
+        return Color.HSVToRGB(color.h, color.s, color.v);
     }
 }

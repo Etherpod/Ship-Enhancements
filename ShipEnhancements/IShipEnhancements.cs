@@ -22,16 +22,24 @@ public interface IShipEnhancements
     /// <summary>
     /// Gets the in-game value of the specified config setting.
     /// </summary>
-    /// <param name="configName"></param>
+    /// <param name="configName">The name of the setting. It should be in lower camel case.</param>
     /// <returns>The current in-game value of the config setting, not the value as seen in the config.</returns>
     public object GetSettingsProperty(string configName);
 
     /// <summary>
     /// Sets the in-game value of the specified config setting. Doesn't affect the displayed value in the mod config.
     /// </summary>
-    /// <param name="configName"></param>
-    /// <param name="value"></param>
+    /// <param name="configName">The name of the setting. It should be in lower camel case.</param>
+    /// <param name="value">The value to assign to the setting. This will reset every time the scene loads.</param>
     public void SetSettingsProperty(string configName, object value);
+
+    /// <summary>
+    /// Sets the visibility of a config setting in the mod settings menu. This resets when the game closes.
+    /// </summary>
+    /// <param name="configName">The name of the setting. It should be in lower camel case.</param>
+    /// <param name="visible">Should this setting be visible in the mod settings menu?</param>
+    /// <param name="forceRefresh">Set this to true if the mod settings menu is open when you call the method.</param>
+    public void SetSettingsOptionVisible(string configName, bool visible, bool forceRefresh = false);
 
     /// <summary>
     /// Gets the event that is invoked before Ship Enhancements makes any changes to the ship.

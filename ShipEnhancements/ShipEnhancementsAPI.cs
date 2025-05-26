@@ -65,6 +65,31 @@ public class ShipEnhancementsAPI : IShipEnhancements
         LogMessage($"Could not find a Ship Enhancements setting named {configName}! From: IShipEnhancements.SetSettingsProperty()", error: true);
     }
 
+    public void SetSettingsOptionVisible(string configName, bool visible, bool forceRefresh = false)
+    {
+        var allSettings = Enum.GetValues(typeof(Settings)) as Settings[];
+        foreach (Settings setting in allSettings)
+        {
+            if (setting.GetName() == configName)
+            {
+                if (visible && Instance.HiddenSettings.Contains(setting))
+                {
+                    Instance.HiddenSettings.Remove(setting);
+                }
+                else if (!visible && !Instance.HiddenSettings.Contains(setting))
+                {
+                    Instance.HiddenSettings.Add(setting);
+                }
+
+                if (forceRefresh)
+                {
+                    Instance.RedrawSettingsMenu();
+                }
+                return;
+            }
+        }
+    }
+
     public UnityEvent GetPreShipInitializeEvent() => Instance.PreShipInitialize;
 
     public UnityEvent GetPostShipInitializeEvent() => Instance.PostShipInitialize;

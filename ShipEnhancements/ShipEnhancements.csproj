@@ -47,9 +47,10 @@
     <None Include="dialogue/**/*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-  <None Include="ExpeditionFlagIcons/**/*.*">
+    <None Include="ExpeditionFlagIcons/**/*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <EmbeddedResource Include="Data/themes.json"/>
   </ItemGroup>
   <ItemGroup>
     <Content Include="ShipEnhancements.csproj.user" />

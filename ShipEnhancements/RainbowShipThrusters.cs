@@ -84,7 +84,7 @@ public class RainbowShipThrusters : MonoBehaviour
 
         if (_indicator.isActiveAndEnabled)
         {
-            ThrustIndicatorManager.SetColor(color);
+            //ThrustIndicatorManager.SetColor(color);
         }
 
         /*if (!((bool)enableThrustModulator.GetProperty() && SELocator.GetShipOverdriveController().IsCooldown()))

@@ -2729,7 +2729,13 @@ public static class PatchClass
             GameObject componentObj = UnityEngine.Object.Instantiate(probeLauncherComponent,
                 __instance.GetComponentInParent<ShipBody>().GetComponentInChildren<PlayerProbeLauncher>().transform.parent);
             AssetBundleUtilities.ReplaceShaders(componentObj);
-            SELocator.SetProbeLauncherComponent(componentObj.GetComponent<ProbeLauncherComponent>());
+            var comp = componentObj.GetComponent<ProbeLauncherComponent>();
+            SELocator.SetProbeLauncherComponent(comp);
+
+            ShipDamageDisplayV2 damageDisplay = __instance.GetComponentInChildren<ShipDamageDisplayV2>();
+            damageDisplay._shipComponents[7] = comp;
+            comp.OnDamaged += damageDisplay.OnComponentUpdate;
+            comp.OnRepaired += damageDisplay.OnComponentUpdate;
         }
         if ((bool)enableSignalscopeComponent.GetProperty())
         {
@@ -2753,7 +2759,13 @@ public static class PatchClass
             AssetBundleUtilities.ReplaceShaders(warpCoreComponent);
             warpCoreComponent.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = UnityEngine.Object.FindObjectOfType<ShipBody>().gameObject;
             GameObject componentObj = UnityEngine.Object.Instantiate(warpCoreComponent, __instance.transform.Find("Systems_Cockpit"));
-            SELocator.SetShipWarpCoreComponent(componentObj.GetComponent<ShipWarpCoreComponent>());
+            var comp = componentObj.GetComponent<ShipWarpCoreComponent>();
+            SELocator.SetShipWarpCoreComponent(comp);
+
+            ShipDamageDisplayV2 damageDisplay = __instance.GetComponentInChildren<ShipDamageDisplayV2>();
+            damageDisplay._shipComponents[6] = comp;
+            comp.OnDamaged += damageDisplay.OnComponentUpdate;
+            comp.OnRepaired += damageDisplay.OnComponentUpdate;
 
             if (ShipEnhancements.NHAPI == null && GameObject.Find("TimberHearth_Body"))
             {
@@ -4595,7 +4607,7 @@ public static class PatchClass
                 }
 
                 __instance.OnActivateMenu += () => ShipEnhancements.Instance.ModHelper.Events.Unity
-                    .FireOnNextUpdate(ShipEnhancements.Instance.RedrawSettingsMenu);
+                    .FireOnNextUpdate(() => ShipEnhancements.Instance.RedrawSettingsMenu());
                 return;
             }
         }
@@ -4726,12 +4738,26 @@ public static class PatchClass
     {
         if (!(bool)splitLockOn.GetProperty()) return true;
 
-        if (SELocator.GetReferenceFrame() != referenceFrame)
+        if (PlayerState.AtFlightConsole() && SELocator.GetReferenceFrame() != referenceFrame)
         {
             return true;
         }
 
         return false;
+    }
+    #endregion
+
+    #region ShipLightFix
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipLight), nameof(ShipLight.SetExtraIntensityScale))]
+    public static void UpdateShipLightEmission(ShipLight __instance)
+    {
+        if (__instance._emissiveRenderer != null)
+        {
+            float num2 = __instance._light.intensity / __instance._baseIntensity;
+            __instance._matPropBlock.SetColor(__instance._propID_EmissionColor, __instance._baseEmission * num2);
+            __instance._emissiveRenderer.SetPropertyBlock(__instance._matPropBlock);
+        }
     }
     #endregion
 }
