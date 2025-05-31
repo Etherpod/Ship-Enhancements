@@ -45,6 +45,9 @@ public static class SELocator
         _playerResources = _playerBody.GetComponent<PlayerResources>();
         _shipDamageController = _shipTransform.GetComponent<ShipDamageController>();
 
+        _shipRF = null;
+        _playerRF = null;
+
         if ((bool)shipOxygenRefill.GetProperty())
         {
             _shipOxygenDetector = _shipDetector.gameObject.AddComponent<OxygenDetector>();
