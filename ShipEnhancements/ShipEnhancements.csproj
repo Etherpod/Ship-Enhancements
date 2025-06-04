@@ -50,6 +50,9 @@
     <None Include="ExpeditionFlagIcons/**/*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="RandomizerSettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <EmbeddedResource Include="Data/themes.json"/>
   </ItemGroup>
   <ItemGroup>

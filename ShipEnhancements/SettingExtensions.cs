@@ -276,6 +276,9 @@ public static class SettingExtensions
     Enum.TryParse<T>(enumName, out var result) ? result 
         : throw new ArgumentException($"Enum '{enumName}' does not exist.");
 
+    public static bool IsEnum<T>(this string enumName) where T : struct =>
+    Enum.TryParse<T>(enumName, out var result);
+
     public static ColorHSV AsHSV(this Color color)
     {
         Color.RGBToHSV(color, out float H, out float S, out float V);

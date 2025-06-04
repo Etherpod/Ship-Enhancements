@@ -13,6 +13,8 @@ using Newtonsoft.Json.Linq;
 using UnityEngine.InputSystem;
 using System.Globalization;
 using UnityEngine.UI;
+using Newtonsoft.Json;
+using ShipEnhancements.Models.Json;
 
 namespace ShipEnhancements;
 
@@ -752,42 +754,134 @@ public class ShipEnhancements : ModBehaviour
     private void UpdateProperties()
     {
         var allSettings = Enum.GetValues(typeof(Settings)) as Settings[];
+        List<Settings> settingsToRandomize = [];
 
         if (ModHelper.Config.GetSettingsValue<string>("preset") == "Random")
         {
-            float total = 0f;
-            for (int i = 0; i < allSettings.Length; i++)
+            var data = LoadData();
+
+            if (data.inclusive != null && data.exclusive != null)
             {
-                if (SettingsPresets.VanillaPlusSettings.ContainsKey(allSettings[i].GetName()))
+                if (data.inclusive.Length == 0)
                 {
-                    allSettings[i].SetProperty(ModHelper.Config.GetSettingsValue<object>(allSettings[i].GetName()));
+                    settingsToRandomize.AddRange(allSettings);
+                }
+
+                var configSettings = ModHelper.Config.Settings.Keys.ToList();
+                List<string> separators = ["Disable Ship Parts", "Adjust Ship Functions", "Add Ship Functions", "Decoration", "Quality of Life"];
+
+                foreach (string setting in data.inclusive)
+                {
+                    if (setting.IsEnum<Settings>())
+                    {
+                        var theSetting = setting.AsEnum<Settings>();
+                        if (!settingsToRandomize.Contains(theSetting) && !data.exclusive.Contains(setting))
+                        {
+                            settingsToRandomize.Add(theSetting);
+                        }
+                    }
+                    else if (separators.Contains(setting))
+                    {
+                        int start = configSettings.IndexOf(setting);
+                        int end = configSettings.Count;
+                        if (setting != separators[separators.Count - 1])
+                        {
+                            end = configSettings.IndexOf(separators[separators.IndexOf(setting) + 1]);
+                        }
+
+                        if (start > 0 && end > 0)
+                        {
+                            for (int i = start; i < end; i++)
+                            {
+                                if (configSettings[i].IsEnum<Settings>())
+                                {
+                                    var theSetting = configSettings[i].AsEnum<Settings>();
+                                    if (!settingsToRandomize.Contains(theSetting) && !data.exclusive.Contains(setting))
+                                    {
+                                        settingsToRandomize.Add(theSetting);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                foreach (string setting in data.exclusive)
+                {
+                    if (setting.IsEnum<Settings>())
+                    {
+                        var theSetting = setting.AsEnum<Settings>();
+                        if (settingsToRandomize.Contains(theSetting) && !data.inclusive.Contains(setting))
+                        {
+                            settingsToRandomize.Remove(theSetting);
+                        }
+                    }
+                    else if (separators.Contains(setting))
+                    {
+                        int start = configSettings.IndexOf(setting);
+                        int end = configSettings.Count;
+                        if (setting != separators[separators.Count - 1])
+                        {
+                            end = configSettings.IndexOf(separators[separators.IndexOf(setting) + 1]);
+                        }
+
+                        if (start > 0 && end > 0)
+                        {
+                            for (int i = start; i < end; i++)
+                            {
+                                if (configSettings[i].IsEnum<Settings>())
+                                {
+                                    var theSetting = configSettings[i].AsEnum<Settings>();
+                                    if (settingsToRandomize.Contains(theSetting) && !data.inclusive.Contains(setting))
+                                    {
+                                        settingsToRandomize.Remove(theSetting);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else
+            {
+                settingsToRandomize.AddRange(allSettings);
+            }
+
+            float total = 0f;
+            foreach (var setting in allSettings)
+            {
+                /*if (SettingsPresets.VanillaPlusSettings.ContainsKey(setting.GetName()))
+                {
+                    setting.SetProperty(SettingsPresets.VanillaPlusSettings[setting.GetName()]);
                 }
                 else
                 {
-                    allSettings[i].SetProperty(ModHelper.Config.GetSettingsValue<object>(allSettings[i].GetName()));
-                }
+                    setting.SetProperty(ModHelper.Config.GetSettingsValue<object>(setting.GetName()));
+                }*/
 
-                if (SettingsPresets.RandomSettings.ContainsKey(allSettings[i].GetName()))
+                setting.SetProperty(ModHelper.DefaultConfig.GetSettingsValue<object>(setting.GetName()));
+
+                if (settingsToRandomize.Contains(setting) && SettingsPresets.RandomSettings.ContainsKey(setting.GetName()))
                 {
-                    total += SettingsPresets.RandomSettings[allSettings[i].GetName()].GetRandomChance();
+                    total += SettingsPresets.RandomSettings[setting.GetName()].GetRandomChance();
                 }
             }
 
             int iterations = Mathf.FloorToInt(
-                Mathf.Lerp(2f, allSettings.Length - 10, (float)Settings.randomIterations.GetValue()));
+                Mathf.Lerp(Mathf.Min(2f, settingsToRandomize.Count), settingsToRandomize.Count, (float)Settings.randomIterations.GetValue()));
 
             for (int j = 0; j < iterations; j++)
             {
                 float rand = UnityEngine.Random.Range(0f, total);
                 float sum = 0;
-                for (int k = 0; k < allSettings.Length; k++)
+                for (int k = 0; k < settingsToRandomize.Count; k++)
                 {
-                    if (SettingsPresets.RandomSettings.ContainsKey(allSettings[k].GetName()))
+                    if (SettingsPresets.RandomSettings.ContainsKey(settingsToRandomize[k].GetName()))
                     {
-                        sum += SettingsPresets.RandomSettings[allSettings[k].GetName()].GetRandomChance();
+                        sum += SettingsPresets.RandomSettings[settingsToRandomize[k].GetName()].GetRandomChance();
                         if (rand < sum)
                         {
-                            allSettings[k].SetProperty(SettingsPresets.RandomSettings[allSettings[k].GetName()]
+                            settingsToRandomize[k].SetProperty(SettingsPresets.RandomSettings[settingsToRandomize[k].GetName()]
                                 .GetRandomValue(true));
                             break;
                         }
@@ -802,6 +896,23 @@ public class ShipEnhancements : ModBehaviour
                 setting.SetProperty(ModHelper.Config.GetSettingsValue<object>(setting.GetName()));
             }
         }
+    }
+
+    private (string[] inclusive, string[] exclusive) LoadData()
+    {
+        WriteDebugMessage(Path.Combine(ModHelper.Manifest.ModFolderPath, "RandomizerSettings.json"));
+
+        var data = JsonConvert.DeserializeObject<RandomizerSettingsJson>(
+            File.ReadAllText(Path.Combine(ModHelper.Manifest.ModFolderPath, "RandomizerSettings.json"))
+        );
+
+        if (data is null)
+        {
+            LogMessage("Couldn't load RandomizerSettings.json! Did you make a typo?", warning: true);
+            return (null, null);
+        }
+
+        return (data.InclusiveSettings, data.ExclusiveSettings);
     }
 
     private void InitializeAchievements()
@@ -2682,8 +2793,6 @@ public class ShipEnhancements : ModBehaviour
 
     public static void WriteDebugMessage(object msg, bool warning = false, bool error = false)
     {
-        return;
-
         msg ??= "null";
 
         if (warning)

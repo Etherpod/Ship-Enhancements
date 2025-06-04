@@ -1,0 +1,76 @@
+{
+  // Controls which Ship Enhancements settings will be randomized when using the Random preset
+  // Use the setting names as seen in the default-config.json file (not the "title" fields)
+  //
+  // Adding "separator" fields from the default config will automatically include all of the settings under the separator
+  // These include "Disable Ship Parts", "Adjust Ship Functions", "Add Ship Functions", "Decoration", and "Quality of Life"
+  //
+  // "preset", "randomIterations" and "randomDifficulty" will never be randomized
+
+  // Any settings listed here will be randomized
+  // Leave empty to include everything
+  "inclusiveSettings": [
+
+  ],
+
+  // Any settings listed here will not be randomized, and will instead continue to use the value shown in the in-game settings menu
+  "exclusiveSettings": [
+    "Decoration",
+    "Quality of Life"
+  ]
+
+  // Example #1:
+  //
+  // "inclusiveSettings": [
+  //
+  // ]
+  //
+  // "exclusiveSettings": [
+  //   "rustLevel",
+  //   "dirtAccumulationTime",
+  //   "addRepairWrench",
+  //   "repairLimit",
+  //   "gravityDirection",
+  //   "Quality of Life"
+  // ]
+
+  // Example #2:
+  //
+  // "inclusiveSettings": [
+  //   "Add Ship Functions",
+  //   "disableGravityCrystal",
+  //   "disableHeadlights",
+  //   "disableShipLights",
+  //   "enableManualScoutRecall",
+  // ]
+  //
+  // "exclusiveSettings": [
+  //
+  // ]
+
+  // Example #3:
+  //
+  // "inclusiveSettings": [
+  //   "Disable Ship Parts"
+  // ]
+  //
+  // "exclusiveSettings": [
+  //   "disableShipSuit",
+  //   "disableHatch",
+  //   "singleUseTractorBeam",
+  //   "disableMapMarkers",
+  // ]
+
+  // Example #4:
+  //
+  // "inclusiveSettings": [
+  //   "oxygenDrainMultiplier"
+  //   "fuelDrainMultiplier"
+  //   "oxygenTankDrainMultiplier"
+  //   "fuelTankDrainMultiplier"
+  // ]
+  //
+  // "exclusiveSettings": [
+  //   "Adjust Ship Functions"
+  // ]
+}
