@@ -850,16 +850,14 @@ public class ShipEnhancements : ModBehaviour
             float total = 0f;
             foreach (var setting in allSettings)
             {
-                /*if (SettingsPresets.VanillaPlusSettings.ContainsKey(setting.GetName()))
+                if (settingsToRandomize.Contains(setting))
                 {
-                    setting.SetProperty(SettingsPresets.VanillaPlusSettings[setting.GetName()]);
+                    setting.SetProperty(ModHelper.DefaultConfig.GetSettingsValue<object>(setting.GetName()));
                 }
                 else
                 {
                     setting.SetProperty(ModHelper.Config.GetSettingsValue<object>(setting.GetName()));
-                }*/
-
-                setting.SetProperty(ModHelper.DefaultConfig.GetSettingsValue<object>(setting.GetName()));
+                }
 
                 if (settingsToRandomize.Contains(setting) && SettingsPresets.RandomSettings.ContainsKey(setting.GetName()))
                 {
@@ -900,8 +898,6 @@ public class ShipEnhancements : ModBehaviour
 
     private (string[] inclusive, string[] exclusive) LoadData()
     {
-        WriteDebugMessage(Path.Combine(ModHelper.Manifest.ModFolderPath, "RandomizerSettings.json"));
-
         var data = JsonConvert.DeserializeObject<RandomizerSettingsJson>(
             File.ReadAllText(Path.Combine(ModHelper.Manifest.ModFolderPath, "RandomizerSettings.json"))
         );
