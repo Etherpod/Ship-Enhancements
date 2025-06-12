@@ -3172,8 +3172,8 @@ public class ShipEnhancements : ModBehaviour
         {
             selectable.gameObject.GetAddComponent<Menu.MenuSelectHandler>().OnSelectableSelected += newModTab.OnMenuItemSelected;
 
-            // this line keeps throwing an NRE, surely this will fix it
-            if (selectable?.gameObject?.name == newModTab?._lastSelected?.gameObject?.name)
+            if (newModTab._lastSelected != null
+                && selectable.gameObject.name == newModTab._lastSelected.gameObject.name)
             {
                 SelectableAudioPlayer component = newModTab._selectOnActivate.GetComponent<SelectableAudioPlayer>();
                 if (component != null)
@@ -3344,6 +3344,40 @@ public class ShipEnhancements : ModBehaviour
 
     private bool SetCustomTooltip(ref string tooltip, string settingName)
     {
+        if (settingName == "preset")
+        {
+            if (_currentPreset == SettingsPresets.PresetName.VanillaPlus)
+            {
+                tooltip = "Vanilla Plus is the default preset. It turns everything off except for some Quality of Life features.";
+            }
+            else if (_currentPreset == SettingsPresets.PresetName.Minimal)
+            {
+                tooltip = "The Minimal preset disables anything related to the ship that you could consider useful.";
+            }
+            else if (_currentPreset == SettingsPresets.PresetName.Impossible)
+            {
+                tooltip = "The Impossible preset doesn't add or disable anything, but it changes the ship to be as annoying as possible.";
+            }
+            else if (_currentPreset == SettingsPresets.PresetName.NewStuff)
+            {
+                tooltip = "The New Stuff preset gives the ship a ton of new features that it doesn't normally have.";
+            }
+            else if (_currentPreset == SettingsPresets.PresetName.Pandemonium)
+            {
+                tooltip = "The Pandemonium preset just turns everything on. Good luck.";
+            }
+            else if (_currentPreset == SettingsPresets.PresetName.Random)
+            {
+                tooltip = "The Random preset randomizes the mod settings each loop. You can customize the randomizer by using the two sliders below or by using the RandomizerSettings.json file in the mod folder.";
+            }
+            else if (_currentPreset == SettingsPresets.PresetName.Custom)
+            {
+                tooltip = "No preset is selected. Customize your ship to your heart's desire.";
+            }
+
+            return true;
+        }
+
         if (settingName.Substring(settingName.Length - 5, 5) != "Blend")
         {
             return false;

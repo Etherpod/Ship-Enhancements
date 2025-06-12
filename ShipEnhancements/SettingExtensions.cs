@@ -269,6 +269,7 @@ public static class SettingExtensions
         foreach (var (setting, value) in settingValues)
         {
             savedCustomSettings[setting] = Instance.ModHelper.DefaultConfig.GetSettingsValue<object>(setting.GetName());
+            Instance.ModHelper.Config.SetSettingsValue(setting.GetName(), savedCustomSettings[setting]);
         }
     }
 

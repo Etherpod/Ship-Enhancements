@@ -4665,7 +4665,7 @@ public static class PatchClass
             }
         }
 
-        SettingExtensions.ResetCustomSettings();
+        ShipEnhancements.Instance.ModHelper.Events.Unity.FireOnNextUpdate(SettingExtensions.ResetCustomSettings);
     }
     #endregion
 
