@@ -1222,7 +1222,6 @@ public static class SettingsPresets
             ("Annoying", (1f, 1f)),
         ], (0.25f, 0.5f), "None") },
         { "disableHatch", new RandomSettingValue((0.05f, 0.5f)) },
-        { "removeMasiSticker", new RandomSettingValue((0.5f, 0.5f)) },
         { "splitLockOn", new RandomSettingValue((0.5f, 0.5f)) },
     };
 

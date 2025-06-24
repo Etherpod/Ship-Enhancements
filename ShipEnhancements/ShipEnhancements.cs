@@ -248,7 +248,6 @@ public class ShipEnhancements : ModBehaviour
         disableHatch,
         splitLockOn,
         enableColorBlending,
-        removeMasiSticker,
     }
 
     private string[] startupMessages =
@@ -1010,11 +1009,6 @@ public class ShipEnhancements : ModBehaviour
         Texture2D blackTex = (Texture2D)LoadAsset("Assets/ShipEnhancements/Black_d.png");
         chassisRenderer.sharedMaterials[6].SetTexture("_OcclusionMap", blackTex);
         chassisRenderer.sharedMaterials[6].SetFloat("_OcclusionStrength", 0.95f);
-
-        if ((bool)Settings.removeMasiSticker.GetProperty())
-        {
-            chassisRenderer.sharedMaterials[0].SetTexture("_MainTex", (Texture2D)LoadAsset("Assets/ShipEnhancements/Structure_HEA_PlayerShip_SignsDecal_d.png"));
-        }
 
         if ((bool)Settings.enableScoutLauncherComponent.GetProperty()
             || (string)Settings.shipWarpCoreType.GetProperty() == "Component")
