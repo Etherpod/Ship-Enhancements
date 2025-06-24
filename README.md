@@ -177,8 +177,9 @@ In case there are too many settings to deal with, there are some pre-made preset
 - **Pandemonium** - I just turned everything on for this one. Good luck.
 - **Random** - Randomizes all of the options each loop. This preserves the settings you had selected previously, so just switch back to the **Custom** preset when you're done.
     - You can control the Random preset with two sliders: **Randomizer Iterations** and **Randomizer Difficulty**.
-	- **Randomizer Iterations** controls how many of the settings to randomize each loop, ranging from only a handful of settings to nearly all of them.
-	- **Randomizer Difficulty** controls how likely it is for difficult settings to be chosen. Minimum difficulty completely removes all of the difficult settings, like **Disable Ship Suit**.
+	  - **Randomizer Iterations** controls how many of the settings to randomize each loop, ranging from only a handful of settings to nearly all of them.
+	  - **Randomizer Difficulty** controls how likely it is for difficult settings to be chosen. Minimum difficulty completely removes all of the difficult settings, like **Disable Ship Suit**.
+	- You can also control the preset using the **RandomizerSettings.json** file in the mod folder, which lets you choose settings to include/exclude from the randomizer.
 
 ## API
 To use the API, copy the **IShipEnhancements** script from this mod's GitHub repository into your own project, then follow [these instructions](https://owml.outerwildsmods.com/guides/apis.html#consuming-apis) on the OWML docs.
