@@ -18,6 +18,7 @@ public class CockpitErnesto : MonoBehaviour
     private Coroutine _currentComment = null;
     private bool _bigHeadMode = false;
     private bool _showShipFailNextTime = false;
+    private int _riddleConversationCountdown;
 
     private readonly int _questionsCount = 29;
     private readonly float _commentLifetime = 10f;
@@ -90,10 +91,11 @@ public class CockpitErnesto : MonoBehaviour
 
         if (ErnestoModListHandler.GetNumberErnestos() > 0)
         {
-            DialogueConditionManager.SharedInstance.SetConditionState("SE_MULTIPLE_ERNESTOS", true);
+            SetConditionState("SE_MULTIPLE_ERNESTOS", true);
         }
 
         _commentText.gameObject.SetActive(false);
+        _riddleConversationCountdown = Random.Range(5, 10);
     }
 
     private void ResetAvailableQuestions()
@@ -109,7 +111,7 @@ public class CockpitErnesto : MonoBehaviour
             }
         }
 
-        if (DialogueConditionManager.SharedInstance.GetConditionState("SE_ERNESTO_GESWALDO_PART_ONE"))
+        if (GetConditionState("SE_ERNESTO_GESWALDO_PART_ONE"))
         {
             _questions.Add(101);
         }
@@ -140,13 +142,23 @@ public class CockpitErnesto : MonoBehaviour
         }
 
         int num = _availableQuestions[Random.Range(0, _availableQuestions.Count)];
-        DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_OPTION_" + num, true);
+        SetConditionState("SE_ERNESTO_OPTION_" + num, true);
         _availableQuestions.Remove(num);
 
         if (_showShipFailNextTime)
         {
-            DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_SHIP_FAILURE", true);
+            SetConditionState("SE_ERNESTO_SHIP_FAILURE", true);
             _showShipFailNextTime = false;
+        }
+
+        if (_riddleConversationCountdown > 0
+            && !GetConditionState("SE_ERNESTO_AWARE_NEXT_TIME"))
+        {
+            _riddleConversationCountdown--;
+        }
+        else
+        {
+            SetConditionState("SE_ERNESTO_RIDDLE", true);
         }
     }
 
@@ -159,7 +171,7 @@ public class CockpitErnesto : MonoBehaviour
 
         foreach (int i in _questions)
         {
-            DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_OPTION_" + i, false);
+            SetConditionState("SE_ERNESTO_OPTION_" + i, false);
         }
 
         if (_availableQuestions.Count == 0)
@@ -169,33 +181,39 @@ public class CockpitErnesto : MonoBehaviour
 
         if (ErnestoModListHandler.GetNumberErnestos() > 0 && PlayerData.GetPersistentCondition("SE_KNOWS_ERNESTO") 
             && !PlayerData.GetPersistentCondition("SE_ERNESTO_IS_AWARE")
-            && !DialogueConditionManager.SharedInstance.GetConditionState("SE_ERNESTO_AWARE_NEXT_TIME"))
+            && !GetConditionState("SE_ERNESTO_AWARE_NEXT_TIME"))
         {
-            DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_AWARE_NEXT_TIME", true);
+            SetConditionState("SE_ERNESTO_AWARE_NEXT_TIME", true);
         }
-        else if (DialogueConditionManager.SharedInstance.GetConditionState("SE_ERNESTO_AWARE_NEXT_TIME"))
+        else if (GetConditionState("SE_ERNESTO_AWARE_NEXT_TIME"))
         {
             PlayerData.SetPersistentCondition("SE_ERNESTO_BECOME_AWARE", true);
-            DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_AWARE_NEXT_TIME", false);
+            SetConditionState("SE_ERNESTO_AWARE_NEXT_TIME", false);
         }
 
-        if (DialogueConditionManager.SharedInstance.GetConditionState("SE_ERNESTO_GESWALDO_PART_TWO"))
+        if (GetConditionState("SE_ERNESTO_GESWALDO_PART_TWO"))
         {
-            DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_GESWALDO_PART_ONE", false);
-            DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_GESWALDO_PART_TWO", false);
+            SetConditionState("SE_ERNESTO_GESWALDO_PART_ONE", false);
+            SetConditionState("SE_ERNESTO_GESWALDO_PART_TWO", false);
         }
 
-        if (DialogueConditionManager.SharedInstance.GetConditionState("SE_ERNESTO_EXPLODE_SHIP")
+        if (GetConditionState("SE_ERNESTO_EXPLODE_SHIP")
             && !SELocator.GetShipDamageController().IsSystemFailed())
         {
-            DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_EXPLODE_SHIP", false);
+            SetConditionState("SE_ERNESTO_EXPLODE_SHIP", false);
             ErnestoDetectiveController.ItWasExplosion(fromErnesto: true);
             SELocator.GetShipDamageController().Explode();
         }
 
-        if (DialogueConditionManager.SharedInstance.GetConditionState("SE_ERNESTO_SHIP_FAILURE"))
+        if (GetConditionState("SE_ERNESTO_SHIP_FAILURE"))
         {
-            DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_SHIP_FAILURE", false);
+            SetConditionState("SE_ERNESTO_SHIP_FAILURE", false);
+        }
+
+        if (GetConditionState("SE_ERNESTO_DISABLE_RIDDLE"))
+        {
+            SetConditionState("SE_ERNESTO_DISABLE_RIDDLE", false);
+            SetConditionState("SE_ERNESTO_RIDDLE", false);
         }
     }
 
@@ -328,5 +346,23 @@ public class CockpitErnesto : MonoBehaviour
         GlobalMessenger.RemoveListener("ExitFlightConsole", OnExitFlightConsole);
         GlobalMessenger.RemoveListener("EnableBigHeadMode", OnEnableBigHeadMode);
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
+    }
+
+    private bool GetConditionState(string id)
+    {
+        if (DialogueConditionManager.SharedInstance.ConditionExists(id))
+        {
+            return DialogueConditionManager.SharedInstance.GetConditionState(id);
+        }
+
+        return false;
+    }
+
+    private void SetConditionState(string id, bool value)
+    {
+        if (DialogueConditionManager.SharedInstance.ConditionExists(id))
+        {
+            DialogueConditionManager.SharedInstance.SetConditionState(id, value);
+        }
     }
 }

@@ -1064,8 +1064,6 @@
     <Dialogue>
       <Page>Hey, do you feel that?</Page>
     </Dialogue>
-    <SetPersistentCondition>SE_ERNESTO_IS_AWARE</SetPersistentCondition>
-    <DisablePersistentCondition>SE_ERNESTO_BECOME_AWARE</DisablePersistentCondition>
     <DialogueOptionsList>
       <DialogueOption>
         <Text>Feel what?</Text>
@@ -1096,6 +1094,8 @@
       <Page>If too many of them come here it might destroy the fabric of spacetime, but I'm sure it's fine.</Page>
       <Page>If you're that worried, you can come ask me how many Ernestos there are and I'll try and give a clear answer.</Page>
     </Dialogue>
+    <SetPersistentCondition>SE_ERNESTO_IS_AWARE</SetPersistentCondition>
+    <DisablePersistentCondition>SE_ERNESTO_BECOME_AWARE</DisablePersistentCondition>
   </DialogueNode>
   <DialogueNode>
     <Name>SE_Ernesto_Awareness_22</Name>
@@ -1104,6 +1104,8 @@
       <Page>Maybe you can go looking for them. That could be a fun scavenger hunt, and I'm sure they wouldn't mind some company.</Page>
       <Page>Feel free to come ask how many there are while you're out there searching, I'll see if I can give you an answer.</Page>
     </Dialogue>
+    <SetPersistentCondition>SE_ERNESTO_IS_AWARE</SetPersistentCondition>
+    <DisablePersistentCondition>SE_ERNESTO_BECOME_AWARE</DisablePersistentCondition>
   </DialogueNode>
   <DialogueNode>
     <Name>SE_Ernesto_Clock</Name>
@@ -1118,5 +1120,54 @@
     <Dialogue>
       <Page>ERNESTO_PLACEHOLDER</Page>
     </Dialogue>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Riddle</Name>
+    <EntryCondition>SE_KNOWS_ERNESTO</EntryCondition>
+    <EntryCondition>SE_ERNESTO_RIDDLE</EntryCondition>
+    <Dialogue>
+      <Page>You know, back when I was living in Dark Bramble, they actually used to tell us stories.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>...What?</Text>
+        <DialogueTarget>SE_Ernesto_Riddle_1</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Riddle_1</Name>
+    <Dialogue>
+      <Page>All the little anglerfish would gather around a seed like a campfire, and they would all huddle together as one of the adults recited the words to a fable.</Page>
+      <Page>It was really quite sweet, and the adults only ate a couple of the babies each time.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>Why are you telling me this?</Text>
+        <DialogueTarget>SE_Ernesto_Riddle_2</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Riddle_2</Name>
+    <Dialogue>
+      <Page>One of my favorite stories was actually more like a riddle. It's been a while, but I think I still remember how it goes...</Page>
+      <Page><![CDATA[<i>]]>There lies a passage, 'neath rock and stone&#xA;Where no foot hath set, no light hath shone&#xA;hamborgor...<![CDATA[</i>]]></Page>
+      <Page>I hope you liked it, it's been a while since I recited it.</Page>
+    </Dialogue>
+    <DialogueOptionsList>
+      <DialogueOption>
+        <Text>I still don't know why you're telling me this.</Text>
+        <DialogueTarget>SE_Ernesto_Riddle_3</DialogueTarget>
+      </DialogueOption>
+    </DialogueOptionsList>
+  </DialogueNode>
+  <DialogueNode>
+    <Name>SE_Ernesto_Riddle_3</Name>
+    <Dialogue>
+      <Page>Oh, no reason in particular. It was just something on my mind.</Page>
+      <Page>Anyway, have fun flying your ship, or whatever.</Page>
+    </Dialogue>
+    <SetCondition>SE_ERNESTO_DISABLE_RIDDLE</SetCondition>
   </DialogueNode>
 </DialogueTree>

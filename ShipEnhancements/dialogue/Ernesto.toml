@@ -1196,8 +1196,6 @@ page = ["ERNESTO_PLACEHOLDER"]
 [[dialogue_node]]
 name = "SE_Ernesto_Awareness"
 entry_condition = ["SE_KNOWS_ERNESTO", "SE_ERNESTO_BECOME_AWARE"]
-set_persistent_condition = "SE_ERNESTO_IS_AWARE"
-disable_persistent_condition = "SE_ERNESTO_BECOME_AWARE"
 
 [[dialogue_node.dialogue]]
 page = ["Hey, do you feel that?"]
@@ -1230,6 +1228,8 @@ dialogue_target = "SE_Ernesto_Awareness_22"
 
 [[dialogue_node]]
 name = "SE_Ernesto_Awareness_21"
+set_persistent_condition = "SE_ERNESTO_IS_AWARE"
+disable_persistent_condition = "SE_ERNESTO_BECOME_AWARE"
 
 [[dialogue_node.dialogue]]
 page = ["Not sure. My best guess would be that Ernestos from other worlds are crossing over into this one.", "If too many of them come here it might destroy the fabric of spacetime, but I'm sure it's fine.", "If you're that worried, you can come ask me how many Ernestos there are and I'll try and give a clear answer."]
@@ -1238,6 +1238,8 @@ page = ["Not sure. My best guess would be that Ernestos from other worlds are cr
 
 [[dialogue_node]]
 name = "SE_Ernesto_Awareness_22"
+set_persistent_condition = "SE_ERNESTO_IS_AWARE"
+disable_persistent_condition = "SE_ERNESTO_BECOME_AWARE"
 
 [[dialogue_node.dialogue]]
 page = ["No clue. I just know that there's more Ernestos than there should be.", "Maybe you can go looking for them. That could be a fun scavenger hunt, and I'm sure they wouldn't mind some company.", "Feel free to come ask how many there are while you're out there searching, I'll see if I can give you an answer."]
@@ -1257,3 +1259,55 @@ name = "SE_Ernesto_ShipFailure"
 
 [[dialogue_node.dialogue]]
 page = ["ERNESTO_PLACEHOLDER"]
+
+
+
+[[dialogue_node]]
+name = "SE_Ernesto_Riddle"
+entry_condition = ["SE_KNOWS_ERNESTO", "SE_ERNESTO_RIDDLE"]
+
+[[dialogue_node.dialogue]]
+page = ["You know, back when I was living in Dark Bramble, they actually used to tell us stories."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "...What?"
+dialogue_target = "SE_Ernesto_Riddle_1"
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_Riddle_1"
+
+[[dialogue_node.dialogue]]
+page = ["All the little anglerfish would gather around a seed like a campfire, and they would all huddle together as one of the adults recited the words to a fable.", "It was really quite sweet, and the adults only ate a couple of the babies each time."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "That's nice, but why are you telling me this?"
+dialogue_target = "SE_Ernesto_Riddle_2"
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_Riddle_2"
+
+[[dialogue_node.dialogue]]
+page = ["One of my favorite stories was actually more like a riddle. It's been a while, but I think I still remember how it goes...", "<![CDATA[<i>]]>There lies a passage, 'neath rock and stone&#xA;Where no foot hath set, no light hath shone&#xA;hamborgor...<![CDATA[</i>]]>", "I hope you liked it, it's been a while since I recited it."]
+
+[dialogue_node.dialogue_options_list]
+
+[[dialogue_node.dialogue_options_list.dialogue_option]]
+text = "I still don't know why you're telling me this."
+dialogue_target = "SE_Ernesto_Riddle_3"
+
+# --
+
+[[dialogue_node]]
+name = "SE_Ernesto_Riddle_3"
+set_condition = ["SE_ERNESTO_DISABLE_RIDDLE"]
+
+[[dialogue_node.dialogue]]
+page = ["Oh, no reason in particular. It was just something on my mind.", "Anyway, have fun flying your ship, or whatever."]
