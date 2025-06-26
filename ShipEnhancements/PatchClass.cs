@@ -4761,23 +4761,39 @@ public static class PatchClass
     }
     #endregion
 
-    #region TotallyNotSuspiciousPatch
+    #region TotallyNotSuspiciousPatches
     [HarmonyPrefix]
     [HarmonyPatch(typeof(NomaiTranslatorProp), nameof(NomaiTranslatorProp.DisplayTextNode))]
     public static bool HideErnestonianText(NomaiTranslatorProp __instance)
     {
-        return true;
-
         bool flag = __instance._scanBeams[0]._nomaiTextLine != null && __instance._scanBeams[0]._nomaiTextLine
             .GetComponentInParent<NomaiText>() is ErnestonianText;
 
-        if (flag)
+        // check if the translator has the language
+        if (flag && false)
         {
             __instance._textField.text = UITextLibrary.GetString(UITextType.TranslatorUntranslatableWarning);
             return false;
         }
 
         return true;
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(NomaiTranslatorProp), nameof(NomaiTranslatorProp.DisplayTextNode))]
+    public static void ChangeErnestonianUnreadMessage(NomaiTranslatorProp __instance)
+    {
+        // check if the translator has the language
+        if (false) return;
+
+        bool flag = __instance._scanBeams[0]._nomaiTextLine != null && __instance._scanBeams[0]._nomaiTextLine
+            .GetComponentInParent<NomaiText>() is ErnestonianText;
+
+        if (flag && __instance._translationTimeElapsed == 0f
+            && !__instance._nomaiTextComponent.IsTranslated(__instance._currentTextID))
+        {
+            __instance._textField.text = TranslationHandler.GetTranslation("<!> Untranslated Ernestonian writing <!>", TranslationHandler.TextType.UI);
+        }
     }
     #endregion
 }
