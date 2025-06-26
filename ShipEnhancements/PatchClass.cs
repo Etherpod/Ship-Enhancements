@@ -4760,4 +4760,24 @@ public static class PatchClass
         }
     }
     #endregion
+
+    #region TotallyNotSuspiciousPatch
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(NomaiTranslatorProp), nameof(NomaiTranslatorProp.DisplayTextNode))]
+    public static bool HideErnestonianText(NomaiTranslatorProp __instance)
+    {
+        return true;
+
+        bool flag = __instance._scanBeams[0]._nomaiTextLine != null && __instance._scanBeams[0]._nomaiTextLine
+            .GetComponentInParent<NomaiText>() is ErnestonianText;
+
+        if (flag)
+        {
+            __instance._textField.text = UITextLibrary.GetString(UITextType.TranslatorUntranslatableWarning);
+            return false;
+        }
+
+        return true;
+    }
+    #endregion
 }

@@ -1555,6 +1555,15 @@ public class ShipEnhancements : ModBehaviour
                 ernestoObj.GetComponentInChildren<UnityEngine.UI.Text>().font = font;
             }
             DialogueBuilder.FixCustomDialogue(ernestoObj, "ConversationZone");
+
+            var bh = GameObject.Find("BrittleHollow_Body");
+            if (bh != null)
+            {
+                var parent = bh.transform.Find("Sector_BH/Sector_OldSettlement/Fragment OldSettlement 5");
+                var additions = LoadPrefab("Assets/ShipEnhancements/OldSettlementAdditions.prefab");
+                AssetBundleUtilities.ReplaceShaders(additions);
+                Instantiate(additions, parent);
+            }
         }
         if ((int)(float)Settings.repairLimit.GetProperty() >= 0)
         {
