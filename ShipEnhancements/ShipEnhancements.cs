@@ -2957,6 +2957,11 @@ public class ShipEnhancements : ModBehaviour
         return range.ToArray();
     }
 
+    private void OnValueChanged(string name)
+    {
+
+    }
+
     public void RedrawSettingsMenu(bool decoration = false)
     {
         MenuManager menuManager = StartupPopupPatches.menuManager;
@@ -3068,6 +3073,7 @@ public class ShipEnhancements : ModBehaviour
                         ModHelper.Config.SetSettingsValue(name, newValue);
                         ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
                         Configure(ModHelper.Config);
+                        OnValueChanged(name);
                     };
                     break;
                 case SettingType.TOGGLE:
@@ -3081,6 +3087,7 @@ public class ShipEnhancements : ModBehaviour
                         ModHelper.Config.SetSettingsValue(name, newValue);
                         ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
                         Configure(ModHelper.Config);
+                        OnValueChanged(name);
                     };
                     break;
                 case SettingType.SELECTOR:
@@ -3094,6 +3101,7 @@ public class ShipEnhancements : ModBehaviour
                         ModHelper.Config.SetSettingsValue(name, newSelection);
                         ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
                         Configure(ModHelper.Config);
+                        OnValueChanged(name);
                     };
                     break;
                 case SettingType.SEPARATOR:
@@ -3112,6 +3120,7 @@ public class ShipEnhancements : ModBehaviour
                         ModHelper.Config.SetSettingsValue(name, newValue);
                         ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
                         Configure(ModHelper.Config);
+                        OnValueChanged(name);
                     };
                     break;
                 case SettingType.TEXT:
@@ -3125,6 +3134,7 @@ public class ShipEnhancements : ModBehaviour
                         ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
                         Configure(ModHelper.Config);
                         textInput.SetText(newValue);
+                        OnValueChanged(name);
                     };
                     break;
                 case SettingType.NUMBER:
@@ -3140,6 +3150,7 @@ public class ShipEnhancements : ModBehaviour
                             ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
                             Configure(ModHelper.Config);
                             numberInput.SetText(newValue.ToString());
+                            OnValueChanged(name);
                         }
                     };
                     break;

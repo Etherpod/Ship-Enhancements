@@ -205,16 +205,15 @@ public class CockpitErnesto : MonoBehaviour
             SELocator.GetShipDamageController().Explode();
         }
 
-        if (GetConditionState("SE_ERNESTO_SHIP_FAILURE"))
-        {
-            SetConditionState("SE_ERNESTO_SHIP_FAILURE", false);
-        }
-
         if (GetConditionState("SE_ERNESTO_DISABLE_RIDDLE"))
         {
             SetConditionState("SE_ERNESTO_DISABLE_RIDDLE", false);
             SetConditionState("SE_ERNESTO_RIDDLE", false);
         }
+
+        SetConditionState("SE_ERNESTO_SHIP_FAILURE", false);
+        SetConditionState("SE_ASKED_ERNESTONIAN", false);
+        SetConditionState("SE_ASKED_POEM", false);
     }
 
     public void MakeComment(string comment)
