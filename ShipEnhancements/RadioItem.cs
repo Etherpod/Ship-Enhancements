@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using ShipEnhancements.Models.Json;
 
 namespace ShipEnhancements;
 
@@ -139,24 +141,26 @@ public class RadioItem : OWItem
 
     private void InitializeAudioDict()
     {
-        _codesToAudio = new()
+        TextAsset file = (TextAsset)ShipEnhancements.LoadAsset("Assets/ShipEnhancements/TextAsset/RadioCodes.json");
+
+        var data = JsonConvert.DeserializeObject<List<RadioCodeJson>>(file.text);
+
+        if (data is null)
         {
-            { "2441", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_LostSignal.mp3") },
-            { "4554", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_Chadvelers.mp3") },
-            { "1513", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_NoTimeForCaution.mp3") },
-            { "3363", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_LastDreamOfHome.mp3") },
-            { "5416", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_HearthsShadow.mp3") },
-            { "6621", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_OlderThanTheUniverse.mp3") },
-            { "1524", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_TheSpiritOfWater.mp3") },
-            { "2425", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_ElegyForTheRings.mp3") },
-            { "3156", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_RiversEndTimes.mp3") },
-            { "4241", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_NomaiMeditation.mp3") },
-            { "6152", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_Doom.mp3") },
-            { "5511", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_CampfireSong.mp3") },
-            { "1122", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_MainTitle.mp3") },
-            { "1133", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_OuterWilds.mp3") },
-            { "1144", ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_TimberHearth.mp3") },
-        };
+            ShipEnhancements.LogMessage("Couldn't load RadioCodes.json!", warning: true);
+            return;
+        }
+
+        _codesToAudio = new();
+
+        foreach (var code in data)
+        {
+            AudioClip clip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/" + code.Path);
+            if (clip != null && !_codesToAudio.ContainsKey(code.Code.ToString()))
+            {
+                _codesToAudio.Add(code.Code.ToString(), clip);
+            }
+        }
     }
 
     private void Start()
