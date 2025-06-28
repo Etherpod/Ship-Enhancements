@@ -211,6 +211,12 @@ public class CockpitErnesto : MonoBehaviour
             SetConditionState("SE_ERNESTO_RIDDLE", false);
         }
 
+        if (PlayerData.GetPersistentCondition("SE_FOUND_ERNESTONIAN_TEXT")
+            && PlayerData.GetPersistentCondition("SE_HAS_ERNESTONIAN_TRANSLATOR"))
+        {
+            PlayerData.SetPersistentCondition("SE_FOUND_ERNESTONIAN_TEXT", false);
+        }
+
         SetConditionState("SE_ERNESTO_SHIP_FAILURE", false);
         SetConditionState("SE_ASKED_ERNESTONIAN", false);
         SetConditionState("SE_ASKED_POEM", false);

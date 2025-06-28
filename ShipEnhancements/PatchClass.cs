@@ -4772,6 +4772,12 @@ public static class PatchClass
         if (flag && !PlayerData.GetPersistentCondition("SE_HAS_ERNESTONIAN_TRANSLATOR"))
         {
             __instance._textField.text = UITextLibrary.GetString(UITextType.TranslatorUntranslatableWarning);
+
+            if (!PlayerData.GetPersistentCondition("SE_FOUND_ERNESTONIAN_TEXT"))
+            {
+                PlayerData.SetPersistentCondition("SE_FOUND_ERNESTONIAN_TEXT", true);
+            }
+
             return false;
         }
 
@@ -4782,7 +4788,10 @@ public static class PatchClass
     [HarmonyPatch(typeof(NomaiTranslatorProp), nameof(NomaiTranslatorProp.DisplayTextNode))]
     public static void ChangeErnestonianUnreadMessage(NomaiTranslatorProp __instance)
     {
-        if (!PlayerData.GetPersistentCondition("SE_HAS_ERNESTONIAN_TRANSLATOR")) return;
+        if (!PlayerData.GetPersistentCondition("SE_HAS_ERNESTONIAN_TRANSLATOR"))
+        {
+            return;
+        }
 
         bool flag = __instance._scanBeams[0]._nomaiTextLine != null && __instance._scanBeams[0]._nomaiTextLine
             .GetComponentInParent<NomaiText>() is ErnestonianText;

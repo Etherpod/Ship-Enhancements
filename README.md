@@ -165,7 +165,6 @@ Some bug fixes or small things that it wouldn't make sense to play without.
 - **Split Ship Lock-on**: (Disabled by default) Separates your ship lock-on target and your suit lock-on target. If you lock onto something while piloting the ship, the ship will continue using that as the target if you exit the seat and lock onto something else.
 - **Always Allow Map Lock-on**: Lets you use the lock-on feature on the map while you're standing on a planet.
 - **Fix Ship Thrust Indicator**: Fixes a bug where the ship's thrust indicator turns off when you stop piloting the ship.
-- **Remove Masi Sticker**: Removes a sticker of Masi Oka that was accidentally added to the ship in a recent Outer Wilds update. If you don't see a difference when turning this off and restarting the game, it was probably fixed.
 
 ## Presets
 In case there are too many settings to deal with, there are some pre-made presets for you to use. The settings can still be meddled with after choosing one.
