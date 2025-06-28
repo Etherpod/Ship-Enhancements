@@ -128,7 +128,8 @@ public class CockpitErnesto : MonoBehaviour
         {
             _questions.Add(202);
         }
-        if (PlayerData.GetPersistentCondition("SE_ERNESTO_TOLD_RIDDLE"))
+        if (PlayerData.GetPersistentCondition("SE_ERNESTO_TOLD_RIDDLE")
+            && !PlayerData.GetPersistentCondition("SE_HAS_ERNESTONIAN_TRANSLATOR"))
         {
             _questions.Add(203);
         }

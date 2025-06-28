@@ -2969,7 +2969,7 @@ public class ShipEnhancements : ModBehaviour
 
     private void OnValueChanged(string name)
     {
-
+        // Use later for more advanced settings menu reloading
     }
 
     public void RedrawSettingsMenu(bool decoration = false)
