@@ -35,23 +35,17 @@ public class RadioItem : OWItem
     [SerializeField]
     private Transform[] _knobTransforms;
     [SerializeField]
-    private Transform _knobStartRot;
-    [SerializeField]
-    private Transform _knobEndRot;
+    private float _knobRotationDiff;
     [SerializeField]
     private RotateTransform[] _rotateEffects;
     [SerializeField]
     private Transform _powerSwitchTransform;
     [SerializeField]
-    private Transform _switchStartRot;
-    [SerializeField]
-    private Transform _switchEndRot;
+    private float _switchRotationDiff;
     [SerializeField]
     private Transform _volumeNeedleTransform;
     [SerializeField]
-    private Transform _needleStartRot;
-    [SerializeField]
-    private Transform _needleEndRot;
+    private float _needleRotationDiff;
     [SerializeField]
     private OWEmissiveRenderer _screenRenderer;
     [SerializeField]
@@ -86,17 +80,21 @@ public class RadioItem : OWItem
     private AudioHighPassFilter _highPassFilter;
     private AudioReverbFilter _reverbFilter;
 
+    private float _initialKnobRotation;
+
     private bool _moveNeedle = false;
     private float _needleT = 0f;
-    private Quaternion _initialNeedleRotation;
-    private Quaternion _targetNeedleRotation;
+    private float _initialNeedleRotation;
+    private float _needleStartRot;
+    private float _needleTargetRot;
     private float _needleRotateSpeed = 3f;
     private int _volumeSteps = 8;
 
     private bool _moveSwitch = false;
     private float _switchT = 0f;
-    private Quaternion _initialSwitchRotation;
-    private Quaternion _targetSwitchRotation;
+    private float _initialSwitchRotation;
+    private float _switchStartRot;
+    private float _switchTargetRot;
     private float _switchRotateSpeed = 7f;
 
     private readonly int _minFrequency = 1;
@@ -155,8 +153,11 @@ public class RadioItem : OWItem
 
         foreach (var code in data)
         {
+            string num = code.Code.ToString();
+            if (_codesToAudio.ContainsKey(num)) continue;
+
             AudioClip clip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/" + code.Path);
-            if (clip != null && !_codesToAudio.ContainsKey(code.Code.ToString()))
+            if (clip != null)
             {
                 _codesToAudio.Add(code.Code.ToString(), clip);
             }
@@ -191,12 +192,7 @@ public class RadioItem : OWItem
         {
             rotator.enabled = false;
         }
-        foreach (Transform knob in _knobTransforms)
-        {
-            knob.rotation = _knobStartRot.rotation;
-        }
-        _powerSwitchTransform.rotation = _switchStartRot.rotation;
-        _volumeNeedleTransform.rotation = _needleStartRot.rotation;
+        _initialKnobRotation = _knobTransforms[0].localRotation.z;
     }
 
     private void Update()
@@ -263,11 +259,7 @@ public class RadioItem : OWItem
                 || OWInput.IsNewlyPressed(InputLibrary.right2, InputMode.All))
             {
                 _codeLabels[_currentCodeIndex].color = _deselectColor;
-                _currentCodeIndex++;
-                if (_currentCodeIndex >= _codes.Length)
-                {
-                    _currentCodeIndex = 0;
-                }
+                _currentCodeIndex = (_currentCodeIndex + 1 + _codes.Length) % _codes.Length;
                 _codeLabels[_currentCodeIndex].color = _selectColor;
 
                 _playerExternalSource.PlayOneShot(AudioType.Menu_UpDown, 0.5f);
@@ -276,11 +268,7 @@ public class RadioItem : OWItem
                 || OWInput.IsNewlyPressed(InputLibrary.left2, InputMode.All))
             {
                 _codeLabels[_currentCodeIndex].color = _deselectColor;
-                _currentCodeIndex--;
-                if (_currentCodeIndex < 0)
-                {
-                    _currentCodeIndex = _codes.Length - 1;
-                }
+                _currentCodeIndex = (_currentCodeIndex - 1 + _codes.Length) % _codes.Length;
                 _codeLabels[_currentCodeIndex].color = _selectColor;
 
                 _playerExternalSource.PlayOneShot(AudioType.Menu_UpDown, 0.5f);
@@ -288,15 +276,14 @@ public class RadioItem : OWItem
             else if (OWInput.IsNewlyPressed(InputLibrary.up, InputMode.All)
                 || OWInput.IsNewlyPressed(InputLibrary.up2, InputMode.All))
             {
-                _codes[_currentCodeIndex]++;
-                if (_codes[_currentCodeIndex] > _maxFrequency)
-                {
-                    _codes[_currentCodeIndex] = _minFrequency;
-                }
+                int range = _maxFrequency - _minFrequency + 1;
+                _codes[_currentCodeIndex] = (_codes[_currentCodeIndex] + 1 - _minFrequency + range)
+                    % range + _minFrequency;
                 _codeLabels[_currentCodeIndex].text = _codes[_currentCodeIndex].ToString();
 
-                Vector3 euler = Vector3.Lerp(_knobStartRot.eulerAngles, _knobEndRot.eulerAngles, (_codes[_currentCodeIndex] - 1) / 5f);
-                _knobTransforms[_currentCodeIndex].rotation = Quaternion.Euler(euler);
+                var euler = _knobTransforms[_currentCodeIndex].localEulerAngles;
+                euler.z = Mathf.Lerp(_initialKnobRotation, _initialKnobRotation + _knobRotationDiff, (_codes[_currentCodeIndex] - 1) / 5f);
+                _knobTransforms[_currentCodeIndex].localRotation = Quaternion.Euler(euler);
 
                 if (_playingAudio)
                 {
@@ -329,15 +316,14 @@ public class RadioItem : OWItem
             else if (OWInput.IsNewlyPressed(InputLibrary.down, InputMode.All)
                 || OWInput.IsNewlyPressed(InputLibrary.down2, InputMode.All))
             {
-                _codes[_currentCodeIndex]--;
-                if (_codes[_currentCodeIndex] < _minFrequency)
-                {
-                    _codes[_currentCodeIndex] = _maxFrequency;
-                }
+                int range = _maxFrequency - _minFrequency + 1;
+                _codes[_currentCodeIndex] = (_codes[_currentCodeIndex] - 1 - _minFrequency + range) 
+                    % range + _minFrequency;
                 _codeLabels[_currentCodeIndex].text = _codes[_currentCodeIndex].ToString();
 
-                Vector3 euler = Vector3.Lerp(_knobStartRot.eulerAngles, _knobEndRot.eulerAngles, (_codes[_currentCodeIndex] - 1) / 5f);
-                _knobTransforms[_currentCodeIndex].rotation = Quaternion.Euler(euler);
+                var euler = _knobTransforms[_currentCodeIndex].localEulerAngles;
+                euler.z = Mathf.Lerp(_initialKnobRotation, _initialKnobRotation + _knobRotationDiff, (_codes[_currentCodeIndex] - 1) / 5f);
+                _knobTransforms[_currentCodeIndex].localRotation = Quaternion.Euler(euler);
 
                 if (_playingAudio)
                 {
@@ -402,13 +388,13 @@ public class RadioItem : OWItem
                         rotator.enabled = true;
                     }
 
-                    _initialSwitchRotation = _powerSwitchTransform.rotation;
-                    _targetSwitchRotation = _switchEndRot.rotation;
+                    _switchStartRot = _powerSwitchTransform.localEulerAngles.y;
+                    _switchTargetRot = _initialSwitchRotation + _switchRotationDiff;
                     _switchT = 0f;
                     _moveSwitch = true;
 
-                    _initialNeedleRotation = _volumeNeedleTransform.rotation;
-                    _targetNeedleRotation = Quaternion.Lerp(_needleStartRot.rotation, _needleEndRot.rotation, _currentVolume);
+                    _needleStartRot = _volumeNeedleTransform.localEulerAngles.y;
+                    _needleTargetRot = Mathf.Lerp(_initialNeedleRotation, _initialNeedleRotation + _needleRotationDiff, _currentVolume);
                     _needleT = 0f;
                     _moveNeedle = true;
 
@@ -436,13 +422,13 @@ public class RadioItem : OWItem
                         rotator.enabled = false;
                     }
 
-                    _initialSwitchRotation = _powerSwitchTransform.rotation;
-                    _targetSwitchRotation = _switchStartRot.rotation;
+                    _switchStartRot = _powerSwitchTransform.localEulerAngles.y;
+                    _switchTargetRot = _initialSwitchRotation;
                     _switchT = 0f;
                     _moveSwitch = true;
 
-                    _initialNeedleRotation = _volumeNeedleTransform.rotation;
-                    _targetNeedleRotation = _needleStartRot.rotation;
+                    _needleStartRot = _volumeNeedleTransform.localEulerAngles.y;
+                    _needleTargetRot = _initialNeedleRotation;
                     _needleT = 0f;
                     _moveNeedle = true;
 
@@ -477,8 +463,8 @@ public class RadioItem : OWItem
 
                 if (_powerOn)
                 {
-                    _initialNeedleRotation = _volumeNeedleTransform.rotation;
-                    _targetNeedleRotation = Quaternion.Lerp(_needleStartRot.rotation, _needleEndRot.rotation, _currentVolume);
+                    _needleStartRot = _volumeNeedleTransform.localEulerAngles.y;
+                    _needleTargetRot = Mathf.Lerp(_initialNeedleRotation, _initialNeedleRotation + _needleRotationDiff, _currentVolume);
                     _needleT = 0f;
                     _moveNeedle = true;
                 }
@@ -498,8 +484,8 @@ public class RadioItem : OWItem
 
                 if (_powerOn)
                 {
-                    _initialNeedleRotation = _volumeNeedleTransform.rotation;
-                    _targetNeedleRotation = Quaternion.Lerp(_needleStartRot.rotation, _needleEndRot.rotation, _currentVolume);
+                    _needleStartRot = _volumeNeedleTransform.localEulerAngles.y;
+                    _needleTargetRot = Mathf.Lerp(_initialNeedleRotation, _initialNeedleRotation + _needleRotationDiff, _currentVolume);
                     _needleT = 0f;
                     _moveNeedle = true;
                 }
@@ -516,7 +502,9 @@ public class RadioItem : OWItem
 
         if (_moveNeedle)
         {
-            _volumeNeedleTransform.rotation = Quaternion.Lerp(_initialNeedleRotation, _targetNeedleRotation, _needleT);
+            Vector3 euler = _volumeNeedleTransform.localEulerAngles;
+            euler.y = Mathf.Lerp(_needleStartRot, _needleTargetRot, _needleT);
+            _volumeNeedleTransform.localRotation = Quaternion.Euler(euler);
             _needleT += Time.deltaTime * _needleRotateSpeed;
             if (_needleT >= 1f)
             {
@@ -525,7 +513,9 @@ public class RadioItem : OWItem
         }
         if (_moveSwitch)
         {
-            _powerSwitchTransform.rotation = Quaternion.Lerp(_initialSwitchRotation, _targetSwitchRotation, _switchT);
+            Vector3 euler = _powerSwitchTransform.localEulerAngles;
+            euler.y = Mathf.SmoothStep(_switchStartRot, _switchTargetRot, _switchT);
+            _powerSwitchTransform.localRotation = Quaternion.Euler(euler);
             _switchT += Time.deltaTime * _switchRotateSpeed;
             if (_switchT >= 1f)
             {
@@ -624,13 +614,13 @@ public class RadioItem : OWItem
                 rotator.enabled = true;
             }
 
-            _initialSwitchRotation = _powerSwitchTransform.rotation;
-            _targetSwitchRotation = _switchEndRot.rotation;
+            _switchStartRot = _powerSwitchTransform.localEulerAngles.y;
+            _switchTargetRot = _initialSwitchRotation + _switchRotationDiff;
             _switchT = 0f;
             _moveSwitch = true;
 
-            _initialNeedleRotation = _volumeNeedleTransform.rotation;
-            _targetNeedleRotation = Quaternion.Lerp(_needleStartRot.rotation, _needleEndRot.rotation, _currentVolume);
+            _needleStartRot = _volumeNeedleTransform.localEulerAngles.y;
+            _needleTargetRot = Mathf.Lerp(_initialNeedleRotation, _initialNeedleRotation + _needleRotationDiff, _currentVolume);
             _needleT = 0f;
             _moveNeedle = true;
         }
@@ -654,13 +644,13 @@ public class RadioItem : OWItem
                 rotator.enabled = false;
             }
 
-            _initialSwitchRotation = _powerSwitchTransform.rotation;
-            _targetSwitchRotation = _switchStartRot.rotation;
+            _switchStartRot = _powerSwitchTransform.localEulerAngles.y;
+            _switchTargetRot = _initialSwitchRotation;
             _switchT = 0f;
             _moveSwitch = true;
 
-            _initialNeedleRotation = _volumeNeedleTransform.rotation;
-            _targetNeedleRotation = _needleStartRot.rotation;
+            _needleStartRot = _volumeNeedleTransform.localEulerAngles.y;
+            _needleTargetRot = _initialNeedleRotation;
             _needleT = 0f;
             _moveNeedle = true;
         }
@@ -673,8 +663,9 @@ public class RadioItem : OWItem
             _codes[i] = newCodes[i];
             _codeLabels[i].text = _codes[i].ToString();
 
-            Vector3 euler = Vector3.Lerp(_knobStartRot.eulerAngles, _knobEndRot.eulerAngles, (_codes[i] - 1) / 5f);
-            _knobTransforms[i].rotation = Quaternion.Euler(euler);
+            var euler = _knobTransforms[i].localEulerAngles;
+            euler.y = Mathf.Lerp(_initialKnobRotation, _initialKnobRotation + _knobRotationDiff, (_codes[i] - 1) / 5f);
+            _knobTransforms[i].localRotation = Quaternion.Euler(euler);
         }
 
         if (_playingAudio)
@@ -725,8 +716,8 @@ public class RadioItem : OWItem
 
         if (_powerOn)
         {
-            _initialNeedleRotation = _volumeNeedleTransform.rotation;
-            _targetNeedleRotation = Quaternion.Lerp(_needleStartRot.rotation, _needleEndRot.rotation, _currentVolume);
+            _needleStartRot = _volumeNeedleTransform.localEulerAngles.y;
+            _needleTargetRot = Mathf.Lerp(_initialNeedleRotation, _initialNeedleRotation + _needleRotationDiff, _currentVolume);
             _needleT = 0f;
             _moveNeedle = true;
         }
