@@ -2213,6 +2213,16 @@ public class ShipEnhancements : ModBehaviour
             Instantiate(zone, sun.transform.Find("Sector_SUN/Volumes_SUN/SupernovaVolume"));
         }
 
+        if ((bool)Settings.addErnesto.GetProperty())
+        {
+            GameObject bh = GameObject.Find("BrittleHollow_Body");
+            if (bh != null)
+            {
+                GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_0187.prefab");
+                Instantiate(zone, bh.transform.Find("Sector_BH/Sector_OldSettlement/Fragment OldSettlement 5/Core_OldSettlement 5"));
+            } 
+        }
+
         if (NHAPI != null)
         {
             NHAPI.GetBodyLoadedEvent().AddListener(OnNHBodyLoaded);
