@@ -128,6 +128,10 @@ public class CockpitErnesto : MonoBehaviour
         {
             _questions.Add(202);
         }
+        if (PlayerData.GetPersistentCondition("SE_ERNESTO_TOLD_RIDDLE"))
+        {
+            _questions.Add(203);
+        }
 
         _availableQuestions.AddRange(_questions);
     }
@@ -151,14 +155,17 @@ public class CockpitErnesto : MonoBehaviour
             _showShipFailNextTime = false;
         }
 
-        if (_riddleConversationCountdown > 0
-            && !GetConditionState("SE_ERNESTO_AWARE_NEXT_TIME"))
+        if (!GetConditionState("SE_ERNESTO_AWARE_NEXT_TIME")
+            && !PlayerData.GetPersistentCondition("SE_ERNESTO_TOLD_RIDDLE"))
         {
-            _riddleConversationCountdown--;
-        }
-        else
-        {
-            SetConditionState("SE_ERNESTO_RIDDLE", true);
+            if (_riddleConversationCountdown > 0)
+            {
+                _riddleConversationCountdown--;
+            }
+            else
+            {
+                SetConditionState("SE_ERNESTO_RIDDLE", true);
+            }
         }
     }
 
@@ -197,17 +204,31 @@ public class CockpitErnesto : MonoBehaviour
             SetConditionState("SE_ERNESTO_GESWALDO_PART_TWO", false);
         }
 
-        if (GetConditionState("SE_ERNESTO_EXPLODE_SHIP")
-            && !SELocator.GetShipDamageController().IsSystemFailed())
+        if (GetConditionState("SE_ERNESTO_EXPLODE_SHIP"))
         {
             SetConditionState("SE_ERNESTO_EXPLODE_SHIP", false);
-            ErnestoDetectiveController.ItWasExplosion(fromErnesto: true);
-            SELocator.GetShipDamageController().Explode();
+            if (!SELocator.GetShipDamageController().IsSystemFailed())
+            {
+                if (GetConditionState("SE_ERNESTO_RIDDLE_EXPLOSION"))
+                {
+                    ErnestoDetectiveController.ItWasExplosion(fromRiddle: true);
+                }
+                else
+                {
+                    ErnestoDetectiveController.ItWasExplosion(fromErnesto: true);
+                }
+                
+                SELocator.GetShipDamageController().Explode();
+                SetConditionState("SE_ERNESTO_RIDDLE_EXPLOSION", false);
+            }
+            else
+            {
+                Locator.GetDeathManager().KillPlayer(DeathType.Lava);
+            }
         }
 
-        if (GetConditionState("SE_ERNESTO_DISABLE_RIDDLE"))
+        if (PlayerData.GetPersistentCondition("SE_ERNESTO_TOLD_RIDDLE"))
         {
-            SetConditionState("SE_ERNESTO_DISABLE_RIDDLE", false);
             SetConditionState("SE_ERNESTO_RIDDLE", false);
         }
 

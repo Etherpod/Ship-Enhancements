@@ -98,7 +98,7 @@ public static class ErnestoDetectiveController
     }
 
     public static void ItWasExplosion(bool fromReactor = false, bool fromSpeed = false, bool fromOverdrive = false, bool sabotage = false,
-        bool fromTorque = false, bool fromFluid = false, bool fromErnesto = false, bool fromTemperature = false)
+        bool fromTorque = false, bool fromFluid = false, bool fromErnesto = false, bool fromRiddle = false, bool fromTemperature = false)
     {
         if (_reachedConclusion) return;
 
@@ -171,6 +171,10 @@ public static class ErnestoDetectiveController
         else if (fromErnesto)
         {
             _hypothesis = "You rolled a 1. You said so yourself.";
+        }
+        else if (fromRiddle)
+        {
+            _hypothesis = "You had it coming.";
         }
         else if (fromTemperature)
         {
