@@ -228,7 +228,7 @@ public class ShipEnhancements : ModBehaviour
         extraEjectButtons,
         preventSystemFailure,
         addShipCurtain,
-        addRepairWrench,
+        repairWrenchType,
         funnySounds,
         alwaysAllowLockOn,
         disableShipMedkit,
@@ -1582,27 +1582,17 @@ public class ShipEnhancements : ModBehaviour
             AssetBundleUtilities.ReplaceShaders(curtainObj);
             Instantiate(curtainObj, SELocator.GetShipTransform().Find("Module_Cabin/Geo_Cabin/Cabin_Geometry/Cabin_Interior"));
         }
-        if ((bool)addRepairWrench.GetProperty())
+        if ((string)repairWrenchType.GetProperty() != "Disabled")
         {
             GameObject wrenchSocketObj = LoadPrefab("Assets/ShipEnhancements/RepairWrenchSocket.prefab");
             RepairWrenchSocket wrenchSocket = Instantiate(wrenchSocketObj,
                 SELocator.GetShipTransform().Find("Module_Cockpit")).GetComponent<RepairWrenchSocket>();
-
-            /*GameObject wrenchObj = LoadPrefab("Assets/ShipEnhancements/RepairWrenchItem.prefab");
-            AssetBundleUtilities.ReplaceShaders(wrenchObj);
-            RepairWrenchItem wrench = Instantiate(wrenchObj).GetComponent<RepairWrenchItem>();
-            wrenchSocket.PlaceIntoSocket(wrench);*/
         }
         if ((bool)addRadio.GetProperty())
         {
             GameObject radioSocketObj = LoadPrefab("Assets/ShipEnhancements/RadioItemSocket.prefab");
             RadioItemSocket radioSocket = Instantiate(radioSocketObj,
                 SELocator.GetShipTransform().Find("Module_Cockpit")).GetComponent<RadioItemSocket>();
-
-            /*GameObject radioObj = LoadPrefab("Assets/ShipEnhancements/RadioItem.prefab");
-            AssetBundleUtilities.ReplaceShaders(radioObj);
-            RadioItem radio = Instantiate(radioObj).GetComponent<RadioItem>();
-            radioSocket.PlaceIntoSocket(radio);*/
 
             GameObject codeNotesObj = LoadPrefab("Assets/ShipEnhancements/CodeNotes.prefab");
             AssetBundleUtilities.ReplaceShaders(codeNotesObj);
@@ -2989,6 +2979,11 @@ public class ShipEnhancements : ModBehaviour
             }
             return;
         }
+
+        if (name == "repairWrenchType" && !newValue.Equals(oldValue))
+        {
+            RedrawSettingsMenu("repairWrenchType", "repairWrenchType");
+        }
     }
 
     public void RedrawSettingsMenu(string startSetting = "", string endSetting = "", string startDestroySetting = "", string endDestroySetting = "")
@@ -3572,6 +3567,19 @@ public class ShipEnhancements : ModBehaviour
                 tooltip = "No preset is selected. Customize your ship to your heart's desire.";
             }
 
+            return true;
+        }
+
+        if (settingName == "repairWrenchType" && (string)repairWrenchType.GetValue() != "Disabled")
+        {
+            if ((string)repairWrenchType.GetValue() == "Enabled")
+            {
+                tooltip = "Adds a repair wrench to the cockpit. Holding it will speed up ship repairs.";
+            }
+            else
+            {
+                tooltip = "Adds a repair wrench to the cockpit. You need to be holding the wrench to make repairs to the ship.";
+            }
             return true;
         }
 

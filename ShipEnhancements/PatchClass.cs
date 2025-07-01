@@ -3210,7 +3210,7 @@ public static class PatchClass
     {
         if ((float)repairTimeMultiplier.GetProperty() > 0f)
         {
-            return true;
+            return ApplyComponentWrenchMultiplier(__instance);
         }
 
         if (!__instance._damaged)
@@ -3238,7 +3238,7 @@ public static class PatchClass
             return false;
         }
 
-        return true;
+        return ApplyComponentWrenchMultiplier(__instance);
     }
 
     [HarmonyPrefix]
@@ -3247,7 +3247,7 @@ public static class PatchClass
     {
         if ((float)repairTimeMultiplier.GetProperty() > 0f)
         {
-            return true;
+            return ApplyHullWrenchMultiplier(__instance);
         }
 
         if (!__instance._damaged)
@@ -3338,12 +3338,70 @@ public static class PatchClass
             return false;
         }
 
-        return true;
+        return ApplyHullWrenchMultiplier(__instance);
     }
 
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(HullDamageEffect), nameof(HullDamageEffect.SetEffectBlend))]
     public static void HullDamageEffect_SetEffectBlend(HullDamageEffect instance, float blend) { }
+
+    public static bool ApplyComponentWrenchMultiplier(ShipComponent __instance)
+    {
+        if ((string)repairWrenchType.GetProperty() != "Enabled"
+            || Locator.GetToolModeSwapper().GetItemCarryTool().GetHeldItemType() 
+            != ShipEnhancements.Instance.RepairWrenchType) return true;
+
+        if (!__instance._damaged)
+        {
+            return false;
+        }
+        __instance._repairFraction = Mathf.Clamp01(__instance._repairFraction + Time.deltaTime / (__instance._repairTime / 3));
+        if (__instance._repairFraction >= 1f)
+        {
+            __instance.SetDamaged(false);
+        }
+        if (__instance._damageEffect)
+        {
+            __instance._damageEffect.SetEffectBlend(1f - __instance._repairFraction);
+        }
+
+        return false;
+    }
+
+    public static bool ApplyHullWrenchMultiplier(ShipHull __instance)
+    {
+        if ((string)repairWrenchType.GetProperty() != "Enabled"
+            || Locator.GetToolModeSwapper().GetItemCarryTool().GetHeldItemType()
+            != ShipEnhancements.Instance.RepairWrenchType) return true;
+
+        if (!__instance._damaged)
+        {
+            return false;
+        }
+
+        __instance._integrity = Mathf.Min(__instance._integrity + Time.deltaTime / (__instance._repairTime / 3), 1f);
+
+        if (__instance._integrity >= 1f)
+        {
+            __instance._damaged = false;
+            var repairDelegate = (MulticastDelegate)typeof(ShipHull).GetField("OnRepaired", BindingFlags.Instance
+                | BindingFlags.NonPublic | BindingFlags.Public).GetValue(__instance);
+            if (repairDelegate != null)
+            {
+                foreach (var handler in repairDelegate.GetInvocationList())
+                {
+                    handler.Method.Invoke(handler.Target, [__instance]);
+                }
+            }
+        }
+
+        if (__instance._damageEffect != null)
+        {
+            __instance._damageEffect.SetEffectBlend(1f - __instance._integrity);
+        }
+
+        return false;
+    }
     #endregion
 
     #region AirDragMultiplier
@@ -3543,7 +3601,7 @@ public static class PatchClass
         if (__result)
         {
             bool isShipType = __instance.type == RepairReceiver.Type.ShipHull || __instance.type == RepairReceiver.Type.ShipComponent;
-            __result = (ShipRepairLimitController.CanRepair() || !isShipType) && (!(bool)addRepairWrench.GetProperty()
+            __result = (ShipRepairLimitController.CanRepair() || !isShipType) && ((string)repairWrenchType.GetProperty() != "Required"
                 || Locator.GetToolModeSwapper().GetItemCarryTool().GetHeldItemType() == ShipEnhancements.Instance.RepairWrenchType);
         }
     }

@@ -28,7 +28,7 @@
   // "exclusiveSettings": [
   //   "rustLevel",
   //   "dirtAccumulationTime",
-  //   "addRepairWrench",
+  //   "repairWrenchType",
   //   "repairLimit",
   //   "gravityDirection",
   //   "Quality of Life"

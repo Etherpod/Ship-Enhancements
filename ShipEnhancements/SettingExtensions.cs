@@ -122,7 +122,7 @@ public static class SettingExtensions
         { extraEjectButtons, (false, false) },
         { preventSystemFailure, (false, false) },
         { addShipCurtain, (false, false) },
-        { addRepairWrench, (false, false) },
+        { repairWrenchType, ("", "") },
         { funnySounds, (false, false) },
         { alwaysAllowLockOn, (false, false) },
         { disableShipMedkit, (false, false) },
