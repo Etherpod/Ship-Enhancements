@@ -3386,12 +3386,16 @@ public static class PatchClass
         if (damage > 0.1f)
         {
             float lerp = Mathf.InverseLerp(0.1f, 0.8f, damage);
-            __instance.GetComponentInChildren<ShipCockpitController>().LockUpControls(Mathf.Lerp(1f, 8f, lerp));
+            float time = Mathf.Lerp(1f, 8f, lerp);
+            __instance.GetComponentInChildren<ShipCockpitController>().LockUpControls(time);
+            ShipNotifications.PostStunDamageNotification(time);
         }
         else if (impact.speed > 30f * (float)shipDamageSpeedMultiplier.GetProperty())
         {
             float lerp = Mathf.InverseLerp(30f, 120f, impact.speed);
-            __instance.GetComponentInChildren<ShipCockpitController>().LockUpControls(Mathf.Lerp(2f, 5f, lerp));
+            float time = Mathf.Lerp(2f, 5f, lerp);
+            __instance.GetComponentInChildren<ShipCockpitController>().LockUpControls(time);
+            ShipNotifications.PostStunDamageNotification(time);
         }
     }
     #endregion
@@ -4299,7 +4303,49 @@ public static class PatchClass
                 || OWInput.IsNewlyPressed(InputLibrary.toolOptionRight, InputMode.All)))
         {
             __instance._photoMode = !__instance._photoMode;
+            var ui = __instance._launcherUIs[0];
+            if (__instance.InPhotoMode())
+            {
+                if (ui._bracketImage != null && !ui._bracketImage.enabled)
+                {
+                    ui._bracketImage.enabled = true;
+                }
+            }
+            else if (ui._bracketImage != null && ui._bracketImage.enabled)
+            {
+                ui._bracketImage.enabled = false;
+            }
         }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ProbeLauncherUI), nameof(ProbeLauncherUI.Update))]
+    public static bool FixShipPhotoModeBrackets(ProbeLauncherUI __instance)
+    {
+        if (!(bool)scoutPhotoMode.GetProperty() 
+            || __instance._probeLauncher.GetName() != ProbeLauncher.Name.Ship)
+        {
+            return true;
+        }
+
+        if (__instance._probeLauncher.InPhotoMode())
+        {
+            if (__instance._bracketImage != null && !__instance._bracketImage.enabled)
+            {
+                __instance._bracketImage.enabled = true;
+            }
+        }
+        else if (__instance._bracketImage != null && __instance._bracketImage.enabled)
+        {
+            __instance._bracketImage.enabled = false;
+        }
+
+        if (__instance._nonSuitUI && ProbeLauncherUI.s_removeSnapshopPrompt.IsVisible() && OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.All))
+        {
+            __instance.DeactivateUI();
+        }
+
+        return false;
     }
     #endregion
 

@@ -1736,6 +1736,14 @@ public class ShipEnhancements : ModBehaviour
                 light.gameObject.SetActive(false);
             }
         }
+        if ((bool)scoutPhotoMode.GetProperty())
+        {
+            var bracketUI = LoadPrefab("Assets/ShipEnhancements/ProbeBracketsDisplay.prefab");
+            var launcherUI = SELocator.GetShipTransform().GetComponentInChildren<ProbeLauncherUI>();
+            var imageObj = Instantiate(bracketUI, launcherUI.transform.parent).GetComponentInChildren<Image>();
+            imageObj.enabled = false;
+            launcherUI._bracketImage = imageObj;
+        }
         if (AchievementsAPI != null)
         {
             GameObject th = GameObject.Find("TimberHearth_Body");

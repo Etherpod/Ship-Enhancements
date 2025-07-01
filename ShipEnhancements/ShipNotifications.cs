@@ -41,6 +41,9 @@ public static class ShipNotifications
     
     private static NotificationData _holdPositionAutopilotDisabledNotification = new NotificationData(NotificationTarget.Ship, "AUTOPILOT: HOLD POSITION DISABLED", 5f, true);
 
+    private static NotificationData _fragileShipNotification = new NotificationData(NotificationTarget.Ship, "SHIP DAMAGED: CONTROLS OFFLINE", 5f, true);
+    private static NotificationData _stunDamageNotification = new NotificationData(NotificationTarget.Ship, "SHIP CONTROLS OVERLOADED", 5f, true);
+
     private static bool _oxygenLow = false;
     private static bool _oxygenCritical = false;
     private static bool _fuelLow = false;
@@ -203,6 +206,17 @@ public static class ShipNotifications
             }
         }
 
+        bool shouldPinFragile = (bool)enableFragileShip.GetProperty() && ShipEnhancements.Instance.anyPartDamaged;
+        bool fragilePinned = NotificationManager.SharedInstance.IsPinnedNotification(_fragileShipNotification);
+        if (shouldPinFragile && !fragilePinned)
+        {
+            NotificationManager.SharedInstance.PostNotification(_fragileShipNotification, true);
+        }
+        else if (!shouldPinFragile && fragilePinned)
+        {
+            NotificationManager.SharedInstance.UnpinNotification(_fragileShipNotification);
+        }
+
         _lastShipOxygen = SELocator.GetShipResources().GetFractionalOxygen();
         _lastShipFuel = SELocator.GetShipResources()._currentFuel;
     }
@@ -268,4 +282,10 @@ public static class ShipNotifications
 
     public static void PostHoldPositionAutopilotDisabledNotification() =>
         NotificationManager.SharedInstance.PostNotification(_holdPositionAutopilotDisabledNotification, false);
+
+    public static void PostStunDamageNotification(float time)
+    {
+        _stunDamageNotification.minDuration = Mathf.Max(_stunDamageNotification.minDuration, time);
+        NotificationManager.SharedInstance.PostNotification(_stunDamageNotification, false);
+    }
 }
