@@ -481,49 +481,6 @@
       ],
       "tooltip": "Attaches a Nomai warp core to the cockpit that can be activated with a button on the ceiling of the cockpit. The Component option makes it a damageable component."
     },
-    "temperatureZonesAmount": {
-      "title": "Add Temperature Zones",
-      "type": "selector",
-      "value": "None",
-      "options": [
-        "None",
-        "Sun",
-        "Hot",
-        "Cold",
-        "All"
-      ],
-      "tooltip": "Determines what type of temperature zones to add. Temperature zones will increase or decrease your ship's temperature. Check the README for more details about temperature zones."
-    },
-    "hullTemperatureDamage": {
-      "title": "Hull Temperature Damage",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Damages the ship hull over time in extremely high or low temperatures."
-    },
-    "componentTemperatureDamage": {
-      "title": "Component Temperature Damage",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Damages the ship components over time in extremely high or low temperatures."
-    },
-    "temperatureDamageMultiplier": {
-      "title": "Temperature Damage Multiplier",
-      "type": "number",
-      "value": 1,
-      "tooltip": "Larger numbers increase the damage that the ship takes from extreme temperatures."
-    },
-    "temperatureResistanceMultiplier": {
-      "title": "Temperature Resistance Multiplier",
-      "type": "number",
-      "value": 1,
-      "tooltip": "Larger numbers increase the time the ship can resist extreme temperatures. The default resistance gives the ship around 3 minutes before the hull reaches max temperature."
-    },
-    "faultyHeatRegulators": {
-      "title": "Faulty Heat Regulators",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Your reactor constantly heats up your ship, making anywhere that isn't cold a potential danger. You can cool off your ship by finding somewhere cold."
-    },
     "enableRepairConfirmation": {
       "title": "Enable Repair Confirmation",
       "type": "toggle",
@@ -699,6 +656,59 @@
       "type": "toggle",
       "value": false,
       "tooltip": "Adds a switch to the cockpit that turns on the ship. If you turned on Idle Fuel Consumption, it will only drain fuel while the ship is on."
+    },
+
+    "tempSplit": {
+      "type": "separator"
+    },
+
+    "enableShipTemperature": {
+      "title": "Enable Ship Temperature",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Adds a temperature mechanic to the ship. Check the README for more details about how it works."
+    },
+    "temperatureZonesAmount": {
+      "title": "Add Temperature Zones",
+      "type": "selector",
+      "value": "All",
+      "options": [
+        "All",
+        "Sun",
+        "Hot",
+        "Cold"
+      ],
+      "tooltip": "Determines what type of temperature zones to add. Temperature zones will increase or decrease your ship's temperature."
+    },
+    "hullTemperatureDamage": {
+      "title": "Hull Temperature Damage",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Damages the ship hull over time in extremely high or low temperatures."
+    },
+    "componentTemperatureDamage": {
+      "title": "Component Temperature Damage",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Damages the ship components over time in extremely high or low temperatures."
+    },
+    "temperatureDamageMultiplier": {
+      "title": "Temperature Damage Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers increase the damage that the ship takes from extreme temperatures."
+    },
+    "temperatureResistanceMultiplier": {
+      "title": "Temperature Resistance Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers increase the time the ship can resist extreme temperatures. The default resistance gives the ship around 3 minutes before the hull reaches max temperature."
+    },
+    "faultyHeatRegulators": {
+      "title": "Faulty Heat Regulators",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Your reactor constantly heats up your ship, making anywhere that isn't cold a potential danger. You can cool off your ship by finding somewhere cold."
     },
 
     "Decoration": {

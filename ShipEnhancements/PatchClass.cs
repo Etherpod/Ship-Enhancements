@@ -37,7 +37,7 @@ public static class PatchClass
             return false;
         }
 
-        if (ShipEnhancements.Instance.disableHeadlights) return false;
+        if (ShipEnhancements.Instance.disableShipHeadlights) return false;
 
         return true;
     }
@@ -840,7 +840,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(SunController), nameof(SunController.UpdateScale))]
     public static void UpdateSunTempZone(SunController __instance, float scale)
     {
-        if ((string)temperatureZonesAmount.GetProperty() == "None") return;
+        if (!(bool)enableShipTemperature.GetProperty()) return;
 
         TemperatureZone tempZone = __instance.GetComponentInChildren<TemperatureZone>();
         if (tempZone != null)
@@ -853,7 +853,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(SupernovaEffectController), nameof(SupernovaEffectController.FixedUpdate))]
     public static void UpdateSupernovaTempZone(SupernovaEffectController __instance)
     {
-        if ((string)temperatureZonesAmount.GetProperty() == "None") return;
+        if (!(bool)enableShipTemperature.GetProperty()) return;
 
         TemperatureZone tempZone = __instance.GetComponentInChildren<TemperatureZone>();
         if (tempZone != null)
@@ -866,7 +866,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(Campfire), nameof(Campfire.SetState))]
     public static void UpdateCampfireTemperatureZone(Campfire __instance)
     {
-        if ((string)temperatureZonesAmount.GetProperty() == "None") return;
+        if (!(bool)enableShipTemperature.GetProperty()) return;
 
         __instance.transform.parent.GetComponentInChildren<TemperatureZone>()?.SetVolumeActive(__instance._state == Campfire.State.LIT);
     }
@@ -979,7 +979,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(RulesetDetector), nameof(RulesetDetector.GetThrustLimit))]
     public static void ShipFreezingThrustDebuff(RulesetDetector __instance, ref float __result)
     {
-        if ((string)temperatureZonesAmount.GetProperty() == "None") return;
+        if (!(bool)enableShipTemperature.GetProperty()) return;
 
         if (__instance.CompareTag("ShipDetector") && SELocator.GetShipTemperatureDetector() != null)
         {

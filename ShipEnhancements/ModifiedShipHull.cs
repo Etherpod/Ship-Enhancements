@@ -15,7 +15,7 @@ public class ModifiedShipHull : MonoBehaviour
         {
             SELocator.GetShipDamageController()._impactSensor.OnImpact += OnImpact;
         }
-        if ((string)temperatureZonesAmount.GetProperty() != "None")
+        if ((bool)enableShipTemperature.GetProperty())
         {
             GameObject obj = new GameObject("ShipHullHeatHazard");
             obj.transform.parent = transform;
@@ -82,7 +82,7 @@ public class ModifiedShipHull : MonoBehaviour
         {
             SELocator.GetShipDamageController()._impactSensor.OnImpact -= OnImpact;
         }
-        if ((string)temperatureZonesAmount.GetProperty() != "None")
+        if ((bool)enableShipTemperature.GetProperty())
         {
             GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
         }

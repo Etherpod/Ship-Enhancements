@@ -24,7 +24,7 @@ public static class SettingsPresets
         { "disableAirAutoRoll", false },
         { "disableWaterAutoRoll", false },
         { "enableThrustModulator", false },
-        { "temperatureZonesAmount", "None" },
+        { "temperatureZonesAmount", "All" },
         { "hullTemperatureDamage", false },
         { "enableShipFuelTransfer", false },
         { "enableJetpackRefuelDrain", false },
@@ -118,6 +118,7 @@ public static class SettingsPresets
         { "enableAutoAlign", false },
         { "shipHornType", "None" },
         { "disableHatch", false },
+        { "enableShipTemperature", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -137,7 +138,7 @@ public static class SettingsPresets
         { "disableAirAutoRoll", true },
         { "disableWaterAutoRoll", true },
         { "enableThrustModulator", false },
-        { "temperatureZonesAmount", "None" },
+        { "temperatureZonesAmount", "All" },
         { "hullTemperatureDamage", false },
         { "enableShipFuelTransfer", false },
         { "enableJetpackRefuelDrain", false },
@@ -231,6 +232,7 @@ public static class SettingsPresets
         { "enableAutoAlign", false },
         { "shipHornType", "None" },
         { "disableHatch", true },
+        { "enableShipTemperature", false },
     };
 
     public static readonly Dictionary<string, object> ImpossibleSettings = new Dictionary<string, object>()
@@ -250,7 +252,7 @@ public static class SettingsPresets
         { "disableAirAutoRoll", false },
         { "disableWaterAutoRoll", false },
         { "enableThrustModulator", false },
-        { "temperatureZonesAmount", "None" },
+        { "temperatureZonesAmount", "All" },
         { "hullTemperatureDamage", false },
         { "enableShipFuelTransfer", false },
         { "enableJetpackRefuelDrain", false },
@@ -344,6 +346,7 @@ public static class SettingsPresets
         { "enableAutoAlign", false },
         { "shipHornType", "None" },
         { "disableHatch", false },
+        { "enableShipTemperature", false },
     };
 
     public static readonly Dictionary<string, object> NewStuffSettings = new Dictionary<string, object>()
@@ -457,6 +460,7 @@ public static class SettingsPresets
         { "enableAutoAlign", true },
         { "shipHornType", "Default" },
         { "disableHatch", false },
+        { "enableShipTemperature", true },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -570,6 +574,7 @@ public static class SettingsPresets
         { "enableAutoAlign", true },
         { "shipHornType", "Annoying" },
         { "disableHatch", false },
+        { "enableShipTemperature", true },
     };
 
     // Random preset composition
@@ -627,7 +632,7 @@ public static class SettingsPresets
             ("Hot", (0f, 0.25f)),
             ("Cold", (0.2f, 0.25f)),
             ("All", (0f, 1f)),
-        ], (0.2f, 0.5f), "None") },
+        ], (0.2f, 0.5f), "All") },
         { "hullTemperatureDamage", new RandomSettingValue((0.5f, 0.8f)) },
         { "enableShipFuelTransfer", new RandomSettingValue((0.8f, 0.8f)) },
         { "enableJetpackRefuelDrain", new RandomSettingValue((0.3f, 0.8f)) },
@@ -1223,6 +1228,7 @@ public static class SettingsPresets
         ], (0.25f, 0.5f), "None") },
         { "disableHatch", new RandomSettingValue((0.05f, 0.5f)) },
         { "splitLockOn", new RandomSettingValue((0.5f, 0.5f)) },
+        { "enableShipTemperature", new RandomSettingValue((0.3f, 0.5f)) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

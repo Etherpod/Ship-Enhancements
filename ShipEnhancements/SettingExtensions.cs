@@ -143,7 +143,8 @@ public static class SettingExtensions
         { randomDifficulty, (1f, 1f) },
         { disableHatch, (false, false) },
         { splitLockOn, (false, false) },
-        { enableColorBlending, (false, false) }
+        { enableColorBlending, (false, false) },
+        { enableShipTemperature, (false, false) },
     };
 
     private static Dictionary<Settings, object> savedCustomSettings = new(settingValues.Count);

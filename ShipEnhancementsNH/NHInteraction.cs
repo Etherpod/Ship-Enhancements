@@ -56,7 +56,7 @@ public static class NHInteractionPatches
     [HarmonyPatch(typeof(StarEvolutionController), "UpdateMainSequence")]
     public static void UpdateSunTempZone(StarEvolutionController __instance, float ____minScale)
     {
-        if ((string)temperatureZonesAmount.GetProperty() == "None" || ____minScale <= 0) return;
+        if (!(bool)enableShipTemperature.GetProperty() || ____minScale <= 0) return;
 
         TemperatureZone tempZone = __instance.GetComponentInChildren<TemperatureZone>();
         if (tempZone != null)
