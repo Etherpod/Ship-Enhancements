@@ -2859,98 +2859,12 @@ public class ShipEnhancements : ModBehaviour
             return;
         }
 
+        _currentPreset = SettingsPresets.GetPresetFromConfig(config.GetSettingsValue<string>("preset"));
         var allSettings = Enum.GetValues(typeof(Settings)) as Settings[];
-        SettingsPresets.PresetName newPreset = SettingsPresets.GetPresetFromConfig(config.GetSettingsValue<string>("preset"));
 
-        // Detect preset change or init preset
-        if (newPreset != _currentPreset || _currentPreset == (SettingsPresets.PresetName)(-1))
+        foreach (Settings setting in allSettings)
         {
-            SettingsPresets.PresetName lastPreset = _currentPreset;
-            _currentPreset = newPreset;
-            config.SetSettingsValue("preset", _currentPreset.GetName());
-
-            // Load saved settings if switching to Custom preset
-            if ((_currentPreset == SettingsPresets.PresetName.Custom
-                || _currentPreset == SettingsPresets.PresetName.Random)
-                && lastPreset != (SettingsPresets.PresetName)(-1))
-            {
-                WriteDebugMessage("Load");
-                SettingExtensions.LoadCustomSettings();
-                foreach (Settings setting in allSettings)
-                {
-                    config.SetSettingsValue(setting.GetName(), setting.GetValue());
-                }
-            }
-            // Save settings if switching off Custom preset
-            else
-            {
-                if (lastPreset == SettingsPresets.PresetName.Custom
-                    || lastPreset == SettingsPresets.PresetName.Random)
-                {
-                    WriteDebugMessage("Save");
-                    SettingExtensions.SaveCustomSettings();
-                }
-
-                // Apply newly selected preset
-                SettingsPresets.ApplyPreset(newPreset, config);
-                foreach (Settings setting in allSettings)
-                {
-                    setting.SetValue(config.GetSettingsValue<object>(setting.GetName()));
-                }
-            }
-
-            // Display changes
-            RedrawSettingsMenu();
-        }
-        // Something other than a preset was changed
-        else
-        {
-            /*var decoChanged = false;
-
-            foreach (var pair in GetDecorationSettings())
-            {
-                var currentSetting = pair.Key.AsEnum<Settings>().GetValue();
-                var newSetting = SettingExtensions.ConvertJValue(config.GetSettingsValue<object>(pair.Key));
-                if (!currentSetting.Equals(newSetting))
-                {
-                    decoChanged = true;
-                    break;
-                }
-            }*/
-
-            var isCustom = false;
-
-            foreach (Settings setting in allSettings)
-            {
-                // Detect changed settings
-                setting.SetValue(config.GetSettingsValue<object>(setting.GetName()));
-
-                // Check if the new values match the selected preset
-                if (!isCustom && _currentPreset != SettingsPresets.PresetName.Custom && _currentPreset != SettingsPresets.PresetName.Random)
-                {
-                    isCustom = (_currentPreset.GetPresetSetting(setting.GetName()) != null
-                        && !_currentPreset.GetPresetSetting(setting.GetName()).Equals(setting.GetValue()));
-                }
-            }
-
-            // If the values no longer match the selected preset...
-            if (isCustom)
-            {
-                // Switch to custom preset
-                _currentPreset = SettingsPresets.PresetName.Custom;
-                config.SetSettingsValue("preset", _currentPreset.GetName());
-                foreach (Settings setting in allSettings)
-                {
-                    config.SetSettingsValue(setting.GetName(), setting.GetValue());
-                }
-
-                // Display changes
-                RedrawSettingsMenu();
-            }
-            /*else if (decoChanged)
-            {
-                RedrawSettingsMenu();
-            }*/
+            setting.SetValue(config.GetSettingsValue<object>(setting.GetName()));
         }
     }
 
@@ -2997,10 +2911,65 @@ public class ShipEnhancements : ModBehaviour
             {
                 RedrawSettingsMenu("enableColorBlending", "indicatorColor" + optionsNew, "enableColorBlending", "indicatorColor1");
             }
+
+            return;
         }
-        else if (name == "disableAutoLights")
+
+        if (_currentPreset != SettingsPresets.PresetName.Custom
+            && _currentPreset != SettingsPresets.PresetName.Random
+            && SettingsPresets.GetPresetSetting(_currentPreset, name) != null
+            && !newValue.Equals(oldValue))
         {
-            RedrawSettingsMenu("disableAutoLights", "disableAutoLights");
+            _currentPreset = SettingsPresets.PresetName.Custom;
+            ModHelper.Config.SetSettingsValue("preset", _currentPreset.GetName());
+            RedrawSettingsMenu("preset", "preset");
+
+            return;
+        }
+
+        if (name == "preset" && !newValue.Equals(oldValue))
+        {
+            var allSettings = Enum.GetValues(typeof(Settings)) as Settings[];
+            var newPreset = (string)newValue;
+            var oldPreset = (string)oldValue;
+
+            _currentPreset = (SettingsPresets.GetPresetFromConfig(newPreset));
+            ModHelper.Config.SetSettingsValue("preset", _currentPreset.GetName());
+
+            if (newPreset == "Custom" || newPreset == "Random")
+            {
+                WriteDebugMessage("Load");
+                SettingExtensions.LoadCustomSettings();
+                foreach (Settings setting in allSettings)
+                {
+                    ModHelper.Config.SetSettingsValue(setting.GetName(), setting.GetValue());
+                }
+            }
+            else if (oldPreset == "Custom" || oldPreset == "Random")
+            {
+                WriteDebugMessage("Save");
+                SettingExtensions.SaveCustomSettings();
+            }
+
+            SettingsPresets.ApplyPreset(SettingsPresets.GetPresetFromConfig(newPreset), ModHelper.Config);
+            foreach (Settings setting in allSettings)
+            {
+                setting.SetValue(ModHelper.Config.GetSettingsValue<object>(setting.GetName()));
+            }
+
+            if (newPreset == "Random" && oldPreset == "Custom")
+            {
+                RedrawSettingsMenu("preset", "randomDifficulty", "preset", "preset");
+            }
+            else if (newPreset == "Custom" && oldPreset == "Random")
+            {
+                RedrawSettingsMenu("preset", "preset", "preset", "randomDifficulty");
+            }
+            else
+            {
+                RedrawSettingsMenu();
+            }
+            return;
         }
     }
 
@@ -3066,15 +3035,6 @@ public class ShipEnhancements : ModBehaviour
             endIndex = ModHelper.Config.Settings.Keys.ToList().IndexOf(endSetting);
         }
 
-        /*if (startSetting != "")
-        {
-            startIndex = decoStartIndex;
-        }
-        else
-        {
-            startIndex = 0;
-        }*/
-
         Dictionary<int, string> cachedNames = [];
 
         for (int i = startIndex; i < ModHelper.Config.Settings.Count; i++)
@@ -3121,7 +3081,6 @@ public class ShipEnhancements : ModBehaviour
                                     {
                                         cachedNames.Add(id, "UIElement-" + label);
                                     }
-                                    //settingsParent.GetChild(c).name = "UIElement-" + label;
                                 }
                             }
                             SettingExtensions.customObjLabels[name] = label;
@@ -3153,8 +3112,6 @@ public class ShipEnhancements : ModBehaviour
                 }
                 continue;
             }
-
-            //ShipEnhancements.WriteDebugMessage("Add setting " + name);
 
             switch (settingType)
             {
@@ -3198,15 +3155,20 @@ public class ShipEnhancements : ModBehaviour
                         ModHelper.Config.SetSettingsValue(name, newSelection);
                         ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
                         Configure(ModHelper.Config);
-                        //ShipEnhancements.WriteDebugMessage("Changed from " + oldValue + " to " + newSelection);
                         OnValueChanged(name, oldValue, newSelection);
                     };
                     break;
                 case SettingType.SEPARATOR:
-                    OptionsMenuManager.AddSeparator(newModTab, true);
-                    OptionsMenuManager.CreateLabel(newModTab, name);
-                    OptionsMenuManager.AddSeparator(newModTab, false);
-                    settingsParent.GetChild(settingsParent.childCount - 1).name = "UIElement-" + label;
+                    if (settingObject["title"] != null)
+                    {
+                        OptionsMenuManager.AddSeparator(newModTab, true);
+                        OptionsMenuManager.CreateLabel(newModTab, label);
+                        OptionsMenuManager.AddSeparator(newModTab, false);
+                    }
+                    else
+                    {
+                        OptionsMenuManager.AddSeparator(newModTab, false);
+                    }
                     break;
                 case SettingType.SLIDER:
                     var currentSliderValue = ModHelper.Config.GetSettingsValue<float>(name);
@@ -3285,83 +3247,12 @@ public class ShipEnhancements : ModBehaviour
                         }
                     }
                 }
-
-                /*var prevSetting = ModHelper.Config.Settings.ElementAt(i - 1);
-                var prevSettingObj = prevSetting.Value as JObject;
-                var prevTitle = "";
-
-                if (lastVisibleIndex >= 0)
-                {
-                    prevSetting = ModHelper.Config.Settings.ElementAt(lastVisibleIndex);
-
-                    if (i - lastVisibleIndex > 1)
-                    {
-
-                    }
-                }
-
-                //ShipEnhancements.WriteDebugMessage(label);
-                if (prevSettingObj != default(JObject) && prevSettingObj["title"] != null)
-                {
-
-                    if (!SetCustomSettingName(ref prevTitle, prevSetting.Key))
-                {
-                    prevTitle = prevSettingObj["title"].ToString();
-                    }
-
-                    ShipEnhancements.WriteDebugMessage(name + " is using: " + prevSetting.Key);
-
-                    if (SettingExtensions.customObjLabels.ContainsKey(prevSetting.Key))
-                    {
-                        // the issue is that separators aren't being added to this list
-                        // so it gets the last item in the list (the separator) and checks the key of the separator which isn't accurate
-                        // maybe try backtracking until reaching something with a title obj?
-                        prevTitle = SettingExtensions.customObjLabels[prevSetting.Key];
-                    }
-                    else
-                    {
-                        prevTitle = ((JObject)prevSetting.Value)["title"].ToString();
-                    }
-                }
-                if (prevTitle != "")
-                {
-                    ShipEnhancements.WriteDebugMessage("Try placing after: " + prevTitle);
-                    var targetIndex = -1;
-                    for (int k = settingsParent.childCount - 1; k >= 0; k--)
-                    {
-                        if (settingsParent.GetChild(k).name == "UIElement-" + prevTitle)
-                        {
-                            ShipEnhancements.WriteDebugMessage("placing after " + prevTitle);
-                            targetIndex = k;
-                            break;
-                        }
-                    }
-                    if (targetIndex >= 0)
-                    {
-                        addedSetting.SetSiblingIndex(targetIndex + 1);
-
-                        if ((bool)Settings.enableColorBlending.GetValue() && GetDecorationSettings().Contains(name))
-                        {
-                            string stem = name.Substring(0, name.Length - 6);
-                            if (_stemToSuffix.ContainsKey(stem) && stem != "indicator"
-                                && name.Substring(name.Length - 1)
-                                == (string)(stem + "ColorOptions").AsEnum<Settings>().GetValue())
-                            {
-                                OptionsMenuManager.AddSeparator(newModTab, false);
-                                var sep = settingsParent.GetChild(settingsParent.childCount - 1);
-                                sep.name = "UIElement-" + label;
-                                sep.SetSiblingIndex(targetIndex + 2);
-                            }
-                        }
-                    }
-                }*/
             }
             else
             {
                 if ((bool)Settings.enableColorBlending.GetValue() && GetDecorationSettings().Contains(name))
                 {
                     string stem = name.Substring(0, name.Length - 6);
-                    //ShipEnhancements.WriteDebugMessage(stem);
                     if (_stemToSuffix.ContainsKey(stem) && stem != "indicator"
                         && name.Substring(name.Length - 1)
                         == (string)(stem + "ColorOptions").AsEnum<Settings>().GetValue())
@@ -3371,18 +3262,6 @@ public class ShipEnhancements : ModBehaviour
                 }
             }
         }
-
-        /*foreach (var pair in cachedNames)
-        {
-            foreach (Transform child in settingsParent)
-            {
-                if (child.GetInstanceID() == pair.Key)
-                {
-                    ShipEnhancements.WriteDebugMessage("OK I'M NOW APPLYING CHANGES TO " + child.name + " IT'S GONNA BECOME " + pair.Value);
-                    //child.name = pair.Value;
-                }
-            }
-        }*/
 
         if (newModTab._tooltipDisplay != null)
         {
@@ -3430,8 +3309,12 @@ public class ShipEnhancements : ModBehaviour
         ModHelper.Events.Unity.FireInNUpdates(() =>
         {
             scrollbar.value = lastScrollValue;
-            _detectValueChanged = true;
         }, 2);
+
+        ModHelper.Events.Unity.FireInNUpdates(() =>
+        {
+            _detectValueChanged = true;
+        }, 5);
     }
 
     private bool DestroyExistingSettings(Menu menu, Transform parent, string startSetting, string endSetting, out int insertionIndex)
@@ -3447,10 +3330,6 @@ public class ShipEnhancements : ModBehaviour
                 var setting = ModHelper.Config.Settings[startSetting] as JObject;
                 if (setting != default(JObject) && setting["title"] != null)
                 {
-                    /*if (!SetCustomSettingName(ref startTitle, startSetting))
-                    {
-                        startTitle = setting["title"].ToString();
-                    }*/
                     if (SettingExtensions.customObjLabels.ContainsKey(startSetting))
                     {
                         startTitle = SettingExtensions.customObjLabels[startSetting];
@@ -3468,11 +3347,6 @@ public class ShipEnhancements : ModBehaviour
                 var setting = ModHelper.Config.Settings[endSetting] as JObject;
                 if (setting != default(JObject) && setting["title"] != null)
                 {
-                    /*if (!SetCustomSettingName(ref endTitle, endSetting))
-                    {
-                        endTitle = setting["title"].ToString();
-                        ShipEnhancements.WriteDebugMessage("         End title: " + endTitle);
-                    }*/
                     if (SettingExtensions.customObjLabels.ContainsKey(endSetting))
                     {
                         endTitle = SettingExtensions.customObjLabels[endSetting];
@@ -3503,14 +3377,11 @@ public class ShipEnhancements : ModBehaviour
                     continue;
                 }
 
-                //ShipEnhancements.WriteDebugMessage("Searching for: " + "UIElement-" + endTitle + "      Current: " + parent.GetChild(i).name);
                 if (parent.GetChild(i).name == "UIElement-" + endTitle)
                 {
-                    ShipEnhancements.WriteDebugMessage("         Found it");
                     endIndex = i;
                 }
 
-                //ShipEnhancements.WriteDebugMessage("Destroy " + parent.GetChild(i).gameObject);
                 Destroy(parent.GetChild(i).gameObject);
 
                 if (endIndex > 0)
@@ -3531,7 +3402,6 @@ public class ShipEnhancements : ModBehaviour
                 MenuOption option = parent.GetChild(i).GetComponentInChildren<MenuOption>();
                 if (option != null)
                 {
-                    //ShipEnhancements.WriteDebugMessage("self destruct");
                     menu._menuOptions = menu._menuOptions.Add(option);
                 }
             }
@@ -3565,7 +3435,6 @@ public class ShipEnhancements : ModBehaviour
 
         if (GetDecorationSettings().Contains(name))
         {
-            //ShipEnhancements.WriteDebugMessage("Chekc should hide " + name);
             if (name != "enableColorBlending" && !(bool)Settings.enableColorBlending.GetValue()
                 && (!int.TryParse(name.Substring(name.Length - 1), out int value) || value != 1))
             {
@@ -3626,22 +3495,18 @@ public class ShipEnhancements : ModBehaviour
         {
             if (!SettingExtensions.customObjLabels.ContainsKey(settingName))
             {
-                ShipEnhancements.WriteDebugMessage("ADD CUSTOM LABEL: " + settingName + " : " + label);
                 SettingExtensions.customObjLabels.Add(settingName, label);
             }
             else
             {
                 string old = SettingExtensions.customObjLabels[settingName];
-                ShipEnhancements.WriteDebugMessage("I WILL NOW CHANGE " + old + " TO " + label);
                 for (int c = 0; c < settingsParent.childCount; c++)
                 {
                     if (settingsParent.GetChild(c).name == "UIElement-" + old)
                     {
-                        ShipEnhancements.WriteDebugMessage("override " + settingName);
                         var id = settingsParent.GetChild(c).GetInstanceID();
                         if (!cachedNames.ContainsKey(id))
                         cachedNames.Add(id, "UIElement-" + label);
-                        //child.name = "UIElement-" + label;
                     }
                 }
                 SettingExtensions.customObjLabels[settingName] = label;
