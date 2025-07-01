@@ -980,6 +980,7 @@ public class ShipEnhancements : ModBehaviour
 
         SELocator.Initalize();
         ThrustIndicatorManager.Initialize();
+        ShipRepairLimitController.Initialize();
 
         SELocator.GetShipBody().GetComponentInChildren<ShipCockpitController>()
             ._interactVolume.gameObject.AddComponent<FlightConsoleInteractController>();
@@ -1928,6 +1929,7 @@ public class ShipEnhancements : ModBehaviour
                 SELocator.GetShipDamageController().Explode();
             }
 
+            ShipRepairLimitController.RefreshRepairPrompt();
             InitializeConditions();
         });
     }

@@ -10,6 +10,14 @@ public static class ShipRepairLimitController
 
     private static int _numberPartsRepaired;
     private static int _partsLimit = -1;
+    private static FirstPersonManipulator _manipulator;
+    private static string _baseRepairPrompt;
+
+    public static void Initialize()
+    {
+        _manipulator = SELocator.GetPlayerBody().GetComponentInChildren<FirstPersonManipulator>();
+        _baseRepairPrompt = _manipulator._repairScreenPrompt.GetText();
+    }
 
     public static void AddPartRepaired()
     {
@@ -19,6 +27,8 @@ public static class ShipRepairLimitController
         {
             OnDisableRepair?.Invoke();
         }
+
+        RefreshRepairPrompt();
     }
 
     public static void SetPartsRepaired(int numParts)
@@ -33,6 +43,8 @@ public static class ShipRepairLimitController
         {
             OnEnableRepair?.Invoke();
         }
+
+        RefreshRepairPrompt();
     }
 
     public static void SetRepairLimit(int maxParts)
@@ -46,6 +58,18 @@ public static class ShipRepairLimitController
         else
         {
             OnEnableRepair?.Invoke();
+        }
+
+        RefreshRepairPrompt();
+    }
+
+    public static void RefreshRepairPrompt()
+    {
+        if (Locator._promptManager == null) return;
+
+        if (_partsLimit - _numberPartsRepaired > 0)
+        {
+            _manipulator?._repairScreenPrompt.SetText(_baseRepairPrompt + $" ({_partsLimit - _numberPartsRepaired})");
         }
     }
 
