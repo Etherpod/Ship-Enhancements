@@ -112,6 +112,7 @@ public class ShipEnhancements : ModBehaviour
     private bool _unsubFromShipSpawn = false;
     private ShipDetachableLeg _frontLeg = null;
     private List<OWAudioSource> _shipAudioToChange = [];
+    private bool _detectValueChanged = true;
 
     public enum Settings
     {
@@ -2904,7 +2905,7 @@ public class ShipEnhancements : ModBehaviour
         // Something other than a preset was changed
         else
         {
-            var decoChanged = false;
+            /*var decoChanged = false;
 
             foreach (var pair in GetDecorationSettings())
             {
@@ -2915,7 +2916,7 @@ public class ShipEnhancements : ModBehaviour
                     decoChanged = true;
                     break;
                 }
-            }
+            }*/
 
             var isCustom = false;
 
@@ -2946,34 +2947,74 @@ public class ShipEnhancements : ModBehaviour
                 // Display changes
                 RedrawSettingsMenu();
             }
-            else if (decoChanged)
+            /*else if (decoChanged)
             {
-                RedrawSettingsMenu(true);
-            }
+                RedrawSettingsMenu();
+            }*/
         }
     }
 
-    private KeyValuePair<string, object>[] GetDecorationSettings()
+    private List<string> GetDecorationSettings()
     {
         int start = ModHelper.Config.Settings.Keys.ToList()
             .IndexOf("enableColorBlending");
         int end = ModHelper.Config.Settings.Keys.ToList()
             .IndexOf("indicatorColor3");
 
-        var range = ModHelper.Config.Settings.ToList()
-            .GetRange(start, end - start)
-            .Where(pair =>
-            !int.TryParse(pair.Key.Substring(pair.Key.Length - 1), out int i));
-        return range.ToArray();
+        var range = ModHelper.Config.Settings.Keys.ToList()
+            .GetRange(start, end - start + 1);
+        return range;
     }
 
-    private void OnValueChanged(string name)
+    private void OnValueChanged(string name, object oldValue, object newValue)
     {
-        // Use later for more advanced settings menu reloading
+        if (!_detectValueChanged)
+        {
+            return;
+        }
+
+        if (GetDecorationSettings().Contains(name)
+            && !int.TryParse(name.Substring(name.Length - 1), out _))
+        {
+            int optionsNew;
+            int optionsOld;
+            if (name == "indicatorColorOptions")
+            {
+                optionsNew = int.Parse((string)newValue);
+                optionsOld = int.Parse((string)oldValue);
+            }
+            else
+            {
+                optionsNew = int.Parse((string)Settings.indicatorColorOptions.GetValue());
+                optionsOld = optionsNew;
+            }
+
+            if ((name == "enableColorBlending") ? (bool)oldValue : (bool)Settings.enableColorBlending.GetValue())
+            {
+                RedrawSettingsMenu("enableColorBlending", "indicatorColor" + optionsNew, "enableColorBlending", "indicatorColor" + optionsOld);
+            }
+            else
+            {
+                RedrawSettingsMenu("enableColorBlending", "indicatorColor" + optionsNew, "enableColorBlending", "indicatorColor1");
+            }
+        }
+        else if (name == "disableAutoLights")
+        {
+            RedrawSettingsMenu("disableAutoLights", "disableAutoLights");
+        }
     }
 
-    public void RedrawSettingsMenu(bool decoration = false)
+    public void RedrawSettingsMenu(string startSetting = "", string endSetting = "", string startDestroySetting = "", string endDestroySetting = "")
     {
+        if (startDestroySetting == "")
+        {
+            startDestroySetting = startSetting;
+        }
+        if (endDestroySetting == "")
+        {
+            endDestroySetting = endSetting;
+        }
+
         MenuManager menuManager = StartupPopupPatches.menuManager;
         IOptionsMenuManager OptionsMenuManager = menuManager.OptionsMenuManager;
 
@@ -3000,40 +3041,47 @@ public class ShipEnhancements : ModBehaviour
 
         Transform settingsParent = newModTab.transform.Find("Scroll View/Viewport/Content");
 
-        if (!DestroyExistingSettings(newModTab, settingsParent, decoration))
+        if (!DestroyExistingSettings(newModTab, settingsParent, startDestroySetting, endDestroySetting, out int insertionIndex))
         {
             return;
         }
 
-        if (!decoration)
+        _detectValueChanged = false;
+
+        if (startSetting == "")
         {
             OptionsMenuManager.AddSeparator(newModTab, true);
             OptionsMenuManager.CreateLabel(newModTab, "Any changes to the settings are applied on the next loop!");
             OptionsMenuManager.AddSeparator(newModTab, true);
         }
 
-        bool blendEnabled = (bool)Settings.enableColorBlending.GetValue();
-
-        int decoStartIndex = ModHelper.Config.Settings.Keys.ToList().IndexOf("enableColorBlending");
-        int decoEndIndex = ModHelper.Config.Settings.Keys.ToList().IndexOf("indicatorColor3");
-
-        int startIndex;
+        int startIndex = 0;
         int endIndex = ModHelper.Config.Settings.Count - 1;
+        if (startSetting != "")
+        {
+            startIndex = ModHelper.Config.Settings.Keys.ToList().IndexOf(startSetting);
+        }
+        if (endSetting != "")
+        {
+            endIndex = ModHelper.Config.Settings.Keys.ToList().IndexOf(endSetting);
+        }
 
-        if (decoration)
+        /*if (startSetting != "")
         {
             startIndex = decoStartIndex;
         }
         else
         {
             startIndex = 0;
-        }
+        }*/
 
-        for (int i = startIndex; i <= endIndex; i++)
+        Dictionary<int, string> cachedNames = [];
+
+        for (int i = startIndex; i < ModHelper.Config.Settings.Count; i++)
         {
             string name = ModHelper.Config.Settings.ElementAt(i).Key;
 
-            if (ShouldHideSetting(i, name, decoration, decoStartIndex, decoEndIndex))
+            if (ShouldHideSetting(i, name))
             {
                 continue;
             }
@@ -3056,10 +3104,28 @@ public class ShipEnhancements : ModBehaviour
                 }
 
                 if (settingObject["title"] != null)
-                {
-                    if (!SetCustomSettingName(ref label, name))
+                { 
+                    if (!SetCustomSettingName(settingsParent, ref label, ref cachedNames, name))
                     {
                         label = ModHelper.MenuTranslations.GetLocalizedString(settingObject["title"].ToString());
+
+                        if (SettingExtensions.customObjLabels.ContainsKey(name))
+                        {
+                            string old = SettingExtensions.customObjLabels[name];
+                            for (int c = 0; c < settingsParent.childCount; c++)
+                            {
+                                if (settingsParent.GetChild(c).name == "UIElement-" + old)
+                                {
+                                    var id = settingsParent.GetChild(c).GetInstanceID();
+                                    if (!cachedNames.ContainsKey(id))
+                                    {
+                                        cachedNames.Add(id, "UIElement-" + label);
+                                    }
+                                    //settingsParent.GetChild(c).name = "UIElement-" + label;
+                                }
+                            }
+                            SettingExtensions.customObjLabels[name] = label;
+                        }
                     }
                 }
 
@@ -3072,6 +3138,24 @@ public class ShipEnhancements : ModBehaviour
                 }
             }
 
+            if (endSetting != "" && i > endIndex)
+            {
+                for (int j = 0; j < settingsParent.childCount; j++)
+                {
+                    if (settingsParent.GetChild(j).name == "UIElement-" + label)
+                    {
+                        MenuOption option = settingsParent.GetChild(j).GetComponentInChildren<MenuOption>();
+                        if (option != null)
+                        {
+                            newModTab._menuOptions = newModTab._menuOptions.Add(option);
+                        }
+                    }
+                }
+                continue;
+            }
+
+            //ShipEnhancements.WriteDebugMessage("Add setting " + name);
+
             switch (settingType)
             {
                 case SettingType.CHECKBOX:
@@ -3080,10 +3164,11 @@ public class ShipEnhancements : ModBehaviour
                     settingCheckbox.ModSettingKey = name;
                     settingCheckbox.OnValueChanged += (bool newValue) =>
                     {
+                        var oldValue = ModHelper.Config.GetSettingsValue<bool>(name);
                         ModHelper.Config.SetSettingsValue(name, newValue);
                         ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
                         Configure(ModHelper.Config);
-                        OnValueChanged(name);
+                        OnValueChanged(name, oldValue, newValue);
                     };
                     break;
                 case SettingType.TOGGLE:
@@ -3094,10 +3179,11 @@ public class ShipEnhancements : ModBehaviour
                     settingToggle.ModSettingKey = name;
                     settingToggle.OnValueChanged += (bool newValue) =>
                     {
+                        var oldValue = ModHelper.Config.GetSettingsValue<bool>(name);
                         ModHelper.Config.SetSettingsValue(name, newValue);
                         ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
                         Configure(ModHelper.Config);
-                        OnValueChanged(name);
+                        OnValueChanged(name, oldValue, newValue);
                     };
                     break;
                 case SettingType.SELECTOR:
@@ -3108,16 +3194,19 @@ public class ShipEnhancements : ModBehaviour
                     settingSelector.ModSettingKey = name;
                     settingSelector.OnValueChanged += (int newIndex, string newSelection) =>
                     {
+                        var oldValue = ModHelper.Config.GetSettingsValue<string>(name);
                         ModHelper.Config.SetSettingsValue(name, newSelection);
                         ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
                         Configure(ModHelper.Config);
-                        OnValueChanged(name);
+                        //ShipEnhancements.WriteDebugMessage("Changed from " + oldValue + " to " + newSelection);
+                        OnValueChanged(name, oldValue, newSelection);
                     };
                     break;
                 case SettingType.SEPARATOR:
                     OptionsMenuManager.AddSeparator(newModTab, true);
                     OptionsMenuManager.CreateLabel(newModTab, name);
                     OptionsMenuManager.AddSeparator(newModTab, false);
+                    settingsParent.GetChild(settingsParent.childCount - 1).name = "UIElement-" + label;
                     break;
                 case SettingType.SLIDER:
                     var currentSliderValue = ModHelper.Config.GetSettingsValue<float>(name);
@@ -3127,10 +3216,11 @@ public class ShipEnhancements : ModBehaviour
                     settingSlider.ModSettingKey = name;
                     settingSlider.OnValueChanged += (float newValue) =>
                     {
+                        var oldValue = ModHelper.Config.GetSettingsValue<float>(name);
                         ModHelper.Config.SetSettingsValue(name, newValue);
                         ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
                         Configure(ModHelper.Config);
-                        OnValueChanged(name);
+                        OnValueChanged(name, oldValue, newValue);
                     };
                     break;
                 case SettingType.TEXT:
@@ -3139,12 +3229,13 @@ public class ShipEnhancements : ModBehaviour
                     textInput.ModSettingKey = name;
                     textInput.OnConfirmEntry += () =>
                     {
+                        var oldValue = ModHelper.Config.GetSettingsValue<string>(name);
                         var newValue = textInput.GetInputText();
                         ModHelper.Config.SetSettingsValue(name, newValue);
                         ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
                         Configure(ModHelper.Config);
                         textInput.SetText(newValue);
-                        OnValueChanged(name);
+                        OnValueChanged(name, oldValue, newValue);
                     };
                     break;
                 case SettingType.NUMBER:
@@ -3155,12 +3246,13 @@ public class ShipEnhancements : ModBehaviour
                     {
                         if (!string.IsNullOrEmpty(numberInput.GetInputText()))
                         {
+                            var oldValue = ModHelper.Config.GetSettingsValue<double>(name);
                             var newValue = double.Parse(numberInput.GetInputText());
                             ModHelper.Config.SetSettingsValue(name, newValue);
                             ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
                             Configure(ModHelper.Config);
                             numberInput.SetText(newValue.ToString());
-                            OnValueChanged(name);
+                            OnValueChanged(name, oldValue, newValue);
                         }
                     };
                     break;
@@ -3170,17 +3262,127 @@ public class ShipEnhancements : ModBehaviour
                     break;
             }
 
-            if (blendEnabled && i <= decoEndIndex)
+            if (startSetting != "")
             {
-                string stem = name.Substring(0, name.Length - 6);
-                if (_stemToSuffix.ContainsKey(stem) && name.Substring(name.Length - 1)
-                    == (blendEnabled ? (string)(stem + "ColorOptions").AsEnum<Settings>().GetValue() : "1"))
+                if (insertionIndex >= 0)
                 {
-                    OptionsMenuManager.AddSeparator(newModTab, false);
+                    var addedSetting = settingsParent.GetChild(settingsParent.childCount - 1);
+                    addedSetting.SetSiblingIndex(insertionIndex);
+                    insertionIndex++;
+
+                    if ((bool)Settings.enableColorBlending.GetValue() && GetDecorationSettings().Contains(name))
+                    {
+                        string stem = name.Substring(0, name.Length - 6);
+                        if (_stemToSuffix.ContainsKey(stem) && stem != "indicator"
+                            && name.Substring(name.Length - 1)
+                            == (string)(stem + "ColorOptions").AsEnum<Settings>().GetValue())
+                        {
+                            OptionsMenuManager.AddSeparator(newModTab, false);
+                            var sep = settingsParent.GetChild(settingsParent.childCount - 1);
+                            sep.name = "UIElement-" + label;
+                            sep.SetSiblingIndex(insertionIndex);
+                            insertionIndex++;
+                        }
+                    }
+                }
+
+                /*var prevSetting = ModHelper.Config.Settings.ElementAt(i - 1);
+                var prevSettingObj = prevSetting.Value as JObject;
+                var prevTitle = "";
+
+                if (lastVisibleIndex >= 0)
+                {
+                    prevSetting = ModHelper.Config.Settings.ElementAt(lastVisibleIndex);
+
+                    if (i - lastVisibleIndex > 1)
+                    {
+
+                    }
+                }
+
+                //ShipEnhancements.WriteDebugMessage(label);
+                if (prevSettingObj != default(JObject) && prevSettingObj["title"] != null)
+                {
+
+                    if (!SetCustomSettingName(ref prevTitle, prevSetting.Key))
+                {
+                    prevTitle = prevSettingObj["title"].ToString();
+                    }
+
+                    ShipEnhancements.WriteDebugMessage(name + " is using: " + prevSetting.Key);
+
+                    if (SettingExtensions.customObjLabels.ContainsKey(prevSetting.Key))
+                    {
+                        // the issue is that separators aren't being added to this list
+                        // so it gets the last item in the list (the separator) and checks the key of the separator which isn't accurate
+                        // maybe try backtracking until reaching something with a title obj?
+                        prevTitle = SettingExtensions.customObjLabels[prevSetting.Key];
+                    }
+                    else
+                    {
+                        prevTitle = ((JObject)prevSetting.Value)["title"].ToString();
+                    }
+                }
+                if (prevTitle != "")
+                {
+                    ShipEnhancements.WriteDebugMessage("Try placing after: " + prevTitle);
+                    var targetIndex = -1;
+                    for (int k = settingsParent.childCount - 1; k >= 0; k--)
+                    {
+                        if (settingsParent.GetChild(k).name == "UIElement-" + prevTitle)
+                        {
+                            ShipEnhancements.WriteDebugMessage("placing after " + prevTitle);
+                            targetIndex = k;
+                            break;
+                        }
+                    }
+                    if (targetIndex >= 0)
+                    {
+                        addedSetting.SetSiblingIndex(targetIndex + 1);
+
+                        if ((bool)Settings.enableColorBlending.GetValue() && GetDecorationSettings().Contains(name))
+                        {
+                            string stem = name.Substring(0, name.Length - 6);
+                            if (_stemToSuffix.ContainsKey(stem) && stem != "indicator"
+                                && name.Substring(name.Length - 1)
+                                == (string)(stem + "ColorOptions").AsEnum<Settings>().GetValue())
+                            {
+                                OptionsMenuManager.AddSeparator(newModTab, false);
+                                var sep = settingsParent.GetChild(settingsParent.childCount - 1);
+                                sep.name = "UIElement-" + label;
+                                sep.SetSiblingIndex(targetIndex + 2);
+                            }
+                        }
+                    }
+                }*/
+            }
+            else
+            {
+                if ((bool)Settings.enableColorBlending.GetValue() && GetDecorationSettings().Contains(name))
+                {
+                    string stem = name.Substring(0, name.Length - 6);
+                    //ShipEnhancements.WriteDebugMessage(stem);
+                    if (_stemToSuffix.ContainsKey(stem) && stem != "indicator"
+                        && name.Substring(name.Length - 1)
+                        == (string)(stem + "ColorOptions").AsEnum<Settings>().GetValue())
+                    {
+                        OptionsMenuManager.AddSeparator(newModTab, false);
+                    }
                 }
             }
         }
 
+        /*foreach (var pair in cachedNames)
+        {
+            foreach (Transform child in settingsParent)
+            {
+                if (child.GetInstanceID() == pair.Key)
+                {
+                    ShipEnhancements.WriteDebugMessage("OK I'M NOW APPLYING CHANGES TO " + child.name + " IT'S GONNA BECOME " + pair.Value);
+                    //child.name = pair.Value;
+                }
+            }
+        }*/
 
         if (newModTab._tooltipDisplay != null)
         {
@@ -3228,18 +3430,65 @@ public class ShipEnhancements : ModBehaviour
         ModHelper.Events.Unity.FireInNUpdates(() =>
         {
             scrollbar.value = lastScrollValue;
+            _detectValueChanged = true;
         }, 2);
     }
 
-    private bool DestroyExistingSettings(Menu menu, Transform parent, bool decoration = false)
+    private bool DestroyExistingSettings(Menu menu, Transform parent, string startSetting, string endSetting, out int insertionIndex)
     {
-        if (decoration)
+        ShipEnhancements.WriteDebugMessage("Color enabled: " + (bool)Settings.enableColorBlending.GetValue() + "  Target: " + endSetting);
+        bool hasStart = startSetting != "";
+        bool hasEnd = endSetting != "";
+        if (hasStart || hasEnd)
         {
+            string startTitle = "";
+            if (hasStart)
+            {
+                var setting = ModHelper.Config.Settings[startSetting] as JObject;
+                if (setting != default(JObject) && setting["title"] != null)
+                {
+                    /*if (!SetCustomSettingName(ref startTitle, startSetting))
+                    {
+                        startTitle = setting["title"].ToString();
+                    }*/
+                    if (SettingExtensions.customObjLabels.ContainsKey(startSetting))
+                    {
+                        startTitle = SettingExtensions.customObjLabels[startSetting];
+                    }
+                    else
+                    {
+                        startTitle = setting["title"].ToString();
+                    }
+                }
+            }
+
+            string endTitle = "";
+            if (hasEnd)
+            {
+                var setting = ModHelper.Config.Settings[endSetting] as JObject;
+                if (setting != default(JObject) && setting["title"] != null)
+                {
+                    /*if (!SetCustomSettingName(ref endTitle, endSetting))
+                    {
+                        endTitle = setting["title"].ToString();
+                        ShipEnhancements.WriteDebugMessage("         End title: " + endTitle);
+                    }*/
+                    if (SettingExtensions.customObjLabels.ContainsKey(endSetting))
+                    {
+                        endTitle = SettingExtensions.customObjLabels[endSetting];
+                    }
+                    else
+                    {
+                        endTitle = setting["title"].ToString();
+                    }
+                }
+            }
+
             int startIndex = -1;
             int endIndex = -1;
             for (int i = 0; i < parent.childCount; i++)
             {
-                if (parent.GetChild(i).name == "UIElement-Enable Color Blending")
+                if (parent.GetChild(i).name == "UIElement-" + startTitle)
                 {
                     startIndex = i;
                 }
@@ -3251,19 +3500,27 @@ public class ShipEnhancements : ModBehaviour
                     {
                         menu._menuOptions = menu._menuOptions.Add(option);
                     }
-                }
-                else
-                {
-                    //ShipEnhancements.WriteDebugMessage("Destroy " + parent.GetChild(i).name);
-                    Destroy(parent.GetChild(i).gameObject);
+                    continue;
                 }
 
-                if (parent.GetChild(i).name == "UIElement-Damage Indicator Color")
+                //ShipEnhancements.WriteDebugMessage("Searching for: " + "UIElement-" + endTitle + "      Current: " + parent.GetChild(i).name);
+                if (parent.GetChild(i).name == "UIElement-" + endTitle)
                 {
+                    ShipEnhancements.WriteDebugMessage("         Found it");
                     endIndex = i;
+                }
+
+                //ShipEnhancements.WriteDebugMessage("Destroy " + parent.GetChild(i).gameObject);
+                Destroy(parent.GetChild(i).gameObject);
+
+                if (endIndex > 0)
+                {
+                    insertionIndex = startIndex;
+                    return startIndex >= 0;
                 }
             }
 
+            insertionIndex = startIndex;
             return startIndex >= 0;
         }
 
@@ -3274,6 +3531,7 @@ public class ShipEnhancements : ModBehaviour
                 MenuOption option = parent.GetChild(i).GetComponentInChildren<MenuOption>();
                 if (option != null)
                 {
+                    //ShipEnhancements.WriteDebugMessage("self destruct");
                     menu._menuOptions = menu._menuOptions.Add(option);
                 }
             }
@@ -3283,10 +3541,11 @@ public class ShipEnhancements : ModBehaviour
             }
         }
 
+        insertionIndex = -1;
         return true;
     }
 
-    private bool ShouldHideSetting(int currIndex, string name, bool onlyDecoration, int decoStartIndex, int decoEndIndex)
+    private bool ShouldHideSetting(int currIndex, string name)
     {
         foreach (Settings hiddenSetting in HiddenSettings)
         {
@@ -3296,20 +3555,18 @@ public class ShipEnhancements : ModBehaviour
             }
         }
 
-        if (!onlyDecoration)
+        if (_currentPreset != SettingsPresets.PresetName.Random)
         {
-            if (_currentPreset != SettingsPresets.PresetName.Random)
+            if (name == "randomIterations" || name == "randomDifficulty")
             {
-                if (name == "randomIterations" || name == "randomDifficulty")
-                {
-                    return true;
-                }
+                return true;
             }
         }
 
-        if (currIndex <= decoEndIndex)
+        if (GetDecorationSettings().Contains(name))
         {
-            if (currIndex > decoStartIndex && !(bool)Settings.enableColorBlending.GetValue()
+            //ShipEnhancements.WriteDebugMessage("Chekc should hide " + name);
+            if (name != "enableColorBlending" && !(bool)Settings.enableColorBlending.GetValue()
                 && (!int.TryParse(name.Substring(name.Length - 1), out int value) || value != 1))
             {
                 return true;
@@ -3333,8 +3590,10 @@ public class ShipEnhancements : ModBehaviour
         return false;
     }
 
-    private bool SetCustomSettingName(ref string label, string settingName)
+    private bool SetCustomSettingName(Transform settingsParent, ref string label, ref Dictionary<int, string> cachedNames, string settingName)
     {
+        bool custom = false;
+
         if (!(bool)Settings.enableColorBlending.GetValue()) return false;
 
         string stem = settingName.Substring(0, settingName.Length - 6);
@@ -3360,6 +3619,33 @@ public class ShipEnhancements : ModBehaviour
         if (found.Count() > 0)
         {
             label = _stemToSuffix[stem] + " " + found.First().suffix;
+            custom = true;
+        }
+
+        if (custom)
+        {
+            if (!SettingExtensions.customObjLabels.ContainsKey(settingName))
+            {
+                ShipEnhancements.WriteDebugMessage("ADD CUSTOM LABEL: " + settingName + " : " + label);
+                SettingExtensions.customObjLabels.Add(settingName, label);
+            }
+            else
+            {
+                string old = SettingExtensions.customObjLabels[settingName];
+                ShipEnhancements.WriteDebugMessage("I WILL NOW CHANGE " + old + " TO " + label);
+                for (int c = 0; c < settingsParent.childCount; c++)
+                {
+                    if (settingsParent.GetChild(c).name == "UIElement-" + old)
+                    {
+                        ShipEnhancements.WriteDebugMessage("override " + settingName);
+                        var id = settingsParent.GetChild(c).GetInstanceID();
+                        if (!cachedNames.ContainsKey(id))
+                        cachedNames.Add(id, "UIElement-" + label);
+                        //child.name = "UIElement-" + label;
+                    }
+                }
+                SettingExtensions.customObjLabels[settingName] = label;
+            }
             return true;
         }
 

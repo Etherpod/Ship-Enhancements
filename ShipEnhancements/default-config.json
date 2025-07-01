@@ -36,7 +36,8 @@
     },
 
     "Disable Ship Parts": {
-      "type": "separator"
+      "type": "separator",
+      "title": "Disable Ship Parts"
     },
 
     "disableGravityCrystal": {
@@ -192,7 +193,8 @@
     },
 
     "Adjust Ship Functions": {
-      "type": "separator"
+      "type": "separator",
+      "title": "Adjust Ship Functions"
     },
 
     "oxygenDrainMultiplier": {
@@ -416,7 +418,8 @@
     },
 
     "Add Ship Functions": {
-      "type": "separator"
+      "type": "separator",
+      "title": "Add Ship Functions"
     },
 
     "shipOxygenRefill": {
@@ -699,7 +702,8 @@
     },
 
     "Decoration": {
-      "type": "separator"
+      "type": "separator",
+      "title": "Decoration"
     },
 
     "enableColorBlending": {
@@ -1180,7 +1184,8 @@
     },
 
     "Quality of Life": {
-      "type": "separator"
+      "type": "separator",
+      "title": "Quality of Life"
     },
 
     "keepHelmetOn": {

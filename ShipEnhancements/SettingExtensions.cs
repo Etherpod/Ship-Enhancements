@@ -148,6 +148,8 @@ public static class SettingExtensions
 
     private static Dictionary<Settings, object> savedCustomSettings = new(settingValues.Count);
 
+    public static Dictionary<string, string> customObjLabels = new();
+
     public static string GetName(this Settings setting)
     {
         return setting.ToString();
