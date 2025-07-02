@@ -135,7 +135,7 @@ public class Tether : MonoBehaviour
             {
                 attachedToPlayer = true;
                 connectedBody.MoveToPosition(connectedBody.transform.position);
-                _joint.massScale = 250f;
+                //_joint.massScale = 250f;
 
                 if (ShipEnhancements.InMultiplayer && !ShipEnhancements.QSBAPI.GetIsHost() && !_rigidbody.IsKinematic())
                 {
@@ -150,7 +150,7 @@ public class Tether : MonoBehaviour
                     _joint.connectedMassScale = 1000f;
                     _joint.massScale = 1000f;
                 }
-                else
+                else if (_rigidbody.IsKinematic() && !_connectedRigidbody.IsKinematic())
                 {
                     _joint.connectedMassScale = 1000f;
                     _joint.massScale = 0.001f;
@@ -165,8 +165,8 @@ public class Tether : MonoBehaviour
             float buffer = ignoreBuffer ? 0f : _transferBufferDistance;
             _joint.minDistance = connectedBody == SELocator.GetPlayerBody() ? 15f : Mathf.Min(_maxTetherDistance, Vector3.Distance(transform.TransformPoint(_anchor), 
                 _connectedTransform.TransformPoint(_connectedAnchor)) + buffer);
-            _joint.spring = 0.2f;
-            _joint.damper = 0f;
+            _joint.spring = 50f;
+            _joint.damper = 2.5f;
         }
         else
         {
