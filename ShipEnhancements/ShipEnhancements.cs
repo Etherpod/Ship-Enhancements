@@ -1408,24 +1408,16 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((bool)addPortableTractorBeam.GetProperty())
         {
-            /*GameObject tractor = LoadPrefab("Assets/ShipEnhancements/PortableTractorBeamItem.prefab");
-            AssetBundleUtilities.ReplaceShaders(tractor);
-            GameObject tractorObj = Instantiate(tractor);*/
             GameObject tractorSocket = LoadPrefab("Assets/ShipEnhancements/PortableTractorBeamSocket.prefab");
             GameObject tractorSocketObj = Instantiate(tractorSocket, SELocator.GetShipTransform().Find("Module_Cabin"));
-            //tractorSocketObj.GetComponent<PortableTractorBeamSocket>().PlaceIntoSocket(tractorObj.GetComponent<PortableTractorBeamItem>());
         }
         if ((bool)addExpeditionFlag.GetProperty())
         {
             SELocator.GetShipTransform().GetComponentInChildren<Minimap>().gameObject.AddComponent<MinimapFlagController>();
             SELocator.GetPlayerBody().GetComponentInChildren<Minimap>().gameObject.AddComponent<MinimapFlagController>();
 
-            /*GameObject flag = LoadPrefab("Assets/ShipEnhancements/ExpeditionFlagItem.prefab");
-            AssetBundleUtilities.ReplaceShaders(flag);
-            GameObject flagObj = Instantiate(flag);*/
             GameObject flagSocket = LoadPrefab("Assets/ShipEnhancements/ExpeditionFlagSocket.prefab");
             GameObject flagSocketObj = Instantiate(flagSocket, SELocator.GetShipTransform().Find("Module_Cabin"));
-            //flagSocketObj.GetComponent<ExpeditionFlagSocket>().PlaceIntoSocket(flagObj.GetComponent<ExpeditionFlagItem>());
         }
         if ((bool)addFuelCanister.GetProperty())
         {
@@ -1517,16 +1509,16 @@ public class ShipEnhancements : ModBehaviour
             GameObject obj1 = crystalParent.Find("Props_NOM_GravityCrystal").gameObject;
             GameObject obj2 = crystalParent.Find("Props_NOM_GravityCrystal_Base").gameObject;
 
-            GameObject crystal = LoadPrefab("Assets/ShipEnhancements/GravityCrystalItem.prefab");
+            /*GameObject crystal = LoadPrefab("Assets/ShipEnhancements/GravityCrystalItem.prefab");
             AssetBundleUtilities.ReplaceShaders(crystal);
-            ShipGravityCrystalItem item = Instantiate(crystal).GetComponent<ShipGravityCrystalItem>();
+            ShipGravityCrystalItem item = Instantiate(crystal).GetComponent<ShipGravityCrystalItem>();*/
 
             GameObject crystalSocket = LoadPrefab("Assets/ShipEnhancements/GravityCrystalSocket.prefab");
             AssetBundleUtilities.ReplaceShaders(crystalSocket);
             ShipGravityCrystalSocket socket = Instantiate(crystalSocket, SELocator.GetShipTransform().Find("Module_Engine")).GetComponent<ShipGravityCrystalSocket>();
-
+            ShipEnhancements.WriteDebugMessage(socket.transform.parent);
             socket.AddComponentMeshes([obj1, obj2]);
-            socket.PlaceIntoSocket(item);
+            //socket.PlaceIntoSocket(item);
         }
         if ((bool)extraNoise.GetProperty())
         {

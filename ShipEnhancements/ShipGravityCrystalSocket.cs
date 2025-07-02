@@ -5,7 +5,7 @@ using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
-public class ShipGravityCrystalSocket : OWItemSocket
+public class ShipGravityCrystalSocket : SEItemSocket
 {
     private List<GameObject> _componentMeshes = [];
     private ShipGravityComponent _gravityComponent;
@@ -15,10 +15,8 @@ public class ShipGravityCrystalSocket : OWItemSocket
 
     public override void Awake()
     {
-        Reset();
-        _sector = SELocator.GetShipSector();
         base.Awake();
-        _acceptableType = ShipGravityCrystalItem.ItemType;
+
         _gravityComponent = SELocator.GetShipTransform().GetComponentInChildren<ShipGravityComponent>();
         _collider = gameObject.GetAddComponent<OWCollider>();
         _socketedShadowCaster = SELocator.GetShipTransform().Find("Module_Engine/Geo_Engine/ShadowCaster_Engine").gameObject;
@@ -28,12 +26,16 @@ public class ShipGravityCrystalSocket : OWItemSocket
 
         _gravityComponent.OnDamaged += OnGravityDamaged;
         _gravityComponent.OnRepaired += OnGravityRepaired;
-        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
     }
 
     public override void Start()
     {
         base.Start();
+    }
+
+    protected override ItemType GetAcceptableType()
+    {
+        return ShipEnhancements.Instance.GravityCrystalType;
     }
 
     public void AddComponentMeshes(GameObject[] meshes)
@@ -99,6 +101,5 @@ public class ShipGravityCrystalSocket : OWItemSocket
     {
         _gravityComponent.OnDamaged -= OnGravityDamaged;
         _gravityComponent.OnRepaired -= OnGravityRepaired;
-        GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
     }
 }

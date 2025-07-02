@@ -120,35 +120,29 @@ public class ShipGravityCrystalItem : OWItem
 
         if (!socketTransform.GetComponent<ShipGravityCrystalSocket>()) return;
 
-        if (_hasBeenSocketed)
+        transform.localScale = Vector3.one;
+
+        _meshParent.SetActive(false);
+        _light.enabled = false;
+
+        if (!(bool)disableGravityCrystal.GetProperty() && !_gravityComponent.isDamaged)
         {
-            transform.localScale = Vector3.one;
-
-            _meshParent.SetActive(false);
-            _light.enabled = false;
-
-            if (!(bool)disableGravityCrystal.GetProperty() && !_gravityComponent.isDamaged)
-            {
-                _gravityComponent.OnComponentRepaired();
-                _gravityComponentLight.enabled = true;
-                _gravityComponent._gravityAudio.FadeIn(0.5f);
-            }
-            else
-            {
-                if (!(bool)disableGravityCrystal.GetProperty())
-                {
-                    _gravityComponentLight.enabled = true;
-                    if (!SELocator.GetShipDamageController().IsSystemFailed())
-                    {
-                        _gravityComponent._damageEffect._particleSystem.Play();
-                    }
-                }
-                _gravityComponent._damageEffect._decalRenderers[0].SetActivation(true);
-            }
+            ShipEnhancements.WriteDebugMessage("socket thing");
+            _gravityComponent.OnComponentRepaired();
+            _gravityComponentLight.enabled = true;
+            _gravityComponent._gravityAudio.FadeIn(0.5f);
         }
         else
         {
-            _hasBeenSocketed = true;
+            if (!(bool)disableGravityCrystal.GetProperty())
+            {
+                _gravityComponentLight.enabled = true;
+                if (!SELocator.GetShipDamageController().IsSystemFailed())
+                {
+                    _gravityComponent._damageEffect._particleSystem.Play();
+                }
+            }
+            _gravityComponent._damageEffect._decalRenderers[0].SetActivation(true);
         }
     }
 
