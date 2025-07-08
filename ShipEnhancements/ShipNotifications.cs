@@ -176,19 +176,19 @@ public static class ShipNotifications
 
         if ((bool)enableShipTemperature.GetProperty() && SELocator.GetShipTemperatureDetector() != null)
         {
-            float hullTempRatio = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio() - 0.5f;
+            float hullTempRatio = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
             float hullTempAbs = Mathf.Abs(hullTempRatio);
-            if (!_hullTemperatureCritical && hullTempAbs > 0.35f)
+            if (!_hullTemperatureCritical && hullTempAbs > 0.7f)
             {
                 _hullTemperatureCritical = true;
                 NotificationManager.SharedInstance.PostNotification(_temperatureCriticalNotification, false);
             }
-            else if (_hullTemperatureCritical && hullTempAbs < 0.35f)
+            else if (_hullTemperatureCritical && hullTempAbs < 0.7f)
             {
                 _hullTemperatureCritical = false;
             }
 
-            if (!_hullTemperatureHigh && hullTempAbs > 0.15f)
+            if (!_hullTemperatureHigh && hullTempAbs > 0.3f)
             {
                 _hullTemperatureHigh = true;
                 if (hullTempRatio > 0)
@@ -200,7 +200,7 @@ public static class ShipNotifications
                     NotificationManager.SharedInstance.PostNotification(_temperatureLowNotification, false);
                 }
             }
-            else if (_hullTemperatureHigh && hullTempAbs < 0.15f)
+            else if (_hullTemperatureHigh && hullTempAbs < 0.3f)
             {
                 _hullTemperatureHigh = false;
             }

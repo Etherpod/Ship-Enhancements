@@ -18,6 +18,7 @@ public static class SELocator
     private static PlayerResources _playerResources;
     private static ProbeLauncherComponent _probeLauncherComponent;
     private static ShipTemperatureDetector _shipTemperatureDetector;
+    private static ShipTemperatureDamageController _shipTempDamageController;
     private static ShipDamageController _shipDamageController;
     private static ShipOverdriveController _shipOverdriveController;
     private static SignalscopeComponent _signalscopeComponent;
@@ -55,6 +56,7 @@ public static class SELocator
         if ((bool)enableShipTemperature.GetProperty())
         {
             _shipTemperatureDetector = _shipDetector.gameObject.AddComponent<ShipTemperatureDetector>();
+            _shipTempDamageController = _shipDetector.gameObject.AddComponent<ShipTemperatureDamageController>();
         }
     }
 
@@ -164,6 +166,11 @@ public static class SELocator
     public static ShipTemperatureDetector GetShipTemperatureDetector()
     {
         return _shipTemperatureDetector;
+    }
+    
+    public static ShipTemperatureDamageController GetShipTemperatureDamageController()
+    {
+        return _shipTempDamageController;
     }
 
     public static ShipDamageController GetShipDamageController()

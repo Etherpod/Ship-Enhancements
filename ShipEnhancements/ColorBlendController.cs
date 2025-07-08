@@ -104,7 +104,7 @@ public class ColorBlendController : MonoBehaviour
         }
         else if (_blendMode == "Ship Temperature" && SELocator.GetShipTemperatureDetector() != null)
         {
-            _targetLerp = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
+            _targetLerp = (SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio() + 1f) / 2f;
             if (Mathf.Abs(_targetLerp - _currentLerp) > _maxLerpStep)
             {
                 _currentLerp = Mathf.Lerp(_currentLerp, _targetLerp, Time.deltaTime);

@@ -134,7 +134,7 @@ public class ShipEngineSwitch : CockpitInteractible
                     if (SELocator.GetShipTemperatureDetector() != null)
                     {
                         float ratio = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
-                        if (Random.value < Mathf.InverseLerp(0.25f, -0.08f, ratio))
+                        if (Random.value < Mathf.InverseLerp(-0.5f, -1.16f, ratio))
                         {
                             AudioClip sputterClip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/ShipEngineSputter.ogg");
                             ShipThrusterAudio thrusterAudio = _thrusterController.GetComponentInChildren<ShipThrusterAudio>();

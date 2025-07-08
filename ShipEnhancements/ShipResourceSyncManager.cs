@@ -32,7 +32,7 @@ public class ShipResourceSyncManager
                 _qsbCompat.SendShipFuelValue(id, SELocator.GetShipResources()._currentFuel);
                 if (TempSync)
                 {
-                    _qsbCompat.SendShipHullTemp(id, SELocator.GetShipTemperatureDetector().GetShipTempMeter());
+                    _qsbCompat.SendShipHullTemp(id, SELocator.GetShipTemperatureDetector().GetCurrentInternalTemperature());
                 }
                 if (FilthSync)
                 {

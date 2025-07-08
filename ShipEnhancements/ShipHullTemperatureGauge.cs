@@ -23,8 +23,8 @@ public class ShipHullTemperatureGauge : MonoBehaviour
     private void Update()
     {
         Quaternion targetQuaternion;
-        float ratio = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
-        targetQuaternion = Quaternion.AngleAxis(Mathf.Lerp(_needleAngleMin, _needleAngleMax, SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio()), Vector3.right);
+        float ratio = (SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio() + 1f) / 2f;
+        targetQuaternion = Quaternion.AngleAxis(Mathf.Lerp(_needleAngleMin, _needleAngleMax, ratio), Vector3.right);
 
         if (Quaternion.Angle(_currentNeedleRotation, targetQuaternion) >= 0.1f)
         {

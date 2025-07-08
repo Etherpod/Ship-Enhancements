@@ -9,41 +9,36 @@ public class TemperatureDetector : MonoBehaviour
     protected float _currentTemperature;
     protected float _highTempCutoff;
     protected bool _highTemperature = false;
-    protected float _internalTempMeterLength;
-    protected float _internalTempMeter;
-    protected bool _updateNextFrame = false;
-
-    protected virtual bool UpdateTemperature => _activeZones.Count > 0 || _updateNextFrame;
+    protected float _maxInternalTemperature;
+    protected float _currentInternalTemperature;
+    protected bool _forceNextUpdate = false;
 
     protected virtual void Start()
     {
         _currentTemperature = 0f;
         _highTempCutoff = 50f;
-        _internalTempMeterLength = 180f;
+        _maxInternalTemperature = 180f;
     }
 
     protected virtual void Update()
     {
-        if (UpdateTemperature)
+        if (CanUpdateTemperature())
         {
             _currentTemperature = CalculateCurrentTemperature();
 
-            if (!_highTemperature)
+            if (!_highTemperature && Mathf.Abs(_currentTemperature) > _highTempCutoff)
             {
-                if (Mathf.Abs(_currentTemperature) > _highTempCutoff)
-                {
-                    _highTemperature = true;
-                }
+                _highTemperature = true;
             }
             else
             {
                 UpdateInternalTemperature();
-                UpdateHighTemperature();
+                OnHighTemperature();
             }
             
-            if (_updateNextFrame)
+            if (_forceNextUpdate)
             {
-                _updateNextFrame = false;
+                _forceNextUpdate = false;
             }
         }
 
@@ -57,7 +52,7 @@ public class TemperatureDetector : MonoBehaviour
         }
     }
 
-    protected virtual void UpdateHighTemperature() { }
+    protected virtual void OnHighTemperature() { }
 
     protected virtual float CalculateCurrentTemperature()
     {
@@ -72,30 +67,36 @@ public class TemperatureDetector : MonoBehaviour
 
     protected virtual void UpdateInternalTemperature()
     {
-        if (Mathf.Abs(_internalTempMeter) < _internalTempMeterLength)
+        if (Mathf.Abs(_currentInternalTemperature) < _maxInternalTemperature)
         {
-            _internalTempMeter += Time.deltaTime * 3f * Mathf.InverseLerp(_highTempCutoff, 100f, Mathf.Abs(_currentTemperature)) * Mathf.Sign(GetTemperatureRatio());
+            var highTempAbs = Mathf.InverseLerp(_highTempCutoff, 100f, Mathf.Abs(_currentTemperature));
+            _currentInternalTemperature += Time.deltaTime * 3f * highTempAbs * Mathf.Sign(GetTemperatureRatio());
         }
     }
 
     protected virtual void UpdateCooldown()
     {
-        if (Mathf.Abs(_internalTempMeter) / _internalTempMeterLength < 0.01f)
+        if (Mathf.Abs(_currentInternalTemperature) / _maxInternalTemperature < 0.01f)
         {
-            _internalTempMeter = 0f;
+            _currentInternalTemperature = 0f;
         }
         else
         {
             float step = Time.deltaTime * Mathf.InverseLerp(_highTempCutoff, 0f, Mathf.Abs(_currentTemperature));
-            if (_internalTempMeter > 0f)
+            if (_currentInternalTemperature > 0f)
             {
-                _internalTempMeter -= step;
+                _currentInternalTemperature -= step;
             }
-            else if (_internalTempMeter < 0f)
+            else if (_currentInternalTemperature < 0f)
             {
-                _internalTempMeter += step;
+                _currentInternalTemperature += step;
             }
         }
+    }
+
+    protected virtual bool CanUpdateTemperature()
+    {
+        return true;
     }
 
     public float GetTemperatureRatio()
@@ -112,7 +113,19 @@ public class TemperatureDetector : MonoBehaviour
 
     public float GetInternalTemperatureRatio()
     {
-        return Mathf.InverseLerp(-_internalTempMeterLength, _internalTempMeterLength, _internalTempMeter);
+        if (_currentInternalTemperature > 0)
+        {
+            return Mathf.InverseLerp(0f, _maxInternalTemperature, _currentInternalTemperature);
+        }
+        else
+        {
+            return -Mathf.InverseLerp(0f, -_maxInternalTemperature, _currentInternalTemperature);
+        }
+    }
+
+    public float GetHighTempCutoff()
+    {
+        return _highTempCutoff;
     }
 
     public bool IsHighTemperature()
@@ -120,14 +133,19 @@ public class TemperatureDetector : MonoBehaviour
         return _highTemperature;
     }
 
-    public float GetShipTempMeter()
+    public float GetCurrentTemperature()
     {
-        return _internalTempMeter;
+        return _currentTemperature;
     }
 
-    public void SetShipTempMeter(float time)
+    public float GetCurrentInternalTemperature()
     {
-        _internalTempMeter = Mathf.Clamp(time, -_internalTempMeterLength, _internalTempMeterLength);
+        return _currentInternalTemperature;
+    }
+
+    public void SetInternalTempRemote(float time)
+    {
+        _currentInternalTemperature = Mathf.Clamp(time, -_maxInternalTemperature, _maxInternalTemperature);
     }
 
     public virtual void AddZone(TemperatureZone zone)
@@ -145,7 +163,7 @@ public class TemperatureDetector : MonoBehaviour
             _activeZones.Remove(zone);
             if (_activeZones.Count == 0)
             {
-                _updateNextFrame = true;
+                _forceNextUpdate = true;
             }
         }
     }
@@ -153,6 +171,6 @@ public class TemperatureDetector : MonoBehaviour
     public virtual void RemoveAllZones()
     {
         _activeZones.Clear();
-        _updateNextFrame = true;
+        _forceNextUpdate = true;
     }
 }

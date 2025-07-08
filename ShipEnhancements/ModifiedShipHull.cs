@@ -52,9 +52,9 @@ public class ModifiedShipHull : MonoBehaviour
             && !PlayerState.IsInsideShip())
         {
             float ratio = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
-            if (ratio > 0.75f)
+            if (ratio > 0.5f)
             {
-                float lerp = Mathf.InverseLerp(0.75f, 1f, ratio);
+                float lerp = Mathf.InverseLerp(0.5f, 1f, ratio);
                 _tempHazardVolume._damagePerSecond = Mathf.Lerp(0f, _shipHeatDamage, lerp);
                 Locator.GetPlayerDetector().GetComponent<HazardDetector>().AddVolume(_tempHazardVolume);
             }

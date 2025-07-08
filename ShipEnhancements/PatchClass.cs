@@ -373,7 +373,8 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipHull), nameof(ShipHull.FixedUpdate))]
     public static bool ApplyHullDamageMultiplier(ShipHull __instance)
     {
-        if (((float)shipDamageMultiplier.GetProperty() == 1 && (float)shipDamageSpeedMultiplier.GetProperty() == 1)
+        if (((float)shipDamageMultiplier.GetProperty() == 1 && (float)shipDamageSpeedMultiplier.GetProperty() == 1
+            && SELocator.GetShipTemperatureDamageController() == null)
             || ShipEnhancements.InMultiplayer)
         {
             return true;
@@ -386,6 +387,14 @@ public static class PatchClass
 
         float damageMultiplier = Mathf.Max((float)shipDamageMultiplier.GetProperty(), 0f);
         float damageSpeedMultiplier = Mathf.Max((float)shipDamageSpeedMultiplier.GetProperty(), 0f);
+
+        var tempDamage = SELocator.GetShipTemperatureDamageController();
+        if (tempDamage != null)
+        {
+            var tempMultiplier = tempDamage.GetDamageMultipliers();
+            damageMultiplier *= tempMultiplier.damageMultiplier;
+            damageSpeedMultiplier *= tempMultiplier.speedMultiplier;
+        }
 
         if (__instance._debugImpact)
         {
@@ -468,7 +477,8 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipComponent), nameof(ShipComponent.ApplyImpact))]
     public static bool ApplyComponentDamageMultiplier(ShipComponent __instance, ImpactData impact)
     {
-        if ((float)shipDamageMultiplier.GetProperty() == 1 && (float)shipDamageSpeedMultiplier.GetProperty() == 1)
+        if ((float)shipDamageMultiplier.GetProperty() == 1 && (float)shipDamageSpeedMultiplier.GetProperty() == 1
+            && SELocator.GetShipTemperatureDamageController() == null)
         {
             return true;
         }
@@ -481,6 +491,14 @@ public static class PatchClass
 
         float damageMultiplier = Mathf.Max((float)shipDamageMultiplier.GetProperty(), 0f);
         float damageSpeedMultiplier = Mathf.Max((float)shipDamageSpeedMultiplier.GetProperty(), 0f);
+
+        var tempDamage = SELocator.GetShipTemperatureDamageController();
+        if (tempDamage != null)
+        {
+            var tempMultiplier = tempDamage.GetDamageMultipliers();
+            damageMultiplier *= tempMultiplier.damageMultiplier;
+            damageSpeedMultiplier *= tempMultiplier.speedMultiplier;
+        }
 
         if (UnityEngine.Random.value / damageMultiplier
             < __instance._damageProbabilityCurve.Evaluate(impact.speed / damageSpeedMultiplier))
@@ -905,7 +923,7 @@ public static class PatchClass
             {
                 __instance._isIgniting = true;
                 float ratio = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
-                if (UnityEngine.Random.value < Mathf.InverseLerp(0.25f, -0.08f, ratio))
+                if (UnityEngine.Random.value < Mathf.InverseLerp(-0.5f, -1.16f, ratio))
                 {
                     AudioClip sputterClip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/ShipEngineSputter.ogg");
                     ShipThrusterAudio thrusterAudio = __instance.GetComponentInChildren<ShipThrusterAudio>();
@@ -984,7 +1002,7 @@ public static class PatchClass
         if (__instance.CompareTag("ShipDetector") && SELocator.GetShipTemperatureDetector() != null)
         {
             float ratio = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
-            float lerp = Mathf.InverseLerp(0.49f, 0.1f, ratio);
+            float lerp = Mathf.InverseLerp(-0.02f, -0.8f, ratio);
             __result *= 1 - (0.5f * lerp);
         }
     }
@@ -2402,7 +2420,7 @@ public static class PatchClass
             return false;
         }
 
-        if (SELocator.GetShipTemperatureDetector() != null && SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio() < 0.25f)
+        if (SELocator.GetShipTemperatureDetector() != null && SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio() < -0.5f)
         {
             __result = AddIgnitionSputter(__instance);
             return false;

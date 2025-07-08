@@ -608,7 +608,7 @@ public class QSBCompatibility
 
     private void ReceiveShipHullTemp(uint id, float temperature)
     {
-        SELocator.GetShipTemperatureDetector()?.SetShipTempMeter(temperature);
+        SELocator.GetShipTemperatureDetector()?.SetInternalTempRemote(temperature);
     }
     #endregion
 

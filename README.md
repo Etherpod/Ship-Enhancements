@@ -199,6 +199,7 @@ To use the API, copy the **IShipEnhancements** script from this mod's GitHub rep
 - The Expedition Flag's map marker may not be visible when using the advanced minimap from General Enhancements
 - The Continuous Matching Velocity feature from General Enhancements may cause bugs when used with the Autopilot Controls
 - Placing the ship's gravity crystal on the landing gear and then detaching the landing gear will crash the game
+- Placing two gravity crystals on two different moving objects next to each other may crash the game
 
 # Credits
 Big thanks to **ditzy** for all of their help! There's so much I have to put it in a list:
