@@ -10,7 +10,9 @@ namespace ShipEnhancements;
 public class PatchHandler : MonoBehaviour
 {
     private static PatchHandler instance;
+
     public static PatchHandler Instance => instance;
+    public static bool EngineSputtering => Instance?._engineSputtering ?? false;
 
     private int _focusedItems;
 
@@ -54,23 +56,31 @@ public class PatchHandler : MonoBehaviour
         AudioClip loopClip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/ShipEngineSputter_Loop.ogg");
         _currentSputterClip = loopClip;
 
-        int num = UnityEngine.Random.Range(4, 8);
+        float ratio = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
+        float tempLerp = Mathf.Sqrt(Mathf.InverseLerp(-0.5f, -1f, ratio));
+        float difficulty = (float)temperatureDifficulty.GetProperty();
+
+        int min = (int)Mathf.Lerp(1f, 3.1f, difficulty * tempLerp);
+        int max = (int)Mathf.Lerp(3f, 7.1f, difficulty * tempLerp);
+
+        int num = UnityEngine.Random.Range(min, max);
         for (int i = 0; i < num; i++)
         {
             _shipThrusterAudio._ignitionSource.PlayOneShot(_currentSputterClip);
 
-            if (UnityEngine.Random.value < 0.2f)
+            float damageChance = Mathf.Lerp(0f, 0.3f, 0.5f + (difficulty / 2f));
+            if (UnityEngine.Random.value < damageChance * tempLerp)
             {
-                RandomShipDamage(damageCause: "engine_stall");
+                RandomShipDamage(componentDamage: difficulty > 0.75f, damageCause: "engine_stall");
             }
 
             yield return new WaitForSeconds(_currentSputterClip.length - 0.005f);
         }
 
-        _engineSputtering = false;
-        ShipThrusterController controller = Locator.GetShipBody().GetComponent<ShipThrusterController>();
-        controller._ignitionTime = Time.time;
         _shipThrusterAudio._ignitionSource.PlayOneShot(ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/ShipEngineSputter_Complete.ogg"));
+
+        yield return new WaitForSeconds(1f);
+        _engineSputtering = false;
 
         _sputterCoroutine = null;
     }
@@ -150,11 +160,11 @@ public class PatchHandler : MonoBehaviour
                 __instance._isIgniting = true;
 
                 float ratio = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
-                float tempLerp = Mathf.InverseLerp(-0.5f, -1f, ratio);
+                float tempLerp = Mathf.Sqrt(Mathf.InverseLerp(-0.5f, -1f, ratio));
                 float maxChance = Mathf.Lerp(0f, 1f, (float)temperatureDifficulty.GetProperty() * 1.5f);
 
                 float rand = (float)new System.Random().NextDouble();
-                if (rand < Mathf.Lerp(0f, maxChance, tempLerp))
+                if (rand < maxChance * tempLerp)
                 {
                     Instance.StartSputter();
                 }

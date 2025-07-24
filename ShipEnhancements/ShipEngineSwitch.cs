@@ -39,7 +39,6 @@ public class ShipEngineSwitch : CockpitInteractible
     private float _ignitionTime;
     private float _ignitionDuration;
     private bool _completedIgnition = false;
-    private bool _engineStalling = false;
     private Color _indicatorLightColor = new Color(1.3f, 0.55f, 0.55f);
     private bool _lastShipPowerState = false;
     private bool _lastShipThrusterState = false;
@@ -134,14 +133,13 @@ public class ShipEngineSwitch : CockpitInteractible
                     if (SELocator.GetShipTemperatureDetector() != null)
                     {
                         float ratio = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
-                        if (Random.value < Mathf.InverseLerp(-0.5f, -1.16f, ratio))
+                        float tempLerp = Mathf.Sqrt(Mathf.InverseLerp(-0.5f, -1f, ratio));
+                        float maxChance = Mathf.Lerp(0f, 1f, (float)temperatureDifficulty.GetProperty() * 1.5f);
+
+                        float rand = (float)new System.Random().NextDouble();
+                        if (rand < maxChance * tempLerp)
                         {
-                            AudioClip sputterClip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/ShipEngineSputter.ogg");
-                            ShipThrusterAudio thrusterAudio = _thrusterController.GetComponentInChildren<ShipThrusterAudio>();
-                            thrusterAudio._ignitionSource.Stop();
-                            thrusterAudio._isIgnitionPlaying = true;
-                            thrusterAudio._ignitionSource.PlayOneShot(sputterClip);
-                            _engineStalling = true;
+                            PatchHandler.Instance.StartSputter();
                         }
                         else
                         {
@@ -155,7 +153,7 @@ public class ShipEngineSwitch : CockpitInteractible
                         GlobalMessenger.FireEvent("StartShipIgnition");
                     }
                 }
-                if (!_completedIgnition && !_engineStalling && Time.time > _ignitionTime + _ignitionDuration)
+                if (!_completedIgnition && !PatchHandler.EngineSputtering && Time.time > _ignitionTime + _ignitionDuration)
                 {
                     _completedIgnition = true;
                     ShipEnhancements.Instance.SetEngineOn(true);
@@ -314,7 +312,10 @@ public class ShipEngineSwitch : CockpitInteractible
             _turnSwitch = false;
             _completedTurn = false;
             //_thrusterController._isIgniting = false;
-            _engineStalling = false;
+            if (SELocator.GetShipTemperatureDetector() != null)
+            {
+                PatchHandler.Instance.StopSputter();
+            }
             GlobalMessenger.FireEvent("CancelShipIgnition");
             if (_audioSource.isPlaying)
             {
@@ -370,11 +371,6 @@ public class ShipEngineSwitch : CockpitInteractible
             StartCoroutine(ActivateIndicatorLights(0f));
             _interactReceiver.ChangePrompt(_offPrompt);
         }
-    }
-
-    public bool IsEngineStalling()
-    {
-        return _engineStalling;
     }
 
     private void OnFuelDepleted()

@@ -852,8 +852,6 @@ public static class PatchClass
     #endregion
 
     #region TemperatureZone
-    public static bool EngineSputtering = false;
-
     [HarmonyPostfix]
     [HarmonyPatch(typeof(SunController), nameof(SunController.UpdateScale))]
     public static void UpdateSunTempZone(SunController __instance, float scale)
@@ -2362,8 +2360,7 @@ public static class PatchClass
         MasterAlarm masterAlarm = SELocator.GetShipTransform().GetComponentInChildren<MasterAlarm>();
         float alarmNoiseRadius = masterAlarm._isAlarmOn ? 350f : 0f;
         ShipThrusterController thrusterController = SELocator.GetShipTransform().GetComponent<ShipThrusterController>();
-        bool shipIgniting = ShipEnhancements.Instance.shipIgniting || EngineSputtering ||
-            (SELocator.GetButtonPanel()?.GetComponentInChildren<ShipEngineSwitch>()?.IsEngineStalling() ?? false);
+        bool shipIgniting = ShipEnhancements.Instance.shipIgniting || PatchHandler.EngineSputtering;
         float ignitionNoiseRadius = shipIgniting ? 500f : 0f;
         float overdriveNoiseRadius = (bool)enableThrustModulator.GetProperty() && SELocator.GetShipOverdriveController() != null
             && SELocator.GetShipOverdriveController().IsCharging() ? 300f : 0f;
