@@ -891,15 +891,23 @@ public static class PatchClass
 
     [HarmonyPostfix]
     [HarmonyPatch(typeof(RulesetDetector), nameof(RulesetDetector.GetThrustLimit))]
-    public static void ShipFreezingThrustDebuff(RulesetDetector __instance, ref float __result)
+    public static void ShipTemperatureThrustEffects(RulesetDetector __instance, ref float __result)
     {
         if (!(bool)enableShipTemperature.GetProperty() || (float)temperatureDifficulty.GetProperty() <= 0f) return;
 
         if (__instance.CompareTag("ShipDetector") && SELocator.GetShipTemperatureDetector() != null)
         {
             float ratio = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
-            float lerp = Mathf.InverseLerp(-0.02f, -0.8f, ratio);
-            __result *= 1 - (0.5f * lerp);
+            if (ratio < 0f)
+            {
+                float lerp = Mathf.InverseLerp(-0.02f, -0.8f, ratio);
+                __result *= 1f - (0.5f * lerp);
+            }
+            else
+            {
+                float lerp = Mathf.InverseLerp(0.02f, 0.8f, ratio);
+                __result *= 1f + (0.5f * lerp);
+            }
         }
     }
     #endregion
