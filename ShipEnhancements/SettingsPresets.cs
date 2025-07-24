@@ -91,7 +91,6 @@ public static class SettingsPresets
         { "randomHullDamage", 0f },
         { "randomComponentDamage", 0f },
         { "enableFragileShip", false },
-        { "faultyHeatRegulators", false },
         { "addErnesto", false },
         { "repairLimit", -1f },
         { "extraEjectButtons", false },
@@ -117,6 +116,7 @@ public static class SettingsPresets
         { "disableHatch", false },
         { "enableShipTemperature", false },
         { "temperatureDifficulty", 0.5f },
+        { "passiveTemperatureGain", "None" },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -203,7 +203,6 @@ public static class SettingsPresets
         { "randomHullDamage", 0f },
         { "randomComponentDamage", 0f },
         { "enableFragileShip", true },
-        { "faultyHeatRegulators", false },
         { "addErnesto", false },
         { "repairLimit", 12f },
         { "extraEjectButtons", false },
@@ -229,6 +228,7 @@ public static class SettingsPresets
         { "disableHatch", true },
         { "enableShipTemperature", false },
         { "temperatureDifficulty", 0.5f },
+        { "passiveTemperatureGain", "None" },
     };
 
     public static readonly Dictionary<string, object> ImpossibleSettings = new Dictionary<string, object>()
@@ -315,7 +315,6 @@ public static class SettingsPresets
         { "randomHullDamage", 0f },
         { "randomComponentDamage", 0.1f },
         { "enableFragileShip", false },
-        { "faultyHeatRegulators", false },
         { "addErnesto", false },
         { "repairLimit", -1f },
         { "extraEjectButtons", false },
@@ -341,6 +340,7 @@ public static class SettingsPresets
         { "disableHatch", false },
         { "enableShipTemperature", false },
         { "temperatureDifficulty", 0.5f },
+        { "passiveTemperatureGain", "None" },
     };
 
     public static readonly Dictionary<string, object> NewStuffSettings = new Dictionary<string, object>()
@@ -427,7 +427,6 @@ public static class SettingsPresets
         { "randomHullDamage", 0f },
         { "randomComponentDamage", 0f },
         { "enableFragileShip", false },
-        { "faultyHeatRegulators", false },
         { "addErnesto", false },
         { "repairLimit", -1f },
         { "extraEjectButtons", true },
@@ -453,6 +452,7 @@ public static class SettingsPresets
         { "disableHatch", false },
         { "enableShipTemperature", true },
         { "temperatureDifficulty", 0.25f },
+        { "passiveTemperatureGain", "None" },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -539,7 +539,6 @@ public static class SettingsPresets
         { "randomHullDamage", 0.1f },
         { "randomComponentDamage", 0.1f },
         { "enableFragileShip", false },
-        { "faultyHeatRegulators", true },
         { "addErnesto", true },
         { "repairLimit", -1f },
         { "extraEjectButtons", true },
@@ -565,6 +564,7 @@ public static class SettingsPresets
         { "disableHatch", false },
         { "enableShipTemperature", true },
         { "temperatureDifficulty", 1f },
+        { "passiveTemperatureGain", "Hot" },
     };
 
     // Random preset composition
@@ -1148,7 +1148,6 @@ public static class SettingsPresets
         { "randomHullDamage", new RandomSettingValue((0f, 1f), (0f, 0.2f), 0f) },
         { "randomComponentDamage", new RandomSettingValue((0f, 1f), (0f, 0.2f), 0f) },
         { "enableFragileShip", new RandomSettingValue((0f, 0.2f)) },
-        { "faultyHeatRegulators", new RandomSettingValue((0f, 0.25f)) },
         { "addErnesto", new RandomSettingValue((0.2f, 0.2f)) },
         { "repairLimit", new RandomSettingValue(
         [
@@ -1221,6 +1220,11 @@ public static class SettingsPresets
             ((0.4f, 0.6f), (0f, 1.2f)),
             ((0.6f, 1f), (0f, 1.2f)),
         ], (0.5f, 0.8f), 0.5f) },
+        { "passiveTemperatureGain", new RandomSettingValue(
+        [
+            ("Hot", (1f, 1f)),
+            ("Cold", (1f, 1f)),
+        ], (0f, 0.5f), "None") },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

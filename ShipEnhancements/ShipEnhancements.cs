@@ -219,7 +219,6 @@ public class ShipEnhancements : ModBehaviour
         randomHullDamage,
         randomComponentDamage,
         enableFragileShip,
-        faultyHeatRegulators,
         addErnesto,
         repairLimit,
         extraEjectButtons,
@@ -249,6 +248,7 @@ public class ShipEnhancements : ModBehaviour
         enableColorBlending,
         enableShipTemperature,
         temperatureDifficulty,
+        passiveTemperatureGain,
     }
 
     private string[] startupMessages =
@@ -2860,7 +2860,7 @@ public class ShipEnhancements : ModBehaviour
         int start = ModHelper.Config.Settings.Keys.ToList()
             .IndexOf("enableShipTemperature");
         int end = ModHelper.Config.Settings.Keys.ToList()
-            .IndexOf("faultyHeatRegulators");
+            .IndexOf("passiveTemperatureGain");
 
         var range = ModHelper.Config.Settings.Keys.ToList()
             .GetRange(start, end - start + 1);
@@ -2906,11 +2906,11 @@ public class ShipEnhancements : ModBehaviour
         {
             if ((bool)oldValue)
             {
-                RedrawSettingsMenu("enableShipTemperature", "enableShipTemperature", "enableShipTemperature", "faultyHeatRegulators");
+                RedrawSettingsMenu("enableShipTemperature", "enableShipTemperature", "enableShipTemperature", "passiveTemperatureGain");
             }
             else
             {
-                RedrawSettingsMenu("enableShipTemperature", "faultyHeatRegulators", "enableShipTemperature", "enableShipTemperature");
+                RedrawSettingsMenu("enableShipTemperature", "passiveTemperatureGain", "enableShipTemperature", "enableShipTemperature");
             }
             return;
         }

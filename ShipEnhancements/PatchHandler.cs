@@ -161,7 +161,7 @@ public class PatchHandler : MonoBehaviour
 
                 float ratio = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
                 float tempLerp = Mathf.Sqrt(Mathf.InverseLerp(-0.5f, -1f, ratio));
-                float maxChance = Mathf.Lerp(0f, 1f, (float)temperatureDifficulty.GetProperty() * 1.5f);
+                float maxChance = Mathf.Lerp(0f, 1f, Mathf.Pow((float)temperatureDifficulty.GetProperty() * 1.5f, 1/1.75f));
 
                 float rand = (float)new System.Random().NextDouble();
                 if (rand < maxChance * tempLerp)

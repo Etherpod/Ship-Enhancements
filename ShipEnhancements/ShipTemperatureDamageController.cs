@@ -24,9 +24,9 @@ public class ShipTemperatureDamageController : MonoBehaviour
     private (float min, float max) _maxCountdownRange;
 
     private float _damageSpeedMultiplier = 1f;
-    private readonly float _maxDamageSpeedMultiplier = 0.4f;
+    private float _maxDamageSpeedMultiplier = 0.4f;
     private float _damageMultiplier = 1f;
-    private readonly float _maxDamageMultiplier = 0.75f;
+    private float _maxDamageMultiplier = 0.75f;
 
     private void Start()
     {
@@ -43,9 +43,12 @@ public class ShipTemperatureDamageController : MonoBehaviour
         _initialReactorArrowAngle = _reactor._startArrowRotation;
         _initialCountdownRange = (_reactor._minCountdown, _reactor._maxCountdown);
         float diff = _reactor._endArrowRotation - _reactor._startArrowRotation;
-        float minReactorLength = Mathf.Lerp(1f, 0.25f, (float)temperatureDifficulty.GetProperty());
+        float minReactorLength = Mathf.Lerp(1f, 4f, (float)temperatureDifficulty.GetProperty());
         _maxReactorArrowAngle = _reactor._endArrowRotation - diff / minReactorLength;
         _maxCountdownRange = (_reactor._minCountdown / minReactorLength, _reactor._maxCountdown / minReactorLength);
+
+        _maxDamageSpeedMultiplier = Mathf.Lerp(0.8f, 0.4f, (float)temperatureDifficulty.GetProperty());
+        _maxDamageMultiplier = Mathf.Lerp(0.6f, 1f, (float)temperatureDifficulty.GetProperty());
     }
 
     private void Update()

@@ -901,12 +901,12 @@ public static class PatchClass
             if (ratio < 0f)
             {
                 float lerp = Mathf.InverseLerp(-0.02f, -0.8f, ratio);
-                __result *= 1f - (0.5f * lerp);
+                __result *= 1f - (0.5f * lerp * (float)temperatureDifficulty.GetProperty());
             }
             else
             {
                 float lerp = Mathf.InverseLerp(0.02f, 0.8f, ratio);
-                __result *= 1f + (0.5f * lerp);
+                __result *= 1f + (0.5f * lerp * (float)temperatureDifficulty.GetProperty());
             }
         }
     }

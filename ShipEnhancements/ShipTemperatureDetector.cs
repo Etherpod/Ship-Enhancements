@@ -23,14 +23,26 @@ public class ShipTemperatureDetector : TemperatureDetector
     {
         base.Update();
 
-        if ((bool)faultyHeatRegulators.GetProperty())
+        if ((string)passiveTemperatureGain.GetProperty() != "None")
         {
+            bool heating = (string)passiveTemperatureGain.GetProperty() == "Hot";
             float resistance = (float)temperatureResistanceMultiplier.GetProperty();
-            float multiplier = Mathf.InverseLerp(-_highTempCutoff / 4f, 0f, _currentTemperature);
+
+            // Reduce effect in opposite temperature
+            float multiplier = 0.25f + (0.75f * Mathf.InverseLerp(_highTempCutoff / 4f * (heating ? -1f : 1f), 0f, _currentTemperature));
+
+            // Reactor increases heat and decreases cold
             float additiveMultiplier = 0f;
             if (SELocator.GetShipDamageController().IsReactorCritical())
             {
-                additiveMultiplier = 1.5f;
+                if (heating)
+                {
+                    additiveMultiplier = 1.5f;
+                }
+                else
+                {
+                    additiveMultiplier = -0.5f;
+                }
             }
 
             if (multiplier > 0 || additiveMultiplier > 0)
@@ -42,9 +54,11 @@ public class ShipTemperatureDetector : TemperatureDetector
                 }
                 else
                 {
+                    // Change faster when close to zero
                     float scalar = 1 + (1f * Mathf.InverseLerp(_highTempCutoff, 0f, Mathf.Abs(_currentTemperature)));
+
                     _currentInternalTemperature = Mathf.Clamp(_currentInternalTemperature + Time.deltaTime
-                        * ((multiplier * scalar) + additiveMultiplier) * Mathf.Sign(resistance),
+                        * Mathf.Max((multiplier * scalar) + additiveMultiplier, 0f) * (heating ? 1f : -1f) * Mathf.Sign(resistance),
                         -_maxInternalTemperature, _maxInternalTemperature);
                 }
             }
@@ -116,13 +130,14 @@ public class ShipTemperatureDetector : TemperatureDetector
         }
         else if (!sameSide)
         {
-            _currentInternalTemperature += Time.deltaTime * Mathf.Sign(GetTemperatureRatio()) * Mathf.Sign((float)temperatureResistanceMultiplier.GetProperty());
+            _currentInternalTemperature += Time.deltaTime * Mathf.InverseLerp(0f, _highTempCutoff, Mathf.Abs(_currentTemperature)) 
+                * Mathf.Sign(GetTemperatureRatio()) * Mathf.Sign((float)temperatureResistanceMultiplier.GetProperty());        
         }
     }
 
     protected override void UpdateCooldown()
     {
-        if (!(bool)faultyHeatRegulators.GetProperty() && Mathf.Abs(_currentInternalTemperature) / _maxInternalTemperature < 0.01f)
+        if ((string)passiveTemperatureGain.GetProperty() == "None" && Mathf.Abs(_currentInternalTemperature) / _maxInternalTemperature < 0.01f)
         {
             _currentInternalTemperature = 0f;
         }
@@ -136,6 +151,11 @@ public class ShipTemperatureDetector : TemperatureDetector
             else if (_currentInternalTemperature < 0f)
             {
                 _currentInternalTemperature += step;
+            }
+
+            if (UnityEngine.InputSystem.Keyboard.current.numpadDivideKey.wasPressedThisFrame)
+            {
+                ShipEnhancements.WriteDebugMessage("cooldown step: " + step);
             }
         }
     }

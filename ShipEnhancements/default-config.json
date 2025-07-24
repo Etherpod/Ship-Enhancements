@@ -699,11 +699,16 @@
       "value": 1,
       "tooltip": "Larger numbers increase the time the ship can resist extreme temperatures. The default resistance gives the ship around 3 minutes before the hull reaches max temperature."
     },
-    "faultyHeatRegulators": {
-      "title": "Faulty Heat Regulators",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Your reactor constantly heats up your ship, making anywhere that isn't cold a potential danger. You can cool off your ship by finding somewhere cold."
+    "passiveTemperatureGain": {
+      "title": "Passive Temperature Gain",
+      "type": "selector",
+      "value": "None",
+      "options": [
+        "None",
+        "Hot",
+        "Cold"
+      ],
+      "tooltip": "Increases/decreases the ship temperature over time, making some areas more safe and others more dangerous."
     },
 
     "Decoration": {
