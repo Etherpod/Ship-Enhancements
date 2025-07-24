@@ -4062,7 +4062,7 @@ public static class PatchClass
                     {
                         if (digestionDamageDelay < 0f)
                         {
-                            RandomDigestionDamage();
+                            PatchHandler.RandomShipDamage(damageCause: "anglerfish");
                             digestionDamageDelay = UnityEngine.Random.Range(0.2f, 0.8f);
                         }
                         else
@@ -4071,51 +4071,6 @@ public static class PatchClass
                         }
                     }
                 }
-            }
-        }
-    }
-
-    public static void RandomDigestionDamage()
-    {
-        if (ShipEnhancements.InMultiplayer && !ShipEnhancements.QSBAPI.GetIsHost() || (float)shipDamageMultiplier.GetProperty() <= 0f) return;
-
-        ShipComponent[] components = SELocator.GetShipDamageController()._shipComponents
-            .Where((component) => component.repairFraction == 1f && !component.isDamaged).ToArray();
-        ShipHull[] hulls = SELocator.GetShipDamageController()._shipHulls.Where((hull) => hull.integrity > 0f).ToArray();
-        if (components.Length > 0 && UnityEngine.Random.value < 0.5f)
-        {
-            int index = UnityEngine.Random.Range(0, components.Length);
-            if (components[index] is ShipReactorComponent && !components[index].isDamaged)
-            {
-                ErnestoDetectiveController.SetReactorCause("anglerfish");
-            }
-            components[index].SetDamaged(true);
-        }
-        else if (hulls.Length > 0)
-        {
-            ShipHull targetHull = hulls[UnityEngine.Random.Range(0, hulls.Length)];
-
-            bool wasDamaged = targetHull._damaged;
-            targetHull._damaged = true;
-            targetHull._integrity = Mathf.Max(0f, targetHull._integrity - UnityEngine.Random.Range(0.05f, 0.15f) * (float)shipDamageMultiplier.GetProperty());
-            var eventDelegate1 = (MulticastDelegate)typeof(ShipHull).GetField("OnDamaged",
-                BindingFlags.Instance | BindingFlags.NonPublic
-                | BindingFlags.Public).GetValue(targetHull);
-            if (eventDelegate1 != null)
-            {
-                foreach (var handler in eventDelegate1.GetInvocationList())
-                {
-                    handler.Method.Invoke(handler.Target, [targetHull]);
-                }
-            }
-            if (targetHull._damageEffect != null)
-            {
-                targetHull._damageEffect.SetEffectBlend(1f - targetHull._integrity);
-            }
-
-            if (ShipEnhancements.InMultiplayer)
-            {
-                ShipEnhancements.QSBInteraction.SetHullDamaged(targetHull, !wasDamaged);
             }
         }
     }

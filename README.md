@@ -88,15 +88,6 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Interactable Ship Curtain**: Lets you close the curtain inside the ship, blocking off the cockpit.
 - **Ship Warp Core**: Attaches a Nomai warp core to your ship's cockpit. You can press the button on the ceiling of the cockpit to activate the warp core, which will warp your ship back to where it was at the start of the loop.
   - The component option for this setting turns the warp core into a damageable component. Activating the return warp while it's damaged may have unintended results.
-- **Temperature Zones**: Implements a temperature mechanic for the ship using the "TEMP" (temperature) dial and a new "SHIP TEMP" (ship temperature) dial. Subjecting your ship to extreme temperatures will increase the ship temperature, making it more likely for your ship to sustain damage or bad side effects.
-  - Any extreme temperatures can damage your ship if temperature damage is enabled. The temperature dial will start flashing if the temperature reaches a dangerous level.
-  - High temperatures (very hot) will make your ship hull hot to the touch and can blow up the Portable Fuel Tank.
-  - Low temperatures (very cold) will lower the strength of your ship's thrusters and make it possible for your ship ignition to fail.
-- **Hull Temperature Damage**: Makes it possible for extreme temperatures to damage the hull of your ship.
-- **Component Temperature Damage**: Makes it possible for extreme temperatures to damage any of your ship's components, like the headlights or artificial gravity.
-- **Temperature Damage Multiplier**: Larger numbers increase the damage done to your ship by extreme temperatures.
-- **Temperature Resistance Multiplier**: Larger numbers make the ship temperature change slower, giving you more time in extreme temperatures but requiring more time to recover.
-- **Faulty Heat Regulators**: Makes your ship unable to dump the reactor heat, leaving it to build up in the ship. Unless you find someplace cold, your ship is going to constantly rise in temeprature.
 - **Repair Confirmation**: Plays a sound when everything has been repaired. Now you don't need to go searching for any hulls you forgot to fix!
 - **Hazardous Thrusters**: Makes your ship's thruster flames actually damage you. Try figuring out how to get near them in the first place.
 - **Cockpit Rust Level**: Controls how much rust is applied to the ship cockpit. Moving the slider all the way to the right completely covers the cockpit in rust.
@@ -138,6 +129,15 @@ Some new stuff that Slate didn't have time to include in the ship.
   - The bottom right button activates position hold. It will remain at whatever position you activate it at relative to the lock-on target.
 - **Engine Switch**: Controls your ship's power and engine. The switch needs to be turned on if you want to fly your ship.
   - If the **Idle Fuel Consumption Multiplier** is above 0, it will only consume fuel when the ship is on.
+
+- **Enable Ship Temperature** Unlocks the settings below and implements a temperature mechanic for the ship, which uses the existing "TEMP" (temperature) dial and a new "SHIP TEMP" (ship temperature) dial.
+  - Extreme temperatures, indicated by the flashing light on the TEMP dial, will cause your SHIP TEMP to change over time. As your SHIP TEMP approaches extreme temperatures, your ship will begin experiencing side effects:
+	- On the hot side, your ship will take random damage over time and the outside of the ship will become dangerous to touch. Your reactor will also heat up, reducing the time before explosion if it were to get damaged, but as a byproduct your ship thrust will become more powerful. At higher temperature difficulties, the **Portable Fuel Tank** can also heat up and explode.
+	- On the cold side, it's actually safe to leave your ship alone. However, your ship engine has a chance to stall for a short time when starting up, and has a chance to damage your ship while doing so. Your ship thrust is weaker, and your ship hull is more fragile, requiring a smaller collision to do damage. If your reactor gets damaged, the cockpit glass will also fog up, making it harder to see where you're going.
+- **Temperature Zones**: Determines where temperature will increase/decrease. **All** adds a temperature zone anywhere that looks hot or cold.
+- **Temperature Difficulty**: Makes the side effects listed above safer or more dangerous. Set this to the minimum to disable all of them.
+- **Temperature Resistance Multiplier**: Larger numbers make the ship temperature change slower, giving you more time in extreme temperatures but requiring more time to recover.
+- **Passive Temperature Gain**: Causes your ship to heat up or cool down over time, making some areas safer and other areas more dangerous.
 
 ## Decoration
 Haven't you ever wished your ship had a little more color?

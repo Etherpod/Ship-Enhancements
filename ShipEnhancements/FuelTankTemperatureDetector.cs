@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -22,12 +23,16 @@ public class FuelTankTemperatureDetector : TemperatureDetector
     {
         base.Update();
 
-        _fuelTank.SetEmissiveScale(Mathf.InverseLerp(0f, _maxInternalTemperature, _currentInternalTemperature));
+        if ((float)temperatureDifficulty.GetProperty() >= 0.75f)
+        {
+            _fuelTank.SetEmissiveScale(Mathf.InverseLerp(0f, _maxInternalTemperature, _currentInternalTemperature));
+        }
     }
 
     protected override void OnHighTemperature()
     {
-        if (_fuelTank.GetFuelRatio() <= 0f || (_currentTemperature < 0 != _currentInternalTemperature < 0))
+        if (_fuelTank.GetFuelRatio() <= 0f || (float)temperatureDifficulty.GetProperty() < 0.75f 
+            || (_currentTemperature < 0 != _currentInternalTemperature < 0))
         {
             return;
         }
