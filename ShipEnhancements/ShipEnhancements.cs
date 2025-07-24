@@ -133,7 +133,6 @@ public class ShipEnhancements : ModBehaviour
         disableWaterAutoRoll,
         enableThrustModulator,
         temperatureZonesAmount,
-        hullTemperatureDamage,
         enableShipFuelTransfer,
         enableJetpackRefuelDrain,
         disableReferenceFrame,
@@ -141,12 +140,10 @@ public class ShipEnhancements : ModBehaviour
         gravityMultiplier,
         fuelTransferMultiplier,
         oxygenRefillMultiplier,
-        temperatureDamageMultiplier,
         temperatureResistanceMultiplier,
         enableAutoHatch,
         oxygenTankDrainMultiplier,
         fuelTankDrainMultiplier,
-        componentTemperatureDamage,
         atmosphereAngularDragMultiplier,
         spaceAngularDragMultiplier,
         disableRotationSpeedLimit,
@@ -251,6 +248,7 @@ public class ShipEnhancements : ModBehaviour
         splitLockOn,
         enableColorBlending,
         enableShipTemperature,
+        temperatureDifficulty,
     }
 
     private string[] startupMessages =
@@ -428,6 +426,8 @@ public class ShipEnhancements : ModBehaviour
             {
                 SEAchievementTracker.Reset();
             }
+
+            new GameObject("SE_PatchHandler").AddComponent<PatchHandler>();
 
             PreShipInitialize?.Invoke();
 

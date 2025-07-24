@@ -43,13 +43,15 @@ public class ShipTemperatureDamageController : MonoBehaviour
         _initialReactorArrowAngle = _reactor._startArrowRotation;
         _initialCountdownRange = (_reactor._minCountdown, _reactor._maxCountdown);
         float diff = _reactor._endArrowRotation - _reactor._startArrowRotation;
-        _maxReactorArrowAngle = _reactor._endArrowRotation - diff / 4f;
-        _maxCountdownRange = (_reactor._minCountdown / 4f, _reactor._maxCountdown / 4f);
-        
+        float minReactorLength = Mathf.Lerp(1f, 0.25f, (float)temperatureDifficulty.GetProperty());
+        _maxReactorArrowAngle = _reactor._endArrowRotation - diff / minReactorLength;
+        _maxCountdownRange = (_reactor._minCountdown / minReactorLength, _reactor._maxCountdown / minReactorLength);
     }
 
     private void Update()
     {
+        if ((float)temperatureDifficulty.GetProperty() <= 0f) return;
+
         if (_detector.GetInternalTemperatureRatio() > 0f)
         {
             UpdateReactor();
@@ -86,15 +88,15 @@ public class ShipTemperatureDamageController : MonoBehaviour
 
                     float timeMultiplier = Mathf.Abs(internalTemp);
                     float tempLerp = Mathf.InverseLerp(_detector.GetHighTempCutoff(), 100f, Mathf.Abs(_detector.GetCurrentTemperature()));
-                    float tempDamage = Mathf.Max((float)temperatureDamageMultiplier.GetProperty(), 0f);
+                    //float tempDamage = Mathf.Max((float)temperatureDamageMultiplier.GetProperty(), 0f);
+                    float tempDamage = (float)temperatureDifficulty.GetProperty() * 2f;
 
                     float damageChance = 0.05f * Mathf.Lerp(0f, 1f + (tempLerp * 2f), Mathf.Pow(timeMultiplier, 2));
-                    if ((bool)componentTemperatureDamage.GetProperty() && UnityEngine.Random.value
-                        < damageChance * tempDamage / 8)
+                    if (UnityEngine.Random.value < damageChance * tempDamage / 8)
                     {
                         _componentDamageNextTime = true;
                     }
-                    if ((bool)hullTemperatureDamage.GetProperty() && UnityEngine.Random.value < damageChance)
+                    if (UnityEngine.Random.value < damageChance)
                     {
                         HullTemperatureDamage();
                     }
@@ -131,7 +133,8 @@ public class ShipTemperatureDamageController : MonoBehaviour
         }
 
         ShipHull targetHull = validHulls[UnityEngine.Random.Range(0, validHulls.Length)];
-        float tempDamage = Mathf.Max((float)temperatureDamageMultiplier.GetProperty(), 0f);
+        //float tempDamage = Mathf.Max((float)temperatureDamageMultiplier.GetProperty(), 0f);
+        float tempDamage = (float)temperatureDifficulty.GetProperty() * 2f;
         float damage = UnityEngine.Random.Range(0.03f, 0.15f) * tempDamage;
         bool wasDamaged = targetHull.isDamaged;
         ApplyHullTempDamage(targetHull, damage);

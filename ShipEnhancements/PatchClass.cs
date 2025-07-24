@@ -889,115 +889,13 @@ public static class PatchClass
         __instance.transform.parent.GetComponentInChildren<TemperatureZone>()?.SetVolumeActive(__instance._state == Campfire.State.LIT);
     }
 
-    public static Vector3 AddIgnitionSputter(ShipThrusterController __instance)
-    {
-        float value = OWInput.GetValue(InputLibrary.thrustX, InputMode.All);
-        float value2 = OWInput.GetValue(InputLibrary.thrustZ, InputMode.All);
-        float value3 = OWInput.GetValue(InputLibrary.thrustUp, InputMode.All);
-        float value4 = OWInput.GetValue(InputLibrary.thrustDown, InputMode.All);
-        if (!OWInput.IsInputMode(InputMode.ShipCockpit | InputMode.LandingCam))
-        {
-            return Vector3.zero;
-        }
-        if (!__instance._shipResources.AreThrustersUsable())
-        {
-            return Vector3.zero;
-        }
-        if (__instance._autopilot.IsFlyingToDestination())
-        {
-            return Vector3.zero;
-        }
-        Vector3 vector = new Vector3(value, 0f, value2);
-        if (vector.sqrMagnitude > 1f)
-        {
-            vector.Normalize();
-        }
-        vector.y = value3 - value4;
-
-        if (__instance._requireIgnition && __instance._landingManager.IsLanded())
-        {
-            vector.x = 0f;
-            vector.z = 0f;
-            vector.y = Mathf.Clamp01(vector.y);
-            if (!__instance._isIgniting && __instance._lastTranslationalInput.y <= 0f && vector.y > 0f)
-            {
-                __instance._isIgniting = true;
-                float ratio = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
-                if (UnityEngine.Random.value < Mathf.InverseLerp(-0.5f, -1.16f, ratio))
-                {
-                    AudioClip sputterClip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/ShipEngineSputter.ogg");
-                    ShipThrusterAudio thrusterAudio = __instance.GetComponentInChildren<ShipThrusterAudio>();
-                    thrusterAudio._ignitionSource.Stop();
-                    thrusterAudio._isIgnitionPlaying = true;
-                    thrusterAudio._ignitionSource.PlayOneShot(sputterClip);
-                    EngineSputtering = true;
-                }
-                else
-                {
-                    __instance._ignitionTime = Time.time;
-                    GlobalMessenger.FireEvent("StartShipIgnition");
-                }
-            }
-            if (__instance._isIgniting)
-            {
-                if (vector.y <= 0f)
-                {
-                    __instance._isIgniting = false;
-                    EngineSputtering = false;
-                    GlobalMessenger.FireEvent("CancelShipIgnition");
-                }
-                else
-                {
-                    if (EngineSputtering || Time.time < __instance._ignitionTime + __instance._ignitionDuration)
-                    {
-                        vector.y = 0f;
-                    }
-                    else
-                    {
-                        __instance._isIgniting = false;
-                        __instance._requireIgnition = false;
-                        GlobalMessenger.FireEvent("CompleteShipIgnition");
-                        RumbleManager.PlayShipIgnition();
-                        RumbleManager.SetShipThrottleNormal();
-                    }
-                }
-            }
-        }
-
-        float num = Mathf.Min(__instance._rulesetDetector.GetThrustLimit(), __instance._thrusterModel.GetMaxTranslationalThrust()) / __instance._thrusterModel.GetMaxTranslationalThrust();
-        Vector3 vector2 = vector * num;
-        if (__instance._limitOrbitSpeed && __instance._shipAlignment.IsAligning() && vector2.magnitude > 0f)
-        {
-            Vector3 vector3 = __instance._landingRF.GetOWRigidBody().GetWorldCenterOfMass() - __instance._shipBody.GetWorldCenterOfMass();
-            Vector3 vector4 = __instance._shipBody.GetVelocity() - __instance._landingRF.GetVelocity();
-            Vector3 vector5 = vector4 - Vector3.Project(vector4, vector3);
-            Vector3 vector6 = Quaternion.FromToRotation(-__instance._shipBody.transform.up, vector3) * __instance._shipBody.transform.TransformDirection(vector2 * __instance._thrusterModel.GetMaxTranslationalThrust());
-            Vector3 vector7 = Vector3.Project(vector6, vector3);
-            Vector3 vector8 = vector6 - vector7;
-            Vector3 vector9 = vector5 + vector8 * Time.deltaTime;
-            float magnitude = vector9.magnitude;
-            float orbitSpeed = __instance._landingRF.GetOrbitSpeed(vector3.magnitude);
-            if (magnitude > orbitSpeed)
-            {
-                vector9 = vector9.normalized * orbitSpeed;
-                vector8 = (vector9 - vector5) / Time.deltaTime;
-                vector6 = vector7 + vector8;
-                vector2 = __instance._shipBody.transform.InverseTransformDirection(vector6 / __instance._thrusterModel.GetMaxTranslationalThrust());
-                if (vector2.sqrMagnitude > 1f)
-                {
-                    vector2.Normalize();
-                }
-            }
-        }
-        __instance._lastTranslationalInput = vector;
-        return vector2;
-    }
+    
 
     [HarmonyPostfix]
     [HarmonyPatch(typeof(RulesetDetector), nameof(RulesetDetector.GetThrustLimit))]
     public static void ShipFreezingThrustDebuff(RulesetDetector __instance, ref float __result)
     {
-        if (!(bool)enableShipTemperature.GetProperty()) return;
+        if (!(bool)enableShipTemperature.GetProperty() || (float)temperatureDifficulty.GetProperty() <= 0f) return;
 
         if (__instance.CompareTag("ShipDetector") && SELocator.GetShipTemperatureDetector() != null)
         {
@@ -2420,9 +2318,11 @@ public static class PatchClass
             return false;
         }
 
-        if (SELocator.GetShipTemperatureDetector() != null && SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio() < -0.5f)
+        if ((bool)enableShipTemperature.GetProperty()
+            && (float)temperatureDifficulty.GetProperty() > 0f
+            && SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio() < -0.5f)
         {
-            __result = AddIgnitionSputter(__instance);
+            __result = PatchHandler.AddIgnitionSputter(__instance);
             return false;
         }
 
@@ -3111,24 +3011,9 @@ public static class PatchClass
     #endregion
 
     #region ToolInteractFix
-    public static int FocusedItems;
-
     public static void UpdateFocusedItems(bool focused)
     {
-        if (focused)
-        {
-            FocusedItems++;
-        }
-        else
-        {
-            FocusedItems--;
-        }
-
-        FirstPersonManipulator manipulator = Locator.GetPlayerCamera().GetComponent<FirstPersonManipulator>();
-        if (manipulator.GetFocusedOWItem() == null && !manipulator.HasFocusedInteractible())
-        {
-            FocusedItems = 0;
-        }
+        PatchHandler.UpdateFocusedItems(focused);
     }
 
     [HarmonyPrefix]
@@ -3147,7 +3032,7 @@ public static class PatchClass
                 break;
         }
 
-        return !sameBinding || mode == ToolMode.None || FocusedItems == 0;
+        return !sameBinding || mode == ToolMode.None || !PatchHandler.HasFocusedItem();
     }
     #endregion
 
@@ -3780,7 +3665,8 @@ public static class PatchClass
                     "No. Guess what that means? There's no one to stop me from hitting you with a rock.",
                     "Narp.",
                 ];
-                __result = lines[UnityEngine.Random.Range(0, lines.Length)];
+                int rand1 = new System.Random().Next(lines.Length);
+                __result = lines[rand1];
             }
             else if (numErnestos == 1)
             {
@@ -3848,7 +3734,8 @@ public static class PatchClass
                     "There are so many it's practically an invasion. An invasion of magical talking anglerfish."
                 ];
             }
-            __result = lines[UnityEngine.Random.Range(0, lines.Length)];
+            int rand2 = new System.Random().Next(lines.Length);
+            __result = lines[rand2];
             return false;
         }
         else if (key == "SE_Ernesto_ClockERNESTO_PLACEHOLDER")

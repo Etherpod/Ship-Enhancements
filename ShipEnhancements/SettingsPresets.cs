@@ -25,7 +25,6 @@ public static class SettingsPresets
         { "disableWaterAutoRoll", false },
         { "enableThrustModulator", false },
         { "temperatureZonesAmount", "All" },
-        { "hullTemperatureDamage", false },
         { "enableShipFuelTransfer", false },
         { "enableJetpackRefuelDrain", false },
         { "disableReferenceFrame", false },
@@ -33,12 +32,10 @@ public static class SettingsPresets
         { "gravityMultiplier", 1f },
         { "fuelTransferMultiplier", 1f },
         { "oxygenRefillMultiplier", 1f },
-        { "temperatureDamageMultiplier", 1f },
         { "temperatureResistanceMultiplier", 1f },
         { "enableAutoHatch", false },
         { "oxygenTankDrainMultiplier", 1f },
         { "fuelTankDrainMultiplier", 1f },
-        { "componentTemperatureDamage", false },
         { "atmosphereAngularDragMultiplier", 1f },
         { "spaceAngularDragMultiplier", 1f },
         { "disableRotationSpeedLimit", false },
@@ -119,6 +116,7 @@ public static class SettingsPresets
         { "shipHornType", "None" },
         { "disableHatch", false },
         { "enableShipTemperature", false },
+        { "temperatureDifficulty", 0.5f },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -139,7 +137,6 @@ public static class SettingsPresets
         { "disableWaterAutoRoll", true },
         { "enableThrustModulator", false },
         { "temperatureZonesAmount", "All" },
-        { "hullTemperatureDamage", false },
         { "enableShipFuelTransfer", false },
         { "enableJetpackRefuelDrain", false },
         { "disableReferenceFrame", true },
@@ -147,12 +144,10 @@ public static class SettingsPresets
         { "gravityMultiplier", 1f },
         { "fuelTransferMultiplier", 1f },
         { "oxygenRefillMultiplier", 1f },
-        { "temperatureDamageMultiplier", 1f },
         { "temperatureResistanceMultiplier", 1f },
         { "enableAutoHatch", false },
         { "oxygenTankDrainMultiplier", 1f },
         { "fuelTankDrainMultiplier", 1f },
-        { "componentTemperatureDamage", false },
         { "atmosphereAngularDragMultiplier", 1f },
         { "spaceAngularDragMultiplier", 1f },
         { "disableRotationSpeedLimit", false },
@@ -233,6 +228,7 @@ public static class SettingsPresets
         { "shipHornType", "None" },
         { "disableHatch", true },
         { "enableShipTemperature", false },
+        { "temperatureDifficulty", 0.5f },
     };
 
     public static readonly Dictionary<string, object> ImpossibleSettings = new Dictionary<string, object>()
@@ -253,7 +249,6 @@ public static class SettingsPresets
         { "disableWaterAutoRoll", false },
         { "enableThrustModulator", false },
         { "temperatureZonesAmount", "All" },
-        { "hullTemperatureDamage", false },
         { "enableShipFuelTransfer", false },
         { "enableJetpackRefuelDrain", false },
         { "disableReferenceFrame", false },
@@ -261,12 +256,10 @@ public static class SettingsPresets
         { "gravityMultiplier", 1.5f },
         { "fuelTransferMultiplier", 1f },
         { "oxygenRefillMultiplier", 1f },
-        { "temperatureDamageMultiplier", 1f },
         { "temperatureResistanceMultiplier", 1f },
         { "enableAutoHatch", false },
         { "oxygenTankDrainMultiplier", 100f },
         { "fuelTankDrainMultiplier", 100f },
-        { "componentTemperatureDamage", false },
         { "atmosphereAngularDragMultiplier", 0.5f },
         { "spaceAngularDragMultiplier", 0f },
         { "disableRotationSpeedLimit", false },
@@ -347,6 +340,7 @@ public static class SettingsPresets
         { "shipHornType", "None" },
         { "disableHatch", false },
         { "enableShipTemperature", false },
+        { "temperatureDifficulty", 0.5f },
     };
 
     public static readonly Dictionary<string, object> NewStuffSettings = new Dictionary<string, object>()
@@ -367,7 +361,6 @@ public static class SettingsPresets
         { "disableWaterAutoRoll", false },
         { "enableThrustModulator", true },
         { "temperatureZonesAmount", "All" },
-        { "hullTemperatureDamage", true },
         { "enableShipFuelTransfer", true },
         { "enableJetpackRefuelDrain", true },
         { "disableReferenceFrame", false },
@@ -375,12 +368,10 @@ public static class SettingsPresets
         { "gravityMultiplier", 1f },
         { "fuelTransferMultiplier", 1f },
         { "oxygenRefillMultiplier", 1f },
-        { "temperatureDamageMultiplier", 1f },
         { "temperatureResistanceMultiplier", 1f },
         { "enableAutoHatch", false },
         { "oxygenTankDrainMultiplier", 1f },
         { "fuelTankDrainMultiplier", 1f },
-        { "componentTemperatureDamage", true },
         { "atmosphereAngularDragMultiplier", 1f },
         { "spaceAngularDragMultiplier", 1f },
         { "disableRotationSpeedLimit", false },
@@ -461,6 +452,7 @@ public static class SettingsPresets
         { "shipHornType", "Default" },
         { "disableHatch", false },
         { "enableShipTemperature", true },
+        { "temperatureDifficulty", 0.25f },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -481,7 +473,6 @@ public static class SettingsPresets
         { "disableWaterAutoRoll", true },
         { "enableThrustModulator", true },
         { "temperatureZonesAmount", "All" },
-        { "hullTemperatureDamage", true },
         { "enableShipFuelTransfer", true },
         { "enableJetpackRefuelDrain", true },
         { "disableReferenceFrame", false },
@@ -489,12 +480,10 @@ public static class SettingsPresets
         { "gravityMultiplier", 0.2f },
         { "fuelTransferMultiplier", 5f },
         { "oxygenRefillMultiplier", 0.4f },
-        { "temperatureDamageMultiplier", 8f },
         { "temperatureResistanceMultiplier", 2f },
         { "enableAutoHatch", true },
         { "oxygenTankDrainMultiplier", 10f },
         { "fuelTankDrainMultiplier", 10f },
-        { "componentTemperatureDamage", true },
         { "atmosphereAngularDragMultiplier", 1.5f },
         { "spaceAngularDragMultiplier", 0.5f },
         { "disableRotationSpeedLimit", false },
@@ -575,6 +564,7 @@ public static class SettingsPresets
         { "shipHornType", "Annoying" },
         { "disableHatch", false },
         { "enableShipTemperature", true },
+        { "temperatureDifficulty", 1f },
     };
 
     // Random preset composition
@@ -633,7 +623,6 @@ public static class SettingsPresets
             ("Cold", (0.2f, 0.25f)),
             ("All", (0f, 1f)),
         ], (0.2f, 0.5f), "All") },
-        { "hullTemperatureDamage", new RandomSettingValue((0.5f, 0.8f)) },
         { "enableShipFuelTransfer", new RandomSettingValue((0.8f, 0.8f)) },
         { "enableJetpackRefuelDrain", new RandomSettingValue((0.3f, 0.8f)) },
         { "disableReferenceFrame", new RandomSettingValue((0f, 0.5f)) },
@@ -658,13 +647,6 @@ public static class SettingsPresets
             ((0.8f, 1.5f), (1f, 1f)),
             ((1.5f, 5f), (0.8f, 0.4f)),
         ], (0.1f, 0.5f), 1f) },
-        { "temperatureDamageMultiplier", new RandomSettingValue(
-        [
-            ((0.2f, 0.7f), (0.4f, 0.3f)),
-            ((0.7f, 1.2f), (1f, 1f)),
-            ((1.2f, 2f), (0.2f, 1.1f)),
-            ((2f, 10f), (0f, 1.2f)),
-        ], (0.4f, 0.8f), 1f) },
         { "temperatureResistanceMultiplier", new RandomSettingValue(
         [
             ((0.05f, 0.2f), (0f, 0.6f)),
@@ -687,7 +669,6 @@ public static class SettingsPresets
             ((1.2f, 2f), (0.2f, 1.1f)),
             ((2f, 5f), (0f, 1.2f)),
         ], (0.3f, 0.8f), 1f) },
-        { "componentTemperatureDamage", new RandomSettingValue((0.2f, 0.8f)) },
         { "atmosphereAngularDragMultiplier", new RandomSettingValue(
         [
             (0f, (0f, 1.2f)),
@@ -1233,6 +1214,13 @@ public static class SettingsPresets
         { "disableHatch", new RandomSettingValue((0.05f, 0.5f)) },
         { "splitLockOn", new RandomSettingValue((0.5f, 0.5f)) },
         { "enableShipTemperature", new RandomSettingValue((0.3f, 0.5f)) },
+        { "temperatureDifficulty", new RandomSettingValue(
+        [
+            ((0f, 0.3f), (1f, 1f)),
+            ((0.3f, 0.4f), (0.2f, 1f)),
+            ((0.4f, 0.6f), (0f, 1.2f)),
+            ((0.6f, 1f), (0f, 1.2f)),
+        ], (0.5f, 0.8f), 0.5f) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

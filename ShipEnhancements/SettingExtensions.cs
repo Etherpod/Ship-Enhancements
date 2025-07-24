@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO.Pipes;
 using UnityEngine;
 using static ShipEnhancements.ShipEnhancements;
 using static ShipEnhancements.ShipEnhancements.Settings;
@@ -9,147 +10,24 @@ namespace ShipEnhancements;
 
 public static class SettingExtensions
 {
-    private static Dictionary<Settings, (object value, object property)> settingValues = new Dictionary<Settings, (object, object)>()
-    {
-        { disableGravityCrystal, (false, false) },
-        { disableEjectButton, (false, false) },
-        { disableHeadlights, (false, false) },
-        { disableLandingCamera, (false, false) },
-        { disableShipLights, (false, false) },
-        { disableShipOxygen, (false, false) },
-        { oxygenDrainMultiplier, (1f, 1f) },
-        { fuelDrainMultiplier, (1f, 1f) },
-        { shipDamageMultiplier, (1f, 1f) },
-        { shipDamageSpeedMultiplier, (1f, 1f) },
-        { shipOxygenRefill, (false, false) },
-        { enableGravityLandingGear, (false, false) },
-        { disableAirAutoRoll, (false, false) },
-        { disableWaterAutoRoll, (false, false) },
-        { enableThrustModulator, (false, false) },
-        { temperatureZonesAmount, ("", "") },
-        { hullTemperatureDamage, (false, false) },
-        { enableShipFuelTransfer, (false, false) },
-        { enableJetpackRefuelDrain, (false, false) },
-        { disableReferenceFrame, (false, false) },
-        { disableMapMarkers, (false, false) },
-        { gravityMultiplier, (1f, 1f) },
-        { fuelTransferMultiplier, (1f, 1f) },
-        { oxygenRefillMultiplier, (1f, 1f) },
-        { temperatureDamageMultiplier, (1f, 1f) },
-        { temperatureResistanceMultiplier, (1f, 1f) },
-        { enableAutoHatch, (false, false) },
-        { oxygenTankDrainMultiplier, (1f, 1f) },
-        { fuelTankDrainMultiplier, (1f, 1f) },
-        { componentTemperatureDamage, (false, false) },
-        { atmosphereAngularDragMultiplier, (1f, 1f) },
-        { spaceAngularDragMultiplier, (1f, 1f) },
-        { disableRotationSpeedLimit, (false, false) },
-        { gravityDirection, ("", "") },
-        { disableScoutRecall, (false, false) },
-        { disableScoutLaunching, (false, false) },
-        { enableScoutLauncherComponent, (false, false) },
-        { enableManualScoutRecall, (false, false) },
-        { enableShipItemPlacement, (false, false) },
-        { addPortableCampfire, (false, false) },
-        { keepHelmetOn, (false, false) },
-        { showWarningNotifications, (false, false) },
-        { shipExplosionMultiplier, (1f, 1f) },
-        { shipBounciness, (1f, 1f) },
-        { enableEnhancedAutopilot, (false, false) },
-        { shipInputLatency, (1f, 1f) },
-        { addEngineSwitch, (false, false) },
-        { idleFuelConsumptionMultiplier, (1f, 1f) },
-        { shipLightColorOptions, ("", "") },
-        { shipLightColor1, ("", "") },
-        { shipLightColor2, ("", "") },
-        { shipLightColor3, ("", "") },
-        { shipLightColorBlend, ("", "") },
-        { hotThrusters, (false, false) },
-        { extraNoise, (false, false) },
-        { interiorHullColorOptions, ("", "") },
-        { interiorHullColor1, ("", "") },
-        { interiorHullColor2, ("", "") },
-        { interiorHullColor3, ("", "") },
-        { interiorHullColorBlend, ("", "") },
-        { exteriorHullColorOptions, ("", "") },
-        { exteriorHullColor1, ("", "") },
-        { exteriorHullColor2, ("", "") },
-        { exteriorHullColor3, ("", "") },
-        { exteriorHullColorBlend, ("", "") },
-        { addTether, (false, false) },
-        { disableDamageIndicators, (false, false) },
-        { addShipSignal, (false, false) },
-        { reactorLifetimeMultiplier, (1f, 1f) },
-        { shipFriction, (1f, 1f) },
-        { enableSignalscopeComponent, (false, false) },
-        { rustLevel, (1f, 1f) },
-        { dirtAccumulationTime, (1f, 1f) },
-        { thrusterColorOptions, ("", "") },
-        { thrusterColor1, ("", "") },
-        { thrusterColor2, ("", "") },
-        { thrusterColor3, ("", "") },
-        { thrusterColorBlend, ("", "") },
-        { disableSeatbelt, (false, false) },
-        { addPortableTractorBeam, (false, false) },
-        { disableShipSuit, (false, false) },
-        { indicatorColorOptions, ("", "") },
-        { indicatorColor1, ("", "") },
-        { indicatorColor2, ("", "") },
-        { indicatorColor3, ("", "") },
-        { indicatorColorBlend, ("", "") },
-        { disableAutoLights, (false, false) },
-        { addExpeditionFlag, (false, false) },
-        { addFuelCanister, (false, false) },
-        { cycloneChaos, (1f, 1f) },
-        { moreExplosionDamage, (false, false) },
-        { singleUseTractorBeam, (false, false) },
-        { disableThrusters, (false, false) },
-        { maxDirtAccumulation, (false, false) },
-        { shipWarpCoreType, ("", "") },
-        { repairTimeMultiplier, (1f, 1f) },
-        { airDragMultiplier, (1f, 1f) },
-        { addShipClock, (false, false) },
-        { enableStunDamage, (false, false) },
-        { enableRepairConfirmation, (false, false) },
-        { shipGravityFix, (false, false) },
-        { enableRemovableGravityCrystal, (false, false) },
-        { randomHullDamage, (1f, 1f) },
-        { randomComponentDamage, (1f, 1f) },
-        { enableFragileShip, (false, false) },
-        { faultyHeatRegulators, (false, false) },
-        { addErnesto, (false, false) },
-        { repairLimit, (1f, 1f) },
-        { extraEjectButtons, (false, false) },
-        { preventSystemFailure, (false, false) },
-        { addShipCurtain, (false, false) },
-        { repairWrenchType, ("", "") },
-        { funnySounds, (false, false) },
-        { alwaysAllowLockOn, (false, false) },
-        { disableShipMedkit, (false, false) },
-        { addRadio, (false, false) },
-        { disableFluidPrevention, (false, false) },
-        { disableHazardPrevention, (false, false) },
-        { prolongDigestion, (false, false) },
-        { unlimitedItems, (false, false) },
-        { noiseMultiplier, (1f, 1f) },
-        { waterDamage, (1f, 1f) },
-        { sandDamage, (1f, 1f) },
-        { disableMinimapMarkers, (1f, 1f) },
-        { scoutPhotoMode, (false, false) },
-        { fixShipThrustIndicator, (false, false) },
-        { enableAutoAlign, (false, false) },
-        { shipHornType, ("", "") },
-        { randomIterations, (1f, 1f) },
-        { randomDifficulty, (1f, 1f) },
-        { disableHatch, (false, false) },
-        { splitLockOn, (false, false) },
-        { enableColorBlending, (false, false) },
-        { enableShipTemperature, (false, false) },
-    };
+    private static Dictionary<Settings, (object value, object property)> settingValues = null;
 
-    private static Dictionary<Settings, object> savedCustomSettings = new(settingValues.Count);
+    private static Dictionary<Settings, object> savedCustomSettings;
 
     public static Dictionary<string, string> customObjLabels = new();
+
+    private static void InitializeValues()
+    {
+        settingValues = [];
+        var allSettings = Enum.GetValues(typeof(Settings)) as Settings[];
+
+        foreach (Settings setting in allSettings)
+        {
+            settingValues.Add(setting, (null, null));
+        }
+
+        savedCustomSettings = new(settingValues.Count);
+    }
 
     public static string GetName(this Settings setting)
     {
@@ -158,6 +36,8 @@ public static class SettingExtensions
 
     public static object GetValue(this Settings setting)
     {
+        if (settingValues == null) InitializeValues();
+
         JValue value = (JValue)settingValues[setting].value;
         if (value.Type == JTokenType.Boolean)
         {
@@ -180,11 +60,22 @@ public static class SettingExtensions
 
     public static void SetValue(this Settings setting, object value)
     {
-        settingValues[setting] = (value, settingValues[setting].property);
+        if (settingValues == null) InitializeValues();
+        
+        if (settingValues[setting].property == null)
+        {
+            settingValues[setting] = (value, value);
+        }
+        else
+        {
+            settingValues[setting] = (value, settingValues[setting].property);
+        }
     }
 
     public static object GetProperty(this Settings setting)
     {
+        if (settingValues == null) InitializeValues();
+
         if (settingValues[setting].property is JValue)
         {
             JValue value = (JValue)settingValues[setting].property;
@@ -212,6 +103,8 @@ public static class SettingExtensions
 
     public static void SetProperty(this Settings setting, object value)
     {
+        if (settingValues == null) InitializeValues();
+
         settingValues[setting] = (settingValues[setting].value, value);
     }
 
@@ -241,11 +134,15 @@ public static class SettingExtensions
 
     public static Type GetType(this Settings setting)
     {
+        if (settingValues == null) InitializeValues();
+
         return settingValues[setting].GetType();
     }
 
     public static void SaveCustomSettings()
     {
+        if (settingValues == null) InitializeValues();
+
         foreach (var (setting, value) in settingValues)
         {
             if (SettingsPresets.VanillaPlusSettings.ContainsKey(setting.GetName()))
@@ -257,6 +154,8 @@ public static class SettingExtensions
 
     public static void LoadCustomSettings()
     {
+        if (settingValues == null) InitializeValues();
+
         foreach (var (setting, value) in savedCustomSettings)
         {
             if (SettingsPresets.VanillaPlusSettings.ContainsKey(setting.GetName()))
@@ -268,6 +167,8 @@ public static class SettingExtensions
 
     public static void ResetCustomSettings()
     {
+        if (settingValues == null) InitializeValues();
+
         foreach (var (setting, value) in settingValues)
         {
             savedCustomSettings[setting] = Instance.ModHelper.DefaultConfig.GetSettingsValue<object>(setting.GetName());

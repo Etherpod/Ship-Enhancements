@@ -685,23 +685,13 @@
       ],
       "tooltip": "Determines what type of temperature zones to add. Temperature zones will increase or decrease your ship's temperature."
     },
-    "hullTemperatureDamage": {
-      "title": "Hull Temperature Damage",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Damages the ship hull over time in extremely high or low temperatures."
-    },
-    "componentTemperatureDamage": {
-      "title": "Component Temperature Damage",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Damages the ship components over time in extremely high or low temperatures."
-    },
-    "temperatureDamageMultiplier": {
-      "title": "Temperature Damage Multiplier",
-      "type": "number",
-      "value": 1,
-      "tooltip": "Larger numbers increase the damage that the ship takes from extreme temperatures."
+    "temperatureDifficulty": {
+      "title": "Temperature Difficulty",
+      "type": "slider",
+      "value": 0.5,
+      "min": 0.0,
+      "max": 1.0,
+      "tooltip": "Controls how dangerous the side effects of extreme temperatures are."
     },
     "temperatureResistanceMultiplier": {
       "title": "Temperature Resistance Multiplier",
