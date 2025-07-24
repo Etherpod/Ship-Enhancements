@@ -15,6 +15,7 @@ public class ShipThrusterBlendController : ColorBlendController
     private Light _light;
     private ThrustAndAttitudeIndicator _indicator;
     private Texture2D _rainbowTex;
+    private Texture2D _editedTex;
 
     protected override void Awake()
     {
@@ -23,6 +24,7 @@ public class ShipThrusterBlendController : ColorBlendController
         _light = GetComponentInChildren<Light>();
         _indicator = SELocator.GetShipTransform().GetComponentInChildren<ThrustAndAttitudeIndicator>(true);
         _rainbowTex = (Texture2D)ShipEnhancements.LoadAsset("Assets/ShipEnhancements/ThrusterColors/ThrusterFlames_White.png");
+        _editedTex = new Texture2D(_rainbowTex.width, _rainbowTex.height);
 
         var tex = (Texture2D)ShipEnhancements.LoadAsset("Assets/ShipEnhancements/ThrusterColors/ThrusterFlames_Default.png");
         _defaultTheme = [tex, 3.325167f, _light.color * 255f, _indicator._rendererBack.material.GetColor("_BarColor") * 255f,
@@ -62,9 +64,9 @@ public class ShipThrusterBlendController : ColorBlendController
         {
             pixelResult[i] = Color.Lerp(startPixels[i], endPixels[i], lerp);
         }
-        Texture2D newTex = new Texture2D(startTex.width, startTex.height);
-        newTex.SetPixels(pixelResult);
-        newTex.Apply();
+        _editedTex.Resize(startTex.width, startTex.height);
+        _editedTex.SetPixels(pixelResult);
+        _editedTex.Apply();
 
         var thrustIntensity = Mathf.Lerp((float)start[1], (float)end[1], lerp);
         var thrustLight = Color.Lerp((Color)start[2], (Color)end[2], lerp);
@@ -72,7 +74,7 @@ public class ShipThrusterBlendController : ColorBlendController
         var indicatorIntensity = Mathf.Lerp((float)start[4], (float)end[4], lerp);
         var indicatorLight = Color.Lerp((Color)start[5], (Color)end[5], lerp);
 
-        return [newTex, thrustIntensity, thrustLight, indicatorColor, 
+        return [_editedTex, thrustIntensity, thrustLight, indicatorColor, 
             indicatorIntensity, indicatorLight];
     }
 
@@ -87,11 +89,11 @@ public class ShipThrusterBlendController : ColorBlendController
             hsv.s = 1f;
             pixelResult[i] = hsv.AsRGB();
         }
-        Texture2D newTex = new Texture2D(_rainbowTex.width, _rainbowTex.height);
-        newTex.SetPixels(pixelResult);
-        newTex.Apply();
+        _editedTex.Resize(_rainbowTex.width, _rainbowTex.height);
+        _editedTex.SetPixels(pixelResult);
+        _editedTex.Apply();
 
-        _blendThemes[index] = [newTex, 1f, color, color, 1f, color];
+        _blendThemes[index] = [_editedTex, 1f, color, color, 1f, color];
     }
 
     protected override void SetColor(Color color)
@@ -105,11 +107,11 @@ public class ShipThrusterBlendController : ColorBlendController
             hsv.s = 1f;
             pixelResult[i] = hsv.AsRGB();
         }
-        Texture2D newTex = new Texture2D(_rainbowTex.width, _rainbowTex.height);
-        newTex.SetPixels(pixelResult);
-        newTex.Apply();
+        _editedTex.Resize(_rainbowTex.width, _rainbowTex.height);
+        _editedTex.SetPixels(pixelResult);
+        _editedTex.Apply();
 
-        SetColor([newTex, 1f, color, color, 1f, color]);
+        SetColor([_editedTex, 1f, color, color, 1f, color]);
     }
 
     protected override void SetColor(List<object> theme)
