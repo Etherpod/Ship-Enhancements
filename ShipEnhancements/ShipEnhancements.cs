@@ -90,6 +90,7 @@ public class ShipEnhancements : ModBehaviour
     public ItemType GravityCrystalType { get; private set; }
     public ItemType RepairWrenchType { get; private set; }
     public ItemType RadioType { get; private set; }
+    public ItemType ResourcePumpType { get; private set; }
     public SignalName ShipSignalName { get; private set; }
     public int ThrustModulatorLevel { get; private set; }
     public float ThrustModulatorFactor => ThrustModulatorLevel / 5f;
@@ -389,6 +390,7 @@ public class ShipEnhancements : ModBehaviour
         GravityCrystalType = EnumUtils.Create<ItemType>("ShipGravityCrystal");
         RepairWrenchType = EnumUtils.Create<ItemType>("RepairWrench");
         RadioType = EnumUtils.Create<ItemType>("Radio");
+        ResourcePumpType = EnumUtils.Create<ItemType>("ResourcePump");
         ShipSignalName = EnumUtils.Create<SignalName>("Ship");
 
         SEItemAudioController.Initialize();
