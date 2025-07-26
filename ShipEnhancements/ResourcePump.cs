@@ -4,15 +4,36 @@ namespace ShipEnhancements;
 
 public class ResourcePump : OWItem
 {
-    public static readonly ItemType ItemType = ShipEnhancements.Instance.PortableTractorBeamType;
+    public static readonly ItemType ItemType = ShipEnhancements.Instance.ResourcePumpType;
+
+    [Space]
+    [SerializeField]
+    private Vector3 _holdPosition;
+    [SerializeField]
+    private Vector3 _holdRotation;
+    [SerializeField]
+    private Vector3 _holdScale = Vector3.one;
+    [SerializeField]
+    private GameObject[] _socketObjects = [];
 
     private FirstPersonManipulator _cameraManipulator;
     private OWCamera _playerCam;
     private bool _lastFocused = false;
 
-    private ScreenPrompt _switchModePrompt;
     private ScreenPrompt _switchTypePrompt;
+    private ScreenPrompt _switchModePrompt;
     private ScreenPrompt _powerPrompt;
+
+    private ResourceType _currentType = ResourceType.Fuel;
+    private bool _isOutput = true;
+    private bool _powered = false;
+
+    public enum ResourceType
+    {
+        Fuel = 0,
+        Oxygen = 1,
+        Water = 2
+    }
 
     public override string GetDisplayName()
     {
@@ -24,14 +45,21 @@ public class ResourcePump : OWItem
         base.Awake();
         _type = ItemType;
         _cameraManipulator = FindObjectOfType<FirstPersonManipulator>();
-        _switchModePrompt = new ScreenPrompt(InputLibrary.up, InputLibrary.down, "Switch Mode ()", ScreenPrompt.MultiCommandType.POS_NEG, 0, ScreenPrompt.DisplayState.Normal, false);
-        _switchTypePrompt = new ScreenPrompt(InputLibrary.left, InputLibrary.right, "Switch Type ()", ScreenPrompt.MultiCommandType.POS_NEG, 0, ScreenPrompt.DisplayState.Normal, false);
+        _switchTypePrompt = new ScreenPrompt(InputLibrary.left, InputLibrary.right, "Switch Type (Fuel)", ScreenPrompt.MultiCommandType.POS_NEG, 0, ScreenPrompt.DisplayState.Normal, false);
+        _switchModePrompt = new ScreenPrompt(InputLibrary.up, InputLibrary.down, "Switch Mode (Output)", ScreenPrompt.MultiCommandType.POS_NEG, 0, ScreenPrompt.DisplayState.Normal, false);
         _powerPrompt = new ScreenPrompt(InputLibrary.interactSecondary, "Turn On", 0, ScreenPrompt.DisplayState.Normal, false);
+        foreach (var obj in _socketObjects)
+        {
+            obj.SetActive(false);
+        }
     }
 
     private void Start()
     {
         _playerCam = Locator.GetPlayerCamera();
+        Locator.GetPromptManager().AddScreenPrompt(_switchTypePrompt, PromptPosition.Center);
+        Locator.GetPromptManager().AddScreenPrompt(_switchModePrompt, PromptPosition.Center);
+        Locator.GetPromptManager().AddScreenPrompt(_powerPrompt, PromptPosition.Center);
     }
 
     private void Update()
@@ -44,6 +72,30 @@ public class ResourcePump : OWItem
         }
 
         UpdatePromptVisibility();
+
+        if (_lastFocused)
+        {
+            bool pressedLeft = OWInput.IsNewlyPressed(InputLibrary.toolOptionLeft, InputMode.Character);
+            if (pressedLeft || OWInput.IsNewlyPressed(InputLibrary.toolOptionRight, InputMode.Character))
+            {
+                int next = ((int)_currentType + (pressedLeft ? -1 : 1)) % 3;
+                _currentType = (ResourceType)next;
+                _switchTypePrompt.SetText($"Switch Type ({_currentType})");
+            }
+
+            bool pressedDown = OWInput.IsNewlyPressed(InputLibrary.toolOptionDown, InputMode.Character);
+            if (pressedDown || OWInput.IsNewlyPressed(InputLibrary.toolOptionUp, InputMode.Character))
+            {
+                _isOutput = !_isOutput;
+                _switchModePrompt.SetText($"Switch Mode ({(_isOutput ? "Output" : "Input")})");
+            }
+
+            if (OWInput.IsNewlyPressed(InputLibrary.interactSecondary, InputMode.Character))
+            {
+                _powered = !_powered;
+                _powerPrompt.SetText(_powered ? "Turn Off" : "Turn On");
+            }
+        }
     }
 
     private void UpdatePromptVisibility()
@@ -51,13 +103,13 @@ public class ResourcePump : OWItem
         bool flag = _lastFocused && _playerCam.enabled && OWInput.IsInputMode(InputMode.Character | InputMode.ShipCockpit);
         if (flag != _switchModePrompt.IsVisible())
         {
-            _switchModePrompt.SetVisibility(flag);
-        }
-        if (flag != _switchModePrompt.IsVisible())
-        {
             _switchTypePrompt.SetVisibility(flag);
         }
         if (flag != _switchModePrompt.IsVisible())
+        {
+            _switchModePrompt.SetVisibility(flag);
+        }
+        if (flag != _powerPrompt.IsVisible())
         {
             _powerPrompt.SetVisibility(flag);
         }
@@ -67,21 +119,27 @@ public class ResourcePump : OWItem
     {
         base.DropItem(position, normal, parent, sector, customDropTarget);
         transform.localScale = Vector3.one;
-        transform.localRotation = Quaternion.identity;
     }
 
     public override void PickUpItem(Transform holdTranform)
     {
         base.PickUpItem(holdTranform);
-        transform.localScale = Vector3.one * 0.5f;
-        transform.localRotation = Quaternion.Euler(90f, 0f, 0f);
-        transform.localPosition = new Vector3(0f, -0.2f, 0f);
+        transform.localPosition = _holdPosition;
+        transform.localRotation = Quaternion.Euler(_holdRotation);
+        transform.localScale = _holdScale;
+        foreach (var obj in _socketObjects)
+        {
+            obj.SetActive(false);
+        }
     }
 
     public override void SocketItem(Transform socketTransform, Sector sector)
     {
         base.SocketItem(socketTransform, sector);
         transform.localScale = Vector3.one;
-        transform.localRotation = Quaternion.identity;
+        foreach (var obj in _socketObjects)
+        {
+            obj.SetActive(true);
+        }
     }
 }

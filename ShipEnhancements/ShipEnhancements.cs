@@ -1729,6 +1729,11 @@ public class ShipEnhancements : ModBehaviour
             imageObj.enabled = false;
             launcherUI._bracketImage = imageObj;
         }
+        if (true)
+        {
+            GameObject pumpSocketObj = LoadPrefab("Assets/ShipEnhancements/ResourcePumpSocket.prefab");
+            Instantiate(pumpSocketObj, SELocator.GetShipTransform().Find("Module_Cabin"));
+        }
         if (AchievementsAPI != null)
         {
             GameObject th = GameObject.Find("TimberHearth_Body");
