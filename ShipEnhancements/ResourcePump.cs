@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace ShipEnhancements;
 
@@ -16,7 +17,21 @@ public class ResourcePump : OWItem
     [SerializeField]
     private GameObject[] _socketObjects = [];
 
+    [Space]
+    [SerializeField]
+    private OxygenVolume _oxygenVolume;
+
+    [Space]
+    [SerializeField]
+    private ParticleSystem _geyserParticles;
+    [SerializeField]
+    private GeyserFluidVolume _geyserVolume;
+    [SerializeField]
+    private OWAudioSource _geyserLoopSource;
+
+    private EffectVolume[] _volumes;
     private FirstPersonManipulator _cameraManipulator;
+    private OWAudioSource _playerExternalSource;
     private OWCamera _playerCam;
     private bool _lastFocused = false;
 
@@ -25,14 +40,17 @@ public class ResourcePump : OWItem
     private ScreenPrompt _powerPrompt;
 
     private ResourceType _currentType = ResourceType.Fuel;
+    private int _currentTypeIndex = 0;
     private bool _isOutput = true;
     private bool _powered = false;
 
+    private bool _geyserActive = false;
+
     public enum ResourceType
     {
-        Fuel = 0,
-        Oxygen = 1,
-        Water = 2
+        Fuel,
+        Oxygen,
+        Water
     }
 
     public override string GetDisplayName()
@@ -44,9 +62,10 @@ public class ResourcePump : OWItem
     {
         base.Awake();
         _type = ItemType;
+        _volumes = GetComponentsInChildren<EffectVolume>(true);
         _cameraManipulator = FindObjectOfType<FirstPersonManipulator>();
-        _switchTypePrompt = new ScreenPrompt(InputLibrary.left, InputLibrary.right, "Switch Type (Fuel)", ScreenPrompt.MultiCommandType.POS_NEG, 0, ScreenPrompt.DisplayState.Normal, false);
-        _switchModePrompt = new ScreenPrompt(InputLibrary.up, InputLibrary.down, "Switch Mode (Output)", ScreenPrompt.MultiCommandType.POS_NEG, 0, ScreenPrompt.DisplayState.Normal, false);
+        _switchTypePrompt = new ScreenPrompt(InputLibrary.toolOptionLeft, InputLibrary.toolOptionRight, "Switch Type (Fuel)", ScreenPrompt.MultiCommandType.POS_NEG, 0, ScreenPrompt.DisplayState.Normal, false);
+        _switchModePrompt = new ScreenPrompt(InputLibrary.toolOptionUp, InputLibrary.toolOptionDown, "Switch Mode (Output)", ScreenPrompt.MultiCommandType.POS_NEG, 0, ScreenPrompt.DisplayState.Normal, false);
         _powerPrompt = new ScreenPrompt(InputLibrary.interactSecondary, "Turn On", 0, ScreenPrompt.DisplayState.Normal, false);
         foreach (var obj in _socketObjects)
         {
@@ -56,10 +75,16 @@ public class ResourcePump : OWItem
 
     private void Start()
     {
+        _playerExternalSource = Locator.GetPlayerAudioController()._oneShotExternalSource;
         _playerCam = Locator.GetPlayerCamera();
         Locator.GetPromptManager().AddScreenPrompt(_switchTypePrompt, PromptPosition.Center);
         Locator.GetPromptManager().AddScreenPrompt(_switchModePrompt, PromptPosition.Center);
         Locator.GetPromptManager().AddScreenPrompt(_powerPrompt, PromptPosition.Center);
+
+        _oxygenVolume._triggerVolume._shape.enabled = true;
+        _geyserVolume._triggerVolume._shape.enabled = true;
+        _oxygenVolume.SetVolumeActivation(false);
+        _geyserVolume.SetVolumeActivation(false);
     }
 
     private void Update()
@@ -78,14 +103,17 @@ public class ResourcePump : OWItem
             bool pressedLeft = OWInput.IsNewlyPressed(InputLibrary.toolOptionLeft, InputMode.Character);
             if (pressedLeft || OWInput.IsNewlyPressed(InputLibrary.toolOptionRight, InputMode.Character))
             {
-                int next = ((int)_currentType + (pressedLeft ? -1 : 1)) % 3;
-                _currentType = (ResourceType)next;
-                _switchTypePrompt.SetText($"Switch Type ({_currentType})");
+                _currentTypeIndex = (_currentTypeIndex + 3 + (pressedLeft ? -1 : 1)) % 3;
+                var nextType = (Enum.GetValues(typeof(ResourceType)) as ResourceType[])[_currentTypeIndex];
+                _switchTypePrompt.SetText($"Switch Type ({nextType})");
+                _playerExternalSource.PlayOneShot(AudioType.Menu_UpDown, 0.5f);
+                UpdateType(nextType);
             }
 
             bool pressedDown = OWInput.IsNewlyPressed(InputLibrary.toolOptionDown, InputMode.Character);
             if (pressedDown || OWInput.IsNewlyPressed(InputLibrary.toolOptionUp, InputMode.Character))
             {
+                _playerExternalSource.PlayOneShot(AudioType.Menu_LeftRight, 0.5f);
                 _isOutput = !_isOutput;
                 _switchModePrompt.SetText($"Switch Mode ({(_isOutput ? "Output" : "Input")})");
             }
@@ -94,7 +122,16 @@ public class ResourcePump : OWItem
             {
                 _powered = !_powered;
                 _powerPrompt.SetText(_powered ? "Turn Off" : "Turn On");
+                UpdatePowered(_powered);
             }
+        }
+    }
+
+    private void FixedUpdate()
+    {
+        if (_geyserActive)
+        {
+            UpdateGeyserLoopingAudioPosition();
         }
     }
 
@@ -115,14 +152,89 @@ public class ResourcePump : OWItem
         }
     }
 
+    private void UpdateGeyserLoopingAudioPosition()
+    {
+        float num = _geyserActive ? _geyserVolume.GetHeight() : _geyserVolume.GetMaximumHeight();
+        float num2 = Mathf.Clamp(transform.InverseTransformPoint(Locator.GetPlayerTransform().position).y, 0f, num);
+        _geyserLoopSource.transform.localPosition = new Vector3(0f, num2, 0f);
+    }
+
+    private void UpdateType(ResourceType type)
+    {
+        if (!_powered || type == _currentType)
+        {
+            _currentType = type;
+            return;
+        }
+
+        if (_currentType == ResourceType.Oxygen)
+        {
+            _oxygenVolume.SetVolumeActivation(false);
+        }
+        else if (type == ResourceType.Oxygen)
+        {
+            _oxygenVolume.SetVolumeActivation(true);
+        }
+
+        if (_currentType == ResourceType.Water)
+        {
+            _geyserActive = false;
+            _geyserLoopSource.FadeOut(0.5f);
+            _geyserParticles.Stop();
+            _geyserVolume.SetFiring(false);
+        }
+        else if (type == ResourceType.Water)
+        {
+            _geyserActive = true;
+            _geyserLoopSource.FadeIn(0.5f);
+            _geyserParticles.Play();
+            _geyserVolume.SetFiring(true);
+            UpdateGeyserLoopingAudioPosition();
+        }
+
+        _currentType = type;
+    }
+    
+    private void UpdatePowered(bool powered)
+    {
+        if (_currentType == ResourceType.Oxygen)
+        {
+            _oxygenVolume.SetVolumeActivation(powered);
+        }
+        else if (_currentType == ResourceType.Water)
+        {
+            if (_geyserActive != powered)
+            {
+                _geyserActive = powered;
+                if (_geyserActive)
+                {
+                    _geyserLoopSource.FadeIn(0.5f);
+                    _geyserParticles.Play();
+                    _geyserVolume.SetFiring(true);
+                }
+                else
+                {
+                    _geyserLoopSource.FadeOut(0.5f);
+                    _geyserParticles.Stop();
+                    _geyserVolume.SetFiring(false);
+                }
+
+                UpdateGeyserLoopingAudioPosition();
+            }
+        }
+    }
+
     public override void DropItem(Vector3 position, Vector3 normal, Transform parent, Sector sector, IItemDropTarget customDropTarget)
     {
         base.DropItem(position, normal, parent, sector, customDropTarget);
+        UpdateAttachedBody(parent.GetAttachedOWRigidbody());
         transform.localScale = Vector3.one;
+        UpdatePowered(_powered);
     }
 
     public override void PickUpItem(Transform holdTranform)
     {
+        UpdatePowered(false);
         base.PickUpItem(holdTranform);
         transform.localPosition = _holdPosition;
         transform.localRotation = Quaternion.Euler(_holdRotation);
@@ -140,6 +252,14 @@ public class ResourcePump : OWItem
         foreach (var obj in _socketObjects)
         {
             obj.SetActive(true);
+        }
+    }
+
+    private void UpdateAttachedBody(OWRigidbody body)
+    {
+        foreach (EffectVolume vol in _volumes)
+        {
+            vol.SetAttachedBody(body);
         }
     }
 }
