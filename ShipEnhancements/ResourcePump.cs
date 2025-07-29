@@ -19,7 +19,15 @@ public class ResourcePump : OWItem
 
     [Space]
     [SerializeField]
+    private OWRenderer _signalRenderer;
+    [SerializeField]
+    private float _maxShipDistance = 3000f;
+
+    [Space]
+    [SerializeField]
     private OxygenVolume _oxygenVolume;
+    [SerializeField]
+    private OWAudioSource _oxygenLoopSource;
 
     [Space]
     [SerializeField]
@@ -34,6 +42,9 @@ public class ResourcePump : OWItem
     private OWAudioSource _playerExternalSource;
     private OWCamera _playerCam;
     private bool _lastFocused = false;
+
+    private readonly int _batteryPropID = Shader.PropertyToID("_Battery");
+    private bool _inSignalRange;
 
     private ScreenPrompt _switchTypePrompt;
     private ScreenPrompt _switchModePrompt;
@@ -122,9 +133,13 @@ public class ResourcePump : OWItem
             {
                 _powered = !_powered;
                 _powerPrompt.SetText(_powered ? "Turn Off" : "Turn On");
-                UpdatePowered(_powered);
+                UpdatePowered(_powered && _inSignalRange);
             }
         }
+
+        float distSqr = (SELocator.GetShipTransform().position - SELocator.GetPlayerBody().transform.position).sqrMagnitude;
+        float lerp = Mathf.InverseLerp(_maxShipDistance * _maxShipDistance, 50f * 50f, distSqr);
+        UpdateBatteryLevel(lerp);
     }
 
     private void FixedUpdate()
@@ -161,7 +176,7 @@ public class ResourcePump : OWItem
 
     private void UpdateType(ResourceType type)
     {
-        if (!_powered || type == _currentType)
+        if (!_powered || !_inSignalRange || type == _currentType)
         {
             _currentType = type;
             return;
@@ -170,10 +185,12 @@ public class ResourcePump : OWItem
         if (_currentType == ResourceType.Oxygen)
         {
             _oxygenVolume.SetVolumeActivation(false);
+            _oxygenLoopSource.FadeOut(0.5f);
         }
         else if (type == ResourceType.Oxygen)
         {
             _oxygenVolume.SetVolumeActivation(true);
+            _oxygenLoopSource.FadeIn(0.5f);
         }
 
         if (_currentType == ResourceType.Water)
@@ -200,6 +217,14 @@ public class ResourcePump : OWItem
         if (_currentType == ResourceType.Oxygen)
         {
             _oxygenVolume.SetVolumeActivation(powered);
+            if (powered)
+            {
+                _oxygenLoopSource.FadeIn(0.5f);
+            }
+            else
+            {
+                _oxygenLoopSource.FadeOut(0.5f);
+            }
         }
         else if (_currentType == ResourceType.Water)
         {
@@ -224,12 +249,22 @@ public class ResourcePump : OWItem
         }
     }
 
+    public void UpdateBatteryLevel(float battery)
+    {
+        _signalRenderer.SetMaterialProperty(_batteryPropID, Mathf.Clamp01(battery));
+        if (_inSignalRange != battery > 0f)
+        {
+            _inSignalRange = battery > 0f;
+            UpdatePowered(_powered && _inSignalRange);
+        }
+    }
+
     public override void DropItem(Vector3 position, Vector3 normal, Transform parent, Sector sector, IItemDropTarget customDropTarget)
     {
         base.DropItem(position, normal, parent, sector, customDropTarget);
         UpdateAttachedBody(parent.GetAttachedOWRigidbody());
         transform.localScale = Vector3.one;
-        UpdatePowered(_powered);
+        UpdatePowered(_powered && _inSignalRange);
     }
 
     public override void PickUpItem(Transform holdTranform)
