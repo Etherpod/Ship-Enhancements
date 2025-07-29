@@ -280,7 +280,7 @@ public class ShipEnhancements : ModBehaviour
         "Is the past a real thing, or is it an illusion made up by your brain?",
         "Did you know moss can be male or female?",
         "If \"color\" is light being reflected off of an object, what color is a mirror?",
-        "Did you know the eyes of a spider see in different ways?",
+        "Did you know spiders see differently through each eye?",
         "Did you find Outer Wilds, or did Outer Wilds find you?",
         "What's your favorite Outer Wilds mod?",
         "Did you know Ernesto has a dedicated wiki page?",
@@ -303,7 +303,29 @@ public class ShipEnhancements : ModBehaviour
         "If you punch yourself and it hurts, does that make you weak or strong?",
         "Why did the chicken cross the road?",
         "This statement is a lie.",
-        "Did you know Outer Wilds isn't scientifically accurate? This is because in Outer Wilds the planets are round, which doesn't match real life as the Earth is in fact-"
+        "Did you know Outer Wilds isn't scientifically accurate? This is because in Outer Wilds the planets are round, which doesn't match real life as the Earth is in fact-",
+        "What's the hardest achievement to get in Outer Wilds?",
+        "What's your favorite planet in Outer Wilds?",
+        "Have you played the mod Nomai's Sky? It's aims to mimic the game No Man's Sky, a space exploration game with literal billions of procedurally generated galaxies to explore.",
+        "Which Outer Wilds modding jam is your favorite?",
+        "Which mod has your favorite Ernesto easter egg?",
+        "Which traveler is your favorite?",
+        "Contrary to common belief, licking uranium is actually very dangerous.",
+        "The Grand Canyon is over a mile deep, and yet humans can be killed by a 10-foot drop. Isn't that crazy?",
+        "What's your favorite species of tree?",
+        "77 + 33 = 100",
+        "Did you know that cheetahs can actually run faster than turtles?",
+        "If you arranged elephants in a line from Earth to the Moon, most of them would die.",
+        "If you were to place every ant on Earth into a bucket, it would fill the bucket.",
+        "Did you know \"ample\" is one of the words in the English language to start with \"a\"?",
+        "Have you played The Legend of Zelda: Breath of the Wild? Outer Wilds was partially inspried by that game.",
+        "Instead of saying you had pizza for dinner, say you had aged organic milk tossed over seasoned tomato purée spread on baked whole wheat.",
+        "Have you heard of the game Blue Prince? It's really cool. If you're into puzzles, I would suggest playing it or watching a playthrough.",
+        "Have you heard of Aliensrock? They make YouTube videos on a lot of puzzle/strategy games.",
+        "If your keyboard has a number pad, you can turn on \"num lock\" and hold Alt while pressing numbers to insert special symbols (™, °, ¼, etc).\nHere are some codes: 0153 (™), 0176 (°), 0149 (•), 0173 (empty character)",
+        "Did you know the smallest angle of a triangle is always adjacent to the hypotenuse?",
+        "At what age do you become \"old\"? 30? 50? 80?",
+        "Have you heard of Kane Pixels? He popularized the \"found footage\" videos of The Backrooms."
     };
 
     private (string blendType, string suffix, Func<int, int, bool> canShow)[] _customSettingNames =
@@ -2802,6 +2824,8 @@ public class ShipEnhancements : ModBehaviour
 
     public static void WriteDebugMessage(object msg, bool warning = false, bool error = false)
     {
+        return;
+
         msg ??= "null";
 
         if (warning)
