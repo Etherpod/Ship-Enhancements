@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace ShipEnhancements;
@@ -16,6 +18,14 @@ public class ResourcePump : OWItem
     private Vector3 _holdScale = Vector3.one;
     [SerializeField]
     private GameObject[] _socketObjects = [];
+
+    [Space]
+    [SerializeField]
+    private PumpFlameController _flameController;
+    [SerializeField]
+    private OWAudioSource _flameLoopSource;
+    [SerializeField]
+    private float _thrusterStrength;
 
     [Space]
     [SerializeField]
@@ -42,6 +52,7 @@ public class ResourcePump : OWItem
     private OWAudioSource _playerExternalSource;
     private OWCamera _playerCam;
     private bool _lastFocused = false;
+    private bool _dropped = false;
 
     private readonly int _batteryPropID = Shader.PropertyToID("_Battery");
     private bool _inSignalRange;
@@ -56,6 +67,7 @@ public class ResourcePump : OWItem
     private bool _powered = false;
 
     private bool _geyserActive = false;
+    private bool _flameActive = false;
 
     public enum ResourceType
     {
@@ -78,6 +90,11 @@ public class ResourcePump : OWItem
         _switchTypePrompt = new ScreenPrompt(InputLibrary.toolOptionLeft, InputLibrary.toolOptionRight, "Switch Type (Fuel)", ScreenPrompt.MultiCommandType.POS_NEG, 0, ScreenPrompt.DisplayState.Normal, false);
         _switchModePrompt = new ScreenPrompt(InputLibrary.toolOptionUp, InputLibrary.toolOptionDown, "Switch Mode (Output)", ScreenPrompt.MultiCommandType.POS_NEG, 0, ScreenPrompt.DisplayState.Normal, false);
         _powerPrompt = new ScreenPrompt(InputLibrary.interactSecondary, "Turn On", 0, ScreenPrompt.DisplayState.Normal, false);
+
+        List<ParticleSystem> systems = _particleSystems.ToList();
+        systems.Clear();
+        _particleSystems = systems.ToArray();
+
         foreach (var obj in _socketObjects)
         {
             obj.SetActive(false);
@@ -133,7 +150,7 @@ public class ResourcePump : OWItem
             {
                 _powered = !_powered;
                 _powerPrompt.SetText(_powered ? "Turn Off" : "Turn On");
-                UpdatePowered(_powered && _inSignalRange);
+                UpdatePowered(_powered && _inSignalRange && _dropped);
             }
         }
 
@@ -147,6 +164,18 @@ public class ResourcePump : OWItem
         if (_geyserActive)
         {
             UpdateGeyserLoopingAudioPosition();
+        }
+        if (_flameActive)
+        {
+            var body = gameObject.GetAttachedOWRigidbody();
+            var toCom = transform.position - body.GetWorldCenterOfMass();
+            var thrustDir = -transform.up * _thrusterStrength;
+
+            body.AddForce(thrustDir);
+
+            var torqueStrength = Vector3.ProjectOnPlane(toCom, thrustDir).magnitude;
+            var torqueVec = Vector3.Cross(toCom, thrustDir).normalized;
+            body.AddTorque(torqueVec * torqueStrength);
         }
     }
 
@@ -182,6 +211,19 @@ public class ResourcePump : OWItem
             return;
         }
 
+        if (_currentType == ResourceType.Fuel)
+        {
+            _flameActive = false;
+            _flameController.DeactivateFlame();
+            _flameLoopSource.FadeOut(0.5f);
+        }
+        else if (type == ResourceType.Fuel)
+        {
+            _flameActive = true;
+            _flameController.ActivateFlame();
+            _flameLoopSource.FadeIn(0.5f);
+        }
+
         if (_currentType == ResourceType.Oxygen)
         {
             _oxygenVolume.SetVolumeActivation(false);
@@ -214,7 +256,21 @@ public class ResourcePump : OWItem
     
     private void UpdatePowered(bool powered)
     {
-        if (_currentType == ResourceType.Oxygen)
+        if (_currentType == ResourceType.Fuel)
+        {
+            _flameActive = powered;
+            if (_flameActive)
+            {
+                _flameController.ActivateFlame();
+                _flameLoopSource.FadeIn(0.5f);
+            }
+            else
+            {
+                _flameController.DeactivateFlame();
+                _flameLoopSource.FadeOut(0.5f);
+            }
+        }
+        else if (_currentType == ResourceType.Oxygen)
         {
             _oxygenVolume.SetVolumeActivation(powered);
             if (powered)
@@ -255,13 +311,14 @@ public class ResourcePump : OWItem
         if (_inSignalRange != battery > 0f)
         {
             _inSignalRange = battery > 0f;
-            UpdatePowered(_powered && _inSignalRange);
+            UpdatePowered(_powered && _inSignalRange && _dropped);
         }
     }
 
     public override void DropItem(Vector3 position, Vector3 normal, Transform parent, Sector sector, IItemDropTarget customDropTarget)
     {
         base.DropItem(position, normal, parent, sector, customDropTarget);
+        _dropped = true;
         UpdateAttachedBody(parent.GetAttachedOWRigidbody());
         transform.localScale = Vector3.one;
         UpdatePowered(_powered && _inSignalRange);
@@ -271,6 +328,7 @@ public class ResourcePump : OWItem
     {
         UpdatePowered(false);
         base.PickUpItem(holdTranform);
+        _dropped = false;
         transform.localPosition = _holdPosition;
         transform.localRotation = Quaternion.Euler(_holdRotation);
         transform.localScale = _holdScale;
@@ -283,6 +341,7 @@ public class ResourcePump : OWItem
     public override void SocketItem(Transform socketTransform, Sector sector)
     {
         base.SocketItem(socketTransform, sector);
+        _dropped = false;
         transform.localScale = Vector3.one;
         foreach (var obj in _socketObjects)
         {
