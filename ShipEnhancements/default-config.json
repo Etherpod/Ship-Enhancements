@@ -620,17 +620,23 @@
       "value": false,
       "tooltip": "Adds a few hooks inside the ship that you can place anywhere you want. Interact with it to tether yourself to it, and interact with another to create a line between them."
     },
-    "unlimitedItems": {
-      "title": "Unlimited Items",
+    "addResourcePump": {
+      "title": "Add Resource Pump",
       "type": "toggle",
       "value": false,
-      "tooltip": "Lets you duplicate items inside the ship."
+      "tooltip": "Adds a wireless pump to the back of the ship that can interact with your ship's resources."
     },
     "enableRemovableGravityCrystal": {
       "title": "Removable Gravity Crystal",
       "type": "toggle",
       "value": false,
       "tooltip": "Lets you remove the gravity crystal from the ship. It can be placed outside the ship on any surface for a portable gravity source."
+    },
+    "unlimitedItems": {
+      "title": "Unlimited Items",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Lets you duplicate items inside the ship."
     },
     "enableGravityLandingGear": {
       "title": "Add Gravity Landing Gear",

@@ -117,6 +117,7 @@ public static class SettingsPresets
         { "enableShipTemperature", false },
         { "temperatureDifficulty", 0.5f },
         { "passiveTemperatureGain", "None" },
+        { "addResourcePump", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -229,6 +230,7 @@ public static class SettingsPresets
         { "enableShipTemperature", false },
         { "temperatureDifficulty", 0.5f },
         { "passiveTemperatureGain", "None" },
+        { "addResourcePump", false },
     };
 
     public static readonly Dictionary<string, object> ImpossibleSettings = new Dictionary<string, object>()
@@ -341,6 +343,7 @@ public static class SettingsPresets
         { "enableShipTemperature", false },
         { "temperatureDifficulty", 0.5f },
         { "passiveTemperatureGain", "None" },
+        { "addResourcePump", false },
     };
 
     public static readonly Dictionary<string, object> NewStuffSettings = new Dictionary<string, object>()
@@ -453,6 +456,7 @@ public static class SettingsPresets
         { "enableShipTemperature", true },
         { "temperatureDifficulty", 0.25f },
         { "passiveTemperatureGain", "None" },
+        { "addResourcePump", true },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -565,6 +569,7 @@ public static class SettingsPresets
         { "enableShipTemperature", true },
         { "temperatureDifficulty", 1f },
         { "passiveTemperatureGain", "Hot" },
+        { "addResourcePump", true },
     };
 
     // Random preset composition
@@ -1225,6 +1230,7 @@ public static class SettingsPresets
             ("Hot", (1f, 1f)),
             ("Cold", (1f, 1f)),
         ], (0f, 0.5f), "None") },
+        { "addResourcePump", new RandomSettingValue((0.5f, 0.5f)) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

@@ -250,6 +250,7 @@ public class ShipEnhancements : ModBehaviour
         enableShipTemperature,
         temperatureDifficulty,
         passiveTemperatureGain,
+        addResourcePump,
     }
 
     private string[] startupMessages =
@@ -1729,7 +1730,7 @@ public class ShipEnhancements : ModBehaviour
             imageObj.enabled = false;
             launcherUI._bracketImage = imageObj;
         }
-        if (true)
+        if ((bool)addResourcePump.GetProperty())
         {
             GameObject pumpSocketObj = LoadPrefab("Assets/ShipEnhancements/ResourcePumpSocket.prefab");
             Instantiate(pumpSocketObj, SELocator.GetShipTransform().Find("Module_Cabin"));
