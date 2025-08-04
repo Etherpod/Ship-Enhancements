@@ -68,7 +68,7 @@ public class ShipTemperatureGauge : MonoBehaviour
             bool flag = Time.timeSinceLevelLoad * 2f % 2f < 1.33f;
             _indicatorLight.SetEmissionColor(flag ? _warningLightColor : Color.black);
         }
-        else
+        else if (_lightActive)
         {
             _lightActive = false;
             _indicatorLight.SetEmissionColor(Color.black);

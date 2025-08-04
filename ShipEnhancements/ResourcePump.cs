@@ -158,7 +158,7 @@ public class ResourcePump : OWItem
             }
         }
 
-        float distSqr = (SELocator.GetShipTransform().position - SELocator.GetPlayerBody().transform.position).sqrMagnitude;
+        float distSqr = (SELocator.GetShipTransform().position - transform.position).sqrMagnitude;
         float lerp = Mathf.InverseLerp(_maxShipDistance * _maxShipDistance, 50f * 50f, distSqr);
         UpdateBatteryLevel(lerp);
 

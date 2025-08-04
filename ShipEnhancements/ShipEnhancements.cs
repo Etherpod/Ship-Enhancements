@@ -1025,6 +1025,7 @@ public class ShipEnhancements : ModBehaviour
             (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillageCloth_Recolored_mat.mat"),
             (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_NOM_CopperOld_mat.mat"),
             (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_NOM_Sandstone_mat.mat"),
+            (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_WaterMeter_mat.mat"),
         };
         Transform cockpitLight = SELocator.GetShipTransform().Find("Module_Cockpit/Lights_Cockpit/Pointlight_HEA_ShipCockpit");
         List<Material> materials = [.. cockpitLight.GetComponent<LightmapController>()._materials];
@@ -1035,6 +1036,11 @@ public class ShipEnhancements : ModBehaviour
         List<Material> materials2 = [.. shipLogLight.GetComponent<LightmapController>()._materials];
         materials2.AddRange(newMaterials);
         shipLogLight.GetComponent<LightmapController>()._materials = [.. materials2];
+
+        Transform suppliesLight = SELocator.GetShipTransform().Find("Module_Supplies/Lights_Supplies/Pointlight_HEA_ShipSupplies_Top");
+        List<Material> materials3 = [.. suppliesLight.GetComponent<LightmapController>()._materials];
+        materials3.AddRange(newMaterials);
+        suppliesLight.GetComponent<LightmapController>()._materials = [.. materials3];
 
         MeshRenderer chassisRenderer = SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry/Cockpit_Interior/Cockpit_Interior_Chassis")
             .GetComponent<MeshRenderer>();
@@ -1749,6 +1755,8 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)addWaterTank.GetProperty())
         {
             SELocator.GetShipBody().gameObject.AddComponent<ShipWaterResource>();
+            GameObject meterObj = LoadPrefab("Assets/ShipEnhancements/ShipWaterMeter.prefab");
+            Instantiate(meterObj, SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit"));
         }
         if ((bool)addWaterCooling.GetProperty())
         {
