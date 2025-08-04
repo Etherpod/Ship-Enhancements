@@ -9,6 +9,8 @@ namespace ShipEnhancements;
 public class ShipTemperatureDetector : TemperatureDetector
 {
     private ShockLayerController _shockLayerController;
+    private ShipFluidDetector _fluidDetector;
+    private bool _waterCooling;
 
     protected override void Start()
     {
@@ -16,7 +18,9 @@ public class ShipTemperatureDetector : TemperatureDetector
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
         _shockLayerController = SELocator.GetShipTransform().GetComponentInChildren<ShockLayerController>();
+        _fluidDetector = SELocator.GetShipDetector().GetComponent<ShipFluidDetector>();
         _maxInternalTemperature *= Mathf.Max(Mathf.Abs((float)temperatureResistanceMultiplier.GetProperty()), 1f);
+        _waterCooling = (bool)addWaterTank.GetProperty() && (bool)addWaterCooling.GetProperty();
     }
 
     protected override void Update()
@@ -68,7 +72,7 @@ public class ShipTemperatureDetector : TemperatureDetector
     protected override bool CanUpdateTemperature()
     {
         return base.CanUpdateTemperature() || (_shockLayerController.enabled 
-            && _shockLayerController._ruleset != null);
+            && _shockLayerController._ruleset != null) || _fluidDetector.InFluidType(FluidVolume.Type.WATER);
     }
 
     protected override float CalculateCurrentTemperature()
@@ -101,6 +105,12 @@ public class ShipTemperatureDetector : TemperatureDetector
             totalTemperature += Mathf.Lerp(0f, 65f, shockSpeedPercent);
         }
 
+        if (_fluidDetector.InFluidType(FluidVolume.Type.WATER)
+            || _fluidDetector.InFluidType(FluidVolume.Type.GEYSER))
+        {
+            totalTemperature -= 15f;
+        }
+
         return Mathf.Clamp(totalTemperature, -100f, 100f);
     }
 
@@ -114,8 +124,14 @@ public class ShipTemperatureDetector : TemperatureDetector
 
     protected override void UpdateInternalTemperature()
     {
-        float cutoff = Mathf.Abs(_maxInternalTemperature * GetTemperatureRatio());
+        if ((IsHeatingLocked() && _currentInternalTemperature > 0f)
+            || (IsCoolingLocked() && _currentInternalTemperature < 0f))
+        {
+            _currentInternalTemperature = Mathf.MoveTowards(_currentInternalTemperature, 0f, Time.deltaTime * 4f);
+            return;
+        }
 
+        float cutoff = Mathf.Abs(_maxInternalTemperature * GetTemperatureRatio());
         bool sameSide = _currentInternalTemperature < 0 == _currentTemperature < 0;
 
         if ((float)temperatureResistanceMultiplier.GetProperty() < 0f)
@@ -152,12 +168,17 @@ public class ShipTemperatureDetector : TemperatureDetector
             {
                 _currentInternalTemperature += step;
             }
-
-            if (UnityEngine.InputSystem.Keyboard.current.numpadDivideKey.wasPressedThisFrame)
-            {
-                ShipEnhancements.WriteDebugMessage("cooldown step: " + step);
-            }
         }
+    }
+
+    private bool IsHeatingLocked()
+    {
+        return _waterCooling && SELocator.GetShipWaterResource().IsCoolingActive();
+    }
+
+    private bool IsCoolingLocked()
+    {
+        return false;
     }
 
     private void OnShipSystemFailure()

@@ -716,6 +716,35 @@
       ],
       "tooltip": "Increases/decreases the ship temperature over time, making some areas more safe and others more dangerous."
     },
+    "enableReactorOverload": {
+      "title": "Allow Reactor Overload",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Lets you interact with the reactor to overload it and prevent your ship from getting cold."
+    },
+
+    "waterSplit": {
+      "type": "separator"
+    },
+
+    "addWaterTank": {
+      "title": "Use Water Tank",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Adds water as a new resource, making use of the water tank attached to the back of the ship. It can be refilled using the Resource Pump."
+    },
+    "waterDrainMultiplier": {
+      "title": "Water Drain Multiplier",
+      "type": "number",
+      "value": 1.0,
+      "tooltip": "Larger numbers make the water tank drain faster when being used, and make it refill faster when using the Resource Pump."
+    },
+    "addWaterCooling": {
+      "title": "Add Water Cooling",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Adds a lever next to the ship log that turns on water cooling, which will consume water to prevent your ship from getting hot. (This doesn't do anything if temperature isn't enabled)"
+    },
 
     "Decoration": {
       "type": "separator",

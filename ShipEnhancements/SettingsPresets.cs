@@ -1231,6 +1231,17 @@ public static class SettingsPresets
             ("Cold", (1f, 1f)),
         ], (0f, 0.5f), "None") },
         { "addResourcePump", new RandomSettingValue((0.5f, 0.5f)) },
+        { "addWaterTank", new RandomSettingValue((0.5f, 0.5f)) },
+        { "addWaterCooling", new RandomSettingValue((0.5f, 0.5f)) },
+        { "waterDrainMultiplier", new RandomSettingValue(
+        [
+            ((0.5f, 1.5f), (1f, 1f)),
+            ((1.5f, 4f), (0.5f, 1f)),
+            ((4f, 12f), (0.1f, 1.05f)),
+            ((12f, 20f), (0f, 1.1f)),
+            ((20f, 50f), (0f, 0.6f)),
+        ], (0.25f, 0.5f), 1f) },
+        { "enableReactorOverload", new RandomSettingValue((0.5f, 0.5f)) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

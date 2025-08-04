@@ -61,8 +61,8 @@ public class ShipEngineSwitch : CockpitInteractible
         _engineSputterClip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/ShipEngineSputter.ogg");
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
-        ShipEnhancements.Instance.OnFuelDepleted += OnFuelDepleted;
-        ShipEnhancements.Instance.OnFuelRestored += OnFuelRestored;
+        ShipEnhancements.Instance.OnResourceDepleted += OnFuelDepleted;
+        ShipEnhancements.Instance.OnResourceRestored += OnFuelRestored;
 
         _baseRotation = _switchTransform.localRotation;
         _targetRotation = Quaternion.Euler(_switchTransform.localRotation.eulerAngles.x, _targetYRotation, 
@@ -373,15 +373,18 @@ public class ShipEngineSwitch : CockpitInteractible
         }
     }
 
-    private void OnFuelDepleted()
+    private void OnFuelDepleted(string resource)
     {
-        _thrustersIndicator.SetEmissionColor(Color.black);
-        _thrustersIndicatorLight.intensity = 0f;
+        if (resource == "fuel")
+        {
+            _thrustersIndicator.SetEmissionColor(Color.black);
+            _thrustersIndicatorLight.intensity = 0f;
+        }
     }
 
-    private void OnFuelRestored()
+    private void OnFuelRestored(string resource)
     {
-        if (_completedIgnition)
+        if (resource == "fuel" && _completedIgnition)
         {
             _thrustersIndicator.SetEmissionColor(_indicatorLightColor);
             _thrustersIndicatorLight.intensity = _baseIndicatorLightIntensity;
@@ -407,8 +410,8 @@ public class ShipEngineSwitch : CockpitInteractible
     {
         base.OnDestroy();
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
-        ShipEnhancements.Instance.OnFuelDepleted -= OnFuelDepleted;
-        ShipEnhancements.Instance.OnFuelRestored -= OnFuelRestored;
+        ShipEnhancements.Instance.OnResourceDepleted -= OnFuelDepleted;
+        ShipEnhancements.Instance.OnResourceRestored -= OnFuelRestored;
 
         if (ShipEnhancements.InMultiplayer)
         {

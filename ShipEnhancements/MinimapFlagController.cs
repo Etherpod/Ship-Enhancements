@@ -24,7 +24,6 @@ public class MinimapFlagController : MonoBehaviour
         {
             prefab = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipFlagMarkerPivot.prefab");
         }
-        AssetBundleUtilities.ReplaceShaders(prefab);
         _flagMarkerPrefab = prefab;
     }
 

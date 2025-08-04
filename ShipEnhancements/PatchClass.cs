@@ -2651,7 +2651,6 @@ public static class PatchClass
             GameObject probeLauncherComponent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ProbeLauncherComponent.prefab");
             GameObject componentObj = UnityEngine.Object.Instantiate(probeLauncherComponent,
                 __instance.GetComponentInParent<ShipBody>().GetComponentInChildren<PlayerProbeLauncher>().transform.parent);
-            AssetBundleUtilities.ReplaceShaders(componentObj);
             var comp = componentObj.GetComponent<ProbeLauncherComponent>();
             SELocator.SetProbeLauncherComponent(comp);
 
@@ -2666,7 +2665,6 @@ public static class PatchClass
             Transform signalscopePivot = __instance.transform.Find("Geo_Cockpit/Cockpit_Tech/Cockpit_Tech_Exterior/SignalDishPivot");
             GameObject componentObj2 = UnityEngine.Object.Instantiate(signalscopeComponent,
                 signalscopePivot);
-            AssetBundleUtilities.ReplaceShaders(componentObj2);
             SignalscopeComponent comp = componentObj2.GetComponent<SignalscopeComponent>();
             SELocator.SetSignalscopeComponent(comp);
 
@@ -2679,7 +2677,6 @@ public static class PatchClass
         {
             // setting wrong here??
             GameObject warpCoreComponent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipWarpCoreComponent.prefab");
-            AssetBundleUtilities.ReplaceShaders(warpCoreComponent);
             warpCoreComponent.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = UnityEngine.Object.FindObjectOfType<ShipBody>().gameObject;
             GameObject componentObj = UnityEngine.Object.Instantiate(warpCoreComponent, __instance.transform.Find("Systems_Cockpit"));
             var comp = componentObj.GetComponent<ShipWarpCoreComponent>();
@@ -2693,7 +2690,6 @@ public static class PatchClass
             if (ShipEnhancements.NHAPI == null && GameObject.Find("TimberHearth_Body"))
             {
                 GameObject receiver = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipWarpReceiver.prefab");
-                AssetBundleUtilities.ReplaceShaders(receiver);
                 receiver.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = UnityEngine.Object.FindObjectOfType<ShipBody>().gameObject;
                 GameObject receiverObj = UnityEngine.Object.Instantiate(receiver, GameObject.Find("TimberHearth_Body").transform);
                 componentObj.GetComponentInChildren<ShipWarpCoreController>().SetReceiver(receiverObj.GetComponent<ShipWarpCoreReceiver>());

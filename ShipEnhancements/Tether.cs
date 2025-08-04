@@ -174,7 +174,6 @@ public class Tether : MonoBehaviour
         }
 
         _tetherMesh = Instantiate(ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/TetherLine.prefab"), transform).transform;
-        AssetBundleUtilities.ReplaceShaders(_tetherMesh.gameObject);
         _tetherMesh.localPosition = _anchor;
 
         Vector3 lineDir = _connectedTransform.TransformPoint(_connectedAnchor) - transform.TransformPoint(_anchor);
@@ -284,7 +283,6 @@ public class Tether : MonoBehaviour
         _connectedAnchor = connectedOffset;
 
         _tetherMesh = Instantiate(ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/TetherLine.prefab"), transform).transform;
-        AssetBundleUtilities.ReplaceShaders(_tetherMesh.gameObject);
         _tetherMesh.localPosition = _anchor;
 
         _tetheredToSelf = _connectedTransform == transform;

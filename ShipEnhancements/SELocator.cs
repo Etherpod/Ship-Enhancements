@@ -29,6 +29,7 @@ public static class SELocator
     private static CockpitErnesto _ernesto;
     private static ShipWarpCoreComponent _warpCoreComponent;
     private static AutopilotPanelController _autopilotPanelController;
+    private static ShipWaterResource _waterResource;
 
     private static ReferenceFrame _shipRF;
     private static ReferenceFrame _playerRF;
@@ -80,6 +81,10 @@ public static class SELocator
         if ((bool)enableEnhancedAutopilot.GetProperty())
         {
             _autopilotPanelController = _shipTransform.GetComponentInChildren<AutopilotPanelController>();
+        }
+        if ((bool)addWaterTank.GetProperty())
+        {
+            _waterResource = _shipBody.GetComponent<ShipWaterResource>();
         }
     }
 
@@ -216,6 +221,11 @@ public static class SELocator
     public static AutopilotPanelController GetAutopilotPanelController()
     {
         return _autopilotPanelController;
+    }
+
+    public static ShipWaterResource GetShipWaterResource()
+    {
+        return _waterResource;
     }
 
     public static ReferenceFrame GetReferenceFrame(bool shipFrame = true, bool ignorePassiveFrame = true)

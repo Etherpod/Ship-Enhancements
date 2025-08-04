@@ -7,6 +7,7 @@ namespace ShipEnhancements;
 public static class ShipNotifications
 {
     private static NotificationData _oxygenDepletedNotification = new NotificationData(NotificationTarget.Ship, "SHIP OXYGEN DEPLETED", 5f, true);
+    private static NotificationData _waterDepletedNotification = new NotificationData(NotificationTarget.Ship, "WATER RESERVES DEPLETED", 5f, true);
 
     private static NotificationData _oxygenLowNotification = new NotificationData(NotificationTarget.Ship, "SHIP OXYGEN LOW", 5f, true);
     private static NotificationData _oxygenCriticalNotification = new NotificationData(NotificationTarget.Ship, "SHIP OXYGEN CRITICAL", 5f, true);
@@ -16,6 +17,9 @@ public static class ShipNotifications
 
     private static NotificationData _fuelLowNotification = new NotificationData(NotificationTarget.Ship, "SHIP FUEL LOW", 5f, true);
     private static NotificationData _fuelCriticalNotification = new NotificationData(NotificationTarget.Ship, "SHIP FUEL CRITICAL", 5f, true);
+
+    private static NotificationData _waterLowNotification = new NotificationData(NotificationTarget.Ship, "WATER RESERVES LOW", 5f, true);
+    private static NotificationData _waterCriticalNotification = new NotificationData(NotificationTarget.Ship, "WATER RESERVES CRITICAL", 5f, true);
 
     private static NotificationData _spinSpeedHighNotification = new NotificationData(NotificationTarget.Ship, "HULL INTEGRITY LOW", 5f, true);
     private static NotificationData _spinSpeedCriticalNotification = new NotificationData(NotificationTarget.Ship, "HULL INTEGRITY CRITICAL", 5f, true);
@@ -48,6 +52,8 @@ public static class ShipNotifications
     private static bool _oxygenCritical = false;
     private static bool _fuelLow = false;
     private static bool _fuelCritical = false;
+    private static bool _waterLow = false;
+    private static bool _waterCritical = false;
     private static bool _hullIntegrityLow = false;
     private static bool _hullIntegrityCritical = false;
     private static bool _hullTemperatureHigh = false;
@@ -56,6 +62,7 @@ public static class ShipNotifications
     private static bool _refillingShipOxygen = false;
     private static float _lastShipOxygen;
     private static float _lastShipFuel;
+    private static float _lastShipWater;
 
     public static void Initialize()
     {
@@ -63,6 +70,8 @@ public static class ShipNotifications
         _oxygenCritical = false;
         _fuelLow = false;
         _fuelCritical = false;
+        _waterLow = false;
+        _waterCritical = false;
         _hullIntegrityLow = false;
         _hullIntegrityCritical = false;
         _hullTemperatureHigh = false;
@@ -70,6 +79,10 @@ public static class ShipNotifications
         _refillingShipOxygen = false;
         _lastShipOxygen = SELocator.GetShipResources().GetFractionalOxygen();
         _lastShipFuel = SELocator.GetShipResources()._currentFuel;
+        if ((bool)addWaterTank.GetProperty())
+        {
+            _lastShipWater = SELocator.GetShipWaterResource().GetWater();
+        }
     }
 
     public static void UpdateNotifications()
@@ -145,6 +158,36 @@ public static class ShipNotifications
             {
                 _fuelLow = false;
             }
+        }
+
+        if ((bool)addWaterTank.GetProperty())
+        {
+            if (SELocator.GetShipWaterResource().GetWater() < _lastShipWater)
+            {
+                if (!_waterCritical && SELocator.GetShipWaterResource().GetFractionalWater() < 0.15f)
+                {
+                    _waterCritical = true;
+                    NotificationManager.SharedInstance.PostNotification(_waterCriticalNotification, false);
+                }
+                else if (!_waterLow && SELocator.GetShipWaterResource().GetFractionalWater() < 0.3f)
+                {
+                    _waterLow = true;
+                    NotificationManager.SharedInstance.PostNotification(_waterLowNotification, false);
+                }
+            }
+            else
+            {
+                if (_waterCritical && SELocator.GetShipWaterResource().GetFractionalWater() > 0.15f)
+                {
+                    _waterCritical = false;
+                }
+                else if (_waterLow && SELocator.GetShipWaterResource().GetFractionalWater() > 0.3f)
+                {
+                    _waterLow = false;
+                }
+            }
+
+            _lastShipWater = SELocator.GetShipWaterResource().GetWater();
         }
 
         if ((bool)disableRotationSpeedLimit.GetProperty())
@@ -229,6 +272,16 @@ public static class ShipNotifications
     public static void OnOxygenRestored()
     {
         NotificationManager.SharedInstance.UnpinNotification(_oxygenDepletedNotification);
+    }
+
+    public static void OnWaterDepleted()
+    {
+        NotificationManager.SharedInstance.PostNotification(_waterDepletedNotification, true);
+    }
+
+    public static void OnWaterRestored()
+    {
+        NotificationManager.SharedInstance.UnpinNotification(_waterDepletedNotification);
     }
 
     public static void PostScoutInShipNotification()

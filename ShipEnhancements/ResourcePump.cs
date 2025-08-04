@@ -51,6 +51,8 @@ public class ResourcePump : OWItem
     private FirstPersonManipulator _cameraManipulator;
     private OWAudioSource _playerExternalSource;
     private OWCamera _playerCam;
+    private ShipResources _shipResources;
+    private ShipFluidDetector _shipFluidDetector;
     private bool _lastFocused = false;
     private bool _dropped = false;
 
@@ -90,6 +92,8 @@ public class ResourcePump : OWItem
         _switchTypePrompt = new ScreenPrompt(InputLibrary.toolOptionLeft, InputLibrary.toolOptionRight, "Switch Type (Fuel)", ScreenPrompt.MultiCommandType.POS_NEG, 0, ScreenPrompt.DisplayState.Normal, false);
         _switchModePrompt = new ScreenPrompt(InputLibrary.toolOptionUp, InputLibrary.toolOptionDown, "Switch Mode (Output)", ScreenPrompt.MultiCommandType.POS_NEG, 0, ScreenPrompt.DisplayState.Normal, false);
         _powerPrompt = new ScreenPrompt(InputLibrary.interactSecondary, "Turn On", 0, ScreenPrompt.DisplayState.Normal, false);
+
+        ShipEnhancements.Instance.OnResourceDepleted += OnResourceDepleted;
 
         List<ParticleSystem> systems = _particleSystems.ToList();
         systems.Clear();
@@ -157,6 +161,31 @@ public class ResourcePump : OWItem
         float distSqr = (SELocator.GetShipTransform().position - SELocator.GetPlayerBody().transform.position).sqrMagnitude;
         float lerp = Mathf.InverseLerp(_maxShipDistance * _maxShipDistance, 50f * 50f, distSqr);
         UpdateBatteryLevel(lerp);
+
+        if (_powered && _inSignalRange && _dropped)
+        {
+            if (_currentType == ResourceType.Fuel)
+            {
+                if (_isOutput)
+                {
+                    SELocator.GetShipResources().DrainFuel(1f * Time.deltaTime);
+                }
+            }
+            else if (_currentType == ResourceType.Oxygen)
+            {
+                if (_isOutput)
+                {
+                    SELocator.GetShipResources().DrainOxygen(0.26f * Time.deltaTime);
+                }
+            }
+            else if (_currentType == ResourceType.Water)
+            {
+                if (_isOutput)
+                {
+                    SELocator.GetShipWaterResource().DrainWater(1.5f * Time.deltaTime);
+                }
+            }
+        }
     }
 
     private void FixedUpdate()
@@ -217,7 +246,7 @@ public class ResourcePump : OWItem
             _flameController.DeactivateFlame();
             _flameLoopSource.FadeOut(0.5f);
         }
-        else if (type == ResourceType.Fuel)
+        else if (type == ResourceType.Fuel && SELocator.GetShipResources()._currentFuel > 0f)
         {
             _flameActive = true;
             _flameController.ActivateFlame();
@@ -229,7 +258,7 @@ public class ResourcePump : OWItem
             _oxygenVolume.SetVolumeActivation(false);
             _oxygenLoopSource.FadeOut(0.5f);
         }
-        else if (type == ResourceType.Oxygen)
+        else if (type == ResourceType.Oxygen && SELocator.GetShipResources()._currentOxygen > 0f)
         {
             _oxygenVolume.SetVolumeActivation(true);
             _oxygenLoopSource.FadeIn(0.5f);
@@ -242,7 +271,7 @@ public class ResourcePump : OWItem
             _geyserParticles.Stop();
             _geyserVolume.SetFiring(false);
         }
-        else if (type == ResourceType.Water)
+        else if (type == ResourceType.Water && SELocator.GetShipWaterResource().GetWater() > 0f)
         {
             _geyserActive = true;
             _geyserLoopSource.FadeIn(0.5f);
@@ -256,7 +285,7 @@ public class ResourcePump : OWItem
     
     private void UpdatePowered(bool powered)
     {
-        if (_currentType == ResourceType.Fuel)
+        if (_currentType == ResourceType.Fuel && SELocator.GetShipResources()._currentFuel > 0f)
         {
             _flameActive = powered;
             if (_flameActive)
@@ -270,7 +299,7 @@ public class ResourcePump : OWItem
                 _flameLoopSource.FadeOut(0.5f);
             }
         }
-        else if (_currentType == ResourceType.Oxygen)
+        else if (_currentType == ResourceType.Oxygen && SELocator.GetShipResources()._currentOxygen > 0f)
         {
             _oxygenVolume.SetVolumeActivation(powered);
             if (powered)
@@ -282,7 +311,7 @@ public class ResourcePump : OWItem
                 _oxygenLoopSource.FadeOut(0.5f);
             }
         }
-        else if (_currentType == ResourceType.Water)
+        else if (_currentType == ResourceType.Water && SELocator.GetShipWaterResource().GetWater() > 0f)
         {
             if (_geyserActive != powered)
             {
@@ -311,6 +340,26 @@ public class ResourcePump : OWItem
         if (_inSignalRange != battery > 0f)
         {
             _inSignalRange = battery > 0f;
+            UpdatePowered(_powered && _inSignalRange && _dropped);
+        }
+    }
+
+    private void OnResourceDepleted(string resource)
+    {
+        if ((resource == "fuel" && _currentType == ResourceType.Fuel)
+            || (resource == "oxygen" && _currentType == ResourceType.Oxygen)
+            || (resource == "water" && _currentType == ResourceType.Water))
+        {
+            UpdatePowered(false);
+        }
+    }
+
+    private void OnResourceRestored(string resource)
+    {
+        if ((resource == "fuel" && _currentType == ResourceType.Fuel)
+            || (resource == "oxygen" && _currentType == ResourceType.Oxygen)
+            || (resource == "water" && _currentType == ResourceType.Water))
+        {
             UpdatePowered(_powered && _inSignalRange && _dropped);
         }
     }

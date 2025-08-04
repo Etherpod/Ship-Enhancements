@@ -25,9 +25,9 @@ public class ShipEnhancements : ModBehaviour
     public event SwitchEvent OnGravityLandingGearSwitch;
     public event SwitchEvent OnGravityLandingGearInverted;
 
-    public delegate void ResourceEvent();
-    public event ResourceEvent OnFuelDepleted;
-    public event ResourceEvent OnFuelRestored;
+    public delegate void ResourceEvent(string resource);
+    public event ResourceEvent OnResourceDepleted;
+    public event ResourceEvent OnResourceRestored;
 
     public delegate void EngineEvent(bool enabled);
     public event EngineEvent OnEngineStateChanged;
@@ -39,6 +39,7 @@ public class ShipEnhancements : ModBehaviour
     public bool oxygenDepleted;
     public bool refillingOxygen;
     public bool fuelDepleted;
+    public bool waterDepleted;
     public float levelOneSpinSpeed = 8f;
     public float levelTwoSpinSpeed = 16f;
     public float maxSpinSpeed = 24f;
@@ -251,6 +252,10 @@ public class ShipEnhancements : ModBehaviour
         temperatureDifficulty,
         passiveTemperatureGain,
         addResourcePump,
+        addWaterTank,
+        waterDrainMultiplier,
+        addWaterCooling,
+        enableReactorOverload,
     }
 
     private string[] startupMessages =
@@ -655,6 +660,8 @@ public class ShipEnhancements : ModBehaviour
                 atmoVolume.SetTriggerActivation(false);
                 _disableAirWhenZeroOxygen = false;
             }
+
+            OnResourceDepleted?.Invoke("oxygen");
         }
         else if (oxygenDepleted && (SELocator.GetShipResources().GetOxygen() > 0 || ((bool)shipOxygenRefill.GetProperty() && IsShipInOxygen())))
         {
@@ -674,6 +681,8 @@ public class ShipEnhancements : ModBehaviour
                 oxygenTank._damageEffect._particleSystem.Play();
                 oxygenTank._damageEffect._particleAudioSource.Play();
             }
+
+            OnResourceRestored?.Invoke("oxygen");
         }
 
         if (!fuelDepleted && SELocator.GetShipResources()._currentFuel <= 0f)
@@ -691,7 +700,7 @@ public class ShipEnhancements : ModBehaviour
                 playerResources._isRefueling = false;
                 NotificationManager.SharedInstance.UnpinNotification(playerResources._refuellingAndHealingNotification);
             }
-            OnFuelDepleted?.Invoke();
+            OnResourceDepleted?.Invoke("fuel");
         }
         else if (fuelDepleted && SELocator.GetShipResources()._currentFuel > 0f)
         {
@@ -702,14 +711,26 @@ public class ShipEnhancements : ModBehaviour
                 fuelTank._damageEffect._particleSystem.Play();
                 fuelTank._damageEffect._particleAudioSource.Play();
             }
-            OnFuelRestored?.Invoke();
+            OnResourceRestored?.Invoke("fuel");
+        }
+
+        if (!waterDepleted && SELocator.GetShipWaterResource().GetWater() <= 0f)
+        {
+            waterDepleted = true;
+            ShipNotifications.OnWaterDepleted();
+            OnResourceDepleted?.Invoke("water");
+        }
+        else if (waterDepleted && SELocator.GetShipWaterResource().GetWater() > 0f)
+        {
+            waterDepleted = false;
+            ShipNotifications.OnWaterRestored();
+            OnResourceRestored?.Invoke("water");
         }
 
         if ((bool)showWarningNotifications.GetProperty() && !_shipDestroyed)
         {
             ShipNotifications.UpdateNotifications();
         }
-
 
         if (!SEAchievementTracker.DeadInTheWater && AchievementsAPI != null)
         {
@@ -992,7 +1013,6 @@ public class ShipEnhancements : ModBehaviour
         DebugObjects = Instantiate(debugObjectsPrefab, SELocator.GetShipBody().transform);
 
         GameObject buttonConsole = LoadPrefab("Assets/ShipEnhancements/ButtonConsole.prefab");
-        AssetBundleUtilities.ReplaceShaders(buttonConsole);
         Instantiate(buttonConsole, SELocator.GetShipBody().transform.Find("Module_Cockpit"));
 
         Material[] newMaterials =
@@ -1010,6 +1030,11 @@ public class ShipEnhancements : ModBehaviour
         List<Material> materials = [.. cockpitLight.GetComponent<LightmapController>()._materials];
         materials.AddRange(newMaterials);
         cockpitLight.GetComponent<LightmapController>()._materials = [.. materials];
+
+        Transform shipLogLight = SELocator.GetShipTransform().Find("Module_Cabin/Lights_Cabin/Pointlight_HEA_ShipCabin");
+        List<Material> materials2 = [.. shipLogLight.GetComponent<LightmapController>()._materials];
+        materials2.AddRange(newMaterials);
+        shipLogLight.GetComponent<LightmapController>()._materials = [.. materials2];
 
         MeshRenderer chassisRenderer = SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry/Cockpit_Interior/Cockpit_Interior_Chassis")
             .GetComponent<MeshRenderer>();
@@ -1235,7 +1260,6 @@ public class ShipEnhancements : ModBehaviour
             if ((float)shipExplosionMultiplier.GetProperty() < 0f)
             {
                 GameObject newExplosion = LoadPrefab("Assets/ShipEnhancements/BlackHoleExplosion.prefab");
-                AssetBundleUtilities.ReplaceShaders(newExplosion);
                 GameObject newExplosionObj = Instantiate(newExplosion, effectsTransform);
                 SELocator.GetShipDamageController()._explosion = newExplosionObj.GetComponent<ExplosionController>();
                 Destroy(explosion.gameObject);
@@ -1335,15 +1359,12 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)extraEjectButtons.GetProperty())
         {
             GameObject suppliesButton = LoadPrefab("Assets/ShipEnhancements/SuppliesEjectButton.prefab");
-            AssetBundleUtilities.ReplaceShaders(suppliesButton);
             Instantiate(suppliesButton, SELocator.GetShipTransform().Find("Module_Cabin"));
 
             GameObject engineButton = LoadPrefab("Assets/ShipEnhancements/EngineEjectButton.prefab");
-            AssetBundleUtilities.ReplaceShaders(engineButton);
             Instantiate(engineButton, SELocator.GetShipTransform().Find("Module_Cabin"));
 
             GameObject landingGearButton = LoadPrefab("Assets/ShipEnhancements/LandingGearEjectButton.prefab");
-            AssetBundleUtilities.ReplaceShaders(landingGearButton);
             Instantiate(landingGearButton, SELocator.GetShipTransform().Find("Module_Cabin"));
         }
         if ((bool)addShipSignal.GetProperty())
@@ -1406,7 +1427,6 @@ public class ShipEnhancements : ModBehaviour
             && (float)maxDirtAccumulation.GetProperty() > 0f))
         {
             GameObject rustController = LoadPrefab("Assets/ShipEnhancements/RustController.prefab");
-            AssetBundleUtilities.ReplaceShaders(rustController);
             Instantiate(rustController, SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry"));
         }
         if ((bool)addPortableTractorBeam.GetProperty())
@@ -1448,14 +1468,12 @@ public class ShipEnhancements : ModBehaviour
         if ((string)shipWarpCoreType.GetProperty() == "Enabled")
         {
             GameObject core = LoadPrefab("Assets/ShipEnhancements/ShipWarpCore.prefab");
-            AssetBundleUtilities.ReplaceShaders(core);
             core.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = SELocator.GetShipBody().gameObject;
             GameObject coreObj = Instantiate(core, SELocator.GetShipTransform().Find("Module_Cockpit"));
 
             if (NHAPI == null && GameObject.Find("TimberHearth_Body"))
             {
                 GameObject receiver = LoadPrefab("Assets/ShipEnhancements/ShipWarpReceiver.prefab");
-                AssetBundleUtilities.ReplaceShaders(receiver);
                 receiver.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = SELocator.GetShipBody().gameObject;
                 GameObject receiverObj = Instantiate(receiver, GameObject.Find("TimberHearth_Body").transform);
                 coreObj.GetComponent<ShipWarpCoreController>().SetReceiver(receiverObj.GetComponent<ShipWarpCoreReceiver>());
@@ -1480,7 +1498,6 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)addShipClock.GetProperty())
         {
             GameObject clock = LoadPrefab("Assets/ShipEnhancements/ShipClock.prefab");
-            AssetBundleUtilities.ReplaceShaders(clock);
             Instantiate(clock, SELocator.GetShipTransform().Find("Module_Cockpit"));
         }
         if ((bool)enableRepairConfirmation.GetProperty() || (bool)enableFragileShip.GetProperty())
@@ -1517,9 +1534,7 @@ public class ShipEnhancements : ModBehaviour
             ShipGravityCrystalItem item = Instantiate(crystal).GetComponent<ShipGravityCrystalItem>();*/
 
             GameObject crystalSocket = LoadPrefab("Assets/ShipEnhancements/GravityCrystalSocket.prefab");
-            AssetBundleUtilities.ReplaceShaders(crystalSocket);
             ShipGravityCrystalSocket socket = Instantiate(crystalSocket, SELocator.GetShipTransform().Find("Module_Engine")).GetComponent<ShipGravityCrystalSocket>();
-            ShipEnhancements.WriteDebugMessage(socket.transform.parent);
             socket.AddComponentMeshes([obj1, obj2]);
             //socket.PlaceIntoSocket(item);
         }
@@ -1532,7 +1547,6 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)addErnesto.GetProperty())
         {
             GameObject ernesto = LoadPrefab("Assets/ShipEnhancements/Ernesto.prefab");
-            AssetBundleUtilities.ReplaceShaders(ernesto);
             GameObject ernestoObj = Instantiate(ernesto, SELocator.GetShipBody().transform.Find("Module_Cockpit"));
             var font = (Font)Resources.Load(@"fonts\english - latin\HVD Fonts - BrandonGrotesque-Bold_Dynamic");
             if (font != null)
@@ -1546,7 +1560,6 @@ public class ShipEnhancements : ModBehaviour
             {
                 var parent = bh.transform.Find("Sector_BH/Sector_OldSettlement/Fragment OldSettlement 5");
                 var additions = LoadPrefab("Assets/ShipEnhancements/OldSettlementAdditions.prefab");
-                AssetBundleUtilities.ReplaceShaders(additions);
                 Instantiate(additions, parent);
             }
         }
@@ -1574,7 +1587,6 @@ public class ShipEnhancements : ModBehaviour
             targetRend.mesh = rend.mesh;
 
             GameObject curtainObj = LoadPrefab("Assets/ShipEnhancements/ShipCurtains.prefab");
-            AssetBundleUtilities.ReplaceShaders(curtainObj);
             Instantiate(curtainObj, SELocator.GetShipTransform().Find("Module_Cabin/Geo_Cabin/Cabin_Geometry/Cabin_Interior"));
         }
         if ((string)repairWrenchType.GetProperty() != "Disabled")
@@ -1590,7 +1602,6 @@ public class ShipEnhancements : ModBehaviour
                 SELocator.GetShipTransform().Find("Module_Cockpit")).GetComponent<RadioItemSocket>();
 
             GameObject codeNotesObj = LoadPrefab("Assets/ShipEnhancements/CodeNotes.prefab");
-            AssetBundleUtilities.ReplaceShaders(codeNotesObj);
             Instantiate(codeNotesObj, SELocator.GetShipTransform().Find("Module_Cockpit"));
 
             AddRadioCodeZones();
@@ -1735,6 +1746,15 @@ public class ShipEnhancements : ModBehaviour
             GameObject pumpSocketObj = LoadPrefab("Assets/ShipEnhancements/ResourcePumpSocket.prefab");
             Instantiate(pumpSocketObj, SELocator.GetShipTransform().Find("Module_Cabin"));
         }
+        if ((bool)addWaterTank.GetProperty())
+        {
+            SELocator.GetShipBody().gameObject.AddComponent<ShipWaterResource>();
+        }
+        if ((bool)addWaterCooling.GetProperty())
+        {
+            GameObject leverObj = LoadPrefab("Assets/ShipEnhancements/WaterCoolingLever.prefab");
+            Instantiate(leverObj, SELocator.GetShipTransform().Find("Module_Cabin/Geo_Cabin"));
+        }
         if (AchievementsAPI != null)
         {
             GameObject th = GameObject.Find("TimberHearth_Body");
@@ -1758,8 +1778,8 @@ public class ShipEnhancements : ModBehaviour
             }
         }
 
-        ShipNotifications.Initialize();
         SELocator.LateInitialize();
+        ShipNotifications.Initialize();
 
         ModHelper.Events.Unity.RunWhen(() => Locator._shipBody != null, () =>
         {
@@ -1783,7 +1803,6 @@ public class ShipEnhancements : ModBehaviour
             {
                 SELocator.GetShipBody().GetComponentInChildren<ShipEjectionSystem>().GetComponent<InteractReceiver>().DisableInteraction();
                 GameObject ejectButtonTape = LoadPrefab("Assets/ShipEnhancements/EjectButtonTape.prefab");
-                AssetBundleUtilities.ReplaceShaders(ejectButtonTape);
                 Instantiate(ejectButtonTape, SELocator.GetShipBody().transform.Find("Module_Cockpit/Geo_Cockpit"));
             }
             if ((bool)disableShipSuit.GetProperty())
@@ -1931,7 +1950,6 @@ public class ShipEnhancements : ModBehaviour
         if (multiplier >= 100f)
         {
             GameObject supernova = LoadPrefab("Assets/ShipEnhancements/ExplosionSupernova.prefab");
-            AssetBundleUtilities.ReplaceShaders(supernova);
             GameObject supernovaObj = Instantiate(supernova, SELocator.GetShipTransform().Find("Module_Engine"));
             supernovaObj.SetActive(false);
             return;
@@ -2260,7 +2278,6 @@ public class ShipEnhancements : ModBehaviour
             if (spawn.transform == null) return;
 
             GameObject receiver = LoadPrefab("Assets/ShipEnhancements/ShipWarpReceiver.prefab");
-            AssetBundleUtilities.ReplaceShaders(receiver);
             receiver.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = SELocator.GetShipBody().gameObject;
             ShipWarpCoreReceiver receiverObj = Instantiate(receiver, spawn.transform).GetComponent<ShipWarpCoreReceiver>();
             receiverObj.transform.localPosition = spawn.offset;
@@ -2273,7 +2290,6 @@ public class ShipEnhancements : ModBehaviour
         else
         {
             GameObject receiver = LoadPrefab("Assets/ShipEnhancements/ShipWarpReceiver.prefab");
-            AssetBundleUtilities.ReplaceShaders(receiver);
             receiver.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = SELocator.GetShipBody().gameObject;
             GameObject receiverObj = Instantiate(receiver, GameObject.Find("TimberHearth_Body").transform);
 
@@ -2822,7 +2838,9 @@ public class ShipEnhancements : ModBehaviour
 
     public static GameObject LoadPrefab(string path)
     {
-        return (GameObject)Instance._shipEnhancementsBundle.LoadAsset(path);
+        var obj = (GameObject)Instance._shipEnhancementsBundle.LoadAsset(path);
+        AssetBundleUtilities.ReplaceShaders(obj);
+        return obj;
     }
 
     public static AudioClip LoadAudio(string path)
