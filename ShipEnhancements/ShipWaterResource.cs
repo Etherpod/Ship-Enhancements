@@ -26,6 +26,12 @@ public class ShipWaterResource : MonoBehaviour
 
     private void Update()
     {
+        if (SELocator.GetShipDamageController().IsSystemFailed())
+        {
+            enabled = false;
+            return;
+        }
+
         if (_coolingActive && SELocator.GetShipTemperatureDetector())
         {
             float temp = SELocator.GetShipTemperatureDetector().GetTemperatureRatio();

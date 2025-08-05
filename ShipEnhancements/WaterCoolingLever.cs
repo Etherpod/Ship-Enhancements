@@ -13,6 +13,14 @@ public class WaterCoolingLever : MonoBehaviour
     private float _disabledAngle;
     [SerializeField]
     private float _enabledAngle;
+    [SerializeField]
+    private OWAudioSource _leverSource;
+    [SerializeField]
+    private OWAudioSource _loopSource;
+    [SerializeField]
+    private AudioClip _onAudio;
+    [SerializeField]
+    private AudioClip _offAudio;
 
     private bool _initialized = false;
     private bool _active = false;
@@ -26,6 +34,9 @@ public class WaterCoolingLever : MonoBehaviour
         transform.localRotation = Quaternion.Euler(new Vector3(_disabledAngle, 0f, 0f));
         _interactReceiver.ChangePrompt("Enable Water Cooling");
         _interactReceiver.OnPressInteract += OnPressInteract;
+        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+        GlobalMessenger.AddListener("ExitShip", OnExitShip);
+        GlobalMessenger.AddListener("EnterShip", OnEnterShip);
         _initialized = true;
         enabled = false;
     }
@@ -58,10 +69,44 @@ public class WaterCoolingLever : MonoBehaviour
         _moveStartTime = Time.time;
         _interactReceiver.DisableInteraction();
         enabled = true;
+
+        if (_active)
+        {
+            _leverSource.PlayOneShot(_onAudio);
+            _loopSource.FadeIn(2f);
+        }
+        else
+        {
+            _leverSource.PlayOneShot(_offAudio);
+            _loopSource.FadeOut(1f);
+        }
+    }
+
+    private void OnShipSystemFailure()
+    {
+        _loopSource.FadeOut(0.5f);
+        _interactReceiver.DisableInteraction();
+        enabled = false;
+    }
+
+    private void OnExitShip()
+    {
+        _loopSource.FadeOut(0.5f);
+    }
+
+    private void OnEnterShip()
+    {
+        if (_active)
+        {
+            _loopSource.FadeIn(0.5f);
+        }
     }
 
     private void OnDestroy()
     {
         _interactReceiver.OnPressInteract -= OnPressInteract;
+        GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
+        GlobalMessenger.RemoveListener("ExitShip", OnExitShip);
+        GlobalMessenger.RemoveListener("EnterShip", OnEnterShip);
     }
 }
