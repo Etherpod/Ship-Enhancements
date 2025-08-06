@@ -10,6 +10,7 @@ public class ShipTemperatureDetector : TemperatureDetector
 {
     private ShockLayerController _shockLayerController;
     private ShipFluidDetector _fluidDetector;
+    private ReactorHeatController _reactorHeat;
     private bool _waterCooling;
 
     protected override void Start()
@@ -19,6 +20,7 @@ public class ShipTemperatureDetector : TemperatureDetector
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
         _shockLayerController = SELocator.GetShipTransform().GetComponentInChildren<ShockLayerController>();
         _fluidDetector = SELocator.GetShipDetector().GetComponent<ShipFluidDetector>();
+        _reactorHeat = SELocator.GetShipDamageController()._shipReactorComponent.GetComponent<ReactorHeatController>();
         _maxInternalTemperature *= Mathf.Max(Mathf.Abs((float)temperatureResistanceMultiplier.GetProperty()), 1f);
         _waterCooling = (bool)addWaterTank.GetProperty() && (bool)addWaterCooling.GetProperty();
     }
@@ -124,11 +126,13 @@ public class ShipTemperatureDetector : TemperatureDetector
 
     protected override void UpdateInternalTemperature()
     {
+        bool ignoreSameSide = false;
+
         if ((IsHeatingLocked() && _currentInternalTemperature > 0f)
             || (IsCoolingLocked() && _currentInternalTemperature < 0f))
         {
             _currentInternalTemperature = Mathf.MoveTowards(_currentInternalTemperature, 0f, Time.deltaTime * 4f);
-            return;
+            ignoreSameSide = true;
         }
 
         float cutoff = Mathf.Abs(_maxInternalTemperature * GetTemperatureRatio());
@@ -139,7 +143,7 @@ public class ShipTemperatureDetector : TemperatureDetector
             sameSide = !sameSide;
         }
 
-        if (sameSide && Mathf.Abs(_currentInternalTemperature) < cutoff)
+        if (sameSide && !ignoreSameSide && Mathf.Abs(_currentInternalTemperature) < cutoff)
         {
             _currentInternalTemperature += Time.deltaTime * 3f * Mathf.InverseLerp(_highTempCutoff, 100f, Mathf.Abs(_currentTemperature)) * Mathf.Sign(GetTemperatureRatio())
                 * Mathf.Sign((float)temperatureResistanceMultiplier.GetProperty());
@@ -178,7 +182,7 @@ public class ShipTemperatureDetector : TemperatureDetector
 
     private bool IsCoolingLocked()
     {
-        return false;
+        return _reactorHeat != null && _reactorHeat.IsOverloaded();
     }
 
     private void OnShipSystemFailure()

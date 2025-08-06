@@ -1046,7 +1046,7 @@ public class ShipEnhancements : ModBehaviour
             .GetComponent<MeshRenderer>();
         Texture2D blackTex = (Texture2D)LoadAsset("Assets/ShipEnhancements/Black_d.png");
         chassisRenderer.sharedMaterials[6].SetTexture("_OcclusionMap", blackTex);
-        chassisRenderer.sharedMaterials[6].SetFloat("_OcclusionStrength", 0.95f);
+        chassisRenderer.sharedMaterials[6].SetFloat("_OcclusionStrength", 0.75f);
 
         if ((bool)enableScoutLauncherComponent.GetProperty()
             || (string)shipWarpCoreType.GetProperty() == "Component")
@@ -1762,6 +1762,15 @@ public class ShipEnhancements : ModBehaviour
         {
             GameObject leverObj = LoadPrefab("Assets/ShipEnhancements/WaterCoolingLever.prefab");
             Instantiate(leverObj, SELocator.GetShipTransform().Find("Module_Cabin/Geo_Cabin"));
+        }
+        if ((bool)enableReactorOverload.GetProperty() || (bool)enableShipTemperature.GetProperty())
+        {
+            SELocator.GetShipDamageController()._shipReactorComponent.gameObject.AddComponent<ReactorHeatController>();
+            if ((bool)enableReactorOverload.GetProperty())
+            {
+                GameObject overloadObj = LoadPrefab("Assets/ShipEnhancements/ReactorOverloadInteract.prefab");
+                Instantiate(overloadObj, SELocator.GetShipTransform().Find("Module_Engine"));
+            }
         }
         if (AchievementsAPI != null)
         {

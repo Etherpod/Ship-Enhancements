@@ -17,6 +17,10 @@ public class ResourcePump : OWItem
     [SerializeField]
     private Vector3 _holdScale = Vector3.one;
     [SerializeField]
+    private Vector3 _inputDropOffset;
+    [SerializeField]
+    private Vector3 _inputDropRotation;
+    [SerializeField]
     private GameObject[] _socketObjects = [];
 
     [Space]
@@ -38,6 +42,8 @@ public class ResourcePump : OWItem
     private OxygenVolume _oxygenVolume;
     [SerializeField]
     private OWAudioSource _oxygenLoopSource;
+    [SerializeField]
+    private OxygenDetector _oxygenDetector;
 
     [Space]
     [SerializeField]
@@ -46,6 +52,8 @@ public class ResourcePump : OWItem
     private GeyserFluidVolume _geyserVolume;
     [SerializeField]
     private OWAudioSource _geyserLoopSource;
+    [SerializeField]
+    private StaticFluidDetector _fluidDetector;
 
     private EffectVolume[] _volumes;
     private FirstPersonManipulator _cameraManipulator;
@@ -148,13 +156,14 @@ public class ResourcePump : OWItem
                 _playerExternalSource.PlayOneShot(AudioType.Menu_LeftRight, 0.5f);
                 _isOutput = !_isOutput;
                 _switchModePrompt.SetText($"Switch Mode ({(_isOutput ? "Output" : "Input")})");
+                UpdatePowered();
             }
 
             if (OWInput.IsNewlyPressed(InputLibrary.interactSecondary, InputMode.Character))
             {
                 _powered = !_powered;
                 _powerPrompt.SetText(_powered ? "Turn Off" : "Turn On");
-                UpdatePowered(_powered && _inSignalRange && _dropped);
+                UpdatePowered();
             }
         }
 
@@ -177,12 +186,20 @@ public class ResourcePump : OWItem
                 {
                     SELocator.GetShipResources().DrainOxygen(0.26f * Time.deltaTime);
                 }
+                else if (_oxygenDetector.GetDetectOxygen())
+                {
+                    SELocator.GetShipResources().AddOxygen(2f * Time.deltaTime);
+                }
             }
             else if (_currentType == ResourceType.Water)
             {
                 if (_isOutput)
                 {
                     SELocator.GetShipWaterResource().DrainWater(1.5f * Time.deltaTime);
+                }
+                else if (IsInWater())
+                {
+                    SELocator.GetShipWaterResource().AddWater(5f * Time.deltaTime);
                 }
             }
         }
@@ -282,6 +299,11 @@ public class ResourcePump : OWItem
 
         _currentType = type;
     }
+
+    private void UpdatePowered()
+    {
+        UpdatePowered(_powered && _inSignalRange && _dropped && _isOutput);
+    }
     
     private void UpdatePowered(bool powered)
     {
@@ -340,7 +362,7 @@ public class ResourcePump : OWItem
         if (_inSignalRange != battery > 0f)
         {
             _inSignalRange = battery > 0f;
-            UpdatePowered(_powered && _inSignalRange && _dropped);
+            UpdatePowered();
         }
     }
 
@@ -360,7 +382,7 @@ public class ResourcePump : OWItem
             || (resource == "oxygen" && _currentType == ResourceType.Oxygen)
             || (resource == "water" && _currentType == ResourceType.Water))
         {
-            UpdatePowered(_powered && _inSignalRange && _dropped);
+            UpdatePowered();
         }
     }
 
@@ -370,7 +392,7 @@ public class ResourcePump : OWItem
         _dropped = true;
         UpdateAttachedBody(parent.GetAttachedOWRigidbody());
         transform.localScale = Vector3.one;
-        UpdatePowered(_powered && _inSignalRange);
+        UpdatePowered();
     }
 
     public override void PickUpItem(Transform holdTranform)
@@ -395,6 +417,49 @@ public class ResourcePump : OWItem
         foreach (var obj in _socketObjects)
         {
             obj.SetActive(true);
+        }
+    }
+
+    public bool IsInWater()
+    {
+        if (_fluidDetector._activeVolumes == null) return false;
+        return _fluidDetector.InFluidType(FluidVolume.Type.WATER) || _fluidDetector.InFluidType(FluidVolume.Type.GEYSER);
+    }
+
+    private void OnEnable()
+    {
+        if (_fluidDetector == null) return;
+
+        if (_fluidDetector.GetShape())
+        {
+            _fluidDetector.GetShape().SetActivation(true);
+        }
+        if (_fluidDetector.GetCollider())
+        {
+            _fluidDetector.GetCollider().enabled = true;
+        }
+    }
+
+    private void OnDisable()
+    {
+        if (_fluidDetector == null) return;
+
+        if (_fluidDetector.GetShape())
+        {
+            _fluidDetector.GetShape().SetActivation(false);
+        }
+        if (_fluidDetector.GetCollider())
+        {
+            _fluidDetector.GetCollider().enabled = false;
+        }
+
+        if (_fluidDetector._activeVolumes != null)
+        {
+            EffectVolume[] volsToRemove = [.. _fluidDetector._activeVolumes];
+            foreach (EffectVolume vol in volsToRemove)
+            {
+                vol._triggerVolume.RemoveObjectFromVolume(_fluidDetector.gameObject);
+            }
         }
     }
 

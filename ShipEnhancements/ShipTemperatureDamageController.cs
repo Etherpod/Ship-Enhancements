@@ -9,7 +9,7 @@ namespace ShipEnhancements;
 public class ShipTemperatureDamageController : MonoBehaviour
 {
     private ShipTemperatureDetector _detector;
-    private ShipReactorComponent _reactor;
+    private ReactorHeatController _reactorHeat;
     private ShipHull[] _shipHulls;
     private ShipHull _lastDamagedHull;
     private ShipComponent[] _shipComponents;
@@ -31,7 +31,7 @@ public class ShipTemperatureDamageController : MonoBehaviour
     private void Start()
     {
         _detector = SELocator.GetShipDetector().GetComponent<ShipTemperatureDetector>();
-        _reactor = SELocator.GetShipDamageController()._shipReactorComponent;
+        _reactorHeat = SELocator.GetShipDamageController()._shipReactorComponent.GetComponent<ReactorHeatController>();
         _shipHulls = SELocator.GetShipDamageController()._shipHulls;
         _shipComponents = SELocator.GetShipDamageController()._shipComponents;
 
@@ -40,12 +40,12 @@ public class ShipTemperatureDamageController : MonoBehaviour
         _delayStartTime = Time.time;
         _randDamageDelay = _damageDelay + UnityEngine.Random.Range(-1f, 1f);
 
-        _initialReactorArrowAngle = _reactor._startArrowRotation;
+        /*_initialReactorArrowAngle = _reactor._startArrowRotation;
         _initialCountdownRange = (_reactor._minCountdown, _reactor._maxCountdown);
         float diff = _reactor._endArrowRotation - _reactor._startArrowRotation;
         float minReactorLength = Mathf.Lerp(1f, 4f, (float)temperatureDifficulty.GetProperty());
         _maxReactorArrowAngle = _reactor._endArrowRotation - diff / minReactorLength;
-        _maxCountdownRange = (_reactor._minCountdown / minReactorLength, _reactor._maxCountdown / minReactorLength);
+        _maxCountdownRange = (_reactor._minCountdown / minReactorLength, _reactor._maxCountdown / minReactorLength);*/
 
         _maxDamageSpeedMultiplier = Mathf.Lerp(0.8f, 0.4f, (float)temperatureDifficulty.GetProperty());
         _maxDamageMultiplier = Mathf.Lerp(0.6f, 1f, (float)temperatureDifficulty.GetProperty());
@@ -66,14 +66,16 @@ public class ShipTemperatureDamageController : MonoBehaviour
     private void UpdateReactor()
     {
         float tempLerp = _detector.GetInternalTemperatureRatio();
-        _reactor._startArrowRotation = Mathf.LerpAngle(_initialReactorArrowAngle, _maxReactorArrowAngle, tempLerp);
+        float multiplier = Mathf.Lerp(0.25f, 0.75f, (float)temperatureDifficulty.GetProperty());
+        _reactorHeat.SetAdditiveHeat(tempLerp * multiplier);
+        /*_reactor._startArrowRotation = Mathf.LerpAngle(_initialReactorArrowAngle, _maxReactorArrowAngle, tempLerp);
         _reactor._minCountdown = Mathf.Lerp(_initialCountdownRange.min, _maxCountdownRange.min, tempLerp);
         _reactor._maxCountdown = Mathf.Lerp(_initialCountdownRange.max, _maxCountdownRange.max, tempLerp);
 
         if (!_reactor.enabled)
         {
             _reactor._timerArrow.localEulerAngles = new Vector3(_reactor._startArrowRotation, 0f, 0f);
-        }
+        }*/
     }
 
     private void UpdateTemperatureDamage()
