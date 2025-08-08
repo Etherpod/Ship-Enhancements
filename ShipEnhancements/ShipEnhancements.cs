@@ -714,17 +714,20 @@ public class ShipEnhancements : ModBehaviour
             OnResourceRestored?.Invoke("fuel");
         }
 
-        if (!waterDepleted && SELocator.GetShipWaterResource().GetWater() <= 0f)
+        if ((bool)addWaterTank.GetProperty())
         {
-            waterDepleted = true;
-            ShipNotifications.OnWaterDepleted();
-            OnResourceDepleted?.Invoke("water");
-        }
-        else if (waterDepleted && SELocator.GetShipWaterResource().GetWater() > 0f)
-        {
-            waterDepleted = false;
-            ShipNotifications.OnWaterRestored();
-            OnResourceRestored?.Invoke("water");
+            if (!waterDepleted && SELocator.GetShipWaterResource().GetWater() <= 0f)
+            {
+                waterDepleted = true;
+                ShipNotifications.OnWaterDepleted();
+                OnResourceDepleted?.Invoke("water");
+            }
+            else if (waterDepleted && SELocator.GetShipWaterResource().GetWater() > 0f)
+            {
+                waterDepleted = false;
+                ShipNotifications.OnWaterRestored();
+                OnResourceRestored?.Invoke("water");
+            }
         }
 
         if ((bool)showWarningNotifications.GetProperty() && !_shipDestroyed)
@@ -1560,6 +1563,7 @@ public class ShipEnhancements : ModBehaviour
                 ernestoObj.GetComponentInChildren<UnityEngine.UI.Text>().font = font;
             }
             DialogueBuilder.FixCustomDialogue(ernestoObj, "ConversationZone");
+            DialogueBuilder.FixCustomDialogue(ernestoObj, "ConversationZone (1)");
 
             var bh = GameObject.Find("BrittleHollow_Body");
             if (bh != null)
