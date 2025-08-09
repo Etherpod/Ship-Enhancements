@@ -62,12 +62,12 @@ public class ShipWaterResource : MonoBehaviour
 
     public void DrainWater(float amount)
     {
-        _currentWater = Mathf.Max(_currentWater - (amount * (float)waterDrainMultiplier.GetProperty()), 0f);
+        _currentWater = Mathf.Clamp(_currentWater - (amount * (float)waterDrainMultiplier.GetProperty()), 0f, _maxWater);
     }
 
     public void AddWater(float amount)
     {
-        _currentWater = Mathf.Min(_currentWater + (amount * (float)waterDrainMultiplier.GetProperty()), _maxWater);
+        _currentWater = Mathf.Min(_currentWater + amount, _maxWater);
     }
 
     private void OnSetCoolingActive(bool active)

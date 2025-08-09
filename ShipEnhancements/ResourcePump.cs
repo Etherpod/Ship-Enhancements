@@ -53,7 +53,7 @@ public class ResourcePump : OWItem
     [SerializeField]
     private OWAudioSource _geyserLoopSource;
     [SerializeField]
-    private StaticFluidDetector _fluidDetector;
+    private ItemFluidDetector _fluidDetector;
 
     private EffectVolume[] _volumes;
     private FirstPersonManipulator _cameraManipulator;
@@ -62,7 +62,7 @@ public class ResourcePump : OWItem
     private ShipResources _shipResources;
     private ShipFluidDetector _shipFluidDetector;
     private bool _lastFocused = false;
-    private bool _dropped = false;
+    private bool _dropped = true;
 
     private readonly int _batteryPropID = Shader.PropertyToID("_Battery");
     private bool _inSignalRange;
@@ -171,6 +171,8 @@ public class ResourcePump : OWItem
         float lerp = Mathf.InverseLerp(_maxShipDistance * _maxShipDistance, 50f * 50f, distSqr);
         UpdateBatteryLevel(lerp);
 
+        ShipEnhancements.WriteDebugMessage("active volumes: " + _fluidDetector._activeVolumes.Count);
+
         if (_powered && _inSignalRange && _dropped)
         {
             if (_currentType == ResourceType.Fuel)
@@ -188,7 +190,7 @@ public class ResourcePump : OWItem
                 }
                 else if (_oxygenDetector.GetDetectOxygen())
                 {
-                    SELocator.GetShipResources().AddOxygen(2f * Time.deltaTime);
+                    SELocator.GetShipResources().DrainOxygen(-2f * Time.deltaTime);
                 }
             }
             else if (_currentType == ResourceType.Water)
@@ -199,7 +201,7 @@ public class ResourcePump : OWItem
                 }
                 else if (IsInWater())
                 {
-                    SELocator.GetShipWaterResource().AddWater(5f * Time.deltaTime);
+                    SELocator.GetShipWaterResource().DrainWater(-5f * Time.deltaTime);
                 }
             }
         }
@@ -389,6 +391,10 @@ public class ResourcePump : OWItem
     public override void DropItem(Vector3 position, Vector3 normal, Transform parent, Sector sector, IItemDropTarget customDropTarget)
     {
         base.DropItem(position, normal, parent, sector, customDropTarget);
+        if (!_dropped)
+        {
+            OnEnable();
+        }
         _dropped = true;
         UpdateAttachedBody(parent.GetAttachedOWRigidbody());
         transform.localScale = Vector3.one;
@@ -399,6 +405,10 @@ public class ResourcePump : OWItem
     {
         UpdatePowered(false);
         base.PickUpItem(holdTranform);
+        if (_dropped)
+        {
+            OnDisable();
+        }
         _dropped = false;
         transform.localPosition = _holdPosition;
         transform.localRotation = Quaternion.Euler(_holdRotation);
@@ -412,6 +422,10 @@ public class ResourcePump : OWItem
     public override void SocketItem(Transform socketTransform, Sector sector)
     {
         base.SocketItem(socketTransform, sector);
+        if (_dropped)
+        {
+            OnDisable();
+        }
         _dropped = false;
         transform.localScale = Vector3.one;
         foreach (var obj in _socketObjects)

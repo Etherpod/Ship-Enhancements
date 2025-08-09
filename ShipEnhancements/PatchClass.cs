@@ -353,7 +353,7 @@ public static class PatchClass
     {
         if ((float)oxygenDrainMultiplier.GetProperty() == 1f) return true;
 
-        __instance._currentOxygen = Mathf.Max(__instance._currentOxygen - (amount * (float)oxygenDrainMultiplier.GetProperty()), 0f);
+        __instance._currentOxygen = Mathf.Clamp(__instance._currentOxygen - (amount * (float)oxygenDrainMultiplier.GetProperty()), 0f, __instance._maxOxygen);
         return false;
     }
 
@@ -363,7 +363,7 @@ public static class PatchClass
     {
         if ((float)fuelDrainMultiplier.GetProperty() == 1f) return true;
 
-        __instance._currentFuel = Mathf.Max(__instance._currentFuel - (amount * (float)fuelDrainMultiplier.GetProperty()), 0f);
+        __instance._currentFuel = Mathf.Clamp(__instance._currentFuel - (amount * (float)fuelDrainMultiplier.GetProperty()), 0f, __instance._maxFuel);
         return false;
     }
     #endregion
