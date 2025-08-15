@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -53,7 +54,7 @@ public class ResourcePump : OWItem
     [SerializeField]
     private OWAudioSource _geyserLoopSource;
     [SerializeField]
-    private ItemFluidDetector _fluidDetector;
+    private FluidDetector _fluidDetector;
 
     private EffectVolume[] _volumes;
     private FirstPersonManipulator _cameraManipulator;
@@ -102,6 +103,7 @@ public class ResourcePump : OWItem
         _powerPrompt = new ScreenPrompt(InputLibrary.interactSecondary, "Turn On", 0, ScreenPrompt.DisplayState.Normal, false);
 
         ShipEnhancements.Instance.OnResourceDepleted += OnResourceDepleted;
+        _fluidDetector.OnEnterFluid += (vol) => ShipEnhancements.WriteDebugMessage(vol);
 
         List<ParticleSystem> systems = _particleSystems.ToList();
         systems.Clear();
@@ -145,6 +147,11 @@ public class ResourcePump : OWItem
             {
                 _currentTypeIndex = (_currentTypeIndex + 3 + (pressedLeft ? -1 : 1)) % 3;
                 var nextType = (Enum.GetValues(typeof(ResourceType)) as ResourceType[])[_currentTypeIndex];
+                if (nextType == ResourceType.Water && !(bool)addWaterTank.GetProperty())
+                {
+                    _currentTypeIndex = (_currentTypeIndex + 3 + (pressedLeft ? -1 : 1)) % 3;
+                    nextType = (Enum.GetValues(typeof(ResourceType)) as ResourceType[])[_currentTypeIndex];
+                }
                 _switchTypePrompt.SetText($"Switch Type ({nextType})");
                 _playerExternalSource.PlayOneShot(AudioType.Menu_UpDown, 0.5f);
                 UpdateType(nextType);
@@ -170,8 +177,6 @@ public class ResourcePump : OWItem
         float distSqr = (SELocator.GetShipTransform().position - transform.position).sqrMagnitude;
         float lerp = Mathf.InverseLerp(_maxShipDistance * _maxShipDistance, 50f * 50f, distSqr);
         UpdateBatteryLevel(lerp);
-
-        ShipEnhancements.WriteDebugMessage("active volumes: " + _fluidDetector._activeVolumes.Count);
 
         if (_powered && _inSignalRange && _dropped)
         {
@@ -201,6 +206,7 @@ public class ResourcePump : OWItem
                 }
                 else if (IsInWater())
                 {
+                    ShipEnhancements.WriteDebugMessage("Add water");
                     SELocator.GetShipWaterResource().DrainWater(-5f * Time.deltaTime);
                 }
             }
@@ -393,10 +399,17 @@ public class ResourcePump : OWItem
         base.DropItem(position, normal, parent, sector, customDropTarget);
         if (!_dropped)
         {
+            _dropped = true;
             OnEnable();
         }
-        _dropped = true;
         UpdateAttachedBody(parent.GetAttachedOWRigidbody());
+        if (!_isOutput)
+        {
+            var r = Quaternion.LookRotation(new Vector3(0, 1, 0), new Vector3(1, 0, -1));
+            var ir = Quaternion.Inverse(r);
+            transform.localRotation = transform.localRotation * ir;
+            transform.localPosition += transform.localRotation * r * _inputDropOffset;
+        }
         transform.localScale = Vector3.one;
         UpdatePowered();
     }
@@ -442,7 +455,7 @@ public class ResourcePump : OWItem
 
     private void OnEnable()
     {
-        if (_fluidDetector == null) return;
+        if (_fluidDetector == null || !_dropped) return;
 
         if (_fluidDetector.GetShape())
         {
