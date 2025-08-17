@@ -2907,7 +2907,19 @@ public class ShipEnhancements : ModBehaviour
         int start = ModHelper.Config.Settings.Keys.ToList()
             .IndexOf("enableShipTemperature");
         int end = ModHelper.Config.Settings.Keys.ToList()
-            .IndexOf("passiveTemperatureGain");
+            .IndexOf("enableReactorOverload");
+
+        var range = ModHelper.Config.Settings.Keys.ToList()
+            .GetRange(start, end - start + 1);
+        return range;
+    }
+
+    private List<string> GetWaterSettings()
+    {
+        int start = ModHelper.Config.Settings.Keys.ToList()
+            .IndexOf("addWaterTank");
+        int end = ModHelper.Config.Settings.Keys.ToList()
+            .IndexOf("addWaterCooling");
 
         var range = ModHelper.Config.Settings.Keys.ToList()
             .GetRange(start, end - start + 1);
@@ -2953,11 +2965,24 @@ public class ShipEnhancements : ModBehaviour
         {
             if ((bool)oldValue)
             {
-                RedrawSettingsMenu("enableShipTemperature", "enableShipTemperature", "enableShipTemperature", "passiveTemperatureGain");
+                RedrawSettingsMenu("enableShipTemperature", "enableShipTemperature", "enableShipTemperature", "enableReactorOverload");
             }
             else
             {
-                RedrawSettingsMenu("enableShipTemperature", "passiveTemperatureGain", "enableShipTemperature", "enableShipTemperature");
+                RedrawSettingsMenu("enableShipTemperature", "enableReactorOverload", "enableShipTemperature", "enableShipTemperature");
+            }
+            return;
+        }
+
+        if (name == "addWaterTank")
+        {
+            if ((bool)oldValue)
+            {
+                RedrawSettingsMenu("addWaterTank", "addWaterTank", "addWaterTank", "addWaterCooling");
+            }
+            else
+            {
+                RedrawSettingsMenu("addWaterTank", "addWaterCooling", "addWaterTank", "addWaterTank");
             }
             return;
         }
@@ -3510,6 +3535,11 @@ public class ShipEnhancements : ModBehaviour
         if (GetTemperatureSettings().Contains(name) && name != "enableShipTemperature")
         {
             return !(bool)enableShipTemperature.GetValue();
+        }
+
+        if (GetWaterSettings().Contains(name) && name != "addWaterTank")
+        {
+            return !(bool)addWaterTank.GetValue();
         }
 
         return false;

@@ -174,6 +174,11 @@ public static class SettingExtensions
             savedCustomSettings[setting] = Instance.ModHelper.DefaultConfig.GetSettingsValue<object>(setting.GetName());
             Instance.ModHelper.Config.SetSettingsValue(setting.GetName(), savedCustomSettings[setting]);
         }
+
+        Instance.ModHelper.Events.Unity.FireOnNextUpdate(() =>
+        {
+            Instance.RedrawSettingsMenu();
+        });
     }
 
     public static T AsEnum<T>(this string enumName) where T : struct =>
