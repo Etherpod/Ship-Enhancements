@@ -37,14 +37,24 @@ public class ResourcePump : OWItem
     private OWRenderer _signalRenderer;
     [SerializeField]
     private float _maxShipDistance = 3000f;
+    [SerializeField]
+    private OWAudioSource _alarmSource;
 
     [Space]
     [SerializeField]
     private OxygenVolume _oxygenVolume;
     [SerializeField]
-    private OWAudioSource _oxygenLoopSource;
+    private OWAudioSource _oxygenOutputSource;
+    [SerializeField]
+    private OWAudioSource _oxygenInputSource;
+    [SerializeField]
+    private OWAudioSource _oxygenDryInputSource;
     [SerializeField]
     private OxygenDetector _oxygenDetector;
+    [SerializeField]
+    private ParticleSystem _oxygenOutputParticles;
+    [SerializeField]
+    private ParticleSystem _oxygenInputParticles;
 
     [Space]
     [SerializeField]
@@ -55,6 +65,12 @@ public class ResourcePump : OWItem
     private OWAudioSource _geyserLoopSource;
     [SerializeField]
     private FluidDetector _fluidDetector;
+    [SerializeField]
+    private OWAudioSource _waterInputSource;
+    [SerializeField]
+    private OWAudioSource _waterDryInputSource;
+    [SerializeField]
+    private ParticleSystem _waterInputParticles;
 
     private EffectVolume[] _volumes;
     private FirstPersonManipulator _cameraManipulator;
@@ -66,6 +82,7 @@ public class ResourcePump : OWItem
     private bool _dropped = true;
 
     private readonly int _batteryPropID = Shader.PropertyToID("_Battery");
+    private readonly int _emissionPropID = Shader.PropertyToID("_Emission");
     private bool _inSignalRange;
 
     private ScreenPrompt _switchTypePrompt;
@@ -79,6 +96,8 @@ public class ResourcePump : OWItem
 
     private bool _geyserActive = false;
     private bool _flameActive = false;
+    private bool _oxygenInputActive = false;
+    private bool _waterInputActive = false;
 
     public enum ResourceType
     {
@@ -195,7 +214,22 @@ public class ResourcePump : OWItem
                 }
                 else if (_oxygenDetector.GetDetectOxygen())
                 {
+                    if (!_oxygenInputActive)
+                    {
+                        _oxygenInputActive = true;
+                        _oxygenDryInputSource.FadeOut(0.5f);
+                        _oxygenInputSource.FadeIn(0.5f);
+                        _oxygenInputParticles.Play();
+                    }
+
                     SELocator.GetShipResources().DrainOxygen(-2f * Time.deltaTime);
+                }
+                else if (_oxygenInputActive)
+                {
+                    _oxygenInputActive = false;
+                    _oxygenDryInputSource.FadeIn(0.5f);
+                    _oxygenInputSource.FadeOut(0.5f);
+                    _oxygenInputParticles.Stop();
                 }
             }
             else if (_currentType == ResourceType.Water)
@@ -206,8 +240,22 @@ public class ResourcePump : OWItem
                 }
                 else if (IsInWater())
                 {
-                    ShipEnhancements.WriteDebugMessage("Add water");
+                    if (!_waterInputActive)
+                    {
+                        _waterInputActive = true;
+                        _waterDryInputSource.FadeOut(0.2f);
+                        _waterInputSource.FadeIn(0.2f);
+                        _waterInputParticles.Play();
+                    }
+
                     SELocator.GetShipWaterResource().DrainWater(-5f * Time.deltaTime);
+                }
+                else if (_waterInputActive)
+                {
+                    _waterInputActive = false;
+                    _waterDryInputSource.FadeIn(0.2f);
+                    _waterInputSource.FadeOut(0.2f);
+                    _waterInputParticles.Stop();
                 }
             }
         }
@@ -267,42 +315,122 @@ public class ResourcePump : OWItem
 
         if (_currentType == ResourceType.Fuel)
         {
-            _flameActive = false;
-            _flameController.DeactivateFlame();
-            _flameLoopSource.FadeOut(0.5f);
+            if (_isOutput)
+            {
+                if (_flameActive)
+                {
+                    _flameActive = false;
+                    _flameController.DeactivateFlame();
+                    _flameLoopSource.FadeOut(0.5f);
+                }
+            }
+            else
+            {
+
+            }
         }
-        else if (nextType == ResourceType.Fuel && SELocator.GetShipResources()._currentFuel > 0f)
+        else if (nextType == ResourceType.Fuel)
         {
-            _flameActive = true;
-            _flameController.ActivateFlame();
-            _flameLoopSource.FadeIn(0.5f);
+            if (_isOutput && SELocator.GetShipResources()._currentFuel > 0f)
+            {
+                if (!_flameActive)
+                {
+                    _flameActive = true;
+                    _flameController.ActivateFlame();
+                    _flameLoopSource.FadeIn(0.5f);
+                }
+            }
+            else if (!_isOutput)
+            {
+
+            }
         }
 
         if (_currentType == ResourceType.Oxygen)
         {
-            _oxygenVolume.SetVolumeActivation(false);
-            _oxygenLoopSource.FadeOut(0.5f);
+            if (_isOutput)
+            {
+                _oxygenVolume.SetVolumeActivation(false);
+                _oxygenOutputParticles.Stop();
+                _oxygenOutputSource.FadeOut(0.5f);
+            }
+            else
+            {
+                _oxygenInputParticles.Stop();
+                _oxygenDryInputSource.FadeOut(0.5f);
+                _oxygenInputSource.FadeOut(0.5f);
+            }
         }
-        else if (nextType == ResourceType.Oxygen && SELocator.GetShipResources()._currentOxygen > 0f)
+        else if (nextType == ResourceType.Oxygen)
         {
-            _oxygenVolume.SetVolumeActivation(true);
-            _oxygenLoopSource.FadeIn(0.5f);
+            if (_isOutput && SELocator.GetShipResources()._currentOxygen > 0f)
+            {
+                _oxygenVolume.SetVolumeActivation(true);
+                _oxygenOutputParticles.Play();
+                _oxygenOutputSource.FadeIn(0.5f);
+            }
+            else if (!_isOutput)
+            {
+                if (_oxygenDetector.GetDetectOxygen())
+                {
+                    _oxygenInputActive = true;
+                    _oxygenInputParticles.Play();
+                    _oxygenInputSource.FadeIn(0.5f);
+                }
+                else
+                {
+                    _oxygenInputActive = false;
+                    _oxygenDryInputSource.FadeIn(0.5f);
+                }
+            }
         }
 
         if (_currentType == ResourceType.Water)
         {
-            _geyserActive = false;
-            _geyserLoopSource.FadeOut(0.5f);
-            _geyserParticles.Stop();
-            _geyserVolume.SetFiring(false);
+            if (_isOutput)
+            {
+                if (_geyserActive)
+                {
+                    _geyserActive = false;
+                    _geyserLoopSource.FadeOut(0.5f);
+                    _geyserParticles.Stop();
+                    _geyserVolume.SetFiring(false);
+                }
+            }
+            else
+            {
+                _waterInputSource.FadeOut(0.2f);
+                _waterDryInputSource.FadeOut(0.2f);
+                _waterInputParticles.Stop();
+            }
         }
-        else if (nextType == ResourceType.Water && SELocator.GetShipWaterResource().GetWater() > 0f)
+        else if (nextType == ResourceType.Water)
         {
-            _geyserActive = true;
-            _geyserLoopSource.FadeIn(0.5f);
-            _geyserParticles.Play();
-            _geyserVolume.SetFiring(true);
-            UpdateGeyserLoopingAudioPosition();
+            if (_isOutput && SELocator.GetShipWaterResource().GetWater() > 0f)
+            {
+                if (!_geyserActive)
+                {
+                    _geyserActive = true;
+                    _geyserLoopSource.FadeIn(0.5f);
+                    _geyserParticles.Play();
+                    _geyserVolume.SetFiring(true);
+                    UpdateGeyserLoopingAudioPosition();
+                }
+            }
+            else if (!_isOutput)
+            {
+                if (IsInWater())
+                {
+                    _waterInputActive = true;
+                    _waterInputSource.FadeIn(0.2f);
+                    _waterInputParticles.Play();
+                }
+                else
+                {
+                    _waterInputActive = false;
+                    _waterDryInputSource.FadeIn(0.2f);
+                }
+            }
         }
 
         _currentType = nextType;
@@ -310,17 +438,26 @@ public class ResourcePump : OWItem
 
     private void UpdatePowered()
     {
-        UpdatePowered(_powered && _inSignalRange && _dropped && _isOutput);
+        UpdatePowered(_powered && _inSignalRange && _dropped);
     }
-    
+
     private void UpdatePowered(bool powered)
     {
+        if (_powered && _dropped && !_inSignalRange && !_alarmSource.isPlaying)
+        {
+            _alarmSource.Play();
+        }
+        else if (_alarmSource.isPlaying)
+        {
+            _alarmSource.Stop();
+        }
+
         if (_currentType == ResourceType.Fuel)
         {
-            powered = powered && SELocator.GetShipResources()._currentFuel > 0f;
-            if (_flameActive != powered)
+            var outputPowered = powered && _isOutput && SELocator.GetShipResources()._currentFuel > 0f;
+            if (_flameActive != outputPowered)
             {
-                _flameActive = powered;
+                _flameActive = outputPowered;
                 if (_flameActive)
                 {
                     _flameController.ActivateFlame();
@@ -335,23 +472,47 @@ public class ResourcePump : OWItem
         }
         else if (_currentType == ResourceType.Oxygen)
         {
-            powered = powered && SELocator.GetShipResources()._currentOxygen > 0f;
-            _oxygenVolume.SetVolumeActivation(powered);
-            if (powered)
+            var outputPowered = powered && _isOutput && SELocator.GetShipResources()._currentOxygen > 0f;
+            _oxygenVolume.SetVolumeActivation(outputPowered);
+            if (outputPowered)
             {
-                _oxygenLoopSource.FadeIn(0.5f);
+                _oxygenOutputParticles.Play();
+                _oxygenOutputSource.FadeIn(0.5f);
             }
             else
             {
-                _oxygenLoopSource.FadeOut(0.5f);
+                _oxygenOutputParticles.Stop();
+                _oxygenOutputSource.FadeOut(0.5f);
+            }
+
+            var inputPowered = powered && !_isOutput;
+            if (inputPowered)
+            {
+                if (_oxygenDetector.GetDetectOxygen())
+                {
+                    _oxygenInputActive = true;
+                    _oxygenInputParticles.Play();
+                    _oxygenInputSource.FadeIn(0.5f);
+                }
+                else
+                {
+                    _oxygenInputActive = false;
+                    _oxygenDryInputSource.FadeIn(0.5f);
+                }
+            }
+            else
+            {
+                _oxygenInputParticles.Stop();
+                _oxygenDryInputSource.FadeOut(0.5f);
+                _oxygenInputSource.FadeOut(0.5f);
             }
         }
         else if (_currentType == ResourceType.Water)
         {
-            powered = powered && SELocator.GetShipWaterResource().GetWater() > 0f;
-            if (_geyserActive != powered)
+            var outputPowered = powered && _isOutput && SELocator.GetShipWaterResource().GetWater() > 0f;
+            if (_geyserActive != outputPowered)
             {
-                _geyserActive = powered;
+                _geyserActive = outputPowered;
                 if (_geyserActive)
                 {
                     _geyserLoopSource.FadeIn(0.5f);
@@ -367,6 +528,28 @@ public class ResourcePump : OWItem
 
                 UpdateGeyserLoopingAudioPosition();
             }
+
+            var inputPowered = powered && !_isOutput;
+            if (inputPowered)
+            {
+                if (IsInWater())
+                {
+                    _waterInputActive = true;
+                    _waterInputSource.FadeIn(0.2f);
+                    _waterInputParticles.Play();
+                }
+                else
+                {
+                    _waterInputActive = false;
+                    _waterDryInputSource.FadeIn(0.2f);
+                }
+            }
+            else
+            {
+                _waterInputSource.FadeOut(0.2f);
+                _waterDryInputSource.FadeOut(0.2f);
+                _waterInputParticles.Stop();
+            }
         }
     }
 
@@ -377,6 +560,16 @@ public class ResourcePump : OWItem
         {
             _inSignalRange = battery > 0f;
             UpdatePowered();
+
+            if (_inSignalRange)
+            {
+                _signalRenderer.SetMaterialProperty(_emissionPropID, 1f);
+            }
+        }
+        if (battery == 0f)
+        {
+            bool light = Time.timeSinceLevelLoad * 2f % 2f < 1f;
+            _signalRenderer.SetMaterialProperty(_emissionPropID, light ? 1f : 0f);
         }
     }
 
@@ -386,7 +579,7 @@ public class ResourcePump : OWItem
             || (resource == "oxygen" && _currentType == ResourceType.Oxygen)
             || (resource == "water" && _currentType == ResourceType.Water))
         {
-            UpdatePowered(false);
+            UpdatePowered();
         }
     }
 
