@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
@@ -26,19 +27,27 @@ public class ResourcePump : OWItem
 
     [Space]
     [SerializeField]
+    private OWRenderer _signalRenderer;
+    [SerializeField]
+    private float _maxShipDistance = 1000f;
+    [SerializeField]
+    private OWAudioSource _alarmSource;
+    [SerializeField]
+    private OWRenderer _outputDisplayRenderer;
+    [SerializeField]
+    private OWRenderer _typeDisplayRenderer;
+
+    [Space]
+    [SerializeField]
     private PumpFlameController _flameController;
     [SerializeField]
     private OWAudioSource _flameLoopSource;
     [SerializeField]
     private float _thrusterStrength;
-
-    [Space]
     [SerializeField]
-    private OWRenderer _signalRenderer;
+    private OWAudioSource _fuelInputSource;
     [SerializeField]
-    private float _maxShipDistance = 3000f;
-    [SerializeField]
-    private OWAudioSource _alarmSource;
+    private ParticleSystem _fuelInputParticles;
 
     [Space]
     [SerializeField]
@@ -82,22 +91,30 @@ public class ResourcePump : OWItem
     private bool _dropped = true;
 
     private readonly int _batteryPropID = Shader.PropertyToID("_Battery");
+    private readonly int _outputPropID = Shader.PropertyToID("_IsOutput");
+    private readonly int _errorPropID = Shader.PropertyToID("_IsError");
     private readonly int _emissionPropID = Shader.PropertyToID("_Emission");
+    private readonly int _typeIndexPropID = Shader.PropertyToID("_TypeIndex");
+    private readonly int _resourceRatioPropID = Shader.PropertyToID("_Ratio");
     private bool _inSignalRange;
 
-    private ScreenPrompt _switchTypePrompt;
-    private ScreenPrompt _switchModePrompt;
-    private ScreenPrompt _powerPrompt;
+    private PriorityScreenPrompt _switchTypePrompt;
+    private PriorityScreenPrompt _switchModePrompt;
+    private PriorityScreenPrompt _powerPrompt;
 
     private ResourceType _currentType = ResourceType.Fuel;
     private int _currentTypeIndex = 0;
     private bool _isOutput = true;
     private bool _powered = false;
+    private bool _outputError = false;
 
     private bool _geyserActive = false;
     private bool _flameActive = false;
+    private bool _fuelInputActive = false;
     private bool _oxygenInputActive = false;
     private bool _waterInputActive = false;
+
+    private List<PlayerRecoveryPoint> _activeRecoveryPoints = [];
 
     public enum ResourceType
     {
@@ -117,9 +134,9 @@ public class ResourcePump : OWItem
         _type = ItemType;
         _volumes = GetComponentsInChildren<EffectVolume>(true);
         _cameraManipulator = FindObjectOfType<FirstPersonManipulator>();
-        _switchTypePrompt = new ScreenPrompt(InputLibrary.toolOptionLeft, InputLibrary.toolOptionRight, "Switch Type (Fuel)", ScreenPrompt.MultiCommandType.POS_NEG, 0, ScreenPrompt.DisplayState.Normal, false);
-        _switchModePrompt = new ScreenPrompt(InputLibrary.toolOptionUp, InputLibrary.toolOptionDown, "Switch Mode (Output)", ScreenPrompt.MultiCommandType.POS_NEG, 0, ScreenPrompt.DisplayState.Normal, false);
-        _powerPrompt = new ScreenPrompt(InputLibrary.interactSecondary, "Turn On", 0, ScreenPrompt.DisplayState.Normal, false);
+        _switchTypePrompt = new PriorityScreenPrompt(InputLibrary.toolOptionLeft, InputLibrary.toolOptionRight, "Switch Type (Fuel)", ScreenPrompt.MultiCommandType.POS_NEG, 0, ScreenPrompt.DisplayState.Normal, false);
+        _switchModePrompt = new PriorityScreenPrompt(InputLibrary.toolOptionUp, InputLibrary.toolOptionDown, "Switch Mode (Output)", ScreenPrompt.MultiCommandType.POS_NEG, 0, ScreenPrompt.DisplayState.Normal, false);
+        _powerPrompt = new PriorityScreenPrompt(InputLibrary.interactSecondary, "Toggle Power (Off)", 0, ScreenPrompt.DisplayState.Normal, false);
 
         ShipEnhancements.Instance.OnResourceDepleted += OnResourceDepleted;
         ShipEnhancements.Instance.OnResourceRestored += OnResourceRestored;
@@ -182,13 +199,14 @@ public class ResourcePump : OWItem
                 _playerExternalSource.PlayOneShot(AudioType.Menu_LeftRight, 0.5f);
                 _isOutput = !_isOutput;
                 _switchModePrompt.SetText($"Switch Mode ({(_isOutput ? "Output" : "Input")})");
+                _outputDisplayRenderer.SetMaterialProperty(_outputPropID, _isOutput ? 1f : 0f);
                 UpdatePowered();
             }
 
             if (OWInput.IsNewlyPressed(InputLibrary.interactSecondary, InputMode.Character))
             {
                 _powered = !_powered;
-                _powerPrompt.SetText(_powered ? "Turn Off" : "Turn On");
+                _powerPrompt.SetText(_powered ? "Toggle Power (On)" : "Toggle Power (Off)");
                 UpdatePowered();
             }
         }
@@ -196,6 +214,8 @@ public class ResourcePump : OWItem
         float distSqr = (SELocator.GetShipTransform().position - transform.position).sqrMagnitude;
         float lerp = Mathf.InverseLerp(_maxShipDistance * _maxShipDistance, 50f * 50f, distSqr);
         UpdateBatteryLevel(lerp);
+        UpdateError();
+        UpdateResourceLevel();
 
         if (_powered && _inSignalRange && _dropped)
         {
@@ -204,6 +224,25 @@ public class ResourcePump : OWItem
                 if (_isOutput)
                 {
                     SELocator.GetShipResources().DrainFuel(1f * Time.deltaTime);
+                }
+                else if (IsNearFuel())
+                {
+                    if (!_fuelInputActive)
+                    {
+                        _fuelInputActive = true;
+                        _fuelInputSource.FadeIn(0.5f);
+                        // dry source out
+                        _fuelInputParticles.Play();
+                    }
+
+                    SELocator.GetShipResources().DrainFuel(-2.5f * Time.deltaTime * _activeRecoveryPoints.Count);
+                }
+                else if (_fuelInputActive)
+                {
+                    _fuelInputActive = false;
+                    _fuelInputSource.FadeOut(0.5f);
+                    // dry source in
+                    _fuelInputParticles.Stop();
                 }
             }
             else if (_currentType == ResourceType.Oxygen)
@@ -222,7 +261,7 @@ public class ResourcePump : OWItem
                         _oxygenInputParticles.Play();
                     }
 
-                    SELocator.GetShipResources().DrainOxygen(-2f * Time.deltaTime);
+                    SELocator.GetShipResources().DrainOxygen(-1.5f * Time.deltaTime);
                 }
                 else if (_oxygenInputActive)
                 {
@@ -310,6 +349,7 @@ public class ResourcePump : OWItem
         if (!_powered || !_inSignalRange || nextType == _currentType)
         {
             _currentType = nextType;
+            _typeDisplayRenderer.SetMaterialProperty(_typeIndexPropID, _currentTypeIndex);
             return;
         }
 
@@ -326,7 +366,9 @@ public class ResourcePump : OWItem
             }
             else
             {
-
+                _fuelInputSource.FadeOut(0.5f);
+                // dry source out
+                _fuelInputParticles.Stop();
             }
         }
         else if (nextType == ResourceType.Fuel)
@@ -342,7 +384,17 @@ public class ResourcePump : OWItem
             }
             else if (!_isOutput)
             {
-
+                if (IsNearFuel())
+                {
+                    _fuelInputActive = true;
+                    _fuelInputParticles.Play();
+                    _fuelInputSource.FadeIn(0.5f);
+                }
+                else
+                {
+                    _fuelInputActive = false;
+                    // dry source in
+                }
             }
         }
 
@@ -434,6 +486,7 @@ public class ResourcePump : OWItem
         }
 
         _currentType = nextType;
+        _typeDisplayRenderer.SetMaterialProperty(_typeIndexPropID, _currentTypeIndex);
     }
 
     private void UpdatePowered()
@@ -443,6 +496,15 @@ public class ResourcePump : OWItem
 
     private void UpdatePowered(bool powered)
     {
+        if (powered)
+        {
+            UpdateFuelSources();
+        }
+        else
+        {
+            _activeRecoveryPoints.Clear();
+        }
+
         if (_powered && _dropped && !_inSignalRange && !_alarmSource.isPlaying)
         {
             _alarmSource.Play();
@@ -468,6 +530,28 @@ public class ResourcePump : OWItem
                     _flameController.DeactivateFlame();
                     _flameLoopSource.FadeOut(0.5f);
                 }
+            }
+
+            var inputPowered = powered && !_isOutput;
+            if (inputPowered)
+            {
+                if (IsNearFuel())
+                {
+                    _fuelInputActive = true;
+                    _fuelInputParticles.Play();
+                    _fuelInputSource.FadeIn(0.5f);
+                }
+                else
+                {
+                    _fuelInputActive = false;
+                    // dry source in
+                }
+            }
+            else
+            {
+                _fuelInputParticles.Stop();
+                _fuelInputSource.FadeOut(0.5f);
+                // dry source out
             }
         }
         else if (_currentType == ResourceType.Oxygen)
@@ -553,23 +637,85 @@ public class ResourcePump : OWItem
         }
     }
 
-    public void UpdateBatteryLevel(float battery)
+    private void UpdateBatteryLevel(float battery)
     {
         _signalRenderer.SetMaterialProperty(_batteryPropID, Mathf.Clamp01(battery));
         if (_inSignalRange != battery > 0f)
         {
             _inSignalRange = battery > 0f;
             UpdatePowered();
+        }
+    }
 
-            if (_inSignalRange)
+    private void UpdateError()
+    {
+        bool flag = false;
+        if (_isOutput)
+        {
+            if ((SELocator.GetShipResources()._currentFuel <= 0f && _currentType == ResourceType.Fuel)
+                || (SELocator.GetShipResources()._currentOxygen <= 0f && _currentType == ResourceType.Oxygen)
+                || (SELocator.GetShipWaterResource().GetWater() <= 0f && _currentType == ResourceType.Water))
             {
-                _signalRenderer.SetMaterialProperty(_emissionPropID, 1f);
+                flag = true;
             }
         }
-        if (battery == 0f)
+        else
         {
-            bool light = Time.timeSinceLevelLoad * 2f % 2f < 1f;
-            _signalRenderer.SetMaterialProperty(_emissionPropID, light ? 1f : 0f);
+            if ((_currentType == ResourceType.Fuel && !IsNearFuel())
+                || (_currentType == ResourceType.Oxygen && !_oxygenDetector.GetDetectOxygen())
+                || (_currentType == ResourceType.Water && !IsInWater()))
+            {
+                flag = true;
+            }
+        }
+
+        if (_outputError != flag)
+        {
+            _outputError = flag;
+            _outputDisplayRenderer.SetMaterialProperty(_errorPropID, flag ? 1f : 0f);
+        }
+    }
+
+    private void UpdateResourceLevel()
+    {
+        float ratio;
+        if (_currentType == ResourceType.Fuel)
+        {
+            ratio = SELocator.GetShipResources().GetFractionalFuel();
+        }
+        else if (_currentType == ResourceType.Oxygen)
+        {
+            ratio = SELocator.GetShipResources().GetFractionalOxygen();
+        }
+        else
+        {
+            ratio = SELocator.GetShipWaterResource().GetFractionalWater();
+        }
+        _typeDisplayRenderer.SetMaterialProperty(_resourceRatioPropID, ratio);
+    }
+
+    private void UpdateFuelSources()
+    {
+        var colliders = Physics.OverlapSphere(_oxygenDetector.transform.position, 10f, OWLayerMask.interactMask);
+        foreach (var col in colliders)
+        {
+            if (col.TryGetComponent(out SingleInteractionVolume vol))
+            {
+                var eventDelegate = (MulticastDelegate)typeof(SingleInteractionVolume).GetField("OnPressInteract", 
+                    BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).GetValue(vol);
+                if (eventDelegate != null)
+                {
+                    foreach (var handler in eventDelegate.GetInvocationList())
+                    {
+                        if (handler.Target is PlayerRecoveryPoint recoveryPoint && recoveryPoint._refuelsPlayer
+                            && !recoveryPoint.GetComponentInParent<ShipBody>())
+                        {
+                            ShipEnhancements.WriteDebugMessage("     Found recovery point: " + recoveryPoint.gameObject.name);
+                            _activeRecoveryPoints.Add(recoveryPoint);
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -610,6 +756,7 @@ public class ResourcePump : OWItem
             transform.localPosition += transform.localRotation * r * _inputDropOffset;
         }
         transform.localScale = Vector3.one;
+        //UpdateFuelSources();
         UpdatePowered();
     }
 
@@ -650,6 +797,11 @@ public class ResourcePump : OWItem
     {
         if (_fluidDetector._activeVolumes == null) return false;
         return _fluidDetector.InFluidType(FluidVolume.Type.WATER) || _fluidDetector.InFluidType(FluidVolume.Type.GEYSER);
+    }
+
+    public bool IsNearFuel()
+    {
+        return _activeRecoveryPoints.Count > 0;
     }
 
     private void OnEnable()

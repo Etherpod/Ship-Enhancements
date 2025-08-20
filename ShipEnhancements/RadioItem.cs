@@ -109,8 +109,8 @@ public class RadioItem : OWItem
     private float _minDreamDist = 3f;
     private float _maxDreamDist = 20f;
 
-    private readonly string _powerOnText = "Turn On Radio";
-    private readonly string _powerOffText = "Turn Off Radio";
+    private readonly string _powerOnText = "Toggle Power (Off)";
+    private readonly string _powerOffText = "Toggle Power (On)";
 
     public override string GetDisplayName()
     {

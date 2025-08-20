@@ -15,17 +15,17 @@
   "ResourcePump_RemoteActivation": false,
   // Gives the Resource Pump the ability to move planets with fuel output mode
   "ResourcePump_UltraThrust": false,
-  // Makes the Resource Pump thrust stronger (or weaker)
+  // Big numbers make the Resource Pump thrust stronger
   "ResourcePump_ThrustStrength": 1.0,
-  // Makes the Resource Pump add/drain resources faster
+  // Big numbers make the Resource Pump add/drain resources faster
   "ResourcePump_TransferMultiplier": 1.0,
 
   // Replaces turbo mode with an "invert direction" mode
   "TractorBeam_MakeTurboInverse": false,
-  // Makes the Portable Tractor Beam push you faster
+  // Larger numbers make the Portable Tractor Beam push you faster
   "TractorBeam_SpeedMultiplier": 1.0,
 
-  // Makes the ship parts fly further when you eject them
+  // Big numbers make the ship parts fly further when you eject them
   "Eject_SpeedMultiplier": 1.0,
 
   // Makes the ship warp directly onto you if you activate the warp using your signalscope
