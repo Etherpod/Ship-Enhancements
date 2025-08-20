@@ -496,14 +496,7 @@ public class ResourcePump : OWItem
 
     private void UpdatePowered(bool powered)
     {
-        if (powered)
-        {
-            UpdateFuelSources();
-        }
-        else
-        {
-            _activeRecoveryPoints.Clear();
-        }
+        UpdateFuelSources();
 
         if (_powered && _dropped && !_inSignalRange && !_alarmSource.isPlaying)
         {
@@ -654,7 +647,7 @@ public class ResourcePump : OWItem
         {
             if ((SELocator.GetShipResources()._currentFuel <= 0f && _currentType == ResourceType.Fuel)
                 || (SELocator.GetShipResources()._currentOxygen <= 0f && _currentType == ResourceType.Oxygen)
-                || (SELocator.GetShipWaterResource().GetWater() <= 0f && _currentType == ResourceType.Water))
+                || ((bool)addWaterTank.GetProperty() && SELocator.GetShipWaterResource().GetWater() <= 0f && _currentType == ResourceType.Water))
             {
                 flag = true;
             }
@@ -663,7 +656,7 @@ public class ResourcePump : OWItem
         {
             if ((_currentType == ResourceType.Fuel && !IsNearFuel())
                 || (_currentType == ResourceType.Oxygen && !_oxygenDetector.GetDetectOxygen())
-                || (_currentType == ResourceType.Water && !IsInWater()))
+                || ((bool)addWaterTank.GetProperty() && _currentType == ResourceType.Water && !IsInWater()))
             {
                 flag = true;
             }

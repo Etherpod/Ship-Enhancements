@@ -10,6 +10,7 @@ public class PumpFlameController : MonoBehaviour
     private DampedSpring _scaleSpring = new DampedSpring();
 
     private MeshRenderer _thrusterRenderer;
+    private HazardVolume _hazardVolume;
     private bool _thrustersFiring;
     private float _baseLightRadius;
     private float _currentScale;
@@ -17,6 +18,15 @@ public class PumpFlameController : MonoBehaviour
     private void Awake()
     {
         _thrusterRenderer = GetComponent<MeshRenderer>();
+        if ((bool)ShipEnhancements.Settings.hotThrusters.GetProperty())
+        {
+            _hazardVolume = GetComponentInChildren<HazardVolume>();
+            _hazardVolume.gameObject.SetActive(false);
+        }
+        else
+        {
+            GetComponentInChildren<HazardVolume>().gameObject.SetActive(false);
+        }
 
         _thrustersFiring = false;
         _baseLightRadius = _light.range;
@@ -45,6 +55,7 @@ public class PumpFlameController : MonoBehaviour
         _light.range = _baseLightRadius * _currentScale;
         _thrusterRenderer.enabled = _currentScale > 0f;
         _light.enabled = _currentScale > 0f;
+        _hazardVolume?.gameObject.SetActive(_currentScale > 0f);
     }
 
     public void ActivateFlame()
