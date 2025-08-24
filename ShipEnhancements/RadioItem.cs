@@ -62,6 +62,7 @@ public class RadioItem : OWItem
     private FirstPersonManipulator _cameraManipulator;
     private OWCamera _playerCam;
     private OWAudioSource _playerExternalSource;
+    private RadioCodeNotes _codeNotes;
     private InputMode _lastInputMode = InputMode.Character;
     private bool _lastFocused = false;
     private bool _playerInteracting = false;
@@ -127,6 +128,7 @@ public class RadioItem : OWItem
         _reverbFilter = _musicSource.GetComponent<AudioReverbFilter>();
         _connectAudio = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_Connect.ogg");
         _disconnectAudio = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_Disconnect.ogg");
+        _codeNotes = SELocator.GetShipBody().GetComponentInChildren<RadioCodeNotes>();
         InitializeAudioDict();
 
         GlobalMessenger.AddListener("ExitShip", OnExitShip);
@@ -582,6 +584,7 @@ public class RadioItem : OWItem
         }
         if (_codesToAudio.ContainsKey(result))
         {
+            _codeNotes.OnEnterCode(result);
             return _codesToAudio[result];
         }
 
