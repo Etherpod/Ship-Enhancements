@@ -1267,7 +1267,13 @@
       "title": "Fix Ship Thrust Indicator",
       "type": "toggle",
       "value": true,
-      "tooltip": "Fixes a bug where the ship's thrust indicator turns off when you leave the console."
+      "tooltip": "Fixes a bug where the ship's thrust indicator would turn off when you left the console."
+    },
+    "buttonsRequireFlightChair": {
+      "title": "Buttons Require Flight Chair",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Only lets you use buttons in the cockpit while you're sitting in the flight chair."
     }
   }
 }

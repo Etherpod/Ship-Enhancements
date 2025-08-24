@@ -256,6 +256,7 @@ public class ShipEnhancements : ModBehaviour
         waterDrainMultiplier,
         addWaterCooling,
         enableReactorOverload,
+        buttonsRequireFlightChair,
     }
 
     private string[] startupMessages =

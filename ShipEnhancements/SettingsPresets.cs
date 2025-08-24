@@ -570,6 +570,7 @@ public static class SettingsPresets
         { "temperatureDifficulty", 1f },
         { "passiveTemperatureGain", "Hot" },
         { "addResourcePump", true },
+        { "buttonsRequireFlightChair", false },
     };
 
     // Random preset composition
@@ -1242,6 +1243,7 @@ public static class SettingsPresets
             ((20f, 50f), (0f, 0.6f)),
         ], (0.25f, 0.5f), 1f) },
         { "enableReactorOverload", new RandomSettingValue((0.5f, 0.5f)) },
+        { "buttonsRequireFlightChair", new RandomSettingValue((0f, 0.5f)) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

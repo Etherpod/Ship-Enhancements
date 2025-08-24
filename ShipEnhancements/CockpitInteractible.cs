@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -12,6 +13,7 @@ public class CockpitInteractible : ElectricalComponent
     protected bool _focused = false;
     protected bool _electricalDisrupted = false;
     protected bool _lastPoweredState = false;
+    protected float _baseInteractRange;
 
     public override void Awake()
     {
@@ -20,11 +22,19 @@ public class CockpitInteractible : ElectricalComponent
         _electricalSystem = FindObjectOfType<ShipBody>().transform
             .Find("Module_Cockpit/Systems_Cockpit/FlightControlsElectricalSystem")
             .GetComponent<ElectricalSystem>();
+        _baseInteractRange = _interactReceiver._interactRange;
 
         _interactReceiver.OnPressInteract += OnPressInteract;
         _interactReceiver.OnReleaseInteract += OnReleaseInteract;
         _interactReceiver.OnGainFocus += OnGainFocus;
         _interactReceiver.OnLoseFocus += OnLoseFocus;
+
+        if ((bool)buttonsRequireFlightChair.GetProperty())
+        {
+            GlobalMessenger<OWRigidbody>.AddListener("EnterFlightConsole", OnEnterFlightConsole);
+            GlobalMessenger.AddListener("ExitFlightConsole", OnExitFlightConsole);
+            _interactReceiver._interactRange = 0f;
+        }
     }
 
     protected virtual void AddToElectricalSystem()
@@ -56,6 +66,16 @@ public class CockpitInteractible : ElectricalComponent
         }
     }
 
+    protected virtual void OnEnterFlightConsole(OWRigidbody body)
+    {
+        _interactReceiver._interactRange = _baseInteractRange;
+    }
+
+    protected virtual void OnExitFlightConsole()
+    {
+        _interactReceiver._interactRange = 0f;
+    }
+
     public override void SetPowered(bool powered)
     {
         if (_electricalSystem != null && _electricalDisrupted != _electricalSystem.IsDisrupted())
@@ -73,5 +93,11 @@ public class CockpitInteractible : ElectricalComponent
         _interactReceiver.OnReleaseInteract -= OnReleaseInteract;
         _interactReceiver.OnGainFocus -= OnGainFocus;
         _interactReceiver.OnLoseFocus -= OnLoseFocus;
+
+        if ((bool)buttonsRequireFlightChair.GetProperty())
+        {
+            GlobalMessenger<OWRigidbody>.RemoveListener("EnterFlightConsole", OnEnterFlightConsole);
+            GlobalMessenger.RemoveListener("ExitFlightConsole", OnExitFlightConsole);
+        }
     }
 }

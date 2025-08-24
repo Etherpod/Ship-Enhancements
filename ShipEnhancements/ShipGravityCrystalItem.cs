@@ -23,7 +23,7 @@ public class ShipGravityCrystalItem : OWItem
     private Light _gravityComponentLight;
     private bool _hasBeenSocketed = false;
     private float _baseFieldStrength;
-    private bool _placedInShipSocket = false;
+    private bool _socketed = false;
 
     public override string GetDisplayName()
     {
@@ -61,17 +61,23 @@ public class ShipGravityCrystalItem : OWItem
         _brokenMesh.SetActive((bool)disableGravityCrystal.GetProperty());
         _meshParent.SetActive(false);
     }
-    
+
     private void OnGravityDamaged(ShipComponent component)
     {
-        _brokenMesh.SetActive(true);
-        _audioSource.AssignAudioLibraryClip(AudioType.NomaiGravCrystalFlickerAmbient_LP);
+        if (_socketed)
+        {
+            _brokenMesh.SetActive(true);
+            _audioSource.AssignAudioLibraryClip(AudioType.NomaiGravCrystalFlickerAmbient_LP);
+        }
     }
 
     private void OnGravityRepaired(ShipComponent component)
     {
-        _brokenMesh.SetActive(false);
-        _audioSource.AssignAudioLibraryClip(AudioType.NomaiGravCrystalAmbient_LP);
+        if (_socketed)
+        {
+            _brokenMesh.SetActive(false);
+            _audioSource.AssignAudioLibraryClip(AudioType.NomaiGravCrystalAmbient_LP);
+        }
     }
 
     public override void DropItem(Vector3 position, Vector3 normal, Transform parent, Sector sector, IItemDropTarget customDropTarget)
@@ -87,6 +93,8 @@ public class ShipGravityCrystalItem : OWItem
             _forceVolume.SetAttachedBody(parent.GetAttachedOWRigidbody());
             _forceVolume.SetVolumeActivation(true);
         }
+
+        _socketed = false;
     }
 
     public override void PickUpItem(Transform holdTranform)
@@ -97,21 +105,26 @@ public class ShipGravityCrystalItem : OWItem
         transform.localScale = Vector3.one * 0.5f;
 
         _meshParent.SetActive(true);
-        _gravityComponent.OnComponentDamaged();
         _light.enabled = false;
 
-        _gravityComponent._gravityAudio.FadeOut(0.5f);
-        _gravityComponentLight.enabled = false;
+        if (_socketed)
+        {
+            _gravityComponent.OnComponentDamaged();
+            _gravityComponent._gravityAudio.FadeOut(0.5f);
+            _gravityComponentLight.enabled = false;
+        }
 
         if (!(bool)disableGravityCrystal.GetProperty() && !_gravityComponent.isDamaged)
         {
             _forceVolume.SetVolumeActivation(false);
-        }      
-        else
+        }
+        else if (_socketed)
         {
             _gravityComponent._damageEffect._decalRenderers[0].SetActivation(false);
             _gravityComponent._damageEffect._particleSystem.Stop();
         }
+
+        _socketed = false;
     }
 
     public override void SocketItem(Transform socketTransform, Sector sector)
@@ -144,6 +157,8 @@ public class ShipGravityCrystalItem : OWItem
             }
             _gravityComponent._damageEffect._decalRenderers[0].SetActivation(true);
         }
+
+        _socketed = true;
     }
 
     public override void OnDestroy()
