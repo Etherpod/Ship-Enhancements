@@ -16,7 +16,7 @@ public class SEItemSocket : OWItemSocket
 
     protected List<OWItem> _itemPool = [];
     protected List<OWItem> _spawnedItems = [];
-    protected readonly int _numItemsToSpawn = 3;
+    protected readonly int _numItemsToSpawn = 30;
 
     public override void Awake()
     {

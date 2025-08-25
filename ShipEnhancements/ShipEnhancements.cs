@@ -59,6 +59,7 @@ public class ShipEnhancements : ModBehaviour
     public static INewHorizons NHAPI;
     public static INHInteraction NHInteraction;
     public static ThemeManager ThemeManager;
+    public static ExperimentalSettingsJson ExperimentalSettings;
 
     public static bool VanillaFixEnabled;
 
@@ -430,6 +431,7 @@ public class ShipEnhancements : ModBehaviour
             ShipRepairLimitController.SetRepairLimit(-1);
             ShipRepairLimitController.SetPartsRepaired(0);
             ErnestoDetectiveController.Initialize();
+            UpdateExperimentalSettings();
 
             if (AchievementsAPI != null)
             {
@@ -593,6 +595,16 @@ public class ShipEnhancements : ModBehaviour
         System.Random rand = new System.Random();
         int index = rand.Next(0, startupMessages.Length);
         ModHelper.Console.WriteLine(startupMessages[index], MessageType.Info);
+    }
+
+    private void UpdateExperimentalSettings()
+    {
+        var data = JsonConvert.DeserializeObject<ExperimentalSettingsJson>(
+            File.ReadAllText(Path.Combine(ModHelper.Manifest.ModFolderPath, "ExperimentalSettings.json"))
+        );
+        ExperimentalSettings = data;
+        ShipEnhancements.WriteDebugMessage(data);
+        ShipEnhancements.WriteDebugMessage(data.ResourcePump_UltraThrust);
     }
 
     private void Update()

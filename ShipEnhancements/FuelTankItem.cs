@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
@@ -51,6 +52,11 @@ public class FuelTankItem : OWItem
         _interactReceiver.OnPressInteract += OnPressInteract;
         _interactReceiver.OnGainFocus += OnGainFocus;
         _interactReceiver.OnLoseFocus += OnLoseFocus;
+
+        if (ShipEnhancements.ExperimentalSettings != null)
+        {
+            _maxFuel = Mathf.Max(ShipEnhancements.ExperimentalSettings.FuelCanister_MaxFuel, 0f);
+        }
     }
 
     private void Start()
@@ -136,7 +142,12 @@ public class FuelTankItem : OWItem
         _refuelPrompt.SetVisibility(false);
         _fuelDepletedPrompt.SetVisibility(false);
 
-        if (_focused)
+        if ((ShipEnhancements.ExperimentalSettings?.FuelCanister_RemoteActivation ?? false)
+            && Keyboard.current.lKey.wasPressedThisFrame)
+        {
+            Explode();
+        }
+        else if (_focused)
         {
             OWItem item = Locator.GetToolModeSwapper().GetItemCarryTool().GetHeldItem();
             if (item != null)
@@ -266,7 +277,7 @@ public class FuelTankItem : OWItem
         return _currentFuel / _maxFuel;
     }
 
-    public void OnImpact(ImpactData impact)
+    public void OnImpact(ImpactData impact, Transform explosionParent = null)
     {
         if (impact.speed > _explosionSpeed && _currentFuel > 0f)
         {
@@ -275,15 +286,22 @@ public class FuelTankItem : OWItem
                 ErnestoDetectiveController.ItWasFuelTank(impact: true);
             }
 
-            Explode();
+            Explode(explosionParent);
         }
     }
 
-    public void Explode()
+    public void Explode(Transform parent = null)
     {
         _explosion?.Play();
         PlayExplodeClip();
-        _explosion.transform.parent = transform.parent;
+        if (parent != null)
+        {
+            _explosion.transform.parent = parent;
+        }
+        else
+        {
+            _explosion.transform.parent = transform.parent;
+        }
         _explosion.GetComponent<SphereCollider>().enabled = true;
         if (GetComponentInParent<ShipBody>() && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
         {

@@ -90,8 +90,11 @@ public class ShipGravityCrystalItem : OWItem
 
         if (!(bool)disableGravityCrystal.GetProperty() && !_gravityComponent.isDamaged)
         {
-            _forceVolume.SetAttachedBody(parent.GetAttachedOWRigidbody());
-            _forceVolume.SetVolumeActivation(true);
+            ShipEnhancements.Instance.ModHelper.Events.Unity.FireOnNextUpdate(() =>
+            {
+                _forceVolume.SetAttachedBody(parent.GetAttachedOWRigidbody());
+                _forceVolume.SetVolumeActivation(true);
+            });
         }
 
         _socketed = false;

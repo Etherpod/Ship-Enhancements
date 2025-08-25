@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
@@ -175,8 +176,15 @@ public class ResourcePump : OWItem
         }
 
         UpdatePromptVisibility();
-
-        if (_lastFocused)
+        
+        if ((ShipEnhancements.ExperimentalSettings?.ResourcePump_RemoteActivation ?? false)
+            && Keyboard.current.oKey.wasPressedThisFrame)
+        {
+            _powered = !_powered;
+            _powerPrompt.SetText(_powered ? "Toggle Power (On)" : "Toggle Power (Off)");
+            UpdatePowered();
+        }
+        else if (_lastFocused)
         {
             bool pressedLeft = OWInput.IsNewlyPressed(InputLibrary.toolOptionLeft, InputMode.Character);
             if (pressedLeft || OWInput.IsNewlyPressed(InputLibrary.toolOptionRight, InputMode.Character))
@@ -219,11 +227,12 @@ public class ResourcePump : OWItem
 
         if (_powered && _inSignalRange && _dropped)
         {
+            float multiplier = ShipEnhancements.ExperimentalSettings?.ResourcePump_TransferMultiplier ?? 1f;
             if (_currentType == ResourceType.Fuel)
             {
                 if (_isOutput)
                 {
-                    SELocator.GetShipResources().DrainFuel(1f * Time.deltaTime);
+                    SELocator.GetShipResources().DrainFuel(1f * Time.deltaTime * multiplier);
                 }
                 else if (IsNearFuel())
                 {
@@ -235,7 +244,7 @@ public class ResourcePump : OWItem
                         _fuelInputParticles.Play();
                     }
 
-                    SELocator.GetShipResources().DrainFuel(-2.5f * Time.deltaTime * _activeRecoveryPoints.Count);
+                    SELocator.GetShipResources().DrainFuel(-2.5f * Time.deltaTime * _activeRecoveryPoints.Count * multiplier);
                 }
                 else if (_fuelInputActive)
                 {
@@ -249,7 +258,7 @@ public class ResourcePump : OWItem
             {
                 if (_isOutput)
                 {
-                    SELocator.GetShipResources().DrainOxygen(0.26f * Time.deltaTime);
+                    SELocator.GetShipResources().DrainOxygen(0.26f * Time.deltaTime * multiplier);
                 }
                 else if (_oxygenDetector.GetDetectOxygen())
                 {
@@ -261,7 +270,7 @@ public class ResourcePump : OWItem
                         _oxygenInputParticles.Play();
                     }
 
-                    SELocator.GetShipResources().DrainOxygen(-1.5f * Time.deltaTime);
+                    SELocator.GetShipResources().DrainOxygen(-1.5f * Time.deltaTime * multiplier);
                 }
                 else if (_oxygenInputActive)
                 {
@@ -275,7 +284,7 @@ public class ResourcePump : OWItem
             {
                 if (_isOutput)
                 {
-                    SELocator.GetShipWaterResource().DrainWater(1.5f * Time.deltaTime);
+                    SELocator.GetShipWaterResource().DrainWater(1.5f * Time.deltaTime * multiplier);
                 }
                 else if (IsInWater())
                 {
@@ -287,7 +296,7 @@ public class ResourcePump : OWItem
                         _waterInputParticles.Play();
                     }
 
-                    SELocator.GetShipWaterResource().DrainWater(-5f * Time.deltaTime);
+                    SELocator.GetShipWaterResource().DrainWater(-5f * Time.deltaTime * multiplier);
                 }
                 else if (_waterInputActive)
                 {
@@ -311,12 +320,24 @@ public class ResourcePump : OWItem
             var body = gameObject.GetAttachedOWRigidbody();
             var toCom = transform.position - body.GetWorldCenterOfMass();
             var thrustDir = -transform.up * _thrusterStrength;
-
-            body.AddForce(thrustDir);
-
             var torqueStrength = Vector3.ProjectOnPlane(toCom, thrustDir).magnitude;
             var torqueVec = Vector3.Cross(toCom, thrustDir).normalized;
-            body.AddTorque(torqueVec * torqueStrength);
+
+            float mult = ShipEnhancements.ExperimentalSettings?.ResourcePump_ThrustStrength ?? 1f;
+            thrustDir *= mult;
+            torqueStrength *= mult;
+
+            if (!body.RunningKinematicSimulation())
+            {
+                float massMult = body.GetMass() < 1f ? (1f - Mathf.Pow(body.GetMass() - 1f, 2f)) : 1f;
+                body.AddForce(thrustDir * massMult);
+                body.AddTorque(torqueVec * torqueStrength * massMult);
+            }
+            else if (ShipEnhancements.ExperimentalSettings?.ResourcePump_UltraThrust ?? false)
+            {
+                body._kinematicRigidbody.AddForce(thrustDir);
+                body._kinematicRigidbody.AddTorque(torqueVec * torqueStrength);
+            }
         }
     }
 
@@ -740,7 +761,10 @@ public class ResourcePump : OWItem
             _dropped = true;
             OnEnable();
         }
-        UpdateAttachedBody(parent.GetAttachedOWRigidbody());
+        ShipEnhancements.Instance.ModHelper.Events.Unity.FireOnNextUpdate(() =>
+        {
+            UpdateAttachedBody(parent.GetAttachedOWRigidbody());
+        });
         if (!_isOutput)
         {
             var r = Quaternion.LookRotation(new Vector3(0, 1, 0), new Vector3(1, 0, -1));

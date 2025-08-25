@@ -5,8 +5,6 @@ namespace ShipEnhancements;
 public class PortableCampfire : Campfire
 {
     [SerializeField]
-    private MeshCollider _collider;
-    [SerializeField]
     private FluidDetector _fluidDetector;
     [SerializeField]
     private AudioClip _waterExtinguishAudio;
@@ -124,19 +122,6 @@ public class PortableCampfire : Campfire
         }
         _audioSource.PlayOneShot(_packUpAudio, 0.5f);
         _item.TogglePackUp(true);
-    }
-
-    public void UpdateProperties()
-    {
-        Rigidbody rb = GetComponentInParent<Rigidbody>();
-        if (rb && !rb.isKinematic)
-        {
-            _collider.convex = true;
-        }
-        else
-        {
-            _collider.convex = false;
-        }
     }
 
     public void UpdateInsideShip(bool insideShip)

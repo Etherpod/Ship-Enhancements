@@ -11,7 +11,7 @@ public class ExpeditionFlagItem : OWItem
 
     [SerializeField] private GameObject _itemModelParent;
     [SerializeField] private GameObject _objModelParent;
-    [SerializeField] private Collider _flagCollider;
+    [SerializeField] private GameObject _flagCollider;
     [SerializeField] private OWTriggerVolume _colTrigger;
     [SerializeField] private MeshRenderer _decalRenderer;
     [SerializeField] private RulesetDetector _rulesetDetector;
@@ -79,14 +79,14 @@ public class ExpeditionFlagItem : OWItem
 
         SetIsDropped(true);
 
-        _flagCollider.enabled = false;
+        _flagCollider.SetActive(false);
         ShipEnhancements.Instance.ModHelper.Events.Unity.FireInNUpdates(() =>
         {
             if (_colTrigger.getTrackedObjects()
             .Where(obj => !obj.GetAttachedOWRigidbody()?.IsKinematic() ?? false)
             .ToArray().Length == 0)
             {
-                _flagCollider.enabled = true;
+                _flagCollider.SetActive(true);
             }
         }, 5);
     }
@@ -122,12 +122,12 @@ public class ExpeditionFlagItem : OWItem
 
     private void OnExit(GameObject hitObj)
     {
-        if (!_flagCollider.enabled
+        if (!_flagCollider.activeInHierarchy
             && _colTrigger.getTrackedObjects()
             .Where(obj => !obj.GetAttachedOWRigidbody()?.IsKinematic() ?? false)
             .ToArray().Length == 0)
         {
-            _flagCollider.enabled = true;
+            _flagCollider.SetActive(true);
         }
     }
 

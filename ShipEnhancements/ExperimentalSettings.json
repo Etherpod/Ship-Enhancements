@@ -1,5 +1,6 @@
 // Welcome to the experimental settings!
 // These options are here because would have caused too much chaos in the official settings menu.
+// Like the regular settings, any changes will only be applied on the next loop.
 // Don't break the mod, please.
 
 // <-- NONE OF THESE WILL WORK IN MULTIPLAYER!!! -->
@@ -10,6 +11,8 @@
 
   // Pressing "L" on your keyboard will blow up every fuel canister at once
   "FuelCanister_RemoteActivation": false,
+  // Changes how much fuel the fuel canister has, 100 fuel is enough to fill up your jetpack one time
+  "FuelCanister_MaxFuel": 300,
 
   // Pressing "K" on your keyboard will turn on/off every Resource Pump at once
   "ResourcePump_RemoteActivation": false,

@@ -232,7 +232,10 @@ public class TetherHookItem : OWItem
     public override void DropItem(Vector3 position, Vector3 normal, Transform parent, Sector sector, IItemDropTarget customDropTarget)
     {
         base.DropItem(position, normal, parent, sector, customDropTarget);
-        _tether.SetAttachedRigidbody(gameObject.GetAttachedOWRigidbody());
+        ShipEnhancements.Instance.ModHelper.Events.Unity.FireOnNextUpdate(() =>
+        {
+            _tether.SetAttachedRigidbody(gameObject.GetAttachedOWRigidbody());
+        });
 
         ShipDetachableModule module = GetComponentInParent<ShipDetachableModule>();
         if (module != null)

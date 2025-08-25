@@ -194,6 +194,7 @@ public class ExplosionDamage : MonoBehaviour
         {
             angler.ChangeState(AnglerfishController.AnglerState.Stunned);
             angler.GetComponentInChildren<AnglerfishFluidVolume>().SetVolumeActivation(false);
+            angler.GetComponentInChildren<AnglerfishAnimController>().OnAnglerSuspended(AnglerfishController.AnglerState.Stunned);
 
             if (ShipEnhancements.AchievementsAPI != null && !SEAchievementTracker.AnglerfishKill)
             {

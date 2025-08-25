@@ -1718,15 +1718,21 @@ public static class PatchClass
         targetRigidbody = null;
         dropTarget = null;
 
-        if (!(bool)enableShipItemPlacement.GetProperty() && !(bool)addTether.GetProperty() && !true) return true;
+        bool unrestricted = ShipEnhancements.ExperimentalSettings?.UnrestrictedItemPlacement ?? false;
+
+        if (!unrestricted
+            && !(bool)enableShipItemPlacement.GetProperty() && !(bool)addTether.GetProperty() 
+            && !(bool)enableRemovableGravityCrystal.GetProperty()) return true;
 
         bool isTether = (bool)addTether.GetProperty() && __instance.GetHeldItemType() == ShipEnhancements.Instance.TetherHookType;
         bool isGravityCrystal = __instance.GetHeldItemType() == ShipEnhancements.Instance.GravityCrystalType;
         bool shipItemPlacement = (bool)enableShipItemPlacement.GetProperty();
 
         PlayerCharacterController playerController = Locator.GetPlayerController();
-        if ((!playerController.IsGrounded() && !isTether && !isGravityCrystal) || PlayerState.IsAttached()
-            || (PlayerState.IsInsideShip() && (!shipItemPlacement || isTether || isGravityCrystal)))
+        bool groundedCheck = !playerController.IsGrounded() && !isTether && !isGravityCrystal && !unrestricted;
+        bool insideShipCheck = PlayerState.IsInsideShip() && !unrestricted && (!shipItemPlacement || isTether || isGravityCrystal);
+
+        if (groundedCheck || PlayerState.IsAttached() || insideShipCheck)
         {
             __result = false;
             return false;
@@ -1736,8 +1742,12 @@ public static class PatchClass
             __result = false;
             return false;
         }
-        if (playerController.GetRelativeGroundVelocity().sqrMagnitude >= playerController.GetRunSpeedMagnitude() * playerController.GetRunSpeedMagnitude()
-            && !isTether && !isGravityCrystal)
+
+        bool speedCheck = playerController.GetRelativeGroundVelocity().sqrMagnitude
+            >= playerController.GetRunSpeedMagnitude() * playerController.GetRunSpeedMagnitude()
+            && !unrestricted && !isTether && !isGravityCrystal;
+
+        if (speedCheck)
         {
             __result = false;
             return false;
@@ -1758,7 +1768,7 @@ public static class PatchClass
                 __result = false;
                 return false;
             }
-            float maxSlopeAngle = (isTether || isGravityCrystal) ? 360f : __instance._maxDroppableSlopeAngle;
+            float maxSlopeAngle = (unrestricted || isTether || isGravityCrystal) ? 360f : __instance._maxDroppableSlopeAngle;
 
             if (Vector3.Angle(Locator.GetPlayerTransform().up, hit.normal) <= maxSlopeAngle)
             {
@@ -1766,7 +1776,7 @@ public static class PatchClass
                 if (component == null || !component.PreventsItemDrop())
                 {
                     targetRigidbody = hit.collider.GetAttachedOWRigidbody(false);
-                    if (targetRigidbody.gameObject.CompareTag("Ship") && !shipItemPlacement && !isTether)
+                    if (targetRigidbody.gameObject.CompareTag("Ship") && !unrestricted && !shipItemPlacement && !isTether)
                     {
                         return false;
                     }
@@ -3042,12 +3052,25 @@ public static class PatchClass
     [HarmonyPatch(typeof(ImpactSensor), nameof(ImpactSensor.OnCollisionEnter))]
     public static void ImpactFuelTank(ImpactSensor __instance, Collision collision)
     {
-        FuelTankItem item = collision.collider.GetComponentInParent<FuelTankItem>();
-        if (collision.rigidbody != null && item != null)
+        if (collision.rigidbody == null) return;
+
+        FuelTankItem item;
+        Transform parent = null;
+        if (__instance.GetComponentInChildren<ForceDetector>()?.CompareTag("DynamicPropDetector") ?? false)
+        {
+            item = __instance.GetComponentInChildren<FuelTankItem>();
+            parent = collision.rigidbody.transform;
+        }
+        else
+        {
+            item = collision.collider.GetComponentInParent<FuelTankItem>();
+        }
+
+        if (item != null)
         {
             OWRigidbody requiredComponent = collision.rigidbody.GetRequiredComponent<OWRigidbody>();
             ImpactData impactData = new ImpactData(__instance._owRigidbody, requiredComponent, collision);
-            item.OnImpact(impactData);
+            item.OnImpact(impactData, parent);
         }
     }
     #endregion
@@ -4069,6 +4092,13 @@ public static class PatchClass
                 }
             }
         }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(AnglerfishAnimController), nameof(AnglerfishAnimController.OnAnglerUnsuspended))]
+    public static bool PreventAnglerAnimWhenStunned(AnglerfishController.AnglerState state)
+    {
+        return state != AnglerfishController.AnglerState.Stunned;
     }
     #endregion
 

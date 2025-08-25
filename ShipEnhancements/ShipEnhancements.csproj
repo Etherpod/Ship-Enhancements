@@ -56,6 +56,9 @@
     <None Include="SESaveData.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="ExperimentalSettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <EmbeddedResource Include="Data/themes.json"/>
   </ItemGroup>
   <ItemGroup>
