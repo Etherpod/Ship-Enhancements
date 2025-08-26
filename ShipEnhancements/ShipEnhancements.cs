@@ -1789,6 +1789,7 @@ public class ShipEnhancements : ModBehaviour
                 Instantiate(overloadObj, SELocator.GetShipTransform().Find("Module_Engine"));
             }
         }
+
         if (AchievementsAPI != null)
         {
             GameObject th = GameObject.Find("TimberHearth_Body");
@@ -1798,6 +1799,10 @@ public class ShipEnhancements : ModBehaviour
                 Transform parent = th.transform.Find("Sector_TH/Sector_Village/Sector_Observatory");
                 Instantiate(satelliteObj, parent);
             }
+        }
+        if (ExperimentalSettings?.QuantumShip ?? false)
+        {
+            Instantiate(LoadPrefab("Assets/ShipEnhancements/QuantumShipController.prefab"), SELocator.GetShipTransform());
         }
 
         SetDamageColors();

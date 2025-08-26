@@ -4924,6 +4924,37 @@ public static class PatchClass
     }
     #endregion
 
+    #region QuantumShip
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(PlayerCharacterController), nameof(PlayerCharacterController.CastForGrounded))]
+    public static void UpdateShipGroundedPre(PlayerCharacterController __instance)
+    {
+        if (!ShipEnhancements.ExperimentalSettings?.QuantumShip ?? false) return;
+
+        if (!PatchHandler.CollidingWithShip  && __instance._groundCollider != null
+            && __instance._groundCollider.GetComponentInParent<ShipBody>())
+        {
+            PatchHandler.SetPlayerStandingOnShip(true);
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(PlayerCharacterController), nameof(PlayerCharacterController.UpdateGrounded))]
+    public static void UpdateShipGroundedPost(PlayerCharacterController __instance)
+    {
+        if (__instance._isMovementLocked || __instance._isTumbling || !__instance._isAlignedToForce
+            || (!ShipEnhancements.ExperimentalSettings?.QuantumShip ?? false))
+        {
+            return;
+        }
+
+        if (PatchHandler.CollidingWithShip)
+        {
+            PatchHandler.SetPlayerStandingOnShip(false);
+        }
+    }
+    #endregion
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ShipAudioController), nameof(ShipAudioController.PlayEject))]
     public static bool FixEjectAudio(ShipAudioController __instance)

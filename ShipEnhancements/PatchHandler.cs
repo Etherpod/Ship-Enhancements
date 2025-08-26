@@ -13,6 +13,7 @@ public class PatchHandler : MonoBehaviour
 
     public static PatchHandler Instance => instance;
     public static bool EngineSputtering => Instance?._engineSputtering ?? false;
+    public static bool CollidingWithShip => Instance?._collidingWithShip ?? false;
 
     private int _focusedItems;
 
@@ -20,6 +21,8 @@ public class PatchHandler : MonoBehaviour
     private bool _engineSputtering;
     private AudioClip _currentSputterClip;
     private Coroutine _sputterCoroutine;
+
+    private bool _collidingWithShip;
 
     private void Awake()
     {
@@ -272,6 +275,16 @@ public class PatchHandler : MonoBehaviour
             {
                 ShipEnhancements.QSBInteraction.SetHullDamaged(targetHull, !wasDamaged);
             }
+        }
+    }
+
+    public static void SetPlayerStandingOnShip(bool standingOnShip)
+    {
+        if (!ShipEnhancements.ExperimentalSettings?.QuantumShip ?? false) return;
+        SELocator.GetShipBody().GetComponentInChildren<QuantumShip>().SetPlayerStandingOnObject(standingOnShip);
+        if (Instance != null)
+        {
+            Instance._collidingWithShip = standingOnShip;
         }
     }
 }

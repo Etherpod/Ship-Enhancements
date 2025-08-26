@@ -50,7 +50,6 @@ public class ShipModuleEjectionSystem : MonoBehaviour
         _audioController = Locator.GetShipTransform().GetComponentInChildren<ShipAudioController>();
         _interactVolume.ChangePrompt(UITextType.ShipEjectPrompt);
 
-        ShipEnhancements.WriteDebugMessage("whya re you here");
         switch (_targetModule)
         {
             case EjectableModule.Cockpit:
