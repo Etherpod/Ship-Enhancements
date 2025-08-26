@@ -15,11 +15,7 @@ public record ExperimentalSettingsJson(
     [JsonProperty] float Tether_MaxLength,
     [JsonProperty] float Tether_ReelMultiplier,
     [JsonProperty] float Eject_SpeedMultiplier,
-    [JsonProperty] bool ShipWarp_WarpToPlayer,
-    [JsonProperty] bool ToxicShip,
-    [JsonProperty] bool BombShip,
     [JsonProperty] bool RealisticClock,
     [JsonProperty] bool MakeWaterDamageEverythingDamage,
-    [JsonProperty] bool QuantumShip,
-    [JsonProperty] bool HearthianRoulette
+    [JsonProperty] bool QuantumShip
 );
