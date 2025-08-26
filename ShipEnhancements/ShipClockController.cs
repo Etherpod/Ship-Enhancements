@@ -34,13 +34,16 @@ public class ShipClockController : MonoBehaviour
 
     private void Update()
     {
-        int seconds = (int)TimeLoop.GetSecondsElapsed() % 60;
-        int minutes = (int)TimeLoop.GetMinutesElapsed() % 60;
+        bool realistic = ShipEnhancements.ExperimentalSettings?.RealisticClock ?? false;
+        float mult = realistic ? 60f : 1f;
+        int seconds = (int)(TimeLoop.GetSecondsElapsed() / mult % 60);
+        int minutes = (int)(TimeLoop.GetMinutesElapsed() / mult % 60);
 
         if (seconds != _lastSeconds)
         {
+            float minuteStep = realistic ? 30f : 6f;
             _minuteHand.transform.localRotation = Quaternion.Euler(0f, 180f + 6f * seconds, 0f);
-            _hourHand.transform.localRotation = Quaternion.Euler(0f, 180f + 6f * minutes, 0f);
+            _hourHand.transform.localRotation = Quaternion.Euler(0f, 180f + minuteStep * minutes, 0f);
 
             List<AudioClip> clips = [.. _tickSounds];
             AudioClip nextClip = _tickSounds.Where(clip => clips.IndexOf(clip) != _lastTickIndex).ToArray()[Random.Range(0, _tickSounds.Length - 1)];

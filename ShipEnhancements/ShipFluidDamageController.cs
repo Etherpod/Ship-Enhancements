@@ -129,6 +129,23 @@ public class ShipFluidDamageController : MonoBehaviour
 
     private void OnEnterFluid(FluidVolume vol, StaticFluidDetector detector)
     {
+        if (ShipEnhancements.ExperimentalSettings?.MakeWaterDamageEverythingDamage ?? false)
+        {
+            ShipModule module2 = detector.GetComponentInParent<ShipModule>();
+            if (module2 != null && !_trackedModules.Contains(module2))
+            {
+                _trackedModules.Add(module2);
+            }
+
+            _currentDamagePercent = (float)waterDamage.GetProperty();
+            if (_currentDamagePercent >= 1f)
+            {
+                ErnestoDetectiveController.ItWasExplosion(fromFluid: true);
+                SELocator.GetShipDamageController().Explode();
+            }
+            return;
+        }
+
         if (!_damageFluids.Keys.Contains(vol.GetFluidType())) return;
 
         ShipModule module = detector.GetComponentInParent<ShipModule>();
@@ -147,7 +164,8 @@ public class ShipFluidDamageController : MonoBehaviour
 
     private void OnExitFluid(FluidVolume vol, StaticFluidDetector detector)
     {
-        if (!_damageFluids.Keys.Contains(vol.GetFluidType())) return;
+        if (!_damageFluids.Keys.Contains(vol.GetFluidType())
+            && !(ShipEnhancements.ExperimentalSettings?.MakeWaterDamageEverythingDamage ?? false)) return;
 
         ShipModule module = detector.GetComponentInParent<ShipModule>();
         if (module != null && _trackedModules.Contains(module))

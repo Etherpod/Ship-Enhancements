@@ -28,6 +28,11 @@
   // Larger numbers make the Portable Tractor Beam push you faster
   "TractorBeam_SpeedMultiplier": 1.0,
 
+  // How far you can reel out the ship tether
+  "Tether_MaxLength": 1000.0,
+  // Big numbers make the tether reel in/out faster
+  "Tether_ReelMultiplier": 1.0,
+
   // Big numbers make the ship parts fly further when you eject them
   "Eject_SpeedMultiplier": 1.0,
 

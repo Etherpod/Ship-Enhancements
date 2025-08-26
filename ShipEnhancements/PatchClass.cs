@@ -4893,4 +4893,43 @@ public static class PatchClass
         }
     }
     #endregion
+
+    #region EjectSpeedMultiplier
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipEjectionSystem), nameof(ShipEjectionSystem.FixedUpdate))]
+    public static bool AddEjectSpeedMultiplier(ShipEjectionSystem __instance)
+    {
+        float multiplier = ShipEnhancements.ExperimentalSettings?.Eject_SpeedMultiplier ?? 1f;
+        if (multiplier == 1f) return true;
+
+        if (__instance._ejectPressed)
+        {
+            OWRigidbody owrigidbody = __instance._cockpitModule.Detach();
+            __instance._shipBody.transform.position -= __instance._shipBody.transform.forward * 2f;
+            float num = __instance._ejectImpulse;
+            num *= multiplier;
+            if (Locator.GetShipDetector().GetComponent<ShipFluidDetector>().InOceanBarrierZone())
+            {
+                MonoBehaviour.print("Ship in ocean barrier zone, reducing eject impulse.");
+                num = 1f;
+            }
+            __instance._shipBody.AddLocalImpulse(Vector3.back * num);
+            owrigidbody.AddLocalImpulse(Vector3.forward * num);
+            __instance._audioController.PlayEject();
+            RumbleManager.PulseEject();
+            __instance.enabled = false;
+        }
+
+        return false;
+    }
+    #endregion
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipAudioController), nameof(ShipAudioController.PlayEject))]
+    public static bool FixEjectAudio(ShipAudioController __instance)
+    {
+        __instance.transform.Find("ShipInteriorAudio/EjectAudio").GetComponent<OWAudioSource>()
+            .PlayOneShot(AudioType.ShipCockpitEject);
+        return false;
+    }
 }

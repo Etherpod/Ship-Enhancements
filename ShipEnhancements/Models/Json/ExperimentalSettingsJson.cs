@@ -12,6 +12,8 @@ public record ExperimentalSettingsJson(
     [JsonProperty] float ResourcePump_TransferMultiplier,
     [JsonProperty] bool TractorBeam_MakeTurboInverse,
     [JsonProperty] float TractorBeam_SpeedMultiplier,
+    [JsonProperty] float Tether_MaxLength,
+    [JsonProperty] float Tether_ReelMultiplier,
     [JsonProperty] float Eject_SpeedMultiplier,
     [JsonProperty] bool ShipWarp_WarpToPlayer,
     [JsonProperty] bool ToxicShip,

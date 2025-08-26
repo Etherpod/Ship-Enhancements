@@ -2548,7 +2548,6 @@ public class ShipEnhancements : ModBehaviour
     private void SetUpShipAudio()
     {
         ShipAudioController shipAudio = SELocator.GetShipTransform().GetComponentInChildren<ShipAudioController>();
-
         _shipAudioToChange.Add(shipAudio._cockpitSource);
 
         OWAudioSource alarmSource = shipAudio._alarmSource;
@@ -2563,11 +2562,19 @@ public class ShipEnhancements : ModBehaviour
         shipAudio._probeScreenSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff,
             toolRef.GetCustomCurve(AudioSourceCurveType.CustomRolloff));
         shipAudio._probeScreenSource.maxDistance = toolRef.maxDistance;
+
         shipAudio._signalscopeSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff,
             toolRef.GetCustomCurve(AudioSourceCurveType.CustomRolloff));
         shipAudio._signalscopeSource.maxDistance = toolRef.maxDistance;
 
+        shipAudio._cockpitSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff,
+            toolRef.GetCustomCurve(AudioSourceCurveType.CustomRolloff));
+        shipAudio._cockpitSource.maxDistance = toolRef.maxDistance;
+
         Destroy(toolRef.gameObject);
+
+        GameObject ejectAudioObj = LoadPrefab("Assets/ShipEnhancements/EjectAudio.prefab");
+        Instantiate(ejectAudioObj, shipAudio.transform.Find("ShipInteriorAudio")).name = "EjectAudio";
     }
 
     #endregion
