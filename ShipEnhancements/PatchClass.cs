@@ -4817,6 +4817,8 @@ public static class PatchClass
 
     public static Vector3 InheritableForcesFix_GetForceAcceleration_Remote(ForceDetector __instance, bool fromInheritable)
     {
+        if (__instance is not DynamicForceDetector) return Vector3.zero;
+
         if (__instance._dirty)
         {
             InheritableForcesFix_AccumulateAcceleration(__instance, fromInheritable);
@@ -4876,20 +4878,22 @@ public static class PatchClass
 
             return;
         }
-
-        __instance._netAcceleration = Vector3.zero;
-        for (int i = __instance._activeVolumes.Count - 1; i >= 0; i--)
+        else if (__instance is DynamicForceDetector)
         {
-            if (__instance._activeVolumes[i] == null)
+            __instance._netAcceleration = Vector3.zero;
+            for (int i = __instance._activeVolumes.Count - 1; i >= 0; i--)
             {
-                Debug.LogError("what", __instance.gameObject);
-                Debug.Break();
+                if (__instance._activeVolumes[i] == null)
+                {
+                    Debug.LogError("what", __instance.gameObject);
+                    Debug.Break();
+                }
+                __instance._netAcceleration += (__instance._activeVolumes[i] as ForceVolume).CalculateForceAccelerationOnBody(__instance._attachedBody) * __instance._fieldMultiplier;
             }
-            __instance._netAcceleration += (__instance._activeVolumes[i] as ForceVolume).CalculateForceAccelerationOnBody(__instance._attachedBody) * __instance._fieldMultiplier;
-        }
-        if (__instance._activeInheritedDetector != null && !fromInheritable)
-        {
-            __instance._netAcceleration += InheritableForcesFix_GetForceAcceleration_Remote(__instance._activeInheritedDetector, true);
+            if (__instance._activeInheritedDetector != null && !fromInheritable)
+            {
+                __instance._netAcceleration += InheritableForcesFix_GetForceAcceleration_Remote(__instance._activeInheritedDetector, true);
+            }
         }
     }
     #endregion
