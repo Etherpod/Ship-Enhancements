@@ -9,6 +9,7 @@ public record ExperimentalSettingsJson(
     [JsonProperty] bool ResourcePump_RemoteActivation,
     [JsonProperty] bool ResourcePump_UltraThrust,
     [JsonProperty] float ResourcePump_ThrustStrength,
+    [JsonProperty] float ResourcePump_SignalRange,
     [JsonProperty] float ResourcePump_TransferMultiplier,
     [JsonProperty] bool TractorBeam_MakeTurboInverse,
     [JsonProperty] float TractorBeam_SpeedMultiplier,

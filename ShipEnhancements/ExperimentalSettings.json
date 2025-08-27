@@ -14,12 +14,14 @@
   // Changes how much fuel the fuel canister has, 100 fuel is enough to fill up your jetpack one time
   "FuelCanister_MaxFuel": 300,
 
-  // Pressing "K" on your keyboard will turn on/off every Resource Pump at once
+  // Pressing "O" on your keyboard will turn on/off every Resource Pump at once
   "ResourcePump_RemoteActivation": false,
   // Gives the Resource Pump the ability to move planets with fuel output mode
   "ResourcePump_UltraThrust": false,
   // Big numbers make the Resource Pump thrust stronger
   "ResourcePump_ThrustStrength": 1.0,
+  // How far the pump can be from the ship before it disconnects (measured in meters)
+  "ResourcePump_SignalRange": 1000,
   // Big numbers make the Resource Pump add/drain resources faster
   "ResourcePump_TransferMultiplier": 1.0,
 
@@ -28,21 +30,13 @@
   // Larger numbers make the Portable Tractor Beam push you faster
   "TractorBeam_SpeedMultiplier": 1.0,
 
-  // How far you can reel out the ship tether
+  // How far you can reel out the ship tether (measured in meters)
   "Tether_MaxLength": 1000.0,
   // Big numbers make the tether reel in/out faster
   "Tether_ReelMultiplier": 1.0,
 
   // Big numbers make the ship parts fly further when you eject them
   "Eject_SpeedMultiplier": 1.0,
-
-  // Makes the ship warp directly onto you if you activate the warp using your signalscope
-  "ShipWarp_WarpToPlayer": false,
-
-  // Kills anglerfish if they eat your ship
-  "ToxicShip": false,
-  // Immediately blows up the ship if the ship systems fail (like when it gets eaten by an anglerfish)
-  "BombShip": false,
 
   // Makes the ship clock show minutes/hours instead of seconds/minutes
   "RealisticClock": false,
@@ -51,8 +45,5 @@
   "MakeWaterDamageEverythingDamage": false,
 
   // If you look away from your ship, it disappears. Forever.
-  "QuantumShip": false,
-
-  // Every loop, one random feature of the ship will be selected to blow up the ship if you use it (scout launcher, landing camera, etc)
-  "HearthianRoulette": false
+  "QuantumShip": false
 }

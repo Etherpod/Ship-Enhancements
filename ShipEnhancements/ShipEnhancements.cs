@@ -2848,6 +2848,7 @@ public class ShipEnhancements : ModBehaviour
 
     public static void WriteDebugMessage(object msg, bool warning = false, bool error = false)
     {
+        return;
         msg ??= "null";
 
         if (warning)

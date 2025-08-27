@@ -28,6 +28,8 @@ public static class SEItemAudioController
     private static AudioClip _portableCampfireDrop;
     private static AudioClip _portableCampfirePickUp;
     private static AudioClip _portableCampfireSocket;
+    private static AudioClip _resourcePumpDrop;
+    private static AudioClip _resourcePumpPickUp;
 
     public static void Initialize()
     {
@@ -50,6 +52,8 @@ public static class SEItemAudioController
         _portableCampfireDrop = ShipEnhancements.LoadAudio(AudioClipPath + "PortableCampfire_Unpack.ogg");
         _portableCampfirePickUp = ShipEnhancements.LoadAudio(AudioClipPath + "PortableCampfire_PickUpLogs.ogg");
         _portableCampfireSocket = ShipEnhancements.LoadAudio(AudioClipPath + "PortableCampfire_DropLogs.ogg");
+        _resourcePumpDrop = ShipEnhancements.LoadAudio(AudioClipPath + "Pump_Drop.ogg");
+        _resourcePumpPickUp = ShipEnhancements.LoadAudio(AudioClipPath + "Pump_PickUp.ogg");
     }
 
     [HarmonyPostfix]
@@ -92,6 +96,10 @@ public static class SEItemAudioController
         else if (itemType == ShipEnhancements.Instance.PortableCampfireType)
         {
             __instance._oneShotExternalSource.PlayOneShot(_portableCampfireSocket, DefaultVolume);
+        }
+        else if (itemType == ShipEnhancements.Instance.ResourcePumpType)
+        {
+            __instance._oneShotExternalSource.PlayOneShot(_resourcePumpDrop, DefaultVolume);
         }
     }
 
@@ -136,6 +144,10 @@ public static class SEItemAudioController
         {
             __instance._oneShotExternalSource.PlayOneShot(_portableCampfirePickUp, DefaultVolume);
         }
+        else if (itemType == ShipEnhancements.Instance.ResourcePumpType)
+        {
+            __instance._oneShotExternalSource.PlayOneShot(_resourcePumpPickUp, DefaultVolume);
+        }
     }
 
     [HarmonyPostfix]
@@ -179,6 +191,10 @@ public static class SEItemAudioController
         {
             __instance._oneShotExternalSource.PlayOneShot(_portableCampfireDrop, DefaultVolume);
         }
+        else if (itemType == ShipEnhancements.Instance.ResourcePumpType)
+        {
+            __instance._oneShotExternalSource.PlayOneShot(_resourcePumpDrop, DefaultVolume);
+        }
     }
 
     [HarmonyPostfix]
@@ -221,6 +237,10 @@ public static class SEItemAudioController
         else if (itemType == ShipEnhancements.Instance.PortableCampfireType)
         {
             __instance._oneShotExternalSource.PlayOneShot(_portableCampfirePickUp, DefaultVolume);
+        }
+        else if (itemType == ShipEnhancements.Instance.ResourcePumpType)
+        {
+            __instance._oneShotExternalSource.PlayOneShot(_resourcePumpPickUp, DefaultVolume);
         }
     }
 }
