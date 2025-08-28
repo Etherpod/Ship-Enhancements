@@ -171,6 +171,10 @@ public static class SettingExtensions
 
         foreach (var (setting, value) in settingValues)
         {
+            if (setting == Settings.addWaterTank)
+            {
+                ShipEnhancements.WriteDebugMessage("gabagool");
+            }
             savedCustomSettings[setting] = Instance.ModHelper.DefaultConfig.GetSettingsValue<object>(setting.GetName());
             Instance.ModHelper.Config.SetSettingsValue(setting.GetName(), savedCustomSettings[setting]);
         }

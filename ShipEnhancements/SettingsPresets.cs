@@ -85,7 +85,7 @@ public static class SettingsPresets
         { "airDragMultiplier", 1f },
         { "addShipClock", false },
         { "enableStunDamage", false },
-        { "enableRepairConfirmation", false },
+        //{ "enableRepairConfirmation", false },
         //{ "shipGravityFix", true },
         { "enableRemovableGravityCrystal", false },
         { "randomHullDamage", 0f },
@@ -118,6 +118,10 @@ public static class SettingsPresets
         { "temperatureDifficulty", 0.5f },
         { "passiveTemperatureGain", "None" },
         { "addResourcePump", false },
+        { "addWaterTank", false },
+        { "waterDrainMultiplier", 1f },
+        { "addWaterCooling", false },
+        { "enableReactorOverload", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -198,7 +202,7 @@ public static class SettingsPresets
         { "airDragMultiplier", 1f },
         { "addShipClock", false },
         { "enableStunDamage", false },
-        { "enableRepairConfirmation", true },
+        //{ "enableRepairConfirmation", true },
         //{ "shipGravityFix", true },
         { "enableRemovableGravityCrystal", false },
         { "randomHullDamage", 0f },
@@ -231,6 +235,10 @@ public static class SettingsPresets
         { "temperatureDifficulty", 0.5f },
         { "passiveTemperatureGain", "None" },
         { "addResourcePump", false },
+        { "addWaterTank", false },
+        { "waterDrainMultiplier", 1f },
+        { "addWaterCooling", false },
+        { "enableReactorOverload", false },
     };
 
     public static readonly Dictionary<string, object> ImpossibleSettings = new Dictionary<string, object>()
@@ -311,7 +319,7 @@ public static class SettingsPresets
         { "airDragMultiplier", 0f },
         { "addShipClock", false },
         { "enableStunDamage", true },
-        { "enableRepairConfirmation", false },
+        //{ "enableRepairConfirmation", false },
         //{ "shipGravityFix", true },
         { "enableRemovableGravityCrystal", false },
         { "randomHullDamage", 0f },
@@ -344,6 +352,10 @@ public static class SettingsPresets
         { "temperatureDifficulty", 0.5f },
         { "passiveTemperatureGain", "None" },
         { "addResourcePump", false },
+        { "addWaterTank", false },
+        { "waterDrainMultiplier", 1f },
+        { "addWaterCooling", false },
+        { "enableReactorOverload", false },
     };
 
     public static readonly Dictionary<string, object> NewStuffSettings = new Dictionary<string, object>()
@@ -424,7 +436,7 @@ public static class SettingsPresets
         { "airDragMultiplier", 1f },
         { "addShipClock", true },
         { "enableStunDamage", false },
-        { "enableRepairConfirmation", true },
+        //{ "enableRepairConfirmation", true },
         //{ "shipGravityFix", true },
         { "enableRemovableGravityCrystal", true },
         { "randomHullDamage", 0f },
@@ -457,6 +469,10 @@ public static class SettingsPresets
         { "temperatureDifficulty", 0.25f },
         { "passiveTemperatureGain", "None" },
         { "addResourcePump", true },
+        { "addWaterTank", true },
+        { "waterDrainMultiplier", 1f },
+        { "addWaterCooling", true },
+        { "enableReactorOverload", true },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -537,7 +553,7 @@ public static class SettingsPresets
         { "airDragMultiplier", 0f },
         { "addShipClock", true },
         { "enableStunDamage", true },
-        { "enableRepairConfirmation", true },
+        //{ "enableRepairConfirmation", true },
         //{ "shipGravityFix", true },
         { "enableRemovableGravityCrystal", true },
         { "randomHullDamage", 0.1f },
@@ -571,6 +587,10 @@ public static class SettingsPresets
         { "passiveTemperatureGain", "Hot" },
         { "addResourcePump", true },
         { "buttonsRequireFlightChair", false },
+        { "addWaterTank", true },
+        { "waterDrainMultiplier", 3f },
+        { "addWaterCooling", true },
+        { "enableReactorOverload", true },
     };
 
     // Random preset composition

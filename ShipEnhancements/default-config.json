@@ -40,6 +40,12 @@
       "title": "Disable Ship Parts"
     },
 
+    "disableComponentsSplit": {
+      "type": "separator",
+      "title": "Components",
+      "tooltip": "side"
+    },
+
     "disableGravityCrystal": {
       "title": "Disable Ship Gravity",
       "type": "toggle",
@@ -58,29 +64,17 @@
       "value": false,
       "tooltip": "Disables the landing camera. Good luck making a proper landing!"
     },
-    "disableEjectButton": {
-      "title": "Disable Eject Button",
+    "disableShipOxygen": {
+      "title": "Disable Ship Oxygen",
       "type": "toggle",
       "value": false,
-      "tooltip": "Disables the eject button in the cockpit."
+      "tooltip": "Removes all of the oxygen from your ship. Don't stay out in space for too long!"
     },
     "disableShipLights": {
       "title": "Disable Ship Lights",
       "type": "toggle",
       "value": false,
       "tooltip": "Permanently turns off both the interior and exterior lighting fixtures."
-    },
-    "disableAutoLights": {
-      "title": "Disable Automatic Lights",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Keeps all of the lights on when you leave the ship instead of turning them off."
-    },
-    "disableShipOxygen": {
-      "title": "Disable Ship Oxygen",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Removes all of the oxygen from your ship. Don't stay out in space for too long!"
     },
     "disableScoutRecall": {
       "title": "Disable Ship Scout Recall",
@@ -113,11 +107,24 @@
       ],
       "tooltip": "Lets you disable some of your ship's thrusters."
     },
+
+    "utilitySplit": {
+      "type": "separator",
+      "title": "Utility",
+      "tooltip": "side"
+    },
+
     "disableDamageIndicators": {
       "title": "Disable Damage Indicators",
       "type": "toggle",
       "value": false,
       "tooltip": "Removes all indicators that tell you the ship is damaged. Also disables the master alarm. Keep an eye or four on the reactor!"
+    },
+    "disableEjectButton": {
+      "title": "Disable Eject Button",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Disables the eject button in the cockpit."
     },
     "disableSeatbelt": {
       "title": "Disable Seatbelt",
@@ -149,6 +156,13 @@
       "value": false,
       "tooltip": "Disables the tractor beam after you enter the ship."
     },
+
+    "environmentalSplit": {
+      "type": "separator",
+      "title": "Environmental",
+      "tooltip": "side"
+    },
+
     "disableAirAutoRoll": {
       "title": "Disable Air Auto Roll",
       "type": "toggle",
@@ -173,6 +187,13 @@
       "value": false,
       "tooltip": "Allows hazards like heat and ghost matter to damage you while inside of the ship."
     },
+
+    "navigationSplit": {
+      "type": "separator",
+      "title": "Navigation",
+      "tooltip": "side"
+    },
+
     "disableReferenceFrame": {
       "title": "Disable Lock-on",
       "type": "toggle",
@@ -195,6 +216,12 @@
     "Adjust Ship Functions": {
       "type": "separator",
       "title": "Adjust Ship Functions"
+    },
+
+    "resourceSplit": {
+      "type": "separator",
+      "title": "Ship Resource Drain",
+      "tooltip": "side"
     },
 
     "oxygenDrainMultiplier": {
@@ -227,6 +254,19 @@
       "value": 0,
       "tooltip": "Larger numbers increase the rate at which your ship's fuel drains while it is on. The default speed is about 100 times slower than the active consumption rate."
     },
+    "enableJetpackRefuelDrain": {
+      "title": "Enable Jetpack Refuel Drain",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Drains the ship's fuel when you refill your jetpack in the ship."
+    },
+
+    "damageSplit": {
+      "type": "separator",
+      "title": "Ship Damage",
+      "tooltip": "side"
+    },
+
     "shipDamageMultiplier": {
       "title": "Damage Multiplier",
       "type": "number",
@@ -273,6 +313,22 @@
       "value": false,
       "tooltip": "Forces the ship to stay functional unless the cockpit detaches."
     },
+    "waterDamage": {
+      "title": "Ship Water Damage",
+      "type": "slider",
+      "min": 0,
+      "max": 1,
+      "value": 0,
+      "tooltip": "Controls how much your ship is damaged by water. Maximum damage blows up your ship if you touch water."
+    },
+    "sandDamage": {
+      "title": "Ship Sand Damage",
+      "type": "slider",
+      "min": 0,
+      "max": 1,
+      "value": 0,
+      "tooltip": "Controls how much your ship is damaged by falling sand. Maximum damage blows up your ship if you touch falling sand."
+    },
     "repairLimit": {
       "title": "Repair Limit",
       "type": "number",
@@ -285,27 +341,13 @@
       "value": 1,
       "tooltip": "Larger numbers increase the time it takes to repair parts of the ship."
     },
-    "gravityMultiplier": {
-      "title": "Ship Gravity Multiplier",
-      "type": "number",
-      "value": 1,
-      "tooltip": "Larger numbers increase the power of the ship's gravity crystal."
+
+    "adjustPhysicsSplit": {
+      "type": "separator",
+      "title": "Ship Physics",
+      "tooltip": "side"
     },
-    "gravityDirection": {
-      "title": "Ship Gravity Direction",
-      "type": "selector",
-      "value": "Down",
-      "options": [
-        "Down",
-        "Up",
-        "Left",
-        "Right",
-        "Forward",
-        "Back",
-        "Random"
-      ],
-      "tooltip": "Changes the direction of your ship's gravity. If you set this to Random, you may find yourself standing diagonally in the ship."
-    },
+
     "atmosphereAngularDragMultiplier": {
       "title": "Atmosphere Angular Drag Multiplier",
       "type": "number",
@@ -338,58 +380,6 @@
       "value": 0,
       "tooltip": "Controls how violently cyclones should affect your ship."
     },
-    "waterDamage": {
-      "title": "Ship Water Damage",
-      "type": "slider",
-      "min": 0,
-      "max": 1,
-      "value": 0,
-      "tooltip": "Controls how much your ship is damaged by water. Maximum damage blows up your ship if you touch water."
-    },
-    "sandDamage": {
-      "title": "Ship Sand Damage",
-      "type": "slider",
-      "min": 0,
-      "max": 1,
-      "value": 0,
-      "tooltip": "Controls how much your ship is damaged by falling sand. Maximum damage blows up your ship if you touch falling sand."
-    },
-    "prolongDigestion": {
-      "title": "Prolong Digestion",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Makes the digestion of your ship a longer process. You will still die."
-    },
-    "shipExplosionMultiplier": {
-      "title": "Ship Explosion Multiplier",
-      "type": "number",
-      "value": 1,
-      "tooltip": "Larger numbers increase the size of the explosion that is created when your ship blows up."
-    },
-    "moreExplosionDamage": {
-      "title": "Extra Explosion Damage",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Makes explosions apply damage to the ship and to fragments of Brittle Hollow. Also lets you kill anglerfish."
-    },
-    "noiseMultiplier": {
-      "title": "Ship Noise Multiplier",
-      "type": "number",
-      "value": 1,
-      "tooltip": "Larger numbers increase the distance your ship can be heard by noise detectors."
-    },
-    "extraNoise": {
-      "title": "Extra Noise",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Makes noisy parts of the ship like the master alarm detectable by noise detectors."
-    },
-    "reactorLifetimeMultiplier": {
-      "title": "Reactor Lifetime Multiplier",
-      "type": "number",
-      "value": 1,
-      "tooltip": "Larger numbers increase the time it takes for the reactor to blow up the ship. The default time is between 25 and 35 seconds."
-    },
     "shipFriction": {
       "title": "Ship Friction",
       "type": "slider",
@@ -403,6 +393,83 @@
       "type": "number",
       "value": 0,
       "tooltip": "Adjusts how bouncy the ship is. Values above 1 will be less accurate and will no longer affect players."
+    },
+
+    "componentsSplit": {
+      "type": "separator",
+      "title": "Ship Components",
+      "tooltip": "side"
+    },
+
+    "gravityMultiplier": {
+      "title": "Ship Gravity Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers increase the power of the ship's gravity crystal."
+    },
+    "gravityDirection": {
+      "title": "Ship Gravity Direction",
+      "type": "selector",
+      "value": "Down",
+      "options": [
+        "Down",
+        "Up",
+        "Left",
+        "Right",
+        "Forward",
+        "Back",
+        "Random"
+      ],
+      "tooltip": "Changes the direction of your ship's gravity. If you set this to Random, you may find yourself standing diagonally in the ship."
+    },
+    "reactorLifetimeMultiplier": {
+      "title": "Reactor Lifetime Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers increase the time it takes for the reactor to blow up the ship. The default time is between 25 and 35 seconds."
+    },
+    "shipExplosionMultiplier": {
+      "title": "Ship Explosion Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers increase the size of the explosion that is created when your ship blows up."
+    },
+    "moreExplosionDamage": {
+      "title": "Extra Explosion Damage",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Makes explosions apply damage to the ship and to fragments of Brittle Hollow. Also lets you kill anglerfish."
+    },
+    "disableAutoLights": {
+      "title": "Keep Power On",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Keeps all of the ship's electrical components on when you leave the ship instead of turning them off."
+    },
+
+    "adjustMiscSplit": {
+      "type": "separator",
+      "title": "Miscellaneous",
+      "tooltip": "side"
+    },
+
+    "prolongDigestion": {
+      "title": "Prolong Digestion",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Makes the digestion of your ship a longer process. You will still die."
+    },
+    "noiseMultiplier": {
+      "title": "Ship Noise Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers increase the distance your ship can be heard by noise detectors."
+    },
+    "extraNoise": {
+      "title": "Extra Noise",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Makes noisy parts of the ship like the master alarm detectable by noise detectors."
     },
     "shipInputLatency": {
       "title": "Ship Input Latency",
@@ -420,6 +487,12 @@
     "Add Ship Functions": {
       "type": "separator",
       "title": "Add Ship Functions"
+    },
+
+    "addUtilitySplit": {
+      "type": "separator",
+      "title": "Utility",
+      "tooltip": "side"
     },
 
     "shipOxygenRefill": {
@@ -440,12 +513,6 @@
       "value": false,
       "tooltip": "Lets you transfer your jetpack fuel to the ship through the fuel tank to refill it."
     },
-    "enableJetpackRefuelDrain": {
-      "title": "Enable Jetpack Refuel Drain",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Drains the ship's fuel when you refill your jetpack in the ship."
-    },
     "fuelTransferMultiplier": {
       "title": "Fuel Transfer Multiplier",
       "type": "number",
@@ -458,65 +525,27 @@
       "value": false,
       "tooltip": "Automatically closes the hatch when you leave the ship."
     },
-    "extraEjectButtons": {
-      "title": "Extra Eject Buttons",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Adds a few extra eject buttons to the ship."
-    },
     "addShipCurtain": {
       "title": "Interactable Ship Curtain",
       "type": "toggle",
       "value": false,
       "tooltip": "Lets you close the curtain in the ship cabin for some extra privacy in the cockpit."
     },
-    "shipWarpCoreType": {
-      "title": "Ship Warp Core",
-      "type": "selector",
-      "value": "Disabled",
-      "options": [
-        "Disabled",
-        "Enabled",
-        "Component"
-      ],
-      "tooltip": "Attaches a Nomai warp core to the cockpit that can be activated with a button on the ceiling of the cockpit. The Component option makes it a damageable component."
-    },
-    "enableRepairConfirmation": {
-      "title": "Enable Repair Confirmation",
+    "addShipClock": {
+      "title": "Add Ship Clock",
       "type": "toggle",
       "value": false,
-      "tooltip": "Plays a sound when every damaged part of the ship has been repaired."
+      "tooltip": "Adds a clock to the ship cockpit. It uses the standard Hearthian units of time: seconds and minutes."
     },
-    "hotThrusters": {
-      "title": "Hazardous Thrusters",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Makes the ship thruster flames do damage when you stand in them."
+
+    "addComponentsSplit": {
+      "type": "separator",
+      "title": "Ship Components",
+      "tooltip": "side"
     },
-    "rustLevel": {
-      "title": "Cockpit Rust Level",
-      "type": "slider",
-      "value": 0,
-      "min": 0,
-      "max": 1,
-      "tooltip": "Controls how much rust is applied to the ship cockpit. Setting this to max will completely cover the cockpit in rust."
-    },
-    "dirtAccumulationTime": {
-      "title": "Dirt Accumulation Time",
-      "type": "number",
-      "value": 0,
-      "tooltip": "Specifies the time in seconds that it takes for dirt to build up on your cockpit (0 is disabled). Find some water if you want to wash it off."
-    },
-    "maxDirtAccumulation": {
-      "title": "Max Dirt Accumulation",
-      "type": "slider",
-      "value": 0.75,
-      "min": 0,
-      "max": 1,
-      "tooltip": "Controls the max amount of dirt that can accumulate on your cockpit glass."
-    },
+
     "enableScoutLauncherComponent": {
-      "title": "Add Scout Launcher Component",
+      "title": "Make Scout Launcher Component",
       "type": "toggle",
       "value": false,
       "tooltip": "Turns the ship's scout launcher into a fully functioning component. You won't be able to launch or recall your scout from the ship if it's damaged."
@@ -528,7 +557,7 @@
       "tooltip": "Lets you switch to photo mode with the ship's scout launcher."
     },
     "enableSignalscopeComponent": {
-      "title": "Add Signalscope Component",
+      "title": "Make Signalscope Component",
       "type": "toggle",
       "value": false,
       "tooltip": "Turns the ship's signalscope into a fully functioning component. You won't be able to track signals in the ship or hear the ship's signal if the signalscope is damaged."
@@ -539,51 +568,13 @@
       "value": false,
       "tooltip": "Allows you to track your ship with the signalscope on the Outer Wilds Ventures frequency. Slate also mentioned something about sending commands with your signalscope."
     },
-    "shipHornType": {
-      "title": "Ship Horn Variant",
-      "type": "selector",
-      "value": "None",
-      "options": [
-        "None",
-        "Default",
-        "Old",
-        "Train",
-        "Loud",
-        "Short",
-        "Clown",
-        "Annoying"
-      ],
-      "tooltip": "Chooses which sound the ship's horn should make. You can honk by pressing the flashlight button when the signalscope is equipped and isn't damaged."
+
+    "itemsSplit": {
+      "type": "separator",
+      "title": "Items",
+      "tooltip": "side"
     },
-    "addShipClock": {
-      "title": "Add Ship Clock",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Adds a clock to the ship cockpit. It uses the standard Hearthian units of time: seconds and minutes."
-    },
-    "addErnesto": {
-      "title": "Add Ernesto",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Adds Ernesto to the cockpit."
-    },
-    "enableShipItemPlacement": {
-      "title": "Ship Item Placement",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Lets you drop items inside of the ship or on top of the ship."
-    },
-    "repairWrenchType": {
-      "title": "Repair Wrench",
-      "type": "selector",
-      "value": "Disabled",
-      "options": [
-        "Disabled",
-        "Enabled",
-        "Required"
-      ],
-      "tooltip": "Adds a repair wrench to the cockpit."
-    },
+
     "addPortableCampfire": {
       "title": "Add Portable Campfire",
       "type": "toggle",
@@ -601,6 +592,17 @@
       "type": "toggle",
       "value": false,
       "tooltip": "Adds a portable Nomai tractor beam to the ship next to the reactor. Place it on the ground if you need an extra boost in height."
+    },
+    "repairWrenchType": {
+      "title": "Repair Wrench",
+      "type": "selector",
+      "value": "Disabled",
+      "options": [
+        "Disabled",
+        "Enabled",
+        "Required"
+      ],
+      "tooltip": "Adds a repair wrench to the cockpit."
     },
     "addExpeditionFlag": {
       "title": "Add Expedition Flag",
@@ -632,11 +634,41 @@
       "value": false,
       "tooltip": "Lets you remove the gravity crystal from the ship. It can be placed outside the ship on any surface for a portable gravity source."
     },
+    "enableShipItemPlacement": {
+      "title": "Ship Item Placement",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Lets you drop items inside of the ship or on top of the ship."
+    },
     "unlimitedItems": {
       "title": "Unlimited Items",
       "type": "toggle",
       "value": false,
       "tooltip": "Lets you duplicate items inside the ship."
+    },
+
+    "buttonsSplit": {
+      "type": "separator",
+      "title": "Buttons",
+      "tooltip": "side"
+    },
+
+    "extraEjectButtons": {
+      "title": "Extra Eject Buttons",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Adds a few extra eject buttons to the ship."
+    },
+    "shipWarpCoreType": {
+      "title": "Ship Warp Core",
+      "type": "selector",
+      "value": "Disabled",
+      "options": [
+        "Disabled",
+        "Enabled",
+        "Component"
+      ],
+      "tooltip": "Attaches a Nomai warp core to the cockpit that can be activated with a button on the ceiling of the cockpit. The Component option makes it a damageable component."
     },
     "enableGravityLandingGear": {
       "title": "Add Gravity Landing Gear",
@@ -670,7 +702,9 @@
     },
 
     "tempSplit": {
-      "type": "separator"
+      "type": "separator",
+      "title": "Temperature",
+      "tooltip": "side"
     },
 
     "enableShipTemperature": {
@@ -724,7 +758,9 @@
     },
 
     "waterSplit": {
-      "type": "separator"
+      "type": "separator",
+      "title": "Water",
+      "tooltip": "side"
     },
 
     "addWaterTank": {
@@ -744,6 +780,63 @@
       "type": "toggle",
       "value": false,
       "tooltip": "Adds a lever next to the ship log that turns on water cooling, which will consume water to prevent your ship from getting hot. (This doesn't do anything if temperature isn't enabled)"
+    },
+
+    "addMiscSplit": {
+      "type": "separator",
+      "title": "Miscellaneous",
+      "tooltip": "side"
+    },
+
+    "hotThrusters": {
+      "title": "Hazardous Thrusters",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Makes the ship thruster flames do damage when you stand in them."
+    },
+    "shipHornType": {
+      "title": "Ship Horn Variant",
+      "type": "selector",
+      "value": "None",
+      "options": [
+        "None",
+        "Default",
+        "Old",
+        "Train",
+        "Loud",
+        "Short",
+        "Clown",
+        "Annoying"
+      ],
+      "tooltip": "Chooses which sound the ship's horn should make. You can honk by pressing the flashlight button when the signalscope is equipped and isn't damaged."
+    },
+    "rustLevel": {
+      "title": "Cockpit Rust Level",
+      "type": "slider",
+      "value": 0,
+      "min": 0,
+      "max": 1,
+      "tooltip": "Controls how much rust is applied to the ship cockpit. Setting this to max will completely cover the cockpit in rust."
+    },
+    "dirtAccumulationTime": {
+      "title": "Dirt Accumulation Time",
+      "type": "number",
+      "value": 0,
+      "tooltip": "Specifies the time in seconds that it takes for dirt to build up on your cockpit (0 is disabled). Find some water if you want to wash it off."
+    },
+    "maxDirtAccumulation": {
+      "title": "Max Dirt Accumulation",
+      "type": "slider",
+      "value": 0.75,
+      "min": 0,
+      "max": 1,
+      "tooltip": "Controls the max amount of dirt that can accumulate on your cockpit glass."
+    },
+    "addErnesto": {
+      "title": "Add Ernesto",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Adds Ernesto to the cockpit."
     },
 
     "Decoration": {
@@ -1233,11 +1326,11 @@
       "title": "Quality of Life"
     },
 
-    "keepHelmetOn": {
-      "title": "Keep Helmet On",
+    "enableRepairConfirmation": {
+      "title": "Enable Repair Confirmation",
       "type": "toggle",
-      "value": true,
-      "tooltip": "Prevents the game from automatically removing your helmet if there isn't oxygen present."
+      "value": false,
+      "tooltip": "Plays a sound when every damaged part of the ship has been repaired."
     },
     "showWarningNotifications": {
       "title": "Show Warning Notifications",
@@ -1245,11 +1338,17 @@
       "value": true,
       "tooltip": "Notifies you in the ship when resources are low or when the outside conditions are becoming dangerous."
     },
-    "shipGravityFix": {
-      "title": "Fix Ship Gravity",
+    "buttonsRequireFlightChair": {
+      "title": "Buttons Require Flight Chair",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Only lets you use buttons in the cockpit while you're sitting in the flight chair."
+    },
+    "alwaysAllowLockOn": {
+      "title": "Always Allow Map Lock-on",
       "type": "toggle",
       "value": true,
-      "tooltip": "Lets you walk around your ship normally when in high-gravity areas, like near the sun."
+      "tooltip": "Lets you lock onto targets in the map view at any time."
     },
     "splitLockOn": {
       "title": "Split Ship Lock-on",
@@ -1257,23 +1356,23 @@
       "value": false,
       "tooltip": "Separates the player lock-on target and the ship lock-on target."
     },
-    "alwaysAllowLockOn": {
-      "title": "Always Allow Map Lock-on",
+    "keepHelmetOn": {
+      "title": "Keep Helmet On",
       "type": "toggle",
       "value": true,
-      "tooltip": "Let's you lock onto targets in the map view at any time."
+      "tooltip": "Prevents the game from automatically removing your helmet if there isn't oxygen present."
+    },
+    "shipGravityFix": {
+      "title": "Fix Ship Gravity",
+      "type": "toggle",
+      "value": true,
+      "tooltip": "Lets you walk around your ship normally when in high-gravity areas, like near the sun."
     },
     "fixShipThrustIndicator": {
       "title": "Fix Ship Thrust Indicator",
       "type": "toggle",
       "value": true,
       "tooltip": "Fixes a bug where the ship's thrust indicator would turn off when you left the console."
-    },
-    "buttonsRequireFlightChair": {
-      "title": "Buttons Require Flight Chair",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Only lets you use buttons in the cockpit while you're sitting in the flight chair."
     }
   }
 }

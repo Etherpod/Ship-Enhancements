@@ -3279,9 +3279,21 @@ public class ShipEnhancements : ModBehaviour
                 case SettingType.SEPARATOR:
                     if (settingObject["title"] != null)
                     {
-                        OptionsMenuManager.AddSeparator(newModTab, true);
-                        OptionsMenuManager.CreateLabel(newModTab, label);
-                        OptionsMenuManager.AddSeparator(newModTab, false);
+                        if (settingObject["title"].ToString() == "line")
+                        {
+                            OptionsMenuManager.AddSeparator(newModTab, true);
+                        }
+                        else if (settingObject["tooltip"] != null
+                            && settingObject["tooltip"].ToString() == "side")
+                        {
+                            CreateSideLabel(newModTab, settingObject["title"].ToString());
+                        }
+                        else
+                        {
+                            OptionsMenuManager.AddSeparator(newModTab, true);
+                            OptionsMenuManager.CreateLabel(newModTab, label);
+                            //OptionsMenuManager.AddSeparator(newModTab, false);
+                        }
                     }
                     else
                     {
@@ -3433,6 +3445,60 @@ public class ShipEnhancements : ModBehaviour
         {
             _detectValueChanged = true;
         }, 5);
+    }
+
+    private void CreateSideLabel(Menu menu, string label)
+    {
+        var newObj = new GameObject("Label");
+
+        var layoutElement = newObj.AddComponent<LayoutElement>();
+        layoutElement.flexibleWidth = 1;
+
+        var verticalLayout = newObj.AddComponent<VerticalLayoutGroup>();
+        verticalLayout.padding = new RectOffset(20, 180, 0, 0);
+        verticalLayout.spacing = 0;
+        verticalLayout.childAlignment = TextAnchor.MiddleLeft;
+        verticalLayout.childForceExpandHeight = false;
+        verticalLayout.childForceExpandWidth = false;
+        verticalLayout.childControlHeight = true;
+        verticalLayout.childControlWidth = true;
+        verticalLayout.childScaleHeight = false;
+        verticalLayout.childScaleWidth = false;
+
+        var textObj = new GameObject("Text");
+
+        var text = textObj.AddComponent<Text>();
+        text.text = label;
+        text.font = Resources.Load<Font>("fonts/english - latin/Adobe - SerifGothicStd");
+        text.fontSize = 36;
+        text.alignment = TextAnchor.MiddleLeft;
+        text.horizontalOverflow = HorizontalWrapMode.Wrap;
+        text.verticalOverflow = VerticalWrapMode.Truncate;
+
+        var textLayoutElement = textObj.AddComponent<LayoutElement>();
+        textLayoutElement.minHeight = 70;
+
+        textObj.transform.parent = newObj.transform;
+        textObj.transform.localScale = Vector3.one;
+        textObj.transform.localPosition = Vector3.zero;
+        textObj.transform.localRotation = Quaternion.identity;
+
+        var parent = menu.transform;
+
+        if (menu.transform.Find("Scroll View") != null)
+        {
+            parent = menu.transform.Find("Scroll View").Find("Viewport").Find("Content");
+        }
+
+        if (menu.transform.Find("Content") != null)
+        {
+            parent = menu.transform.Find("Content");
+        }
+
+        newObj.transform.parent = parent;
+        newObj.transform.localScale = Vector3.one;
+        newObj.transform.localPosition = Vector3.zero;
+        newObj.transform.localRotation = Quaternion.identity;
     }
 
     private bool DestroyExistingSettings(Menu menu, Transform parent, string startSetting, string endSetting, out int insertionIndex)
