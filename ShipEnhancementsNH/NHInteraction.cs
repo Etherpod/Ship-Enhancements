@@ -14,7 +14,7 @@ public class NHInteraction : MonoBehaviour, INHInteraction
     private void Start()
     {
         ShipEnhancements.ShipEnhancements.Instance.AssignNHInterface(this);
-        Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
+        new Harmony("Etherpod.ShipEnhancementsNH").PatchAll(Assembly.GetExecutingAssembly());
     }
 
     public void AddTempZoneToNHSuns(GameObject tempZonePrefab)

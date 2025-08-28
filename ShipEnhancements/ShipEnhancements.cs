@@ -55,9 +55,9 @@ public class ShipEnhancements : ModBehaviour
     public static IQSBAPI QSBAPI;
     public static QSBCompatibility QSBCompat;
     public static IQSBInteraction QSBInteraction;
-
     public static INewHorizons NHAPI;
     public static INHInteraction NHInteraction;
+    public static IGEInteraction GEInteraction;
     public static ThemeManager ThemeManager;
     public static ExperimentalSettingsJson ExperimentalSettings;
 
@@ -372,7 +372,7 @@ public class ShipEnhancements : ModBehaviour
     private void Awake()
     {
         Instance = this;
-        HarmonyLib.Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
+        new HarmonyLib.Harmony("Etherpod.ShipEnhancements").PatchAll(Assembly.GetExecutingAssembly());
     }
 
     private void Start()
@@ -383,6 +383,7 @@ public class ShipEnhancements : ModBehaviour
         InitializeAchievements();
         InitializeQSB();
         InitializeNH();
+        InitializeGE();
         VanillaFixEnabled = ModHelper.Interaction.ModExists("JohnCorby.VanillaFix");
         ErnestoModListHandler.Initialize();
         SettingsPresets.InitializePresets();
@@ -1012,6 +1013,21 @@ public class ShipEnhancements : ModBehaviour
     public void AssignNHInterface(INHInteraction nhInterface)
     {
         NHInteraction = nhInterface;
+    }
+
+    private void InitializeGE()
+    {
+        bool geEnabled = ModHelper.Interaction.ModExists("SBtT.GeneralEnhancements");
+        if (geEnabled)
+        {
+            var geAssembly = Assembly.LoadFrom(Path.Combine(ModHelper.Manifest.ModFolderPath, "ShipEnhancementsGE.dll"));
+            gameObject.AddComponent(geAssembly.GetType("ShipEnhancementsGE.GEInteraction", true));
+        }
+    }
+
+    public void AssignGEInterface(IGEInteraction geInterface)
+    {
+        GEInteraction = geInterface;
     }
 
     private void InitializeShip()

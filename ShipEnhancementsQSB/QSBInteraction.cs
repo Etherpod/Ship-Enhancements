@@ -35,7 +35,7 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
     private void Start()
     {
         ShipEnhancements.ShipEnhancements.Instance.AssignQSBInterface(this);
-        Harmony.CreateAndPatchAll(Assembly.GetExecutingAssembly());
+        new Harmony("Etherpod.ShipEnhancementsQSB").PatchAll(Assembly.GetExecutingAssembly());
 
         LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
         {

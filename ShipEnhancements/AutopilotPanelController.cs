@@ -151,6 +151,7 @@ public class AutopilotPanelController : MonoBehaviour
         {
             _orbitAutopilotButton.SetActive(true);
         }
+
         if (IsHoldInputSelected())
         {
             _persistentInput.SetInputEnabled(false);
@@ -158,6 +159,14 @@ public class AutopilotPanelController : MonoBehaviour
         if (IsHoldPositionSelected())
         {
             _holdPositionButton.SetActive(false);
+        }
+        if (IsMatchVelocitySelected())
+        {
+            _matchVelocityButton.SetActive(false);
+            if (ShipEnhancements.GEInteraction != null)
+            {
+                ShipEnhancements.GEInteraction.StopContinuousMatchVelocity();
+            }
         }
     }
 
@@ -276,6 +285,12 @@ public class AutopilotPanelController : MonoBehaviour
 
     public void CancelMatchVelocity()
     {
+        if (IsMatchVelocitySelected() && ShipEnhancements.GEInteraction != null 
+            && ShipEnhancements.GEInteraction.IsContinuousMatchVelocityEnabled())
+        {
+            return;
+        }
+
         if (_activeMatch.IsActivated())
         {
             _activeMatch.SetActive(false);

@@ -4327,68 +4327,53 @@ public static class PatchClass
                 }
             }
         }
+        // cancel if left flight chair
         if (!OWInput.IsInputMode(InputMode.ShipCockpit | InputMode.LandingCam))
         {
-            if (/*__instance._autopilot.IsMatchingVelocity() && !__instance._autopilot.IsFlyingToDestination()*/true)
-            {
-                SELocator.GetAutopilotPanelController().CancelMatchVelocity();
-                //__instance._autopilot.StopMatchVelocity();
-                SendAutopilotState(stopMatch: true);
-            }
+            SELocator.GetAutopilotPanelController().CancelMatchVelocity();
+            SendAutopilotState(stopMatch: true);
             return false;
         }
         __instance.UpdateShipLightInput();
+        // abort autopilot
         if (__instance._autopilot.IsFlyingToDestination() || __instance._autopilot.GetComponent<PidAutopilot>().enabled)
         {
             if (OWInput.IsNewlyPressed(InputLibrary.autopilot, InputMode.All))
             {
                 SELocator.GetAutopilotPanelController().CancelAutopilot();
-                //__instance.AbortAutopilot();
                 SendAutopilotState(abort: true);
             }
             if (OWInput.IsNewlyPressed(InputLibrary.matchVelocity, InputMode.All))
             {
                 SELocator.GetAutopilotPanelController().CancelMatchVelocity();
-                //__instance.AbortAutopilot();
                 SendAutopilotState(stopMatch: true);
             }
         }
         else
         {
-            if (/*__instance.IsAutopilotAvailable() && */__instance._playerAtFlightConsole && !__instance._shipSystemFailure
+            // start autopilot
+            if (__instance._playerAtFlightConsole && !__instance._shipSystemFailure
                 && OWInput.IsNewlyPressed(InputLibrary.autopilot, InputMode.ShipCockpit))
             {
                 InputLibrary.lockOn.BlockNextRelease();
 
                 SELocator.GetAutopilotPanelController().ActivateAutopilot();
-                //__instance._autopilot.FlyToDestination(Locator.GetReferenceFrame(true));
                 SendAutopilotState(SELocator.GetReferenceFrame()?.GetOWRigidBody(), destination: true);
             }
-            if (/*__instance.IsMatchVelocityAvailable(false) && */__instance._playerAtFlightConsole && !__instance._shipSystemFailure
+            // start velocity match
+            if (__instance._playerAtFlightConsole && !__instance._shipSystemFailure
                 && OWInput.IsNewlyPressed(InputLibrary.matchVelocity, InputMode.All))
             {
                 SELocator.GetAutopilotPanelController().ActivateMatchVelocity();
-                //__instance._autopilot.StartMatchVelocity(Locator.GetReferenceFrame(false), false);
                 SendAutopilotState(SELocator.GetReferenceFrame(ignorePassiveFrame: false)?.GetOWRigidBody(), startMatch: true);
             }
-            else if (/*__instance._autopilot.IsMatchingVelocity() && !__instance._autopilot.IsFlyingToDestination() && */OWInput.IsNewlyReleased(InputLibrary.matchVelocity, InputMode.All))
+            // stop velocity match
+            else if (OWInput.IsNewlyReleased(InputLibrary.matchVelocity, InputMode.All)
+                && (ShipEnhancements.GEInteraction == null || !ShipEnhancements.GEInteraction.IsContinuousMatchVelocityEnabled()))
             {
                 SELocator.GetAutopilotPanelController().CancelMatchVelocity();
-                //__instance._autopilot.StopMatchVelocity();
                 SendAutopilotState(stopMatch: true);
             }
-/*            if (!__instance._enteringLandingCam)
-            {
-                if (!__instance.UsingLandingCam() && OWInput.IsNewlyPressed(InputLibrary.landingCamera, InputMode.All) && !OWInput.IsPressed(InputLibrary.freeLook, 0f))
-                {
-                    __instance.EnterLandingView();
-                }
-                else if (__instance.UsingLandingCam() && (OWInput.IsNewlyPressed(InputLibrary.landingCamera, InputMode.All) || OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.All)))
-                {
-                    InputLibrary.cancel.ConsumeInput();
-                    __instance.ExitLandingView();
-                }
-            }*/
         }
         if (!__instance._enteringLandingCam)
         {
