@@ -63,6 +63,7 @@ public class QSBCompatibility
         _api.RegisterHandler<(float, bool)>("ship-fuel-drain", ReceiveShipFuelDrain);
         _api.RegisterHandler<float>("set-ship-oxygen", ReceiveShipOxygenValue);
         _api.RegisterHandler<float>("set-ship-fuel", ReceiveShipFuelValue);
+        _api.RegisterHandler<float>("set-ship-water", ReceiveShipWaterValue);
         _api.RegisterHandler<bool>("panel-state", ReceivePanelExtended);
         _api.RegisterHandler<(int, bool)>("modulator-button-state", ReceiveModulatorButtonState);
         _api.RegisterHandler<(bool, bool, bool)>("overdrive-button-state", ReceiveOverdriveButtonState);
@@ -101,6 +102,11 @@ public class QSBCompatibility
         _api.RegisterHandler<(int, bool, bool, bool, bool)>("autopilot-state", ReceiveAutopilotState);
         _api.RegisterHandler<(bool, bool, bool)>("pid-autopilot-state", ReceivePidAutopilotState);
         _api.RegisterHandler<NoData>("honk-horn", ReceiveHonkHorn);
+        _api.RegisterHandler<(int, int)>("pump-type", ReceivePumpType);
+        _api.RegisterHandler<(int, bool)>("pump-powered", ReceivePumpPowered);
+        _api.RegisterHandler<(int, bool)>("pump-mode", ReceivePumpMode);
+        _api.RegisterHandler<bool>("water-cooling", ReceiveWaterCoolingState);
+        _api.RegisterHandler<bool>("reactor-overload", ReceiveReactorOverload);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -449,6 +455,16 @@ public class QSBCompatibility
     private void ReceiveShipFuelValue(uint id, float newValue)
     {
         SELocator.GetShipResources()?.SetFuel(newValue);
+    }
+
+    public void SendShipWaterValue(uint id, float newValue)
+    {
+        _api.SendMessage("set-ship-water", newValue, id, false);
+    }
+
+    private void ReceiveShipWaterValue(uint id, float newValue)
+    {
+        SELocator.GetShipWaterResource()?.SetWater(newValue);
     }
 
     public void SendShipFuelMax(uint id)
@@ -1100,6 +1116,74 @@ public class QSBCompatibility
     private void ReceiveHonkHorn(uint id, NoData noData)
     {
         SELocator.GetShipTransform().GetComponentInChildren<ShipHornController>()?.PlayHorn();
+    }
+    #endregion
+
+    #region ResourcePump
+    public void SendPumpType(uint id, OWItem item, int typeIndex)
+    {
+        _api.SendMessage("pump-type", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), typeIndex), id, false);
+    }
+
+    private void ReceivePumpType(uint from, (int itemID, int typeIndex) data)
+    {
+        OWItem item = ShipEnhancements.QSBInteraction.GetItemFromID(data.itemID);
+        if (item == null) return;
+
+        ResourcePump pump = item as ResourcePump;
+        pump.UpdateTypeRemote(data.typeIndex);
+    }
+
+    public void SendPumpPowered(uint id, OWItem item, bool powered)
+    {
+        _api.SendMessage("pump-powered", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), powered), id, false);
+    }
+
+    private void ReceivePumpPowered(uint from, (int itemID, bool powered) data)
+    {
+        OWItem item = ShipEnhancements.QSBInteraction.GetItemFromID(data.itemID);
+        if (item == null) return;
+
+        ResourcePump pump = item as ResourcePump;
+        pump.UpdatePoweredRemote(data.powered);
+    }
+
+    public void SendPumpMode(uint id, OWItem item, bool output)
+    {
+        _api.SendMessage("pump-mode", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), output), id, false);
+    }
+
+    private void ReceivePumpMode(uint from, (int itemID, bool output) data)
+    {
+        OWItem item = ShipEnhancements.QSBInteraction.GetItemFromID(data.itemID);
+        if (item == null) return;
+
+        ResourcePump pump = item as ResourcePump;
+        pump.UpdateModeRemote(data.output);
+    }
+    #endregion
+
+    #region WaterCooling
+    public void SendWaterCoolingState(uint id, bool state)
+    {
+        _api.SendMessage("water-cooling", state, id, false);
+    }
+
+    private void ReceiveWaterCoolingState(uint from, bool state)
+    {
+        SELocator.GetShipBody().GetComponentInChildren<WaterCoolingLever>()?.OnPressInteractRemote(state);
+    }
+    #endregion
+
+    #region ReactorOverload
+    public void SendReactorOverload(uint id, bool overload)
+    {
+        _api.SendMessage("reactor-overload", overload, id, false);
+    }
+
+    private void ReceiveReactorOverload(uint from, bool overload)
+    {
+        GameObject.FindObjectOfType<ReactorOverloader>().SetOverloadedRemote(overload);
     }
     #endregion
 }

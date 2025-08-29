@@ -188,7 +188,7 @@ public class ResourcePump : OWItem
         {
             _powered = !_powered;
             _powerPrompt.SetText(_powered ? "Toggle Power (On)" : "Toggle Power (Off)");
-            UpdatePowered();
+            UpdatePowered(sendMessage: true);
         }
         else if (_lastFocused)
         {
@@ -204,7 +204,7 @@ public class ResourcePump : OWItem
                 }
                 _switchTypePrompt.SetText($"Switch Type ({nextType})");
                 _playerExternalSource.PlayOneShot(AudioType.Menu_UpDown, 0.5f);
-                UpdateType(nextType);
+                UpdateType(nextType, sendMessage: true);
             }
 
             bool pressedDown = OWInput.IsNewlyPressed(InputLibrary.toolOptionDown, InputMode.Character);
@@ -214,14 +214,22 @@ public class ResourcePump : OWItem
                 _isOutput = !_isOutput;
                 _switchModePrompt.SetText($"Switch Mode ({(_isOutput ? "Output" : "Input")})");
                 _outputDisplayRenderer.SetMaterialProperty(_outputPropID, _isOutput ? 1f : 0f);
-                UpdatePowered();
+
+                if (ShipEnhancements.InMultiplayer)
+                {
+                    foreach (var id in ShipEnhancements.PlayerIDs)
+                    {
+                        ShipEnhancements.QSBCompat.SendPumpMode(id, this, _isOutput);
+                    }
+                }
+                UpdatePowered(sendMessage: true);
             }
 
             if (OWInput.IsNewlyPressed(InputLibrary.interactSecondary, InputMode.Character))
             {
                 _powered = !_powered;
                 _powerPrompt.SetText(_powered ? "Toggle Power (On)" : "Toggle Power (Off)");
-                UpdatePowered();
+                UpdatePowered(sendMessage: true);
             }
         }
 
@@ -333,7 +341,7 @@ public class ResourcePump : OWItem
         {
             UpdateGeyserLoopingAudioPosition();
         }
-        if (_flameActive)
+        if (_flameActive && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
         {
             var body = gameObject.GetAttachedOWRigidbody();
             var toCom = transform.position - body.GetWorldCenterOfMass();
@@ -397,7 +405,7 @@ public class ResourcePump : OWItem
         _geyserLoopSource.transform.localPosition = new Vector3(0f, num2, 0f);
     }
 
-    private void UpdateType(ResourceType nextType)
+    private void UpdateType(ResourceType nextType, bool sendMessage = false)
     {
         _framesUntilCollisionCheck = _collisionCheckInterval;
         UpdateWaterVolumes();
@@ -407,6 +415,15 @@ public class ResourcePump : OWItem
         {
             _currentType = nextType;
             _typeDisplayRenderer.SetMaterialProperty(_typeIndexPropID, _currentTypeIndex);
+
+            if (sendMessage && ShipEnhancements.InMultiplayer)
+            {
+                foreach (var id in ShipEnhancements.PlayerIDs)
+                {
+                    ShipEnhancements.QSBCompat.SendPumpType(id, this, _currentTypeIndex);
+                }
+            }
+
             return;
         }
 
@@ -552,14 +569,52 @@ public class ResourcePump : OWItem
 
         _currentType = nextType;
         _typeDisplayRenderer.SetMaterialProperty(_typeIndexPropID, _currentTypeIndex);
+
+        if (sendMessage && ShipEnhancements.InMultiplayer)
+        {
+            foreach (var id in ShipEnhancements.PlayerIDs)
+            {
+                ShipEnhancements.QSBCompat.SendPumpType(id, this, _currentTypeIndex);
+            }
+        }
     }
 
-    private void UpdatePowered()
+    public void UpdateTypeRemote(int typeIndex)
     {
-        UpdatePowered(_powered && _inSignalRange && _dropped);
+        ShipEnhancements.WriteDebugMessage("Switching to " + typeIndex);
+        _currentTypeIndex = (typeIndex + 3) % 3;
+        var nextType = (Enum.GetValues(typeof(ResourceType)) as ResourceType[])[_currentTypeIndex];
+        ShipEnhancements.WriteDebugMessage("Next: " + nextType);
+        if (nextType == ResourceType.Water && !(bool)addWaterTank.GetProperty())
+        {
+            _currentTypeIndex = (_currentTypeIndex + 4) % 3;
+            nextType = (Enum.GetValues(typeof(ResourceType)) as ResourceType[])[_currentTypeIndex];
+        }
+        _switchTypePrompt.SetText($"Switch Type ({nextType})");
+        UpdateType(nextType);
     }
 
-    private void UpdatePowered(bool powered)
+    public void UpdateModeRemote(bool isOutput)
+    {
+        _isOutput = isOutput;
+        _switchModePrompt.SetText($"Switch Mode ({(_isOutput ? "Output" : "Input")})");
+        _outputDisplayRenderer.SetMaterialProperty(_outputPropID, _isOutput ? 1f : 0f);
+        UpdatePowered();
+    }
+
+    private void UpdatePowered(bool sendMessage = false)
+    {
+        UpdatePowered(_powered && _inSignalRange && _dropped, sendMessage);
+    }
+
+    public void UpdatePoweredRemote(bool powered)
+    {
+        _powered = powered;
+        _powerPrompt.SetText(_powered ? "Toggle Power (On)" : "Toggle Power (Off)");
+        UpdatePowered(powered, sendMessage: false);
+    }
+
+    private void UpdatePowered(bool powered, bool sendMessage = false)
     {
         if (_powered && _dropped && !_inSignalRange && !_alarmSource.isPlaying)
         {
@@ -701,6 +756,14 @@ public class ResourcePump : OWItem
                 _waterInputSource.FadeOut(0.2f, OWAudioSource.FadeOutCompleteAction.PAUSE);
                 _waterDryInputSource.FadeOut(0.2f, OWAudioSource.FadeOutCompleteAction.PAUSE);
                 _waterInputParticles.Stop();
+            }
+        }
+
+        if (sendMessage && ShipEnhancements.InMultiplayer)
+        {
+            foreach (var id in ShipEnhancements.PlayerIDs)
+            {
+                ShipEnhancements.QSBCompat.SendPumpPowered(id, this, powered);
             }
         }
     }
@@ -862,7 +925,7 @@ public class ResourcePump : OWItem
 
     public override void PickUpItem(Transform holdTranform)
     {
-        UpdatePowered(false);
+        UpdatePowered(false, sendMessage: false);
         base.PickUpItem(holdTranform);
         if (_dropped)
         {

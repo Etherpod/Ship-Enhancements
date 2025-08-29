@@ -80,6 +80,35 @@ public class WaterCoolingLever : MonoBehaviour
             _leverSource.PlayOneShot(_offAudio);
             _loopSource.FadeOut(1f);
         }
+
+        if (ShipEnhancements.InMultiplayer)
+        {
+            foreach (var id in ShipEnhancements.PlayerIDs)
+            {
+                ShipEnhancements.QSBCompat.SendWaterCoolingState(id, _active);
+            }
+        }
+    }
+
+    public void OnPressInteractRemote(bool state)
+    {
+        _active = state;
+        _startAngle = transform.localEulerAngles.x;
+        _targetAngle = _active ? _enabledAngle : _disabledAngle;
+        _moveStartTime = Time.time;
+        _interactReceiver.DisableInteraction();
+        enabled = true;
+
+        if (_active)
+        {
+            _leverSource.PlayOneShot(_onAudio);
+            _loopSource.FadeIn(2f);
+        }
+        else
+        {
+            _leverSource.PlayOneShot(_offAudio);
+            _loopSource.FadeOut(1f);
+        }
     }
 
     private void OnShipSystemFailure()

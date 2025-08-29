@@ -25,6 +25,7 @@ public class ReactorOverloader : MonoBehaviour
     {
         if (_focused)
         {
+            bool was = _overloaded;
             if (!_overloaded && OWInput.IsPressed(InputLibrary.interact, InputMode.Character, 1f))
             {
                 _interactReceiver.ChangePrompt("Reset Reactor");
@@ -38,6 +39,14 @@ public class ReactorOverloader : MonoBehaviour
                 _reactorHeat.SetOverloadHeat(0f);
                 _overloaded = false;
             }
+
+            if (was != _overloaded && ShipEnhancements.InMultiplayer)
+            {
+                foreach (uint id in ShipEnhancements.PlayerIDs)
+                {
+                    ShipEnhancements.QSBCompat.SendReactorOverload(id, _overloaded);
+                }
+            }
         }
 
         if (_overloaded)
@@ -46,6 +55,22 @@ public class ReactorOverloader : MonoBehaviour
             float diffLerp = (float)ShipEnhancements.Settings.temperatureDifficulty.GetProperty();
             float heat = Mathf.Lerp(0f, 0.8f, tempLerp * diffLerp);
             _reactorHeat.SetOverloadHeat(heat);
+        }
+    }
+
+    public void SetOverloadedRemote(bool overloaded)
+    {
+        _overloaded = overloaded;
+        if (_overloaded)
+        {
+            _interactReceiver.ChangePrompt("Reset Reactor");
+            _interactReceiver.ResetInteraction();
+        }
+        else
+        {
+            _interactReceiver.ChangePrompt(UITextLibrary.GetString(UITextType.HoldPrompt) + " Overload Reactor");
+            _interactReceiver.ResetInteraction();
+            _reactorHeat.SetOverloadHeat(0f);
         }
     }
 

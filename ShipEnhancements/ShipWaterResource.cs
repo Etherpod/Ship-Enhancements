@@ -70,6 +70,11 @@ public class ShipWaterResource : MonoBehaviour
         _currentWater = Mathf.Min(_currentWater + amount, _maxWater);
     }
 
+    public void SetWater(float water)
+    {
+        _currentWater = Mathf.Clamp(water, 0f, _maxWater);
+    }
+
     private void OnSetCoolingActive(bool active)
     {
         _coolingActive = active;
