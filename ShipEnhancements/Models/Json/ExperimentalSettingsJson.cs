@@ -15,6 +15,7 @@ public record ExperimentalSettingsJson(
     [JsonProperty] float TractorBeam_SpeedMultiplier,
     [JsonProperty] float Tether_MaxLength,
     [JsonProperty] float Tether_ReelMultiplier,
+    [JsonProperty] float ThrustModulator_OverdriveStrength,
     [JsonProperty] float Eject_SpeedMultiplier,
     [JsonProperty] bool RealisticClock,
     [JsonProperty] bool MakeWaterDamageEverythingDamage,

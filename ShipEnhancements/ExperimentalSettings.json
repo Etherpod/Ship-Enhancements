@@ -35,6 +35,9 @@
   // Big numbers make the tether reel in/out faster
   "Tether_ReelMultiplier": 1.0,
 
+  // Changes how fast the Thrust Modulator's overdrive makes you go
+  "ThrustModulator_OverdriveStrength": 500.0,
+
   // Big numbers make the ship parts fly further when you eject them
   "Eject_SpeedMultiplier": 1.0,
 

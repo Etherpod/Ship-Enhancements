@@ -40,6 +40,7 @@ public class ShipOverdriveController : ElectricalComponent
     private bool _onResetTimer = false;
     private bool _fuelDepleted = false;
     private bool _thrustersUsable = true;
+    private float _overdriveStrength;
 
     public bool Charging { get { return _charging; } }
     public bool OnCooldown { get { return _onCooldown; } }
@@ -62,6 +63,7 @@ public class ShipOverdriveController : ElectricalComponent
         _buttonPanel = GetComponentInParent<CockpitButtonPanel>();
         _reactor = SELocator.GetShipDamageController()._shipReactorComponent;
         _modulatorController = GetComponent<ThrustModulatorController>();
+        _overdriveStrength = ShipEnhancements.ExperimentalSettings?.ThrustModulator_OverdriveStrength ?? 500f;
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
 
         _electricalSystem = SELocator.GetShipTransform()
@@ -202,7 +204,7 @@ public class ShipOverdriveController : ElectricalComponent
 
         if (host)
         {
-            SELocator.GetShipBody().AddImpulse(SELocator.GetShipTransform().forward * 500f);
+            SELocator.GetShipBody().AddImpulse(SELocator.GetShipTransform().forward * _overdriveStrength);
             SELocator.GetShipResources().DrainFuel(150f);
             ShipElectricalComponent electrical = SELocator.GetShipDamageController()._shipElectricalComponent;
             electrical._electricalSystem.Disrupt(electrical._disruptionLength);
