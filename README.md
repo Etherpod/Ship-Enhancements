@@ -240,9 +240,7 @@ To use the API, copy the **IShipEnhancements** script from this mod's GitHub rep
 ## Known Bugs
 - When playing in multiplayer and using Input Latency, the delayed inputs of the non-hosts will not work once they leave the flight console
 - If you attach yourself to an object with a tether and the object enters a black hole, there is a chance you will be violently thrown across the solar system
-- The Portable Campfire can be lit inside the core of Giant's Deep
 - Reeling in towards a tether hook on the other side of a wall will sometimes produce unintended side effects
-- The Expedition Flag's map marker may not be visible when using the advanced minimap from General Enhancements
 
 # Credits
 Big thanks to **ditzy** for all of their help! There's so much I have to put it in a list:

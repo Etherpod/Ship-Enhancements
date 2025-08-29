@@ -120,6 +120,9 @@ public class ResourcePump : OWItem
 
     private List<PlayerRecoveryPoint> _activeRecoveryPoints = [];
     private List<ParticleSystem> _activeTransferParticles = [];
+    private List<FluidVolume> _waterVolumes = [];
+    private int _collisionCheckInterval = 30;
+    private int _framesUntilCollisionCheck;
 
     public enum ResourceType
     {
@@ -354,6 +357,20 @@ public class ResourcePump : OWItem
                 body._kinematicRigidbody.AddTorque(torqueVec * torqueStrength);
             }
         }
+        if (_powered && !_isOutput && _inSignalRange
+            && _currentType is ResourceType.Fuel or ResourceType.Water)
+        {
+            if (_framesUntilCollisionCheck <= 0)
+            {
+                UpdateFuelSources();
+                UpdateWaterVolumes();
+                _framesUntilCollisionCheck = _collisionCheckInterval;
+            }
+            else
+            {
+                _framesUntilCollisionCheck--;
+            }
+        }
     }
 
     private void UpdatePromptVisibility()
@@ -382,6 +399,10 @@ public class ResourcePump : OWItem
 
     private void UpdateType(ResourceType nextType)
     {
+        _framesUntilCollisionCheck = _collisionCheckInterval;
+        UpdateWaterVolumes();
+        UpdateFuelSources();
+
         if (!_powered || !_inSignalRange || nextType == _currentType)
         {
             _currentType = nextType;
@@ -540,8 +561,6 @@ public class ResourcePump : OWItem
 
     private void UpdatePowered(bool powered)
     {
-        UpdateFuelSources();
-
         if (_powered && _dropped && !_inSignalRange && !_alarmSource.isPlaying)
         {
             _alarmSource.Play();
@@ -550,6 +569,10 @@ public class ResourcePump : OWItem
         {
             _alarmSource.Stop();
         }
+
+        _framesUntilCollisionCheck = _collisionCheckInterval;
+        UpdateWaterVolumes();
+        UpdateFuelSources();
 
         if (_currentType == ResourceType.Fuel)
         {
@@ -777,6 +800,23 @@ public class ResourcePump : OWItem
         }
     }
 
+    private void UpdateWaterVolumes()
+    {
+        _waterVolumes.Clear();
+
+        Collider[] cols = Physics.OverlapSphere(_fluidDetector.transform.position, 0.6f, OWLayerMask.effectVolumeMask);
+        if (cols.Length > 0)
+        {
+            foreach (var col in cols)
+            {
+                if (col.TryGetComponent(out FluidVolume vol) && vol.GetFluidType() is FluidVolume.Type.WATER or FluidVolume.Type.GEYSER)
+                {
+                    _waterVolumes.Add(vol);
+                }
+            }
+        }
+    }
+
     private void OnResourceDepleted(string resource)
     {
         if ((resource == "fuel" && _currentType == ResourceType.Fuel)
@@ -817,7 +857,6 @@ public class ResourcePump : OWItem
             transform.localPosition += transform.localRotation * r * _inputDropOffset;
         }
         transform.localScale = Vector3.one;
-        //UpdateFuelSources();
         UpdatePowered();
     }
 
@@ -855,8 +894,13 @@ public class ResourcePump : OWItem
 
     public bool IsInWater()
     {
-        if (_fluidDetector._activeVolumes == null) return false;
-        return _fluidDetector.InFluidType(FluidVolume.Type.WATER) || _fluidDetector.InFluidType(FluidVolume.Type.GEYSER);
+        bool flag = false;
+        if (_fluidDetector._activeVolumes != null)
+        {
+            flag = _fluidDetector.InFluidType(FluidVolume.Type.WATER) 
+                || _fluidDetector.InFluidType(FluidVolume.Type.GEYSER);
+        }
+        return flag || _waterVolumes.Count > 0;
     }
 
     public bool IsNearFuel()
