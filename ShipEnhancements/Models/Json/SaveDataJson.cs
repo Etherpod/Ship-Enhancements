@@ -6,5 +6,5 @@ public record SaveDataJson()
 {
     [JsonRequired]
     [JsonProperty("learnedRadioCodes")]
-    public int LearnedRadioCodes;
+    public int LearnedRadioCodes = 7;
 }

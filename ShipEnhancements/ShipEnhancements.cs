@@ -60,6 +60,7 @@ public class ShipEnhancements : ModBehaviour
     public static IGEInteraction GEInteraction;
     public static ThemeManager ThemeManager;
     public static ExperimentalSettingsJson ExperimentalSettings;
+    public static SaveDataJson SaveData;
 
     public static bool VanillaFixEnabled;
 
@@ -410,10 +411,6 @@ public class ShipEnhancements : ModBehaviour
         {
             if (loadScene != OWScene.SolarSystem) return;
 
-            // Alt never works the first time I press it
-            // Hopefully this doesn't break any compatibility
-            InputLibrary.freeLook.ConsumeInput();
-
             GlobalMessenger.AddListener("SuitUp", OnPlayerSuitUp);
             GlobalMessenger.AddListener("RemoveSuit", OnPlayerRemoveSuit);
             GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
@@ -433,6 +430,13 @@ public class ShipEnhancements : ModBehaviour
             ShipRepairLimitController.SetPartsRepaired(0);
             ErnestoDetectiveController.Initialize();
             UpdateExperimentalSettings();
+
+            SaveData = ModHelper.Storage.Load<SaveDataJson>("save.json");
+            if (SaveData == null)
+            {
+                SaveData = new SaveDataJson();
+                ModHelper.Storage.Save(SaveData, "save.json");
+            }
 
             if (AchievementsAPI != null)
             {
@@ -605,7 +609,12 @@ public class ShipEnhancements : ModBehaviour
         );
         ExperimentalSettings = data;
         ShipEnhancements.WriteDebugMessage(data);
-        ShipEnhancements.WriteDebugMessage(data.ResourcePump_UltraThrust);
+    }
+
+    public static void UpdateSaveFile()
+    {
+        if (SaveData == null) SaveData = new();
+        Instance.ModHelper.Storage.Save(SaveData, "save.json");
     }
 
     private void Update()
