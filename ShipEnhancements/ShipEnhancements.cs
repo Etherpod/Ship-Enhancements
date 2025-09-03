@@ -554,7 +554,7 @@ public class ShipEnhancements : ModBehaviour
                 SELocator.GetShipDamageController().OnShipComponentDamaged -= ctx => CheckAllPartsDamaged();
                 SELocator.GetShipDamageController().OnShipHullDamaged -= ctx => CheckAllPartsDamaged();
             }
-            if (NHAPI != null && _unsubFromBodyLoaded)
+            /*if (NHAPI != null && _unsubFromBodyLoaded)
             {
                 NHAPI.GetBodyLoadedEvent().RemoveListener(OnNHBodyLoaded);
                 _unsubFromBodyLoaded = false;
@@ -563,7 +563,7 @@ public class ShipEnhancements : ModBehaviour
             {
                 NHAPI.GetStarSystemLoadedEvent().RemoveListener(OnNHStarSystemLoaded);
                 _unsubFromSystemLoaded = false;
-            }
+            }*/
             if (NHAPI != null && _unsubFromShipSpawn)
             {
                 NHAPI.GetStarSystemLoadedEvent().RemoveListener(SetCustomWarpDestination);
@@ -2306,17 +2306,25 @@ public class ShipEnhancements : ModBehaviour
             GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_Doom.prefab");
             Instantiate(zone, NHAPI.GetPlanet(name).transform);
         }
-        if ((bool)enableShipTemperature.GetProperty() && ModCompatibility.Evacuation
-            && name == "Twilight Frost")
+        if ((bool)enableShipTemperature.GetProperty() && ModCompatibility.Evacuation)
         {
-            GameObject zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/Evacuation_TwilightFrost");
-            Instantiate(zone, NHAPI.GetPlanet(name).transform);
+            if (name == "Twilight Frost")
+            {
+                GameObject zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/Evacuation_TwilightFrost.prefab");
+                Instantiate(zone, NHAPI.GetPlanet(name).transform);
+            }
+            else if (name == "Smoldering Gulch")
+            {
+                GameObject zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/Evacuation_SmolderingGulch.prefab");
+                Instantiate(zone, NHAPI.GetPlanet(name).transform);
+            }
         }
     }
 
     private void OnNHStarSystemLoaded(string name)
     {
-        if ((bool)enableShipTemperature.GetProperty())
+        if ((bool)enableShipTemperature.GetProperty() 
+            && (!ModCompatibility.Evacuation || name != "2walker2.OogaBooga"))
         {
             GameObject sunTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Sun.prefab");
 
