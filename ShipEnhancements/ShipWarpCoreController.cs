@@ -188,7 +188,7 @@ public class ShipWarpCoreController : CockpitInteractible
 
         if (playerInShip)
         {
-            if (!ShipEnhancements.VanillaFixEnabled && PlayerState.InBrambleDimension())
+            if (!ModCompatibility.VanillaFix && PlayerState.InBrambleDimension())
             {
                 PlayerFogWarpDetector detector = Locator.GetPlayerDetector().GetComponent<PlayerFogWarpDetector>();
                 FogWarpVolume[] volumes = detector._warpVolumes.ToArray();

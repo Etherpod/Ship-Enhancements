@@ -62,8 +62,6 @@ public class ShipEnhancements : ModBehaviour
     public static ExperimentalSettingsJson ExperimentalSettings;
     public static SaveDataJson SaveData;
 
-    public static bool VanillaFixEnabled;
-
     public static uint[] PlayerIDs
     {
         get
@@ -385,7 +383,7 @@ public class ShipEnhancements : ModBehaviour
         InitializeQSB();
         InitializeNH();
         InitializeGE();
-        VanillaFixEnabled = ModHelper.Interaction.ModExists("JohnCorby.VanillaFix");
+        ModCompatibility.InitCompatibility();
         ErnestoModListHandler.Initialize();
         SettingsPresets.InitializePresets();
 
@@ -1016,6 +1014,11 @@ public class ShipEnhancements : ModBehaviour
             NHAPI = ModHelper.Interaction.TryGetModApi<INewHorizons>("xen.NewHorizons");
             var nhAssembly = Assembly.LoadFrom(Path.Combine(ModHelper.Manifest.ModFolderPath, "ShipEnhancementsNH.dll"));
             gameObject.AddComponent(nhAssembly.GetType("ShipEnhancementsNH.NHInteraction", true));
+
+            NHAPI.GetBodyLoadedEvent().AddListener(OnNHBodyLoaded);
+            _unsubFromBodyLoaded = true;
+            NHAPI.GetStarSystemLoadedEvent().AddListener(OnNHStarSystemLoaded);
+            _unsubFromSystemLoaded = true;
         }
     }
 
@@ -2077,12 +2080,7 @@ public class ShipEnhancements : ModBehaviour
 
     private void SpawnSunTemperatureZones()
     {
-        if (NHAPI != null && !_unsubFromSystemLoaded)
-        {
-            NHAPI.GetStarSystemLoadedEvent().AddListener(OnNHStarSystemLoaded);
-            _unsubFromSystemLoaded = true;
-        }
-        else
+        if (NHAPI == null)
         {
             GameObject sun = GameObject.Find("Sun_Body");
             if (sun != null)
@@ -2199,6 +2197,12 @@ public class ShipEnhancements : ModBehaviour
                 Instantiate(thTempZone1, th.transform.Find("Sector_TH"));
                 GameObject thTempZone3 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_TimberHearthSurface.prefab");
                 Instantiate(thTempZone3, th.transform.Find("Sector_TH"));
+
+                if (ModCompatibility.ChristmasStory)
+                {
+                    GameObject thTempZone4 = LoadPrefab("Assets/ShipEnhancements/TZCustom/ChristmasStory_Village.prefab");
+                    Instantiate(thTempZone4, th.transform.Find("Sector_TH/Sector_Village"));
+                }
             }
 
             GameObject moon = GameObject.Find("Moon_Body");
@@ -2293,12 +2297,6 @@ public class ShipEnhancements : ModBehaviour
                 Instantiate(zone, bh.transform.Find("Sector_BH/Sector_OldSettlement/Fragment OldSettlement 5/Core_OldSettlement 5"));
             } 
         }
-
-        if (NHAPI != null)
-        {
-            NHAPI.GetBodyLoadedEvent().AddListener(OnNHBodyLoaded);
-            _unsubFromBodyLoaded = true;
-        }
     }
 
     private void OnNHBodyLoaded(string name)
@@ -2306,7 +2304,13 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)addRadio.GetProperty() && name == "Egg Star")
         {
             GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_Doom.prefab");
-            Instantiate(zone, NHAPI.GetPlanet("Egg Star").transform);
+            Instantiate(zone, NHAPI.GetPlanet(name).transform);
+        }
+        if ((bool)enableShipTemperature.GetProperty() && ModCompatibility.Evacuation
+            && name == "Twilight Frost")
+        {
+            GameObject zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/Evacuation_TwilightFrost");
+            Instantiate(zone, NHAPI.GetPlanet(name).transform);
         }
     }
 

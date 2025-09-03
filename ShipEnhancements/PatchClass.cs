@@ -3483,7 +3483,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(DialogueNode), nameof(DialogueNode.EntryConditionsSatisfied))]
     public static bool DialogueEntryConditi4onsSatisfied(DialogueNode __instance, ref bool __result)
     {
-        if (ShipEnhancements.VanillaFixEnabled) return false;
+        if (ModCompatibility.VanillaFix) return false;
 
         bool flag = true;
         if (__instance._listEntryCondition.Count == 0)
@@ -4121,7 +4121,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(NoiseMaker), nameof(NoiseMaker.GetNoiseOrigin))]
     public static void FixShipNoiseOrigin(NoiseMaker __instance, ref Vector3 __result)
     {
-        if (!ShipEnhancements.VanillaFixEnabled && __instance is ShipNoiseMaker)
+        if (!ModCompatibility.VanillaFix && __instance is ShipNoiseMaker)
         {
             __result = __instance._attachedBody.GetWorldCenterOfMass();
         }
