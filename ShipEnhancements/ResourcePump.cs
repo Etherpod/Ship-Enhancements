@@ -170,6 +170,32 @@ public class ResourcePump : OWItem
         _geyserVolume._triggerVolume._shape.enabled = true;
         _oxygenVolume.SetVolumeActivation(false);
         _geyserVolume.SetVolumeActivation(false);
+
+        string color = (string)thrusterColor1.GetProperty();
+        bool thrusterBlend = ((bool)enableColorBlending.GetProperty()
+            && int.Parse((string)thrusterColorOptions.GetProperty()) > 1)
+            || color == "Rainbow";
+
+        if (thrusterBlend)
+        {
+            _flameController.gameObject.AddComponent<ShipThrusterBlendController>();
+        }
+        else if (color != "Default")
+        {
+            MeshRenderer rend = _flameController.GetComponent<MeshRenderer>();
+
+            ThrusterTheme thrusterColors = ShipEnhancements.ThemeManager.GetThrusterTheme(color);
+            rend.material.SetTexture("_MainTex",
+                (Texture2D)ShipEnhancements.LoadAsset("Assets/ShipEnhancements/ThrusterColors/"
+                + thrusterColors.ThrusterColor));
+
+            Color thrustColor = Color.white * Mathf.Pow(2, thrusterColors.ThrusterIntensity);
+            thrustColor.a = thrustColor.a = 0.5019608f;
+            rend.material.SetColor("_Color", thrustColor);
+
+            Light light = _flameController.GetComponentInChildren<Light>();
+            light.color = thrusterColors.ThrusterLight / 255f;
+        }
     }
 
     private void Update()
