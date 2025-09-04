@@ -22,11 +22,11 @@ public class ShipFluidDamageController : MonoBehaviour
         GameObject engine = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/Detectors/EngineFluidDetector.prefab");
         GameObject supplies = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/Detectors/SuppliesFluidDetector.prefab");
         GameObject landingGear = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/Detectors/LandingGearFluidDetector.prefab");
-        _moduleDetectors.Add(Instantiate(cabin, transform.parent.Find("Module_Cabin")).GetComponent<StaticFluidDetector>());
-        _moduleDetectors.Add(Instantiate(cockpit, transform.parent.Find("Module_Cockpit")).GetComponent<StaticFluidDetector>());
-        _moduleDetectors.Add(Instantiate(engine, transform.parent.Find("Module_Engine")).GetComponent<StaticFluidDetector>());
-        _moduleDetectors.Add(Instantiate(supplies, transform.parent.Find("Module_Supplies")).GetComponent<StaticFluidDetector>());
-        _moduleDetectors.Add(Instantiate(landingGear, transform.parent.Find("Module_LandingGear")).GetComponent<StaticFluidDetector>());
+        _moduleDetectors.Add(ShipEnhancements.CreateObject(cabin, transform.parent.Find("Module_Cabin")).GetComponent<StaticFluidDetector>());
+        _moduleDetectors.Add(ShipEnhancements.CreateObject(cockpit, transform.parent.Find("Module_Cockpit")).GetComponent<StaticFluidDetector>());
+        _moduleDetectors.Add(ShipEnhancements.CreateObject(engine, transform.parent.Find("Module_Engine")).GetComponent<StaticFluidDetector>());
+        _moduleDetectors.Add(ShipEnhancements.CreateObject(supplies, transform.parent.Find("Module_Supplies")).GetComponent<StaticFluidDetector>());
+        _moduleDetectors.Add(ShipEnhancements.CreateObject(landingGear, transform.parent.Find("Module_LandingGear")).GetComponent<StaticFluidDetector>());
 
         foreach (StaticFluidDetector detector in _moduleDetectors)
         {

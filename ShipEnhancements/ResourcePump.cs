@@ -876,7 +876,7 @@ public class ResourcePump : OWItem
                         {
                             ShipEnhancements.WriteDebugMessage("     Found recovery point: " + recoveryPoint.gameObject.name);
                             _activeRecoveryPoints.Add(recoveryPoint);
-                            Transform particle = Instantiate(_fuelTransferParticles.gameObject, recoveryPoint.transform).transform;
+                            Transform particle = ShipEnhancements.CreateObject(_fuelTransferParticles.gameObject, recoveryPoint.transform).transform;
                             Quaternion toPumpRot = Quaternion.LookRotation(transform.position - particle.position, transform.up);
                             Quaternion yForward = Quaternion.LookRotation(Vector3.down, Vector3.forward);
                             toPumpRot = toPumpRot * yForward;

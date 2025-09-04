@@ -26,7 +26,7 @@ public class ShipTemperatureGauge : MonoBehaviour
     private void Start()
     {
         GameObject indicatorLight = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/IndicatorLight_TemperatureGauge.prefab");
-        _indicatorLight = Instantiate(indicatorLight, SELocator.GetShipBody().transform).GetComponent<OWRenderer>();
+        _indicatorLight = ShipEnhancements.CreateObject(indicatorLight, SELocator.GetShipBody().transform).GetComponent<OWRenderer>();
     }
 
     private void Update()

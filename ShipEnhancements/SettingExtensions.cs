@@ -1,10 +1,8 @@
 ﻿using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.IO.Pipes;
 using UnityEngine;
 using static ShipEnhancements.ShipEnhancements;
-using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 

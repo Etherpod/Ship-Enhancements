@@ -6,23 +6,23 @@ public class TemperatureZone : MonoBehaviour
 {
     [SerializeField]
     [Range(-100f, 100f)]
-    private float _temperature;
+    protected float _temperature;
     [SerializeField]
-    private float _innerRadius;
+    protected float _innerRadius;
     [SerializeField]
-    private bool _isShell;
+    protected bool _isShell;
     [SerializeField]
-    private float _shellCenterRadius;
+    protected float _shellCenterRadius;
     [SerializeField]
-    private float _shellCenterThickness;
+    protected float _shellCenterThickness;
 
-    private OWTriggerVolume _triggerVolume;
-    private SphereShape _shape;
-    private float _outerRadius;
-    private float _scale = 1f;
-    private bool _active = true;
+    protected OWTriggerVolume _triggerVolume;
+    protected SphereShape _shape;
+    protected float _outerRadius;
+    protected float _scale = 1f;
+    protected bool _active = true;
 
-    private void Awake()
+    protected virtual void Awake()
     {
         _shape = GetComponent<SphereShape>();
         _triggerVolume = gameObject.GetAddComponent<OWTriggerVolume>();
@@ -33,7 +33,7 @@ public class TemperatureZone : MonoBehaviour
         _outerRadius = _shape.radius;
     }
 
-    private void OnEffectVolumeEnter(GameObject hitObj)
+    protected virtual void OnEffectVolumeEnter(GameObject hitObj)
     {
         if (hitObj.TryGetComponent(out TemperatureDetector detector))
         {
@@ -41,7 +41,7 @@ public class TemperatureZone : MonoBehaviour
         }
     }
 
-    private void OnEffectVolumeExit(GameObject hitObj)
+    protected virtual void OnEffectVolumeExit(GameObject hitObj)
     {
         if (hitObj.TryGetComponent(out TemperatureDetector detector))
         {
@@ -49,7 +49,7 @@ public class TemperatureZone : MonoBehaviour
         }
     }
 
-    public float GetTemperature(TemperatureDetector detector)
+    public virtual float GetTemperature(TemperatureDetector detector)
     {
         if (!_active)
         {
@@ -71,13 +71,13 @@ public class TemperatureZone : MonoBehaviour
         return _temperature * multiplier;
     }
 
-    public void SetScale(float scale)
+    public virtual void SetScale(float scale)
     {
         _scale = scale;
         _shape.transform.localScale = Vector3.one * scale;
     }
 
-    public void SetProperties(float temperature, float outerRadius, float innerRadius, 
+    public virtual void SetProperties(float temperature, float outerRadius, float innerRadius, 
         bool isShell, float shellCenterRadius, float shellCenterThickness)
     {
         _temperature = temperature;
@@ -89,12 +89,12 @@ public class TemperatureZone : MonoBehaviour
         _shellCenterThickness = shellCenterThickness;
     }
 
-    public void SetVolumeActive(bool active)
+    public virtual void SetVolumeActive(bool active)
     {
         _active = active;
     }
 
-    private void OnDestroy()
+    protected virtual void OnDestroy()
     {
         if (_triggerVolume)
         {

@@ -118,8 +118,8 @@ public class FuelTankItem : OWItem
 
                 if (multiplier >= 10f)
                 {
-                    Instantiate(ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipExplosionExpandAudio.prefab"),
-                        audio.transform).name = "ShipExplosionExpandAudio";
+                    ShipEnhancements.CreateObject(ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipExplosionExpandAudio.prefab"),
+                        audio.transform);
                 }
             }
         }
@@ -127,7 +127,7 @@ public class FuelTankItem : OWItem
         if ((bool)moreExplosionDamage.GetProperty() && multiplier > 0f)
         {
             GameObject damage = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ExplosionDamage.prefab");
-            GameObject damageObj = Instantiate(damage, _explosion.transform);
+            GameObject damageObj = ShipEnhancements.CreateObject(damage, _explosion.transform);
             damageObj.transform.localPosition = Vector3.zero;
             damageObj.transform.localScale = Vector3.one;
             ExplosionDamage explosionDamage = damageObj.GetComponent<ExplosionDamage>();

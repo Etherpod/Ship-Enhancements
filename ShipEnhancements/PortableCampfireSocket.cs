@@ -26,7 +26,7 @@ public class PortableCampfireSocket : SEItemSocket
             if (campfire != null)
             {
                 GameObject campfireTempZone = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Campfire.prefab");
-                Instantiate(campfireTempZone, campfire.transform.parent);
+                ShipEnhancements.CreateObject(campfireTempZone, campfire.transform.parent);
             }
         }
     }
@@ -48,7 +48,7 @@ public class PortableCampfireSocket : SEItemSocket
             if (campfire != null)
             {
                 GameObject campfireTempZone = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Campfire.prefab");
-                Instantiate(campfireTempZone, campfire.transform.parent);
+                ShipEnhancements.CreateObject(campfireTempZone, campfire.transform.parent);
             }
         }
     }
