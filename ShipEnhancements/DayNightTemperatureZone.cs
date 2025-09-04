@@ -23,7 +23,6 @@ public class DayNightTemperatureZone : TemperatureZone
         if (_useCustomSun && ShipEnhancements.NHAPI != null)
         {
             var sun = ShipEnhancements.NHAPI.GetPlanet(_customSunName);
-            ShipEnhancements.WriteDebugMessage(sun);
             if (sun != null)
             {
                 _sunTransform = sun.transform;
@@ -49,7 +48,6 @@ public class DayNightTemperatureZone : TemperatureZone
 
     public override float GetTemperature(TemperatureDetector detector)
     {
-        ShipEnhancements.WriteDebugMessage(_sunTransform);
         if (!_active || _sunTransform == null)
         {
             return 0;
@@ -60,7 +58,6 @@ public class DayNightTemperatureZone : TemperatureZone
         var dayAmount = Vector3.Dot(toSun, toDetector);
         float twilightOffset = 1 - Mathf.Sin(_twilightAngle * Mathf.Deg2Rad * 0.5f);
         float nightLerp = Mathf.InverseLerp(twilightOffset, -twilightOffset, dayAmount);
-        ShipEnhancements.WriteDebugMessage(nightLerp);
 
         float distSqr = (detector.transform.position - (transform.position + _shape.center)).sqrMagnitude;
         float multiplier;

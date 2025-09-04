@@ -2313,26 +2313,48 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((bool)enableShipTemperature.GetProperty())
         {
+            GameObject zone = null;
+
             if (ModCompatibility.Evacuation)
             {
                 if (name == "Twilight Frost")
                 {
-                    GameObject zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/Evacuation_TwilightFrost.prefab");
-                    CreateObject(zone, NHAPI.GetPlanet(name).transform);
+                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/Evacuation_TwilightFrost.prefab");
                 }
                 else if (name == "Smoldering Gulch")
                 {
-                    GameObject zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/Evacuation_SmolderingGulch.prefab");
-                    CreateObject(zone, NHAPI.GetPlanet(name).transform);
+                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/Evacuation_SmolderingGulch.prefab");
                 }
             }
             if (ModCompatibility.EchoHike)
             {
                 if (name == "Echo Hike")
                 {
-                    GameObject zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/EchoHike_FrozenSolace.prefab");
-                    CreateObject(zone, NHAPI.GetPlanet(name).transform);
+                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/EchoHike_FrozenSolace.prefab");
                 }
+            }
+            if (ModCompatibility.AxiomsRefuge)
+            {
+                if (name == "Axiom")
+                {
+                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/AxiomsRefuge_Axiom.prefab");
+                }
+                else if (name == "Aicale")
+                {
+                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/AxiomsRefuge_Aicale.prefab");
+                }
+            }
+            if (ModCompatibility.MisfiredJump)
+            {
+                if (name == "Scalding Abyss")
+                {
+                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/MisfiredJump_ScaldingAbyss.prefab");
+                }
+            }
+
+            if (zone != null)
+            {
+                CreateObject(zone, NHAPI.GetPlanet(name).transform);
             }
         }
     }

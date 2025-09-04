@@ -8,6 +8,9 @@ public static class ModCompatibility
     public static bool ChristmasStory { get; private set; }
     public static bool Evacuation { get; private set; }
     public static bool EchoHike { get; private set; }
+    public static bool AxiomsRefuge { get; private set; }
+    public static bool MisfiredJump { get; private set; }
+    public static bool ForgottenCastaways { get; private set; }
 
     public static void InitCompatibility()
     {
@@ -16,5 +19,8 @@ public static class ModCompatibility
         ChristmasStory = interaction.ModExists("hearth1an.ChristmasStory");
         Evacuation = interaction.ModExists("2walker2.Evacuation");
         EchoHike = interaction.ModExists("Trifid.TrifidJam3");
+        AxiomsRefuge = interaction.ModExists("MegaPiggy.Axiom");
+        MisfiredJump = interaction.ModExists("Echatsum.MisfiredJump");
+        ForgottenCastaways = interaction.ModExists("cleric.DeepBramble");
     }
 }
