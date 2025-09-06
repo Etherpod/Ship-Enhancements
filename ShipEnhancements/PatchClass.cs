@@ -2651,20 +2651,28 @@ public static class PatchClass
 
     #region CockpitComponents
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(ShipHull), nameof(ShipHull.Awake))]
-    public static void AddComponents(ShipHull __instance)
+    [HarmonyPatch(typeof(ShipDamageController), nameof(ShipDamageController.Awake))]
+    public static void AddComponents(ShipDamageController __instance)
     {
-        if (__instance.hullName != UITextType.ShipPartForward) return;
+        ShipHull cockpit = null;
+        foreach (var hull in __instance.GetComponentsInChildren<ShipHull>())
+        {
+            if (hull.hullName == UITextType.ShipPartForward)
+            {
+                cockpit = hull;
+                break;
+            }
+        }
+        if (cockpit == null) return;
 
         if ((bool)enableScoutLauncherComponent.GetProperty())
         {
             GameObject probeLauncherComponent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ProbeLauncherComponent.prefab");
-            GameObject componentObj = ShipEnhancements.CreateObject(probeLauncherComponent,
-                __instance.GetComponentInParent<ShipBody>().GetComponentInChildren<PlayerProbeLauncher>().transform.parent);
+            GameObject componentObj = ShipEnhancements.CreateObject(probeLauncherComponent, cockpit._componentsGroup.transform);
             var comp = componentObj.GetComponent<ProbeLauncherComponent>();
             SELocator.SetProbeLauncherComponent(comp);
 
-            ShipDamageDisplayV2 damageDisplay = __instance.GetComponentInChildren<ShipDamageDisplayV2>();
+            ShipDamageDisplayV2 damageDisplay = cockpit.GetComponentInChildren<ShipDamageDisplayV2>();
             damageDisplay._shipComponents[7] = comp;
             comp.OnDamaged += damageDisplay.OnComponentUpdate;
             comp.OnRepaired += damageDisplay.OnComponentUpdate;
@@ -2672,13 +2680,11 @@ public static class PatchClass
         if ((bool)enableSignalscopeComponent.GetProperty())
         {
             GameObject signalscopeComponent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/SignalscopeComponent.prefab");
-            Transform signalscopePivot = __instance.transform.Find("Geo_Cockpit/Cockpit_Tech/Cockpit_Tech_Exterior/SignalDishPivot");
-            GameObject componentObj2 = ShipEnhancements.CreateObject(signalscopeComponent,
-                signalscopePivot);
+            GameObject componentObj2 = ShipEnhancements.CreateObject(signalscopeComponent, cockpit._componentsGroup.transform);
             SignalscopeComponent comp = componentObj2.GetComponent<SignalscopeComponent>();
             SELocator.SetSignalscopeComponent(comp);
 
-            ShipDamageDisplayV2 damageDisplay = __instance.GetComponentInChildren<ShipDamageDisplayV2>();
+            ShipDamageDisplayV2 damageDisplay = cockpit.GetComponentInChildren<ShipDamageDisplayV2>();
             damageDisplay._shipComponents[8] = comp;
             comp.OnDamaged += damageDisplay.OnComponentUpdate;
             comp.OnRepaired += damageDisplay.OnComponentUpdate;
@@ -2688,11 +2694,11 @@ public static class PatchClass
             // setting wrong here??
             GameObject warpCoreComponent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipWarpCoreComponent.prefab");
             warpCoreComponent.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = UnityEngine.Object.FindObjectOfType<ShipBody>().gameObject;
-            GameObject componentObj = ShipEnhancements.CreateObject(warpCoreComponent, __instance.transform.Find("Systems_Cockpit"));
+            GameObject componentObj = ShipEnhancements.CreateObject(warpCoreComponent, cockpit._componentsGroup.transform);
             var comp = componentObj.GetComponent<ShipWarpCoreComponent>();
             SELocator.SetShipWarpCoreComponent(comp);
 
-            ShipDamageDisplayV2 damageDisplay = __instance.GetComponentInChildren<ShipDamageDisplayV2>();
+            ShipDamageDisplayV2 damageDisplay = cockpit.GetComponentInChildren<ShipDamageDisplayV2>();
             damageDisplay._shipComponents[6] = comp;
             comp.OnDamaged += damageDisplay.OnComponentUpdate;
             comp.OnRepaired += damageDisplay.OnComponentUpdate;

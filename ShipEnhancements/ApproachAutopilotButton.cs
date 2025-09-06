@@ -18,6 +18,10 @@ public class ApproachAutopilotButton : CockpitButtonSwitch
         {
             if (CanActivate())
             {
+                if (ShipEnhancements.GEInteraction != null)
+                {
+                    ShipEnhancements.GEInteraction.StopContinuousMatchVelocity();
+                }
                 _autopilot.FlyToDestination(SELocator.GetReferenceFrame());
             }
             else

@@ -131,7 +131,7 @@ public class ShipTemperatureDetector : TemperatureDetector
         if ((IsHeatingLocked() && _currentInternalTemperature > 0f)
             || (IsCoolingLocked() && _currentInternalTemperature < 0f))
         {
-            _currentInternalTemperature = Mathf.MoveTowards(_currentInternalTemperature, 0f, Time.deltaTime * 4f);
+            _currentInternalTemperature = Mathf.MoveTowards(_currentInternalTemperature, 0f, Time.deltaTime * 2f);
             ignoreSameSide = true;
         }
 

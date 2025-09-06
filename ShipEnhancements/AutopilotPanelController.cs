@@ -163,10 +163,6 @@ public class AutopilotPanelController : MonoBehaviour
         if (IsMatchVelocitySelected())
         {
             _matchVelocityButton.SetActive(false);
-            if (ShipEnhancements.GEInteraction != null)
-            {
-                ShipEnhancements.GEInteraction.StopContinuousMatchVelocity();
-            }
         }
     }
 
