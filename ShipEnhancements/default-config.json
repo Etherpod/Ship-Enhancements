@@ -1361,18 +1361,6 @@
       "type": "toggle",
       "value": true,
       "tooltip": "Prevents the game from automatically removing your helmet if there isn't oxygen present."
-    },
-    "shipGravityFix": {
-      "title": "Fix Ship Gravity",
-      "type": "toggle",
-      "value": true,
-      "tooltip": "Lets you walk around your ship normally when in high-gravity areas, like near the sun."
-    },
-    "fixShipThrustIndicator": {
-      "title": "Fix Ship Thrust Indicator",
-      "type": "toggle",
-      "value": true,
-      "tooltip": "Fixes a bug where the ship's thrust indicator would turn off when you left the console."
     }
   }
 }

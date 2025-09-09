@@ -216,7 +216,6 @@ public class ShipEnhancements : ModBehaviour
         addShipClock,
         enableStunDamage,
         enableRepairConfirmation,
-        shipGravityFix,
         enableRemovableGravityCrystal,
         randomHullDamage,
         randomComponentDamage,
@@ -240,7 +239,6 @@ public class ShipEnhancements : ModBehaviour
         sandDamage,
         disableMinimapMarkers,
         scoutPhotoMode,
-        fixShipThrustIndicator,
         enableAutoAlign,
         shipHornType,
         randomIterations,
@@ -2242,6 +2240,18 @@ public class ShipEnhancements : ModBehaviour
                 zone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_QuantumMoon_BrittleHollow.prefab");
                 CreateObject(zone, root.Find("State_BH"));
             }
+
+            var thing = new ShipEnhancementsAPI();
+            var settings = new IShipEnhancements.TemperatureZoneSettings();
+            settings.temperature = 100;
+            settings.name = "gabagool";
+            settings.parent = GameObject.Find("TimberHearth_Body").transform;
+            settings.innerRadius = 400;
+            settings.outerRadius = 800;
+            settings.isDayNight = true;
+            settings.nightTemperature = -100;
+            settings.twilightAngle = 10;
+            thing.AddTemperatureZone(settings);
         }
     }
 
@@ -2781,10 +2791,7 @@ public class ShipEnhancements : ModBehaviour
     {
         _shipDestroyed = true;
         SELocator.GetShipBody().SetCenterOfMass(SELocator.GetShipBody().GetWorldCenterOfMass());
-        if ((bool)fixShipThrustIndicator.GetProperty())
-        {
-            ThrustIndicatorManager.DisableIndicator();
-        }
+        ThrustIndicatorManager.DisableIndicator();
     }
 
     private void OnWakeUp()

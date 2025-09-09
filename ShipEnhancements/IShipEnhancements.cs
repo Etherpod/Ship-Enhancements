@@ -1,23 +1,96 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace ShipEnhancements;
 
 public interface IShipEnhancements
 {
-    /// <summary>
-    /// Creates a custom temperature zone.
-    /// </summary>
-    /// <param name="temperature">The temperature of the zone. Needs to be between 100 and -100.</param>
-    /// <param name="outerRadius">The distance from the center where the temperature starts to increase or decrease.</param>
-    /// <param name="innerRadius">The distance from the center where the temperature stops increasing or decreasing. Needs to be less than the outer radius.</param>
-    /// <param name="isShell">Determines whether the zone should be hollow in the inside. In other words, the temperature will return to zero when you reach the inner radius instead of remaining at the highest or lowest temperature.</param>
-    /// <param name="shellCenterRadius">The distance from the center where the temperature is the highest or lowest. Needs to be between the outer radius and the inner radius.</param>
-    /// <param name="shellCenterThickness">Makes the shell center radius cover a larger area.</param>
-    /// <returns>A prefab of a temperature zone, which needs to be instantiated manually.</returns>
+    [Obsolete("This method is deprecated, please use AddTemperatureZone instead.")]
     public GameObject CreateTemperatureZone(float temperature, float outerRadius, float innerRadius,
         bool isShell = false, float shellCenterRadius = 0f, float shellCenterThickness = 0f, 
         string objectName = "TemperatureZone");
+
+    public GameObject AddTemperatureZone(TemperatureZoneSettings settings);
+
+    public struct TemperatureZoneSettings
+    {
+        /// <summary>
+        /// The name of the object this temperature zone will go on.
+        /// </summary>
+        public string name;
+        /// <summary>
+        /// The object to place this temperature zone on.
+        /// </summary>
+        public Transform parent;
+
+        /// <summary>
+        /// The maximum temperature of this zone, between 100 and -100.
+        /// </summary>
+        public float temperature;
+        /// <summary>
+        /// The radius at which the temperature will start moving towards the maximum temperature.
+        /// </summary>
+        public float outerRadius;
+        /// <summary>
+        /// The radius at which the temperature reaches maximum.
+        /// </summary>
+        public float innerRadius;
+
+        /// <summary>
+        /// Makes the temperature zone hollow, reaching max temperature at shellCenterRadius and returning to zero at innerRadius.
+        /// </summary>
+        public bool isShell;
+        /// <summary>
+        /// The radius at which the temperature reaches maximum for a shell zone.
+        /// </summary>
+        public float shellCenterRadius;
+        /// <summary>
+        /// Adds a buffer on each side of the shellCenterRadius to make the area of max temperature wider. This is the total thickness of that area.
+        /// </summary>
+        public float shellCenterThickness;
+
+        /// <summary>
+        /// Allows temperature to change depending on which side of the planet you're on.
+        /// </summary>
+        public bool isDayNight;
+        /// <summary>
+        /// The temperature on the night side of the planet.
+        /// </summary>
+        public float nightTemperature;
+        /// <summary>
+        /// The total angle that makes up the twilight zone. A larger angle means it will take longer to fade from the day temperature to the night temperature.
+        /// </summary>
+        public float twilightAngle;
+        /// <summary>
+        /// Specifies what to use as the sun. Set this if your temperature zone is in a custom star system, otherwise leave it empty.
+        /// </summary>
+        public string customSunName;
+
+        public TemperatureZoneSettings()
+        {
+            name = "TemperatureZone";
+            customSunName = null;
+        }
+
+        public TemperatureZoneSettings(string name, Vector3 position, Transform parent, float temperature, float outerRadius, float innerRadius,
+            bool isShell, float shellCenterRadius, float shellCenterThickness, bool isDayNight, float nightTemperature,
+            float twilightAngle, string customSunName = null)
+        {
+            this.name = name;
+            this.parent = parent;
+            this.temperature = temperature;
+            this.outerRadius = outerRadius;
+            this.innerRadius = innerRadius;
+            this.isShell = isShell;
+            this.shellCenterRadius = shellCenterRadius;
+            this.shellCenterThickness = shellCenterThickness;
+            this.isDayNight = isDayNight;
+            this.nightTemperature = nightTemperature;
+            this.twilightAngle = twilightAngle;
+            this.customSunName = customSunName;
+        }
+    }
 
     /// <summary>
     /// Gets the in-game value of the specified config setting.

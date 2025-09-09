@@ -6,6 +6,7 @@ using static ShipEnhancements.ShipEnhancements;
 namespace ShipEnhancements;
 public class ShipEnhancementsAPI : IShipEnhancements
 {
+    [Obsolete("This method is deprecated, please use AddTemperatureZone instead.")]
     public GameObject CreateTemperatureZone(float temperature, float outerRadius, float innerRadius, 
         bool isShell = false, float shellCenterRadius = 0f, float shellCenterThickness = 0f, 
         string objectName = "TemperatureZone")
@@ -34,6 +35,42 @@ public class ShipEnhancementsAPI : IShipEnhancements
             }
         }
         tempZone.SetProperties(temperature, outerRadius, innerRadius, isShell, shellCenterRadius, shellCenterThickness);
+        return tempZoneObj;
+    }
+
+    public GameObject AddTemperatureZone(IShipEnhancements.TemperatureZoneSettings settings)
+    {
+        GameObject tempZoneObj = new GameObject(settings.name);
+        tempZoneObj.SetActive(false);
+        tempZoneObj.transform.parent = settings.parent;
+        tempZoneObj.transform.localPosition = Vector3.zero;
+        TemperatureZone tempZone = settings.isDayNight ? tempZoneObj.AddComponent<DayNightTemperatureZone>() : tempZoneObj.AddComponent<TemperatureZone>();
+        tempZoneObj.AddComponent<SphereShape>();
+        tempZoneObj.AddComponent<OWTriggerVolume>();
+        tempZoneObj.layer = LayerMask.NameToLayer("BasicEffectVolume");
+        tempZoneObj.SetActive(true);
+        if (settings.innerRadius > settings.outerRadius)
+        {
+            LogMessage($"Error when creating temperature zone \"{settings.name}\": innerRadius ({settings.innerRadius}) is larger than outerRadius ({settings.outerRadius})", warning: true);
+            settings.innerRadius = 0f;
+        }
+        if (settings.isShell)
+        {
+            if (settings.shellCenterRadius < settings.innerRadius || settings.shellCenterRadius > settings.outerRadius)
+            {
+                LogMessage($"Error when creating temperature zone \"{settings.name}\": shellCenterRadius ({settings.shellCenterRadius}) is outside of bounds (outerRadius: {settings.outerRadius}, innerRadius: {settings.innerRadius})", warning: true);
+                settings.shellCenterRadius = (settings.innerRadius + settings.outerRadius) / 2f;
+            }
+            float outerBuffer = settings.outerRadius - settings.shellCenterRadius;
+            float innerBuffer = settings.shellCenterRadius - settings.innerRadius;
+            if (settings.shellCenterThickness > outerBuffer || settings.shellCenterThickness > innerBuffer)
+            {
+                LogMessage($"Error when creating temperature zone \"{settings.name}\": shellCenterThickness ({settings.shellCenterThickness}) extends out of bounds (outerRadius: {settings.outerRadius}, innerRadius: {settings.innerRadius})", warning: true);
+                settings.shellCenterThickness = Mathf.Min(outerBuffer, innerBuffer);
+            }
+        }
+        tempZone.SetProperties(settings.temperature, settings.outerRadius, settings.innerRadius, settings.isShell, 
+            settings.shellCenterRadius, settings.shellCenterThickness, settings.nightTemperature, settings.twilightAngle, settings.customSunName);
         return tempZoneObj;
     }
 

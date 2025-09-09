@@ -89,6 +89,19 @@ public class TemperatureZone : MonoBehaviour
         _shellCenterThickness = shellCenterThickness;
     }
 
+    public virtual void SetProperties(float temperature, float outerRadius, float innerRadius,
+        bool isShell, float shellCenterRadius, float shellCenterThickness, 
+        float nightTemperature, float twilightAngle, string customSunName)
+    {
+        _temperature = temperature;
+        _outerRadius = outerRadius;
+        _shape.radius = outerRadius;
+        _innerRadius = innerRadius;
+        _isShell = isShell;
+        _shellCenterRadius = shellCenterRadius;
+        _shellCenterThickness = shellCenterThickness;
+    }
+
     public virtual void SetVolumeActive(bool active)
     {
         _active = active;

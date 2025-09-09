@@ -27,6 +27,10 @@ public class DayNightTemperatureZone : TemperatureZone
             {
                 _sunTransform = sun.transform;
             }
+            else
+            {
+                ShipEnhancements.LogMessage($"Error on temperature zone {gameObject.name}: Could not find sun named {_customSunName}");
+            }
         }
         else
         {
@@ -73,5 +77,17 @@ public class DayNightTemperatureZone : TemperatureZone
         }
         float temp = Mathf.SmoothStep(_temperature, _nightTemperature, nightLerp);
         return temp * multiplier;
+    }
+
+    public override void SetProperties(float temperature, float outerRadius, float innerRadius, 
+        bool isShell, float shellCenterRadius, float shellCenterThickness, 
+        float nightTemperature, float twilightAngle, string customSunName)
+    {
+        base.SetProperties(temperature, outerRadius, innerRadius, isShell, 
+            shellCenterRadius, shellCenterThickness);
+        _nightTemperature = nightTemperature;
+        _twilightAngle = twilightAngle;
+        _customSunName = customSunName;
+        _useCustomSun = !string.IsNullOrEmpty(_customSunName);
     }
 }

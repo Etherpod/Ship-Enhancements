@@ -1,6 +1,10 @@
 ![Ship Enhancements banner](banner.png)
 
+---
+
 Ship Enhancements adds way too much stuff to the ship, all of which you can find in the mod settings menu. Any changes to the ship will be applied on the next loop. Experiment and have fun!
+
+---
 
 To answer some questions you may have...
 
@@ -12,6 +16,8 @@ I made a mod called [Traveler's Pack](https://outerwildsmods.com/mods/travelersp
 
 ## Does this mod support [Achievements+](https://outerwildsmods.com/mods/achievements/)?
 It sure does! It adds 12 new achievements that you can try and unlock.
+
+---
 
 # Feature Overview
 
@@ -170,6 +176,18 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Passive Temperature Gain**: Causes your ship to heat up or cool down over time, making some areas safer and other areas more dangerous.
 - **Allow Reactor Overload**: Lets you interact with the ship's reactor to overload it, which prevents your ship from getting cold but heats the reactor up. The colder it is, the hotter the reactor will get.
 
+---
+
+Temperature zones are not only added to the vanilla solar system, but are also added to the mods listed below! If you think a mod is missing from the list, feel free to contact me (Etherpod) or make a GitHub issue about it. Assuming I haven't disappeared off the internet, I'll update Ship Enhancements to include that mod.
+ - Axiom's Refuge
+ - Christmas Story
+ - Echo Hike
+ - Evacuation
+ - Misfired Jump
+ - The Stranger They Are
+
+---
+
 ### *Water*
 - **Use Water Tank**: Unlocks the settings below and adds water as a new resource to your ship. Other features will drain it to function.
 - **Water Drain Multiplier**: Larger numbers make the ship's water drain faster.
@@ -190,6 +208,8 @@ Haven't you ever wished your ship had a little more color?
 - **Ship Thruster Flame Color**: Changes the color of the ship's thruster flames as well as the color of the thruster indicator inside of the ship.
 - **Damage Indicator Color**: Changes the color of the ship damage display, the master alarm, the reactor, and the damage indicator lights.
 
+---
+
 Enabling color blending lets you fade the ship decoration between different colors based on certain parameters. For example, I could set it to change the lights to red if the ship is hot and change the lights to blue if the ship is cold. If you want to try messing with it, here's an overview on the different parameter options:
 - **Time**: Fades between colors over time.
 - **Fuel**: Changes colors as your fuel gets lower.
@@ -201,16 +221,16 @@ Enabling color blending lets you fade the ship decoration between different colo
 - **Temperature**: Changes colors as the environment becomes warmer or colder.
 - **Ship Temperature**: Changes colors as your ship becomes warmer or colder.
 
+---
+
 ## Quality of Life
 Some bug fixes and some small things that make your ship a little nicer to use.
 - **Repair Confirmation**: Plays a sound when everything has been repaired. Now you don't need to go searching for any hulls you forgot to fix!
 - **Show Warning Notifications**: Notifies you in the ship when resources are low or when the outside conditions are becoming dangerous.
 - **Buttons Require Flight Chair**: Makes it so buttons in the cockpit can only be pressed while you're piloting the ship. Useful if your friends keep messing with them while you're trying to fly.
 - **Always Allow Map Lock-on**: Lets you use the lock-on feature on the map while you're standing on a planet.
-- **Split Ship Lock-on**: (Disabled by default) Separates your ship lock-on target and your suit lock-on target. If you lock onto something while piloting the ship, the ship will continue using that as the target if you exit the seat and lock onto something else.
+- **Split Ship Lock-on**: Separates your ship lock-on target and your suit lock-on target. If you lock onto something while piloting the ship, the ship will continue using that as the target if you exit the seat and lock onto something else.
 - **Keep Helmet On**: When there is no oxygen present, this prevents the game from removing your helmet when doing things such as piloting the ship or roasting a marshmallow at a campfire.
-- **Fix Ship Gravity**: Gets rid of that annoying bug where you're trying to land on the Sun Station and you can't move around in your ship because it's holding you against the wall.
-- **Fix Ship Thrust Indicator**: Fixes a bug where the ship's thrust indicator turns off when you stop piloting the ship.
 
 ## Presets
 In case there are too many settings to deal with, there are some pre-made presets for you to use. The settings can still be meddled with after choosing one.
@@ -238,9 +258,23 @@ To use the API, copy the **IShipEnhancements** script from this mod's GitHub rep
 - **GetPreShipInitializeEvent()** and **GetPostShipInitializeEvent()** - Subscribe to these events to run code before and after Ship Enhancements makes any changes to the ship.
 
 ## Known Bugs
+Some bugs introduced by this mod that I have no idea how to fix.
 - When playing in multiplayer and using Input Latency, the delayed inputs of the non-hosts will not work once they leave the flight console
 - If you attach yourself to an object with a tether and the object enters a black hole, there is a chance you will be violently thrown across the solar system
 - Reeling in towards a tether hook on the other side of a wall will sometimes produce unintended side effects
+
+## Fixed Bugs
+Some Outer Wilds bugs that this mod fixes automatically. These bugs are mostly caused by situations you would have never encountered without mods.
+- Outside sources of gravity would be doubled in strength while inside the ship, which made walking around inside the ship impossible while next to the sun
+- The ship's thrust indicator would turn off when you left the flight chair
+- Free look inside the ship would be unusable while in zero gravity
+- The fuel/oxygen tank leak effects would continue playing after the associated resource had run out
+- Running out of oxygen wouldn't actually do anything, and you could still breath inside the ship
+- Two moving objects with their own gravity sources would crash the game if they both entered each other's gravity fields
+- Sounds in the cockpit (like the autopilot beeping) could be heard from anywhere in the universe while outside the ship
+- Anglerfish would always target you instead of the thing making the noise (also patched by Vanilla Fix)
+- Warping out of Dark Bramble wouldn't get rid of the fog effect (also patched by Vanilla Fix)
+- Dialogue would sometimes start with the wrong text (also patched by Vanilla Fix)
 
 # Credits
 Big thanks to **ditzy** for all of their help! There's so much I have to put it in a list:

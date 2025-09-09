@@ -3397,8 +3397,6 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipDirectionalForceVolume), nameof(ShipDirectionalForceVolume.CalculateForceAccelerationOnBody))]
     public static bool ShipGravityFix(ShipDirectionalForceVolume __instance, OWRigidbody targetBody, ref Vector3 __result)
     {
-        if (!(bool)shipGravityFix.GetProperty()) return true;
-
         Vector3 vector = __instance._attachedBody.GetAcceleration();
         if (vector.magnitude > 20f)
         {
@@ -4491,7 +4489,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.Start))]
     public static void ThrustIndicatorStartOn(ThrustAndAttitudeIndicator __instance)
     {
-        if ((bool)fixShipThrustIndicator.GetProperty() && __instance._shipIndicatorMode && !__instance.enabled)
+        if (__instance._shipIndicatorMode && !__instance.enabled)
         {
             __instance._activeThrusterModel = __instance._shipThrusterModel;
             __instance._activeThrusterController = __instance._shipThrusterController;
@@ -4504,7 +4502,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.OnExitFlightConsole))]
     public static void KeepThrustIndicatorOn(ThrustAndAttitudeIndicator __instance)
     {
-        if ((bool)fixShipThrustIndicator.GetProperty() && __instance._shipIndicatorMode && !__instance.enabled)
+        if (__instance._shipIndicatorMode && !__instance.enabled)
         {
             __instance._activeThrusterModel = __instance._shipThrusterModel;
             __instance._activeThrusterController = __instance._shipThrusterController;
@@ -4517,7 +4515,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.OnEnterConversation))]
     public static void KeepThrustIndicatorOnInConversation(ThrustAndAttitudeIndicator __instance)
     {
-        if ((bool)fixShipThrustIndicator.GetProperty() && __instance._shipIndicatorMode && __instance._inConversation)
+        if (__instance._shipIndicatorMode && __instance._inConversation)
         {
             __instance._thrusterArrowRoot.gameObject.SetActive(true);
             __instance._inConversation = false;
@@ -4528,7 +4526,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ThrustAndAttitudeIndicator), nameof(ThrustAndAttitudeIndicator.LateUpdate))]
     public static void OverrideJetpackDisplay(ThrustAndAttitudeIndicator __instance)
     {
-        if ((bool)fixShipThrustIndicator.GetProperty() && __instance._shipIndicatorMode && __instance._jetpackThrusterModel.IsBoosterFiring())
+        if (__instance._shipIndicatorMode && __instance._jetpackThrusterModel.IsBoosterFiring())
         {
             Vector3 localAcceleration = __instance._activeThrusterModel.GetLocalAcceleration();
             float num3 = __instance._activeThrusterModel.GetMaxTranslationalThrust();
@@ -4794,7 +4792,7 @@ public static class PatchClass
     #region InheritableForcesFix
     public static readonly HashSet<ForceDetector> seenDetectors = new();
 
-    [HarmonyPrefix]
+    /*[HarmonyPrefix]
     [HarmonyPatch(typeof(ForceDetector), nameof(ForceDetector.GetForceAcceleration))]
     public static bool InheritableForcesFix_GetForceAcceleration_Direct(ForceDetector __instance, ref Vector3 __result)
     {
@@ -4807,9 +4805,9 @@ public static class PatchClass
         }
         __result = __instance._netAcceleration;
         return false;
-    }
+    }*/
 
-    public static Vector3 InheritableForcesFix_GetForceAcceleration_Remote(ForceDetector __instance)
+    /*public static Vector3 InheritableForcesFix_GetForceAcceleration_Remote(ForceDetector __instance)
     {
         if (__instance is not DynamicForceDetector) return __instance.GetForceAcceleration();
 
@@ -4819,9 +4817,9 @@ public static class PatchClass
             __instance._dirty = false;
         }
         return __instance._netAcceleration;
-    }
+    }*/
 
-    [HarmonyPrefix]
+    /*[HarmonyPrefix]
     [HarmonyPatch(typeof(ForceDetector), nameof(ForceDetector.ManagedFixedUpdate))]
     public static bool InheritableForcesFix_ManagedFixedUpdate(ForceDetector __instance)
     {
@@ -4833,8 +4831,10 @@ public static class PatchClass
             __instance._dirty = false;
         }
         return false;
-    }
+    }*/
 
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ForceDetector), nameof(ForceDetector.ManagedFixedUpdate))]
     public static void InheritableForcesFix_AccumulateAcceleration(ForceDetector __instance)
     {
         bool clearDetectors = false;
@@ -4874,7 +4874,7 @@ public static class PatchClass
                     clearDetectors = true;
                 }
                 seenDetectors.Add(__instance);
-                detector._netAcceleration += InheritableForcesFix_GetForceAcceleration_Remote(detector._activeInheritedDetector);
+                detector._netAcceleration += detector._activeInheritedDetector.GetForceAcceleration();
             }
         }
         else if (__instance is DynamicForceDetector)
@@ -4896,7 +4896,7 @@ public static class PatchClass
                     clearDetectors = true;
                 }
                 seenDetectors.Add(__instance);
-                __instance._netAcceleration += InheritableForcesFix_GetForceAcceleration_Remote(__instance._activeInheritedDetector);
+                __instance._netAcceleration += __instance._activeInheritedDetector.GetForceAcceleration();
             }
         }
 
@@ -4975,5 +4975,22 @@ public static class PatchClass
         __instance.transform.Find("ShipInteriorAudio/EjectAudio").GetComponent<OWAudioSource>()
             .PlayOneShot(AudioType.ShipCockpitEject);
         return false;
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(AlignmentForceDetector), nameof(AlignmentForceDetector.AccumulateAcceleration))]
+    public static void test(AlignmentForceDetector __instance)
+    {
+        if (!Keyboard.current.nKey.isPressed) return;
+
+        ShipEnhancements.WriteDebugMessage(__instance._attachedBody);
+
+        if (__instance._attachedBody is ShipBody)
+        {
+            foreach (var vol in __instance._activeVolumes)
+            {
+                ShipEnhancements.WriteDebugMessage(vol);
+            }
+        }
     }
 }
