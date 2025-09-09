@@ -56,7 +56,7 @@ public class DayNightTemperatureZone : TemperatureZone
         var toSun = (_sunTransform.position - _planetBody.transform.position).normalized;
         var toDetector = (detector.transform.position - _planetBody.transform.position).normalized;
         var dayAmount = Vector3.Dot(toSun, toDetector);
-        float twilightOffset = 1 - Mathf.Sin(_twilightAngle * Mathf.Deg2Rad * 0.5f);
+        float twilightOffset = Mathf.Sin(_twilightAngle * Mathf.Deg2Rad * 0.5f);
         float nightLerp = Mathf.InverseLerp(twilightOffset, -twilightOffset, dayAmount);
 
         float distSqr = (detector.transform.position - (transform.position + _shape.center)).sqrMagnitude;

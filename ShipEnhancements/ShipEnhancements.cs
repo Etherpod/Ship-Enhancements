@@ -2230,6 +2230,18 @@ public class ShipEnhancements : ModBehaviour
                 GameObject whsTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_WhiteHoleStation.prefab");
                 CreateObject(whsTempZone, whs.transform);
             }
+
+            GameObject qm = GameObject.Find("QuantumMoon_Body");
+            if (qm != null)
+            {
+                Transform root = qm.transform.Find("Sector_QuantumMoon");
+                GameObject zone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_QuantumMoon_HourglassTwins.prefab");
+                CreateObject(zone, root.Find("State_HT"));
+                zone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_QuantumMoon_DarkBramble.prefab");
+                CreateObject(zone, root.Find("State_DB"));
+                zone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_QuantumMoon_BrittleHollow.prefab");
+                CreateObject(zone, root.Find("State_BH"));
+            }
         }
     }
 
@@ -2349,6 +2361,45 @@ public class ShipEnhancements : ModBehaviour
                 if (name == "Scalding Abyss")
                 {
                     zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/MisfiredJump_ScaldingAbyss.prefab");
+                }
+            }
+            if (ModCompatibility.TheStrangerTheyAre)
+            {
+                if (name == "Ringed Giant")
+                {
+                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/TheStrangerTheyAre_RingedGiant.prefab");
+                }
+                else if (name == "Burning Bombardier")
+                {
+                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/TheStrangerTheyAre_BurningBombardier.prefab");
+                }
+                else if (name == "Sizzling Sands")
+                {
+                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/TheStrangerTheyAre_SizzlingSands.prefab");
+                }
+                else if (name == "Distant Enigma")
+                {
+                    Transform root = NHAPI.GetPlanet(name).transform;
+                    if (root.Find("Sector-3") && !root.Find("Sector-3/TheStrangerTheyAre_DistantEnigma_ThinIce"))
+                    {
+                        zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/TheStrangerTheyAre_DistantEnigma_ThinIce.prefab");
+                        CreateObject(zone, root.Find("Sector-3"));
+                    }
+                    else if (root.Find("Sector-2") && !root.Find("Sector-2/TheStrangerTheyAre_DistantEnigma_Water"))
+                    {
+                        zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/TheStrangerTheyAre_DistantEnigma_Water.prefab");
+                        CreateObject(zone, root.Find("Sector-2"));
+                    }
+                    else if (!root.Find("Sector/TheStrangerTheyAre_DistantEnigma_ThickIce"))
+                    {
+                        zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/TheStrangerTheyAre_DistantEnigma_ThickIce.prefab");
+                        CreateObject(zone, root.Find("Sector"));
+                    }
+                    return;
+                }
+                else if (name == "Velvet Vortex")
+                {
+                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/TheStrangerTheyAre_VelvetVortex.prefab");
                 }
             }
 

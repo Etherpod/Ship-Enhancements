@@ -8,6 +8,7 @@ using OWML.Common;
 using OWML.ModHelper.Menus.CustomInputs;
 using OWML.ModHelper.Menus.NewMenuSystem;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
@@ -4791,6 +4792,8 @@ public static class PatchClass
     #endregion
 
     #region InheritableForcesFix
+    public static readonly HashSet<ForceDetector> seenDetectors = new();
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ForceDetector), nameof(ForceDetector.GetForceAcceleration))]
     public static bool InheritableForcesFix_GetForceAcceleration_Direct(ForceDetector __instance, ref Vector3 __result)
@@ -4799,20 +4802,20 @@ public static class PatchClass
 
         if (__instance._dirty)
         {
-            InheritableForcesFix_AccumulateAcceleration(__instance, false);
+            InheritableForcesFix_AccumulateAcceleration(__instance);
             __instance._dirty = false;
         }
         __result = __instance._netAcceleration;
         return false;
     }
 
-    public static Vector3 InheritableForcesFix_GetForceAcceleration_Remote(ForceDetector __instance, bool fromInheritable)
+    public static Vector3 InheritableForcesFix_GetForceAcceleration_Remote(ForceDetector __instance)
     {
-        if (__instance is not DynamicForceDetector) return Vector3.zero;
+        if (__instance is not DynamicForceDetector) return __instance.GetForceAcceleration();
 
         if (__instance._dirty)
         {
-            InheritableForcesFix_AccumulateAcceleration(__instance, fromInheritable);
+            InheritableForcesFix_AccumulateAcceleration(__instance);
             __instance._dirty = false;
         }
         return __instance._netAcceleration;
@@ -4826,14 +4829,16 @@ public static class PatchClass
 
         if (__instance._dirty)
         {
-            InheritableForcesFix_AccumulateAcceleration(__instance, false);
+            InheritableForcesFix_AccumulateAcceleration(__instance);
             __instance._dirty = false;
         }
         return false;
     }
 
-    public static void InheritableForcesFix_AccumulateAcceleration(ForceDetector __instance, bool fromInheritable)
+    public static void InheritableForcesFix_AccumulateAcceleration(ForceDetector __instance)
     {
+        bool clearDetectors = false;
+
         if (__instance is AlignmentForceDetector)
         {
             var detector = __instance as AlignmentForceDetector;
@@ -4862,12 +4867,15 @@ public static class PatchClass
                     }
                 }
             }
-            if (detector._activeInheritedDetector != null && !fromInheritable)
+            if (detector._activeInheritedDetector != null && !seenDetectors.Contains(detector._activeInheritedDetector))
             {
-                detector._netAcceleration += InheritableForcesFix_GetForceAcceleration_Remote(detector._activeInheritedDetector, true);
+                if (seenDetectors.Count == 0)
+                {
+                    clearDetectors = true;
+                }
+                seenDetectors.Add(__instance);
+                detector._netAcceleration += InheritableForcesFix_GetForceAcceleration_Remote(detector._activeInheritedDetector);
             }
-
-            return;
         }
         else if (__instance is DynamicForceDetector)
         {
@@ -4881,10 +4889,20 @@ public static class PatchClass
                 }
                 __instance._netAcceleration += (__instance._activeVolumes[i] as ForceVolume).CalculateForceAccelerationOnBody(__instance._attachedBody) * __instance._fieldMultiplier;
             }
-            if (__instance._activeInheritedDetector != null && !fromInheritable)
+            if (__instance._activeInheritedDetector != null && !seenDetectors.Contains(__instance._activeInheritedDetector))
             {
-                __instance._netAcceleration += InheritableForcesFix_GetForceAcceleration_Remote(__instance._activeInheritedDetector, true);
+                if (seenDetectors.Count == 0)
+                {
+                    clearDetectors = true;
+                }
+                seenDetectors.Add(__instance);
+                __instance._netAcceleration += InheritableForcesFix_GetForceAcceleration_Remote(__instance._activeInheritedDetector);
             }
+        }
+
+        if (clearDetectors)
+        {
+            seenDetectors.Clear();
         }
     }
     #endregion

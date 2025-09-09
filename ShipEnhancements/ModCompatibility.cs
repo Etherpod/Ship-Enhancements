@@ -10,7 +10,7 @@ public static class ModCompatibility
     public static bool EchoHike { get; private set; }
     public static bool AxiomsRefuge { get; private set; }
     public static bool MisfiredJump { get; private set; }
-    public static bool ForgottenCastaways { get; private set; }
+    public static bool TheStrangerTheyAre { get; private set; }
 
     public static void InitCompatibility()
     {
@@ -21,6 +21,6 @@ public static class ModCompatibility
         EchoHike = interaction.ModExists("Trifid.TrifidJam3");
         AxiomsRefuge = interaction.ModExists("MegaPiggy.Axiom");
         MisfiredJump = interaction.ModExists("Echatsum.MisfiredJump");
-        ForgottenCastaways = interaction.ModExists("cleric.DeepBramble");
+        TheStrangerTheyAre = interaction.ModExists("AnonymousStrangerOW.TheStrangerTheyAre");
     }
 }
