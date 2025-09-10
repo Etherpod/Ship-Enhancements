@@ -13,17 +13,8 @@ public class ExplosionForceVolume : RadialForceVolume
     {
         if (targetBody is ShipBody)
         {
-            var force = base.CalculateForceAccelerationOnBody(targetBody) * 100f;
-            ShipEnhancements.WriteDebugMessage(force.x);
-            ShipEnhancements.WriteDebugMessage(force.y);
-            ShipEnhancements.WriteDebugMessage(force.z + "\n");
-            return force;
+            return base.CalculateForceAccelerationAtPoint(targetBody.GetWorldCenterOfMass());
         }
         return base.CalculateForceAccelerationOnBody(targetBody);
-    }
-
-    public override Vector3 CalculateForceAccelerationAtPoint(Vector3 worldPos)
-    {
-        return base.CalculateForceAccelerationAtPoint(worldPos);
     }
 }

@@ -4976,21 +4976,4 @@ public static class PatchClass
             .PlayOneShot(AudioType.ShipCockpitEject);
         return false;
     }
-
-    [HarmonyPostfix]
-    [HarmonyPatch(typeof(AlignmentForceDetector), nameof(AlignmentForceDetector.AccumulateAcceleration))]
-    public static void test(AlignmentForceDetector __instance)
-    {
-        if (!Keyboard.current.nKey.isPressed) return;
-
-        ShipEnhancements.WriteDebugMessage(__instance._attachedBody);
-
-        if (__instance._attachedBody is ShipBody)
-        {
-            foreach (var vol in __instance._activeVolumes)
-            {
-                ShipEnhancements.WriteDebugMessage(vol);
-            }
-        }
-    }
 }
