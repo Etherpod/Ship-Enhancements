@@ -183,6 +183,7 @@ Temperature zones are not only added to the vanilla solar system, but are also a
  - Christmas Story
  - Echo Hike
  - Evacuation
+ - Heliostudy
  - Misfired Jump
  - The Stranger They Are
 

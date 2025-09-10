@@ -11,6 +11,7 @@ public static class ModCompatibility
     public static bool AxiomsRefuge { get; private set; }
     public static bool MisfiredJump { get; private set; }
     public static bool TheStrangerTheyAre { get; private set; }
+    public static bool Heliostudy { get; private set; }
 
     public static void InitCompatibility()
     {
@@ -22,5 +23,6 @@ public static class ModCompatibility
         AxiomsRefuge = interaction.ModExists("MegaPiggy.Axiom");
         MisfiredJump = interaction.ModExists("Echatsum.MisfiredJump");
         TheStrangerTheyAre = interaction.ModExists("AnonymousStrangerOW.TheStrangerTheyAre");
+        Heliostudy = interaction.ModExists("2walker2.OWJam5ModProject");
     }
 }

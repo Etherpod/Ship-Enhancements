@@ -6,18 +6,18 @@ public class DayNightTemperatureZone : TemperatureZone
 {
     [SerializeField]
     [Range(-100f, 100f)]
-    private float _nightTemperature;
+    protected float _nightTemperature;
     [SerializeField]
-    private float _twilightAngle = 15f;
+    protected float _twilightAngle = 15f;
     [SerializeField]
-    private bool _useCustomSun = false;
+    protected bool _useCustomSun = false;
     [SerializeField]
-    private string _customSunName;
+    protected string _customSunName;
 
-    private Transform _sunTransform;
-    private OWRigidbody _planetBody;
+    protected Transform _sunTransform;
+    protected OWRigidbody _planetBody;
 
-    private void Start()
+    protected virtual void Start()
     {
         _planetBody = gameObject.GetAttachedOWRigidbody();
         if (_useCustomSun && ShipEnhancements.NHAPI != null)

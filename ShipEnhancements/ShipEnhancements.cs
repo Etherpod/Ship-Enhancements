@@ -2240,18 +2240,6 @@ public class ShipEnhancements : ModBehaviour
                 zone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_QuantumMoon_BrittleHollow.prefab");
                 CreateObject(zone, root.Find("State_BH"));
             }
-
-            var thing = new ShipEnhancementsAPI();
-            var settings = new IShipEnhancements.TemperatureZoneSettings();
-            settings.temperature = 100;
-            settings.name = "gabagool";
-            settings.parent = GameObject.Find("TimberHearth_Body").transform;
-            settings.innerRadius = 400;
-            settings.outerRadius = 800;
-            settings.isDayNight = true;
-            settings.nightTemperature = -100;
-            settings.twilightAngle = 10;
-            thing.AddTemperatureZone(settings);
         }
     }
 
@@ -2410,6 +2398,30 @@ public class ShipEnhancements : ModBehaviour
                 else if (name == "Velvet Vortex")
                 {
                     zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/TheStrangerTheyAre_VelvetVortex.prefab");
+                }
+            }
+            if (ModCompatibility.Heliostudy)
+            {
+                if (name == "Walker_Jam5_Planet4")
+                {
+                    Transform root = NHAPI.GetPlanet(name).transform;
+                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/Heliostudy_GlacialAbyss!.prefab");
+                    CreateObject(zone, root);
+                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/Heliostudy_GlacialAbyss!_Core.prefab");
+                    CreateObject(zone, root);
+                    return;
+                }
+                else if (name == "Walker_Jam5_Planet2")
+                {
+                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/Heliostudy_TheBigOne.prefab");
+                }
+                else if (name == "Walker_Jam5_Planet3")
+                {
+                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/Heliostudy_Daucus.prefab");
+                }
+                else if (name == "Walker_Jam5_Planet1")
+                {
+                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/Heliostudy_ShatteredGeode.prefab");
                 }
             }
 
