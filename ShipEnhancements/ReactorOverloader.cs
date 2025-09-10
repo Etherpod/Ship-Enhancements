@@ -5,6 +5,7 @@ namespace ShipEnhancements;
 public class ReactorOverloader : MonoBehaviour
 {
     private InteractReceiver _interactReceiver;
+    private ShipReactorComponent _reactor;
     private ReactorHeatController _reactorHeat;
     private ShipTemperatureDetector _temperatureDetector;
     private bool _focused = false;
@@ -12,13 +13,16 @@ public class ReactorOverloader : MonoBehaviour
 
     private void Start()
     {
-        _reactorHeat = SELocator.GetShipDamageController()._shipReactorComponent.GetComponent<ReactorHeatController>();
+        _reactor = SELocator.GetShipDamageController()._shipReactorComponent;
+        _reactorHeat = _reactor.GetComponent<ReactorHeatController>();
         _temperatureDetector = SELocator.GetShipTemperatureDetector();
         _interactReceiver = GetComponent<InteractReceiver>();
         _interactReceiver.ChangePrompt(UITextLibrary.GetString(UITextType.HoldPrompt) + " Overload Reactor");
         _interactReceiver.OnGainFocus += OnGainFocus;
         _interactReceiver.OnLoseFocus += OnLoseFocus;
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+        _reactor.OnDamaged += OnReactorDamaged;
+        _reactor.OnRepaired += OnReactorRepaired;
     }
 
     private void Update()
@@ -84,6 +88,16 @@ public class ReactorOverloader : MonoBehaviour
         _focused = false;
     }
 
+    private void OnReactorDamaged(ShipComponent component)
+    {
+        _interactReceiver.DisableInteraction();
+    }
+
+    private void OnReactorRepaired(ShipComponent component)
+    {
+        _interactReceiver.EnableInteraction();
+    }
+
     private void OnShipSystemFailure()
     {
         enabled = false;
@@ -94,5 +108,7 @@ public class ReactorOverloader : MonoBehaviour
         _interactReceiver.OnGainFocus -= OnGainFocus;
         _interactReceiver.OnLoseFocus -= OnLoseFocus;
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
+        _reactor.OnDamaged -= OnReactorDamaged;
+        _reactor.OnRepaired -= OnReactorRepaired;
     }
 }
