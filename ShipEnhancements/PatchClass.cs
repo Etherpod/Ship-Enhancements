@@ -888,7 +888,7 @@ public static class PatchClass
         __instance.transform.parent.GetComponentInChildren<TemperatureZone>()?.SetVolumeActive(__instance._state == Campfire.State.LIT);
     }
 
-    
+
 
     [HarmonyPostfix]
     [HarmonyPatch(typeof(RulesetDetector), nameof(RulesetDetector.GetThrustLimit))]
@@ -1722,7 +1722,7 @@ public static class PatchClass
         bool unrestricted = ShipEnhancements.ExperimentalSettings?.UnrestrictedItemPlacement ?? false;
 
         if (!unrestricted
-            && !(bool)enableShipItemPlacement.GetProperty() && !(bool)addTether.GetProperty() 
+            && !(bool)enableShipItemPlacement.GetProperty() && !(bool)addTether.GetProperty()
             && !(bool)enableRemovableGravityCrystal.GetProperty()) return true;
 
         bool isTether = (bool)addTether.GetProperty() && __instance.GetHeldItemType() == ShipEnhancements.Instance.TetherHookType;
@@ -2036,7 +2036,7 @@ public static class PatchClass
         {
             OWAudioSource audio = __instance._audioController._loudShipSource.transform
                 .Find("ShipExplosionExpandAudio").GetComponent<OWAudioSource>();
-            float dist = Vector3.Distance(__instance.transform.position, 
+            float dist = Vector3.Distance(__instance.transform.position,
                 Locator.GetPlayerCamera().transform.position) - (__instance.transform.localScale.x * col.radius);
             float multiplierLerp = Mathf.InverseLerp(20f, 1000f, __instance.transform.localScale.x * col.radius);
             float distLerp = Mathf.InverseLerp(Mathf.Lerp(20f, 1000f, multiplierLerp), 0f, dist);
@@ -2094,7 +2094,7 @@ public static class PatchClass
                 return false;
             }
         }
-        
+
         if ((float)shipExplosionMultiplier.GetProperty() >= 10f
             && (float)shipExplosionMultiplier.GetProperty() < 100f)
         {
@@ -2111,7 +2111,7 @@ public static class PatchClass
         else if (__instance.GetComponentInParent<FuelTankItem>())
         {
             __instance._forceVolume.SetVolumeActivation(true);
-            if (Vector3.Distance(__instance.transform.position, Locator.GetPlayerTransform().position) 
+            if (Vector3.Distance(__instance.transform.position, Locator.GetPlayerTransform().position)
                 < __instance.transform.localScale.x * __instance.GetComponent<SphereCollider>().radius)
             {
                 RumbleManager.PulseShipExplode();
@@ -3282,7 +3282,7 @@ public static class PatchClass
     public static bool ApplyComponentWrenchMultiplier(ShipComponent __instance)
     {
         if ((string)repairWrenchType.GetProperty() != "Enabled"
-            || Locator.GetToolModeSwapper().GetItemCarryTool().GetHeldItemType() 
+            || Locator.GetToolModeSwapper().GetItemCarryTool().GetHeldItemType()
             != ShipEnhancements.Instance.RepairWrenchType) return true;
 
         if (!__instance._damaged)
@@ -3825,7 +3825,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipDetachableModule), nameof(ShipDetachableModule.ApplyImpact))]
     public static void ErnestoDetectHullImpact(ShipDetachableModule __instance, bool __runOriginal)
     {
-        if (!(bool)addErnesto.GetProperty() || !__runOriginal 
+        if (!(bool)addErnesto.GetProperty() || !__runOriginal
             || SELocator.GetShipDamageController().IsSystemFailed()) return;
 
         for (int i = 0; i < __instance._hulls.Length; i++)
@@ -4018,7 +4018,7 @@ public static class PatchClass
 
         if (__instance._currentState == AnglerfishController.AnglerState.Consuming)
         {
-            if (!__instance._targetBody.CompareTag("Player") && caughtBody.CompareTag("Player") 
+            if (!__instance._targetBody.CompareTag("Player") && caughtBody.CompareTag("Player")
                 && !PlayerState.IsInsideShip() && !PlayerState.AtFlightConsole())
             {
                 Locator.GetDeathManager().KillPlayer(DeathType.Digestion);
@@ -4247,13 +4247,13 @@ public static class PatchClass
     {
         if (!(bool)scoutPhotoMode.GetProperty()) return;
 
-        if ((bool)disableScoutLaunching.GetProperty() && __instance._name == ProbeLauncher.Name.Ship 
+        if ((bool)disableScoutLaunching.GetProperty() && __instance._name == ProbeLauncher.Name.Ship
             && __instance._photoMode) return;
 
         // copy-pasted from vanilla impl, with the first == changed to !=, so this is effectively:
         // "if the vanilla UpdatePreLaunch is about to ignore a tool left/right press only because
         // this is the ship's scout launcher, then don't ignore it"
-        if (__instance._name == ProbeLauncher.Name.Ship && (OWInput.IsNewlyPressed(InputLibrary.toolOptionLeft, InputMode.All) 
+        if (__instance._name == ProbeLauncher.Name.Ship && (OWInput.IsNewlyPressed(InputLibrary.toolOptionLeft, InputMode.All)
                 || OWInput.IsNewlyPressed(InputLibrary.toolOptionRight, InputMode.All)))
         {
             __instance._photoMode = !__instance._photoMode;
@@ -4276,7 +4276,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ProbeLauncherUI), nameof(ProbeLauncherUI.Update))]
     public static bool FixShipPhotoModeBrackets(ProbeLauncherUI __instance)
     {
-        if (!(bool)scoutPhotoMode.GetProperty() 
+        if (!(bool)scoutPhotoMode.GetProperty()
             || __instance._probeLauncher.GetName() != ProbeLauncher.Name.Ship)
         {
             return true;
@@ -4421,7 +4421,7 @@ public static class PatchClass
         return false;
     }
 
-    public static void SendAutopilotState(OWRigidbody body = null, bool destination = false, 
+    public static void SendAutopilotState(OWRigidbody body = null, bool destination = false,
         bool startMatch = false, bool stopMatch = false, bool abort = false)
     {
         if (ShipEnhancements.InMultiplayer)
@@ -4792,118 +4792,112 @@ public static class PatchClass
     #region InheritableForcesFix
     public static readonly HashSet<ForceDetector> seenDetectors = new();
 
-    /*[HarmonyPrefix]
-    [HarmonyPatch(typeof(ForceDetector), nameof(ForceDetector.GetForceAcceleration))]
-    public static bool InheritableForcesFix_GetForceAcceleration_Direct(ForceDetector __instance, ref Vector3 __result)
-    {
-        if (__instance is not DynamicForceDetector) return true;
-
-        if (__instance._dirty)
-        {
-            InheritableForcesFix_AccumulateAcceleration(__instance);
-            __instance._dirty = false;
-        }
-        __result = __instance._netAcceleration;
-        return false;
-    }*/
-
-    /*public static Vector3 InheritableForcesFix_GetForceAcceleration_Remote(ForceDetector __instance)
-    {
-        if (__instance is not DynamicForceDetector) return __instance.GetForceAcceleration();
-
-        if (__instance._dirty)
-        {
-            InheritableForcesFix_AccumulateAcceleration(__instance);
-            __instance._dirty = false;
-        }
-        return __instance._netAcceleration;
-    }*/
-
-    /*[HarmonyPrefix]
-    [HarmonyPatch(typeof(ForceDetector), nameof(ForceDetector.ManagedFixedUpdate))]
-    public static bool InheritableForcesFix_ManagedFixedUpdate(ForceDetector __instance)
-    {
-        if (__instance is not DynamicForceDetector) return true;
-
-        if (__instance._dirty)
-        {
-            InheritableForcesFix_AccumulateAcceleration(__instance);
-            __instance._dirty = false;
-        }
-        return false;
-    }*/
-
     [HarmonyPrefix]
-    [HarmonyPatch(typeof(ForceDetector), nameof(ForceDetector.ManagedFixedUpdate))]
-    public static void InheritableForcesFix_AccumulateAcceleration(ForceDetector __instance)
+    [HarmonyPatch(typeof(ForceDetector), nameof(ForceDetector.AccumulateAcceleration))]
+    public static bool InheritableForcesFix_AccumulateAcceleration_Dynamic(ForceDetector __instance)
     {
+        if (__instance is not DynamicForceDetector) return true;
+
         bool clearDetectors = false;
 
-        if (__instance is AlignmentForceDetector)
+        __instance._netAcceleration = Vector3.zero;
+        for (int i = __instance._activeVolumes.Count - 1; i >= 0; i--)
         {
-            var detector = __instance as AlignmentForceDetector;
-            detector._netAcceleration = Vector3.zero;
-            detector._aligmentAccel = Vector3.zero;
-            detector._alignmentAngularVelocity = Vector3.zero;
-            int num = 0;
-            for (int i = detector._activeVolumes.Count - 1; i >= 0; i--)
+            if (__instance._activeVolumes[i] == null)
             {
-                ForceVolume forceVolume = detector._activeVolumes[i] as ForceVolume;
-                Vector3 vector = forceVolume.CalculateForceAccelerationOnBody(detector._attachedBody);
-                detector._netAcceleration += vector * detector._fieldMultiplier;
-                int alignmentPriority = forceVolume.GetAlignmentPriority();
-                if (forceVolume.GetAffectsAlignment(detector._attachedBody))
-                {
-                    if (alignmentPriority > num)
-                    {
-                        detector._aligmentAccel = vector;
-                        detector._alignmentAngularVelocity = forceVolume.GetAttachedOWRigidbody().GetAngularVelocity();
-                        num = alignmentPriority;
-                    }
-                    else if (alignmentPriority == num)
-                    {
-                        detector._aligmentAccel += vector;
-                        detector._alignmentAngularVelocity += forceVolume.GetAttachedOWRigidbody().GetAngularVelocity();
-                    }
-                }
+                Debug.LogError("what", __instance.gameObject);
+                Debug.Break();
             }
-            if (detector._activeInheritedDetector != null && !seenDetectors.Contains(detector._activeInheritedDetector))
-            {
-                if (seenDetectors.Count == 0)
-                {
-                    clearDetectors = true;
-                }
-                seenDetectors.Add(__instance);
-                detector._netAcceleration += detector._activeInheritedDetector.GetForceAcceleration();
-            }
+            __instance._netAcceleration += (__instance._activeVolumes[i] as ForceVolume).CalculateForceAccelerationOnBody(__instance._attachedBody) * __instance._fieldMultiplier;
         }
-        else if (__instance is DynamicForceDetector)
+        if (__instance._activeInheritedDetector != null && !seenDetectors.Contains(__instance._activeInheritedDetector))
         {
-            __instance._netAcceleration = Vector3.zero;
-            for (int i = __instance._activeVolumes.Count - 1; i >= 0; i--)
+            if (seenDetectors.Count == 0)
             {
-                if (__instance._activeVolumes[i] == null)
-                {
-                    Debug.LogError("what", __instance.gameObject);
-                    Debug.Break();
-                }
-                __instance._netAcceleration += (__instance._activeVolumes[i] as ForceVolume).CalculateForceAccelerationOnBody(__instance._attachedBody) * __instance._fieldMultiplier;
+                clearDetectors = true;
             }
-            if (__instance._activeInheritedDetector != null && !seenDetectors.Contains(__instance._activeInheritedDetector))
-            {
-                if (seenDetectors.Count == 0)
-                {
-                    clearDetectors = true;
-                }
-                seenDetectors.Add(__instance);
-                __instance._netAcceleration += __instance._activeInheritedDetector.GetForceAcceleration();
-            }
+            seenDetectors.Add(__instance);
+            __instance._netAcceleration += __instance._activeInheritedDetector.GetForceAcceleration();
         }
 
         if (clearDetectors)
         {
             seenDetectors.Clear();
         }
+
+        return false;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(AlignmentForceDetector), nameof(AlignmentForceDetector.AccumulateAcceleration))]
+    public static bool InheritableForcesFix_AccumulateAcceleration_Alignment(AlignmentForceDetector __instance)
+    {
+        if (Keyboard.current.mKey.isPressed)
+        {
+            ShipEnhancements.WriteDebugMessage((__instance is AlignmentForceDetector) + " - " + __instance);
+        }
+
+        bool clearDetectors = false;
+
+        var detector = __instance as AlignmentForceDetector;
+        detector._netAcceleration = Vector3.zero;
+        detector._aligmentAccel = Vector3.zero;
+        detector._alignmentAngularVelocity = Vector3.zero;
+        int num = 0;
+        for (int i = detector._activeVolumes.Count - 1; i >= 0; i--)
+        {
+            ForceVolume forceVolume = detector._activeVolumes[i] as ForceVolume;
+            Vector3 vector = forceVolume.CalculateForceAccelerationOnBody(detector._attachedBody);
+            detector._netAcceleration += vector * detector._fieldMultiplier;
+            int alignmentPriority = forceVolume.GetAlignmentPriority();
+            if (forceVolume.GetAffectsAlignment(detector._attachedBody))
+            {
+                if (alignmentPriority > num)
+                {
+                    detector._aligmentAccel = vector;
+                    detector._alignmentAngularVelocity = forceVolume.GetAttachedOWRigidbody().GetAngularVelocity();
+                    num = alignmentPriority;
+                }
+                else if (alignmentPriority == num)
+                {
+                    detector._aligmentAccel += vector;
+                    detector._alignmentAngularVelocity += forceVolume.GetAttachedOWRigidbody().GetAngularVelocity();
+                }
+            }
+        }
+        if (Keyboard.current.nKey.isPressed)
+        {
+            ShipEnhancements.WriteDebugMessage("Process on " + __instance.GetAttachedOWRigidbody());
+            ShipEnhancements.WriteDebugMessage("Seen detectors: ");
+            foreach (var d in seenDetectors)
+            {
+                ShipEnhancements.WriteDebugMessage(d);
+            }
+        }
+        if (detector._activeInheritedDetector != null && !seenDetectors.Contains(detector._activeInheritedDetector))
+        {
+            if (seenDetectors.Count == 0)
+            {
+                clearDetectors = true;
+            }
+            if (Keyboard.current.nKey.isPressed)
+            {
+                ShipEnhancements.WriteDebugMessage("Add " + __instance);
+            }
+            seenDetectors.Add(__instance);
+            detector._netAcceleration += detector._activeInheritedDetector.GetForceAcceleration();
+        }
+        else if (Keyboard.current.nKey.isPressed)
+        {
+            ShipEnhancements.WriteDebugMessage("Cancel");
+        }
+
+        if (clearDetectors)
+        {
+            seenDetectors.Clear();
+        }
+
+        return false;
     }
     #endregion
 
@@ -4944,7 +4938,7 @@ public static class PatchClass
     {
         if (!ShipEnhancements.ExperimentalSettings?.QuantumShip ?? false) return;
 
-        if (!PatchHandler.CollidingWithShip  && __instance._groundCollider != null
+        if (!PatchHandler.CollidingWithShip && __instance._groundCollider != null
             && __instance._groundCollider.GetComponentInParent<ShipBody>())
         {
             PatchHandler.SetPlayerStandingOnShip(true);

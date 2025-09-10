@@ -30,7 +30,7 @@ public class TemperatureDetector : MonoBehaviour
             {
                 _highTemperature = true;
             }
-            else
+            else if (_highTemperature)
             {
                 UpdateInternalTemperature();
                 OnHighTemperature();
