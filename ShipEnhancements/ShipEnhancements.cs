@@ -2424,6 +2424,13 @@ public class ShipEnhancements : ModBehaviour
                     zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/Heliostudy_ShatteredGeode.prefab");
                 }
             }
+            if (ModCompatibility.OnARail)
+            {
+                if (name == "Frost Car")
+                {
+                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/OnARail_FrostCar.prefab");
+                }
+            }
 
             if (zone != null)
             {

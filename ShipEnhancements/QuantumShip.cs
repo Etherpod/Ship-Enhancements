@@ -5,6 +5,8 @@ namespace ShipEnhancements;
 
 public class QuantumShip : VisibilityObject
 {
+    // add references to all the things that the ShipDestroyed message activates
+
     private bool _visibleInProbeSnapshot;
     private float _maxSnapshotLockRange = 5000f;
     private bool _subscribedToRemoveSnapshotEvent;
