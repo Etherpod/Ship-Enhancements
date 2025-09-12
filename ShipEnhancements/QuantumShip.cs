@@ -5,8 +5,6 @@ namespace ShipEnhancements;
 
 public class QuantumShip : VisibilityObject
 {
-    // add references to all the things that the ShipDestroyed message activates
-
     private bool _visibleInProbeSnapshot;
     private float _maxSnapshotLockRange = 5000f;
     private bool _subscribedToRemoveSnapshotEvent;
@@ -39,7 +37,7 @@ public class QuantumShip : VisibilityObject
 
     public bool IsPlayerEntangled()
     {
-        return _isPlayerStandingOnObject;
+        return _isPlayerStandingOnObject || PlayerState.IsInsideShip();
     }
 
     public void SetPlayerStandingOnObject(bool isPlayerStandingOnObject)
@@ -65,7 +63,7 @@ public class QuantumShip : VisibilityObject
 
     private bool IsLockedByPlayerContact()
     {
-        return PlayerState.IsInsideShip() || (IsPlayerEntangled() && (IsIlluminated() || Locator.GetFlashlight().IsFlashlightOn()));
+        return IsPlayerEntangled() && (IsIlluminated() || Locator.GetFlashlight().IsFlashlightOn());
     }
 
     private void Collapse()

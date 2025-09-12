@@ -34,6 +34,7 @@ public class GravityRepelVolume : MonoBehaviour
 
     private void OnTriggerEnter(Collider hitCollider)
     {
+        CleanTrackedObjects();
         if (IsTrackable(hitCollider.gameObject))
         {
             if (OWLayerMask.IsLayerInMask(hitCollider.gameObject.layer, OWLayerMask.physicalMask))
@@ -50,6 +51,7 @@ public class GravityRepelVolume : MonoBehaviour
 
     private void OnTriggerExit(Collider hitCollider)
     {
+        CleanTrackedObjects();
         if (IsTrackable(hitCollider.gameObject))
         {
             if (_trackedObjects.Contains(hitCollider.gameObject))
@@ -64,6 +66,26 @@ public class GravityRepelVolume : MonoBehaviour
             if (_trackedObjects.Count == 0 && _trackedFluids.Count == 0)
             {
                 _repel = false;
+            }
+        }
+    }
+
+    private void CleanTrackedObjects()
+    {
+        for (int i = 0; i < _trackedObjects.Count; i++)
+        {
+            if (!_trackedObjects[i].activeInHierarchy)
+            {
+                _trackedObjects.RemoveAt(i);
+                i--;
+            }
+        }
+        for (int k = 0; k < _trackedFluids.Count; k++)
+        {
+            if (!_trackedFluids[k].activeInHierarchy)
+            {
+                _trackedFluids.RemoveAt(k);
+                k--;
             }
         }
     }

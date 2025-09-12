@@ -19,5 +19,5 @@ public record ExperimentalSettingsJson(
     [JsonProperty] float Eject_SpeedMultiplier,
     [JsonProperty] bool RealisticClock,
     [JsonProperty] bool MakeWaterDamageEverythingDamage,
-    [JsonProperty] bool QuantumShip
+    [JsonProperty] bool UltraQuantumShip
 );

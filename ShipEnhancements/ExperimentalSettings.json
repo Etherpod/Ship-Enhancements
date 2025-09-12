@@ -48,5 +48,5 @@
   "MakeWaterDamageEverythingDamage": false,
 
   // If you look away from your ship, it disappears. Forever.
-  "QuantumShip": false
+  "UltraQuantumShip": false
 }

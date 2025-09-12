@@ -4138,13 +4138,21 @@ public static class PatchClass
     [HarmonyPatch(typeof(Minimap), nameof(Minimap.SetComponentsEnabled))]
     public static bool KeepMinimapOff(Minimap __instance, bool value)
     {
-        if (!(bool)disableMinimapMarkers.GetProperty() || !value) return true;
+        bool qShip = (bool)enableQuantumShip.GetProperty();
+        bool disabled = (bool)disableMinimapMarkers.GetProperty();
+        if (!value || (!qShip && !disabled)) return true;
 
         for (int i = 0; i < __instance._minimapRenderersToSwitchOnOff.Length; i++)
         {
             if (__instance._minimapRenderersToSwitchOnOff[i].transform.parent == __instance._globeMeshTransform)
             {
                 __instance._minimapRenderersToSwitchOnOff[i].enabled = value;
+            }
+            else
+            {
+                __instance._minimapRenderersToSwitchOnOff[i].enabled = !disabled && (!qShip
+                    || __instance._minimapRenderersToSwitchOnOff[i].name != "ShipMarker"
+                    || !(Locator.GetQuantumMoon()?._isShipInside ?? false));
             }
         }
         for (int j = 0; j < __instance._electricalComponentsToSwitchOnOff.Length; j++)
@@ -4185,7 +4193,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitUI), nameof(ShipCockpitUI.Update))]
     public static void UpdateFlagMarkersOn(ShipCockpitUI __instance)
     {
-        if ((bool)addExpeditionFlag.GetProperty() && !(bool)disableMapMarkers.GetProperty())
+        if ((bool)addExpeditionFlag.GetProperty() && !(bool)disableMinimapMarkers.GetProperty())
         {
             MinimapFlagController flagController = __instance.GetComponentInChildren<MinimapFlagController>();
             if (flagController == null) return;
@@ -4936,7 +4944,8 @@ public static class PatchClass
     [HarmonyPatch(typeof(PlayerCharacterController), nameof(PlayerCharacterController.CastForGrounded))]
     public static void UpdateShipGroundedPre(PlayerCharacterController __instance)
     {
-        if (!ShipEnhancements.ExperimentalSettings?.QuantumShip ?? false) return;
+        if (!(bool)enableQuantumShip.GetProperty() 
+            && !(ShipEnhancements.ExperimentalSettings?.UltraQuantumShip ?? false)) return;
 
         if (!PatchHandler.CollidingWithShip && __instance._groundCollider != null
             && __instance._groundCollider.GetComponentInParent<ShipBody>())
@@ -4949,8 +4958,10 @@ public static class PatchClass
     [HarmonyPatch(typeof(PlayerCharacterController), nameof(PlayerCharacterController.UpdateGrounded))]
     public static void UpdateShipGroundedPost(PlayerCharacterController __instance)
     {
-        if (__instance._isMovementLocked || __instance._isTumbling || !__instance._isAlignedToForce
-            || (!ShipEnhancements.ExperimentalSettings?.QuantumShip ?? false))
+        if (!(bool)enableQuantumShip.GetProperty()
+            && !(ShipEnhancements.ExperimentalSettings?.UltraQuantumShip ?? false)) return;
+
+        if (__instance._isMovementLocked || __instance._isTumbling || !__instance._isAlignedToForce)
         {
             return;
         }
@@ -4959,6 +4970,36 @@ public static class PatchClass
         {
             PatchHandler.SetPlayerStandingOnShip(false);
         }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(QuantumMoon), nameof(QuantumMoon.SetSurfaceState))]
+    public static void FixShipStateChange(QuantumMoon __instance)
+    {
+        if ((bool)enableQuantumShip.GetProperty() && __instance._isShipInside)
+        {
+            SELocator.GetShipBody().SetVelocity(__instance._moonBody.GetPointVelocity(SELocator.GetShipTransform().position));
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(SocketedQuantumObject), nameof(SocketedQuantumObject.MoveToSocket))]
+    public static void FixShipSocketChange(SocketedQuantumObject __instance)
+    {
+        if ((bool)enableQuantumShip.GetProperty() && __instance is SocketedQuantumShip)
+        {
+            QuantumMoon qm = Locator.GetQuantumMoon();
+            if (qm == null) return;
+            SELocator.GetShipBody().SetVelocity(qm._moonBody.GetPointVelocity(SELocator.GetShipTransform().position));
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(QuantumObject), nameof(QuantumObject.IsLockedByActiveCamera))]
+    public static void ShipVisibilityLockFix(QuantumObject __instance, ref bool __result)
+    {
+        if (!(bool)enableQuantumShip.GetProperty() || __instance is not SocketedQuantumShip) return;
+        __result = __result || PlayerState.IsInsideShip();
     }
     #endregion
 

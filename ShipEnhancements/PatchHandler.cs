@@ -280,11 +280,18 @@ public class PatchHandler : MonoBehaviour
 
     public static void SetPlayerStandingOnShip(bool standingOnShip)
     {
-        if (!ShipEnhancements.ExperimentalSettings?.QuantumShip ?? false) return;
-        SELocator.GetShipBody().GetComponentInChildren<QuantumShip>().SetPlayerStandingOnObject(standingOnShip);
         if (Instance != null)
         {
             Instance._collidingWithShip = standingOnShip;
+        }
+
+        if (ShipEnhancements.ExperimentalSettings?.UltraQuantumShip ?? false)
+        {
+            SELocator.GetShipBody().GetComponentInChildren<QuantumShip>().SetPlayerStandingOnObject(standingOnShip);
+        }
+        else if ((bool)enableQuantumShip.GetProperty())
+        {
+            SELocator.GetShipBody().GetComponent<SocketedQuantumShip>().SetPlayerStandingOnObject(standingOnShip);
         }
     }
 }

@@ -465,6 +465,12 @@
       "value": 1,
       "tooltip": "Larger numbers increase the distance your ship can be heard by noise detectors."
     },
+    "enableQuantumShip": {
+      "title": "Enable Quantum Ship",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Makes your ship quantum while on the Quantum Moon. This is not entirely lore accurate."
+    },
     "extraNoise": {
       "title": "Extra Noise",
       "type": "toggle",

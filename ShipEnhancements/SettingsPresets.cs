@@ -120,6 +120,7 @@ public static class SettingsPresets
         { "waterDrainMultiplier", 1f },
         { "addWaterCooling", false },
         { "enableReactorOverload", false },
+        { "enableQuantumShip", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -235,6 +236,7 @@ public static class SettingsPresets
         { "waterDrainMultiplier", 1f },
         { "addWaterCooling", false },
         { "enableReactorOverload", false },
+        { "enableQuantumShip", false },
     };
 
     public static readonly Dictionary<string, object> ImpossibleSettings = new Dictionary<string, object>()
@@ -350,6 +352,7 @@ public static class SettingsPresets
         { "waterDrainMultiplier", 1f },
         { "addWaterCooling", false },
         { "enableReactorOverload", false },
+        { "enableQuantumShip", true },
     };
 
     public static readonly Dictionary<string, object> NewStuffSettings = new Dictionary<string, object>()
@@ -465,6 +468,7 @@ public static class SettingsPresets
         { "waterDrainMultiplier", 1f },
         { "addWaterCooling", true },
         { "enableReactorOverload", true },
+        { "enableQuantumShip", false },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -581,6 +585,7 @@ public static class SettingsPresets
         { "waterDrainMultiplier", 3f },
         { "addWaterCooling", true },
         { "enableReactorOverload", true },
+        { "enableQuantumShip", true },
     };
 
     // Random preset composition
@@ -1252,6 +1257,7 @@ public static class SettingsPresets
         ], (0.25f, 0.5f), 1f) },
         { "enableReactorOverload", new RandomSettingValue((0.5f, 0.5f)) },
         { "buttonsRequireFlightChair", new RandomSettingValue((0f, 0.5f)) },
+        { "enableQuantumShip", new RandomSettingValue((0.3f, 0.8f)) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

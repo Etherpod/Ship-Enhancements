@@ -255,6 +255,7 @@ public class ShipEnhancements : ModBehaviour
         addWaterCooling,
         enableReactorOverload,
         buttonsRequireFlightChair,
+        enableQuantumShip,
     }
 
     private string[] startupMessages =
@@ -1826,9 +1827,22 @@ public class ShipEnhancements : ModBehaviour
                 CreateObject(satelliteObj, parent);
             }
         }
-        if (ExperimentalSettings?.QuantumShip ?? false)
+        if (ExperimentalSettings?.UltraQuantumShip ?? false)
         {
             CreateObject(LoadPrefab("Assets/ShipEnhancements/QuantumShipController.prefab"), SELocator.GetShipTransform());
+        }
+        else if ((bool)enableQuantumShip.GetProperty())
+        {
+            var qPrefab = LoadPrefab("Assets/ShipEnhancements/QuantumShipController.prefab");
+            Instantiate(qPrefab.transform.GetChild(0), SELocator.GetShipTransform());
+            var qShip = SELocator.GetShipBody().gameObject.AddComponent<SocketedQuantumShip>();
+            qShip._maxSnapshotLockRange = 5000f;
+            qShip._collapseOnStart = false;
+            qShip._ignoreRetryQueue = true;
+            qShip._alignWithGravity = false;
+            qShip._alignWithSocket = true;
+            qShip._randomYRotation = true;
+            qShip._localOffset = new Vector3(0, 4, 0);
         }
 
         SetDamageColors();
@@ -2310,7 +2324,7 @@ public class ShipEnhancements : ModBehaviour
             {
                 GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_0187.prefab");
                 CreateObject(zone, bh.transform.Find("Sector_BH/Sector_OldSettlement/Fragment OldSettlement 5/Core_OldSettlement 5"));
-            } 
+            }
         }
     }
 
@@ -2441,7 +2455,7 @@ public class ShipEnhancements : ModBehaviour
 
     private void OnNHStarSystemLoaded(string name)
     {
-        if ((bool)enableShipTemperature.GetProperty() 
+        if ((bool)enableShipTemperature.GetProperty()
             && (!ModCompatibility.Evacuation || name != "2walker2.OogaBooga"))
         {
             GameObject sunTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Sun.prefab");
@@ -3344,7 +3358,7 @@ public class ShipEnhancements : ModBehaviour
                 }
 
                 if (settingObject["title"] != null)
-                { 
+                {
                     if (!SetCustomSettingName(settingsParent, ref label, ref cachedNames, name))
                     {
                         label = ModHelper.MenuTranslations.GetLocalizedString(settingObject["title"].ToString());
@@ -3837,7 +3851,7 @@ public class ShipEnhancements : ModBehaviour
         Settings blendSetting = (stem + "ColorBlend").AsEnum<Settings>();
         string blend = (string)blendSetting.GetValue();
 
-        var found = _customSettingNames.Where(tuple => tuple.blendType == blend 
+        var found = _customSettingNames.Where(tuple => tuple.blendType == blend
             && tuple.canShow(index, num));
 
         if (found.Count() > 0)
@@ -3861,7 +3875,7 @@ public class ShipEnhancements : ModBehaviour
                     {
                         var id = settingsParent.GetChild(c).GetInstanceID();
                         if (!cachedNames.ContainsKey(id))
-                        cachedNames.Add(id, "UIElement-" + label);
+                            cachedNames.Add(id, "UIElement-" + label);
                     }
                 }
                 SettingExtensions.customObjLabels[settingName] = label;
