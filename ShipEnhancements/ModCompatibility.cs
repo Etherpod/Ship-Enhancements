@@ -13,6 +13,7 @@ public static class ModCompatibility
     public static bool TheStrangerTheyAre { get; private set; }
     public static bool Heliostudy { get; private set; }
     public static bool OnARail { get; private set; }
+    public static bool UnnamedMystery { get; private set; }
 
     public static void InitCompatibility()
     {
@@ -26,5 +27,6 @@ public static class ModCompatibility
         TheStrangerTheyAre = interaction.ModExists("AnonymousStrangerOW.TheStrangerTheyAre");
         Heliostudy = interaction.ModExists("2walker2.OWJam5ModProject");
         OnARail = interaction.ModExists("CantAffordaName.OnARail");
+        UnnamedMystery = interaction.ModExists("O32.UnnamedMystery");
     }
 }

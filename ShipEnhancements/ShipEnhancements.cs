@@ -2445,6 +2445,17 @@ public class ShipEnhancements : ModBehaviour
                     zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/OnARail_FrostCar.prefab");
                 }
             }
+            if (ModCompatibility.UnnamedMystery)
+            {
+                if (name == "Electrum")
+                {
+                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/UnnamedMystery_Electrum.prefab");
+                }
+                else if (name == "Zephyria")
+                {
+                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/UnnamedMystery_Zephyria.prefab");
+                }
+            }
 
             if (zone != null)
             {
