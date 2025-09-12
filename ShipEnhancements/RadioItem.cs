@@ -772,13 +772,18 @@ public class RadioItem : OWItem
 
         if (_connectedToShip)
         {
-            _musicSource.spatialBlend = 1f;
-            _musicSource.spread = 60f;
+            //_musicSource.spatialBlend = 1f;
+            //_musicSource.spread = 60f;
             _highPassFilter.enabled = true;
             _oneShotSource.PlayOneShot(_disconnectAudio, 1f);
             _connectedToShip = false;
 
             SetRadioVolume();
+        }
+        else if (holdTranform.GetAttachedOWRigidbody() == SELocator.GetPlayerBody())
+        {
+            _musicSource.spatialBlend = 0f;
+            _musicSource.spread = 0f;
         }
 
         _meshParent.transform.localScale = Vector3.one * 0.6f;
@@ -788,13 +793,23 @@ public class RadioItem : OWItem
     public override void DropItem(Vector3 position, Vector3 normal, Transform parent, Sector sector, IItemDropTarget customDropTarget)
     {
         base.DropItem(position, normal, parent, sector, customDropTarget);
+
+        if (!_connectedToShip)
+        {
+            _musicSource.spatialBlend = 1f;
+            _musicSource.spread = 60f;
+        }
+
         _meshParent.transform.localScale = Vector3.one;
     }
 
     private void OnExitShip()
     {
-        _musicSource.spatialBlend = 1f;
-        _musicSource.spread = 60f;
+        if (_connectedToShip)
+        {
+            _musicSource.spatialBlend = 1f;
+            _musicSource.spread = 60f;
+        }
     }
 
     private void OnEnterShip()
