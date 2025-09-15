@@ -2562,7 +2562,7 @@ public class ShipEnhancements : ModBehaviour
         Material inSharedMat = suppliesRenderer.sharedMaterials[0];
         Material inSharedMat2 = inSharedMat;
 
-        CockpitButtonPanel buttonPanel = SELocator.GetButtonPanel();
+        CockpitButtonPanel buttonPanel = SELocator.GetShipBody().GetComponentInChildren<CockpitButtonPanel>();
         if (buttonPanel != null)
         {
             MeshRenderer buttonPanelRenderer = buttonPanel.transform.Find("Panel/PanelBody.001").GetComponent<MeshRenderer>();
