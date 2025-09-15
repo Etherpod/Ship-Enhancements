@@ -2003,14 +2003,10 @@ public class ShipEnhancements : ModBehaviour
             }
             if ((bool)disableMinimapMarkers.GetProperty())
             {
-                Minimap playerMinimap = GameObject.Find("SecondaryGroup/HUD_Minimap/Minimap_Root").GetComponent<Minimap>();
-                for (int i = 0; i < playerMinimap.transform.childCount; i++)
-                {
-                    if (playerMinimap.transform.GetChild(i).name.Contains("PlayerMarker"))
-                    {
-                        playerMinimap.transform.GetChild(i).gameObject.SetActive(false);
-                    }
-                }
+                GameObject playerMarker = GameObject.Find("SecondaryGroup/HUD_Minimap/Minimap_Root/PlayerMarker/Arrow");
+                playerMarker.SetActive(false);
+                GameObject geMarker = GameObject.Find("SecondaryGroup/HUD_Minimap/Minimap_Root/AboveGroundMarker/Arrow");
+                geMarker?.SetActive(false);
             }
             if ((!InMultiplayer || QSBAPI.GetIsHost()) && (float)shipDamageSpeedMultiplier.GetProperty() < 0f)
             {
