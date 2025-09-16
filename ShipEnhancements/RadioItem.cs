@@ -772,18 +772,22 @@ public class RadioItem : OWItem
 
         if (_connectedToShip)
         {
-            //_musicSource.spatialBlend = 1f;
-            //_musicSource.spread = 60f;
             _highPassFilter.enabled = true;
             _oneShotSource.PlayOneShot(_disconnectAudio, 1f);
             _connectedToShip = false;
 
             SetRadioVolume();
         }
-        else if (holdTranform.GetAttachedOWRigidbody() == SELocator.GetPlayerBody())
+        
+        if (holdTranform.GetAttachedOWRigidbody() == SELocator.GetPlayerBody())
         {
             _musicSource.spatialBlend = 0f;
             _musicSource.spread = 0f;
+        }
+        else
+        {
+            _musicSource.spatialBlend = 1f;
+            _musicSource.spread = 60f;
         }
 
         _meshParent.transform.localScale = Vector3.one * 0.6f;
