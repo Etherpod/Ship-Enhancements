@@ -166,6 +166,11 @@ public class CockpitButton : CockpitInteractible
         return _on;
     }
 
+    public virtual string GetOnLabel()
+    {
+        return _onLabel;
+    }
+
     private void OnShipSystemFailure()
     {
         enabled = false;

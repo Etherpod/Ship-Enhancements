@@ -26,6 +26,8 @@ public class AutopilotPanelController : MonoBehaviour
 
     private void Start()
     {
+        ShipEnhancements.WriteDebugMessage("START START START");
+
         _autopilot = SELocator.GetShipBody().GetComponent<Autopilot>();
         _pidAutopilot = SELocator.GetShipBody().GetComponent<PidAutopilot>();
         _persistentInput = SELocator.GetShipBody().GetComponent<ShipPersistentInput>();
@@ -360,6 +362,16 @@ public class AutopilotPanelController : MonoBehaviour
     public bool IsHoldInputSelected()
     {
         return _activeMatch == _holdInputButton;
+    }
+
+    public CockpitButtonSwitch GetActiveAutopilot()
+    {
+        return _activeAutopilot;
+    }
+
+    public CockpitButtonSwitch GetActiveMatchVelocity()
+    {
+        return _activeMatch;
     }
 
     public bool IsAutopilotDamaged()

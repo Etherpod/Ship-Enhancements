@@ -48,6 +48,30 @@ public class CockpitButtonPanel : MonoBehaviour
     private float _extensionTime = 0.4f;
     private int _focusedButtons = 0;
 
+    public struct ButtonStates
+    {
+        public bool gravState;
+        public bool invertPowerState;
+        public bool alignState;
+        public bool alignModeState;
+        public int modulatorLevel;
+        public string selectedAutopilot;
+        public string selectedMatchVelocity;
+        public bool engineSwitchState;
+
+        public ButtonStates()
+        {
+            gravState = false;
+            invertPowerState = false;
+            alignState = false;
+            alignModeState = false;
+            modulatorLevel = 5;
+            selectedAutopilot = "Activate Autopilot";
+            selectedMatchVelocity = "Activate Match Velocity";
+            engineSwitchState = false;
+        }
+    }
+
     private void Awake()
     {
         if (!(bool)enableGravityLandingGear.GetProperty()
@@ -179,67 +203,51 @@ public class CockpitButtonPanel : MonoBehaviour
         }
     }
 
-    /*public void SetThrustModulatorActive(bool active)
+    public ButtonStates GetButtonStates()
     {
-        if (active)
+        AutopilotPanelController autopilotPanel = _persistentInputObject.GetComponentInChildren<AutopilotPanelController>(true);
+        ButtonStates state = new()
         {
-            _numButtons++;
-            _thrustModulatorObject.SetActive(true);
-            _thrustModulatorReplacement.SetActive(false);
-        }
-        else
-        {
-            _thrustModulatorObject.SetActive(false);
-            _thrustModulatorReplacement.SetActive(true);
-        }
+            gravState = _gravityGearObject.GetComponentInChildren<GravityLandingGearSwitch>(true).IsOn(),
+            invertPowerState = _gravityGearObject.GetComponentInChildren<GravityGearInvertSwitch>(true).IsOn(),
+            alignState = _alignSwitchObject.GetComponentInChildren<AutoAlignButton>(true).IsOn(),
+            alignModeState = _alignSwitchObject.GetComponentInChildren<AutoAlignDirectionButton>(true).IsOn(),
+            modulatorLevel = ShipEnhancements.Instance.ThrustModulatorLevel,
+            selectedAutopilot = autopilotPanel.GetActiveAutopilot().GetOnLabel(),
+            selectedMatchVelocity = autopilotPanel.GetActiveMatchVelocity().GetOnLabel(),
+            engineSwitchState = ShipEnhancements.Instance.engineOn
+        };
+        return state;
     }
 
-    public void SetGravityLandingGearActive(bool active)
+    public void SetButtonStates(ButtonStates data)
     {
-        if (active)
+        _gravityGearObject.GetComponentInChildren<GravityLandingGearSwitch>(true).SetState(data.gravState);
+        _gravityGearObject.GetComponentInChildren<GravityGearInvertSwitch>(true).SetState(data.invertPowerState);
+
+        _alignSwitchObject.GetComponentInChildren<AutoAlignButton>(true).SetState(data.alignState);
+        _alignSwitchObject.GetComponentInChildren<AutoAlignDirectionButton>(true).SetState(data.alignModeState);
+
+        ShipEnhancements.Instance.SetThrustModulatorLevel(data.modulatorLevel);
+        _thrustModulatorObject.GetComponentInChildren<ThrustModulatorController>(true).UpdateModulatorDisplay(data.modulatorLevel);
+
+        AutopilotPanelController autopilotPanel = _persistentInputObject.GetComponentInChildren<AutopilotPanelController>(true);
+        foreach (var bs in _persistentInputObject.GetComponentsInChildren<CockpitButtonSwitch>(true))
         {
-            _numButtons++;
-            _gravityGearObject.SetActive(true);
-            _gravityGearReplacement.SetActive(false);
+            if (bs.GetOnLabel() == data.selectedAutopilot
+                || bs.GetOnLabel() == data.selectedMatchVelocity)
+            {
+                bs.SetState(true);
+                bs.RaiseChangeStateEvent();
+                bs.OnChangeStateEvent();
+            }
         }
-        else
+
+        if (_engineSwitchObject.activeInHierarchy)
         {
-            _gravityGearObject.SetActive(false);
-            _gravityGearReplacement.SetActive(true);
+            _engineSwitchObject.GetComponentInChildren<ShipEngineSwitch>(true).InitializeEngineSwitch(data.engineSwitchState);
         }
     }
-
-    public void SetPersistentInputActive(bool active)
-    {
-        if (active)
-        {
-            _numButtons++;
-            _numBottomButtons++;
-            _persistentInputObject.SetActive(true);
-            _persistentInputReplacement.SetActive(false);
-        }
-        else
-        {
-            _persistentInputObject.SetActive(false);
-            _persistentInputReplacement.SetActive(true);
-        }
-    }
-
-    public void SetEngineSwitchActive(bool active)
-    {
-        if (active)
-        {
-            _numButtons++;
-            _numBottomButtons++;
-            _engineSwitchObject.SetActive(true);
-            _engineSwitchReplacement.SetActive(false);
-        }
-        else
-        {
-            _engineSwitchObject.SetActive(false);
-            _engineSwitchReplacement.SetActive(true);
-        }
-    }*/
 
     private void OnShipSystemFailure()
     {

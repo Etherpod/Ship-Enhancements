@@ -256,6 +256,7 @@ public class ShipEnhancements : ModBehaviour
         enableReactorOverload,
         buttonsRequireFlightChair,
         enableQuantumShip,
+        persistentShipState,
     }
 
     private string[] startupMessages =
@@ -371,6 +372,11 @@ public class ShipEnhancements : ModBehaviour
     {
         Instance = this;
         new HarmonyLib.Harmony("Etherpod.ShipEnhancements").PatchAll(Assembly.GetExecutingAssembly());
+
+        if (true)
+        {
+            gameObject.AddComponent<PersistentShipState>();
+        }
     }
 
     private void Start()

@@ -1258,6 +1258,7 @@ public static class SettingsPresets
         { "enableReactorOverload", new RandomSettingValue((0.5f, 0.5f)) },
         { "buttonsRequireFlightChair", new RandomSettingValue((0f, 0.5f)) },
         { "enableQuantumShip", new RandomSettingValue((0.3f, 0.8f)) },
+        { "persistentShipState", new RandomSettingValue((0.25f, 0.8f)) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

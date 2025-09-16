@@ -185,7 +185,9 @@ Temperature zones are not only added to the vanilla solar system, but are also a
  - Evacuation
  - Heliostudy
  - Misfired Jump
+ - On A Rail
  - The Stranger They Are
+ - Unnamed Mystery
 
 ---
 
@@ -229,6 +231,7 @@ Some bug fixes and some small things that make your ship a little nicer to use.
 - **Repair Confirmation**: Plays a sound when everything has been repaired. Now you don't need to go searching for any hulls you forgot to fix!
 - **Show Warning Notifications**: Notifies you in the ship when resources are low or when the outside conditions are becoming dangerous.
 - **Buttons Require Flight Chair**: Makes it so buttons in the cockpit can only be pressed while you're piloting the ship. Useful if your friends keep messing with them while you're trying to fly.
+- **Remember Ship State**: Preserves the current state of the ship (resource levels, ship damage, etc.) when warping to a new star system.
 - **Always Allow Map Lock-on**: Lets you use the lock-on feature on the map while you're standing on a planet.
 - **Split Ship Lock-on**: Separates your ship lock-on target and your suit lock-on target. If you lock onto something while piloting the ship, the ship will continue using that as the target if you exit the seat and lock onto something else.
 - **Keep Helmet On**: When there is no oxygen present, this prevents the game from removing your helmet when doing things such as piloting the ship or roasting a marshmallow at a campfire.

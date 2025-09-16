@@ -1350,6 +1350,12 @@
       "value": false,
       "tooltip": "Only lets you use buttons in the cockpit while you're sitting in the flight chair."
     },
+    "persistentShipState": {
+      "title": "Remember Ship State",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Preserves things like fuel, oxygen, and ship damage when warping to a new star system."
+    },
     "alwaysAllowLockOn": {
       "title": "Always Allow Map Lock-on",
       "type": "toggle",
