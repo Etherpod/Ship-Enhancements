@@ -4,6 +4,7 @@ using OWML.ModHelper;
 using System.Reflection;
 using ShipEnhancements;
 using GeneralEnhancements;
+using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancementsGE;
 
@@ -54,6 +55,8 @@ public static class GEPatches
     [HarmonyPatch(typeof(ContinuousMatchVelocity), nameof(ContinuousMatchVelocity.StopShipMatch))]
     public static void UpdateMatchVelocityButton()
     {
+        if (!(bool)enableEnhancedAutopilot.GetProperty()) return;
+
         if (SELocator.GetAutopilotPanelController().IsMatchVelocitySelected())
         {
             SELocator.GetAutopilotPanelController().CancelMatchVelocity();

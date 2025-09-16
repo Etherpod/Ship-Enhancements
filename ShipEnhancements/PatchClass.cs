@@ -2730,10 +2730,25 @@ public static class PatchClass
         }
     }
 
+    [HarmonyReversePatch]
+    [HarmonyPatch(typeof(UITextLibrary), nameof(UITextLibrary.GetString))]
+    public static string UITextLibrary_GetString(UITextType TextID)
+    {
+        return "";
+    }
+
     [HarmonyPostfix]
     [HarmonyPatch(typeof(UITextLibrary), nameof(UITextLibrary.GetString))]
     public static void InjectComponentNames(UITextType TextID, ref string __result)
     {
+        if (ShipEnhancements.Instance.shipLoaded
+            && (bool)enableGasLeak.GetProperty() && PatchHandler.SwapRepairPrompt
+            && TextID.ToString().Contains("ShipPart"))
+        {
+            __result = UITextLibrary_GetString(PatchHandler.FakeRepairPrompt);
+            return;
+        }
+
         if (TextID == ShipEnhancements.Instance.ProbeLauncherName)
         {
             __result = "SCOUT LAUNCHER";
@@ -5000,6 +5015,28 @@ public static class PatchClass
     {
         if (!(bool)enableQuantumShip.GetProperty() || __instance is not SocketedQuantumShip) return;
         __result = __result || PlayerState.IsInsideShip();
+    }
+    #endregion
+
+    #region GasLeak
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(OWTime), nameof(OWTime.Pause))]
+    public static void GasLeakPause()
+    {
+        if ((bool)enableGasLeak.GetProperty() && UnityEngine.Random.value < 0.001f)
+        {
+            Time.timeScale = 1f;
+        }
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(FirstPersonManipulator), nameof(FirstPersonManipulator.LateUpdate))]
+    public static void UpdateLastFocusedRepairReceiver(FirstPersonManipulator __instance)
+    {
+        if ((bool)enableGasLeak.GetProperty())
+        {
+            PatchHandler.SetLastFocusedRepairReciver(__instance._focusedRepairReceiver);
+        }
     }
     #endregion
 

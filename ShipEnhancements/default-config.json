@@ -838,6 +838,12 @@
       "max": 1,
       "tooltip": "Controls the max amount of dirt that can accumulate on your cockpit glass."
     },
+    "enableGasLeak": {
+      "title": "Enable Gas Leak",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "I'm not exactly sure what this does."
+    },
     "addErnesto": {
       "title": "Add Ernesto",
       "type": "toggle",

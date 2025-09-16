@@ -14,6 +14,8 @@ public class PatchHandler : MonoBehaviour
     public static PatchHandler Instance => instance;
     public static bool EngineSputtering => Instance?._engineSputtering ?? false;
     public static bool CollidingWithShip => Instance?._collidingWithShip ?? false;
+    public static bool SwapRepairPrompt => Instance?._swapRepairPrompt ?? false;
+    public static UITextType FakeRepairPrompt => Instance?._fakeRepairPrompt ?? UITextType.None;
 
     private int _focusedItems;
 
@@ -23,6 +25,10 @@ public class PatchHandler : MonoBehaviour
     private Coroutine _sputterCoroutine;
 
     private bool _collidingWithShip;
+
+    private RepairReceiver _lastFocusedRepairReceiver;
+    private bool _swapRepairPrompt = false;
+    private UITextType _fakeRepairPrompt;
 
     private void Awake()
     {
@@ -292,6 +298,23 @@ public class PatchHandler : MonoBehaviour
         else if ((bool)enableQuantumShip.GetProperty())
         {
             SELocator.GetShipBody().GetComponent<SocketedQuantumShip>().SetPlayerStandingOnObject(standingOnShip);
+        }
+    }
+
+    public static void SetLastFocusedRepairReciver(RepairReceiver receiver)
+    {
+        if (Instance != null && receiver != Instance._lastFocusedRepairReceiver)
+        {
+            Instance._lastFocusedRepairReceiver = receiver;
+            if (receiver != null)
+            {
+                Instance._swapRepairPrompt = UnityEngine.Random.value < 0.1f;
+
+                var allTexts = Enum.GetValues(typeof(UITextType)) as UITextType[];
+                var parts = allTexts.Where(text => text != receiver.GetRepairableName()
+                    && text.ToString().Contains("ShipPart")).ToArray();
+                Instance._fakeRepairPrompt = parts[UnityEngine.Random.Range(0, parts.Length)];
+            }
         }
     }
 }

@@ -20,6 +20,7 @@ public class ShipClockController : MonoBehaviour
     private int _lastSeconds;
     private int _lastTickIndex = -1;
     private bool _shipDestroyed = false;
+    private bool _reverse = false;
 
     private void Awake()
     {
@@ -29,6 +30,10 @@ public class ShipClockController : MonoBehaviour
 
         _gear.enabled = false;
         _lastSeconds = 0;
+        if ((bool)ShipEnhancements.Settings.enableGasLeak.GetProperty())
+        {
+            _reverse = Random.value < 0.1f;
+        }
         enabled = false;
     }
 
@@ -36,8 +41,8 @@ public class ShipClockController : MonoBehaviour
     {
         bool realistic = ShipEnhancements.ExperimentalSettings?.RealisticClock ?? false;
         float mult = realistic ? 60f : 1f;
-        int seconds = (int)(TimeLoop.GetSecondsElapsed() / mult % 60);
-        int minutes = (int)(TimeLoop.GetMinutesElapsed() / mult % 60);
+        int seconds = (int)(TimeLoop.GetSecondsElapsed() / mult % 60) * (_reverse ? -1 : 1);
+        int minutes = (int)(TimeLoop.GetMinutesElapsed() / mult % 60) * (_reverse ? -1 : 1);
 
         if (seconds != _lastSeconds)
         {

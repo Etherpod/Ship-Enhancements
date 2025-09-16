@@ -61,7 +61,7 @@ public class PersistentShipState : MonoBehaviour
             _componentIntegrities.Add(comp._componentName.ToString(), comp._repairFraction);
         }
 
-        _headlightsOn = FindObjectOfType<ShipCockpitController>()._externalLightsOn;
+        _headlightsOn = Locator.GetPlayerCameraController()._shipController._externalLightsOn;
         _buttonStates = SELocator.GetButtonPanel()?.GetButtonStates() ?? new();
     }
 

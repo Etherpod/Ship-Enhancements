@@ -50,6 +50,7 @@ public class ShipEnhancements : ModBehaviour
     public bool groundedByHornfels;
     public bool shipIgniting;
     public bool disableShipHeadlights;
+    public bool shipLoaded = false;
 
     public static IAchievements AchievementsAPI;
     public static IQSBAPI QSBAPI;
@@ -105,7 +106,6 @@ public class ShipEnhancements : ModBehaviour
 
     private AssetBundle _shipEnhancementsBundle;
     private float _lastSuitOxygen;
-    private bool _shipLoaded = false;
     private bool _shipDestroyed;
     private bool _checkEndConversation = false;
     private bool _setupQSB = false;
@@ -257,6 +257,7 @@ public class ShipEnhancements : ModBehaviour
         buttonsRequireFlightChair,
         enableQuantumShip,
         persistentShipState,
+        enableGasLeak,
     }
 
     private string[] startupMessages =
@@ -589,7 +590,7 @@ public class ShipEnhancements : ModBehaviour
             }
 
             _lastSuitOxygen = 0f;
-            _shipLoaded = false;
+            shipLoaded = false;
             playerTether = null;
             _shipAudioToChange.Clear();
             InputLatencyController.OnUnloadScene();
@@ -622,7 +623,7 @@ public class ShipEnhancements : ModBehaviour
 
     private void Update()
     {
-        if (!_shipLoaded || LoadManager.GetCurrentScene() != OWScene.SolarSystem || _shipDestroyed) return;
+        if (!shipLoaded || LoadManager.GetCurrentScene() != OWScene.SolarSystem || _shipDestroyed) return;
 
         if (SELocator.GetShipBody().GetAngularVelocity().sqrMagnitude > maxSpinSpeed * maxSpinSpeed)
         {
@@ -782,7 +783,7 @@ public class ShipEnhancements : ModBehaviour
 
     private void LateUpdate()
     {
-        if (!_shipLoaded || LoadManager.GetCurrentScene() != OWScene.SolarSystem) return;
+        if (!shipLoaded || LoadManager.GetCurrentScene() != OWScene.SolarSystem) return;
 
         if (!SELocator.GetPlayerResources()._refillingOxygen && refillingOxygen)
         {
@@ -792,7 +793,7 @@ public class ShipEnhancements : ModBehaviour
 
     private void FixedUpdate()
     {
-        if (!_shipLoaded || _shipDestroyed) return;
+        if (!shipLoaded || _shipDestroyed) return;
 
         if (InputLatencyController.ReadingSavedInputs && InputLatencyController.IsInputQueued)
         {
@@ -1122,7 +1123,7 @@ public class ShipEnhancements : ModBehaviour
             audio.spatialBlend = 1f;
         }
 
-        _shipLoaded = true;
+        shipLoaded = true;
         UpdateSuitOxygen();
 
         if (AchievementsAPI != null)
@@ -1850,6 +1851,13 @@ public class ShipEnhancements : ModBehaviour
             qShip._randomYRotation = true;
             qShip._localOffset = new Vector3(0, 4, 0);
         }
+        if ((bool)enableGasLeak.GetProperty())
+        {
+            RandomShipEffect();
+
+            SELocator.GetShipBody().GetComponentInChildren<ShipAudioController>()
+                .gameObject.AddComponent<SmokeDetectorChirp>();
+        }
 
         SetDamageColors();
 
@@ -1868,7 +1876,7 @@ public class ShipEnhancements : ModBehaviour
 
         ModHelper.Events.Unity.RunWhen(() => Locator._shipBody != null, () =>
         {
-            _shipLoaded = true;
+            shipLoaded = true;
             if ((bool)disableGravityCrystal.GetProperty())
             {
                 DisableGravityCrystal();
@@ -2762,6 +2770,88 @@ public class ShipEnhancements : ModBehaviour
 
         GameObject ejectAudioObj = LoadPrefab("Assets/ShipEnhancements/EjectAudio.prefab");
         CreateObject(ejectAudioObj, shipAudio.transform.Find("ShipInteriorAudio")).name = "EjectAudio";
+    }
+
+    private void RandomShipEffect(int lastNum = -1)
+    {
+        int numEffects = 4;
+        int num;
+        System.Random rand = new();
+        if (lastNum > 0)
+        {
+            num = rand.Next(0, numEffects - 1);
+            if (num >= lastNum)
+            {
+                num++;
+            }
+        }
+        else
+        {
+            num = rand.Next(0, numEffects);
+        }
+
+        if (num == 0)
+        {
+            Transform cockpitParent = SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Tech/Cockpit_Tech_Interior");
+            cockpitParent.Find("OxygenPosterCanvas").gameObject.SetActive(false);
+            cockpitParent.Find("EnjoyCanvas").gameObject.SetActive(false);
+
+            Transform cabinParent = SELocator.GetShipTransform().Find("Module_Cabin/Geo_Cabin/Cabin_Tech/Cabin_Tech_Interior");
+            cabinParent.Find("Cabin_Poster_TextCanvases").gameObject.SetActive(false);
+
+            Transform suppliesParent = SELocator.GetShipTransform().Find("Module_Supplies/Geo_Supplies/Supplies_Tech");
+            suppliesParent.Find("Scout_Poster_TextCanvases").gameObject.SetActive(false);
+        }
+        else if (num == 1)
+        {
+            OWCamera cam = SELocator.GetShipTransform().GetComponentInChildren<LandingCamera>().owCamera;
+            if (rand.NextDouble() < 0.5f)
+            {
+                cam.fieldOfView = 80f;
+            }
+            else
+            {
+                cam.fieldOfView = 120f;
+            }
+        }
+        else if (num == 2)
+        {
+            Transform cockpitParent = SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Tech/Cockpit_Tech_Interior");
+            MeshRenderer consoleRend = cockpitParent.Find("ConsoleScreen").GetComponent<MeshRenderer>();
+            consoleRend.sharedMaterial.SetColor("_Color", new Color(0.35f, 0.27f, 0.52f));
+            consoleRend.sharedMaterial.SetColor("_EmissionColor", new Color(0.45f, 0.39f, 0.8f));
+        }
+        else if (num == 3)
+        {
+            Minimap minimap = SELocator.GetShipTransform().GetComponentInChildren<Minimap>();
+            minimap._globeMeshTransform.Find("Sphere").localRotation = Quaternion.Euler(0f, 180f, 180f);
+
+            Transform north = minimap._globeMeshTransform.Find("PointLight_HUD_MiniMap_NorthPole");
+            Transform south = minimap._globeMeshTransform.Find("PointLight_HUD_MiniMap_SouthPole");
+            Vector3 temp = north.localPosition;
+            north.localPosition = south.localPosition;
+            south.localPosition = temp;
+
+            north = minimap._globeMeshTransform.Find("MinimapNorthPoleLightBulb");
+            south = minimap._globeMeshTransform.Find("MinimapSouthPoleLightBulb");
+            temp = north.localPosition;
+            north.localPosition = south.localPosition;
+            south.localPosition = temp;
+        }
+
+        if (lastNum < 0 && UnityEngine.Random.value < 0.25f)
+        {
+            RandomShipEffect(num);
+        }
+
+        // random beep/knock
+        // landing camera FOV change
+        // pause screen doesn't pause
+        // swap north/south pole on minimap
+        // weird console notification
+        // swap repair prompt name
+        // ship console screen color change
+        // remove poster text
     }
 
     #endregion
