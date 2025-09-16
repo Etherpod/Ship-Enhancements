@@ -2774,7 +2774,7 @@ public class ShipEnhancements : ModBehaviour
 
     private void RandomShipEffect(int lastNum = -1)
     {
-        int numEffects = 4;
+        int numEffects = 6;
         int num;
         System.Random rand = new();
         if (lastNum > 0)
@@ -2789,6 +2789,8 @@ public class ShipEnhancements : ModBehaviour
         {
             num = rand.Next(0, numEffects);
         }
+
+        ShipEnhancements.WriteDebugMessage(num);
 
         if (num == 0)
         {
@@ -2818,8 +2820,8 @@ public class ShipEnhancements : ModBehaviour
         {
             Transform cockpitParent = SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Tech/Cockpit_Tech_Interior");
             MeshRenderer consoleRend = cockpitParent.Find("ConsoleScreen").GetComponent<MeshRenderer>();
-            consoleRend.sharedMaterial.SetColor("_Color", new Color(0.35f, 0.27f, 0.52f));
-            consoleRend.sharedMaterial.SetColor("_EmissionColor", new Color(0.45f, 0.39f, 0.8f));
+            consoleRend.material.SetColor("_Color", new Color(0.35f, 0.27f, 0.52f));
+            consoleRend.material.SetColor("_EmissionColor", new Color(0.45f, 0.39f, 0.8f));
         }
         else if (num == 3)
         {
@@ -2838,20 +2840,32 @@ public class ShipEnhancements : ModBehaviour
             north.localPosition = south.localPosition;
             south.localPosition = temp;
         }
+        else if (num == 4)
+        {
+            foreach (var lightmap in SELocator.GetShipTransform().GetComponentsInChildren<LightmapController>())
+            {
+                ShipLight sl = lightmap.GetComponent<ShipLight>();
+                if (sl != null)
+                {
+                    sl._baseIntensity /= 1.5f;
+                    sl._baseEmission /= 1.5f;
+                }
+            }
+        }
+        else if (num == 5)
+        {
+            ShipOxygenTankComponent tank = SELocator.GetShipTransform().GetComponentInChildren<ShipOxygenTankComponent>();
+            OWAudioSource source = tank._damageEffect._particleAudioSource;
+            source._audioLibraryClip = AudioType.None;
+            source._clipArrayLength = 0;
+            source._clipArrayIndex = -1;
+            source.clip = LoadAudio("Assets/ShipEnhancements/AudioClip/oxygen_leak_strange.ogg");
+        }
 
         if (lastNum < 0 && UnityEngine.Random.value < 0.25f)
         {
             RandomShipEffect(num);
         }
-
-        // random beep/knock
-        // landing camera FOV change
-        // pause screen doesn't pause
-        // swap north/south pole on minimap
-        // weird console notification
-        // swap repair prompt name
-        // ship console screen color change
-        // remove poster text
     }
 
     #endregion
