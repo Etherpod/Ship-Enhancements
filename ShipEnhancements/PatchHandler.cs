@@ -308,7 +308,7 @@ public class PatchHandler : MonoBehaviour
             Instance._lastFocusedRepairReceiver = receiver;
             if (receiver != null)
             {
-                Instance._swapRepairPrompt = UnityEngine.Random.value < 0.1f;
+                Instance._swapRepairPrompt = UnityEngine.Random.value < 0.01f;
 
                 var allTexts = Enum.GetValues(typeof(UITextType)) as UITextType[];
                 var parts = allTexts.Where(text => text != receiver.GetRepairableName()

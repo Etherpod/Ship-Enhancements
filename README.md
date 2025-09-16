@@ -202,6 +202,7 @@ Temperature zones are not only added to the vanilla solar system, but are also a
 - **Cockpit Rust Level**: Controls how much rust is applied to the ship cockpit. Moving the slider all the way to the right completely covers the cockpit in rust.
 - **Dirt Accumulation Time**: Larger numbers increase the time (in seconds) it takes for dirt to build up on your cockpit glass, which you can wash off by finding a source of water (or something similar to water). Set this to 0 to disable it.
 - **Max Dirt Accumulation**: Stops dirt from building up on your cockpit when it reaches a certain level.
+- **Enable Gas Leak**: Not quite sure what this one does.
 - **Ernesto**: Adds Ernesto to the cockpit. You can talk to him if you're bored.
 
 ## Decoration
