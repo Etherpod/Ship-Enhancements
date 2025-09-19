@@ -4,34 +4,26 @@ using System.Collections.Generic;
 
 namespace ShipEnhancements;
 
-public class CockpitFilthController : MonoBehaviour
+public class CockpitEffectController : MonoBehaviour
 {
     [SerializeField]
     Texture2D[] _rustTextures;
     [SerializeField]
-    MeshRenderer _rustRenderer;
+    Texture2D[] _dirtTextures;
     [SerializeField]
-    MeshRenderer _dirtRenderer;
-    [SerializeField]
-    MeshRenderer _dirtShadowRenderer;
-    [SerializeField]
-    GameObject _rustParent;
-    [SerializeField]
-    GameObject _dirtParent;
-    [SerializeField]
-    GameObject _dirtShadowParent;
+    MeshRenderer _filthRenderer;
 
-    private Material _rustMat;
+    private Material _filthMat;
     private int _rustTexIndex;
-    private float _rustProgression;
-    private Material _dirtMat;
-    private string _dirtLowerClipPropID = "_LowerClip";
-    private string _dirtUpperClipPropID = "_UpperClip";
-    private Material _dirtShadowMat;
-    private string _dirtShadowCutoffPropID = "_Cutoff";
+    private int _dirtTexIndex;
+    private readonly int _rustTexPropID = Shader.PropertyToID("_RustTex");
+    private readonly int _dirtTexPropID = Shader.PropertyToID("_DirtTex");
+    private readonly int _rustCutoffPropID = Shader.PropertyToID("_RustCutoff");
+    private readonly int _dirtCutoffPropID = Shader.PropertyToID("_DirtCutoff");
     private FluidDetector _cockpitDetector;
     private ShockLayerController _shockLayerController;
 
+    private float _rustProgression;
     private float _dirtBuildupProgression;
     private float _dirtBuildupTime;
     private bool _addDirtBuildup = false;
@@ -48,10 +40,12 @@ public class CockpitFilthController : MonoBehaviour
 
     private void Awake()
     {
-        _rustProgression = Mathf.Lerp(1f, 0.15f, (float)rustLevel.GetProperty());
-        _dirtBuildupTime = (float)dirtAccumulationTime.GetProperty();
         _cockpitDetector = GetComponentInChildren<StaticFluidDetector>();
         _shockLayerController = SELocator.GetShipTransform().GetComponentInChildren<ShockLayerController>();
+        _filthMat = _filthRenderer.sharedMaterial;
+
+        _rustProgression = Mathf.Lerp(1f, 0.15f, (float)rustLevel.GetProperty());
+        _dirtBuildupTime = (float)dirtAccumulationTime.GetProperty();
 
         if (_dirtBuildupTime > 0f)
         {
@@ -64,36 +58,32 @@ public class CockpitFilthController : MonoBehaviour
     {
         if ((float)rustLevel.GetProperty() > 0)
         {
-            _rustMat = _rustRenderer.sharedMaterial;
-            _rustMat.SetFloat("_Cutoff", _rustProgression);
+            _filthMat.SetFloat(_rustCutoffPropID, _rustProgression);
             if (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost())
             {
                 _rustTexIndex = Random.Range(0, _rustTextures.Length);
-                _rustMat.SetTexture("_MainTex", _rustTextures[_rustTexIndex]);
-                _rustMat.SetTextureOffset("_MainTex", new Vector2(Random.Range(0f, 1f), Random.Range(0f, 1f)));
+                _filthMat.SetTexture(_rustTexPropID, _rustTextures[_rustTexIndex]);
+                _filthMat.SetTextureOffset(_rustTexPropID, new Vector2(Random.Range(0f, 1f), Random.Range(0f, 1f)));
             }
         }
         else
         {
-            _rustParent.SetActive(false);
+            _filthMat.SetFloat(_rustCutoffPropID, 0f);
         }
 
         if (_dirtBuildupTime > 0f && (float)maxDirtAccumulation.GetProperty() > 0f)
         {
-            _dirtMat = _dirtRenderer.sharedMaterial;
-            _dirtShadowMat = _dirtShadowRenderer.sharedMaterial;
+            _filthMat.SetFloat(_dirtCutoffPropID, 1f);
             if (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost())
             {
-                _dirtMat.SetTextureOffset("_MainTex", new Vector2(Random.Range(0f, 1f), Random.Range(0f, 1f)));
-                _dirtMat.SetFloat(_dirtLowerClipPropID, 1f);
-                _dirtMat.SetFloat(_dirtUpperClipPropID, 1f);
-                _dirtShadowMat.SetFloat(_dirtShadowCutoffPropID, 1f);
+                _dirtTexIndex = Random.Range(0, _dirtTextures.Length);
+                _filthMat.SetTexture(_dirtTexPropID, _dirtTextures[_dirtTexIndex]);
+                _filthMat.SetTextureOffset(_dirtTexPropID, new Vector2(Random.Range(0f, 1f), Random.Range(0f, 1f)));
             }
         }
         else
         {
-            _dirtParent.SetActive(false);
-            _dirtShadowParent.SetActive(false);
+            _filthMat.SetFloat(_dirtCutoffPropID, 0f);
             enabled = false;
         }
     }
@@ -155,31 +145,14 @@ public class CockpitFilthController : MonoBehaviour
                 }
             }
 
-            if (_dirtMat.GetFloat(_dirtUpperClipPropID) < 1f)
-            {
-                _dirtMat.SetFloat(_dirtUpperClipPropID, Mathf.Lerp(1f, 0f, (_dirtBuildupProgression - 0.5f) * 2));
-            }
-            else if (_dirtMat.GetFloat(_dirtLowerClipPropID) < 1f)
-            {
-                _dirtMat.SetFloat(_dirtLowerClipPropID, Mathf.Lerp(1f, 0f, _dirtBuildupProgression * 2));
-            }
-            _dirtShadowMat.SetFloat(_dirtShadowCutoffPropID, 1 - _dirtBuildupProgression);
-
+            _filthMat.SetFloat(_dirtCutoffPropID, 1 - _dirtBuildupProgression);
             _dirtBuildupProgression = Mathf.Clamp01(_dirtBuildupProgression - Time.deltaTime / clearTime);
         }
         else if (_addDirtBuildup && _dirtBuildupProgression < (float)maxDirtAccumulation.GetProperty())
         {
-            if (_dirtMat.GetFloat(_dirtLowerClipPropID) > 0f)
-            {
-                _dirtMat.SetFloat(_dirtLowerClipPropID, Mathf.Lerp(1f, 0f, _dirtBuildupProgression * 2));
-            }
-            else if (_dirtMat.GetFloat(_dirtUpperClipPropID) > 0f)
-            {
-                _dirtMat.SetFloat(_dirtUpperClipPropID, Mathf.Lerp(1f, 0f, (_dirtBuildupProgression - 0.5f) * 2));
-            }
-            _dirtShadowMat.SetFloat(_dirtShadowCutoffPropID, 1 - _dirtBuildupProgression);
-
-            _dirtBuildupProgression = Mathf.Clamp01(_dirtBuildupProgression + (Time.deltaTime * (float)maxDirtAccumulation.GetProperty()) / _dirtBuildupTime);
+            _filthMat.SetFloat(_dirtCutoffPropID, 1 - _dirtBuildupProgression);
+            _dirtBuildupProgression = Mathf.Clamp01(_dirtBuildupProgression 
+                + Time.deltaTime * (float)maxDirtAccumulation.GetProperty() / _dirtBuildupTime);
         }
     }
 
@@ -215,34 +188,26 @@ public class CockpitFilthController : MonoBehaviour
         }
     }
 
-    public void BroadcastInitialRustState()
+    public void BroadcastCockpitEffectState()
     {
         if (ShipEnhancements.InMultiplayer)
         {
             foreach (uint id in ShipEnhancements.PlayerIDs)
             {
-                ShipEnhancements.QSBCompat.SendInitialRustState(id, _rustTexIndex, _rustMat.GetTextureOffset("_MainTex"));
+                ShipEnhancements.QSBCompat.SendInitialRustState(id, _rustTexIndex, _filthMat.GetTextureOffset(_rustTexPropID),
+                    _dirtTexIndex, _filthMat.GetTextureOffset(_dirtTexPropID), _dirtBuildupProgression);
             }
         }
     }
 
-    public void SetInitialRustState(int textureIndex, Vector2 textureOffset)
+    public void SetInitialEffectState(int rustIndex, Vector2 rustOffset, int dirtIndex, Vector2 dirtOffset, float dirtProgression)
     {
-        //_rustMat = _rustRenderer.sharedMaterial;
-        //_rustMat.SetFloat("_Cutoff", _rustProgression);
-        _rustMat.SetTexture("_MainTex", _rustTextures[textureIndex]);
-        _rustMat.SetTextureOffset("_MainTex", textureOffset);
-    }
+        _filthMat.SetTexture(_rustTexPropID, _rustTextures[rustIndex]);
+        _filthMat.SetTextureOffset(_rustTexPropID, rustOffset);
 
-    public void BroadcastInitialDirtState()
-    {
-        if (ShipEnhancements.InMultiplayer)
-        {
-            foreach (uint id in ShipEnhancements.PlayerIDs)
-            {
-                ShipEnhancements.QSBCompat.SendInitialDirtState(id, _dirtMat.GetTextureOffset("_MainTex"), _dirtBuildupProgression);
-            }
-        }
+        _filthMat.SetTextureOffset(_dirtTexPropID, dirtOffset);
+        _dirtBuildupProgression = dirtProgression;
+        _filthMat.SetFloat(_dirtCutoffPropID, 1 - _dirtBuildupProgression);
     }
 
     public void BroadcastDirtState()
@@ -256,20 +221,10 @@ public class CockpitFilthController : MonoBehaviour
         }
     }
 
-    public void SetInitialDirtState(Vector2 textureOffset, float currentProgression)
-    {
-        _dirtMat = _dirtRenderer.sharedMaterial;
-        _dirtMat.SetTextureOffset("_MainTex", textureOffset);
-        _dirtBuildupProgression = currentProgression;
-        _dirtMat.SetFloat(_dirtLowerClipPropID, Mathf.Lerp(1f, 0f, _dirtBuildupProgression * 2));
-        _dirtMat.SetFloat(_dirtUpperClipPropID, Mathf.Lerp(1f, 0.5f, (_dirtBuildupProgression - 0.5f) * 2));
-    }
-
     public void UpdateDirtState(float progression)
     {
         _dirtBuildupProgression = progression;
-        _dirtMat.SetFloat(_dirtLowerClipPropID, Mathf.Lerp(1f, 0f, _dirtBuildupProgression * 2));
-        _dirtMat.SetFloat(_dirtUpperClipPropID, Mathf.Lerp(1f, 0.5f, (_dirtBuildupProgression - 0.5f) * 2));
+        _filthMat.SetFloat(_dirtCutoffPropID, 1 - _dirtBuildupProgression);
     }
     
     private void OnDestroy()

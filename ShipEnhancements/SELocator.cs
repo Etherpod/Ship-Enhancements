@@ -24,7 +24,7 @@ public static class SELocator
     private static SignalscopeComponent _signalscopeComponent;
     private static CockpitButtonPanel _buttonPanel;
     private static ThrustModulatorController _modulatorController;
-    private static CockpitFilthController _cockpitFilthController;
+    private static CockpitEffectController _cockpitFilthController;
     private static FlightConsoleInteractController _consoleInteractController;
     private static CockpitErnesto _ernesto;
     private static ShipWarpCoreComponent _warpCoreComponent;
@@ -72,7 +72,7 @@ public static class SELocator
         }
         if ((float)rustLevel.GetProperty() > 0 || (float)dirtAccumulationTime.GetProperty() > 0f)
         {
-            _cockpitFilthController = _shipTransform.GetComponentInChildren<CockpitFilthController>(true);
+            _cockpitFilthController = _shipTransform.GetComponentInChildren<CockpitEffectController>(true);
         }
         if ((bool)addErnesto.GetProperty())
         {
@@ -198,7 +198,7 @@ public static class SELocator
         return _modulatorController;
     }
 
-    public static CockpitFilthController GetCockpitFilthController()
+    public static CockpitEffectController GetCockpitFilthController()
     {
         return _cockpitFilthController;
     }
