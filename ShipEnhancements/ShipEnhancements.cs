@@ -1479,11 +1479,11 @@ public class ShipEnhancements : ModBehaviour
                 collider.material = mat;
             }
         }
-        if ((float)rustLevel.GetProperty() > 0f || ((float)dirtAccumulationTime.GetProperty() > 0f
+        if (true || (float)rustLevel.GetProperty() > 0f || ((float)dirtAccumulationTime.GetProperty() > 0f
             && (float)maxDirtAccumulation.GetProperty() > 0f))
         {
-            GameObject rustController = LoadPrefab("Assets/ShipEnhancements/RustController.prefab");
-            CreateObject(rustController, SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry"));
+            GameObject cockpitController = LoadPrefab("Assets/ShipEnhancements/CockpitEffectController.prefab");
+            CreateObject(cockpitController, SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry"));
         }
         if ((bool)addPortableTractorBeam.GetProperty())
         {

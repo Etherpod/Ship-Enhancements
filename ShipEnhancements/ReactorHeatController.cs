@@ -67,7 +67,7 @@ public class ReactorHeatController : MonoBehaviour
 		}
 	}
 
-	public void SetOverloadHeat(float heatPercent)
+    public void SetOverloadHeat(float heatPercent)
 	{
 		_overloadHeat = heatPercent;
 		_heatRatio = _additiveHeat + _overloadHeat;
@@ -76,6 +76,11 @@ public class ReactorHeatController : MonoBehaviour
 			// Add Ernesto detective
 			_reactor._shipDamageController.Explode();
 		}
+	}
+
+	public float GetHeatRatio()
+	{
+		return _heatRatio;
 	}
 
 	public bool IsOverloaded()

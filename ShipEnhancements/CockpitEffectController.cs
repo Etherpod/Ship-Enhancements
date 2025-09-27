@@ -7,21 +7,26 @@ namespace ShipEnhancements;
 public class CockpitEffectController : MonoBehaviour
 {
     [SerializeField]
-    Texture2D[] _rustTextures;
+    private Texture2D[] _rustTextures;
     [SerializeField]
-    Texture2D[] _dirtTextures;
+    private Texture2D[] _dirtTextures;
     [SerializeField]
-    MeshRenderer _filthRenderer;
+    private MeshRenderer _filthRenderer;
+    [SerializeField]
+    private MeshRenderer _iceRenderer;
 
     private Material _filthMat;
+    private Material _iceMat;
     private int _rustTexIndex;
     private int _dirtTexIndex;
     private readonly int _rustTexPropID = Shader.PropertyToID("_RustTex");
     private readonly int _dirtTexPropID = Shader.PropertyToID("_DirtTex");
     private readonly int _rustCutoffPropID = Shader.PropertyToID("_RustCutoff");
     private readonly int _dirtCutoffPropID = Shader.PropertyToID("_DirtCutoff");
+    private readonly int _iceCutoffPropID = Shader.PropertyToID("_FreezeFactor");
     private FluidDetector _cockpitDetector;
     private ShockLayerController _shockLayerController;
+    private ReactorHeatController _reactorHeat;
 
     private float _rustProgression;
     private float _dirtBuildupProgression;
@@ -29,6 +34,7 @@ public class CockpitEffectController : MonoBehaviour
     private bool _addDirtBuildup = false;
     private float _dirtClearTime = 3f;
     private bool _clearDirt = false;
+    private float _iceBuildup = 0f;
 
     private readonly Dictionary<FluidVolume.Type, float> _fluidClearTimes = new()
     {
@@ -43,6 +49,7 @@ public class CockpitEffectController : MonoBehaviour
         _cockpitDetector = GetComponentInChildren<StaticFluidDetector>();
         _shockLayerController = SELocator.GetShipTransform().GetComponentInChildren<ShockLayerController>();
         _filthMat = _filthRenderer.sharedMaterial;
+        _iceMat = _iceRenderer.sharedMaterial;
 
         _rustProgression = Mathf.Lerp(1f, 0.15f, (float)rustLevel.GetProperty());
         _dirtBuildupTime = (float)dirtAccumulationTime.GetProperty();
@@ -56,6 +63,8 @@ public class CockpitEffectController : MonoBehaviour
 
     private void Start()
     {
+        _reactorHeat = SELocator.GetShipTransform().GetComponentInChildren<ReactorHeatController>();
+
         if ((float)rustLevel.GetProperty() > 0)
         {
             _filthMat.SetFloat(_rustCutoffPropID, _rustProgression);
@@ -84,11 +93,39 @@ public class CockpitEffectController : MonoBehaviour
         else
         {
             _filthMat.SetFloat(_dirtCutoffPropID, 0f);
-            enabled = false;
+            _dirtBuildupTime = 0f;
+            //enabled = false;
         }
+
+        _iceMat.SetFloat(_iceCutoffPropID, 0f);
     }
 
     private void Update()
+    {
+        if (_dirtBuildupTime == 0f && (false || _reactorHeat == null))
+        {
+            enabled = false;
+            return;
+        }
+
+        if (_dirtBuildupTime > 0f)
+        {
+            UpdateDirt();
+        }
+        if (true && _reactorHeat != null)
+        {
+            UpdateIce();
+        }
+    }
+
+    private void UpdateIce()
+    {
+        float ratio = _reactorHeat.GetHeatRatio() * 1.5f;
+        _iceBuildup = Mathf.Lerp(_iceBuildup, ratio, Time.deltaTime / 60f);
+        _iceMat.SetFloat(_iceCutoffPropID, _iceBuildup);
+    }
+
+    private void UpdateDirt()
     {
         float clearTime = _dirtClearTime;
 
@@ -151,7 +188,7 @@ public class CockpitEffectController : MonoBehaviour
         else if (_addDirtBuildup && _dirtBuildupProgression < (float)maxDirtAccumulation.GetProperty())
         {
             _filthMat.SetFloat(_dirtCutoffPropID, 1 - _dirtBuildupProgression);
-            _dirtBuildupProgression = Mathf.Clamp01(_dirtBuildupProgression 
+            _dirtBuildupProgression = Mathf.Clamp01(_dirtBuildupProgression
                 + Time.deltaTime * (float)maxDirtAccumulation.GetProperty() / _dirtBuildupTime);
         }
     }
