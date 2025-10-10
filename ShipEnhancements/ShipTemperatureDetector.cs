@@ -131,7 +131,9 @@ public class ShipTemperatureDetector : TemperatureDetector
         if ((IsHeatingLocked() && _currentInternalTemperature > 0f)
             || (IsCoolingLocked() && _currentInternalTemperature < 0f))
         {
-            _currentInternalTemperature = Mathf.MoveTowards(_currentInternalTemperature, 0f, Time.deltaTime * 2f);
+            float sign = Mathf.Sign(_currentInternalTemperature);
+            _currentInternalTemperature = Mathf.MoveTowards(_currentInternalTemperature, 0f, Time.deltaTime * 3f
+                * Mathf.InverseLerp(150f * sign, _highTempCutoff * sign, _currentTemperature));
             ignoreSameSide = true;
         }
 
