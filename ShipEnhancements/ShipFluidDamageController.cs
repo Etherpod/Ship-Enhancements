@@ -45,6 +45,11 @@ public class ShipFluidDamageController : MonoBehaviour
         {
             _damageFluids.Add(FluidVolume.Type.SAND, (float)sandDamage.GetProperty());
         }
+        if ((float)cycloneChaos.GetProperty() > 0.7f)
+        {
+            _damageFluids.Add(FluidVolume.Type.CLOUD, 
+                (float)cycloneChaos.GetProperty() - 0.3f);
+        }
 
         _damageDelay = 1f;
     }
@@ -148,6 +153,13 @@ public class ShipFluidDamageController : MonoBehaviour
 
         if (!_damageFluids.Keys.Contains(vol.GetFluidType())) return;
 
+        if (_damageFluids.Keys.Contains(FluidVolume.Type.CLOUD) 
+            && vol.GetFluidType() == FluidVolume.Type.CLOUD
+            && vol is not TornadoFluidVolume)
+        {
+            return;
+        }
+
         ShipModule module = detector.GetComponentInParent<ShipModule>();
         if (module != null && !_trackedModules.Contains(module))
         {
@@ -166,6 +178,13 @@ public class ShipFluidDamageController : MonoBehaviour
     {
         if (!_damageFluids.Keys.Contains(vol.GetFluidType())
             && !(ShipEnhancements.ExperimentalSettings?.MakeWaterDamageEverythingDamage ?? false)) return;
+
+        if (_damageFluids.Keys.Contains(FluidVolume.Type.CLOUD)
+            && vol.GetFluidType() == FluidVolume.Type.CLOUD
+            && vol is not TornadoFluidVolume)
+        {
+            return;
+        }
 
         ShipModule module = detector.GetComponentInParent<ShipModule>();
         if (module != null && _trackedModules.Contains(module))

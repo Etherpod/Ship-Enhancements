@@ -140,6 +140,10 @@ public static class ErnestoDetectiveController
             {
                 _hypothesis = "They say to \"never try starting a cold engine\", you know. But you went ahead and did it anyways, didn't you? No wonder your reactor blew up.";
             }
+            else if (_reactorCause == "overloaded")
+            {
+                _hypothesis = "You tried overloading the reactor while it was damaged. Talk about adding fuel to the fire.";
+            }
             else
             {
                 if (ShipEnhancements.Instance.engineOn && !(bool)disableDamageIndicators.GetProperty())
