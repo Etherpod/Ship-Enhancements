@@ -255,8 +255,9 @@ public class CockpitButtonPanel : MonoBehaviour
             AutopilotPanelController autopilotPanel = _persistentInputObject.GetComponentInChildren<AutopilotPanelController>(true);
             foreach (var bs in _persistentInputObject.GetComponentsInChildren<CockpitButtonSwitch>(true))
             {
-                if (bs.GetOnLabel() == data.selectedAutopilot
+                if ((bs.GetOnLabel() == data.selectedAutopilot
                     || bs.GetOnLabel() == data.selectedMatchVelocity)
+                    && !bs.IsOn())
                 {
                     bs.SetState(true);
                     bs.RaiseChangeStateEvent();

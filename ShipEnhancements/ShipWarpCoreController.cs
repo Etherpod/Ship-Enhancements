@@ -49,7 +49,7 @@ public class ShipWarpCoreController : CockpitInteractible
         }
         else
         {
-            Transform parent = ShipEnhancements.NHInteraction.GetCenterOfUniverse()?.transform;
+            Transform parent = ShipEnhancements.NHInteraction?.GetCenterOfUniverse()?.transform;
             if (parent == null)
             {
                 parent = GameObject.Find("Sun_Body")?.transform;

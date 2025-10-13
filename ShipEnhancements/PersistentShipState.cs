@@ -9,6 +9,7 @@ namespace ShipEnhancements;
 public class PersistentShipState : MonoBehaviour
 {
     private bool _everInitialized = false;
+    private bool _skipNextLoad = false;
 
     private float _shipFuel;
     private float _shipOxygen;
@@ -23,11 +24,17 @@ public class PersistentShipState : MonoBehaviour
 
     private void Start()
     {
+        GlobalMessenger.AddListener("TriggerFlashback", OnTriggerFlashback);
+
         LoadManager.OnStartSceneLoad += (scene, loadScene) =>
         {
             if (scene == OWScene.SolarSystem)
             {
                 SaveState();
+            }
+            else if (loadScene != OWScene.SolarSystem)
+            {
+                _skipNextLoad = true;
             }
         };
 
@@ -35,6 +42,7 @@ public class PersistentShipState : MonoBehaviour
         {
             if (loadScene == OWScene.SolarSystem)
             {
+                if (_skipNextLoad) { return; }
                 LoadState();
             }
         };
@@ -81,31 +89,34 @@ public class PersistentShipState : MonoBehaviour
 
         ShipEnhancements.Instance.ModHelper.Events.Unity.RunWhen(() => Locator._shipBody != null, () =>
         {
-            SELocator.GetShipResources()._currentFuel = _shipFuel;
-            SELocator.GetShipResources()._currentOxygen = _shipOxygen;
-            SELocator.GetShipWaterResource()?.SetWater(_shipWater);
-
-            ShipHull[] hulls = SELocator.GetShipDamageController()._shipHulls;
-            foreach (var hull in hulls)
+            if (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost())
             {
-                if (_hullIntegrities.TryGetValue(hull.hullName.ToString(), out float integrity))
-                {
-                    SetHullIntegrity(hull, integrity);
-                }
-            }
+                SELocator.GetShipResources()._currentFuel = _shipFuel;
+                SELocator.GetShipResources()._currentOxygen = _shipOxygen;
+                SELocator.GetShipWaterResource()?.SetWater(_shipWater);
 
-            ShipComponent[] components = SELocator.GetShipDamageController()._shipComponents;
-            foreach (var comp in components)
-            {
-                if (_componentIntegrities.TryGetValue(comp._componentName.ToString(), out float integrity))
+                ShipHull[] hulls = SELocator.GetShipDamageController()._shipHulls;
+                foreach (var hull in hulls)
                 {
-                    if (integrity < 1f && comp._repairReceiver.repairDistance > 0f)
+                    if (_hullIntegrities.TryGetValue(hull.hullName.ToString(), out float integrity))
                     {
-                        comp.SetDamaged(true);
-                        comp._repairFraction = integrity;
-                        if (comp._damageEffect)
+                        SetHullIntegrity(hull, integrity);
+                    }
+                }
+
+                ShipComponent[] components = SELocator.GetShipDamageController()._shipComponents;
+                foreach (var comp in components)
+                {
+                    if (_componentIntegrities.TryGetValue(comp._componentName.ToString(), out float integrity))
+                    {
+                        if (integrity < 1f && comp._repairReceiver.repairDistance > 0f)
                         {
-                            comp._damageEffect.SetEffectBlend(1f - comp._repairFraction);
+                            comp.SetDamaged(true);
+                            comp._repairFraction = integrity;
+                            if (comp._damageEffect)
+                            {
+                                comp._damageEffect.SetEffectBlend(1f - comp._repairFraction);
+                            }
                         }
                     }
                 }
@@ -142,5 +153,15 @@ public class PersistentShipState : MonoBehaviour
         {
             ShipEnhancements.QSBInteraction.SetHullDamaged(hull, !wasDamaged);
         }
+    }
+
+    private void OnTriggerFlashback()
+    {
+        _skipNextLoad = true;
+    }
+
+    private void OnDestroy()
+    {
+        GlobalMessenger.RemoveListener("TriggerFlashback", OnTriggerFlashback);
     }
 }
