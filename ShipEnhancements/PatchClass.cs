@@ -3545,10 +3545,10 @@ public static class PatchClass
     [HarmonyPatch(typeof(RepairReceiver), nameof(RepairReceiver.IsRepairable))]
     public static void ApplyShipRepairLimit(RepairReceiver __instance, ref bool __result)
     {
-        if (__result)
+        bool isShipType = __instance.type == RepairReceiver.Type.ShipHull || __instance.type == RepairReceiver.Type.ShipComponent;
+        if (__result && isShipType)
         {
-            bool isShipType = __instance.type == RepairReceiver.Type.ShipHull || __instance.type == RepairReceiver.Type.ShipComponent;
-            __result = (ShipRepairLimitController.CanRepair() || !isShipType) && ((string)repairWrenchType.GetProperty() != "Required"
+            __result = ShipRepairLimitController.CanRepair() && ((string)repairWrenchType.GetProperty() != "Required"
                 || Locator.GetToolModeSwapper().GetItemCarryTool().GetHeldItemType() == ShipEnhancements.Instance.RepairWrenchType);
         }
     }
