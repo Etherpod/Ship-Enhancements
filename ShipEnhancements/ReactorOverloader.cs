@@ -4,6 +4,15 @@ namespace ShipEnhancements;
 
 public class ReactorOverloader : MonoBehaviour
 {
+    [SerializeField]
+    private OWAudioSource _startupSource;
+    [SerializeField]
+    private OWAudioSource _disableSource;
+    [SerializeField]
+    private OWAudioSource _loopSource;
+
+    private readonly float _startupLength = 1.2f;
+
     private InteractReceiver _interactReceiver;
     private ShipReactorComponent _reactor;
     private ReactorHeatController _reactorHeat;
@@ -20,6 +29,8 @@ public class ReactorOverloader : MonoBehaviour
         _interactReceiver.ChangePrompt(UITextLibrary.GetString(UITextType.HoldPrompt) + " Overload Reactor");
         _interactReceiver.OnGainFocus += OnGainFocus;
         _interactReceiver.OnLoseFocus += OnLoseFocus;
+        _interactReceiver.OnPressInteract += OnPressInteract;
+        _interactReceiver.OnReleaseInteract += OnReleaseInteract;
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
         _reactor.OnDamaged += OnReactorDamaged;
         _reactor.OnRepaired += OnReactorRepaired;
@@ -30,10 +41,11 @@ public class ReactorOverloader : MonoBehaviour
         if (_focused)
         {
             bool was = _overloaded;
-            if (!_overloaded && OWInput.IsPressed(InputLibrary.interact, InputMode.Character, 1f))
+            if (!_overloaded && OWInput.IsPressed(InputLibrary.interact, InputMode.Character, _startupLength))
             {
                 _interactReceiver.ChangePrompt("Reset Reactor");
                 _interactReceiver.ResetInteraction();
+                _loopSource.FadeIn(1f);
                 _overloaded = true;
             }
             else if (_overloaded && OWInput.IsNewlyPressed(InputLibrary.interact, InputMode.Character))
@@ -41,6 +53,11 @@ public class ReactorOverloader : MonoBehaviour
                 _interactReceiver.ChangePrompt(UITextLibrary.GetString(UITextType.HoldPrompt) + " Overload Reactor");
                 _interactReceiver.ResetInteraction();
                 _reactorHeat.SetOverloadHeat(0f);
+
+                _loopSource.FadeOut(0.5f);
+                _disableSource.time = 0f;
+                _disableSource.Play();
+
                 _overloaded = false;
             }
 
@@ -88,6 +105,25 @@ public class ReactorOverloader : MonoBehaviour
         _focused = false;
     }
 
+    private void OnPressInteract()
+    {
+        _startupSource.time = 0f;
+        _startupSource.Play();
+
+        if (!_overloaded)
+        {
+            _disableSource.FadeOut(0.5f);
+        }
+    }
+
+    private void OnReleaseInteract()
+    {
+        if (!_overloaded)
+        {
+            _startupSource.Stop();
+        }
+    }
+
     private void OnReactorDamaged(ShipComponent component)
     {
         _interactReceiver.DisableInteraction();
@@ -100,6 +136,9 @@ public class ReactorOverloader : MonoBehaviour
 
     private void OnShipSystemFailure()
     {
+        _loopSource.FadeOut(0.5f);
+        _disableSource.FadeOut(0.5f);
+        _startupSource.FadeOut(0.5f);
         enabled = false;
     }
 
@@ -107,6 +146,8 @@ public class ReactorOverloader : MonoBehaviour
     {
         _interactReceiver.OnGainFocus -= OnGainFocus;
         _interactReceiver.OnLoseFocus -= OnLoseFocus;
+        _interactReceiver.OnPressInteract -= OnPressInteract;
+        _interactReceiver.OnReleaseInteract -= OnReleaseInteract;
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
         _reactor.OnDamaged -= OnReactorDamaged;
         _reactor.OnRepaired -= OnReactorRepaired;
