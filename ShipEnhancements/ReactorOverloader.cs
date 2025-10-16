@@ -54,8 +54,9 @@ public class ReactorOverloader : MonoBehaviour
                 _interactReceiver.ResetInteraction();
                 _reactorHeat.SetOverloadHeat(0f);
 
-                _loopSource.FadeOut(0.5f);
+                _loopSource.FadeOut(1f);
                 _disableSource.time = 0f;
+                _disableSource.SetLocalVolume(1f);
                 _disableSource.Play();
 
                 _overloaded = false;
@@ -86,12 +87,18 @@ public class ReactorOverloader : MonoBehaviour
         {
             _interactReceiver.ChangePrompt("Reset Reactor");
             _interactReceiver.ResetInteraction();
+            _loopSource.FadeIn(0.5f);
         }
         else
         {
             _interactReceiver.ChangePrompt(UITextLibrary.GetString(UITextType.HoldPrompt) + " Overload Reactor");
             _interactReceiver.ResetInteraction();
             _reactorHeat.SetOverloadHeat(0f);
+
+            _loopSource.FadeOut(1f);
+            _disableSource.time = 0f;
+            _disableSource.SetLocalVolume(1f);
+            _disableSource.Play();
         }
     }
 
@@ -107,12 +114,12 @@ public class ReactorOverloader : MonoBehaviour
 
     private void OnPressInteract()
     {
-        _startupSource.time = 0f;
-        _startupSource.Play();
-
         if (!_overloaded)
         {
-            _disableSource.FadeOut(0.5f);
+            _disableSource.FadeOut(1f);
+            _startupSource.time = 0f;
+            _startupSource.SetLocalVolume(1f);
+            _startupSource.Play();
         }
     }
 
