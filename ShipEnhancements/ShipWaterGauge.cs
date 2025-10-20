@@ -2,19 +2,19 @@
 
 namespace ShipEnhancements;
 
-public class ShipWaterMeter : MonoBehaviour
+public class ShipWaterGauge : MonoBehaviour
 {
     [SerializeField]
     private Transform _needleTransform;
     [SerializeField]
+    private float _needleAngleMin;
+    [SerializeField]
+    private float _needleAngleMax;
+    [SerializeField]
     private OWRenderer _indicatorLight;
-    [SerializeField]
-    private float _needlePosMax;
-    [SerializeField]
-    private float _needlePosMin;
 
-    private float _lastNeedlePos;
-    private float _currentNeedlePos;
+    private float _lastNeedleAngle;
+    private Quaternion _currentNeedleRotation;
     private bool _lightActive;
     private Color _warningLightColor;
     private bool _interpolating;
@@ -23,33 +23,34 @@ public class ShipWaterMeter : MonoBehaviour
     {
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
 
-        _currentNeedlePos = _needleTransform.localPosition.x;
+        _currentNeedleRotation = _needleTransform.localRotation;
         _warningLightColor = new Color(1.3f, 0.55f, 0.55f);
     }
 
     private void Update()
     {
+        Quaternion targetQuaternion;
         float ratio = SELocator.GetShipWaterResource().GetFractionalWater();
-        float targetPos = Mathf.Lerp(_needlePosMin, _needlePosMax, ratio);
+        targetQuaternion = Quaternion.AngleAxis(Mathf.Lerp(_needleAngleMin, _needleAngleMax, ratio), Vector3.up);
 
-        if (Mathf.Abs(targetPos - _currentNeedlePos) >= 0.0002f)
+        if (Quaternion.Angle(_currentNeedleRotation, targetQuaternion) >= 0.1f)
         {
-            if (Mathf.Abs(targetPos - _currentNeedlePos) > 0.0004f)
+            if (Quaternion.Angle(_currentNeedleRotation, targetQuaternion) > 0.5f)
             {
                 _interpolating = true;
             }
             else
             {
                 _interpolating = false;
-                _needleTransform.SetLocalPositionX(targetPos);
-                _currentNeedlePos = targetPos;
+                _needleTransform.localRotation = targetQuaternion;
+                _currentNeedleRotation = targetQuaternion;
             }
         }
 
         if (_interpolating)
         {
-            _needleTransform.SetLocalPositionX(Mathf.Lerp(_needleTransform.localPosition.x, targetPos, Time.deltaTime));
-            _currentNeedlePos = _needleTransform.localPosition.x;
+            _needleTransform.localRotation = Quaternion.Lerp(_needleTransform.localRotation, targetQuaternion, Time.deltaTime);
+            _currentNeedleRotation = _needleTransform.localRotation;
         }
 
         if (ratio <= 0f)
