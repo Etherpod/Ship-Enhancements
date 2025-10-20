@@ -576,7 +576,8 @@ public class ShipEnhancements : ModBehaviour
                 _unsubFromShipSpawn = false;
             }
 
-            if (!InMultiplayer || QSBAPI.GetIsHost())
+            bool skipSettings = GetComponent<PersistentShipState>()?.PreserveSettings ?? false;
+            if ((!InMultiplayer || QSBAPI.GetIsHost()) && !skipSettings)
             {
                 UpdateProperties();
 
@@ -1067,16 +1068,20 @@ public class ShipEnhancements : ModBehaviour
 
         Material[] newMaterials =
         {
-            (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillageCabin_Recolored_mat.mat"),
-            (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillageMetal_Recolored_mat.mat"),
-            (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillagePlanks_Recolored_mat.mat"),
-            (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_CampsiteProps_Recolored_mat.mat"),
-            (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_SignsDecal_Recolored_mat.mat"),
-            (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillageCloth_Recolored_mat.mat"),
-            (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_NOM_CopperOld_mat.mat"),
-            (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_NOM_Sandstone_mat.mat"),
-            (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/ShipInterior_WaterMeter_mat.mat"),
-            (Material)_shipEnhancementsBundle.LoadAsset("Assets/ShipEnhancements/CockpitWindowFrost_Material.mat"),
+            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_SE_VillageCabin_mat.mat"),
+            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillageCabin_Recolored_mat.mat"),
+            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_SE_VillageMetal_mat.mat"),
+            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillageMetal_Recolored_mat.mat"),
+            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillagePlanks_Recolored_mat.mat"),
+            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_SE_CampsiteProps_mat.mat"),
+            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_CampsiteProps_Recolored_mat.mat"),
+            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_SE_SignsDecal_mat.mat"),
+            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_SignsDecal_Recolored_mat.mat"),
+            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillageCloth_Recolored_mat.mat"),
+            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_NOM_CopperOld_mat.mat"),
+            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_NOM_Sandstone_mat.mat"),
+            (Material)LoadAsset("Assets/ShipEnhancements/CockpitWindowFrost_Material.mat"),
+            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_WaterGaugeMetal_mat.mat"),
         };
         Transform cockpitLight = SELocator.GetShipTransform().Find("Module_Cockpit/Lights_Cockpit/Pointlight_HEA_ShipCockpit");
         List<Material> materials = [.. cockpitLight.GetComponent<LightmapController>()._materials];
@@ -2576,14 +2581,8 @@ public class ShipEnhancements : ModBehaviour
         MeshRenderer suppliesRenderer = SELocator.GetShipTransform().
             Find("Module_Supplies/Geo_Supplies/Supplies_Geometry/Supplies_Interior").GetComponent<MeshRenderer>();
         Material inSharedMat = suppliesRenderer.sharedMaterials[0];
-        Material inSharedMat2 = inSharedMat;
-
-        CockpitButtonPanel buttonPanel = SELocator.GetShipBody().GetComponentInChildren<CockpitButtonPanel>();
-        if (buttonPanel != null)
-        {
-            MeshRenderer buttonPanelRenderer = buttonPanel.transform.Find("Panel/PanelBody.001").GetComponent<MeshRenderer>();
-            inSharedMat2 = buttonPanelRenderer.sharedMaterials[0];
-        }
+        Material inSharedMat2 = (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillageCabin_Recolored_mat.mat");
+        Material inSharedMat3 = (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_SE_VillageCabin_mat.mat");
 
         bool blendInterior = ((bool)enableColorBlending.GetProperty()
             && int.Parse((string)interiorHullColorOptions.GetProperty()) > 1)
@@ -2595,17 +2594,20 @@ public class ShipEnhancements : ModBehaviour
                 .gameObject.GetAddComponent<InteriorHullBlendController>();
             hullBlend.AddSharedMaterial(inSharedMat);
             hullBlend.AddSharedMaterial(inSharedMat2);
+            hullBlend.AddSharedMaterial(inSharedMat3);
         }
         else if (interior != "Default")
         {
             Color color = ThemeManager.GetHullTheme(interior).HullColor / 255f;
             inSharedMat.SetColor("_Color", color);
             inSharedMat2.SetColor("_Color", color);
+            inSharedMat3.SetColor("_Color", color);
         }
         else
         {
             inSharedMat.SetColor("_Color", Color.white);
             inSharedMat2.SetColor("_Color", Color.white);
+            inSharedMat3.SetColor("_Color", Color.white);
         }
 
         MeshRenderer cabinRenderer = SELocator.GetShipTransform().

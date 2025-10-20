@@ -8,6 +8,8 @@ namespace ShipEnhancements;
 
 public class PersistentShipState : MonoBehaviour
 {
+    public bool PreserveSettings { get => !_skipNextLoad; }
+
     private bool _everInitialized = false;
     private bool _skipNextLoad = false;
 
@@ -42,7 +44,11 @@ public class PersistentShipState : MonoBehaviour
         {
             if (loadScene == OWScene.SolarSystem)
             {
-                if (_skipNextLoad) { return; }
+                if (_skipNextLoad)
+                {
+                    _skipNextLoad = false;
+                    return;
+                }
                 LoadState();
             }
         };

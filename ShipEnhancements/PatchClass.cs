@@ -1303,17 +1303,17 @@ public static class PatchClass
         }
         if (shipLauncher)
         {
+            if (recallDisabled && !ShipProbePickupVolume.probeInShip)
+            {
+                ShipNotifications.PostScoutLauncherEmptyNotification();
+                return false;
+            }
             if (launchingDisabled && usingShip)
             {
                 return false;
             }
             if (scoutLauncherComponent && SELocator.GetProbeLauncherComponent().isDamaged)
             {
-                return false;
-            }
-            if (recallDisabled && !ShipProbePickupVolume.probeInShip)
-            {
-                ShipNotifications.PostScoutLauncherEmptyNotification();
                 return false;
             }
         }
