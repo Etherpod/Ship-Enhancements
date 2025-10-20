@@ -178,7 +178,7 @@ Some new stuff that Slate didn't have time to include in the ship.
 
 ---
 
-Temperature zones are not only added to the vanilla solar system, but are also added to the mods listed below! If you think a mod is missing from the list, feel free to contact me (Etherpod) or make a GitHub issue about it. Assuming I haven't disappeared off the internet, I'll update Ship Enhancements to include that mod.
+Temperature zones are not only added to the vanilla solar system, but are also added to the mods listed below! If you think a mod is missing from the list, feel free to contact me (Etherpod) or make a GitHub issue about it. if I haven't given up on modding yet, I'll update Ship Enhancements to add temperature zones to your mod.
  - Axiom's Refuge
  - Christmas Story
  - Echo Hike
@@ -229,12 +229,14 @@ Enabling color blending lets you fade the ship decoration between different colo
 
 ## Quality of Life
 Some bug fixes and some small things that make your ship a little nicer to use.
-- **Repair Confirmation**: Plays a sound when everything has been repaired. Now you don't need to go searching for any hulls you forgot to fix!
+- **Repair Confirmation**: Plays a sound when everything has been repaired. Now you don't need to go searching for any ship components you forgot to fix!
 - **Show Warning Notifications**: Notifies you in the ship when resources are low or when the outside conditions are becoming dangerous.
 - **Buttons Require Flight Chair**: Makes it so buttons in the cockpit can only be pressed while you're piloting the ship. Useful if your friends keep messing with them while you're trying to fly.
-- **Remember Ship State**: Preserves the current state of the ship (resource levels, ship damage, etc.) when warping to a new star system.
+- **Remember Ship State**: Preserves the current settings applied to the ship and the current state of the ship (resource levels, ship damage, etc.) when warping to a new star system. When you die, the settings will update and your ship will be reset.
+  - For example: If you change a setting before warping, you won't see that change after you warp. If your fuel is half empty, your fuel will still be half empty after warping.
 - **Always Allow Map Lock-on**: Lets you use the lock-on feature on the map while you're standing on a planet.
 - **Split Ship Lock-on**: Separates your ship lock-on target and your suit lock-on target. If you lock onto something while piloting the ship, the ship will continue using that as the target if you exit the seat and lock onto something else.
+  - For example: Standing outside the ship, you open your map and lock onto Brittle Hollow. If you start piloting the ship, you will no longer be locked onto Brittle Hollow, and you can lock onto something else. If you exit the flight chair, you will be locked onto Brittle Hollow again.
 - **Keep Helmet On**: When there is no oxygen present, this prevents the game from removing your helmet when doing things such as piloting the ship or roasting a marshmallow at a campfire.
 
 ## Presets
@@ -272,14 +274,14 @@ Some bugs introduced by this mod that I have no idea how to fix.
 Some Outer Wilds bugs that this mod fixes automatically. These bugs are mostly caused by situations you would have never encountered without mods.
 - Outside sources of gravity would be doubled in strength while inside the ship, which made walking around inside the ship impossible while next to the sun
 - The ship's thrust indicator would turn off when you left the flight chair
-- Free look inside the ship would be unusable while in zero gravity
+- Free look inside the ship would be unusable while the ship gravity was disabled
 - The fuel/oxygen tank leak effects would continue playing after the associated resource had run out
 - Running out of oxygen wouldn't actually do anything, and you could still breath inside the ship
 - Two moving objects with their own gravity sources would crash the game if they both entered each other's gravity fields
 - Sounds in the cockpit (like the autopilot beeping) could be heard from anywhere in the universe while outside the ship
-- Anglerfish would always target you instead of the thing making the noise (also patched by Vanilla Fix)
-- Warping out of Dark Bramble wouldn't get rid of the fog effect (also patched by Vanilla Fix)
-- Dialogue would sometimes start with the wrong text (also patched by Vanilla Fix)
+- Anglerfish would always target you instead of the thing making the noise (also patched by **Vanilla Fix**)
+- Warping out of Dark Bramble wouldn't get rid of the fog effect (also patched by **Vanilla Fix**)
+- Dialogue would sometimes start with the wrong text (also patched by **Vanilla Fix**)
 
 # Credits
 Big thanks to **ditzy** for all of their help! There's so much I have to put it in a list:
@@ -292,7 +294,7 @@ Big thanks to **ColumbidaeCafe** for helping develop most of the ideas and sound
 
 Thank you **harperlr** for making the radio model and for helping to playtest QSB support!
 
-Thank you **SpatialX** for making a [Ship Enhancements trailer](https://youtu.be/FT8VdG_Bzo0) and for leaving a ton of ideas on the mod page!
+Thank you **SpatialX** for making an awesome [Ship Enhancements trailer](https://youtu.be/FT8VdG_Bzo0)!
 
 Thank you **JohnCorby** for helping with some physics shenanigans ::)
 
