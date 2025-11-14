@@ -15,6 +15,7 @@ public static class ModCompatibility
     public static bool OnARail { get; private set; }
     public static bool UnnamedMystery { get; private set; }
     public static bool NomaisSky { get; private set; }
+    public static bool FretsQuest2 { get; private set; }
 
     public static void InitCompatibility()
     {
@@ -30,5 +31,6 @@ public static class ModCompatibility
         OnARail = interaction.ModExists("CantAffordaName.OnARail");
         UnnamedMystery = interaction.ModExists("O32.UnnamedMystery");
         NomaisSky = interaction.ModExists("Vambok.NomaiSky");
+        FretsQuest2 = interaction.ModExists("Samster68.FretsQuest2");
     }
 }

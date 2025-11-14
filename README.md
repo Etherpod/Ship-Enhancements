@@ -178,11 +178,12 @@ Some new stuff that Slate didn't have time to include in the ship.
 
 ---
 
-Temperature zones are not only added to the vanilla solar system, but are also added to the mods listed below! If you think a mod is missing from the list, feel free to contact me (Etherpod) or make a GitHub issue about it. if I haven't given up on modding yet, I'll update Ship Enhancements to add temperature zones to your mod.
+Temperature zones are not only added to the vanilla solar system, but are also added to the mods listed below! If you think a mod is missing from the list, feel free to contact me (Etherpod) or make a GitHub issue about it. If I haven't given up on modding yet, I'll update Ship Enhancements to add temperature zones to your mod.
  - Axiom's Refuge
  - Christmas Story
  - Echo Hike
  - Evacuation
+ - Fret's Quest 2
  - Heliostudy
  - Misfired Jump
  - On A Rail

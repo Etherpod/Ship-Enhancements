@@ -2473,6 +2473,13 @@ public class ShipEnhancements : ModBehaviour
                     zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/UnnamedMystery_Zephyria.prefab");
                 }
             }
+            if (ModCompatibility.FretsQuest2)
+            {
+                if (name == "Frozen Homeworld")
+                {
+                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/FretsQuest2_FrozenHomeworld.prefab");
+                }
+            }
 
             if (zone != null)
             {
@@ -3688,6 +3695,13 @@ public class ShipEnhancements : ModBehaviour
                     }
                 }
             }
+        }
+
+        if (endSetting == "")
+        {
+            OptionsMenuManager.AddSeparator(newModTab, true);
+            OptionsMenuManager.CreateLabel(newModTab, "Found a bug? Have an idea for a new setting?\nFeel free to come chat about it on the Outer Wilds Modding Discord server!");
+            OptionsMenuManager.AddSeparator(newModTab, true);
         }
 
         if (newModTab._tooltipDisplay != null)
