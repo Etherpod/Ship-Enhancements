@@ -8,7 +8,7 @@
     <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
     <NoWarn>MSB3270</NoWarn>
-    <DebugType>portable</DebugType>
+    <DebugType>none</DebugType>
   </PropertyGroup>
   
   <ItemGroup>
