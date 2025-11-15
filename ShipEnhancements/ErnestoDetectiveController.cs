@@ -136,6 +136,14 @@ public static class ErnestoDetectiveController
             {
                 _hypothesis = "Did you forget your ship is afraid of tiny particles? You left it sitting in something for too long and the reactor got damaged, and then the ship blew up.";
             }
+            else if (_reactorCause == "engine_stall")
+            {
+                _hypothesis = "They say to \"never try starting a cold engine\", you know. But you went ahead and did it anyways, didn't you? No wonder your reactor blew up.";
+            }
+            else if (_reactorCause == "overloaded")
+            {
+                _hypothesis = "You tried overloading the reactor while it was damaged. Talk about adding fuel to the fire.";
+            }
             else
             {
                 if (ShipEnhancements.Instance.engineOn && !(bool)disableDamageIndicators.GetProperty())

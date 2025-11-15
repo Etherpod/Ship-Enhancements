@@ -16,12 +16,21 @@ public class MatchVelocityButton : CockpitButtonSwitch
         {
             if (CanActivate())
             {
+                if (ShipEnhancements.GEInteraction != null)
+                {
+                    ShipEnhancements.GEInteraction.EnableContinuousMatchVelocity();
+                }
                 _autopilot.StartMatchVelocity(SELocator.GetReferenceFrame(ignorePassiveFrame: false));
             }
             else
             {
                 SetActive(false);
             }
+        }
+        else if (ShipEnhancements.GEInteraction != null 
+            && ShipEnhancements.GEInteraction.IsContinuousMatchVelocityEnabled())
+        {
+            ShipEnhancements.GEInteraction.StopContinuousMatchVelocity();
         }
         else if (_autopilot.IsMatchingVelocity())
         {

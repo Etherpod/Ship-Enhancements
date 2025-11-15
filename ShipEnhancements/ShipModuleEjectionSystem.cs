@@ -113,6 +113,7 @@ public class ShipModuleEjectionSystem : MonoBehaviour
 
                 //_shipBody.transform.position -= _shipBody.transform.TransformVector(_ejectDirection);
                 float num = _ejectImpulse;
+                num *= ShipEnhancements.ExperimentalSettings?.Eject_SpeedMultiplier ?? 1f;
                 if (Locator.GetShipDetector().GetComponent<ShipFluidDetector>().InOceanBarrierZone())
                 {
                     MonoBehaviour.print("Ship in ocean barrier zone, reducing eject impulse.");

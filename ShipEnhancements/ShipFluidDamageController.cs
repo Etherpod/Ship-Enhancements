@@ -22,11 +22,11 @@ public class ShipFluidDamageController : MonoBehaviour
         GameObject engine = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/Detectors/EngineFluidDetector.prefab");
         GameObject supplies = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/Detectors/SuppliesFluidDetector.prefab");
         GameObject landingGear = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/Detectors/LandingGearFluidDetector.prefab");
-        _moduleDetectors.Add(Instantiate(cabin, transform.parent.Find("Module_Cabin")).GetComponent<StaticFluidDetector>());
-        _moduleDetectors.Add(Instantiate(cockpit, transform.parent.Find("Module_Cockpit")).GetComponent<StaticFluidDetector>());
-        _moduleDetectors.Add(Instantiate(engine, transform.parent.Find("Module_Engine")).GetComponent<StaticFluidDetector>());
-        _moduleDetectors.Add(Instantiate(supplies, transform.parent.Find("Module_Supplies")).GetComponent<StaticFluidDetector>());
-        _moduleDetectors.Add(Instantiate(landingGear, transform.parent.Find("Module_LandingGear")).GetComponent<StaticFluidDetector>());
+        _moduleDetectors.Add(ShipEnhancements.CreateObject(cabin, transform.parent.Find("Module_Cabin")).GetComponent<StaticFluidDetector>());
+        _moduleDetectors.Add(ShipEnhancements.CreateObject(cockpit, transform.parent.Find("Module_Cockpit")).GetComponent<StaticFluidDetector>());
+        _moduleDetectors.Add(ShipEnhancements.CreateObject(engine, transform.parent.Find("Module_Engine")).GetComponent<StaticFluidDetector>());
+        _moduleDetectors.Add(ShipEnhancements.CreateObject(supplies, transform.parent.Find("Module_Supplies")).GetComponent<StaticFluidDetector>());
+        _moduleDetectors.Add(ShipEnhancements.CreateObject(landingGear, transform.parent.Find("Module_LandingGear")).GetComponent<StaticFluidDetector>());
 
         foreach (StaticFluidDetector detector in _moduleDetectors)
         {
@@ -44,6 +44,11 @@ public class ShipFluidDamageController : MonoBehaviour
         if ((float)sandDamage.GetProperty() > 0f)
         {
             _damageFluids.Add(FluidVolume.Type.SAND, (float)sandDamage.GetProperty());
+        }
+        if ((float)cycloneChaos.GetProperty() > 0.7f)
+        {
+            _damageFluids.Add(FluidVolume.Type.CLOUD, 
+                (float)cycloneChaos.GetProperty() - 0.3f);
         }
 
         _damageDelay = 1f;
@@ -129,7 +134,31 @@ public class ShipFluidDamageController : MonoBehaviour
 
     private void OnEnterFluid(FluidVolume vol, StaticFluidDetector detector)
     {
+        if (ShipEnhancements.ExperimentalSettings?.MakeWaterDamageEverythingDamage ?? false)
+        {
+            ShipModule module2 = detector.GetComponentInParent<ShipModule>();
+            if (module2 != null && !_trackedModules.Contains(module2))
+            {
+                _trackedModules.Add(module2);
+            }
+
+            _currentDamagePercent = (float)waterDamage.GetProperty();
+            if (_currentDamagePercent >= 1f)
+            {
+                ErnestoDetectiveController.ItWasExplosion(fromFluid: true);
+                SELocator.GetShipDamageController().Explode();
+            }
+            return;
+        }
+
         if (!_damageFluids.Keys.Contains(vol.GetFluidType())) return;
+
+        if (_damageFluids.Keys.Contains(FluidVolume.Type.CLOUD) 
+            && vol.GetFluidType() == FluidVolume.Type.CLOUD
+            && vol is not TornadoFluidVolume)
+        {
+            return;
+        }
 
         ShipModule module = detector.GetComponentInParent<ShipModule>();
         if (module != null && !_trackedModules.Contains(module))
@@ -147,7 +176,15 @@ public class ShipFluidDamageController : MonoBehaviour
 
     private void OnExitFluid(FluidVolume vol, StaticFluidDetector detector)
     {
-        if (!_damageFluids.Keys.Contains(vol.GetFluidType())) return;
+        if (!_damageFluids.Keys.Contains(vol.GetFluidType())
+            && !(ShipEnhancements.ExperimentalSettings?.MakeWaterDamageEverythingDamage ?? false)) return;
+
+        if (_damageFluids.Keys.Contains(FluidVolume.Type.CLOUD)
+            && vol.GetFluidType() == FluidVolume.Type.CLOUD
+            && vol is not TornadoFluidVolume)
+        {
+            return;
+        }
 
         ShipModule module = detector.GetComponentInParent<ShipModule>();
         if (module != null && _trackedModules.Contains(module))

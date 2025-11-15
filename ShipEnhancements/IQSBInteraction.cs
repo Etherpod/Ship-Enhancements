@@ -1,6 +1,8 @@
 ﻿using ShipEnhancements;
 using UnityEngine;
 
+namespace ShipEnhancements;
+
 public interface IQSBInteraction
 {
     bool FlightConsoleOccupied();

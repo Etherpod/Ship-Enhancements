@@ -239,7 +239,7 @@ public class OverdriveButton : CockpitInteractible
             }
         }
 
-        _interactReceiver.SetInteractionEnabled(_powered);
+        _interactReceiver.SetInteractionEnabled(_active && _powered && _cooldownT <= 0f);
     }
 
     public void SetCooldown(float cooldown)

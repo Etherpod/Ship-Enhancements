@@ -26,8 +26,7 @@ public class ShipTemperatureGauge : MonoBehaviour
     private void Start()
     {
         GameObject indicatorLight = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/IndicatorLight_TemperatureGauge.prefab");
-        AssetBundleUtilities.ReplaceShaders(indicatorLight);
-        _indicatorLight = Instantiate(indicatorLight, SELocator.GetShipBody().transform).GetComponent<OWRenderer>();
+        _indicatorLight = ShipEnhancements.CreateObject(indicatorLight, SELocator.GetShipBody().transform).GetComponent<OWRenderer>();
     }
 
     private void Update()
@@ -69,7 +68,7 @@ public class ShipTemperatureGauge : MonoBehaviour
             bool flag = Time.timeSinceLevelLoad * 2f % 2f < 1.33f;
             _indicatorLight.SetEmissionColor(flag ? _warningLightColor : Color.black);
         }
-        else
+        else if (_lightActive)
         {
             _lightActive = false;
             _indicatorLight.SetEmissionColor(Color.black);

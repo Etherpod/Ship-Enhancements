@@ -62,6 +62,7 @@ public class RadioItem : OWItem
     private FirstPersonManipulator _cameraManipulator;
     private OWCamera _playerCam;
     private OWAudioSource _playerExternalSource;
+    private RadioCodeNotes _codeNotes;
     private InputMode _lastInputMode = InputMode.Character;
     private bool _lastFocused = false;
     private bool _playerInteracting = false;
@@ -109,8 +110,8 @@ public class RadioItem : OWItem
     private float _minDreamDist = 3f;
     private float _maxDreamDist = 20f;
 
-    private readonly string _powerOnText = "Turn On Radio";
-    private readonly string _powerOffText = "Turn Off Radio";
+    private readonly string _powerOnText = "Toggle Power (Off)";
+    private readonly string _powerOffText = "Toggle Power (On)";
 
     public override string GetDisplayName()
     {
@@ -127,6 +128,7 @@ public class RadioItem : OWItem
         _reverbFilter = _musicSource.GetComponent<AudioReverbFilter>();
         _connectAudio = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_Connect.ogg");
         _disconnectAudio = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/Radio_Disconnect.ogg");
+        _codeNotes = SELocator.GetShipBody().GetComponentInChildren<RadioCodeNotes>();
         InitializeAudioDict();
 
         GlobalMessenger.AddListener("ExitShip", OnExitShip);
@@ -582,6 +584,7 @@ public class RadioItem : OWItem
         }
         if (_codesToAudio.ContainsKey(result))
         {
+            _codeNotes.OnEnterCode(result);
             return _codesToAudio[result];
         }
 
@@ -769,13 +772,22 @@ public class RadioItem : OWItem
 
         if (_connectedToShip)
         {
-            _musicSource.spatialBlend = 1f;
-            _musicSource.spread = 60f;
             _highPassFilter.enabled = true;
             _oneShotSource.PlayOneShot(_disconnectAudio, 1f);
             _connectedToShip = false;
 
             SetRadioVolume();
+        }
+        
+        if (holdTranform.GetAttachedOWRigidbody() == SELocator.GetPlayerBody())
+        {
+            _musicSource.spatialBlend = 0f;
+            _musicSource.spread = 0f;
+        }
+        else
+        {
+            _musicSource.spatialBlend = 1f;
+            _musicSource.spread = 60f;
         }
 
         _meshParent.transform.localScale = Vector3.one * 0.6f;
@@ -785,13 +797,23 @@ public class RadioItem : OWItem
     public override void DropItem(Vector3 position, Vector3 normal, Transform parent, Sector sector, IItemDropTarget customDropTarget)
     {
         base.DropItem(position, normal, parent, sector, customDropTarget);
+
+        if (!_connectedToShip)
+        {
+            _musicSource.spatialBlend = 1f;
+            _musicSource.spread = 60f;
+        }
+
         _meshParent.transform.localScale = Vector3.one;
     }
 
     private void OnExitShip()
     {
-        _musicSource.spatialBlend = 1f;
-        _musicSource.spread = 60f;
+        if (_connectedToShip)
+        {
+            _musicSource.spatialBlend = 1f;
+            _musicSource.spread = 60f;
+        }
     }
 
     private void OnEnterShip()

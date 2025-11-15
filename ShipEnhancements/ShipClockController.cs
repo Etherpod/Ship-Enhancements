@@ -20,6 +20,7 @@ public class ShipClockController : MonoBehaviour
     private int _lastSeconds;
     private int _lastTickIndex = -1;
     private bool _shipDestroyed = false;
+    private bool _reverse = false;
 
     private void Awake()
     {
@@ -29,18 +30,25 @@ public class ShipClockController : MonoBehaviour
 
         _gear.enabled = false;
         _lastSeconds = 0;
+        if ((bool)ShipEnhancements.Settings.enableGasLeak.GetProperty())
+        {
+            _reverse = Random.value < 0.1f;
+        }
         enabled = false;
     }
 
     private void Update()
     {
-        int seconds = (int)TimeLoop.GetSecondsElapsed() % 60;
-        int minutes = (int)TimeLoop.GetMinutesElapsed() % 60;
+        bool realistic = ShipEnhancements.ExperimentalSettings?.RealisticClock ?? false;
+        float mult = realistic ? 60f : 1f;
+        int seconds = (int)(TimeLoop.GetSecondsElapsed() / mult % 60) * (_reverse ? -1 : 1);
+        int minutes = (int)(TimeLoop.GetMinutesElapsed() / mult % 60) * (_reverse ? -1 : 1);
 
         if (seconds != _lastSeconds)
         {
+            float minuteStep = realistic ? 30f : 6f;
             _minuteHand.transform.localRotation = Quaternion.Euler(0f, 180f + 6f * seconds, 0f);
-            _hourHand.transform.localRotation = Quaternion.Euler(0f, 180f + 6f * minutes, 0f);
+            _hourHand.transform.localRotation = Quaternion.Euler(0f, 180f + minuteStep * minutes, 0f);
 
             List<AudioClip> clips = [.. _tickSounds];
             AudioClip nextClip = _tickSounds.Where(clip => clips.IndexOf(clip) != _lastTickIndex).ToArray()[Random.Range(0, _tickSounds.Length - 1)];

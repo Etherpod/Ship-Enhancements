@@ -18,16 +18,18 @@ public static class SELocator
     private static PlayerResources _playerResources;
     private static ProbeLauncherComponent _probeLauncherComponent;
     private static ShipTemperatureDetector _shipTemperatureDetector;
+    private static ShipTemperatureDamageController _shipTempDamageController;
     private static ShipDamageController _shipDamageController;
     private static ShipOverdriveController _shipOverdriveController;
     private static SignalscopeComponent _signalscopeComponent;
     private static CockpitButtonPanel _buttonPanel;
     private static ThrustModulatorController _modulatorController;
-    private static CockpitFilthController _cockpitFilthController;
+    private static CockpitEffectController _cockpitFilthController;
     private static FlightConsoleInteractController _consoleInteractController;
     private static CockpitErnesto _ernesto;
     private static ShipWarpCoreComponent _warpCoreComponent;
     private static AutopilotPanelController _autopilotPanelController;
+    private static ShipWaterResource _waterResource;
 
     private static ReferenceFrame _shipRF;
     private static ReferenceFrame _playerRF;
@@ -52,9 +54,10 @@ public static class SELocator
         {
             _shipOxygenDetector = _shipDetector.gameObject.AddComponent<OxygenDetector>();
         }
-        if (temperatureZonesAmount.GetProperty().ToString() != "None")
+        if ((bool)enableShipTemperature.GetProperty())
         {
             _shipTemperatureDetector = _shipDetector.gameObject.AddComponent<ShipTemperatureDetector>();
+            _shipTempDamageController = _shipDetector.gameObject.AddComponent<ShipTemperatureDamageController>();
         }
     }
 
@@ -69,7 +72,7 @@ public static class SELocator
         }
         if ((float)rustLevel.GetProperty() > 0 || (float)dirtAccumulationTime.GetProperty() > 0f)
         {
-            _cockpitFilthController = _shipTransform.GetComponentInChildren<CockpitFilthController>(true);
+            _cockpitFilthController = _shipTransform.GetComponentInChildren<CockpitEffectController>(true);
         }
         if ((bool)addErnesto.GetProperty())
         {
@@ -78,6 +81,10 @@ public static class SELocator
         if ((bool)enableEnhancedAutopilot.GetProperty())
         {
             _autopilotPanelController = _shipTransform.GetComponentInChildren<AutopilotPanelController>();
+        }
+        if ((bool)addWaterTank.GetProperty())
+        {
+            _waterResource = _shipBody.GetComponent<ShipWaterResource>();
         }
     }
 
@@ -165,6 +172,11 @@ public static class SELocator
     {
         return _shipTemperatureDetector;
     }
+    
+    public static ShipTemperatureDamageController GetShipTemperatureDamageController()
+    {
+        return _shipTempDamageController;
+    }
 
     public static ShipDamageController GetShipDamageController()
     {
@@ -186,7 +198,7 @@ public static class SELocator
         return _modulatorController;
     }
 
-    public static CockpitFilthController GetCockpitFilthController()
+    public static CockpitEffectController GetCockpitFilthController()
     {
         return _cockpitFilthController;
     }
@@ -209,6 +221,11 @@ public static class SELocator
     public static AutopilotPanelController GetAutopilotPanelController()
     {
         return _autopilotPanelController;
+    }
+
+    public static ShipWaterResource GetShipWaterResource()
+    {
+        return _waterResource;
     }
 
     public static ReferenceFrame GetReferenceFrame(bool shipFrame = true, bool ignorePassiveFrame = true)

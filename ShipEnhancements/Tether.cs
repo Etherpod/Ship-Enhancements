@@ -19,8 +19,9 @@ public class Tether : MonoBehaviour
     private CapsuleCollider _collider;
     private bool _reelingIn = false;
     private bool _reelingOut = false;
+    private float _reelSpeed = 5f;
     private readonly float _minTetherDistance = 0.25f;
-    private readonly float _maxTetherDistance = 1000f;
+    private float _maxTetherDistance = 1000f;
     private readonly float _transferBufferDistance = 2f;
 
     private Transform _connectedTransform;
@@ -47,6 +48,8 @@ public class Tether : MonoBehaviour
     {
         _hook = GetComponent<TetherHookItem>();
         _audioController = SELocator.GetPlayerBody().GetComponentInChildren<TetherAudioController>();
+        _maxTetherDistance = Mathf.Max(0.5f, ShipEnhancements.ExperimentalSettings?.Tether_MaxLength ?? _maxTetherDistance);
+        _reelSpeed *= ShipEnhancements.ExperimentalSettings?.Tether_ReelMultiplier ?? 1f;
     }
 
     private void Update()
@@ -77,7 +80,7 @@ public class Tether : MonoBehaviour
                 float tetherDist = (_connectedTransform.TransformPoint(_connectedAnchor) - transform.TransformPoint(_anchor)).sqrMagnitude;
                 if (OWInput.IsPressed(InputLibrary.toolOptionDown) && _joint.minDistance < _maxTetherDistance)
                 {
-                    _joint.minDistance += Time.deltaTime * 5f;
+                    _joint.minDistance += Time.deltaTime * _reelSpeed;
                     // Play reel noise
                     if (!_reelingIn)
                     {
@@ -88,7 +91,7 @@ public class Tether : MonoBehaviour
                 }
                 else if (tetherDist < Mathf.Pow(_joint.minDistance + 2f, 2) && OWInput.IsPressed(InputLibrary.toolOptionUp) && _joint.minDistance > _minTetherDistance)
                 {
-                    _joint.minDistance -= Time.deltaTime * 5f;
+                    _joint.minDistance -= Time.deltaTime * _reelSpeed;
                     // Play reel noise
                     if (!_reelingOut)
                     {
@@ -173,8 +176,7 @@ public class Tether : MonoBehaviour
             _tetheredToSelf = true;
         }
 
-        _tetherMesh = Instantiate(ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/TetherLine.prefab"), transform).transform;
-        AssetBundleUtilities.ReplaceShaders(_tetherMesh.gameObject);
+        _tetherMesh = ShipEnhancements.CreateObject(ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/TetherLine.prefab"), transform).transform;
         _tetherMesh.localPosition = _anchor;
 
         Vector3 lineDir = _connectedTransform.TransformPoint(_connectedAnchor) - transform.TransformPoint(_anchor);
@@ -283,8 +285,7 @@ public class Tether : MonoBehaviour
         _connectedTransform = connectedObj;
         _connectedAnchor = connectedOffset;
 
-        _tetherMesh = Instantiate(ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/TetherLine.prefab"), transform).transform;
-        AssetBundleUtilities.ReplaceShaders(_tetherMesh.gameObject);
+        _tetherMesh = ShipEnhancements.CreateObject(ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/TetherLine.prefab"), transform).transform;
         _tetherMesh.localPosition = _anchor;
 
         _tetheredToSelf = _connectedTransform == transform;

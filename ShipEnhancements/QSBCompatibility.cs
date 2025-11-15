@@ -63,6 +63,7 @@ public class QSBCompatibility
         _api.RegisterHandler<(float, bool)>("ship-fuel-drain", ReceiveShipFuelDrain);
         _api.RegisterHandler<float>("set-ship-oxygen", ReceiveShipOxygenValue);
         _api.RegisterHandler<float>("set-ship-fuel", ReceiveShipFuelValue);
+        _api.RegisterHandler<float>("set-ship-water", ReceiveShipWaterValue);
         _api.RegisterHandler<bool>("panel-state", ReceivePanelExtended);
         _api.RegisterHandler<(int, bool)>("modulator-button-state", ReceiveModulatorButtonState);
         _api.RegisterHandler<(bool, bool, bool)>("overdrive-button-state", ReceiveOverdriveButtonState);
@@ -75,8 +76,7 @@ public class QSBCompatibility
         _api.RegisterHandler<int>("disconnect-tether", ReceiveDisconnectTether);
         _api.RegisterHandler<(int, int)>("transfer-tether", ReceiveTransferTether);
         _api.RegisterHandler<NoData>("ship-fuel-max", ReceiveShipFuelMax);
-        _api.RegisterHandler<(int, float, float)>("rust-state", ReceiveInitialRustState);
-        _api.RegisterHandler<(float, float, float)>("initial-dirt-state", ReceiveInitialDirtState);
+        _api.RegisterHandler<(int, float, float, int, float, float, float)>("cockpit-effect-state", ReceiveCockpitEffectState);
         _api.RegisterHandler<float>("dirt-state", ReceiveDirtState);
         _api.RegisterHandler<SerializedVector3>("detach-all-players", ReceiveDetachAllPlayers);
         _api.RegisterHandler<SerializedVector3>("persistent-input", ReceivePersistentInput);
@@ -101,6 +101,11 @@ public class QSBCompatibility
         _api.RegisterHandler<(int, bool, bool, bool, bool)>("autopilot-state", ReceiveAutopilotState);
         _api.RegisterHandler<(bool, bool, bool)>("pid-autopilot-state", ReceivePidAutopilotState);
         _api.RegisterHandler<NoData>("honk-horn", ReceiveHonkHorn);
+        _api.RegisterHandler<(int, int)>("pump-type", ReceivePumpType);
+        _api.RegisterHandler<(int, bool)>("pump-powered", ReceivePumpPowered);
+        _api.RegisterHandler<(int, bool)>("pump-mode", ReceivePumpMode);
+        _api.RegisterHandler<bool>("water-cooling", ReceiveWaterCoolingState);
+        _api.RegisterHandler<bool>("reactor-overload", ReceiveReactorOverload);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -202,13 +207,10 @@ public class QSBCompatibility
                 SendCampfireInitialState(id, campfire, dropped, unpacked, lit);
             }
         }
-        if ((float)rustLevel.GetProperty() > 0)
+        if ((float)rustLevel.GetProperty() > 0 || ((float)dirtAccumulationTime.GetProperty() > 0f 
+            && (float)maxDirtAccumulation.GetProperty() > 0f))
         {
-            SELocator.GetCockpitFilthController()?.BroadcastInitialRustState();
-        }
-        if ((float)dirtAccumulationTime.GetProperty() > 0f)
-        {
-            SELocator.GetCockpitFilthController()?.BroadcastInitialDirtState();
+            SELocator.GetCockpitFilthController()?.BroadcastCockpitEffectState();
         }
         if ((float)shipExplosionMultiplier.GetProperty() < 0f)
         {
@@ -451,6 +453,16 @@ public class QSBCompatibility
         SELocator.GetShipResources()?.SetFuel(newValue);
     }
 
+    public void SendShipWaterValue(uint id, float newValue)
+    {
+        _api.SendMessage("set-ship-water", newValue, id, false);
+    }
+
+    private void ReceiveShipWaterValue(uint id, float newValue)
+    {
+        SELocator.GetShipWaterResource()?.SetWater(newValue);
+    }
+
     public void SendShipFuelMax(uint id)
     {
         _api.SendMessage("ship-fuel-max", new NoData(), id, false);
@@ -608,7 +620,7 @@ public class QSBCompatibility
 
     private void ReceiveShipHullTemp(uint id, float temperature)
     {
-        SELocator.GetShipTemperatureDetector()?.SetShipTempMeter(temperature);
+        SELocator.GetShipTemperatureDetector()?.SetInternalTempRemote(temperature);
     }
     #endregion
 
@@ -665,24 +677,16 @@ public class QSBCompatibility
 
     #region CockpitFlith
 
-    public void SendInitialRustState(uint id, int textureIndex, Vector2 textureOffset)
+    public void SendInitialRustState(uint id, int rustIndex, Vector2 rustOffset, int dirtIndex, Vector2 dirtOffset, float dirtProgression)
     {
-        _api.SendMessage("rust-state", (textureIndex, textureOffset.x, textureOffset.y), id, false);
+        _api.SendMessage("rust-state", (rustIndex, rustOffset.x, rustOffset.y, dirtIndex, dirtOffset.x, dirtOffset.y, dirtProgression), id, false);
     }
 
-    private void ReceiveInitialRustState(uint id, (int textureIndex, float offsetX, float offsetY) data)
+    private void ReceiveCockpitEffectState(uint id, (int rustIndex, float rustOffsetX, float rustOffsetY, 
+        int dirtIndex, float dirtOffsetX, float dirtOffsetY, float dirtProgression) data)
     {
-        SELocator.GetCockpitFilthController()?.SetInitialRustState(data.textureIndex, new Vector2(data.offsetX, data.offsetY));
-    }
-
-    public void SendInitialDirtState(uint id, Vector2 textureOffset, float currentProgression)
-    {
-        _api.SendMessage("initial-dirt-state", (textureOffset.x, textureOffset.y, currentProgression), id, false);
-    }
-
-    private void ReceiveInitialDirtState(uint id, (float offsetX, float offsetY, float currentProgression) data)
-    {
-        SELocator.GetCockpitFilthController()?.SetInitialDirtState(new Vector2(data.offsetX, data.offsetY), data.currentProgression);
+        SELocator.GetCockpitFilthController()?.SetInitialEffectState(data.rustIndex, new Vector2(data.rustOffsetX, data.rustOffsetY),
+            data.dirtIndex, new Vector2(data.dirtOffsetX, data.dirtOffsetY), data.dirtProgression);
     }
 
     public void SendDirtState(uint id, float progression)
@@ -1100,6 +1104,74 @@ public class QSBCompatibility
     private void ReceiveHonkHorn(uint id, NoData noData)
     {
         SELocator.GetShipTransform().GetComponentInChildren<ShipHornController>()?.PlayHorn();
+    }
+    #endregion
+
+    #region ResourcePump
+    public void SendPumpType(uint id, OWItem item, int typeIndex)
+    {
+        _api.SendMessage("pump-type", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), typeIndex), id, false);
+    }
+
+    private void ReceivePumpType(uint from, (int itemID, int typeIndex) data)
+    {
+        OWItem item = ShipEnhancements.QSBInteraction.GetItemFromID(data.itemID);
+        if (item == null) return;
+
+        ResourcePump pump = item as ResourcePump;
+        pump.UpdateTypeRemote(data.typeIndex);
+    }
+
+    public void SendPumpPowered(uint id, OWItem item, bool powered)
+    {
+        _api.SendMessage("pump-powered", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), powered), id, false);
+    }
+
+    private void ReceivePumpPowered(uint from, (int itemID, bool powered) data)
+    {
+        OWItem item = ShipEnhancements.QSBInteraction.GetItemFromID(data.itemID);
+        if (item == null) return;
+
+        ResourcePump pump = item as ResourcePump;
+        pump.UpdatePoweredRemote(data.powered);
+    }
+
+    public void SendPumpMode(uint id, OWItem item, bool output)
+    {
+        _api.SendMessage("pump-mode", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), output), id, false);
+    }
+
+    private void ReceivePumpMode(uint from, (int itemID, bool output) data)
+    {
+        OWItem item = ShipEnhancements.QSBInteraction.GetItemFromID(data.itemID);
+        if (item == null) return;
+
+        ResourcePump pump = item as ResourcePump;
+        pump.UpdateModeRemote(data.output);
+    }
+    #endregion
+
+    #region WaterCooling
+    public void SendWaterCoolingState(uint id, bool state)
+    {
+        _api.SendMessage("water-cooling", state, id, false);
+    }
+
+    private void ReceiveWaterCoolingState(uint from, bool state)
+    {
+        SELocator.GetShipBody().GetComponentInChildren<WaterCoolingLever>()?.OnPressInteractRemote(state);
+    }
+    #endregion
+
+    #region ReactorOverload
+    public void SendReactorOverload(uint id, bool overload)
+    {
+        _api.SendMessage("reactor-overload", overload, id, false);
+    }
+
+    private void ReceiveReactorOverload(uint from, bool overload)
+    {
+        GameObject.FindObjectOfType<ReactorOverloader>().SetOverloadedRemote(overload);
     }
     #endregion
 }

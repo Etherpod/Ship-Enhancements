@@ -24,6 +24,11 @@ public class PidAutopilotButton : CockpitButtonSwitch
         {
             if (CanActivate())
             {
+                if (ShipEnhancements.GEInteraction != null
+                    && ShipEnhancements.GEInteraction.IsContinuousMatchVelocityEnabled())
+                {
+                    ShipEnhancements.GEInteraction.StopContinuousMatchVelocity();
+                }
                 _pidAutopilot.SetAutopilotActive(true, _mode, false);
             }
             else

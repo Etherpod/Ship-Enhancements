@@ -47,7 +47,6 @@ public class PortableCampfireItem : OWItem
         base.DropItem(position, normal, parent, sector, customDropTarget);
         transform.localScale = Vector3.one;
         TogglePackUp(false);
-        _campfire.UpdateProperties();
         if (wasCarrying && parent.GetComponentInParent<ShipBody>() && PlayerState.IsInsideShip())
         {
             _campfire.UpdateInsideShip(true);

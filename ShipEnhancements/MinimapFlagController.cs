@@ -24,7 +24,6 @@ public class MinimapFlagController : MonoBehaviour
         {
             prefab = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipFlagMarkerPivot.prefab");
         }
-        AssetBundleUtilities.ReplaceShaders(prefab);
         _flagMarkerPrefab = prefab;
     }
 
@@ -95,7 +94,7 @@ public class MinimapFlagController : MonoBehaviour
         if (!_activeFlags.ContainsKey(flag))
         {
             ShipCockpitUI cockpitUI = SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitUI>();
-            Transform markerTransform = Instantiate(_flagMarkerPrefab, transform).transform;
+            Transform markerTransform = ShipEnhancements.CreateObject(_flagMarkerPrefab, transform).transform;
             _activeFlags.Add(flag, markerTransform);
             foreach (var rend in markerTransform.GetComponentsInChildren<Renderer>())
             {

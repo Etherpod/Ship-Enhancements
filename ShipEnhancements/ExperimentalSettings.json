@@ -1,0 +1,52 @@
+// Welcome to the experimental settings!
+// These options are here because would have caused too much chaos in the official settings menu.
+// Like the regular settings, any changes will only be applied on the next loop.
+// Don't break the mod, please.
+
+// <-- NONE OF THESE WILL WORK IN MULTIPLAYER!!! -->
+
+{
+  // Lets you place items while in zero gravity and on walls/ceilings
+  "UnrestrictedItemPlacement": false,
+
+  // Pressing "L" on your keyboard will blow up every fuel canister at once
+  "FuelCanister_RemoteActivation": false,
+  // Changes how much fuel the fuel canister has, 100 fuel is enough to fill up your jetpack one time
+  "FuelCanister_MaxFuel": 300,
+
+  // Pressing "O" on your keyboard will turn on/off every Resource Pump at once
+  "ResourcePump_RemoteActivation": false,
+  // Gives the Resource Pump the ability to move planets with fuel output mode
+  "ResourcePump_UltraThrust": false,
+  // Big numbers make the Resource Pump thrust stronger
+  "ResourcePump_ThrustStrength": 1.0,
+  // How far the pump can be from the ship before it disconnects (measured in meters)
+  "ResourcePump_SignalRange": 1000,
+  // Big numbers make the Resource Pump add/drain resources faster
+  "ResourcePump_TransferMultiplier": 1.0,
+
+  // Replaces turbo mode with an "invert direction" mode
+  "TractorBeam_MakeTurboInverse": false,
+  // Larger numbers make the Portable Tractor Beam push you faster
+  "TractorBeam_SpeedMultiplier": 1.0,
+
+  // How far you can reel out the ship tether (measured in meters)
+  "Tether_MaxLength": 1000.0,
+  // Big numbers make the tether reel in/out faster
+  "Tether_ReelMultiplier": 1.0,
+
+  // Changes how fast the Thrust Modulator's overdrive makes you go
+  "ThrustModulator_OverdriveStrength": 500.0,
+
+  // Big numbers make the ship parts fly further when you eject them
+  "Eject_SpeedMultiplier": 1.0,
+
+  // Makes the ship clock show minutes/hours instead of seconds/minutes
+  "RealisticClock": false,
+
+  // Makes the Ship Water Damage setting apply to everything (even air will damage you)
+  "MakeWaterDamageEverythingDamage": false,
+
+  // If you look away from your ship, it disappears. Forever.
+  "UltraQuantumShip": false
+}

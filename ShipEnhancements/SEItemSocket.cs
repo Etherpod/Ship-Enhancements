@@ -16,7 +16,7 @@ public class SEItemSocket : OWItemSocket
 
     protected List<OWItem> _itemPool = [];
     protected List<OWItem> _spawnedItems = [];
-    protected readonly int _numItemsToSpawn = 3;
+    protected readonly int _numItemsToSpawn = 30;
 
     public override void Awake()
     {
@@ -56,7 +56,7 @@ public class SEItemSocket : OWItemSocket
 
                 for (int i = 0; i < _numItemsToSpawn; i++)
                 {
-                    OWItem newItem = Instantiate(_prefabItem, transform);
+                    OWItem newItem = ShipEnhancements.CreateObject(_prefabItem.gameObject, transform).GetComponent<OWItem>();
                     newItem.gameObject.SetActive(false);
                     _itemPool.Add(newItem);
                 }
@@ -139,7 +139,7 @@ public class SEItemSocket : OWItemSocket
 
         if (!ShipEnhancements.InMultiplayer || !(bool)unlimitedItems.GetProperty())
         {
-            OWItem newItem = Instantiate(_prefabItem);
+            OWItem newItem = ShipEnhancements.CreateObject(_prefabItem.gameObject).GetComponent<OWItem>();
             PlaceIntoSocket(newItem);
         }
         else if (_itemPool.Count > 0)

@@ -8,76 +8,47 @@ namespace ShipEnhancements;
 
 public class ShipTemperatureDetector : TemperatureDetector
 {
-    private ShipHull[] _shipHulls;
-    private ShipHull _lastDamagedHull;
-    private ShipComponent[] _shipComponents;
     private ShockLayerController _shockLayerController;
-    private float _damageDelay = 1.5f;
-    private float _randDamageDelay;
-    private float _delayStartTime;
-    private bool _componentDamageNextTime = false;
-
-    protected override bool UpdateTemperature => base.UpdateTemperature
-        || (_shockLayerController.enabled && _shockLayerController._ruleset != null);
+    private ShipFluidDetector _fluidDetector;
+    private ReactorHeatController _reactorHeat;
+    private bool _waterCooling;
 
     protected override void Start()
     {
         base.Start();
 
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
-
-        _shipHulls = SELocator.GetShipDamageController()._shipHulls;
-        _shipComponents = SELocator.GetShipDamageController()._shipComponents;
         _shockLayerController = SELocator.GetShipTransform().GetComponentInChildren<ShockLayerController>();
-
-        _delayStartTime = Time.time;
-        _randDamageDelay = _damageDelay + UnityEngine.Random.Range(-1f, 1f);
-        _internalTempMeterLength *= Mathf.Max(Mathf.Abs((float)temperatureResistanceMultiplier.GetProperty()), 1f);
-    }
-
-    private void UpdateTemperatureDamage()
-    {
-        if (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost())
-        {
-            if (Time.time > _delayStartTime + _randDamageDelay)
-            {
-                _delayStartTime = Time.time;
-                _randDamageDelay = _damageDelay + UnityEngine.Random.Range(-1f, 1f);
-
-                float timeMultiplier = Mathf.InverseLerp(0f, _internalTempMeterLength, Mathf.Abs(_internalTempMeter));
-                float tempDamage = Mathf.Max((float)temperatureDamageMultiplier.GetProperty(), 0f);
-
-                float damageChance = 0.05f * Mathf.Lerp(0f, 1f + (Mathf.InverseLerp(_highTempCutoff, 100f, Mathf.Abs(_currentTemperature)) * 2f), Mathf.Pow(timeMultiplier, 2));
-                if ((bool)componentTemperatureDamage.GetProperty() && UnityEngine.Random.value
-                    < damageChance * tempDamage / 8)
-                {
-                    _componentDamageNextTime = true;
-                }
-                if ((bool)hullTemperatureDamage.GetProperty() && UnityEngine.Random.value < damageChance)
-                {
-                    HullTemperatureDamage();
-                }
-            }
-            else if (_componentDamageNextTime && Time.time > _delayStartTime + _randDamageDelay / 2)
-            {
-                _componentDamageNextTime = false;
-                ComponentTemperatureDamage();
-            }
-        }
+        _fluidDetector = SELocator.GetShipDetector().GetComponent<ShipFluidDetector>();
+        _reactorHeat = SELocator.GetShipDamageController()._shipReactorComponent.GetComponent<ReactorHeatController>();
+        _maxInternalTemperature *= Mathf.Max(Mathf.Abs((float)temperatureResistanceMultiplier.GetProperty()), 1f);
+        _waterCooling = (bool)addWaterTank.GetProperty() && (bool)addWaterCooling.GetProperty();
     }
 
     protected override void Update()
     {
         base.Update();
 
-        if ((bool)faultyHeatRegulators.GetProperty())
+        if ((string)passiveTemperatureGain.GetProperty() != "None")
         {
+            bool heating = (string)passiveTemperatureGain.GetProperty() == "Hot";
             float resistance = (float)temperatureResistanceMultiplier.GetProperty();
-            float multiplier = Mathf.InverseLerp(-_highTempCutoff / 4f, 0f, _currentTemperature);
+
+            // Reduce effect in opposite temperature
+            float multiplier = 0.25f + (0.75f * Mathf.InverseLerp(_highTempCutoff / 4f * (heating ? -1f : 1f), 0f, _currentTemperature));
+
+            // Reactor increases heat and decreases cold
             float additiveMultiplier = 0f;
             if (SELocator.GetShipDamageController().IsReactorCritical())
             {
-                additiveMultiplier = 1.5f;
+                if (heating)
+                {
+                    additiveMultiplier = 1.5f;
+                }
+                else
+                {
+                    additiveMultiplier = -0.5f;
+                }
             }
 
             if (multiplier > 0 || additiveMultiplier > 0)
@@ -89,78 +60,21 @@ public class ShipTemperatureDetector : TemperatureDetector
                 }
                 else
                 {
+                    // Change faster when close to zero
                     float scalar = 1 + (1f * Mathf.InverseLerp(_highTempCutoff, 0f, Mathf.Abs(_currentTemperature)));
-                    _internalTempMeter = Mathf.Clamp(_internalTempMeter + Time.deltaTime
-                        * ((multiplier * scalar) + additiveMultiplier) * Mathf.Sign(resistance),
-                        -_internalTempMeterLength, _internalTempMeterLength);
+
+                    _currentInternalTemperature = Mathf.Clamp(_currentInternalTemperature + Time.deltaTime
+                        * Mathf.Max((multiplier * scalar) + additiveMultiplier, 0f) * (heating ? 1f : -1f) * Mathf.Sign(resistance),
+                        -_maxInternalTemperature, _maxInternalTemperature);
                 }
             }
         }
-
-        UpdateTemperatureDamage();
     }
 
-    private void HullTemperatureDamage()
+    protected override bool CanUpdateTemperature()
     {
-        ShipHull[] validHulls;
-
-        if (_lastDamagedHull != null)
-        {
-            validHulls = _shipHulls.Where(hull =>
-            {
-                return hull != _lastDamagedHull;
-            }).ToArray();
-        }
-        else
-        {
-            validHulls = _shipHulls;
-        }
-
-        ShipHull targetHull = validHulls[UnityEngine.Random.Range(0, validHulls.Length)];
-        float tempDamage = Mathf.Max((float)temperatureDamageMultiplier.GetProperty(), 0f);
-        float damage = UnityEngine.Random.Range(0.03f, 0.15f) * tempDamage;
-        bool wasDamaged = targetHull.isDamaged;
-        ApplyHullTempDamage(targetHull, damage);
-
-        if (ShipEnhancements.InMultiplayer && ShipEnhancements.QSBAPI.GetIsHost())
-        {
-            ShipEnhancements.QSBInteraction.SetHullDamaged(targetHull, !wasDamaged);
-        }
-    }
-
-    public void ApplyHullTempDamage(ShipHull targetHull, float damage)
-    {
-        targetHull._damaged = true;
-        targetHull._integrity = Mathf.Max(targetHull._integrity - damage, 0f);
-        var eventDelegate1 = (MulticastDelegate)typeof(ShipHull).GetField("OnDamaged", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).GetValue(targetHull);
-        if (eventDelegate1 != null)
-        {
-            foreach (var handler in eventDelegate1.GetInvocationList())
-            {
-                handler.Method.Invoke(handler.Target, [targetHull]);
-            }
-        }
-        if (targetHull._damageEffect != null)
-        {
-            targetHull._damageEffect.SetEffectBlend(1f - targetHull._integrity);
-        }
-        _lastDamagedHull = targetHull;
-
-        if (targetHull._integrity <= 0f && targetHull.shipModule is ShipDetachableModule
-            && (!(bool)preventSystemFailure.GetProperty() || targetHull.section == ShipHull.Section.Front))
-        {
-            ErnestoDetectiveController.ItWasTemperatureDamage(_internalTempMeter >= 0f);
-        }
-    }
-
-    private void ComponentTemperatureDamage()
-    {
-        ShipComponent[] enabledComponents = _shipComponents.Where(component =>
-        {
-            return component.repairFraction == 1f && !component.isDamaged;
-        }).ToArray();
-        ShipComponent targetComponent = enabledComponents[UnityEngine.Random.Range(0, enabledComponents.Length)];
-        ApplyComponentTempDamage(targetComponent);
+        return base.CanUpdateTemperature() || (_shockLayerController.enabled 
+            && _shockLayerController._ruleset != null) || _fluidDetector.InFluidType(FluidVolume.Type.WATER);
     }
 
     protected override float CalculateCurrentTemperature()
@@ -193,10 +107,16 @@ public class ShipTemperatureDetector : TemperatureDetector
             totalTemperature += Mathf.Lerp(0f, 65f, shockSpeedPercent);
         }
 
+        if (_fluidDetector.InFluidType(FluidVolume.Type.WATER)
+            || _fluidDetector.InFluidType(FluidVolume.Type.GEYSER))
+        {
+            totalTemperature -= 15f;
+        }
+
         return Mathf.Clamp(totalTemperature, -100f, 100f);
     }
 
-    protected override void UpdateHighTemperature()
+    protected override void OnHighTemperature()
     {
         if ((float)temperatureResistanceMultiplier.GetProperty() == 0)
         {
@@ -206,53 +126,65 @@ public class ShipTemperatureDetector : TemperatureDetector
 
     protected override void UpdateInternalTemperature()
     {
-        float cutoff = Mathf.Abs(_internalTempMeterLength * GetTemperatureRatio());
+        bool ignoreSameSide = false;
 
-        bool sameSide = _internalTempMeter < 0 == _currentTemperature < 0;
+        if ((IsHeatingLocked() && _currentInternalTemperature > 0f)
+            || (IsCoolingLocked() && _currentInternalTemperature < 0f))
+        {
+            float sign = Mathf.Sign(_currentInternalTemperature);
+            _currentInternalTemperature = Mathf.MoveTowards(_currentInternalTemperature, 0f, Time.deltaTime * 3f
+                * Mathf.InverseLerp(150f * sign, _highTempCutoff * sign, _currentTemperature));
+            ignoreSameSide = true;
+        }
+
+        float cutoff = Mathf.Abs(_maxInternalTemperature * GetTemperatureRatio());
+        bool sameSide = _currentInternalTemperature < 0 == _currentTemperature < 0;
 
         if ((float)temperatureResistanceMultiplier.GetProperty() < 0f)
         {
             sameSide = !sameSide;
         }
 
-        if (sameSide && Mathf.Abs(_internalTempMeter) < cutoff)
+        if (sameSide && !ignoreSameSide && Mathf.Abs(_currentInternalTemperature) < cutoff)
         {
-            _internalTempMeter += Time.deltaTime * 3f * Mathf.InverseLerp(_highTempCutoff, 100f, Mathf.Abs(_currentTemperature)) * Mathf.Sign(GetTemperatureRatio())
+            _currentInternalTemperature += Time.deltaTime * 3f * Mathf.InverseLerp(_highTempCutoff, 100f, Mathf.Abs(_currentTemperature)) * Mathf.Sign(GetTemperatureRatio())
                 * Mathf.Sign((float)temperatureResistanceMultiplier.GetProperty());
         }
         else if (!sameSide)
         {
-            _internalTempMeter += Time.deltaTime * Mathf.Sign(GetTemperatureRatio()) * Mathf.Sign((float)temperatureResistanceMultiplier.GetProperty());
+            _currentInternalTemperature += Time.deltaTime * Mathf.InverseLerp(0f, _highTempCutoff, Mathf.Abs(_currentTemperature)) 
+                * Mathf.Sign(GetTemperatureRatio()) * Mathf.Sign((float)temperatureResistanceMultiplier.GetProperty());        
         }
     }
 
     protected override void UpdateCooldown()
     {
-        if (!(bool)faultyHeatRegulators.GetProperty() && Mathf.Abs(_internalTempMeter) / _internalTempMeterLength < 0.01f)
+        if ((string)passiveTemperatureGain.GetProperty() == "None" && Mathf.Abs(_currentInternalTemperature) / _maxInternalTemperature < 0.01f)
         {
-            _internalTempMeter = 0f;
+            _currentInternalTemperature = 0f;
         }
         else
         {
             float step = Time.deltaTime * Mathf.InverseLerp(_highTempCutoff, 0f, Mathf.Abs(_currentTemperature));
-            if (_internalTempMeter > 0f)
+            if (_currentInternalTemperature > 0f)
             {
-                _internalTempMeter -= step;
+                _currentInternalTemperature -= step;
             }
-            else if (_internalTempMeter < 0f)
+            else if (_currentInternalTemperature < 0f)
             {
-                _internalTempMeter += step;
+                _currentInternalTemperature += step;
             }
         }
     }
 
-    public void ApplyComponentTempDamage(ShipComponent component)
+    private bool IsHeatingLocked()
     {
-        if (component is ShipReactorComponent && !component.isDamaged)
-        {
-            ErnestoDetectiveController.SetReactorCause("temperature" + (_internalTempMeter >= 0f ? "_hot" : "_cold"));
-        }
-        component.SetDamaged(true);
+        return _waterCooling && SELocator.GetShipWaterResource().IsCoolingActive();
+    }
+
+    private bool IsCoolingLocked()
+    {
+        return _reactorHeat != null && _reactorHeat.IsOverloaded();
     }
 
     private void OnShipSystemFailure()

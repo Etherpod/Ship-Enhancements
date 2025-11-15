@@ -400,5 +400,8 @@ FodyWeavers.xsd
 *.sln.iml
 .idea
 
-# Assets
-ShipEnhancements/assets
+# Asset bundles
+ShipEnhancements/assets/*
+
+# Keep gitkeep files
+!.gitkeep

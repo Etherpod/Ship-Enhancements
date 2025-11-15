@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipEnhancementsQSB", "Ship
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipEnhancementsNH", "ShipEnhancementsNH\ShipEnhancementsNH.csproj", "{8AA4C3E7-FB27-4C08-8EDA-9C9264E19194}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipEnhancementsGE", "ShipEnhancementsGE\ShipEnhancementsGE.csproj", "{3489F1C4-9E91-442B-AE53-3044E6DACD38}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{8AA4C3E7-FB27-4C08-8EDA-9C9264E19194}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8AA4C3E7-FB27-4C08-8EDA-9C9264E19194}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8AA4C3E7-FB27-4C08-8EDA-9C9264E19194}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3489F1C4-9E91-442B-AE53-3044E6DACD38}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3489F1C4-9E91-442B-AE53-3044E6DACD38}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3489F1C4-9E91-442B-AE53-3044E6DACD38}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3489F1C4-9E91-442B-AE53-3044E6DACD38}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

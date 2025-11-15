@@ -1,11 +1,11 @@
-﻿using UnityEngine;
+﻿using OWML.Utils;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace ShipEnhancements;
 
 public class PortableCampfire : Campfire
 {
-    [SerializeField]
-    private MeshCollider _collider;
     [SerializeField]
     private FluidDetector _fluidDetector;
     [SerializeField]
@@ -28,6 +28,10 @@ public class PortableCampfire : Campfire
     private bool _lastOutsideWaterState = false;
     private ShipReactorComponent _reactor;
     private PortableCampfireItem _item;
+
+    private int _waterCheckInterval = 30;
+    private int _framesUntilWaterCheck;
+    private List<FluidVolume> _waterVolumes = [];
 
     public override void Awake()
     {
@@ -109,6 +113,35 @@ public class PortableCampfire : Campfire
         }
     }
 
+    private void FixedUpdate()
+    {
+        if (_framesUntilWaterCheck <= 0)
+        {
+            _waterVolumes.Clear();
+
+            Collider[] cols = Physics.OverlapSphere(_fluidDetector.transform.position, 0.6f, OWLayerMask.effectVolumeMask);
+            ShipEnhancements.WriteDebugMessage("cols: " + cols);
+            if (cols.Length > 0)
+            {
+                foreach (var col in cols)
+                {
+                    ShipEnhancements.WriteDebugMessage("test " + col);
+                    if (col.TryGetComponent(out FluidVolume vol) && vol.GetFluidType() is FluidVolume.Type.WATER or FluidVolume.Type.GEYSER)
+                    {
+                        ShipEnhancements.WriteDebugMessage("add " + vol);
+                        _waterVolumes.Add(vol);
+                    }
+                }
+            }
+
+            _framesUntilWaterCheck = _waterCheckInterval;
+        }
+        else
+        {
+            _framesUntilWaterCheck--;
+        }
+    }
+
     public void PackUp()
     {
         UpdateInsideShip(false);
@@ -124,19 +157,6 @@ public class PortableCampfire : Campfire
         }
         _audioSource.PlayOneShot(_packUpAudio, 0.5f);
         _item.TogglePackUp(true);
-    }
-
-    public void UpdateProperties()
-    {
-        Rigidbody rb = GetComponentInParent<Rigidbody>();
-        if (rb && !rb.isKinematic)
-        {
-            _collider.convex = true;
-        }
-        else
-        {
-            _collider.convex = false;
-        }
     }
 
     public void UpdateInsideShip(bool insideShip)
@@ -184,8 +204,13 @@ public class PortableCampfire : Campfire
 
     public bool IsOutsideWater()
     {
-        if (_fluidDetector._activeVolumes == null) return true;
-        return !_fluidDetector.InFluidType(FluidVolume.Type.WATER);
+        bool inWater = false;
+        if (_fluidDetector._activeVolumes != null)
+        {
+            inWater = _fluidDetector.InFluidType(FluidVolume.Type.WATER) 
+                || _fluidDetector.InFluidType(FluidVolume.Type.GEYSER);
+        }
+        return !inWater && _waterVolumes.Count == 0;
     }
 
     public void UpdatePrompt()
@@ -243,6 +268,8 @@ public class PortableCampfire : Campfire
             _fluidDetector.GetCollider().enabled = true;
         }
 
+        _framesUntilWaterCheck = 0;
+
         if (_fluidDetector._activeVolumes != null)
         {
             ShipEnhancements.Instance.ModHelper.Events.Unity.FireOnNextUpdate(() =>
@@ -275,6 +302,8 @@ public class PortableCampfire : Campfire
                 vol._triggerVolume.RemoveObjectFromVolume(_fluidDetector.gameObject);
             }
         }
+
+        _waterVolumes.Clear();
     }
 
     public override void OnDestroy()

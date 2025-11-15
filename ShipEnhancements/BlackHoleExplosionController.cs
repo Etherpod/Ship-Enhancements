@@ -113,7 +113,7 @@ public class BlackHoleExplosionController : ExplosionController
         _audioController.PlayShipExplodeClip();
 
         GameObject parent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ReactorBlackHoleParent.prefab");
-        Transform parentTransform = Instantiate(parent).transform;
+        Transform parentTransform = ShipEnhancements.CreateObject(parent).transform;
         transform.parent = parentTransform;
         ShipEnhancements.Instance.ModHelper.Events.Unity.FireOnNextUpdate(() => parentTransform.GetComponent<OWRigidbody>().SetVelocity(Vector3.zero));
 
@@ -138,7 +138,7 @@ public class BlackHoleExplosionController : ExplosionController
         _singularity.Create();
 
         GameObject parent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ReactorBlackHoleParent.prefab");
-        Transform parentTransform = Instantiate(parent).transform;
+        Transform parentTransform = ShipEnhancements.CreateObject(parent).transform;
         transform.parent = parentTransform;
         ShipEnhancements.Instance.ModHelper.Events.Unity.FireOnNextUpdate(() => parentTransform.GetComponent<OWRigidbody>().SetVelocity(Vector3.zero));
 

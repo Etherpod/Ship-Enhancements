@@ -107,7 +107,7 @@ public class ExplosionDamage : MonoBehaviour
                 _trackedHulls.Add(hull);
                 bool newlyDamaged = false;
 
-                float num = UnityEngine.Random.Range(0.9f, 1.1f) * Mathf.Sqrt(1f/20f * (float)shipExplosionMultiplier.GetProperty())
+                float num = UnityEngine.Random.Range(0.5f, 1.1f) * Mathf.Sqrt(1f/20f * (float)shipExplosionMultiplier.GetProperty())
                     * (float)shipDamageMultiplier.GetProperty();
                 hull._integrity = Mathf.Max(hull._integrity - num, 0f);
                 for (int i = 0; i < hull._components.Length; i++)
@@ -194,6 +194,7 @@ public class ExplosionDamage : MonoBehaviour
         {
             angler.ChangeState(AnglerfishController.AnglerState.Stunned);
             angler.GetComponentInChildren<AnglerfishFluidVolume>().SetVolumeActivation(false);
+            angler.GetComponentInChildren<AnglerfishAnimController>().OnAnglerSuspended(AnglerfishController.AnglerState.Stunned);
 
             if (ShipEnhancements.AchievementsAPI != null && !SEAchievementTracker.AnglerfishKill)
             {

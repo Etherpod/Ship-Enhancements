@@ -1,5 +1,7 @@
 ﻿using UnityEngine;
 
+namespace ShipEnhancements;
+
 public interface INHInteraction
 {
     public void AddTempZoneToNHSuns(GameObject tempZonePrefab);

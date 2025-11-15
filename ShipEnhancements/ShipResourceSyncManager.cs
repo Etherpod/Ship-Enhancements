@@ -8,7 +8,7 @@ public class ShipResourceSyncManager
     private int _currentFrameDelay;
     private QSBCompatibility _qsbCompat;
 
-    private bool TempSync => (string)temperatureZonesAmount.GetProperty() != "None";
+    private bool TempSync => (bool)enableShipTemperature.GetProperty();
     private bool FilthSync => (float)dirtAccumulationTime.GetProperty() > 0f && (float)maxDirtAccumulation.GetProperty() > 0f;
 
     public ShipResourceSyncManager(QSBCompatibility qsbCompatibility)
@@ -32,7 +32,7 @@ public class ShipResourceSyncManager
                 _qsbCompat.SendShipFuelValue(id, SELocator.GetShipResources()._currentFuel);
                 if (TempSync)
                 {
-                    _qsbCompat.SendShipHullTemp(id, SELocator.GetShipTemperatureDetector().GetShipTempMeter());
+                    _qsbCompat.SendShipHullTemp(id, SELocator.GetShipTemperatureDetector().GetCurrentInternalTemperature());
                 }
                 if (FilthSync)
                 {

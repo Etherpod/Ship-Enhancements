@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using OWML.Utils;
 
 namespace ShipEnhancements;
 
@@ -19,6 +20,8 @@ public class PortableTractorBeamItem : OWItem
     private GameObject _regularBeamVolume;
     [SerializeField]
     private GameObject _turboBeamVolume;
+    [SerializeField]
+    private GameObject _reverseBeamVolume;
 
     private EffectVolume[] _volumes;
     private ScreenPrompt _turboPrompt;
@@ -52,6 +55,20 @@ public class PortableTractorBeamItem : OWItem
         _socketed = true;
         _beamVolumeParent.SetActive(false);
         _turboBeamVolume.SetActive(false);
+        _reverseBeamVolume.SetActive(false);
+
+        if (ShipEnhancements.ExperimentalSettings?.TractorBeam_MakeTurboInverse ?? false)
+        {
+            _turboBeamVolume = _reverseBeamVolume;
+        }
+
+        float multiplier = ShipEnhancements.ExperimentalSettings?.TractorBeam_SpeedMultiplier ?? 1f;
+        var regularBeam = _regularBeamVolume.GetComponentInChildren<TractorBeamFluid>();
+        regularBeam._verticalSpeed *= multiplier;
+        regularBeam._reverseSpeed *= multiplier;
+        var turboBeam = _turboBeamVolume.GetComponentInChildren<TractorBeamFluid>();
+        turboBeam._verticalSpeed *= multiplier;
+        turboBeam._reverseSpeed *= multiplier;
     }
 
     private void Update()
@@ -100,7 +117,10 @@ public class PortableTractorBeamItem : OWItem
     {
         base.DropItem(position, normal, parent, sector, customDropTarget);
         TogglePackUp(false);
-        UpdateAttachedBody(parent.GetAttachedOWRigidbody());
+        ShipEnhancements.Instance.ModHelper.Events.Unity.FireOnNextUpdate(() =>
+        {
+            UpdateAttachedBody(parent.GetAttachedOWRigidbody());
+        });
         Locator.GetPromptManager().AddScreenPrompt(_turboPrompt, PromptPosition.Center, false);
         StartCoroutine(ActivationDelay());
         _audioSource.Stop();

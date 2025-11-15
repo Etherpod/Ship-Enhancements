@@ -49,7 +49,7 @@ public class ShipWarpCoreController : CockpitInteractible
         }
         else
         {
-            Transform parent = ShipEnhancements.NHInteraction.GetCenterOfUniverse()?.transform;
+            Transform parent = ShipEnhancements.NHInteraction?.GetCenterOfUniverse()?.transform;
             if (parent == null)
             {
                 parent = GameObject.Find("Sun_Body")?.transform;
@@ -188,7 +188,7 @@ public class ShipWarpCoreController : CockpitInteractible
 
         if (playerInShip)
         {
-            if (!ShipEnhancements.VanillaFixEnabled && PlayerState.InBrambleDimension())
+            if (!ModCompatibility.VanillaFix && PlayerState.InBrambleDimension())
             {
                 PlayerFogWarpDetector detector = Locator.GetPlayerDetector().GetComponent<PlayerFogWarpDetector>();
                 FogWarpVolume[] volumes = detector._warpVolumes.ToArray();
