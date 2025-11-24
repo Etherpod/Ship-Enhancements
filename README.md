@@ -275,9 +275,10 @@ Some bugs introduced by this mod that I have no idea how to fix.
 Some Outer Wilds bugs that this mod fixes automatically. These bugs are mostly caused by situations you would have never encountered without mods.
 - Outside sources of gravity would be doubled in strength while inside the ship, which made walking around inside the ship impossible while next to the sun
 - The ship's thrust indicator would turn off when you left the flight chair
+- Running out of oxygen wouldn't actually do anything, and you could still breath inside the ship
+- Equipping the suit with no oxygen present would completely drain the suit oxygen
 - Free look inside the ship would be unusable while the ship gravity was disabled
 - The fuel/oxygen tank leak effects would continue playing after the associated resource had run out
-- Running out of oxygen wouldn't actually do anything, and you could still breath inside the ship
 - Two moving objects with their own gravity sources would crash the game if they both entered each other's gravity fields
 - Sounds in the cockpit (like the autopilot beeping) could be heard from anywhere in the universe while outside the ship
 - Anglerfish would always target you instead of the thing making the noise (also patched by **Vanilla Fix**)
