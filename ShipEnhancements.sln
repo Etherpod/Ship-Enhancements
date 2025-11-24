@@ -11,6 +11,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipEnhancementsNH", "ShipE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipEnhancementsGE", "ShipEnhancementsGE\ShipEnhancementsGE.csproj", "{3489F1C4-9E91-442B-AE53-3044E6DACD38}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipEnhancements.Generators", "ShipEnhancements.Generators\ShipEnhancements.Generators.csproj", "{585E1326-1E5E-4768-B539-7DEB3CB9871D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipEnhancements.Generators.Tests", "ShipEnhancements.Generators.Tests\ShipEnhancements.Generators.Tests.csproj", "{342BB14F-BF31-4663-8E07-C8C6E8C27641}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +37,14 @@ Global
 		{3489F1C4-9E91-442B-AE53-3044E6DACD38}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3489F1C4-9E91-442B-AE53-3044E6DACD38}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3489F1C4-9E91-442B-AE53-3044E6DACD38}.Release|Any CPU.Build.0 = Release|Any CPU
+		{585E1326-1E5E-4768-B539-7DEB3CB9871D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{585E1326-1E5E-4768-B539-7DEB3CB9871D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{585E1326-1E5E-4768-B539-7DEB3CB9871D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{585E1326-1E5E-4768-B539-7DEB3CB9871D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{342BB14F-BF31-4663-8E07-C8C6E8C27641}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{342BB14F-BF31-4663-8E07-C8C6E8C27641}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{342BB14F-BF31-4663-8E07-C8C6E8C27641}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{342BB14F-BF31-4663-8E07-C8C6E8C27641}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
