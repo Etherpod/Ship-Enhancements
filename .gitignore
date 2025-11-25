@@ -405,3 +405,6 @@ ShipEnhancements/assets/*
 
 # Keep gitkeep files
 !.gitkeep
+
+# Custom generated files
+**/gen/

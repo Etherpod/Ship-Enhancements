@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net48</TargetFramework>
     <LangVersion>latest</LangVersion>
@@ -23,15 +23,23 @@
 
     <Message Text="Copy complete" Importance="High" />
   </Target>
-  
-  <ItemGroup>
-		<ProjectReference
-			Include="../ShipEnhancements.Generators/ShipEnhancements.Generators.csproj"
-			OutputItemType="Analyzer"
-			ReferenceOutputAssembly="false"
+	
+	<Target Name="GenerateSettings" BeforeTargets="BeforeBuild" >
+		<Exec
+			Command="..\ShipEnhancements.Settings.Generator\bin\Debug\net9.0\ShipEnhancements.Settings.Generator.exe"
+			ConsoleToMsBuild="true"
 		/>
+	</Target>
+
+  <ItemGroup>
+<!--		<ProjectReference-->
+<!--			Include="../ShipEnhancements.Generators/ShipEnhancements.Generators.csproj"-->
+<!--			OutputItemType="Analyzer"-->
+<!--			ReferenceOutputAssembly="false"-->
+<!--		/>-->
+		<PackageReference Include="BepInEx.AssemblyPublicizer.MSBuild" Version="0.4.2" PrivateAssets="all" />
     <PackageReference Include="OWML" Version="2.14.0" />
-    <PackageReference Include="OuterWildsGameLibs" Version="1.1.15.1018" />
+    <PackageReference Include="OuterWildsGameLibs" Version="1.1.15.1018" Publicize="true"/>
   </ItemGroup>
   <ItemGroup>
     <None Include="default-config.json">
