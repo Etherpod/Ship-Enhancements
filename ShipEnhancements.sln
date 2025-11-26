@@ -4,16 +4,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.10.34916.146
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShipEnhancements", "ShipEnhancements\ShipEnhancements.csproj", "{A336B472-E385-4359-BD7D-27B79401BCE4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B41AB9DB-FF92-4672-B1D2-AEEAEAE441BD} = {B41AB9DB-FF92-4672-B1D2-AEEAEAE441BD}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipEnhancementsQSB", "ShipEnhancementsQSB\ShipEnhancementsQSB.csproj", "{9115E5BD-B135-4A41-A087-ACD31D922FD8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipEnhancementsNH", "ShipEnhancementsNH\ShipEnhancementsNH.csproj", "{8AA4C3E7-FB27-4C08-8EDA-9C9264E19194}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipEnhancementsGE", "ShipEnhancementsGE\ShipEnhancementsGE.csproj", "{3489F1C4-9E91-442B-AE53-3044E6DACD38}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipEnhancements.Generators", "ShipEnhancements.Generators\ShipEnhancements.Generators.csproj", "{585E1326-1E5E-4768-B539-7DEB3CB9871D}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipEnhancements.Generators.Tests", "ShipEnhancements.Generators.Tests\ShipEnhancements.Generators.Tests.csproj", "{342BB14F-BF31-4663-8E07-C8C6E8C27641}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShipEnhancements.Settings.Generator", "ShipEnhancements.Settings.Generator\ShipEnhancements.Settings.Generator.csproj", "{B41AB9DB-FF92-4672-B1D2-AEEAEAE441BD}"
 EndProject
@@ -39,14 +38,6 @@ Global
 		{3489F1C4-9E91-442B-AE53-3044E6DACD38}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3489F1C4-9E91-442B-AE53-3044E6DACD38}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3489F1C4-9E91-442B-AE53-3044E6DACD38}.Release|Any CPU.Build.0 = Release|Any CPU
-		{585E1326-1E5E-4768-B539-7DEB3CB9871D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{585E1326-1E5E-4768-B539-7DEB3CB9871D}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{585E1326-1E5E-4768-B539-7DEB3CB9871D}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{585E1326-1E5E-4768-B539-7DEB3CB9871D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{342BB14F-BF31-4663-8E07-C8C6E8C27641}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{342BB14F-BF31-4663-8E07-C8C6E8C27641}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{342BB14F-BF31-4663-8E07-C8C6E8C27641}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{342BB14F-BF31-4663-8E07-C8C6E8C27641}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B41AB9DB-FF92-4672-B1D2-AEEAEAE441BD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B41AB9DB-FF92-4672-B1D2-AEEAEAE441BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B41AB9DB-FF92-4672-B1D2-AEEAEAE441BD}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -2,7 +2,6 @@
   "$schema": "https://raw.githubusercontent.com/ow-mods/owml/master/schemas/config_schema.json",
   "enabled": true,
   "settings": {
-
     "preset": {
       "title": "Preset",
       "type": "selector",
@@ -34,65 +33,118 @@
       "value": 0.5,
       "tooltip": "Use with the Random preset. Controls how likely it is for dangerous settings to be randomized, like disabling your suit. The minimum makes it impossible, the maximum makes it very possible."
     },
-
     "Disable Ship Parts": {
       "type": "separator",
       "title": "Disable Ship Parts"
     },
-
     "disableComponentsSplit": {
       "type": "separator",
       "title": "Components",
       "tooltip": "side"
     },
-
     "disableGravityCrystal": {
       "title": "Disable Ship Gravity",
       "type": "toggle",
       "value": false,
-      "tooltip": "Disables the gravity crystal inside the ship."
+      "tooltip": "Disables the gravity crystal inside the ship.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": true,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": false
+      }
     },
     "disableHeadlights": {
       "title": "Disable Headlights",
       "type": "toggle",
       "value": false,
-      "tooltip": "Disables the ship headlights and the landing camera light."
+      "tooltip": "Disables the ship headlights and the landing camera light.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": true,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": false
+      }
     },
     "disableLandingCamera": {
       "title": "Disable Landing Camera",
       "type": "toggle",
       "value": false,
-      "tooltip": "Disables the landing camera. Good luck making a proper landing!"
+      "tooltip": "Disables the landing camera. Good luck making a proper landing!",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": true,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": true
+      }
     },
     "disableShipOxygen": {
       "title": "Disable Ship Oxygen",
       "type": "toggle",
       "value": false,
-      "tooltip": "Removes all of the oxygen from your ship. Don't stay out in space for too long!"
+      "tooltip": "Removes all of the oxygen from your ship. Don\u0027t stay out in space for too long!",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": true,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": false
+      }
     },
     "disableShipLights": {
       "title": "Disable Ship Lights",
       "type": "toggle",
       "value": false,
-      "tooltip": "Permanently turns off both the interior and exterior lighting fixtures."
+      "tooltip": "Permanently turns off both the interior and exterior lighting fixtures.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": true,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": false
+      }
     },
     "disableScoutRecall": {
       "title": "Disable Ship Scout Recall",
       "type": "toggle",
       "value": false,
-      "tooltip": "Removes your ability to recall the scout with the ship."
+      "tooltip": "Removes your ability to recall the scout with the ship.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": true,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": false
+      }
     },
     "disableScoutLaunching": {
       "title": "Disable Ship Scout Launching",
       "type": "toggle",
       "value": false,
-      "tooltip": "Removes your ability to launch the scout with the ship."
+      "tooltip": "Removes your ability to launch the scout with the ship.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": true,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": false
+      }
     },
     "enableManualScoutRecall": {
       "title": "Disable Handheld Scout Recall",
       "type": "toggle",
       "value": false,
-      "tooltip": "Forces you to retrieve your scout by hand when you launch it. If you retrieve it with the ship, you need to go get it from on top of the ship before you can fire it again on foot."
+      "tooltip": "Forces you to retrieve your scout by hand when you launch it. If you retrieve it with the ship, you need to go get it from on top of the ship before you can fire it again on foot.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": true,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": true
+      }
     },
     "disableThrusters": {
       "title": "Disable Thrusters",
@@ -105,179 +157,329 @@
         "Up-Down",
         "All Except Forward"
       ],
-      "tooltip": "Lets you disable some of your ship's thrusters."
+      "tooltip": "Lets you disable some of your ship\u0027s thrusters.",
+      "presets": {
+        "vanillaPlus": "None",
+        "minimal": "Backward",
+        "impossible": "None",
+        "newStuff": "None",
+        "pandemonium": "None"
+      }
     },
-
     "utilitySplit": {
       "type": "separator",
       "title": "Utility",
       "tooltip": "side"
     },
-
     "disableDamageIndicators": {
       "title": "Disable Damage Indicators",
       "type": "toggle",
       "value": false,
-      "tooltip": "Removes all indicators that tell you the ship is damaged. Also disables the master alarm. Keep an eye or four on the reactor!"
+      "tooltip": "Removes all indicators that tell you the ship is damaged. Also disables the master alarm. Keep an eye or four on the reactor!",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": true,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": true
+      }
     },
     "disableEjectButton": {
       "title": "Disable Eject Button",
       "type": "toggle",
       "value": false,
-      "tooltip": "Disables the eject button in the cockpit."
+      "tooltip": "Disables the eject button in the cockpit.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": true,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": true
+      }
     },
     "disableSeatbelt": {
       "title": "Disable Seatbelt",
       "type": "toggle",
       "value": false,
-      "tooltip": "Removes the seatbelt in your ship that keeps you from killing yourself. If you crash into something too quickly you'll fly out of your chair."
+      "tooltip": "Removes the seatbelt in your ship that keeps you from killing yourself. If you crash into something too quickly you\u0027ll fly out of your chair.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": true,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": true
+      }
     },
     "disableShipSuit": {
       "title": "Disable Ship Suit",
       "type": "toggle",
       "value": false,
-      "tooltip": "Removes the suit from the ship. How long can you hold your breath in space?"
+      "tooltip": "Removes the suit from the ship. How long can you hold your breath in space?",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": false
+      }
     },
     "disableShipMedkit": {
       "title": "Disable Ship Medkit",
       "type": "toggle",
       "value": false,
-      "tooltip": "Prevents you from recovering health using the ship supplies."
+      "tooltip": "Prevents you from recovering health using the ship supplies.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": true,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": true
+      }
     },
     "disableHatch": {
       "title": "Disable Ship Hatch",
       "type": "toggle",
       "value": false,
-      "tooltip": "Completely removes the hatch from your ship. Be careful walking around in there!"
+      "tooltip": "Completely removes the hatch from your ship. Be careful walking around in there!",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": true,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": false
+      }
     },
     "singleUseTractorBeam": {
       "title": "Single-Use Tractor Beam",
       "type": "toggle",
       "value": false,
-      "tooltip": "Disables the tractor beam after you enter the ship."
+      "tooltip": "Disables the tractor beam after you enter the ship.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": true,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": true
+      }
     },
-
     "environmentalSplit": {
       "type": "separator",
       "title": "Environmental",
       "tooltip": "side"
     },
-
     "disableAirAutoRoll": {
       "title": "Disable Air Auto Roll",
       "type": "toggle",
       "value": false,
-      "tooltip": "Allows your ship to rotate freely in atmospheres."
+      "tooltip": "Allows your ship to rotate freely in atmospheres.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": true,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
     "disableWaterAutoRoll": {
       "title": "Disable Water Auto Roll",
       "type": "toggle",
       "value": false,
-      "tooltip": "Allows your ship to rotate freely in water."
+      "tooltip": "Allows your ship to rotate freely in water.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": true,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": true
+      }
     },
     "disableFluidPrevention": {
       "title": "Disable Fluid Prevention",
       "type": "toggle",
       "value": false,
-      "tooltip": "Allows fluids like sand and water to enter your ship."
+      "tooltip": "Allows fluids like sand and water to enter your ship.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": true,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": true
+      }
     },
     "disableHazardPrevention": {
       "title": "Disable Hazard Prevention",
       "type": "toggle",
       "value": false,
-      "tooltip": "Allows hazards like heat and ghost matter to damage you while inside of the ship."
+      "tooltip": "Allows hazards like heat and ghost matter to damage you while inside of the ship.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": true
+      }
     },
-
     "navigationSplit": {
       "type": "separator",
       "title": "Navigation",
       "tooltip": "side"
     },
-
     "disableReferenceFrame": {
       "title": "Disable Lock-on",
       "type": "toggle",
       "value": false,
-      "tooltip": "Disables your ability to lock on to objects. You may find it difficult to use autopilot with this enabled."
+      "tooltip": "Disables your ability to lock on to objects. You may find it difficult to use autopilot with this enabled.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": true,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": false
+      }
     },
     "disableMapMarkers": {
       "title": "Disable HUD Markers",
       "type": "toggle",
       "value": false,
-      "tooltip": "Removes the on-screen markers that show you the location of your ship, your scout, and any marked locations in the ship log."
+      "tooltip": "Removes the on-screen markers that show you the location of your ship, your scout, and any marked locations in the ship log.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": true,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": false
+      }
     },
     "disableMinimapMarkers": {
       "title": "Disable Minimap Markers",
       "type": "toggle",
       "value": false,
-      "tooltip": "Turns off the icons showing the location of your ship and scout on your suit's minimap and your ship's minimap."
+      "tooltip": "Turns off the icons showing the location of your ship and scout on your suit\u0027s minimap and your ship\u0027s minimap.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": true,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": false
+      }
     },
-
     "Adjust Ship Functions": {
       "type": "separator",
       "title": "Adjust Ship Functions"
     },
-
     "resourceSplit": {
       "type": "separator",
       "title": "Ship Resource Drain",
       "tooltip": "side"
     },
-
     "oxygenDrainMultiplier": {
       "title": "Oxygen Drain Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the speed at which the ship oxygen drains. The default speed takes about 12.8 hours to fully drain."
+      "tooltip": "Larger numbers increase the speed at which the ship oxygen drains. The default speed takes about 12.8 hours to fully drain.",
+      "presets": {
+        "vanillaPlus": 1,
+        "minimal": 1,
+        "impossible": 200,
+        "newStuff": 1,
+        "pandemonium": 400
+      }
     },
     "fuelDrainMultiplier": {
       "title": "Fuel Drain Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the speed at which the ship fuel drains. The default speed takes about 34 minutes to fully drain."
+      "tooltip": "Larger numbers increase the speed at which the ship fuel drains. The default speed takes about 34 minutes to fully drain.",
+      "presets": {
+        "vanillaPlus": 1,
+        "minimal": 1,
+        "impossible": 8,
+        "newStuff": 1,
+        "pandemonium": 8
+      }
     },
     "oxygenTankDrainMultiplier": {
       "title": "Oxygen Tank Drain Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the amount of oxygen that drains when the oxygen tank is damaged in addition to the regular drain rate. The default speed is 38 times faster."
+      "tooltip": "Larger numbers increase the amount of oxygen that drains when the oxygen tank is damaged in addition to the regular drain rate. The default speed is 38 times faster.",
+      "presets": {
+        "vanillaPlus": 1,
+        "minimal": 1,
+        "impossible": 100,
+        "newStuff": 1,
+        "pandemonium": 10
+      }
     },
     "fuelTankDrainMultiplier": {
       "title": "Fuel Tank Drain Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the amount of fuel that drains when the fuel tank is damaged in addition to the regular drain rate. The default speed is about 10 times faster."
+      "tooltip": "Larger numbers increase the amount of fuel that drains when the fuel tank is damaged in addition to the regular drain rate. The default speed is about 10 times faster.",
+      "presets": {
+        "vanillaPlus": 1,
+        "minimal": 1,
+        "impossible": 100,
+        "newStuff": 1,
+        "pandemonium": 10
+      }
     },
     "idleFuelConsumptionMultiplier": {
       "title": "Idle Fuel Consumption Multiplier",
       "type": "number",
       "value": 0,
-      "tooltip": "Larger numbers increase the rate at which your ship's fuel drains while it is on. The default speed is about 100 times slower than the active consumption rate."
+      "tooltip": "Larger numbers increase the rate at which your ship\u0027s fuel drains while it is on. The default speed is about 100 times slower than the active consumption rate.",
+      "presets": {
+        "vanillaPlus": 0,
+        "minimal": 0,
+        "impossible": 0,
+        "newStuff": 0,
+        "pandemonium": 1
+      }
     },
     "enableJetpackRefuelDrain": {
       "title": "Enable Jetpack Refuel Drain",
       "type": "toggle",
       "value": false,
-      "tooltip": "Drains the ship's fuel when you refill your jetpack in the ship."
+      "tooltip": "Drains the ship\u0027s fuel when you refill your jetpack in the ship.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
-
     "damageSplit": {
       "type": "separator",
       "title": "Ship Damage",
       "tooltip": "side"
     },
-
     "shipDamageMultiplier": {
       "title": "Damage Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the damage done to the ship hull and increase the probability that components will be damaged on impact."
+      "tooltip": "Larger numbers increase the damage done to the ship hull and increase the probability that components will be damaged on impact.",
+      "presets": {
+        "vanillaPlus": 1,
+        "minimal": 1,
+        "impossible": 5,
+        "newStuff": 1,
+        "pandemonium": 2
+      }
     },
     "shipDamageSpeedMultiplier": {
       "title": "Damage Speed Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the minimum speed for taking impact damage. Set this to something super small to blow up your ship when you touch something."
+      "tooltip": "Larger numbers increase the minimum speed for taking impact damage. Set this to something super small to blow up your ship when you touch something.",
+      "presets": {
+        "vanillaPlus": 1,
+        "minimal": 1,
+        "impossible": 0.3,
+        "newStuff": 1,
+        "pandemonium": 0.4
+      }
     },
     "randomHullDamage": {
       "title": "Random Hull Damage",
@@ -285,7 +487,14 @@
       "min": 0,
       "max": 1,
       "value": 0,
-      "tooltip": "Deals a random amount of damage to a number of hulls at the start of the loop. A minimum value means no hulls are damaged and a maximum value means every hull is damaged."
+      "tooltip": "Deals a random amount of damage to a number of hulls at the start of the loop. A minimum value means no hulls are damaged and a maximum value means every hull is damaged.",
+      "presets": {
+        "vanillaPlus": 0,
+        "minimal": 0,
+        "impossible": 0,
+        "newStuff": 0,
+        "pandemonium": 0.1
+      }
     },
     "randomComponentDamage": {
       "title": "Random Component Damage",
@@ -293,25 +502,53 @@
       "min": 0,
       "max": 1,
       "value": 0,
-      "tooltip": "Breaks a number of the ship's components excluding the important ones. A minimum value means no components are damaged and a maximum value means every component is damaged."
+      "tooltip": "Breaks a number of the ship\u0027s components excluding the important ones. A minimum value means no components are damaged and a maximum value means every component is damaged.",
+      "presets": {
+        "vanillaPlus": 0,
+        "minimal": 0,
+        "impossible": 0.1,
+        "newStuff": 0,
+        "pandemonium": 0.1
+      }
     },
     "enableStunDamage": {
       "title": "Enable Stun Damage",
       "type": "toggle",
       "value": false,
-      "tooltip": "Temporarily stuns you if you hit something too hard with the ship."
+      "tooltip": "Temporarily stuns you if you hit something too hard with the ship.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": true,
+        "newStuff": false,
+        "pandemonium": true
+      }
     },
     "enableFragileShip": {
       "title": "Enable Fragile Ship",
       "type": "toggle",
       "value": false,
-      "tooltip": "You are unable to pilot your ship if anything is damaged."
+      "tooltip": "You are unable to pilot your ship if anything is damaged.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": true,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": false
+      }
     },
     "preventSystemFailure": {
       "title": "Prevent System Failure",
       "type": "toggle",
       "value": false,
-      "tooltip": "Forces the ship to stay functional unless the cockpit detaches."
+      "tooltip": "Forces the ship to stay functional unless the cockpit detaches.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
     "waterDamage": {
       "title": "Ship Water Damage",
@@ -319,7 +556,14 @@
       "min": 0,
       "max": 1,
       "value": 0,
-      "tooltip": "Controls how much your ship is damaged by water. Maximum damage blows up your ship if you touch water."
+      "tooltip": "Controls how much your ship is damaged by water. Maximum damage blows up your ship if you touch water.",
+      "presets": {
+        "vanillaPlus": 0,
+        "minimal": 0,
+        "impossible": 1,
+        "newStuff": 0,
+        "pandemonium": 0.5
+      }
     },
     "sandDamage": {
       "title": "Ship Sand Damage",
@@ -327,50 +571,97 @@
       "min": 0,
       "max": 1,
       "value": 0,
-      "tooltip": "Controls how much your ship is damaged by falling sand. Maximum damage blows up your ship if you touch falling sand."
+      "tooltip": "Controls how much your ship is damaged by falling sand. Maximum damage blows up your ship if you touch falling sand.",
+      "presets": {
+        "vanillaPlus": 0,
+        "minimal": 0,
+        "impossible": 1,
+        "newStuff": 0,
+        "pandemonium": 0.5
+      }
     },
     "repairLimit": {
       "title": "Repair Limit",
       "type": "number",
       "value": -1,
-      "tooltip": "Turns off ship repairing after you repair this many parts. Set to -1 to disable."
+      "tooltip": "Turns off ship repairing after you repair this many parts. Set to -1 to disable.",
+      "presets": {
+        "vanillaPlus": -1,
+        "minimal": 12,
+        "impossible": -1,
+        "newStuff": -1,
+        "pandemonium": -1
+      }
     },
     "repairTimeMultiplier": {
       "title": "Repair Time Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the time it takes to repair parts of the ship."
+      "tooltip": "Larger numbers increase the time it takes to repair parts of the ship.",
+      "presets": {
+        "vanillaPlus": 1,
+        "minimal": 1,
+        "impossible": 5,
+        "newStuff": 1,
+        "pandemonium": 0.1
+      }
     },
-
     "adjustPhysicsSplit": {
       "type": "separator",
       "title": "Ship Physics",
       "tooltip": "side"
     },
-
     "atmosphereAngularDragMultiplier": {
       "title": "Atmosphere Angular Drag Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers make your ship harder to turn while in an atmosphere. Set to zero to make your ship spin forever. WARNING: Values below 1 may cause motion sickness."
+      "tooltip": "Larger numbers make your ship harder to turn while in an atmosphere. Set to zero to make your ship spin forever. WARNING: Values below 1 may cause motion sickness.",
+      "presets": {
+        "vanillaPlus": 1,
+        "minimal": 1,
+        "impossible": 0.5,
+        "newStuff": 1,
+        "pandemonium": 1.5
+      }
     },
     "spaceAngularDragMultiplier": {
       "title": "Space Angular Drag Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers make your ship harder to turn while in space. Set to zero to make your ship spin forever. WARNING: Values below 1 may cause motion sickness."
+      "tooltip": "Larger numbers make your ship harder to turn while in space. Set to zero to make your ship spin forever. WARNING: Values below 1 may cause motion sickness.",
+      "presets": {
+        "vanillaPlus": 1,
+        "minimal": 1,
+        "impossible": 0,
+        "newStuff": 1,
+        "pandemonium": 0.5
+      }
     },
     "disableRotationSpeedLimit": {
       "title": "Disable Rotation Speed Limit",
       "type": "toggle",
       "value": false,
-      "tooltip": "Lets you spin your ship as quickly as you want. DO NOT ENABLE IF YOU ARE PRONE TO MOTION SICKNESS."
+      "tooltip": "Lets you spin your ship as quickly as you want. DO NOT ENABLE IF YOU ARE PRONE TO MOTION SICKNESS.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": false
+      }
     },
     "airDragMultiplier": {
       "title": "Air Drag Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase how much the ship is slowed down by air. Set to zero to disable air drag."
+      "tooltip": "Larger numbers increase how much the ship is slowed down by air. Set to zero to disable air drag.",
+      "presets": {
+        "vanillaPlus": 1,
+        "minimal": 1,
+        "impossible": 0,
+        "newStuff": 1,
+        "pandemonium": 0
+      }
     },
     "cycloneChaos": {
       "title": "Cyclone Chaos",
@@ -378,7 +669,14 @@
       "min": 0,
       "max": 1,
       "value": 0,
-      "tooltip": "Controls how violently cyclones should affect your ship."
+      "tooltip": "Controls how violently cyclones should affect your ship.",
+      "presets": {
+        "vanillaPlus": 0,
+        "minimal": 0,
+        "impossible": 1,
+        "newStuff": 0,
+        "pandemonium": 1
+      }
     },
     "shipFriction": {
       "title": "Ship Friction",
@@ -386,26 +684,45 @@
       "min": 0,
       "max": 1,
       "value": 0.5,
-      "tooltip": "Adjusts how much friction the ship has. The minimum makes your ship super slippery."
+      "tooltip": "Adjusts how much friction the ship has. The minimum makes your ship super slippery.",
+      "presets": {
+        "vanillaPlus": 0.5,
+        "minimal": 0.5,
+        "impossible": 0,
+        "newStuff": 0.5,
+        "pandemonium": 0
+      }
     },
     "shipBounciness": {
       "title": "Ship Bounciness",
       "type": "number",
       "value": 0,
-      "tooltip": "Adjusts how bouncy the ship is. Values above 1 will be less accurate and will no longer affect players."
+      "tooltip": "Adjusts how bouncy the ship is. Values above 1 will be less accurate and will no longer affect players.",
+      "presets": {
+        "vanillaPlus": 0,
+        "minimal": 0,
+        "impossible": 1,
+        "newStuff": 0,
+        "pandemonium": 0.5
+      }
     },
-
     "componentsSplit": {
       "type": "separator",
       "title": "Ship Components",
       "tooltip": "side"
     },
-
     "gravityMultiplier": {
       "title": "Ship Gravity Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the power of the ship's gravity crystal."
+      "tooltip": "Larger numbers increase the power of the ship\u0027s gravity crystal.",
+      "presets": {
+        "vanillaPlus": 1,
+        "minimal": 1,
+        "impossible": 1.5,
+        "newStuff": 1,
+        "pandemonium": 0.2
+      }
     },
     "gravityDirection": {
       "title": "Ship Gravity Direction",
@@ -420,184 +737,350 @@
         "Back",
         "Random"
       ],
-      "tooltip": "Changes the direction of your ship's gravity. If you set this to Random, you may find yourself standing diagonally in the ship."
+      "tooltip": "Changes the direction of your ship\u0027s gravity. If you set this to Random, you may find yourself standing diagonally in the ship.",
+      "presets": {
+        "vanillaPlus": "Down",
+        "minimal": "Down",
+        "impossible": "Down",
+        "newStuff": "Down",
+        "pandemonium": "Random"
+      }
     },
     "reactorLifetimeMultiplier": {
       "title": "Reactor Lifetime Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the time it takes for the reactor to blow up the ship. The default time is between 25 and 35 seconds."
+      "tooltip": "Larger numbers increase the time it takes for the reactor to blow up the ship. The default time is between 25 and 35 seconds.",
+      "presets": {
+        "vanillaPlus": 1,
+        "minimal": 1,
+        "impossible": 0.5,
+        "newStuff": 1,
+        "pandemonium": 0.5
+      }
     },
     "shipExplosionMultiplier": {
       "title": "Ship Explosion Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the size of the explosion that is created when your ship blows up."
+      "tooltip": "Larger numbers increase the size of the explosion that is created when your ship blows up.",
+      "presets": {
+        "vanillaPlus": 1,
+        "minimal": 1,
+        "impossible": 100,
+        "newStuff": 1,
+        "pandemonium": 25
+      }
     },
     "moreExplosionDamage": {
       "title": "Extra Explosion Damage",
       "type": "toggle",
       "value": false,
-      "tooltip": "Makes explosions apply damage to the ship and to fragments of Brittle Hollow. Also lets you kill anglerfish."
+      "tooltip": "Makes explosions apply damage to the ship and to fragments of Brittle Hollow. Also lets you kill anglerfish.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": true,
+        "newStuff": false,
+        "pandemonium": true
+      }
     },
     "disableAutoLights": {
       "title": "Keep Power On",
       "type": "toggle",
       "value": false,
-      "tooltip": "Keeps all of the ship's electrical components on when you leave the ship instead of turning them off."
+      "tooltip": "Keeps all of the ship\u0027s electrical components on when you leave the ship instead of turning them off.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
-
     "adjustMiscSplit": {
       "type": "separator",
       "title": "Miscellaneous",
       "tooltip": "side"
     },
-
     "prolongDigestion": {
       "title": "Prolong Digestion",
       "type": "toggle",
       "value": false,
-      "tooltip": "Makes the digestion of your ship a longer process. You will still die."
+      "tooltip": "Makes the digestion of your ship a longer process. You will still die.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": true
+      }
     },
     "noiseMultiplier": {
       "title": "Ship Noise Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the distance your ship can be heard by noise detectors."
+      "tooltip": "Larger numbers increase the distance your ship can be heard by noise detectors.",
+      "presets": {
+        "vanillaPlus": 1,
+        "minimal": 1,
+        "impossible": 5,
+        "newStuff": 1,
+        "pandemonium": 1
+      }
     },
     "enableQuantumShip": {
       "title": "Enable Quantum Ship",
       "type": "toggle",
       "value": false,
-      "tooltip": "Makes your ship quantum while on the Quantum Moon. This is not entirely lore accurate."
+      "tooltip": "Makes your ship quantum while on the Quantum Moon. This is not entirely lore accurate.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": true,
+        "newStuff": false,
+        "pandemonium": true
+      }
     },
     "extraNoise": {
       "title": "Extra Noise",
       "type": "toggle",
       "value": false,
-      "tooltip": "Makes noisy parts of the ship like the master alarm detectable by noise detectors."
+      "tooltip": "Makes noisy parts of the ship like the master alarm detectable by noise detectors.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": true,
+        "newStuff": false,
+        "pandemonium": true
+      }
     },
     "shipInputLatency": {
       "title": "Ship Input Latency",
       "type": "number",
       "value": 0,
-      "tooltip": "Adds a delay in seconds while piloting the ship between when you press the button and when the ship recieves the input. Now you can pretend you're playing online!"
+      "tooltip": "Adds a delay in seconds while piloting the ship between when you press the button and when the ship recieves the input. Now you can pretend you\u0027re playing online!",
+      "presets": {
+        "vanillaPlus": 0,
+        "minimal": 0,
+        "impossible": 0,
+        "newStuff": 0,
+        "pandemonium": 0
+      }
     },
     "funnySounds": {
       "title": "Funny Sounds",
       "type": "toggle",
       "value": false,
-      "tooltip": "Replaces some of the in-game sounds with silly sound effects."
+      "tooltip": "Replaces some of the in-game sounds with silly sound effects.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": false
+      }
     },
-
     "Add Ship Functions": {
       "type": "separator",
       "title": "Add Ship Functions"
     },
-
     "addUtilitySplit": {
       "type": "separator",
       "title": "Utility",
       "tooltip": "side"
     },
-
     "shipOxygenRefill": {
       "title": "Enable Ship Oxygen Refill",
       "type": "toggle",
       "value": false,
-      "tooltip": "Refills the ship's oxygen tank when near oxygen sources. Doesn't work when oxygen is disabled."
+      "tooltip": "Refills the ship\u0027s oxygen tank when near oxygen sources. Doesn\u0027t work when oxygen is disabled.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
     "oxygenRefillMultiplier": {
       "title": "Oxygen Refill Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the speed at which the ship oxygen refills. The default speed takes about a minute to completely refill."
+      "tooltip": "Larger numbers increase the speed at which the ship oxygen refills. The default speed takes about a minute to completely refill.",
+      "presets": {
+        "vanillaPlus": 1,
+        "minimal": 1,
+        "impossible": 1,
+        "newStuff": 1,
+        "pandemonium": 0.4
+      }
     },
     "enableShipFuelTransfer": {
       "title": "Enable Ship Fuel Transfer",
       "type": "toggle",
       "value": false,
-      "tooltip": "Lets you transfer your jetpack fuel to the ship through the fuel tank to refill it."
+      "tooltip": "Lets you transfer your jetpack fuel to the ship through the fuel tank to refill it.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
     "fuelTransferMultiplier": {
       "title": "Fuel Transfer Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the amount of fuel added to the ship when transferring fuel, and also increase the amount of fuel subtracted when refueling the jetpack."
+      "tooltip": "Larger numbers increase the amount of fuel added to the ship when transferring fuel, and also increase the amount of fuel subtracted when refueling the jetpack.",
+      "presets": {
+        "vanillaPlus": 1,
+        "minimal": 1,
+        "impossible": 1,
+        "newStuff": 1,
+        "pandemonium": 5
+      }
     },
     "enableAutoHatch": {
       "title": "Enable Automatic Hatch",
       "type": "toggle",
       "value": false,
-      "tooltip": "Automatically closes the hatch when you leave the ship."
+      "tooltip": "Automatically closes the hatch when you leave the ship.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": true
+      }
     },
     "addShipCurtain": {
       "title": "Interactable Ship Curtain",
       "type": "toggle",
       "value": false,
-      "tooltip": "Lets you close the curtain in the ship cabin for some extra privacy in the cockpit."
+      "tooltip": "Lets you close the curtain in the ship cabin for some extra privacy in the cockpit.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
     "addShipClock": {
       "title": "Add Ship Clock",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds a clock to the ship cockpit. It uses the standard Hearthian units of time: seconds and minutes."
+      "tooltip": "Adds a clock to the ship cockpit. It uses the standard Hearthian units of time: seconds and minutes.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
-
     "addComponentsSplit": {
       "type": "separator",
       "title": "Ship Components",
       "tooltip": "side"
     },
-
     "enableScoutLauncherComponent": {
       "title": "Make Scout Launcher Component",
       "type": "toggle",
       "value": false,
-      "tooltip": "Turns the ship's scout launcher into a fully functioning component. You won't be able to launch or recall your scout from the ship if it's damaged."
+      "tooltip": "Turns the ship\u0027s scout launcher into a fully functioning component. You won\u0027t be able to launch or recall your scout from the ship if it\u0027s damaged.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
     "scoutPhotoMode": {
       "title": "Ship Scout Photo Mode",
       "type": "toggle",
       "value": false,
-      "tooltip": "Lets you switch to photo mode with the ship's scout launcher."
+      "tooltip": "Lets you switch to photo mode with the ship\u0027s scout launcher.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
     "enableSignalscopeComponent": {
       "title": "Make Signalscope Component",
       "type": "toggle",
       "value": false,
-      "tooltip": "Turns the ship's signalscope into a fully functioning component. You won't be able to track signals in the ship or hear the ship's signal if the signalscope is damaged."
+      "tooltip": "Turns the ship\u0027s signalscope into a fully functioning component. You won\u0027t be able to track signals in the ship or hear the ship\u0027s signal if the signalscope is damaged.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
     "addShipSignal": {
       "title": "Add Ship Signal",
       "type": "toggle",
       "value": false,
-      "tooltip": "Allows you to track your ship with the signalscope on the Outer Wilds Ventures frequency. Slate also mentioned something about sending commands with your signalscope."
+      "tooltip": "Allows you to track your ship with the signalscope on the Outer Wilds Ventures frequency. Slate also mentioned something about sending commands with your signalscope.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
-
     "itemsSplit": {
       "type": "separator",
       "title": "Items",
       "tooltip": "side"
     },
-
     "addPortableCampfire": {
       "title": "Add Portable Campfire",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds a portable campfire to the ship near your suit. Unpack it anywhere you'd like and roast a marshmallow!"
+      "tooltip": "Adds a portable campfire to the ship near your suit. Unpack it anywhere you\u0027d like and roast a marshmallow!",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
     "addFuelCanister": {
       "title": "Add Portable Fuel Canister",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds a portable fuel canister to the ship by the ship log. It has enough fuel to refill your jetpack about 3 times, and will also blow up if you hit it too hard."
+      "tooltip": "Adds a portable fuel canister to the ship by the ship log. It has enough fuel to refill your jetpack about 3 times, and will also blow up if you hit it too hard.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
     "addPortableTractorBeam": {
       "title": "Add Portable Tractor Beam",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds a portable Nomai tractor beam to the ship next to the reactor. Place it on the ground if you need an extra boost in height."
+      "tooltip": "Adds a portable Nomai tractor beam to the ship next to the reactor. Place it on the ground if you need an extra boost in height.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
     "repairWrenchType": {
       "title": "Repair Wrench",
@@ -608,62 +1091,123 @@
         "Enabled",
         "Required"
       ],
-      "tooltip": "Adds a repair wrench to the cockpit."
+      "tooltip": "Adds a repair wrench to the cockpit.",
+      "presets": {
+        "vanillaPlus": "Disabled",
+        "minimal": "Required",
+        "impossible": "Disabled",
+        "newStuff": "Enabled",
+        "pandemonium": "Enabled"
+      }
     },
     "addExpeditionFlag": {
       "title": "Add Expedition Flag",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds a portable flag to the ship between the cockpit and the supplies module. You can change the icon on the flag by following the instructions on the mod website."
+      "tooltip": "Adds a portable flag to the ship between the cockpit and the supplies module. You can change the icon on the flag by following the instructions on the mod website.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
     "addRadio": {
       "title": "Add Radio",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds a radio to the ship cockpit. You can change the 4-digit frequency to listen to music on it."
+      "tooltip": "Adds a radio to the ship cockpit. You can change the 4-digit frequency to listen to music on it.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
     "addTether": {
       "title": "Add Ship Tether",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds a few hooks inside the ship that you can place anywhere you want. Interact with it to tether yourself to it, and interact with another to create a line between them."
+      "tooltip": "Adds a few hooks inside the ship that you can place anywhere you want. Interact with it to tether yourself to it, and interact with another to create a line between them.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
     "addResourcePump": {
       "title": "Add Resource Pump",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds a wireless pump to the back of the ship that can interact with your ship's resources."
+      "tooltip": "Adds a wireless pump to the back of the ship that can interact with your ship\u0027s resources.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
     "enableRemovableGravityCrystal": {
       "title": "Removable Gravity Crystal",
       "type": "toggle",
       "value": false,
-      "tooltip": "Lets you remove the gravity crystal from the ship. It can be placed outside the ship on any surface for a portable gravity source."
+      "tooltip": "Lets you remove the gravity crystal from the ship. It can be placed outside the ship on any surface for a portable gravity source.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
     "enableShipItemPlacement": {
       "title": "Ship Item Placement",
       "type": "toggle",
       "value": false,
-      "tooltip": "Lets you drop items inside of the ship or on top of the ship."
+      "tooltip": "Lets you drop items inside of the ship or on top of the ship.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
     "unlimitedItems": {
       "title": "Unlimited Items",
       "type": "toggle",
       "value": false,
-      "tooltip": "Lets you duplicate items inside the ship."
+      "tooltip": "Lets you duplicate items inside the ship.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": false
+      }
     },
-
     "buttonsSplit": {
       "type": "separator",
       "title": "Buttons",
       "tooltip": "side"
     },
-
     "extraEjectButtons": {
       "title": "Extra Eject Buttons",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds a few extra eject buttons to the ship."
+      "tooltip": "Adds a few extra eject buttons to the ship.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
     "shipWarpCoreType": {
       "title": "Ship Warp Core",
@@ -674,50 +1218,97 @@
         "Enabled",
         "Component"
       ],
-      "tooltip": "Attaches a Nomai warp core to the cockpit that can be activated with a button on the ceiling of the cockpit. The Component option makes it a damageable component."
+      "tooltip": "Attaches a Nomai warp core to the cockpit that can be activated with a button on the ceiling of the cockpit. The Component option makes it a damageable component.",
+      "presets": {
+        "vanillaPlus": "Disabled",
+        "minimal": "Disabled",
+        "impossible": "Disabled",
+        "newStuff": "Component",
+        "pandemonium": "Component"
+      }
     },
     "enableGravityLandingGear": {
       "title": "Add Gravity Landing Gear",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds an interface to the cockpit for controlling the new gravity tech on your landing gear, which only functions when the landing gear isn't damaged."
+      "tooltip": "Adds an interface to the cockpit for controlling the new gravity tech on your landing gear, which only functions when the landing gear isn\u0027t damaged.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
     "enableThrustModulator": {
       "title": "Add Thrust Modulator",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds an interface to the cockpit for decreasing your ship's maximum thrust or putting your reactor in overdrive."
+      "tooltip": "Adds an interface to the cockpit for decreasing your ship\u0027s maximum thrust or putting your reactor in overdrive.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
     "enableAutoAlign": {
       "title": "Add Auto Align Controls",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds an interface to the cockpit that lets you rotate your ship to face the current targeted object."
+      "tooltip": "Adds an interface to the cockpit that lets you rotate your ship to face the current targeted object.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
     "enableEnhancedAutopilot": {
       "title": "Add Autopilot Controls",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds an interface to the cockpit that gives you access to some of the new autopilot features Slate was working on."
+      "tooltip": "Adds an interface to the cockpit that gives you access to some of the new autopilot features Slate was working on.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
     "addEngineSwitch": {
       "title": "Add Engine Switch",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds a switch to the cockpit that turns on the ship. If you turned on Idle Fuel Consumption, it will only drain fuel while the ship is on."
+      "tooltip": "Adds a switch to the cockpit that turns on the ship. If you turned on Idle Fuel Consumption, it will only drain fuel while the ship is on.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
-
     "tempSplit": {
       "type": "separator",
       "title": "Temperature",
       "tooltip": "side"
     },
-
     "enableShipTemperature": {
       "title": "Enable Ship Temperature",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds a temperature mechanic to the ship. Check the README for more details about how it works."
+      "tooltip": "Adds a temperature mechanic to the ship. Check the README for more details about how it works.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
     "temperatureZonesAmount": {
       "title": "Add Temperature Zones",
@@ -729,7 +1320,14 @@
         "Hot",
         "Cold"
       ],
-      "tooltip": "Determines what type of temperature zones to add. Temperature zones will increase or decrease your ship's temperature."
+      "tooltip": "Determines what type of temperature zones to add. Temperature zones will increase or decrease your ship\u0027s temperature.",
+      "presets": {
+        "vanillaPlus": "All",
+        "minimal": "All",
+        "impossible": "All",
+        "newStuff": "All",
+        "pandemonium": "All"
+      }
     },
     "temperatureDifficulty": {
       "title": "Temperature Difficulty",
@@ -737,13 +1335,27 @@
       "value": 0.5,
       "min": 0.0,
       "max": 1.0,
-      "tooltip": "Controls how dangerous the side effects of extreme temperatures are."
+      "tooltip": "Controls how dangerous the side effects of extreme temperatures are.",
+      "presets": {
+        "vanillaPlus": 0.5,
+        "minimal": 0.5,
+        "impossible": 0.5,
+        "newStuff": 0.25,
+        "pandemonium": 1
+      }
     },
     "temperatureResistanceMultiplier": {
       "title": "Temperature Resistance Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the time the ship can resist extreme temperatures. The default resistance gives the ship around 3 minutes before the hull reaches max temperature."
+      "tooltip": "Larger numbers increase the time the ship can resist extreme temperatures. The default resistance gives the ship around 3 minutes before the hull reaches max temperature.",
+      "presets": {
+        "vanillaPlus": 1,
+        "minimal": 1,
+        "impossible": 1,
+        "newStuff": 1,
+        "pandemonium": 2
+      }
     },
     "passiveTemperatureGain": {
       "title": "Passive Temperature Gain",
@@ -754,51 +1366,89 @@
         "Hot",
         "Cold"
       ],
-      "tooltip": "Increases/decreases the ship temperature over time, making some areas more safe and others more dangerous."
+      "tooltip": "Increases/decreases the ship temperature over time, making some areas more safe and others more dangerous.",
+      "presets": {
+        "vanillaPlus": "None",
+        "minimal": "None",
+        "impossible": "None",
+        "newStuff": "None",
+        "pandemonium": "Hot"
+      }
     },
     "enableReactorOverload": {
       "title": "Allow Reactor Overload",
       "type": "toggle",
       "value": false,
-      "tooltip": "Lets you interact with the reactor to overload it and prevent your ship from getting cold."
+      "tooltip": "Lets you interact with the reactor to overload it and prevent your ship from getting cold.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
-
     "waterSplit": {
       "type": "separator",
       "title": "Water",
       "tooltip": "side"
     },
-
     "addWaterTank": {
       "title": "Use Water Tank",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds water as a new resource, making use of the water tank attached to the back of the ship. It can be refilled using the Resource Pump."
+      "tooltip": "Adds water as a new resource, making use of the water tank attached to the back of the ship. It can be refilled using the Resource Pump.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
     "waterDrainMultiplier": {
       "title": "Water Drain Multiplier",
       "type": "number",
       "value": 1.0,
-      "tooltip": "Larger numbers make the water tank drain faster when being used, and make it refill faster when using the Resource Pump."
+      "tooltip": "Larger numbers make the water tank drain faster when being used, and make it refill faster when using the Resource Pump.",
+      "presets": {
+        "vanillaPlus": 1,
+        "minimal": 1,
+        "impossible": 1,
+        "newStuff": 1,
+        "pandemonium": 3
+      }
     },
     "addWaterCooling": {
       "title": "Add Water Cooling",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds a lever next to the ship log that turns on water cooling, which will consume water to prevent your ship from getting hot. (This doesn't do anything if temperature isn't enabled)"
+      "tooltip": "Adds a lever next to the ship log that turns on water cooling, which will consume water to prevent your ship from getting hot. (This doesn\u0027t do anything if temperature isn\u0027t enabled)",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": true,
+        "pandemonium": true
+      }
     },
-
     "addMiscSplit": {
       "type": "separator",
       "title": "Miscellaneous",
       "tooltip": "side"
     },
-
     "hotThrusters": {
       "title": "Hazardous Thrusters",
       "type": "toggle",
       "value": false,
-      "tooltip": "Makes the ship thruster flames do damage when you stand in them."
+      "tooltip": "Makes the ship thruster flames do damage when you stand in them.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": true
+      }
     },
     "shipHornType": {
       "title": "Ship Horn Variant",
@@ -814,7 +1464,14 @@
         "Clown",
         "Annoying"
       ],
-      "tooltip": "Chooses which sound the ship's horn should make. You can honk by pressing the flashlight button when the signalscope is equipped and isn't damaged."
+      "tooltip": "Chooses which sound the ship\u0027s horn should make. You can honk by pressing the flashlight button when the signalscope is equipped and isn\u0027t damaged.",
+      "presets": {
+        "vanillaPlus": "None",
+        "minimal": "None",
+        "impossible": "None",
+        "newStuff": "Default",
+        "pandemonium": "Annoying"
+      }
     },
     "rustLevel": {
       "title": "Cockpit Rust Level",
@@ -822,13 +1479,27 @@
       "value": 0,
       "min": 0,
       "max": 1,
-      "tooltip": "Controls how much rust is applied to the ship cockpit. Setting this to max will completely cover the cockpit in rust."
+      "tooltip": "Controls how much rust is applied to the ship cockpit. Setting this to max will completely cover the cockpit in rust.",
+      "presets": {
+        "vanillaPlus": 0,
+        "minimal": 0,
+        "impossible": 0.4,
+        "newStuff": 0,
+        "pandemonium": 0.5
+      }
     },
     "dirtAccumulationTime": {
       "title": "Dirt Accumulation Time",
       "type": "number",
       "value": 0,
-      "tooltip": "Specifies the time in seconds that it takes for dirt to build up on your cockpit (0 is disabled). Find some water if you want to wash it off."
+      "tooltip": "Specifies the time in seconds that it takes for dirt to build up on your cockpit (0 is disabled). Find some water if you want to wash it off.",
+      "presets": {
+        "vanillaPlus": 0,
+        "minimal": 0,
+        "impossible": 120,
+        "newStuff": 0,
+        "pandemonium": 350
+      }
     },
     "maxDirtAccumulation": {
       "title": "Max Dirt Accumulation",
@@ -836,31 +1507,45 @@
       "value": 0.75,
       "min": 0,
       "max": 1,
-      "tooltip": "Controls the max amount of dirt that can accumulate on your cockpit glass."
+      "tooltip": "Controls the max amount of dirt that can accumulate on your cockpit glass.",
+      "presets": {
+        "vanillaPlus": 0.8,
+        "minimal": 0.8,
+        "impossible": 1,
+        "newStuff": 0.8,
+        "pandemonium": 0.8
+      }
     },
     "enableGasLeak": {
       "title": "Enable Gas Leak",
       "type": "toggle",
       "value": false,
-      "tooltip": "I'm not exactly sure what this does."
+      "tooltip": "I\u0027m not exactly sure what this does.",
+      "presets": {}
     },
     "addErnesto": {
       "title": "Add Ernesto",
       "type": "toggle",
       "value": false,
-      "tooltip": "Adds Ernesto to the cockpit."
+      "tooltip": "Adds Ernesto to the cockpit.",
+      "presets": {
+        "vanillaPlus": false,
+        "minimal": false,
+        "impossible": false,
+        "newStuff": false,
+        "pandemonium": true
+      }
     },
-
     "Decoration": {
       "type": "separator",
       "title": "Decoration"
     },
-
     "enableColorBlending": {
       "title": "Enable Color Blending",
       "type": "toggle",
       "value": false,
-      "tooltip": "Lets you blend the decorations between different colors based on chosen parameters."
+      "tooltip": "Lets you blend the decorations between different colors based on chosen parameters.",
+      "presets": {}
     },
     "shipLightColorBlend": {
       "title": "Ship Light Blend",
@@ -877,7 +1562,8 @@
         "Temperature",
         "Ship Temperature"
       ],
-      "tooltip": "Sets the method of blending between colors."
+      "tooltip": "Sets the method of blending between colors.",
+      "presets": {}
     },
     "shipLightColorOptions": {
       "title": "Ship Light Color Options",
@@ -888,7 +1574,8 @@
         "2",
         "3"
       ],
-      "tooltip": "Sets the number of colors to blend between."
+      "tooltip": "Sets the number of colors to blend between.",
+      "presets": {}
     },
     "shipLightColor1": {
       "title": "Ship Light Color",
@@ -913,7 +1600,8 @@
         "Divine",
         "Rainbow"
       ],
-      "tooltip": "Changes the color of the interior and exterior ship lights."
+      "tooltip": "Changes the color of the interior and exterior ship lights.",
+      "presets": {}
     },
     "shipLightColor2": {
       "title": "Ship Light Color",
@@ -938,7 +1626,8 @@
         "Divine",
         "Rainbow"
       ],
-      "tooltip": "Changes the color of the interior and exterior ship lights."
+      "tooltip": "Changes the color of the interior and exterior ship lights.",
+      "presets": {}
     },
     "shipLightColor3": {
       "title": "Ship Light Color",
@@ -963,7 +1652,8 @@
         "Divine",
         "Rainbow"
       ],
-      "tooltip": "Changes the color of the interior and exterior ship lights."
+      "tooltip": "Changes the color of the interior and exterior ship lights.",
+      "presets": {}
     },
     "interiorHullColorBlend": {
       "title": "Interior Hull Blend",
@@ -980,7 +1670,8 @@
         "Temperature",
         "Ship Temperature"
       ],
-      "tooltip": "Sets the method of blending between colors."
+      "tooltip": "Sets the method of blending between colors.",
+      "presets": {}
     },
     "interiorHullColorOptions": {
       "title": "Interior Hull Color Options",
@@ -991,7 +1682,8 @@
         "2",
         "3"
       ],
-      "tooltip": "Sets the number of colors to blend between."
+      "tooltip": "Sets the number of colors to blend between.",
+      "presets": {}
     },
     "interiorHullColor1": {
       "title": "Interior Hull Color",
@@ -1012,7 +1704,8 @@
         "Dark Gray",
         "Rainbow"
       ],
-      "tooltip": "Changes the color of the inside of the ship."
+      "tooltip": "Changes the color of the inside of the ship.",
+      "presets": {}
     },
     "interiorHullColor2": {
       "title": "Interior Hull Color",
@@ -1033,7 +1726,8 @@
         "Dark Gray",
         "Rainbow"
       ],
-      "tooltip": "Changes the color of the inside of the ship."
+      "tooltip": "Changes the color of the inside of the ship.",
+      "presets": {}
     },
     "interiorHullColor3": {
       "title": "Interior Hull Color",
@@ -1054,7 +1748,8 @@
         "Dark Gray",
         "Rainbow"
       ],
-      "tooltip": "Changes the color of the inside of the ship."
+      "tooltip": "Changes the color of the inside of the ship.",
+      "presets": {}
     },
     "exteriorHullColorBlend": {
       "title": "Exterior Hull Blend",
@@ -1071,7 +1766,8 @@
         "Temperature",
         "Ship Temperature"
       ],
-      "tooltip": "Sets the method of blending between colors."
+      "tooltip": "Sets the method of blending between colors.",
+      "presets": {}
     },
     "exteriorHullColorOptions": {
       "title": "Exterior Hull Color Options",
@@ -1082,7 +1778,8 @@
         "2",
         "3"
       ],
-      "tooltip": "Sets the number of colors to blend between."
+      "tooltip": "Sets the number of colors to blend between.",
+      "presets": {}
     },
     "exteriorHullColor1": {
       "title": "Exterior Hull Color",
@@ -1103,7 +1800,8 @@
         "Dark Gray",
         "Rainbow"
       ],
-      "tooltip": "Changes the color of the outside of the ship."
+      "tooltip": "Changes the color of the outside of the ship.",
+      "presets": {}
     },
     "exteriorHullColor2": {
       "title": "Exterior Hull Color",
@@ -1124,7 +1822,8 @@
         "Dark Gray",
         "Rainbow"
       ],
-      "tooltip": "Changes the color of the outside of the ship."
+      "tooltip": "Changes the color of the outside of the ship.",
+      "presets": {}
     },
     "exteriorHullColor3": {
       "title": "Exterior Hull Color",
@@ -1145,7 +1844,8 @@
         "Dark Gray",
         "Rainbow"
       ],
-      "tooltip": "Changes the color of the outside of the ship."
+      "tooltip": "Changes the color of the outside of the ship.",
+      "presets": {}
     },
     "thrusterColorBlend": {
       "title": "Thruster Blend",
@@ -1162,7 +1862,8 @@
         "Temperature",
         "Ship Temperature"
       ],
-      "tooltip": "Sets the method of blending between colors."
+      "tooltip": "Sets the method of blending between colors.",
+      "presets": {}
     },
     "thrusterColorOptions": {
       "title": "Thruster Color Options",
@@ -1173,7 +1874,8 @@
         "2",
         "3"
       ],
-      "tooltip": "Sets the number of colors to blend between."
+      "tooltip": "Sets the number of colors to blend between.",
+      "presets": {}
     },
     "thrusterColor1": {
       "title": "Ship Thruster Flame Color",
@@ -1194,7 +1896,8 @@
         "Gray",
         "Rainbow"
       ],
-      "tooltip": "Changes the color of the thruster flames produced by the ship."
+      "tooltip": "Changes the color of the thruster flames produced by the ship.",
+      "presets": {}
     },
     "thrusterColor2": {
       "title": "Ship Thruster Flame Color",
@@ -1215,7 +1918,8 @@
         "Gray",
         "Rainbow"
       ],
-      "tooltip": "Changes the color of the thruster flames produced by the ship."
+      "tooltip": "Changes the color of the thruster flames produced by the ship.",
+      "presets": {}
     },
     "thrusterColor3": {
       "title": "Ship Thruster Flame Color",
@@ -1236,7 +1940,8 @@
         "Gray",
         "Rainbow"
       ],
-      "tooltip": "Changes the color of the thruster flames produced by the ship."
+      "tooltip": "Changes the color of the thruster flames produced by the ship.",
+      "presets": {}
     },
     "indicatorColorBlend": {
       "title": "Damage Indicator Blend",
@@ -1253,7 +1958,8 @@
         "Temperature",
         "Ship Temperature"
       ],
-      "tooltip": "Sets the method of blending between colors."
+      "tooltip": "Sets the method of blending between colors.",
+      "presets": {}
     },
     "indicatorColorOptions": {
       "title": "Damage Indicator Color Options",
@@ -1264,7 +1970,8 @@
         "2",
         "3"
       ],
-      "tooltip": "Sets the number of colors to blend between."
+      "tooltip": "Sets the number of colors to blend between.",
+      "presets": {}
     },
     "indicatorColor1": {
       "title": "Damage Indicator Color",
@@ -1286,7 +1993,8 @@
         "Black",
         "Rainbow"
       ],
-      "tooltip": "Changes the color of the damage indicators on the ship."
+      "tooltip": "Changes the color of the damage indicators on the ship.",
+      "presets": {}
     },
     "indicatorColor2": {
       "title": "Damage Indicator Color",
@@ -1308,7 +2016,8 @@
         "Black",
         "Rainbow"
       ],
-      "tooltip": "Changes the color of the damage indicators on the ship."
+      "tooltip": "Changes the color of the damage indicators on the ship.",
+      "presets": {}
     },
     "indicatorColor3": {
       "title": "Damage Indicator Color",
@@ -1330,55 +2039,63 @@
         "Black",
         "Rainbow"
       ],
-      "tooltip": "Changes the color of the damage indicators on the ship."
+      "tooltip": "Changes the color of the damage indicators on the ship.",
+      "presets": {}
     },
-
     "Quality of Life": {
       "type": "separator",
       "title": "Quality of Life"
     },
-
     "enableRepairConfirmation": {
       "title": "Enable Repair Confirmation",
       "type": "toggle",
       "value": false,
-      "tooltip": "Plays a sound when every damaged part of the ship has been repaired."
+      "tooltip": "Plays a sound when every damaged part of the ship has been repaired.",
+      "presets": {}
     },
     "showWarningNotifications": {
       "title": "Show Warning Notifications",
       "type": "toggle",
       "value": true,
-      "tooltip": "Notifies you in the ship when resources are low or when the outside conditions are becoming dangerous."
+      "tooltip": "Notifies you in the ship when resources are low or when the outside conditions are becoming dangerous.",
+      "presets": {}
     },
     "buttonsRequireFlightChair": {
       "title": "Buttons Require Flight Chair",
       "type": "toggle",
       "value": false,
-      "tooltip": "Only lets you use buttons in the cockpit while you're sitting in the flight chair."
+      "tooltip": "Only lets you use buttons in the cockpit while you\u0027re sitting in the flight chair.",
+      "presets": {
+        "pandemonium": false
+      }
     },
     "persistentShipState": {
       "title": "Remember Ship State",
       "type": "toggle",
       "value": false,
-      "tooltip": "Preserves things like fuel, oxygen, and ship damage when warping to a new star system."
+      "tooltip": "Preserves things like fuel, oxygen, and ship damage when warping to a new star system.",
+      "presets": {}
     },
     "alwaysAllowLockOn": {
       "title": "Always Allow Map Lock-on",
       "type": "toggle",
       "value": true,
-      "tooltip": "Lets you lock onto targets in the map view at any time."
+      "tooltip": "Lets you lock onto targets in the map view at any time.",
+      "presets": {}
     },
     "splitLockOn": {
       "title": "Split Ship Lock-on",
       "type": "toggle",
       "value": false,
-      "tooltip": "Separates the player lock-on target and the ship lock-on target."
+      "tooltip": "Separates the player lock-on target and the ship lock-on target.",
+      "presets": {}
     },
     "keepHelmetOn": {
       "title": "Keep Helmet On",
       "type": "toggle",
       "value": true,
-      "tooltip": "Prevents the game from automatically removing your helmet if there isn't oxygen present."
+      "tooltip": "Prevents the game from automatically removing your helmet if there isn\u0027t oxygen present.",
+      "presets": {}
     }
   }
 }

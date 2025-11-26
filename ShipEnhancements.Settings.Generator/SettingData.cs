@@ -6,4 +6,5 @@ internal class SettingData
     public string Title { get; set; } = string.Empty;
     public string FieldType { get; set; } = string.Empty;
     public string DefaultValue { get; set; } = string.Empty;
-};
+    public IDictionary<string, string> PresetOverrides { get; set; } =  new Dictionary<string, string>();
+}
