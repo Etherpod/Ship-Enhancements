@@ -1161,6 +1161,8 @@ public static class PatchClass
         if ((bool)disableRotationSpeedLimit.GetProperty())
         {
             __instance._owRigidbody.SetMaxAngularVelocity(25f);
+            // Changing the max velocity makes the ship more sensitive
+            __instance._maxRotationalThrust *= 0.75f;
         }
     }
 
