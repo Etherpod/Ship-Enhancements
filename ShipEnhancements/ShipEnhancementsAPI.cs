@@ -1,4 +1,5 @@
 ﻿using System;
+using ShipEnhancements.ModMenu;
 using UnityEngine;
 using UnityEngine.Events;
 using static ShipEnhancements.ShipEnhancements;
@@ -38,39 +39,42 @@ public class ShipEnhancementsAPI : IShipEnhancements
         return tempZoneObj;
     }
 
-    public GameObject AddTemperatureZone(IShipEnhancements.TemperatureZoneSettings settings)
+    public GameObject AddTemperatureZone(string name, Transform parent, float temperature, float outerRadius,
+        float innerRadius, bool isShell,
+        float shellCenterRadius, float shellCenterThickness, bool isDayNight, float nightTemperature,
+        float twilightAngle, string customSunName)
     {
-        GameObject tempZoneObj = new GameObject(settings.name);
+        GameObject tempZoneObj = new GameObject(name);
         tempZoneObj.SetActive(false);
-        tempZoneObj.transform.parent = settings.parent;
+        tempZoneObj.transform.parent = parent;
         tempZoneObj.transform.localPosition = Vector3.zero;
-        TemperatureZone tempZone = settings.isDayNight ? tempZoneObj.AddComponent<DayNightTemperatureZone>() : tempZoneObj.AddComponent<TemperatureZone>();
+        TemperatureZone tempZone = isDayNight ? tempZoneObj.AddComponent<DayNightTemperatureZone>() : tempZoneObj.AddComponent<TemperatureZone>();
         tempZoneObj.AddComponent<SphereShape>();
         tempZoneObj.AddComponent<OWTriggerVolume>();
         tempZoneObj.layer = LayerMask.NameToLayer("BasicEffectVolume");
         tempZoneObj.SetActive(true);
-        if (settings.innerRadius > settings.outerRadius)
+        if (innerRadius > outerRadius)
         {
-            LogMessage($"Error when creating temperature zone \"{settings.name}\": innerRadius ({settings.innerRadius}) is larger than outerRadius ({settings.outerRadius})", warning: true);
-            settings.innerRadius = 0f;
+            LogMessage($"Error when creating temperature zone \"{name}\": innerRadius ({innerRadius}) is larger than outerRadius ({outerRadius})", warning: true);
+            innerRadius = 0f;
         }
-        if (settings.isShell)
+        if (isShell)
         {
-            if (settings.shellCenterRadius < settings.innerRadius || settings.shellCenterRadius > settings.outerRadius)
+            if (shellCenterRadius < innerRadius || shellCenterRadius > outerRadius)
             {
-                LogMessage($"Error when creating temperature zone \"{settings.name}\": shellCenterRadius ({settings.shellCenterRadius}) is outside of bounds (outerRadius: {settings.outerRadius}, innerRadius: {settings.innerRadius})", warning: true);
-                settings.shellCenterRadius = (settings.innerRadius + settings.outerRadius) / 2f;
+                LogMessage($"Error when creating temperature zone \"{name}\": shellCenterRadius ({shellCenterRadius}) is outside of bounds (outerRadius: {outerRadius}, innerRadius: {innerRadius})", warning: true);
+                shellCenterRadius = (innerRadius + outerRadius) / 2f;
             }
-            float outerBuffer = settings.outerRadius - settings.shellCenterRadius;
-            float innerBuffer = settings.shellCenterRadius - settings.innerRadius;
-            if (settings.shellCenterThickness > outerBuffer || settings.shellCenterThickness > innerBuffer)
+            float outerBuffer = outerRadius - shellCenterRadius;
+            float innerBuffer = shellCenterRadius - innerRadius;
+            if (shellCenterThickness > outerBuffer || shellCenterThickness > innerBuffer)
             {
-                LogMessage($"Error when creating temperature zone \"{settings.name}\": shellCenterThickness ({settings.shellCenterThickness}) extends out of bounds (outerRadius: {settings.outerRadius}, innerRadius: {settings.innerRadius})", warning: true);
-                settings.shellCenterThickness = Mathf.Min(outerBuffer, innerBuffer);
+                LogMessage($"Error when creating temperature zone \"{name}\": shellCenterThickness ({shellCenterThickness}) extends out of bounds (outerRadius: {outerRadius}, innerRadius: {innerRadius})", warning: true);
+                shellCenterThickness = Mathf.Min(outerBuffer, innerBuffer);
             }
         }
-        tempZone.SetProperties(settings.temperature, settings.outerRadius, settings.innerRadius, settings.isShell, 
-            settings.shellCenterRadius, settings.shellCenterThickness, settings.nightTemperature, settings.twilightAngle, settings.customSunName);
+        tempZone.SetProperties(temperature, outerRadius, innerRadius, isShell, 
+            shellCenterRadius, shellCenterThickness, nightTemperature, twilightAngle, customSunName);
         return tempZoneObj;
     }
 
@@ -104,23 +108,33 @@ public class ShipEnhancementsAPI : IShipEnhancements
 
     public void SetSettingsOptionVisible(string configName, bool visible, bool forceRefresh = false)
     {
+        if (configName == "preset")
+        {
+            SEMenuManager.HidePreset = visible;
+            if (forceRefresh)
+            {
+                SEMenuManager.RedrawSettingsMenu();
+            }
+            return;
+        }
+        
         var allSettings = Enum.GetValues(typeof(Settings)) as Settings[];
         foreach (Settings setting in allSettings)
         {
             if (setting.GetName() == configName)
             {
-                if (visible && Instance.HiddenSettings.Contains(setting))
+                if (visible && SEMenuManager.HiddenSettings.Contains(setting))
                 {
-                    Instance.HiddenSettings.Remove(setting);
+                    SEMenuManager.HiddenSettings.Remove(setting);
                 }
-                else if (!visible && !Instance.HiddenSettings.Contains(setting))
+                else if (!visible && !SEMenuManager.HiddenSettings.Contains(setting))
                 {
-                    Instance.HiddenSettings.Add(setting);
+                    SEMenuManager.HiddenSettings.Add(setting);
                 }
 
                 if (forceRefresh)
                 {
-                    Instance.RedrawSettingsMenu();
+                    SEMenuManager.RedrawSettingsMenu();
                 }
                 return;
             }
@@ -129,27 +143,35 @@ public class ShipEnhancementsAPI : IShipEnhancements
 
     public void HideAllSettings(bool forceRefresh = false)
     {
-        Instance.HiddenSettings.Clear();
+        SEMenuManager.HiddenSettings.Clear();
         var allSettings = Enum.GetValues(typeof(Settings)) as Settings[];
         foreach (var setting in allSettings)
         {
-            Instance.HiddenSettings.Add(setting);
+            SEMenuManager.HiddenSettings.Add(setting);
         }
+
+        SEMenuManager.HidePreset = true;
 
         if (forceRefresh)
         {
-            Instance.RedrawSettingsMenu();
+            SEMenuManager.RedrawSettingsMenu();
         }
     }
 
     public void ShowAllSettings(bool forceRefresh = false)
     {
-        Instance.HiddenSettings.Clear();
+        SEMenuManager.HiddenSettings.Clear();
+        SEMenuManager.HidePreset = false;
 
         if (forceRefresh)
         {
-            Instance.RedrawSettingsMenu();
+            SEMenuManager.RedrawSettingsMenu();
         }
+    }
+
+    public void ResetSettings()
+    {
+        SettingExtensions.ResetCustomSettings();
     }
 
     public UnityEvent GetPreShipInitializeEvent() => Instance.PreShipInitialize;

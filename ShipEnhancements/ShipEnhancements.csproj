@@ -1,65 +1,69 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
-    <LangVersion>latest</LangVersion>
-    <Copyright>Copyright © 2024 Etherpod</Copyright>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
-    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
-    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
-    <NoWarn>MSB3270</NoWarn>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DebugType>none</DebugType>
-  </PropertyGroup>
-  <Target Name="CopyDLLs" AfterTargets="Build" Condition=" '$(Configuration)' == 'Debug' And '$(UnityProjectDir)' != '' ">
-    <Message Text="Copying assets to Unity project" Importance="High" />
+    <PropertyGroup>
+        <TargetFramework>net48</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <Copyright>Copyright © 2024 Etherpod</Copyright>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+        <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
+        <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
+        <NoWarn>MSB3270</NoWarn>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <DebugType>none</DebugType>
+    </PropertyGroup>
+    <Target Name="CopyDLLs" AfterTargets="Build" Condition=" '$(Configuration)' == 'Debug' And '$(UnityProjectDir)' != '' ">
+        <Message Text="Copying assets to Unity project" Importance="High"/>
 
-    <Copy SourceFiles="$(TargetDir)$(ProjectName).dll" DestinationFolder="$(UnityProjectModDir)" />
+        <Copy SourceFiles="$(TargetDir)$(ProjectName).dll" DestinationFolder="$(UnityProjectModDir)"/>
+        <ItemGroup>
+            <CopyItems Include="$(TargetDir)\dialogue\*.*"/>
+        </ItemGroup>
+        <Copy SourceFiles="@(CopyItems)" DestinationFolder="$(UnityProjectDialogueDir)"/>
+
+        <Message Text="Copy complete" Importance="High"/>
+    </Target>
+
     <ItemGroup>
-      <CopyItems Include="$(TargetDir)\dialogue\*.*" />
+        <PackageReference Include="OWML" Version="2.15.4"/>
+        <PackageReference Include="OuterWildsGameLibs" Version="1.1.16.1372"/>
     </ItemGroup>
-    <Copy SourceFiles="@(CopyItems)" DestinationFolder="$(UnityProjectDialogueDir)" />
-
-    <Message Text="Copy complete" Importance="High" />
-  </Target>
-  
-  <ItemGroup>
-    <PackageReference Include="OWML" Version="2.14.0" />
-    <PackageReference Include="OuterWildsGameLibs" Version="1.1.15.1018" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="default-config.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="manifest.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="assets/**/*.*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="translations/**/*.*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="Icons/**/*.*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="dialogue/**/*.*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="ExpeditionFlagIcons/**/*.*">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="RandomizerSettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="ExperimentalSettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <EmbeddedResource Include="Data/themes.json"/>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="ShipEnhancements.csproj.user" />
-  </ItemGroup>
-  <ProjectExtensions><VisualStudio><UserProperties default-config_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
+    <ItemGroup>
+        <None Include="default-config.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Include="manifest.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Include="assets/**/*.*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Include="translations/**/*.*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Include="Icons/**/*.*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Include="dialogue/**/*.*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Include="ExpeditionFlagIcons/**/*.*">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Include="RandomizerSettings.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Include="ExperimentalSettings.json">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <EmbeddedResource Include="Data/themes.json"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Content Include="ShipEnhancements.csproj.user"/>
+    </ItemGroup>
+    <ProjectExtensions>
+        <VisualStudio>
+            <UserProperties default-config_1json__JsonSchema=""/>
+        </VisualStudio>
+    </ProjectExtensions>
 </Project>

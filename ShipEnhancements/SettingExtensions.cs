@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using ShipEnhancements.ModMenu;
 using static ShipEnhancements.ShipEnhancements;
 
 namespace ShipEnhancements;
@@ -179,7 +180,7 @@ public static class SettingExtensions
 
         Instance.ModHelper.Events.Unity.FireOnNextUpdate(() =>
         {
-            Instance.RedrawSettingsMenu();
+            SEMenuManager.RedrawSettingsMenu();
         });
     }
 

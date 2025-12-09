@@ -5,7 +5,7 @@ using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using OWML.Common;
-using OWML.ModHelper.Menus.CustomInputs;
+using ShipEnhancements.ModMenu;
 using OWML.ModHelper.Menus.NewMenuSystem;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -4601,8 +4601,10 @@ public static class PatchClass
         IOptionsMenuManager OptionsMenuManager = menuManager.OptionsMenuManager;
 
         var menus = typeof(MenuManager).GetField("ModSettingsMenus", BindingFlags.Public
-            | BindingFlags.NonPublic | BindingFlags.Static).GetValue(menuManager)
+            | BindingFlags.NonPublic | BindingFlags.Static)?.GetValue(menuManager)
             as List<(IModBehaviour behaviour, Menu modMenu)>;
+
+        if (menus == null) return;
 
         for (int i = 0; i < menus.Count; i++)
         {
@@ -4615,7 +4617,7 @@ public static class PatchClass
                 }
 
                 __instance.OnActivateMenu += () => ShipEnhancements.Instance.ModHelper.Events.Unity
-                    .FireOnNextUpdate(() => ShipEnhancements.Instance.RedrawSettingsMenu());
+                    .FireOnNextUpdate(() => SEMenuManager.RedrawSettingsMenu());
                 return;
             }
         }
@@ -4626,8 +4628,10 @@ public static class PatchClass
     public static void PreventRepeatActivation(MenuManager __instance, bool force)
     {
         var menus = typeof(MenuManager).GetField("ModSettingsMenus", BindingFlags.Public
-            | BindingFlags.NonPublic | BindingFlags.Static).GetValue(__instance)
+            | BindingFlags.NonPublic | BindingFlags.Static)?.GetValue(__instance)
             as List<(IModBehaviour behaviour, Menu modMenu)>;
+
+        if (menus == null) return;
 
         for (int i = 0; i < menus.Count; i++)
         {
@@ -4645,8 +4649,10 @@ public static class PatchClass
     {
         MenuManager menuManager = StartupPopupPatches.menuManager;
         var menus = typeof(MenuManager).GetField("ModSettingsMenus", BindingFlags.Public
-            | BindingFlags.NonPublic | BindingFlags.Static).GetValue(menuManager)
+            | BindingFlags.NonPublic | BindingFlags.Static)?.GetValue(menuManager)
             as List<(IModBehaviour behaviour, Menu modMenu)>;
+
+        if (menus == null) return;
 
         Menu modMenu = null;
         for (int i = 0; i < menus.Count; i++)

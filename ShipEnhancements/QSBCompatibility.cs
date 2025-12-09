@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using ShipEnhancements.ModMenu;
 using UnityEngine;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
@@ -147,7 +148,7 @@ public class QSBCompatibility
 
     public void SendHostPreset(uint id)
     {
-        _api.SendMessage("host-preset", (int)ShipEnhancements.Instance.GetCurrentPreset(), id, false);
+        _api.SendMessage("host-preset", (int)SEMenuManager.CurrentPreset, id, false);
     }
 
     private void ReceiveHostPreset(uint id, int preset)
