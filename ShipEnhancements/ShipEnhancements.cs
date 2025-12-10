@@ -1077,6 +1077,8 @@ public class ShipEnhancements : ModBehaviour
             }
         }
 
+        SetUpShipLogSplashScreen();
+
         SetUpShipAudio();
 
         foreach (OWAudioSource audio in _shipAudioToChange)
@@ -2703,6 +2705,32 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)addRadio.GetProperty())
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_RADIO_ENABLED", true);
+        }
+    }
+
+    private void SetUpShipLogSplashScreen()
+    {
+        GameObject go = SELocator.GetShipBody().GetComponentInChildren<ShipLogSplashScreen>().gameObject;
+        MeshRenderer rend = go.GetComponent<MeshRenderer>();
+
+        Texture2D tex = null;
+        
+        List<string> files = [];
+        files.AddRange(Directory.GetFiles(Path.Combine(ModHelper.Manifest.ModFolderPath, "ShipLogIcons"), 
+            "*.jpg", SearchOption.AllDirectories));
+        files.AddRange(Directory.GetFiles(Path.Combine(ModHelper.Manifest.ModFolderPath, "ShipLogIcons"),
+            "*.png", SearchOption.AllDirectories));
+        
+        if (files.Count > 0)
+        {
+            byte[] fileData = File.ReadAllBytes(files[UnityEngine.Random.Range(0, files.Count)]);
+            tex = new Texture2D(2, 2);
+            tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
+        }
+
+        if (tex != null)
+        {
+            rend.sharedMaterial.SetTexture("_MainTex", tex);
         }
     }
 

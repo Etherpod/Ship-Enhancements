@@ -1,0 +1,1 @@
+Add any .png or .jpg images you want to appear on the ship log's splash screen to this folder. It will select a random image from this folder when the loop starts.
