@@ -102,6 +102,11 @@ public class ShipEnhancements : ModBehaviour
     private bool _unsubFromShipSpawn = false;
     private ShipDetachableLeg _frontLeg = null;
     private List<OWAudioSource> _shipAudioToChange = [];
+    
+    private Material _defaultInteriorMat;
+    private Material _defaultExteriorMat;
+    private Material _customInteriorMat;
+    private Material _customExteriorMat;
 
     public enum Settings
     {
@@ -1020,6 +1025,22 @@ public class ShipEnhancements : ModBehaviour
 
         GameObject buttonConsole = LoadPrefab("Assets/ShipEnhancements/ButtonConsole.prefab");
         CreateObject(buttonConsole, SELocator.GetShipBody().transform.Find("Module_Cockpit"));
+        
+        if (_defaultInteriorMat == null)
+        {
+            MeshRenderer suppliesRenderer = SELocator.GetShipTransform().
+                Find("Module_Supplies/Geo_Supplies/Supplies_Geometry/Supplies_Interior").GetComponent<MeshRenderer>();
+            _defaultInteriorMat = suppliesRenderer.sharedMaterials[0];
+            _customInteriorMat = new Material(_defaultInteriorMat);
+        }
+        
+        if (_defaultExteriorMat == null)
+        {
+            MeshRenderer cabinRenderer = SELocator.GetShipTransform().
+                Find("Module_Cabin/Geo_Cabin/Cabin_Geometry/Cabin_Exterior").GetComponent<MeshRenderer>();
+            _defaultExteriorMat = cabinRenderer.sharedMaterials[3];
+            _customExteriorMat = new Material(_defaultExteriorMat);
+        }
 
         Material[] newMaterials =
         {
@@ -2541,10 +2562,7 @@ public class ShipEnhancements : ModBehaviour
         {
             return;
         }
-
-        MeshRenderer suppliesRenderer = SELocator.GetShipTransform().
-            Find("Module_Supplies/Geo_Supplies/Supplies_Geometry/Supplies_Interior").GetComponent<MeshRenderer>();
-        Material inSharedMat = suppliesRenderer.sharedMaterials[0];
+        
         Material inSharedMat2 = (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillageCabin_Recolored_mat.mat");
         Material inSharedMat3 = (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_SE_VillageCabin_mat.mat");
 
@@ -2552,50 +2570,120 @@ public class ShipEnhancements : ModBehaviour
             && int.Parse((string)interiorHullColorOptions.GetProperty()) > 1)
             || interior == "Rainbow";
 
-        if (blendInterior)
+        if (!blendInterior && interior == "Default")
         {
-            InteriorHullBlendController hullBlend = SELocator.GetShipBody()
-                .gameObject.GetAddComponent<InteriorHullBlendController>();
-            hullBlend.AddSharedMaterial(inSharedMat);
-            hullBlend.AddSharedMaterial(inSharedMat2);
-            hullBlend.AddSharedMaterial(inSharedMat3);
-        }
-        else if (interior != "Default")
-        {
-            Color color = ThemeManager.GetHullTheme(interior).HullColor / 255f;
-            inSharedMat.SetColor("_Color", color);
-            inSharedMat2.SetColor("_Color", color);
-            inSharedMat3.SetColor("_Color", color);
+            inSharedMat2.SetColor("_Color", Color.white);
+            inSharedMat3.SetColor("_Color", Color.white);
+
+            foreach (MeshRenderer rend in SELocator.GetShipTransform().GetComponentsInChildren<MeshRenderer>())
+            {
+                for (int i = 0; i < rend.sharedMaterials.Length; i++)
+                {
+                    if (rend.sharedMaterials[i] == null) continue;
+                    
+                    if (rend.sharedMaterials[i] == _customInteriorMat)
+                    {
+                        // use a list to change sharedMaterials because
+                        // changing a single material doesn't work for some reason
+                        List<Material> mats = new List<Material>();
+                        mats.AddRange(rend.sharedMaterials);
+                        mats[i] = _defaultInteriorMat;
+                        rend.sharedMaterials = mats.ToArray();
+                    }
+                }
+            }
+            
+            _customInteriorMat = new Material(_defaultInteriorMat);
         }
         else
         {
-            inSharedMat.SetColor("_Color", Color.white);
-            inSharedMat2.SetColor("_Color", Color.white);
-            inSharedMat3.SetColor("_Color", Color.white);
+            foreach (MeshRenderer rend in SELocator.GetShipTransform().GetComponentsInChildren<MeshRenderer>())
+            {
+                for (int i = 0; i < rend.sharedMaterials.Length; i++)
+                {
+                    if (rend.sharedMaterials[i] == null) continue;
+                    
+                    if (rend.sharedMaterials[i] == _defaultInteriorMat)
+                    {
+                        List<Material> mats = new List<Material>();
+                        mats.AddRange(rend.sharedMaterials);
+                        mats[i] = _customInteriorMat;
+                        rend.sharedMaterials = mats.ToArray();
+                    }
+                }
+            }
+            
+            if (blendInterior)
+            {
+                InteriorHullBlendController hullBlend = SELocator.GetShipBody()
+                    .gameObject.GetAddComponent<InteriorHullBlendController>();
+                hullBlend.AddSharedMaterial(_customInteriorMat);
+                hullBlend.AddSharedMaterial(inSharedMat2);
+                hullBlend.AddSharedMaterial(inSharedMat3);
+            }
+            else if (interior != "Default")
+            {
+                Color color = ThemeManager.GetHullTheme(interior).HullColor / 255f;
+                _customInteriorMat.SetColor("_Color", color);
+                inSharedMat2.SetColor("_Color", color);
+                inSharedMat3.SetColor("_Color", color);
+                WriteDebugMessage(_customInteriorMat.color);
+            }
         }
-
-        MeshRenderer cabinRenderer = SELocator.GetShipTransform().
-            Find("Module_Cabin/Geo_Cabin/Cabin_Geometry/Cabin_Exterior").GetComponent<MeshRenderer>();
-        Material outSharedMat = cabinRenderer.sharedMaterials[3];
 
         bool blendExterior = ((bool)enableColorBlending.GetProperty()
             && int.Parse((string)exteriorHullColorOptions.GetProperty()) > 1)
             || exterior == "Rainbow";
 
-        if (blendExterior)
+        if (!blendExterior && exterior == "Default")
         {
-            ExteriorHullBlendController hullBlend = SELocator.GetShipBody()
-                .gameObject.GetAddComponent<ExteriorHullBlendController>();
-            hullBlend.AddSharedMaterial(outSharedMat);
-        }
-        else if (exterior != "Default")
-        {
-            Color color = ThemeManager.GetHullTheme(exterior).HullColor / 255f;
-            outSharedMat.SetColor("_Color", color);
+            foreach (MeshRenderer rend in SELocator.GetShipTransform().GetComponentsInChildren<MeshRenderer>())
+            {
+                for (int i = 0; i < rend.sharedMaterials.Length; i++)
+                {
+                    if (rend.sharedMaterials[i] == null) continue;
+                    
+                    if (rend.sharedMaterials[i] == _customExteriorMat)
+                    {
+                        List<Material> mats = new List<Material>();
+                        mats.AddRange(rend.sharedMaterials);
+                        mats[i] = _defaultExteriorMat;
+                        rend.sharedMaterials = mats.ToArray();
+                    }
+                }
+            }
+            
+            _customExteriorMat = new Material(_defaultExteriorMat);
         }
         else
         {
-            outSharedMat.SetColor("_Color", Color.white);
+            foreach (MeshRenderer rend in SELocator.GetShipTransform().GetComponentsInChildren<MeshRenderer>())
+            {
+                for (int i = 0; i < rend.sharedMaterials.Length; i++)
+                {
+                    if (rend.sharedMaterials[i] == null) continue;
+                    
+                    if (rend.sharedMaterials[i] == _defaultExteriorMat)
+                    {
+                        List<Material> mats = new List<Material>();
+                        mats.AddRange(rend.sharedMaterials);
+                        mats[i] = _customExteriorMat;
+                        rend.sharedMaterials = mats.ToArray();
+                    }
+                }
+            }
+            
+            if (blendExterior)
+            {
+                ExteriorHullBlendController hullBlend = SELocator.GetShipBody()
+                    .gameObject.GetAddComponent<ExteriorHullBlendController>();
+                hullBlend.AddSharedMaterial(_customExteriorMat);
+            }
+            else if (exterior != "Default")
+            {
+                Color color = ThemeManager.GetHullTheme(exterior).HullColor / 255f;
+                _customExteriorMat.SetColor("_Color", color);
+            }
         }
     }
 
@@ -3120,8 +3208,6 @@ public class ShipEnhancements : ModBehaviour
 
     public static void WriteDebugMessage(object msg, bool warning = false, bool error = false)
     {
-        return;
-
         msg ??= "null";
 
         if (warning)
