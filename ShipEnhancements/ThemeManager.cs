@@ -13,6 +13,7 @@ public class ThemeManager
     private IDictionary<string, HullTheme> _nameToHullTheme;
     private IDictionary<string, ThrusterTheme> _nameToThrusterTheme;
     private IDictionary<string, DamageTheme> _nameToDamageTheme;
+    private IDictionary<string, string> _hullTexturePaths;
 
     public ThemeManager(string resourceName)
     {
@@ -22,7 +23,8 @@ public class ThemeManager
         
         ShipEnhancements.WriteDebugMessage("theme manager initialized");
     }
-    
+
+    public string GetHullTexturePath(string name) => _hullTexturePaths[name];
     public LightTheme GetLightTheme(string name) => _nameToLightTheme[name];
     public HullTheme GetHullTheme(string name) => _nameToHullTheme[name];
     public ThrusterTheme GetThrusterTheme(string name) => _nameToThrusterTheme[name];
@@ -62,6 +64,15 @@ public class ThemeManager
                 theme => theme.Name,
                 theme => theme
             );
+
+        _hullTexturePaths = new Dictionary<string, string>();
+        foreach (var (key, value) in data.TexturePaths)
+        {
+            if (value is string str)
+            {
+                _hullTexturePaths.Add(key, str);
+            }
+        }
     }
 }
 

@@ -536,33 +536,21 @@ public static class SEMenuManager
 					addedSetting.SetSiblingIndex(insertionIndex);
 					insertionIndex++;
 
-					if ((bool)enableColorBlending.GetValue() && GetDecorationSettings().Contains(name))
+					if (GetDecorationSettings().Contains(name) && ShouldSplitDecoration(name))
 					{
-						string stem = name.Substring(0, name.Length - 6);
-						if (_stemToSuffix.ContainsKey(stem) && stem != "indicator"
-							&& name.Substring(name.Length - 1)
-							== (string)(stem + "ColorOptions").AsEnum<Settings>().GetValue())
-						{
-							OptionsMenuManager.AddSeparator(newModTab, false);
-							var sep = settingsParent.GetChild(settingsParent.childCount - 1);
-							sep.name = "UIElement-" + label;
-							sep.SetSiblingIndex(insertionIndex);
-							insertionIndex++;
-						}
+						OptionsMenuManager.AddSeparator(newModTab, false);
+						var sep = settingsParent.GetChild(settingsParent.childCount - 1);
+						sep.name = "UIElement-" + label;
+						sep.SetSiblingIndex(insertionIndex);
+						insertionIndex++;
 					}
 				}
 			}
 			else
 			{
-				if ((bool)enableColorBlending.GetValue() && GetDecorationSettings().Contains(name))
+				if (GetDecorationSettings().Contains(name) && ShouldSplitDecoration(name))
 				{
-					string stem = name.Substring(0, name.Length - 6);
-					if (_stemToSuffix.ContainsKey(stem) && stem != "indicator"
-						&& name.Substring(name.Length - 1)
-						== (string)(stem + "ColorOptions").AsEnum<Settings>().GetValue())
-					{
-						OptionsMenuManager.AddSeparator(newModTab, false);
-					}
+					OptionsMenuManager.AddSeparator(newModTab, false);
 				}
 			}
 		}
@@ -624,6 +612,33 @@ public static class SEMenuManager
 		ModHelper.Events.Unity.FireInNUpdates(() => { scrollbar.value = lastScrollValue; }, 2);
 
 		ModHelper.Events.Unity.FireInNUpdates(() => { _detectValueChanged = true; }, 5);
+	}
+
+	private static bool ShouldSplitDecoration(string name)
+	{
+		if (name == "enableColorBlending") return true;
+		
+		if (name.Contains("HullTexture"))
+		{
+			string hull = name.Replace("Texture", "");
+			if (!(bool)(hull + "Type").AsEnum<Settings>().GetValue())
+			{
+				return true;
+			}
+		}
+		
+		string stem = name.Substring(0, name.Length - 6);
+		bool correctStem = _stemToSuffix.ContainsKey(stem) && stem != "indicator";
+
+		if (!correctStem) return false;
+		
+		if (!(bool)enableColorBlending.GetValue() && name.Substring(name.Length - 1) == "1")
+		{
+			return true;
+		}
+		
+		return name.Substring(name.Length - 1) == 
+			(string)(stem + "ColorOptions").AsEnum<Settings>().GetValue();
 	}
 
 	private static void CreateSideLabel(Menu menu, string label)
@@ -804,12 +819,35 @@ public static class SEMenuManager
 
 		if (GetDecorationSettings().Contains(name))
 		{
+			if (name.Contains("teriorHullType"))
+			{
+				return false;
+			}
+
+			if (name.Contains("Hull"))
+			{
+				string hull = name.Substring(0, 12);
+				bool usingColor = (bool)(hull + "Type").AsEnum<Settings>().GetValue();
+				bool isTex = name.Substring(name.Length - 7) == "Texture";
+
+				if ((isTex && usingColor) || (!isTex && !usingColor))
+				{
+					return true;
+				}
+				if (isTex && !usingColor)
+				{
+					return false;
+				}
+			}
+			
+			// if color blending is off, hide settings that don't end in 1
 			if (name != "enableColorBlending" && !(bool)enableColorBlending.GetValue()
 				&& (!int.TryParse(name.Substring(name.Length - 1), out int value) || value != 1))
 			{
 				return true;
 			}
 
+			// if color blending is on, hide color settings that don't match their color options
 			if (name.Length >= 6)
 			{
 				string stem = name.Substring(0, name.Length - 6);

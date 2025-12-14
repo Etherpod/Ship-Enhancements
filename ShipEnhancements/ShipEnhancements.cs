@@ -249,6 +249,10 @@ public class ShipEnhancements : ModBehaviour
         enableQuantumShip,
         persistentShipState,
         enableGasLeak,
+        interiorHullType,
+        interiorHullTexture,
+        exteriorHullType,
+        exteriorHullTexture
     }
 
     private string[] startupMessages =
@@ -1058,6 +1062,8 @@ public class ShipEnhancements : ModBehaviour
             (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_NOM_Sandstone_mat.mat"),
             (Material)LoadAsset("Assets/ShipEnhancements/CockpitWindowFrost_Material.mat"),
             (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_WaterGaugeMetal_mat.mat"),
+            _customInteriorMat,
+            _customExteriorMat
         };
         Transform cockpitLight = SELocator.GetShipTransform().Find("Module_Cockpit/Lights_Cockpit/Pointlight_HEA_ShipCockpit");
         List<Material> materials = [.. cockpitLight.GetComponent<LightmapController>()._materials];
@@ -2569,8 +2575,10 @@ public class ShipEnhancements : ModBehaviour
         bool blendInterior = ((bool)enableColorBlending.GetProperty()
             && int.Parse((string)interiorHullColorOptions.GetProperty()) > 1)
             || interior == "Rainbow";
+        bool interiorTex = !(bool)interiorHullType.GetProperty() && 
+            (string)interiorHullTexture.GetProperty() != "None";
 
-        if (!blendInterior && interior == "Default")
+        if (!blendInterior && interior == "Default" && !interiorTex)
         {
             inSharedMat2.SetColor("_Color", Color.white);
             inSharedMat3.SetColor("_Color", Color.white);
@@ -2612,8 +2620,32 @@ public class ShipEnhancements : ModBehaviour
                     }
                 }
             }
-            
-            if (blendInterior)
+
+            if (interiorTex)
+            {
+                string path = ThemeManager.GetHullTexturePath((string)interiorHullTexture.GetProperty());
+                Texture2D color = (Texture2D)LoadAsset(path + "_d.png");
+                Texture2D normal = (Texture2D)LoadAsset(path + "_n.png");
+                Texture2D smooth = (Texture2D)LoadAsset(path + "_s.png");
+
+                Material[] mats = [_customInteriorMat, inSharedMat2, inSharedMat3];
+                foreach (Material mat in mats)
+                {
+                    if (color != null)
+                    {
+                        mat.SetTexture("_MainTex", color);
+                    }
+                    if (normal != null)
+                    {
+                        mat.SetTexture("_BumpMap", normal);
+                    }
+                    if (smooth != null)
+                    {
+                        mat.SetTexture("_MetallicGlossMap", smooth);
+                    }
+                }
+            }
+            else if (blendInterior)
             {
                 InteriorHullBlendController hullBlend = SELocator.GetShipBody()
                     .gameObject.GetAddComponent<InteriorHullBlendController>();
@@ -2634,8 +2666,10 @@ public class ShipEnhancements : ModBehaviour
         bool blendExterior = ((bool)enableColorBlending.GetProperty()
             && int.Parse((string)exteriorHullColorOptions.GetProperty()) > 1)
             || exterior == "Rainbow";
+        bool exteriorTex = !(bool)exteriorHullType.GetProperty() && 
+            (string)exteriorHullTexture.GetProperty() != "None";
 
-        if (!blendExterior && exterior == "Default")
+        if (!blendExterior && exterior == "Default" && !exteriorTex)
         {
             foreach (MeshRenderer rend in SELocator.GetShipTransform().GetComponentsInChildren<MeshRenderer>())
             {
@@ -2673,7 +2707,27 @@ public class ShipEnhancements : ModBehaviour
                 }
             }
             
-            if (blendExterior)
+            if (exteriorTex)
+            {
+                string path = ThemeManager.GetHullTexturePath((string)exteriorHullTexture.GetProperty());
+                Texture2D color = (Texture2D)LoadAsset(path + "_d.png");
+                Texture2D normal = (Texture2D)LoadAsset(path + "_n.png");
+                Texture2D smooth = (Texture2D)LoadAsset(path + "_s.png");
+
+                if (color != null)
+                {
+                    _customExteriorMat.SetTexture("_MainTex", color);
+                }
+                if (normal != null)
+                {
+                    _customExteriorMat.SetTexture("_BumpMap", normal);
+                }
+                if (smooth != null)
+                {
+                    _customExteriorMat.SetTexture("_MetallicGlossMap", smooth);
+                }
+            }
+            else if (blendExterior)
             {
                 ExteriorHullBlendController hullBlend = SELocator.GetShipBody()
                     .gameObject.GetAddComponent<ExteriorHullBlendController>();
@@ -2686,7 +2740,7 @@ public class ShipEnhancements : ModBehaviour
             }
         }
     }
-
+    
     private void SetDamageColors()
     {
         string color = (string)indicatorColor1.GetProperty();

@@ -39,13 +39,12 @@
       "type": "separator",
       "title": "Disable Ship Parts"
     },
-
+    
     "disableComponentsSplit": {
       "type": "separator",
       "title": "Components",
       "tooltip": "side"
     },
-
     "disableGravityCrystal": {
       "title": "Disable Ship Gravity",
       "type": "toggle",
@@ -714,8 +713,10 @@
     },
 
     "enableShipTemperature": {
-      "title": "Enable Ship Temperature",
+      "title": "Ship Temperature",
       "type": "toggle",
+      "yes": "Enable",
+      "no": "Disable",
       "value": false,
       "tooltip": "Adds a temperature mechanic to the ship. Check the README for more details about how it works."
     },
@@ -770,8 +771,10 @@
     },
 
     "addWaterTank": {
-      "title": "Use Water Tank",
+      "title": "Ship Water Tank",
       "type": "toggle",
+      "yes": "Enable",
+      "no": "Disable",
       "value": false,
       "tooltip": "Adds water as a new resource, making use of the water tank attached to the back of the ship. It can be refilled using the Resource Pump."
     },
@@ -857,7 +860,9 @@
     },
 
     "enableColorBlending": {
-      "title": "Enable Color Blending",
+      "title": "Color Blending",
+      "yes": "Enable",
+      "no": "Disable",
       "type": "toggle",
       "value": false,
       "tooltip": "Lets you blend the decorations between different colors based on chosen parameters."
@@ -965,6 +970,34 @@
       ],
       "tooltip": "Changes the color of the interior and exterior ship lights."
     },
+    "interiorHullType": {
+      "title": "Interior Hull Type",
+      "type": "toggle",
+      "yes": "Color",
+      "no": "Texture",
+      "value": true,
+      "tooltip": "Determines whether to apply a color or a texture to the interior hull."
+    },
+    "interiorHullTexture": {
+      "title": "Interior Hull Texture",
+      "type": "selector",
+      "options": [
+        "None",
+        "Nomai Stone",
+        "Nomai Pattern",
+        "Nomai Metal",
+        "Wooden",
+        "Metal",
+        "Rusted Metal",
+        "Mossy",
+        "Snowy",
+        "Ember Twin Rock",
+        "Ash Twin Rock",
+        "Quantum Rock"
+      ],
+      "value": "None",
+      "tooltip": "Changes the texture of the hull inside of the ship."
+    },
     "interiorHullColorBlend": {
       "title": "Interior Hull Blend",
       "type": "selector",
@@ -1055,6 +1088,34 @@
         "Rainbow"
       ],
       "tooltip": "Changes the color of the inside of the ship."
+    },
+    "exteriorHullType": {
+      "title": "Exterior Hull Type",
+      "type": "toggle",
+      "yes": "Color",
+      "no": "Texture",
+      "value": true,
+      "tooltip": "Determines whether to apply a color or a texture to the exterior hull."
+    },
+    "exteriorHullTexture": {
+      "title": "Exterior Hull Texture",
+      "type": "selector",
+      "options": [
+        "None",
+        "Nomai Stone",
+        "Nomai Pattern",
+        "Nomai Metal",
+        "Wooden",
+        "Metal",
+        "Rusted Metal",
+        "Mossy",
+        "Snowy",
+        "Ember Twin Rock",
+        "Ash Twin Rock",
+        "Quantum Rock"
+      ],
+      "value": "None",
+      "tooltip": "Changes the texture of the hull inside of the ship."
     },
     "exteriorHullColorBlend": {
       "title": "Exterior Hull Blend",

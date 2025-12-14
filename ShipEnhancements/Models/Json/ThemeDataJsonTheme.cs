@@ -5,6 +5,7 @@ using System.Collections.Generic;
 namespace ShipEnhancements.Models.Json;
 
 public record ThemeDataJsonTheme(
+    [JsonProperty("texturePaths")] Dictionary<string, object> TexturePaths,
     [JsonProperty("lightThemes")] List<LightThemeDataJson> LightThemes,
     [JsonProperty("hullThemes")] List<HullThemeDataJson> HullThemes,
     [JsonProperty("thrusterThemes")] List<ThrusterThemeDataJson> ThrusterThemes,

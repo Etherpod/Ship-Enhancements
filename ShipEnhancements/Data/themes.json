@@ -1,4 +1,17 @@
 ﻿{
+  "texturePaths": {
+    "Nomai Stone": "Assets/ShipEnhancements/ShipSkins/SE_Nomai_v3",
+    "Nomai Pattern": "Assets/ShipEnhancements/ShipSkins/SE_Nomai_v1",
+    "Nomai Metal": "Assets/ShipEnhancements/ShipSkins/SE_Nomai_v2",
+    "Wooden": "Assets/ShipEnhancements/ShipSkins/SE_Wooden",
+    "Metal": "Assets/ShipEnhancements/ShipSkins/SE_Metal",
+    "Rusted Metal": "Assets/ShipEnhancements/ShipSkins/SE_RustedMetal",
+    "Mossy": "Assets/ShipEnhancements/ShipSkins/SE_Mossy",
+    "Snowy": "Assets/ShipEnhancements/ShipSkins/SE_Snowy",
+    "Ember Twin Rock": "Assets/ShipEnhancements/ShipSkins/SE_EmberTwinRock",
+    "Ash Twin Rock": "Assets/ShipEnhancements/ShipSkins/SE_AshTwinRock",
+    "Quantum Rock": "Assets/ShipEnhancements/ShipSkins/SE_QuantumRock"
+  },
   "lightThemes": [
     {
       "name": "Red",
