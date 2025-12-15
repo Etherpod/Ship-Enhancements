@@ -27,9 +27,9 @@ Permanently remove useless or very important parts of the ship.
 ### *Components*
 - **Gravity Crystal**: You are now only affected by outside sources of gravity. If you're in space you'll just float.
 - **Headlights**: Disables your ship's headlights and landing camera light. You may need to rely on your scout for light.
-- **Landing Camera**: Good luck.
+- **Landing Camera**: Turns your landing camera screen into incomprehensible static. Good luck out there.
 - **Oxygen**: Literally removes all of the oxygen in the ship unless you're near trees or in an oxygen-filled atmosphere. This takes priority over all of the other oxygen modifications.
-- **Interior/Exterior Lights**: Makes your ship very dark.
+- **Interior/Exterior Lights**: Makes your ship very dark and very hard to spot against the backdrop of space.
 - **Ship Scout Recall**: Removes your ability to recall the scout using the ship. The scout must be manually docked on the ship's scout launcher to fire, and can only be recalled using the handheld scout launcher.
 - **Ship Scout Launching**: Removes your ability to launch the scout from the ship. You'll have to do this yourself outside of the ship.
 - **Handheld Scout Recall**: Removes your abillity to recall the scout on foot. If you shoot your scout somewhere, you'll have to walk over and pick it up by hand to use it again. If you accidentally launch it into deep space, don't worry; if the ship can still recall it, you can go retrieve it from the top of the ship in the scout launcher.
@@ -39,7 +39,7 @@ Permanently remove useless or very important parts of the ship.
 - **Damage Indicators**: Turns off all of those pesky notifications about parts of your ship being damaged, including the master alarm. Keep an eye or four on the reactor, please.
 - **Eject Button**: Covers the eject button with tape so that your friend can't keep ejecting the cockpit while you're trying to fly.
 - **Seatbelt**: Breaks a number of state laws by removing your seatbelt. If you crash into something with enough force you'll fly out of the chair.
-- **Ship Suit**: Removes your spacesuit from the ship. Space exploration just got a whole lot more dangerous.
+- **Ship Suit**: Removes your spacesuit from the ship. Space exploration just got a whole lot more dangerous!
 - **Medkit**: Prevents you from healing inside the ship. Marshmallows might end up being your only way to regain health.
 - **Hatch**: Removes the hatch, leaving a gaping hole in your ship. Be careful when you're walking around in there!
 - **Single-Use Tractor Beam**: Turns off the ship's tractor beam after you enter the ship for the first time. If you leave without your suit, you might have trouble getting back in again.
@@ -69,9 +69,9 @@ Change some of the ways the ship works to make gameplay easier, harder, or just 
 - **Damage Multiplier**: Larger numbers increase the damage done to the ship hull and increase the probability that components will be damaged on impact.
 - **Damage Speed Multiplier**: Larger numbers increase the speed you need to be traveling at before taking damage. Set this to something really small to blow up your ship when you touch something.
 - **Random Hull Damage**: Applies random damage to a random set of hulls on the start of the loop. The slider controls the percentage of hulls to be damaged- minimum is none, maximum is all of them- and how much damage to do to them.
-- **Random Component Damage**: Breaks a set number of random components at the start of the loop. The silder controls the percentage of components to be damaged, where the minimum is none and the maximum is all of them. The vital ship components (reactor, fuel tank, one random thruster) are excluded from being selected.
+- **Random Component Damage**: Breaks a set number of random components at the start of the loop. The silder controls the percentage of components to be damaged, where the minimum is none and the maximum is all of them. The vital ship components (reactor, fuel tank, one random thruster) will never be damaged by this setting.
 - **Enable Stun Damage**: Blocks all of your inputs for a short time after you crash. The harder you hit something, the longer you'll be frozen.
-- **Enable Fragile Ship**: Prevents you from moving your ship if the ship is damaged at all.
+- **Enable Fragile Ship**: Prevents you from piloting your ship if the ship is damaged at all.
 - **Prevent System Failure**: Keeps your ship up and running as long as the cockpit is still attached.
 - **Ship Water Damage**: Determines how much damage your ship should sustain while submerged in water. Max damage will instantly blow up your ship.
 - **Ship Sand Damage**: Determines how much damage your ship should sustain while being bombarded by falling sand. Max damage will instantly blow up your ship.
@@ -88,9 +88,9 @@ Change some of the ways the ship works to make gameplay easier, harder, or just 
 
 ### *Ship Components*
 - **Ship Gravity Multiplier**: Larger numbers increase the strength of your ship's gravity crystal. Large numbers are advised against, however, as exiting your ship will kill you.
-- **Ship Gravity Direction**: Lets you change the direction of your ship's gravity. Set this to Random if you feel like the game isn't painful enough.
+- **Ship Gravity Direction**: Lets you change the direction of your ship's gravity. Set this to "Random" if you feel like the game isn't painful enough.
 - **Reactor Lifetime Multiplier**: Larger numbers increase the time it takes for the reactor to blow up when it has been damaged. Set this to something small to give yourself a panic attack every time the master alarm goes off.
-- **Ship Explosion Multiplier**: Larger numbers increase the size of the explosion that is created when your ship blows up. Don't go above 30.
+- **Ship Explosion Multiplier**: Larger numbers increase the size of the explosion that is created when your ship blows up. Don't go above 100.
 - **Extra Explosion Damage**: Gives explosions the ability to damage your ship and fragments of Brittle Hollow. Also lets you kill anglerfish.
 - **Keep Power On**: Prevents the lights and other electrical parts from turning off when you leave the ship.
 
@@ -146,7 +146,7 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Gravity Landing Gear**: Adds an interface to the cockpit that controls the new gravity technology built into your ship's landing gear. It will stop working if your landing gear is damaged.
   - The purple switch turns the gravity landing gear on/off.
   - The green switch inverts the gravity, pushing you away from surfaces instead of pulling you towards them.
-- **Thrust Modulator**: Adds an interface to the cockpit that lets you lower or disproportionately raise the maximum thrust your ship can use. Stacks with the smooth thrust option from General Enhancements.
+- **Thrust Modulator**: Adds an interface to the cockpit that lets you lower or disproportionately raise the maximum thrust your ship can use. Stacks with the smooth thrust option from **General Enhancements**.
   - The orange buttons let you set a limit on your maximum thrust.
   - The two rectangular buttons to the left of the orange buttons control the overdrive. Press the green button to disable the safeties, then once the bottom button turns yellow, press it to activate the overdrive. Make sure you're buckled up before the overdrive activates.
 - **Auto Align Controls**: Adds an interface to the cockpit that lets you automatically rotate your ship to face the current lock-on target.
@@ -158,7 +158,7 @@ Some new stuff that Slate didn't have time to include in the ship.
   - The top left button (turquoise) activates the default autopilot function. It will fly towards the lock-on target.
   - The bottom left button (blue) activates orbital autopilot, which will find a stable orbit around the lock-on target or the planet you're currently on.
   - The center button (red) activates input hold, which will put the ship in recording mode. While in recording mode, give the ship a thrust input (up, down, left, etc.) and turn off recording mode while holding that input. Now you can let go of everything, and it will keep holding that thrust until you press the button again.
-    - Don't forget that while the red button is lit up, the match velocity button will also activate it! It's a lot easier to use that than trying to press the tiny red button every time.
+    - Don't forget that while the red button is lit up, the match velocity keybind (the spacebar on keyboard) will also activate recording mode! It's a lot easier to use that than trying to press the tiny red button every time.
   - The top right button (orange) activates the default match velocity. It will match velocity with whatever your lock-on target is.
   - The bottom right button (dark orange) activates position hold. It will remain at whatever position you activate it at relative to the lock-on target.
     - If you fly above a tree and activate position hold, the ship will try to stay above the tree. If it gets knocked away by something, it'll fly back to where it was.
@@ -195,7 +195,8 @@ Temperature zones are not only added to the vanilla solar system, but are also a
 ### *Water*
 - **Use Water Tank**: Unlocks the settings below and adds water as a new resource to your ship. Other features will drain it to function.
 - **Water Drain Multiplier**: Larger numbers make the ship's water drain faster.
-- **Add Water Cooling**: Adds a lever next to the ship log that turns on water cooling, which will drain water to prevent your ship from getting hot (meant to be used along with ship temperature).
+- **Add Water Cooling**: Adds a lever next to the ship log that turns on water cooling, which will drain water to prevent your ship from getting hot. The hotter it is, the faster the water will drain.
+  - This feature is meant to be used with **Ship Temperature** enabled, but you can still use it without enabling temperature. The lever just won't really do anything.
 
 ### *Miscellaneous*
 - **Ship Horn**: Lets you honk by pressing the flashlight keybind while the ship's signalscope is equipped. You can pick from a variety of horn noises.
@@ -267,7 +268,7 @@ To use the API, copy the **IShipEnhancements** script from this mod's GitHub rep
 
 ## Known Bugs
 Some bugs introduced by this mod that I have no idea how to fix.
-- When playing in multiplayer and using Input Latency, the delayed inputs of the non-hosts will not work once they leave the flight console
+- When playing in multiplayer and using **Ship Input Latency**, the delayed inputs of the non-hosts will not work once they leave the flight console
 - If you attach yourself to an object with a tether and the object enters a black hole, there is a chance you will be violently thrown across the solar system
 - Reeling in towards a tether hook on the other side of a wall will sometimes produce unintended side effects
 
