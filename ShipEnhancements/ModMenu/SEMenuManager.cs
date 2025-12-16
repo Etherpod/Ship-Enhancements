@@ -616,7 +616,7 @@ public static class SEMenuManager
 
 	private static bool ShouldSplitDecoration(string name)
 	{
-		if (name == "enableColorBlending") return true;
+		if (name is "enableColorBlending" or "shipGlassTexture") return true;
 		
 		if (name.Contains("HullTexture"))
 		{
@@ -819,7 +819,7 @@ public static class SEMenuManager
 
 		if (GetDecorationSettings().Contains(name))
 		{
-			if (name.Contains("teriorHullType"))
+			if (name.Contains("teriorHullType") || name == "shipGlassTexture")
 			{
 				return false;
 			}

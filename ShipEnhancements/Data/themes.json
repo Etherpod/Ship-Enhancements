@@ -1,16 +1,75 @@
 ﻿{
-  "texturePaths": {
-    "Nomai Stone": "Assets/ShipEnhancements/ShipSkins/SE_Nomai_v3",
-    "Nomai Pattern": "Assets/ShipEnhancements/ShipSkins/SE_Nomai_v1",
-    "Nomai Metal": "Assets/ShipEnhancements/ShipSkins/SE_Nomai_v2",
-    "Wooden": "Assets/ShipEnhancements/ShipSkins/SE_Wooden",
-    "Metal": "Assets/ShipEnhancements/ShipSkins/SE_Metal",
-    "Rusted Metal": "Assets/ShipEnhancements/ShipSkins/SE_RustedMetal",
-    "Mossy": "Assets/ShipEnhancements/ShipSkins/SE_Mossy",
-    "Snowy": "Assets/ShipEnhancements/ShipSkins/SE_Snowy",
-    "Ember Twin Rock": "Assets/ShipEnhancements/ShipSkins/SE_EmberTwinRock",
-    "Ash Twin Rock": "Assets/ShipEnhancements/ShipSkins/SE_AshTwinRock",
-    "Quantum Rock": "Assets/ShipEnhancements/ShipSkins/SE_QuantumRock"
+  "hullTexturePaths": {
+    "Nomai Stone": {
+      "path": "Assets/ShipEnhancements/ShipSkins/SE_NomaiStone",
+      "smoothness": 1,
+      "normalScale": 0.4
+    },
+    "Nomai Pattern": {
+      "path": "Assets/ShipEnhancements/ShipSkins/SE_NomaiPattern",
+      "smoothness": 1,
+      "normalScale": 1
+    },
+    "Nomai Metal": {
+      "path": "Assets/ShipEnhancements/ShipSkins/SE_Nomai_v2",
+      "smoothness": 0.84,
+      "normalScale": 1
+    },
+    "Wooden": {
+      "path": "Assets/ShipEnhancements/ShipSkins/SE_Wooden",
+      "smoothness": 1,
+      "normalScale": 0.5
+    },
+    "Light Metal": {
+      "path": "Assets/ShipEnhancements/ShipSkins/SE_LightMetal",
+      "smoothness": 1,
+      "normalScale": 1
+    },
+    "Dark Metal": {
+      "path": "Assets/ShipEnhancements/ShipSkins/SE_DarkMetal",
+      "smoothness": 1,
+      "normalScale": 1
+    },
+    "Rusted Metal": {
+      "path": "Assets/ShipEnhancements/ShipSkins/SE_RustedMetal",
+      "smoothness": 1,
+      "normalScale": 1
+    },
+    "Moss": {
+      "path": "Assets/ShipEnhancements/ShipSkins/SE_Mossy",
+      "smoothness": 0.19,
+      "normalScale": 0.2
+    },
+    "Snow": {
+      "path": "Assets/ShipEnhancements/ShipSkins/SE_Snowy",
+      "smoothness": 1,
+      "normalScale": 0.5
+    },
+    "Ember Twin Rock": {
+      "path": "Assets/ShipEnhancements/ShipSkins/SE_EmberTwinRock",
+      "smoothness": 0.65,
+      "normalScale": 0.8
+    },
+    "Ash Twin Rock": {
+      "path": "Assets/ShipEnhancements/ShipSkins/SE_AshTwinRock",
+      "smoothness": 0.65,
+      "normalScale": 0.75
+    },
+    "Quantum Rock": {
+      "path": "Assets/ShipEnhancements/ShipSkins/SE_QuantumRock",
+      "smoothness": 0.5,
+      "normalScale": 0.3
+    }
+  },
+  "glassMaterialPaths": {
+    "Nomai Glass": "Assets/ShipEnhancements/ShipSkins/CockpitMaterials/Structure_NOM_Glass_Opaque_mat.mat",
+    "Stranger Glass": "Assets/ShipEnhancements/ShipSkins/CockpitMaterials/Effects_DW_GlowingGlass_mat.mat",
+    "Thick Glass": "Assets/ShipEnhancements/ShipSkins/CockpitMaterials/Structure_DW_DullGlass_mat.mat",
+    "Geode": "Assets/ShipEnhancements/ShipSkins/CockpitMaterials/Terrain_BH_RockGeode_v2_mat.mat",
+    "Ice": "Assets/ShipEnhancements/ShipSkins/CockpitMaterials/Effects_CO_MeltingIce_mat.mat",
+    "Gravity Crystal": "Assets/ShipEnhancements/ShipSkins/CockpitMaterials/Props_NOM_GravityCrystal_mat.mat",
+    "Ghost Matter": "Assets/ShipEnhancements/ShipSkins/CockpitMaterials/Terrain_GM_Crystal_mat.mat",
+    "Egg": "Assets/ShipEnhancements/ShipSkins/CockpitMaterials/Props_DB_Egg_mat.mat"
   },
   "lightThemes": [
     {

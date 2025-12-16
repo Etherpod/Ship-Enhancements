@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using ShipEnhancements.Models.Json;
 using UnityEngine;
 
@@ -13,7 +14,8 @@ public class ThemeManager
     private IDictionary<string, HullTheme> _nameToHullTheme;
     private IDictionary<string, ThrusterTheme> _nameToThrusterTheme;
     private IDictionary<string, DamageTheme> _nameToDamageTheme;
-    private IDictionary<string, string> _hullTexturePaths;
+    private IDictionary<string, HullTexturePath> _hullTexturePaths;
+    private IDictionary<string, string> _glassMaterialPaths;
 
     public ThemeManager(string resourceName)
     {
@@ -24,7 +26,8 @@ public class ThemeManager
         ShipEnhancements.WriteDebugMessage("theme manager initialized");
     }
 
-    public string GetHullTexturePath(string name) => _hullTexturePaths[name];
+    public HullTexturePath GetHullTexturePath(string name) => _hullTexturePaths[name];
+    public string GetGlassMaterialPath(string name) => _glassMaterialPaths[name];
     public LightTheme GetLightTheme(string name) => _nameToLightTheme[name];
     public HullTheme GetHullTheme(string name) => _nameToHullTheme[name];
     public ThrusterTheme GetThrusterTheme(string name) => _nameToThrusterTheme[name];
@@ -65,12 +68,21 @@ public class ThemeManager
                 theme => theme
             );
 
-        _hullTexturePaths = new Dictionary<string, string>();
-        foreach (var (key, value) in data.TexturePaths)
+        _hullTexturePaths = new Dictionary<string, HullTexturePath>();
+        foreach (var (key, value) in data.HullTexturePaths)
+        {
+            if (value is JObject obj)
+            {
+                _hullTexturePaths.Add(key, HullTexturePath.From(obj));
+            }
+        }
+        
+        _glassMaterialPaths = new Dictionary<string, string>();
+        foreach (var (key, value) in data.GlassMaterialPaths)
         {
             if (value is string str)
             {
-                _hullTexturePaths.Add(key, str);
+                _glassMaterialPaths.Add(key, str);
             }
         }
     }
@@ -161,3 +173,31 @@ public record DamageTheme(
         );
     }
 };
+
+public record HullTexturePath(string path, float smoothness, float normalScale)
+{
+    internal static HullTexturePath From(JObject dict)
+    {
+        string path = "";
+        float smoothness = 0.65f;
+        float normalScale = 0.3f;
+        
+        if (dict.ContainsKey("path"))
+        {
+            path = (string)dict["path"];
+            ShipEnhancements.WriteDebugMessage("path: " + path);
+        }
+        
+        if (dict.ContainsKey("smoothness"))
+        {
+            smoothness = (float)dict["smoothness"];
+        }
+
+        if (dict.ContainsKey("normalScale"))
+        {
+            normalScale = (float)dict["normalScale"];
+        }
+
+        return new HullTexturePath(path, smoothness, normalScale);
+    }
+}
