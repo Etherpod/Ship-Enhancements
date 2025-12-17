@@ -77,8 +77,10 @@ public static class SEMenuManager
 	private static readonly Dictionary<string, string> _stemToSuffix = new()
 	{
 		{ "shipLight", "Light Color" },
-		{ "interiorHull", "Interior Color" },
-		{ "exteriorHull", "Exterior Color" },
+		{ "interiorHull", "Interior Hull Color" },
+		{ "exteriorHull", "Exterior Hull Color" },
+		{ "interiorWood", "Interior Wood Color" },
+		{ "exteriorWood", "Exterior Wood Color" },
 		{ "thruster", "Thruster Color" },
 		{ "indicator", "Indicator Color" }
 	};
@@ -618,7 +620,7 @@ public static class SEMenuManager
 	{
 		if (name is "enableColorBlending" or "shipGlassTexture") return true;
 		
-		if (name.Contains("HullTexture"))
+		if (name.Contains("Texture"))
 		{
 			string hull = name.Replace("Texture", "");
 			if (!(bool)(hull + "Type").AsEnum<Settings>().GetValue())

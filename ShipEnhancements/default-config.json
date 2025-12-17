@@ -1003,7 +1003,7 @@
         "Nomai Stone",
         "Nomai Pattern",
         "Nomai Metal",
-        "Wooden",
+        "Polished Wood",
         "Light Metal",
         "Dark Metal",
         "Rusted Metal",
@@ -1063,7 +1063,7 @@
         "Dark Gray",
         "Rainbow"
       ],
-      "tooltip": "Changes the color of the inside of the ship."
+      "tooltip": "Changes the color of the hull inside of the ship."
     },
     "interiorHullColor2": {
       "title": "Interior Hull Color",
@@ -1084,7 +1084,7 @@
         "Dark Gray",
         "Rainbow"
       ],
-      "tooltip": "Changes the color of the inside of the ship."
+      "tooltip": "Changes the color of the hull inside of the ship."
     },
     "interiorHullColor3": {
       "title": "Interior Hull Color",
@@ -1105,7 +1105,125 @@
         "Dark Gray",
         "Rainbow"
       ],
-      "tooltip": "Changes the color of the inside of the ship."
+      "tooltip": "Changes the color of the hull inside of the ship."
+    },
+    "interiorWoodType": {
+      "title": "Interior Wood Type",
+      "type": "toggle",
+      "yes": "Color",
+      "no": "Texture",
+      "value": true,
+      "tooltip": "Determines whether to apply a color or a texture to the interior wood."
+    },
+    "interiorWoodTexture": {
+      "title": "Interior Wood Texture",
+      "type": "selector",
+      "options": [
+        "None",
+        "Nomai Stone",
+        "Nomai Pattern",
+        "Nomai Metal",
+        "Polished Wood",
+        "Dark Metal",
+        "Moss",
+        "Snow",
+        "Ember Twin Rock",
+        "Ash Twin Rock",
+        "Quantum Rock"
+      ],
+      "value": "None",
+      "tooltip": "Changes the texture of the wood inside of the ship."
+    },
+    "interiorWoodColorBlend": {
+      "title": "Interior Wood Blend",
+      "type": "selector",
+      "value": "Time",
+      "options": [
+        "Time",
+        "Fuel",
+        "Oxygen",
+        "Ship Damage %",
+        "Reactor State",
+        "Velocity",
+        "Gravity",
+        "Temperature",
+        "Ship Temperature"
+      ],
+      "tooltip": "Sets the method of blending between colors."
+    },
+    "interiorHullWoodOptions": {
+      "title": "Interior Wood Color Options",
+      "type": "selector",
+      "value": "1",
+      "options": [
+        "1",
+        "2",
+        "3"
+      ],
+      "tooltip": "Sets the number of colors to blend between."
+    },
+    "interiorWoodColor1": {
+      "title": "Interior Wood Color",
+      "type": "selector",
+      "value": "Default",
+      "options": [
+        "Default",
+        "Red",
+        "Orange",
+        "Golden",
+        "Green",
+        "Mint",
+        "Turquoise",
+        "Blue",
+        "Lavender",
+        "Pink",
+        "Hot Pink",
+        "Dark Gray",
+        "Rainbow"
+      ],
+      "tooltip": "Changes the color of the wood inside of the ship."
+    },
+    "interiorWoodColor2": {
+      "title": "Interior Wood Color",
+      "type": "selector",
+      "value": "Default",
+      "options": [
+        "Default",
+        "Red",
+        "Orange",
+        "Golden",
+        "Green",
+        "Mint",
+        "Turquoise",
+        "Blue",
+        "Lavender",
+        "Pink",
+        "Hot Pink",
+        "Dark Gray",
+        "Rainbow"
+      ],
+      "tooltip": "Changes the color of the wood inside of the ship."
+    },
+    "interiorWoodColor3": {
+      "title": "Interior Wood Color",
+      "type": "selector",
+      "value": "Default",
+      "options": [
+        "Default",
+        "Red",
+        "Orange",
+        "Golden",
+        "Green",
+        "Mint",
+        "Turquoise",
+        "Blue",
+        "Lavender",
+        "Pink",
+        "Hot Pink",
+        "Dark Gray",
+        "Rainbow"
+      ],
+      "tooltip": "Changes the color of the wood inside of the ship."
     },
     "exteriorHullType": {
       "title": "Exterior Hull Type",
@@ -1123,7 +1241,7 @@
         "Nomai Stone",
         "Nomai Pattern",
         "Nomai Metal",
-        "Wooden",
+        "Polished Wood",
         "Light Metal",
         "Dark Metal",
         "Rusted Metal",
@@ -1134,7 +1252,7 @@
         "Quantum Rock"
       ],
       "value": "None",
-      "tooltip": "Changes the texture of the hull inside of the ship."
+      "tooltip": "Changes the texture of the hull outside of the ship."
     },
     "exteriorHullColorBlend": {
       "title": "Exterior Hull Blend",
@@ -1183,7 +1301,7 @@
         "Dark Gray",
         "Rainbow"
       ],
-      "tooltip": "Changes the color of the outside of the ship."
+      "tooltip": "Changes the color of the hull outside of the ship."
     },
     "exteriorHullColor2": {
       "title": "Exterior Hull Color",
@@ -1204,7 +1322,7 @@
         "Dark Gray",
         "Rainbow"
       ],
-      "tooltip": "Changes the color of the outside of the ship."
+      "tooltip": "Changes the color of the hull outside of the ship."
     },
     "exteriorHullColor3": {
       "title": "Exterior Hull Color",
@@ -1225,7 +1343,125 @@
         "Dark Gray",
         "Rainbow"
       ],
-      "tooltip": "Changes the color of the outside of the ship."
+      "tooltip": "Changes the color of the hull outside of the ship."
+    },
+    "exteriorWoodType": {
+      "title": "Exterior Wood Type",
+      "type": "toggle",
+      "yes": "Color",
+      "no": "Texture",
+      "value": true,
+      "tooltip": "Determines whether to apply a color or a texture to the exterior wood."
+    },
+    "exteriorWoodTexture": {
+      "title": "Exterior Wood Texture",
+      "type": "selector",
+      "options": [
+        "None",
+        "Nomai Stone",
+        "Nomai Pattern",
+        "Nomai Metal",
+        "Polished Wood",
+        "Dark Metal",
+        "Moss",
+        "Snow",
+        "Ember Twin Rock",
+        "Ash Twin Rock",
+        "Quantum Rock"
+      ],
+      "value": "None",
+      "tooltip": "Changes the texture of the wood outside of the ship."
+    },
+    "exteriorWoodColorBlend": {
+      "title": "Exterior Wood Blend",
+      "type": "selector",
+      "value": "Time",
+      "options": [
+        "Time",
+        "Fuel",
+        "Oxygen",
+        "Ship Damage %",
+        "Reactor State",
+        "Velocity",
+        "Gravity",
+        "Temperature",
+        "Ship Temperature"
+      ],
+      "tooltip": "Sets the method of blending between colors."
+    },
+    "exteriorWoodColorOptions": {
+      "title": "Exterior Wood Color Options",
+      "type": "selector",
+      "value": "1",
+      "options": [
+        "1",
+        "2",
+        "3"
+      ],
+      "tooltip": "Sets the number of colors to blend between."
+    },
+    "exteriorWoodColor1": {
+      "title": "Exterior Wood Color",
+      "type": "selector",
+      "value": "Default",
+      "options": [
+        "Default",
+        "Red",
+        "Orange",
+        "Golden",
+        "Green",
+        "Mint",
+        "Turquoise",
+        "Blue",
+        "Lavender",
+        "Pink",
+        "Hot Pink",
+        "Dark Gray",
+        "Rainbow"
+      ],
+      "tooltip": "Changes the color of the wood outside of the ship."
+    },
+    "exteriorWoodColor2": {
+      "title": "Exterior Hull Color",
+      "type": "selector",
+      "value": "Default",
+      "options": [
+        "Default",
+        "Red",
+        "Orange",
+        "Golden",
+        "Green",
+        "Mint",
+        "Turquoise",
+        "Blue",
+        "Lavender",
+        "Pink",
+        "Hot Pink",
+        "Dark Gray",
+        "Rainbow"
+      ],
+      "tooltip": "Changes the color of the wood outside of the ship."
+    },
+    "exteriorWoodColor3": {
+      "title": "Exterior Hull Color",
+      "type": "selector",
+      "value": "Default",
+      "options": [
+        "Default",
+        "Red",
+        "Orange",
+        "Golden",
+        "Green",
+        "Mint",
+        "Turquoise",
+        "Blue",
+        "Lavender",
+        "Pink",
+        "Hot Pink",
+        "Dark Gray",
+        "Rainbow"
+      ],
+      "tooltip": "Changes the color of the wood outside of the ship."
     },
     "thrusterColorBlend": {
       "title": "Thruster Blend",
