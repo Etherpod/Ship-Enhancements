@@ -121,6 +121,8 @@ public static class SettingsPresets
         { "addWaterCooling", false },
         { "enableReactorOverload", false },
         { "enableQuantumShip", false },
+        { "enableGasLeak", false },
+        { "shipRegenerationMultiplier", 0f },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -237,6 +239,8 @@ public static class SettingsPresets
         { "addWaterCooling", false },
         { "enableReactorOverload", false },
         { "enableQuantumShip", false },
+        { "enableGasLeak", false },
+        { "shipRegenerationMultiplier", 0f },
     };
 
     public static readonly Dictionary<string, object> ImpossibleSettings = new Dictionary<string, object>()
@@ -353,6 +357,8 @@ public static class SettingsPresets
         { "addWaterCooling", false },
         { "enableReactorOverload", false },
         { "enableQuantumShip", true },
+        { "enableGasLeak", false },
+        { "shipRegenerationMultiplier", 0f },
     };
 
     public static readonly Dictionary<string, object> NewStuffSettings = new Dictionary<string, object>()
@@ -469,6 +475,8 @@ public static class SettingsPresets
         { "addWaterCooling", true },
         { "enableReactorOverload", true },
         { "enableQuantumShip", false },
+        { "enableGasLeak", false },
+        { "shipRegenerationMultiplier", 0f },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -586,6 +594,8 @@ public static class SettingsPresets
         { "addWaterCooling", true },
         { "enableReactorOverload", true },
         { "enableQuantumShip", true },
+        { "enableGasLeak", true },
+        { "shipRegenerationMultiplier", 1f },
     };
 
     // Random preset composition
@@ -767,7 +777,7 @@ public static class SettingsPresets
             ("Gravity", (1f, 1f)),
             ("Temperature", (1f, 1f)),
             ("Ship Temperature", (1f, 1f)),
-        ], (1f, 1f), "Time") },
+        ], (0.5f, 0.5f), "Time") },
         { "shipLightColorOptions", new RandomSettingValue(
         [
             ("2", (1f, 1f)),
@@ -791,7 +801,7 @@ public static class SettingsPresets
             ("Black", (1f, 1f)),
             ("Divine", (0f, 0.5f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "shipLightColor2", new RandomSettingValue(
         [
             ("Red", (1f, 1f)),
@@ -810,7 +820,7 @@ public static class SettingsPresets
             ("Black", (1f, 1f)),
             ("Divine", (0f, 0.5f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "shipLightColor3", new RandomSettingValue(
         [
             ("Red", (1f, 1f)),
@@ -829,7 +839,7 @@ public static class SettingsPresets
             ("Black", (1f, 1f)),
             ("Divine", (0f, 0.5f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "hotThrusters", new RandomSettingValue((0.2f, 0.8f)) },
         { "extraNoise", new RandomSettingValue((0f, 0.8f)) },
         { "interiorHullColorBlend", new RandomSettingValue(
@@ -843,7 +853,7 @@ public static class SettingsPresets
             ("Gravity", (1f, 1f)),
             ("Temperature", (1f, 1f)),
             ("Ship Temperature", (1f, 1f)),
-        ], (1f, 1f), "Time") },
+        ], (0.5f, 0.5f), "Time") },
         { "interiorHullColorOptions", new RandomSettingValue(
         [
             ("2", (1f, 1f)),
@@ -863,7 +873,7 @@ public static class SettingsPresets
             ("Hot Pink", (1f, 1f)),
             ("Dark Gray", (1f, 1f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "interiorHullColor2", new RandomSettingValue(
         [
             ("Red", (1f, 1f)),
@@ -878,7 +888,7 @@ public static class SettingsPresets
             ("Hot Pink", (1f, 1f)),
             ("Dark Gray", (1f, 1f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "interiorHullColor3", new RandomSettingValue(
         [
             ("Red", (1f, 1f)),
@@ -893,7 +903,7 @@ public static class SettingsPresets
             ("Hot Pink", (1f, 1f)),
             ("Dark Gray", (1f, 1f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "exteriorHullColorBlend", new RandomSettingValue(
         [
             ("Time", (1f, 1f)),
@@ -905,7 +915,7 @@ public static class SettingsPresets
             ("Gravity", (1f, 1f)),
             ("Temperature", (1f, 1f)),
             ("Ship Temperature", (1f, 1f)),
-        ], (1f, 1f), "Time") },
+        ], (0.5f, 0.5f), "Time") },
         { "exteriorHullColorOptions", new RandomSettingValue(
         [
             ("2", (1f, 1f)),
@@ -925,7 +935,7 @@ public static class SettingsPresets
             ("Hot Pink", (1f, 1f)),
             ("Dark Gray", (1f, 1f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "exteriorHullColor2", new RandomSettingValue(
         [
             ("Red", (1f, 1f)),
@@ -940,7 +950,7 @@ public static class SettingsPresets
             ("Hot Pink", (1f, 1f)),
             ("Dark Gray", (1f, 1f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "exteriorHullColor3", new RandomSettingValue(
         [
             ("Red", (1f, 1f)),
@@ -955,7 +965,7 @@ public static class SettingsPresets
             ("Hot Pink", (1f, 1f)),
             ("Dark Gray", (1f, 1f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "addTether", new RandomSettingValue((0.5f, 0.5f)) },
         { "disableDamageIndicators", new RandomSettingValue((0f, 0.5f)) },
         { "addShipSignal", new RandomSettingValue((0.5f, 0.5f)) },
@@ -999,7 +1009,7 @@ public static class SettingsPresets
             ("Gravity", (1f, 1f)),
             ("Temperature", (1f, 1f)),
             ("Ship Temperature", (1f, 1f)),
-        ], (1f, 1f), "Time") },
+        ], (0.5f, 0.5f), "Time") },
         { "thrusterColorOptions", new RandomSettingValue(
         [
             ("2", (1f, 1f)),
@@ -1019,7 +1029,7 @@ public static class SettingsPresets
             ("White", (1f, 1f)),
             ("Gray", (1f, 1f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "thrusterColor2", new RandomSettingValue(
         [
             ("Red", (1f, 1f)),
@@ -1034,7 +1044,7 @@ public static class SettingsPresets
             ("White", (1f, 1f)),
             ("Gray", (1f, 1f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "thrusterColor3", new RandomSettingValue(
         [
             ("Red", (1f, 1f)),
@@ -1049,7 +1059,7 @@ public static class SettingsPresets
             ("White", (1f, 1f)),
             ("Gray", (1f, 1f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "disableSeatbelt", new RandomSettingValue((0f, 0.5f)) },
         { "addPortableTractorBeam", new RandomSettingValue((0.5f, 0.5f)) },
         { "disableShipSuit", new RandomSettingValue((0f, 0.02f)) },
@@ -1064,7 +1074,7 @@ public static class SettingsPresets
             ("Gravity", (1f, 1f)),
             ("Temperature", (1f, 1f)),
             ("Ship Temperature", (1f, 1f)),
-        ], (1f, 1f), "Time") },
+        ], (0.5f, 0.5f), "Time") },
         { "indicatorColorOptions", new RandomSettingValue(
         [
             ("2", (1f, 1f)),
@@ -1085,7 +1095,7 @@ public static class SettingsPresets
             ("White", (1f, 1f)),
             ("Black", (1f, 1f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "indicatorColor2", new RandomSettingValue(
         [
             ("Orange", (1f, 1f)),
@@ -1101,7 +1111,7 @@ public static class SettingsPresets
             ("White", (1f, 1f)),
             ("Black", (1f, 1f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "indicatorColor3", new RandomSettingValue(
         [
             ("Orange", (1f, 1f)),
@@ -1117,7 +1127,7 @@ public static class SettingsPresets
             ("White", (1f, 1f)),
             ("Black", (1f, 1f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "disableAutoLights", new RandomSettingValue((0.5f, 0.5f)) },
         { "addExpeditionFlag", new RandomSettingValue((0.5f, 0.5f)) },
         { "addFuelCanister", new RandomSettingValue((0.5f, 0.5f)) },
@@ -1259,6 +1269,207 @@ public static class SettingsPresets
         { "buttonsRequireFlightChair", new RandomSettingValue((0f, 0.5f)) },
         { "enableQuantumShip", new RandomSettingValue((0.3f, 0.8f)) },
         { "persistentShipState", new RandomSettingValue((0.25f, 0.8f)) },
+        { "enableGasLeak", new RandomSettingValue((0f, 0.2f)) },
+        { "fuelRegenerationMultiplier", new RandomSettingValue(
+        [
+            ((0f, 0.5f), (1f, 0.5f)),
+            ((0.5f, 2f), (0.5f, 1f)),
+        ], (0.25f, 0.5f), 0f) },
+        { "interiorHullType", new RandomSettingValue((0.5f, 0.5f)) },
+        { "exteriorHullType", new RandomSettingValue((0.5f, 0.5f)) },
+        { "interiorHullTexture", new RandomSettingValue(
+        [
+            ("Nomai Stone", (1f, 1f)),
+            ("Nomai Pattern", (1f, 1f)),
+            ("Nomai Metal", (1f, 1f)),
+            ("Polished Wood", (1f, 1f)),
+            ("Light Metal", (1f, 1f)),
+            ("Dark Metal", (1f, 1f)),
+            ("Rusted Metal", (1f, 1f)),
+            ("Moss", (1f, 1f)),
+            ("Snow", (1f, 1f)),
+            ("Ember Twin Rock", (1f, 1f)),
+            ("Ash Twin Rock", (1f, 1f)),
+            ("Quantum Rock", (1f, 1f)),
+        ], (0.3f, 0.8f), "None") },
+        { "exteriorHullTexture", new RandomSettingValue(
+        [
+            ("Nomai Stone", (1f, 1f)),
+            ("Nomai Pattern", (1f, 1f)),
+            ("Nomai Metal", (1f, 1f)),
+            ("Polished Wood", (1f, 1f)),
+            ("Light Metal", (1f, 1f)),
+            ("Dark Metal", (1f, 1f)),
+            ("Rusted Metal", (1f, 1f)),
+            ("Moss", (1f, 1f)),
+            ("Snow", (1f, 1f)),
+            ("Ember Twin Rock", (1f, 1f)),
+            ("Ash Twin Rock", (1f, 1f)),
+            ("Quantum Rock", (1f, 1f)),
+        ], (0.3f, 0.8f), "None") },
+        { "interiorWoodType", new RandomSettingValue((0.5f, 0.5f)) },
+        { "exteriorWoodType", new RandomSettingValue((0.5f, 0.5f)) },
+        { "interiorWoodTexture", new RandomSettingValue(
+        [
+            ("Nomai Stone", (1f, 1f)),
+            ("Nomai Pattern", (1f, 1f)),
+            ("Nomai Metal", (1f, 1f)),
+            ("Polished Wood", (1f, 1f)),
+            ("Dark Metal", (1f, 1f)),
+            ("Moss", (1f, 1f)),
+            ("Snow", (1f, 1f)),
+            ("Ember Twin Rock", (1f, 1f)),
+            ("Ash Twin Rock", (1f, 1f)),
+            ("Quantum Rock", (1f, 1f)),
+        ], (0.3f, 0.8f), "None") },
+        { "exteriorWoodTexture", new RandomSettingValue(
+        [
+            ("Nomai Stone", (1f, 1f)),
+            ("Nomai Pattern", (1f, 1f)),
+            ("Nomai Metal", (1f, 1f)),
+            ("Polished Wood", (1f, 1f)),
+            ("Dark Metal", (1f, 1f)),
+            ("Moss", (1f, 1f)),
+            ("Snow", (1f, 1f)),
+            ("Ember Twin Rock", (1f, 1f)),
+            ("Ash Twin Rock", (1f, 1f)),
+            ("Quantum Rock", (1f, 1f)),
+        ], (0.3f, 0.8f), "None") },
+        { "interiorWoodColorBlend", new RandomSettingValue(
+        [
+            ("Time", (1f, 1f)),
+            ("Fuel", (1f, 1f)),
+            ("Oxygen", (1f, 1f)),
+            ("Ship Damage %", (1f, 1f)),
+            ("Reactor State", (1f, 1f)),
+            ("Velocity", (1f, 1f)),
+            ("Gravity", (1f, 1f)),
+            ("Temperature", (1f, 1f)),
+            ("Ship Temperature", (1f, 1f)),
+        ], (0.5f, 0.5f), "Time") },
+        { "interiorWoodColorOptions", new RandomSettingValue(
+        [
+            ("2", (1f, 1f)),
+            ("3", (1f, 1f)),
+        ], (0.5f, 0.5f), "1") },
+        { "interiorWoodColor1", new RandomSettingValue(
+        [
+            ("Red", (1f, 1f)),
+            ("Orange", (1f, 1f)),
+            ("Golden", (1f, 1f)),
+            ("Green", (1f, 1f)),
+            ("Mint", (1f, 1f)),
+            ("Turquoise", (1f, 1f)),
+            ("Blue", (1f, 1f)),
+            ("Lavender", (1f, 1f)),
+            ("Pink", (1f, 1f)),
+            ("Hot Pink", (1f, 1f)),
+            ("Dark Gray", (1f, 1f)),
+            ("Rainbow", (0f, 1f)),
+        ], (0.3f, 0.8f), "Default") },
+        { "interiorWoodColor2", new RandomSettingValue(
+        [
+            ("Red", (1f, 1f)),
+            ("Orange", (1f, 1f)),
+            ("Golden", (1f, 1f)),
+            ("Green", (1f, 1f)),
+            ("Mint", (1f, 1f)),
+            ("Turquoise", (1f, 1f)),
+            ("Blue", (1f, 1f)),
+            ("Lavender", (1f, 1f)),
+            ("Pink", (1f, 1f)),
+            ("Hot Pink", (1f, 1f)),
+            ("Dark Gray", (1f, 1f)),
+            ("Rainbow", (0f, 1f)),
+        ], (0.3f, 0.8f), "Default") },
+        { "interiorWoodColor3", new RandomSettingValue(
+        [
+            ("Red", (1f, 1f)),
+            ("Orange", (1f, 1f)),
+            ("Golden", (1f, 1f)),
+            ("Green", (1f, 1f)),
+            ("Mint", (1f, 1f)),
+            ("Turquoise", (1f, 1f)),
+            ("Blue", (1f, 1f)),
+            ("Lavender", (1f, 1f)),
+            ("Pink", (1f, 1f)),
+            ("Hot Pink", (1f, 1f)),
+            ("Dark Gray", (1f, 1f)),
+            ("Rainbow", (0f, 1f)),
+        ], (0.3f, 0.8f), "Default") },
+        { "exteriorWoodColorBlend", new RandomSettingValue(
+        [
+            ("Time", (1f, 1f)),
+            ("Fuel", (1f, 1f)),
+            ("Oxygen", (1f, 1f)),
+            ("Ship Damage %", (1f, 1f)),
+            ("Reactor State", (1f, 1f)),
+            ("Velocity", (1f, 1f)),
+            ("Gravity", (1f, 1f)),
+            ("Temperature", (1f, 1f)),
+            ("Ship Temperature", (1f, 1f)),
+        ], (0.5f, 0.5f), "Time") },
+        { "exteriorWoodColorOptions", new RandomSettingValue(
+        [
+            ("2", (1f, 1f)),
+            ("3", (1f, 1f)),
+        ], (0.5f, 0.5f), "1") },
+        { "exteriorWoodColor1", new RandomSettingValue(
+        [
+            ("Red", (1f, 1f)),
+            ("Orange", (1f, 1f)),
+            ("Golden", (1f, 1f)),
+            ("Green", (1f, 1f)),
+            ("Mint", (1f, 1f)),
+            ("Turquoise", (1f, 1f)),
+            ("Blue", (1f, 1f)),
+            ("Lavender", (1f, 1f)),
+            ("Pink", (1f, 1f)),
+            ("Hot Pink", (1f, 1f)),
+            ("Dark Gray", (1f, 1f)),
+            ("Rainbow", (0f, 1f)),
+        ], (0.3f, 0.8f), "Default") },
+        { "exteriorWoodColor2", new RandomSettingValue(
+        [
+            ("Red", (1f, 1f)),
+            ("Orange", (1f, 1f)),
+            ("Golden", (1f, 1f)),
+            ("Green", (1f, 1f)),
+            ("Mint", (1f, 1f)),
+            ("Turquoise", (1f, 1f)),
+            ("Blue", (1f, 1f)),
+            ("Lavender", (1f, 1f)),
+            ("Pink", (1f, 1f)),
+            ("Hot Pink", (1f, 1f)),
+            ("Dark Gray", (1f, 1f)),
+            ("Rainbow", (0f, 1f)),
+        ], (0.3f, 0.8f), "Default") },
+        { "exteriorWoodColor3", new RandomSettingValue(
+        [
+            ("Red", (1f, 1f)),
+            ("Orange", (1f, 1f)),
+            ("Golden", (1f, 1f)),
+            ("Green", (1f, 1f)),
+            ("Mint", (1f, 1f)),
+            ("Turquoise", (1f, 1f)),
+            ("Blue", (1f, 1f)),
+            ("Lavender", (1f, 1f)),
+            ("Pink", (1f, 1f)),
+            ("Hot Pink", (1f, 1f)),
+            ("Dark Gray", (1f, 1f)),
+            ("Rainbow", (0f, 1f)),
+        ], (0.3f, 0.8f), "Default") },
+        { "shipGlassTexture", new RandomSettingValue(
+        [
+            ("Nomai Glass", (1f, 1f)),
+            ("Stranger Glass", (1f, 1f)),
+            ("Thick Glass", (1f, 1f)),
+            ("Geode", (1f, 1f)),
+            ("Ice", (1f, 1f)),
+            ("Gravity Crystal", (1f, 1f)),
+            ("Ghost Matter", (1f, 1f)),
+            ("Egg", (1f, 1f)),
+        ], (0.3f, 0.8f), "None") },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }
