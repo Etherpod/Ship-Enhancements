@@ -821,7 +821,8 @@ public static class SEMenuManager
 
 		if (GetDecorationSettings().Contains(name))
 		{
-			if (name.Contains("teriorHullType") || name == "shipGlassTexture")
+			if (name.Contains("teriorHullType") || name.Contains("teriorWoodType") || 
+				name == "shipGlassTexture")
 			{
 				return false;
 			}
@@ -830,6 +831,22 @@ public static class SEMenuManager
 			{
 				string hull = name.Substring(0, 12);
 				bool usingColor = (bool)(hull + "Type").AsEnum<Settings>().GetValue();
+				bool isTex = name.Substring(name.Length - 7) == "Texture";
+
+				if ((isTex && usingColor) || (!isTex && !usingColor))
+				{
+					return true;
+				}
+				if (isTex && !usingColor)
+				{
+					return false;
+				}
+			}
+			
+			if (name.Contains("Wood"))
+			{
+				string wood = name.Substring(0, 12);
+				bool usingColor = (bool)(wood + "Type").AsEnum<Settings>().GetValue();
 				bool isTex = name.Substring(name.Length - 7) == "Texture";
 
 				if ((isTex && usingColor) || (!isTex && !usingColor))

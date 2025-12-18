@@ -15,6 +15,7 @@ public class ThemeManager
     private IDictionary<string, ThrusterTheme> _nameToThrusterTheme;
     private IDictionary<string, DamageTheme> _nameToDamageTheme;
     private IDictionary<string, HullTexturePath> _hullTexturePaths;
+    private IDictionary<string, WoodTexturePath> _woodTexturePaths;
     private IDictionary<string, string> _glassMaterialPaths;
 
     public ThemeManager(string resourceName)
@@ -27,6 +28,7 @@ public class ThemeManager
     }
 
     public HullTexturePath GetHullTexturePath(string name) => _hullTexturePaths[name];
+    public WoodTexturePath GetWoodTexturePath(string name) => _woodTexturePaths[name];
     public string GetGlassMaterialPath(string name) => _glassMaterialPaths[name];
     public LightTheme GetLightTheme(string name) => _nameToLightTheme[name];
     public HullTheme GetHullTheme(string name) => _nameToHullTheme[name];
@@ -74,6 +76,15 @@ public class ThemeManager
             if (value is JObject obj)
             {
                 _hullTexturePaths.Add(key, HullTexturePath.From(obj));
+            }
+        }
+        
+        _woodTexturePaths = new Dictionary<string, WoodTexturePath>();
+        foreach (var (key, value) in data.WoodTexturePaths)
+        {
+            if (value is JObject obj)
+            {
+                _woodTexturePaths.Add(key, WoodTexturePath.From(obj));
             }
         }
         
@@ -185,7 +196,6 @@ public record HullTexturePath(string path, float smoothness, float normalScale)
         if (dict.ContainsKey("path"))
         {
             path = (string)dict["path"];
-            ShipEnhancements.WriteDebugMessage("path: " + path);
         }
         
         if (dict.ContainsKey("smoothness"))
@@ -199,5 +209,33 @@ public record HullTexturePath(string path, float smoothness, float normalScale)
         }
 
         return new HullTexturePath(path, smoothness, normalScale);
+    }
+}
+
+public record WoodTexturePath(string path, float smoothness, float normalScale)
+{
+    internal static WoodTexturePath From(JObject dict)
+    {
+        string path = "";
+        float smoothness = 0.24f;
+        float normalScale = 1f;
+        
+        if (dict.ContainsKey("path"))
+        {
+            path = (string)dict["path"];
+            ShipEnhancements.WriteDebugMessage("path: " + path);
+        }
+        
+        if (dict.ContainsKey("smoothness"))
+        {
+            smoothness = (float)dict["smoothness"];
+        }
+
+        if (dict.ContainsKey("normalScale"))
+        {
+            normalScale = (float)dict["normalScale"];
+        }
+
+        return new WoodTexturePath(path, smoothness, normalScale);
     }
 }

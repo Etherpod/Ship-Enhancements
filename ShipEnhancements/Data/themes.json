@@ -1,64 +1,116 @@
 ﻿{
   "hullTexturePaths": {
     "Nomai Stone": {
-      "path": "Assets/ShipEnhancements/ShipSkins/SE_NomaiStone",
-      "smoothness": 1,
+      "path": "Assets/ShipEnhancements/ShipSkins/HullTextures/SE_Hull_NomaiStone",
+      "smoothness": 0.75,
       "normalScale": 0.4
     },
     "Nomai Pattern": {
-      "path": "Assets/ShipEnhancements/ShipSkins/SE_NomaiPattern",
-      "smoothness": 1,
+      "path": "Assets/ShipEnhancements/ShipSkins/HullTextures/SE_Hull_NomaiPattern",
+      "smoothness": 0.75,
       "normalScale": 1
     },
     "Nomai Metal": {
-      "path": "Assets/ShipEnhancements/ShipSkins/SE_Nomai_v2",
+      "path": "Assets/ShipEnhancements/ShipSkins/HullTextures/SE_Hull_NomaiMetal",
       "smoothness": 0.84,
       "normalScale": 1
     },
-    "Wooden": {
-      "path": "Assets/ShipEnhancements/ShipSkins/SE_Wooden",
+    "Polished Wood": {
+      "path": "Assets/ShipEnhancements/ShipSkins/HullTextures/SE_Hull_PolishedWood",
       "smoothness": 1,
       "normalScale": 0.5
     },
     "Light Metal": {
-      "path": "Assets/ShipEnhancements/ShipSkins/SE_LightMetal",
+      "path": "Assets/ShipEnhancements/ShipSkins/HullTextures/SE_Hull_LightMetal",
       "smoothness": 1,
       "normalScale": 1
     },
     "Dark Metal": {
-      "path": "Assets/ShipEnhancements/ShipSkins/SE_DarkMetal",
+      "path": "Assets/ShipEnhancements/ShipSkins/HullTextures/SE_Hull_DarkMetal",
       "smoothness": 1,
       "normalScale": 1
     },
     "Rusted Metal": {
-      "path": "Assets/ShipEnhancements/ShipSkins/SE_RustedMetal",
+      "path": "Assets/ShipEnhancements/ShipSkins/HullTextures/SE_Hull_RustedMetal",
       "smoothness": 1,
       "normalScale": 1
     },
     "Moss": {
-      "path": "Assets/ShipEnhancements/ShipSkins/SE_Mossy",
+      "path": "Assets/ShipEnhancements/ShipSkins/HullTextures/SE_Hull_Moss",
       "smoothness": 0.19,
       "normalScale": 0.2
     },
     "Snow": {
-      "path": "Assets/ShipEnhancements/ShipSkins/SE_Snowy",
+      "path": "Assets/ShipEnhancements/ShipSkins/HullTextures/SE_Hull_Snow",
       "smoothness": 1,
       "normalScale": 0.5
     },
     "Ember Twin Rock": {
-      "path": "Assets/ShipEnhancements/ShipSkins/SE_EmberTwinRock",
-      "smoothness": 0.65,
+      "path": "Assets/ShipEnhancements/ShipSkins/HullTextures/SE_Hull_EmberTwinRock",
+      "smoothness": 0.1,
       "normalScale": 0.8
     },
     "Ash Twin Rock": {
-      "path": "Assets/ShipEnhancements/ShipSkins/SE_AshTwinRock",
-      "smoothness": 0.65,
+      "path": "Assets/ShipEnhancements/ShipSkins/HullTextures/SE_Hull_AshTwinRock",
+      "smoothness": 0.2,
       "normalScale": 0.75
     },
     "Quantum Rock": {
-      "path": "Assets/ShipEnhancements/ShipSkins/SE_QuantumRock",
-      "smoothness": 0.5,
-      "normalScale": 0.3
+      "path": "Assets/ShipEnhancements/ShipSkins/HullTextures/SE_Hull_QuantumRock",
+      "smoothness": 1,
+      "normalScale": 0.5
+    }
+  },
+  "woodTexturePaths": {
+    "Nomai Stone": {
+      "path": "Assets/ShipEnhancements/ShipSkins/WoodTextures/SE_Wood_NomaiStone",
+      "smoothness": 1,
+      "normalScale": 1
+    },
+    "Nomai Pattern": {
+      "path": "Assets/ShipEnhancements/ShipSkins/WoodTextures/SE_Wood_NomaiPattern",
+      "smoothness": 1,
+      "normalScale": 0.65
+    },
+    "Nomai Metal": {
+      "path": "Assets/ShipEnhancements/ShipSkins/WoodTextures/SE_Wood_NomaiMetal",
+      "smoothness": 0.84,
+      "normalScale": 1
+    },
+    "Polished Wood": {
+      "path": "Assets/ShipEnhancements/ShipSkins/WoodTextures/SE_Wood_PolishedWood",
+      "smoothness": 1,
+      "normalScale": 0.5
+    },
+    "Dark Metal": {
+      "path": "Assets/ShipEnhancements/ShipSkins/WoodTextures/SE_Wood_DarkMetal",
+      "smoothness": 1,
+      "normalScale": 1
+    },
+    "Moss": {
+      "path": "Assets/ShipEnhancements/ShipSkins/WoodTextures/SE_Wood_Moss",
+      "smoothness": 0.19,
+      "normalScale": 0.2
+    },
+    "Snow": {
+      "path": "Assets/ShipEnhancements/ShipSkins/WoodTextures/SE_Wood_Snow",
+      "smoothness": 1,
+      "normalScale": 0.5
+    },
+    "Ember Twin Rock": {
+      "path": "Assets/ShipEnhancements/ShipSkins/WoodTextures/SE_Wood_EmberTwinRock",
+      "smoothness": 0.3,
+      "normalScale": 0.5
+    },
+    "Ash Twin Rock": {
+      "path": "Assets/ShipEnhancements/ShipSkins/WoodTextures/SE_Wood_AshTwinRock",
+      "smoothness": 0.35,
+      "normalScale": 1
+    },
+    "Quantum Rock": {
+      "path": "Assets/ShipEnhancements/ShipSkins/WoodTextures/SE_Wood_QuantumRock",
+      "smoothness": 0.35,
+      "normalScale": 0.5
     }
   },
   "glassMaterialPaths": {

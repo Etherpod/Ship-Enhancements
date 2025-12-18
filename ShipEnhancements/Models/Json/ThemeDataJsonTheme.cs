@@ -6,6 +6,7 @@ namespace ShipEnhancements.Models.Json;
 
 public record ThemeDataJsonTheme(
     [JsonProperty("hullTexturePaths")] Dictionary<string, object> HullTexturePaths,
+    [JsonProperty("woodTexturePaths")] Dictionary<string, object> WoodTexturePaths,
     [JsonProperty("glassMaterialPaths")] Dictionary<string, object> GlassMaterialPaths,
     [JsonProperty("lightThemes")] List<LightThemeDataJson> LightThemes,
     [JsonProperty("hullThemes")] List<HullThemeDataJson> HullThemes,

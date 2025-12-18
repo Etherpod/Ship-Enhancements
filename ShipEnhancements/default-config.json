@@ -1151,7 +1151,7 @@
       ],
       "tooltip": "Sets the method of blending between colors."
     },
-    "interiorHullWoodOptions": {
+    "interiorWoodColorOptions": {
       "title": "Interior Wood Color Options",
       "type": "selector",
       "value": "1",
