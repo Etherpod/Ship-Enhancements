@@ -102,6 +102,12 @@ public class ShipEnhancements : ModBehaviour
     private bool _unsubFromShipSpawn = false;
     private ShipDetachableLeg _frontLeg = null;
     private List<OWAudioSource> _shipAudioToChange = [];
+
+    public Material textureBlendMat;
+    public RenderTexture interiorHullRenderTex;
+    public RenderTexture exteriorHullRenderTex;
+    public RenderTexture interiorWoodRenderTex;
+    public RenderTexture exteriorWoodRenderTex;
     
     private Material _defaultInteriorHullMat;
     private Material _defaultExteriorHullMat;
@@ -374,6 +380,12 @@ public class ShipEnhancements : ModBehaviour
     {
         _shipEnhancementsBundle = AssetBundle.LoadFromFile(Path.Combine(ModHelper.Manifest.ModFolderPath, "assets/shipenhancements"));
         ThemeManager = new ThemeManager("ShipEnhancements.Data.themes.json");
+        
+        textureBlendMat = LoadMaterial("Assets/ShipEnhancements/ShipTextureBlend.mat");
+        interiorHullRenderTex = new RenderTexture(1024, 1024, 0);
+        exteriorHullRenderTex = new RenderTexture(1024, 1024, 0);
+        interiorWoodRenderTex = new RenderTexture(1024, 1024, 0);
+        exteriorWoodRenderTex = new RenderTexture(1024, 1024, 0);
 
         InitializeAchievements();
         InitializeQSB();
@@ -2701,22 +2713,25 @@ public class ShipEnhancements : ModBehaviour
                     HullTexturePath hullTexture = ThemeManager.GetHullTexturePath((string)interiorHullTexture.GetProperty());
                     SetHullTexture(interiorMats[i].defaultMat, ref interiorMats[i].customMat, hullTexture);
                 }
-                else if (blendInteriorHull)
-                {                    
-                    ShipEnhancements.WriteDebugMessage("blend interior");
-                    UpdateHullMaterials(interiorMats[i].defaultMat, ref interiorMats[i].customMat, false);
-                    InteriorHullBlendController hullBlend = SELocator.GetShipBody()
-                        .gameObject.GetAddComponent<InteriorHullBlendController>();
-                    hullBlend.AddSharedMaterial(interiorMats[i].customMat);
-                }
-                else if (interiorHull != "Default")
+                else
                 {
-                    Color color = ThemeManager.GetHullTheme(interiorHull).HullColor / 255f;
-                    SetHullColor(interiorMats[i].defaultMat, ref interiorMats[i].customMat, color);
+                    if (blendInteriorHull)
+                    {                    
+                        ShipEnhancements.WriteDebugMessage("blend interior");
+                        UpdateHullMaterials(interiorMats[i].defaultMat, ref interiorMats[i].customMat, false);
+                        InteriorHullBlendController hullBlend = SELocator.GetShipBody()
+                            .gameObject.GetAddComponent<InteriorHullBlendController>();
+                        hullBlend.AddSharedMaterial(interiorMats[i].defaultMat, interiorMats[i].customMat);
+                    }
+                    else if (interiorHull != "Default")
+                    {
+                        Color color = ThemeManager.GetHullTheme(interiorHull).HullColor / 255f;
+                        SetHullColor(interiorMats[i].defaultMat, ref interiorMats[i].customMat, interiorHullRenderTex, color);
+                    }
                 }
             }
         }
-
+        
         if (!blendExteriorHull && exteriorHull == "Default" && !exteriorHullTex)
         {
             UpdateHullMaterials(_defaultExteriorHullMat, ref _customExteriorHullMat, true);
@@ -2728,17 +2743,20 @@ public class ShipEnhancements : ModBehaviour
                 HullTexturePath hullTexture = ThemeManager.GetHullTexturePath((string)exteriorHullTexture.GetProperty());
                 SetHullTexture(_defaultExteriorHullMat, ref _customExteriorHullMat, hullTexture);
             }
-            else if (blendExteriorHull)
+            else
             {
-                UpdateHullMaterials(_defaultExteriorHullMat, ref _customExteriorHullMat, false);
-                ExteriorHullBlendController hullBlend = SELocator.GetShipBody()
-                    .gameObject.GetAddComponent<ExteriorHullBlendController>();
-                hullBlend.AddSharedMaterial(_customExteriorHullMat);
-            }
-            else if (exteriorHull != "Default")
-            {
-                Color color = ThemeManager.GetHullTheme(exteriorHull).HullColor / 255f;
-                SetHullColor(_defaultExteriorHullMat, ref _customExteriorHullMat, color);
+                if (blendExteriorHull)
+                {
+                    UpdateHullMaterials(_defaultExteriorHullMat, ref _customExteriorHullMat, false);
+                    ExteriorHullBlendController hullBlend = SELocator.GetShipBody()
+                        .gameObject.GetAddComponent<ExteriorHullBlendController>();
+                    hullBlend.AddSharedMaterial(_defaultExteriorHullMat, _customExteriorHullMat);
+                }
+                else if (exteriorHull != "Default")
+                {
+                    Color color = ThemeManager.GetHullTheme(exteriorHull).HullColor / 255f;
+                    SetHullColor(_defaultExteriorHullMat, ref _customExteriorHullMat, exteriorHullRenderTex, color);
+                }
             }
         }
         
@@ -2753,17 +2771,20 @@ public class ShipEnhancements : ModBehaviour
                 WoodTexturePath WoodTexture = ThemeManager.GetWoodTexturePath((string)interiorWoodTexture.GetProperty());
                 SetWoodTexture(_defaultInteriorWoodMat, ref _customInteriorWoodMat, WoodTexture);
             }
-            else if (blendInteriorWood)
+            else
             {
-                UpdateHullMaterials(_defaultInteriorWoodMat, ref _customInteriorWoodMat, false);
-                InteriorHullBlendController WoodBlend = SELocator.GetShipBody()
-                    .gameObject.GetAddComponent<InteriorHullBlendController>();
-                WoodBlend.AddSharedMaterial(_customInteriorWoodMat);
-            }
-            else if (interiorWood != "Default")
-            {
-                Color color = ThemeManager.GetHullTheme(interiorWood).HullColor / 255f;
-                SetHullColor(_defaultInteriorWoodMat, ref _customInteriorWoodMat, color);
+                if (blendInteriorWood)
+                {
+                    UpdateHullMaterials(_defaultInteriorWoodMat, ref _customInteriorWoodMat, false);
+                    InteriorWoodBlendController WoodBlend = SELocator.GetShipBody()
+                        .gameObject.GetAddComponent<InteriorWoodBlendController>();
+                    WoodBlend.AddSharedMaterial(_defaultInteriorWoodMat, _customInteriorWoodMat);
+                }
+                else if (interiorWood != "Default")
+                {
+                    Color color = ThemeManager.GetHullTheme(interiorWood).HullColor / 255f;
+                    SetHullColor(_defaultInteriorWoodMat, ref _customInteriorWoodMat, interiorWoodRenderTex, color, true);
+                }
             }
         }
         
@@ -2781,23 +2802,28 @@ public class ShipEnhancements : ModBehaviour
             else if (blendExteriorWood)
             {
                 UpdateHullMaterials(_defaultExteriorWoodMat, ref _customExteriorWoodMat, false);
-                ExteriorHullBlendController WoodBlend = SELocator.GetShipBody()
-                    .gameObject.GetAddComponent<ExteriorHullBlendController>();
-                WoodBlend.AddSharedMaterial(_customExteriorWoodMat);
+                ExteriorWoodBlendController WoodBlend = SELocator.GetShipBody()
+                    .gameObject.GetAddComponent<ExteriorWoodBlendController>();
+                WoodBlend.AddSharedMaterial(_defaultExteriorWoodMat, _customExteriorWoodMat);
             }
             else if (exteriorWood != "Default")
             {
                 Color color = ThemeManager.GetHullTheme(exteriorWood).HullColor / 255f;
-                SetHullColor(_defaultExteriorWoodMat, ref _customExteriorWoodMat, color);
+                SetHullColor(_defaultExteriorWoodMat, ref _customExteriorWoodMat, exteriorWoodRenderTex, color, true);
             }
         }
     }
 
-    private void SetHullColor(Material baseMat, ref Material customMat, Color color)
+    private void SetHullColor(Material baseMat, ref Material customMat, RenderTexture targetTex, Color color, bool isWood = false)
     {
         ShipEnhancements.WriteDebugMessage("Setting hull color to " + color);
         UpdateHullMaterials(baseMat, ref customMat, false);
-        customMat.SetColor("_Color", color);
+        
+        textureBlendMat.SetColor("_OverlayColor", color);
+        textureBlendMat.SetFloat("_BlendFactor", 1f);
+        textureBlendMat.SetFloat("_IsWoodTexture", isWood ? 1f : 0f);
+        Graphics.Blit(baseMat.GetTexture("_MainTex"), targetTex, textureBlendMat);
+        customMat.SetTexture("_MainTex", targetTex);
     }
 
     private void SetHullTexture(Material baseMat, ref Material customMat, HullTexturePath hullTexture)

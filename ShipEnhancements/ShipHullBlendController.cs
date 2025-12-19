@@ -5,7 +5,9 @@ namespace ShipEnhancements;
 
 public class ShipHullBlendController : ColorBlendController
 {
-    private List<Material> _sharedMaterials = [];
+    private List<(Material baseMat, Material customMat)> _sharedMaterials = [];
+    protected virtual RenderTexture TargetRenderTex => null;
+    protected virtual bool IsWoodController => false;
 
     protected override void Awake()
     {
@@ -49,9 +51,13 @@ public class ShipHullBlendController : ColorBlendController
     protected override void SetColor(List<object> theme)
     {
         Color color = (Color)theme[0];
-        foreach (Material mat in _sharedMaterials)
+        foreach (var pair in _sharedMaterials)
         {
-            mat.SetColor("_Color", color / 255f);
+            ShipEnhancements.Instance.textureBlendMat.SetColor("_OverlayColor", color / 255f);
+            ShipEnhancements.Instance.textureBlendMat.SetFloat("_BlendFactor", 1f);
+            ShipEnhancements.Instance.textureBlendMat.SetFloat("_IsWoodTexture", IsWoodController ? 1f : 0f);
+            Graphics.Blit(pair.baseMat.GetTexture("_MainTex"), TargetRenderTex, ShipEnhancements.Instance.textureBlendMat);
+            pair.customMat.SetTexture("_MainTex", TargetRenderTex);
         }
     }
 
@@ -61,8 +67,8 @@ public class ShipHullBlendController : ColorBlendController
         base.ResetColor();
     }
 
-    public void AddSharedMaterial(Material mat)
+    public void AddSharedMaterial(Material baseMat, Material customMat)
     {
-        _sharedMaterials.Add(mat);
+        _sharedMaterials.Add((baseMat, customMat));
     }
 }

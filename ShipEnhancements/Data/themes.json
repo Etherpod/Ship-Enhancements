@@ -3,11 +3,11 @@
     "Nomai Stone": {
       "path": "Assets/ShipEnhancements/ShipSkins/HullTextures/SE_Hull_NomaiStone",
       "smoothness": 0.75,
-      "normalScale": 0.4
+      "normalScale": 1
     },
     "Nomai Pattern": {
       "path": "Assets/ShipEnhancements/ShipSkins/HullTextures/SE_Hull_NomaiPattern",
-      "smoothness": 0.75,
+      "smoothness": 0.7,
       "normalScale": 1
     },
     "Nomai Metal": {
@@ -37,8 +37,8 @@
     },
     "Moss": {
       "path": "Assets/ShipEnhancements/ShipSkins/HullTextures/SE_Hull_Moss",
-      "smoothness": 0.19,
-      "normalScale": 0.2
+      "smoothness": 0.65,
+      "normalScale": 0.3
     },
     "Snow": {
       "path": "Assets/ShipEnhancements/ShipSkins/HullTextures/SE_Hull_Snow",
@@ -47,13 +47,13 @@
     },
     "Ember Twin Rock": {
       "path": "Assets/ShipEnhancements/ShipSkins/HullTextures/SE_Hull_EmberTwinRock",
-      "smoothness": 0.1,
-      "normalScale": 0.8
+      "smoothness": 0.65,
+      "normalScale": 0.5
     },
     "Ash Twin Rock": {
       "path": "Assets/ShipEnhancements/ShipSkins/HullTextures/SE_Hull_AshTwinRock",
-      "smoothness": 0.2,
-      "normalScale": 0.75
+      "smoothness": 0.65,
+      "normalScale": 0.8
     },
     "Quantum Rock": {
       "path": "Assets/ShipEnhancements/ShipSkins/HullTextures/SE_Hull_QuantumRock",
@@ -99,13 +99,13 @@
     },
     "Ember Twin Rock": {
       "path": "Assets/ShipEnhancements/ShipSkins/WoodTextures/SE_Wood_EmberTwinRock",
-      "smoothness": 0.3,
+      "smoothness": 0.1,
       "normalScale": 0.5
     },
     "Ash Twin Rock": {
       "path": "Assets/ShipEnhancements/ShipSkins/WoodTextures/SE_Wood_AshTwinRock",
-      "smoothness": 0.35,
-      "normalScale": 1
+      "smoothness": 0.3,
+      "normalScale": 0.8
     },
     "Quantum Rock": {
       "path": "Assets/ShipEnhancements/ShipSkins/WoodTextures/SE_Wood_QuantumRock",
