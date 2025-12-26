@@ -102,7 +102,7 @@ public class CockpitEffectController : MonoBehaviour
 
     private void Update()
     {
-        if (_dirtBuildupTime == 0f && (false || _reactorHeat == null))
+        if (_dirtBuildupTime == 0f && _reactorHeat == null)
         {
             enabled = false;
             return;
@@ -112,7 +112,7 @@ public class CockpitEffectController : MonoBehaviour
         {
             UpdateDirt();
         }
-        if (true && _reactorHeat != null)
+        if (SELocator.GetShipTemperatureDetector().GetTemperatureRatio() < 0f && _reactorHeat != null)
         {
             UpdateIce();
         }
@@ -120,7 +120,9 @@ public class CockpitEffectController : MonoBehaviour
 
     private void UpdateIce()
     {
-        float ratio = _reactorHeat.GetHeatRatio() * 1.5f;
+        float tempRatio = SELocator.GetShipTemperatureDetector().GetTemperatureRatio() * -1;
+        tempRatio *= 1.2f;
+        float ratio = _reactorHeat.GetHeatRatio() * 1.5f * tempRatio;
         _iceBuildup = Mathf.Lerp(_iceBuildup, ratio, Time.deltaTime / 60f);
         _iceMat.SetFloat(_iceCutoffPropID, _iceBuildup);
     }
