@@ -6,12 +6,10 @@ namespace ShipEnhancements;
 public class ShipHullBlendController : ColorBlendController
 {
     private List<ShipTextureBlender> _textureBlenders = [];
-    protected virtual RenderTexture TargetRenderTex => null;
-    protected virtual bool IsWoodController => false;
 
     protected override void Awake()
     {
-        _defaultTheme = [Color.white * 255f];
+        _defaultTheme = [new Color(1f, 1f, 1f, 0f) * 255f];
         base.Awake();
     }
 
@@ -24,7 +22,9 @@ public class ShipHullBlendController : ColorBlendController
         }
 
         HullTheme theme = ShipEnhancements.ThemeManager.GetHullTheme(themeName);
-        _blendThemes[i] = [theme.HullColor];
+        Color color = theme.HullColor;
+        color.a = 255f;
+        _blendThemes[i] = [color];
     }
 
     protected override void UpdateLerp(List<object> start, List<object> end, float lerp)
@@ -35,6 +35,7 @@ public class ShipHullBlendController : ColorBlendController
     protected override List<object> GetLerp(List<object> start, List<object> end, float lerp)
     {
         var newColor = Color.Lerp((Color)start[0], (Color)end[0], lerp);
+        newColor.a = Mathf.Lerp(((Color)start[0]).a, ((Color)end[0]).a, lerp);
         return [newColor];
     }
 
