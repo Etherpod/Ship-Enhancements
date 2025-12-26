@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.Experimental.Rendering;
 
 namespace ShipEnhancements;
 
@@ -19,6 +19,7 @@ public class ShipTextureBlender : MonoBehaviour
 	private Texture baseTex;
 	
 	private Renderer _renderer;
+	private bool _useLightmap;
 	
 	private static readonly Dictionary<Texture, RenderTexture> RenderTextures = new();
 
@@ -42,6 +43,16 @@ public class ShipTextureBlender : MonoBehaviour
 		}
 
 		_renderer.materials[materialIndex].mainTexture = blendTex;
+		if (_useLightmap)
+		{
+			foreach (LightmapController lightmap in SELocator.GetShipTransform()
+				.GetComponentsInChildren<LightmapController>())
+			{
+				List<Material> mats = lightmap._materials.ToList();
+				mats.AddRange(_renderer.materials);
+				lightmap._materials = mats.ToArray();
+			}
+		}
 	}
 
 	private void OnDestroy()
@@ -62,19 +73,19 @@ public class ShipTextureBlender : MonoBehaviour
 	}
 
 	public void Initialize(int matIndex, Material blendMat, Texture baseTexture,
-		Color color, float blend = 1f, bool isWood = false)
+		Color color, float blend = 1f, bool isWood = false, bool useLightmap = false)
 	{
 		materialIndex = matIndex;
 		blendMaterial = blendMat;
 		baseTex = baseTexture;
 		overlayColor = color;
 		blendFactor = blend;
+		_useLightmap = useLightmap;
 
 		blendMaterial.SetFloat(WoodToggleId, isWood ? 1f : 0f);
 	}
 
-	public void SetTexture(Texture newColor, 
-		Texture newNormal, Texture newSmooth,
+	public void SetTexture(Texture newColor, Texture newNormal, Texture newSmooth,
 		float normalScale, float smoothness)
 	{
 		baseTex = newColor;

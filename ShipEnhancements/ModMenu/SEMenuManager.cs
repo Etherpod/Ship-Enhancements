@@ -128,8 +128,9 @@ public static class SEMenuManager
 			return;
 		}
 
-		if (GetDecorationSettings().Contains(name)
-			&& !int.TryParse(name.Substring(name.Length - 1), out _))
+		if (GetDecorationSettings().Contains(name) && 
+			!int.TryParse(name.Substring(name.Length - 1), out _) &&
+			!name.Contains("Texture"))
 		{
 			int optionsNew;
 			int optionsOld;
@@ -620,14 +621,14 @@ public static class SEMenuManager
 	{
 		if (name is "enableColorBlending" or "shipGlassTexture") return true;
 		
-		if (name.Contains("Texture"))
+		/*if (name.Contains("Texture"))
 		{
 			string hull = name.Replace("Texture", "");
 			if (!(bool)(hull + "Type").AsEnum<Settings>().GetValue())
 			{
 				return true;
 			}
-		}
+		}*/
 		
 		string stem = name.Substring(0, name.Length - 6);
 		bool correctStem = _stemToSuffix.ContainsKey(stem) && stem != "indicator";
@@ -821,13 +822,12 @@ public static class SEMenuManager
 
 		if (GetDecorationSettings().Contains(name))
 		{
-			if (name.Contains("teriorHullType") || name.Contains("teriorWoodType") || 
-				name == "shipGlassTexture")
+			if (name.Contains("Texture"))
 			{
 				return false;
 			}
 
-			if (name.Contains("Hull"))
+			/*if (name.Contains("Hull"))
 			{
 				string hull = name.Substring(0, 12);
 				bool usingColor = (bool)(hull + "Type").AsEnum<Settings>().GetValue();
@@ -857,7 +857,7 @@ public static class SEMenuManager
 				{
 					return false;
 				}
-			}
+			}*/
 			
 			// if color blending is off, hide settings that don't end in 1
 			if (name != "enableColorBlending" && !(bool)enableColorBlending.GetValue()

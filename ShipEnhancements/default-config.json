@@ -993,14 +993,6 @@
       "value": "None",
       "tooltip": "Changes the outside texture of the cockpit and the hatch."
     },
-    "interiorHullType": {
-      "title": "Interior Hull Type",
-      "type": "toggle",
-      "yes": "Color",
-      "no": "Texture",
-      "value": true,
-      "tooltip": "Determines whether to apply a color or a texture to the interior hull."
-    },
     "interiorHullTexture": {
       "title": "Interior Hull Texture",
       "type": "selector",
@@ -1113,14 +1105,6 @@
       ],
       "tooltip": "Changes the color of the hull inside of the ship."
     },
-    "interiorWoodType": {
-      "title": "Interior Wood Type",
-      "type": "toggle",
-      "yes": "Color",
-      "no": "Texture",
-      "value": true,
-      "tooltip": "Determines whether to apply a color or a texture to the interior wood."
-    },
     "interiorWoodTexture": {
       "title": "Interior Wood Texture",
       "type": "selector",
@@ -1230,14 +1214,6 @@
         "Rainbow"
       ],
       "tooltip": "Changes the color of the wood inside of the ship."
-    },
-    "exteriorHullType": {
-      "title": "Exterior Hull Type",
-      "type": "toggle",
-      "yes": "Color",
-      "no": "Texture",
-      "value": true,
-      "tooltip": "Determines whether to apply a color or a texture to the exterior hull."
     },
     "exteriorHullTexture": {
       "title": "Exterior Hull Texture",
@@ -1350,14 +1326,6 @@
         "Rainbow"
       ],
       "tooltip": "Changes the color of the hull outside of the ship."
-    },
-    "exteriorWoodType": {
-      "title": "Exterior Wood Type",
-      "type": "toggle",
-      "yes": "Color",
-      "no": "Texture",
-      "value": true,
-      "tooltip": "Determines whether to apply a color or a texture to the exterior wood."
     },
     "exteriorWoodTexture": {
       "title": "Exterior Wood Texture",
