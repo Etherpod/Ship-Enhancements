@@ -404,17 +404,19 @@ public class ColorBlendController : MonoBehaviour
 
         float num = Time.time % _rainbowCycleLength / _rainbowCycleLength;
         ColorHSV color = new ColorHSV(num, 1f, 255f);
+        Color rgbColor = color.AsRGB();
+        rgbColor.a = 255f;
 
         if (_blendThemes != null)
         {
             foreach (int i in _rainbowIndexes)
             {
-                UpdateRainbowTheme(i, color.AsRGB());
+                UpdateRainbowTheme(i, rgbColor);
             }
         }
         else
         {
-            SetColor(color.AsRGB());
+            SetColor(rgbColor);
         }
     }
 

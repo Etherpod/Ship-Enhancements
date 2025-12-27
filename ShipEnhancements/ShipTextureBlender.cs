@@ -30,8 +30,9 @@ public class ShipTextureBlender : MonoBehaviour
 	
 	private void Start()
 	{
-		if (RenderTextures.TryGetValue(baseTex, out var rt))
+		if (false && RenderTextures.TryGetValue(baseTex, out var rt))
 		{
+			ShipEnhancements.WriteDebugMessage("Use existing render texture - " + gameObject.name);
 			blendTex = rt;
 		}
 		else
@@ -40,6 +41,7 @@ public class ShipTextureBlender : MonoBehaviour
 			blendTex ??= new RenderTexture(rendererMainTex.width, rendererMainTex.height, 0, RenderTextureFormat.ARGBFloat);
 			blendTex.Create();
 			RenderTextures[baseTex] = blendTex;
+			ShipEnhancements.WriteDebugMessage("Create new render texture - " + gameObject.name);
 		}
 
 		_renderer.materials[materialIndex].mainTexture = blendTex;

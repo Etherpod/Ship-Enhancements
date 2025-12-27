@@ -2763,6 +2763,7 @@ public class ShipEnhancements : ModBehaviour
                 else if (interiorHull != "Default")
                 {
                     Color color = ThemeManager.GetHullTheme(interiorHull).HullColor / 255f;
+                    color.a = 1f;
                     interiorHullBlenders.ForEach(blender => blender.SetColor(color));
                 }
             }
@@ -2785,6 +2786,7 @@ public class ShipEnhancements : ModBehaviour
             else if (exteriorHull != "Default")
             {
                 Color color = ThemeManager.GetHullTheme(exteriorHull).HullColor / 255f;
+                color.a = 1f;
                 exteriorHullBlenders.ForEach(blender => blender.SetColor(color));
             }
         }
@@ -2806,6 +2808,7 @@ public class ShipEnhancements : ModBehaviour
             else if (interiorWood != "Default")
             {
                 Color color = ThemeManager.GetHullTheme(interiorWood).HullColor / 255f;
+                color.a = 1f;
                 interiorWoodBlenders.ForEach(blender => blender.SetColor(color));
             }
         }
@@ -2827,6 +2830,7 @@ public class ShipEnhancements : ModBehaviour
             else if (exteriorWood != "Default")
             {
                 Color color = ThemeManager.GetHullTheme(exteriorWood).HullColor / 255f;
+                color.a = 1f;
                 exteriorWoodBlenders.ForEach(blender => blender.SetColor(color));
             }
         }
