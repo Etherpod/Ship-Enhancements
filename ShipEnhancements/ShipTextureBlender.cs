@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ShipEnhancements.Utils;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering;
 
@@ -20,8 +21,6 @@ public class ShipTextureBlender : MonoBehaviour
 	
 	private Renderer _renderer;
 	
-	private static readonly Dictionary<Texture, RenderTexture> RenderTextures = new();
-
 	private void Awake()
 	{
 		_renderer = GetComponent<Renderer>();
@@ -29,25 +28,14 @@ public class ShipTextureBlender : MonoBehaviour
 	
 	private void Start()
 	{
-		if (RenderTextures.TryGetValue(baseTex, out var rt))
-		{
-			blendTex = rt;
-		}
-		else
-		{
-			var rendererMainTex = _renderer.materials[materialIndex].mainTexture;
-			blendTex ??= new RenderTexture(rendererMainTex.width, rendererMainTex.height, 0, RenderTextureFormat.ARGBFloat);
-			blendTex.Create();
-			RenderTextures[baseTex] = blendTex;
-		}
-
-		_renderer.materials[materialIndex].mainTexture = blendTex;
-	}
+        var (mat, rt) = this.GetBlendMaterial(_renderer.sharedMaterials[materialIndex]);
+        blendTex = rt;
+        _renderer.sharedMaterials[materialIndex] = mat;
+    }
 
 	private void OnDestroy()
 	{
-		RenderTextures.Remove(baseTex);
-		blendTex?.Release();
+        this.FreeBlendMaterial();
 	}
 
 	private void Update()
