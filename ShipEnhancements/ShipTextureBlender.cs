@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using ShipEnhancements.Utils;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 
 namespace ShipEnhancements;
 
@@ -19,10 +20,7 @@ public class ShipTextureBlender : MonoBehaviour
 	private Texture baseTex;
 	
 	private Renderer _renderer;
-	private bool _useLightmap;
 	
-	private static readonly Dictionary<Texture, RenderTexture> RenderTextures = new();
-
 	private void Awake()
 	{
 		_renderer = GetComponent<Renderer>();
@@ -30,37 +28,14 @@ public class ShipTextureBlender : MonoBehaviour
 	
 	private void Start()
 	{
-		if (false && RenderTextures.TryGetValue(baseTex, out var rt))
-		{
-			ShipEnhancements.WriteDebugMessage("Use existing render texture - " + gameObject.name);
-			blendTex = rt;
-		}
-		else
-		{
-			var rendererMainTex = _renderer.materials[materialIndex].mainTexture;
-			blendTex ??= new RenderTexture(rendererMainTex.width, rendererMainTex.height, 0, RenderTextureFormat.ARGBFloat);
-			blendTex.Create();
-			RenderTextures[baseTex] = blendTex;
-			ShipEnhancements.WriteDebugMessage("Create new render texture - " + gameObject.name);
-		}
-
-		_renderer.materials[materialIndex].mainTexture = blendTex;
-		if (_useLightmap)
-		{
-			foreach (LightmapController lightmap in SELocator.GetShipTransform()
-				.GetComponentsInChildren<LightmapController>())
-			{
-				List<Material> mats = lightmap._materials.ToList();
-				mats.AddRange(_renderer.materials);
-				lightmap._materials = mats.ToArray();
-			}
-		}
-	}
+        var (mat, rt) = this.GetBlendMaterial(_renderer.sharedMaterials[materialIndex]);
+        blendTex = rt;
+        _renderer.sharedMaterials[materialIndex] = mat;
+    }
 
 	private void OnDestroy()
 	{
-		RenderTextures.Remove(baseTex);
-		blendTex?.Release();
+        this.FreeBlendMaterial();
 	}
 
 	private void Update()
@@ -75,14 +50,13 @@ public class ShipTextureBlender : MonoBehaviour
 	}
 
 	public void Initialize(int matIndex, Material blendMat, Texture baseTexture,
-		Color color, float blend = 1f, bool isWood = false, bool useLightmap = false)
+		Color color, float blend = 1f, bool isWood = false)
 	{
 		materialIndex = matIndex;
 		blendMaterial = blendMat;
 		baseTex = baseTexture;
 		overlayColor = color;
 		blendFactor = blend;
-		_useLightmap = useLightmap;
 
 		blendMaterial.SetFloat(WoodToggleId, isWood ? 1f : 0f);
 	}
