@@ -37,6 +37,9 @@
 
   // Changes how fast the Thrust Modulator's overdrive makes you go
   "ThrustModulator_OverdriveStrength": 500.0,
+  
+  // Turns the ship on at the start of the loop, set this to false if you want to turn it on yourself
+  "EngineSwitch_StartEnabled": true,
 
   // Big numbers make the ship parts fly further when you eject them
   "Eject_SpeedMultiplier": 1.0,
