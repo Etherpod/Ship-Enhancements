@@ -199,6 +199,12 @@
       "value": false,
       "tooltip": "Disables your ability to lock on to objects. You may find it difficult to use autopilot with this enabled."
     },
+    "disableSignalscopeBrackets": {
+      "title": "Disable Signalscope Brackets",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Removes the brackets that appear on your screen while using the signalscope that help guide you to where the signal is."
+    },
     "disableMapMarkers": {
       "title": "Disable HUD Markers",
       "type": "toggle",
@@ -578,6 +584,12 @@
       "type": "toggle",
       "value": false,
       "tooltip": "Allows you to track your ship with the signalscope on the Outer Wilds Ventures frequency. Slate also mentioned something about sending commands with your signalscope."
+    },
+    "enableShipSignalscopeZoom": {
+      "title": "Enable Ship Signalscope Zoom",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Allows you to zoom in while using the ship's signalscope. You can adjust the zoom like you normally would using the handheld signalscope."
     },
 
     "itemsSplit": {

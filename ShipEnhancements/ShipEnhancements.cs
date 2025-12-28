@@ -278,6 +278,8 @@ public class ShipEnhancements : ModBehaviour
         exteriorWoodColor3,
         exteriorWoodColorBlend,
         fuelRegenerationMultiplier,
+        disableSignalscopeBrackets,
+        enableShipSignalscopeZoom
     }
 
     private readonly string[] startupMessages =

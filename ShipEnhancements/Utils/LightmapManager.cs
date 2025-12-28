@@ -28,7 +28,7 @@ public static class LightmapManager
 	{
 		if (materials.Contains(mat))
 		{
-			ShipEnhancements.WriteDebugMessage("ignoring duplicate mat " + mat.name);
+			//ShipEnhancements.WriteDebugMessage("ignoring duplicate mat " + mat.name);
 			return;
 		}
 		//ShipEnhancements.WriteDebugMessage("adding unique mat " + mat.name);
@@ -39,7 +39,7 @@ public static class LightmapManager
 
 	public static void RemoveMaterial(Material mat)
 	{
-		if (!materials.Contains(mat)) return;
+		if (!materials.Contains(mat)) return; 
 		SyncMaterials();
 		materials.Add(mat);
 		UpdateControllers();

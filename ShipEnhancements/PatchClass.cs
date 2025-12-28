@@ -5054,6 +5054,278 @@ public static class PatchClass
     }
     #endregion
 
+    #region ShipSignalscopeZoom
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(Signalscope), nameof(Signalscope.Update))]
+    public static bool ShipSigScopeZoom(Signalscope __instance)
+    {
+        if (!(bool)enableShipSignalscopeZoom.GetProperty()) return true;
+
+        PlayerTool_Update(__instance);
+        if (!__instance._isEquipped || __instance._isPuttingAway)
+        {
+            return false;
+        }
+
+        __instance.UpdateAudioSignals();
+        if (Locator.GetPlayerSuit().IsWearingHelmet() && !__instance._inZoomMode &&
+            __instance._signalscopeUI.IsWaveformActive())
+        {
+            __instance._signalscopeUI.SetWaveformUIActive(false);
+        }
+        else if ((__instance._inZoomMode ||
+                (!Locator.GetPlayerSuit().IsWearingHelmet() && !PlayerState.AtFlightConsole())) &&
+            !__instance._signalscopeUI.IsWaveformActive())
+        {
+            __instance._signalscopeUI.SetWaveformUIActive(true);
+        }
+
+        if (!__instance._isPuttingAway && !__instance._inZoomMode &&
+            (OWInput.IsInputMode(InputMode.Character) ||
+                OWInput.IsInputMode(InputMode.ScopeZoom | InputMode.ShipCockpit)))
+        {
+            if (OWInput.IsNewlyPressed(InputLibrary.toolActionPrimary, InputMode.All))
+            {
+                __instance.EnterSignalscopeZoom();
+            }
+        }
+        else if (__instance._inZoomMode)
+        {
+            float num = OWInput.GetValue(InputLibrary.toolOptionDown, InputMode.ScopeZoom | InputMode.ShipCockpit) -
+                OWInput.GetValue(InputLibrary.toolOptionUp, InputMode.ScopeZoom | InputMode.ShipCockpit);
+            float num2 = (__instance._useWarpFov ? (__instance._targetWarpFOV - __instance._targetFOV) : 0f);
+            __instance._fovWarpOffset = Mathf.MoveTowards(__instance._fovWarpOffset, num2, Time.deltaTime * 30f);
+            __instance._targetFOV = Mathf.Clamp(__instance._targetFOV + num * Time.deltaTime * 50f, 10f, 60f);
+            __instance._playerCamController.SetTargetFieldOfView(__instance._targetFOV + __instance._fovWarpOffset);
+            if (OWInput.IsNewlyReleased(InputLibrary.toolActionPrimary, InputMode.ScopeZoom | InputMode.ShipCockpit))
+            {
+                __instance.ExitSignalscopeZoom();
+            }
+        }
+
+        int frequencyFilterIndex = __instance._frequencyFilterIndex;
+        if (!PlayerState.IsInsideTheEye() &&
+            OWInput.IsInputMode(InputMode.Character | InputMode.ScopeZoom | InputMode.ShipCockpit))
+        {
+            if (OWInput.IsNewlyPressed(InputLibrary.toolOptionRight, InputMode.All))
+            {
+                __instance.SwitchFrequencyFilter(1);
+            }
+            else if (OWInput.IsNewlyPressed(InputLibrary.toolOptionLeft, InputMode.All))
+            {
+                __instance.SwitchFrequencyFilter(-1);
+            }
+        }
+
+        if (__instance._frequencyFilterIndex != frequencyFilterIndex)
+        {
+            __instance._signalscopeAudio.PlayChangeSignalscopeFrequency();
+        }
+
+        return false;
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(Signalscope), nameof(Signalscope.ExitSignalscopeZoom))]
+    public static void PreventScopeObjEnable(Signalscope __instance)
+    {
+        if (!(bool)enableShipSignalscopeZoom.GetProperty() || !PlayerState.AtFlightConsole()) return;
+        
+        __instance._scopeGameObject.SetActive(false);
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.AllowFreeLook))]
+    public static void DisableFreeLookWhileZoomed(ShipCockpitController __instance, ref bool __result)
+    {
+        if (!(bool)enableShipSignalscopeZoom.GetProperty()) return;
+        
+        __result = __result && !Locator.GetPlayerController()._signalscopeZoom;
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(ShipThrusterController), nameof(ShipThrusterController.ReadRotationalInput))]
+    public static void AddLookSensitivityFactorWhileZoomed(ShipThrusterController __instance, ref Vector3 __result)
+    {
+        if (!(bool)enableShipSignalscopeZoom.GetProperty()) return;
+        
+        if (PlayerState.AtFlightConsole() && Locator.GetPlayerController()._signalscopeZoom)
+        {
+            __result *= PlayerCameraController.ZOOM_SCALAR;
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(BaseInputManager), nameof(BaseInputManager.OnEnterSignalscopeZoom))]
+    public static bool DisableScopeZoomModeAtCockpit(BaseInputManager __instance)
+    {
+        if (!(bool)enableShipSignalscopeZoom.GetProperty()) return true;
+        
+        return !PlayerState.AtFlightConsole();
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(BaseInputManager), nameof(BaseInputManager.OnExitSignalscopeZoom))]
+    public static bool DisableModeResetAfterZoom(BaseInputManager __instance)
+    {
+        if (!(bool)enableShipSignalscopeZoom.GetProperty()) return true;
+        
+        return !PlayerState.AtFlightConsole();
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(PlayerCameraController), nameof(PlayerCameraController.UpdateInput))]
+    public static bool ForceShipControlWhileZoomed(PlayerCameraController __instance)
+    {
+        if (!(bool)enableShipSignalscopeZoom.GetProperty()) return true;
+        
+        bool usingFreeLook = __instance._shipController != null && __instance._shipController.AllowFreeLook() &&
+            OWInput.IsPressed(InputLibrary.freeLook, 0f);
+        bool inCharacterMode = OWInput.IsInputMode(InputMode.Character | InputMode.ScopeZoom |
+            InputMode.NomaiRemoteCam | InputMode.PatchingSuit);
+        bool usingCockpitZoom = PlayerState.AtFlightConsole() && __instance._zoomed;
+        if (__instance._isSnapping || __instance._isLockedOn ||
+            (PlayerState.InZeroG() && PlayerState.IsWearingSuit()) ||
+            (!inCharacterMode && !usingFreeLook) ||
+            usingCockpitZoom)
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ToolModeSwapper), nameof(ToolModeSwapper.Update))]
+    public static bool PrevetProbeEquipFromSigScope(ToolModeSwapper __instance)
+    {
+        if (!(bool)enableShipSignalscopeZoom.GetProperty()) return true;
+
+        if (__instance._isSwitchingToolMode && !__instance._equippedTool.IsEquipped())
+        {
+            __instance._equippedTool = __instance._nextTool;
+            __instance._nextTool = null;
+            if (__instance._equippedTool != null)
+            {
+                __instance._equippedTool.EquipTool();
+            }
+
+            __instance._currentToolMode = __instance._nextToolMode;
+            __instance._nextToolMode = ToolMode.None;
+            __instance._isSwitchingToolMode = false;
+        }
+
+        InputMode inputMode = InputMode.Character | InputMode.ShipCockpit;
+        if (!__instance.IsNomaiTextInFocus())
+        {
+            __instance._waitForLoseNomaiTextFocus = false;
+        }
+
+        if (__instance._shipDestroyed && __instance._currentToolGroup == ToolGroup.Ship)
+        {
+            return false;
+        }
+
+        if (__instance._currentToolMode != ToolMode.None && __instance._currentToolMode != ToolMode.Item &&
+            (OWInput.IsNewlyPressed(InputLibrary.cancel, inputMode | InputMode.ScopeZoom) ||
+                PlayerState.InConversation()))
+        {
+            InputLibrary.cancel.ConsumeInput();
+            if (__instance.GetAutoEquipTranslator() && __instance._currentToolMode == ToolMode.Translator)
+            {
+                __instance._waitForLoseNomaiTextFocus = true;
+            }
+
+            __instance.UnequipTool();
+        }
+        else if (__instance.IsNomaiTextInFocus() && __instance._currentToolMode != ToolMode.Translator &&
+            ((__instance.GetAutoEquipTranslator() && !__instance._waitForLoseNomaiTextFocus) ||
+                OWInput.IsNewlyPressed(InputLibrary.interact, inputMode)))
+        {
+            __instance.EquipToolMode(ToolMode.Translator);
+            if (__instance._firstPersonManipulator.GetFocusedNomaiText() != null && __instance._firstPersonManipulator
+                .GetFocusedNomaiText().CheckTurnOffFlashlight())
+            {
+                Locator.GetFlashlight().TurnOff(false);
+            }
+        }
+        else if (__instance._currentToolMode == ToolMode.Translator && !__instance.IsNomaiTextInFocus() &&
+            __instance.GetAutoEquipTranslator())
+        {
+            __instance.UnequipTool();
+        }
+        else if (OWInput.IsNewlyPressed(InputLibrary.probeLaunch, inputMode))
+        {
+            if (__instance._currentToolGroup == ToolGroup.Suit &&
+                __instance._itemCarryTool.GetHeldItemType() == ItemType.DreamLantern)
+            {
+                return false;
+            }
+
+            if (((__instance._currentToolMode == ToolMode.None || __instance._currentToolMode == ToolMode.Item) &&
+                    Locator.GetPlayerSuit().IsWearingSuit(false)) ||
+                ((__instance._currentToolMode ==
+                        ToolMode.None /*|| __instance._currentToolMode == ToolMode.SignalScope*/) &&
+                    OWInput.IsInputMode(InputMode.ShipCockpit)))
+            {
+                __instance.EquipToolMode(ToolMode.Probe);
+            }
+        }
+        else if (OWInput.IsNewlyPressed(InputLibrary.signalscope, inputMode | InputMode.ScopeZoom))
+        {
+            if (PlayerState.InDreamWorld())
+            {
+                return false;
+            }
+
+            if (__instance._currentToolMode == ToolMode.SignalScope)
+            {
+                __instance.UnequipTool();
+            }
+            else
+            {
+                __instance.EquipToolMode(ToolMode.SignalScope);
+            }
+        }
+
+        bool flag = __instance._itemCarryTool.UpdateInteract(__instance._firstPersonManipulator,
+            __instance.IsItemToolBlocked());
+        if (!__instance._itemCarryTool.IsEquipped() && flag)
+        {
+            __instance.EquipToolMode(ToolMode.Item);
+            return false;
+        }
+
+        if (__instance._itemCarryTool.GetHeldItem() != null && __instance._currentToolMode == ToolMode.None &&
+            OWInput.IsInputMode(InputMode.Character) && !OWInput.IsChangePending())
+        {
+            __instance.EquipToolMode(ToolMode.Item);
+        }
+
+        return false;
+    }
+
+    #endregion
+    
+    #region DisableSignalscopeBrackets
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(SignalscopeReticleController), nameof(SignalscopeReticleController.UpdateBrackets))]
+    public static bool DisableSignalscopeBrackets(SignalscopeReticleController __instance)
+    {
+        if (!(bool)disableSignalscopeBrackets.GetProperty()) return true;
+        
+        if (__instance._clonedLeftBrackets.Count > 0)
+        {
+            __instance._clonedLeftBrackets.Clear();
+            __instance._clonedRightBrackets.Clear();
+        }
+        return false;
+    }
+    
+    #endregion
+
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ShipAudioController), nameof(ShipAudioController.PlayEject))]
     public static bool FixEjectAudio(ShipAudioController __instance)
