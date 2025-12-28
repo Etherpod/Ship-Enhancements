@@ -3392,20 +3392,26 @@ public static class PatchClass
     {
         if (!(bool)enableStunDamage.GetProperty() || SELocator.GetShipDamageController().IsSystemFailed()) return;
 
+        float time;
+        
         if (damage > 0.1f)
         {
             float lerp = Mathf.InverseLerp(0.1f, 0.8f, damage);
-            float time = Mathf.Lerp(1f, 8f, lerp);
-            __instance.GetComponentInChildren<ShipCockpitController>().LockUpControls(time);
-            ShipNotifications.PostStunDamageNotification(time);
+            time = Mathf.Lerp(1f, 8f, lerp);
         }
         else if (impact.speed > 30f * (float)shipDamageSpeedMultiplier.GetProperty())
         {
             float lerp = Mathf.InverseLerp(30f, 120f, impact.speed);
-            float time = Mathf.Lerp(2f, 5f, lerp);
-            __instance.GetComponentInChildren<ShipCockpitController>().LockUpControls(time);
-            ShipNotifications.PostStunDamageNotification(time);
+            time = Mathf.Lerp(2f, 5f, lerp);
         }
+        else
+        {
+            return;
+        }
+        
+        __instance.GetComponentInChildren<ShipCockpitController>().LockUpControls(time);
+        ShipNotifications.PostStunDamageNotification(time);
+        __instance.GetComponent<ShipThrusterController>().SetRollMode(false, 1);
     }
     #endregion
 
