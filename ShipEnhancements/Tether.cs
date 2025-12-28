@@ -107,10 +107,10 @@ public class Tether : MonoBehaviour
                     _audioController.StopReelAudio();
                 }
 
-                if (OWInput.IsPressed(InputLibrary.freeLook) && OWInput.IsNewlyPressed(InputLibrary.interact))
+                if (!PlayerState.AtFlightConsole() && 
+                    OWInput.IsPressed(InputLibrary.freeLook) && OWInput.IsNewlyPressed(InputLibrary.interact))
                 {
                     _hook.DisconnectTether();
-                    // Play untether noise
                 }
             }
         }
