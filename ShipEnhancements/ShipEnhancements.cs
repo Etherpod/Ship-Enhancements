@@ -13,6 +13,7 @@ using UnityEngine.UI;
 using Newtonsoft.Json;
 using ShipEnhancements.Models.Json;
 using ShipEnhancements.ModMenu;
+using ShipEnhancements.Utils;
 using UnityEngine.Experimental.Rendering;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
@@ -569,6 +570,8 @@ public class ShipEnhancements : ModBehaviour
                 NHAPI.GetStarSystemLoadedEvent().RemoveListener(SetCustomWarpDestination);
                 _unsubFromShipSpawn = false;
             }
+
+            LightmapManager.Clear();
 
             bool skipSettings = GetComponent<PersistentShipState>()?.PreserveSettings ?? false;
             if ((!InMultiplayer || QSBAPI.GetIsHost()) && !skipSettings)
@@ -1128,8 +1131,10 @@ public class ShipEnhancements : ModBehaviour
         {
             _defaultSEInteriorMat2 = LoadMaterial("Assets/ShipEnhancements/ShipInterior_SE_VillageCabin_mat.mat");
         }
+
+        LightmapManager.Clear();
         
-        Material[] newMaterials =
+        Material[] lightmapMaterials =
         {
             LoadMaterial("Assets/ShipEnhancements/ShipInterior_SE_VillageCabin_mat.mat"),
             LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_VillageCabin_Recolored_mat.mat"),
@@ -1147,7 +1152,13 @@ public class ShipEnhancements : ModBehaviour
             LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_WaterGaugeMetal_mat.mat"),
             _customGlassMat,
         };
-        Transform cockpitLight = SELocator.GetShipTransform().Find("Module_Cockpit/Lights_Cockpit/Pointlight_HEA_ShipCockpit");
+
+        foreach (var mat in lightmapMaterials)
+        {
+            LightmapManager.AddMaterial(mat);
+        }
+        
+        /*Transform cockpitLight = SELocator.GetShipTransform().Find("Module_Cockpit/Lights_Cockpit/Pointlight_HEA_ShipCockpit");
         List<Material> materials = [.. cockpitLight.GetComponent<LightmapController>()._materials];
         materials.AddRange(newMaterials);
         cockpitLight.GetComponent<LightmapController>()._materials = [.. materials];
@@ -1160,7 +1171,7 @@ public class ShipEnhancements : ModBehaviour
         Transform suppliesLight = SELocator.GetShipTransform().Find("Module_Supplies/Lights_Supplies/Pointlight_HEA_ShipSupplies_Top");
         List<Material> materials3 = [.. suppliesLight.GetComponent<LightmapController>()._materials];
         materials3.AddRange(newMaterials);
-        suppliesLight.GetComponent<LightmapController>()._materials = [.. materials3];
+        suppliesLight.GetComponent<LightmapController>()._materials = [.. materials3];*/
 
         MeshRenderer chassisRenderer = SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry/Cockpit_Interior/Cockpit_Interior_Chassis")
             .GetComponent<MeshRenderer>();
@@ -2696,10 +2707,9 @@ public class ShipEnhancements : ModBehaviour
                     interiorHullBlenders.Add(blender);
                     blender.Initialize(
                         i,
-                        new Material(textureBlendMat),
+                        textureBlendMat,
                         _defaultInteriorHullMat.GetTexture("_MainTex"),
-                        Color.white,
-                        useLightmap: true
+                        new Color(1f, 1f, 1f, 0f)
                     );
                 }
                 else if (rend.sharedMaterials[i] == _defaultExteriorHullMat &&
@@ -2709,9 +2719,9 @@ public class ShipEnhancements : ModBehaviour
                     exteriorHullBlenders.Add(blender);
                     blender.Initialize(
                         i,
-                        new Material(textureBlendMat),
+                        textureBlendMat,
                         _defaultExteriorHullMat.GetTexture("_MainTex"),
-                        Color.white
+                        new Color(1f, 1f, 1f, 0f)
                     );
                 }
                 else if (rend.sharedMaterials[i] == _defaultInteriorWoodMat &&
@@ -2721,11 +2731,10 @@ public class ShipEnhancements : ModBehaviour
                     interiorWoodBlenders.Add(blender);
                     blender.Initialize(
                         i,
-                        new Material(textureBlendMat),
+                        textureBlendMat,
                         _defaultInteriorWoodMat.GetTexture("_MainTex"),
-                        Color.white,
-                        isWood: true,
-                        useLightmap: true
+                        new Color(1f, 1f, 1f, 0f),
+                        isWood: true
                     );
                 }
                 else if (rend.sharedMaterials[i] == _defaultExteriorWoodMat &&
@@ -2735,9 +2744,9 @@ public class ShipEnhancements : ModBehaviour
                     exteriorWoodBlenders.Add(blender);
                     blender.Initialize(
                         i,
-                        new Material(textureBlendMat),
+                        textureBlendMat,
                         _defaultExteriorWoodMat.GetTexture("_MainTex"),
-                        Color.white,
+                        new Color(1f, 1f, 1f, 0f),
                         isWood: true
                     );
                 }
@@ -2763,7 +2772,7 @@ public class ShipEnhancements : ModBehaviour
                 else if (interiorHull != "Default")
                 {
                     Color color = ThemeManager.GetHullTheme(interiorHull).HullColor / 255f;
-                    color.a = 1f;
+                    color.a = 0f;
                     interiorHullBlenders.ForEach(blender => blender.SetColor(color));
                 }
             }
@@ -2786,7 +2795,7 @@ public class ShipEnhancements : ModBehaviour
             else if (exteriorHull != "Default")
             {
                 Color color = ThemeManager.GetHullTheme(exteriorHull).HullColor / 255f;
-                color.a = 1f;
+                color.a = 0f;
                 exteriorHullBlenders.ForEach(blender => blender.SetColor(color));
             }
         }
@@ -2808,7 +2817,7 @@ public class ShipEnhancements : ModBehaviour
             else if (interiorWood != "Default")
             {
                 Color color = ThemeManager.GetHullTheme(interiorWood).HullColor / 255f;
-                color.a = 1f;
+                color.a = 0f;
                 interiorWoodBlenders.ForEach(blender => blender.SetColor(color));
             }
         }
@@ -2830,7 +2839,7 @@ public class ShipEnhancements : ModBehaviour
             else if (exteriorWood != "Default")
             {
                 Color color = ThemeManager.GetHullTheme(exteriorWood).HullColor / 255f;
-                color.a = 1f;
+                color.a = 0f;
                 exteriorWoodBlenders.ForEach(blender => blender.SetColor(color));
             }
         }

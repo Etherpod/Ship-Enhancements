@@ -20,6 +20,7 @@ public class ShipTextureBlender : MonoBehaviour
 	private Texture baseTex;
 	
 	private Renderer _renderer;
+	private bool _isWood;
 	
 	private void Awake()
 	{
@@ -28,9 +29,18 @@ public class ShipTextureBlender : MonoBehaviour
 	
 	private void Start()
 	{
-        var (mat, rt) = this.GetBlendMaterial(_renderer.sharedMaterials[materialIndex]);
-        blendTex = rt;
-        _renderer.sharedMaterials[materialIndex] = mat;
+		var (mat, rt) = this.GetBlendMaterial(_renderer.sharedMaterials[materialIndex]);
+		blendTex = rt;
+		
+		Material[] sharedMats = _renderer.sharedMaterials;
+		sharedMats[materialIndex] = mat;
+		sharedMats[materialIndex].mainTexture = mat.mainTexture;
+		_renderer.sharedMaterials = sharedMats;
+
+		foreach (var sMat in _renderer.sharedMaterials)
+		{
+			LightmapManager.AddMaterial(sMat);
+		}
     }
 
 	private void OnDestroy()
@@ -46,6 +56,7 @@ public class ShipTextureBlender : MonoBehaviour
 
 		blendMaterial.SetColor(OverlayColorId, overlayColor);
 		blendMaterial.SetFloat(BlendFactorId, blendFactor);
+		blendMaterial.SetFloat(WoodToggleId, _isWood ? 1f : 0f);
 		Graphics.Blit(baseTex, blendTex, blendMaterial);
 	}
 
@@ -57,8 +68,7 @@ public class ShipTextureBlender : MonoBehaviour
 		baseTex = baseTexture;
 		overlayColor = color;
 		blendFactor = blend;
-
-		blendMaterial.SetFloat(WoodToggleId, isWood ? 1f : 0f);
+		_isWood = isWood;
 	}
 
 	public void SetTexture(Texture newColor, Texture newNormal, Texture newSmooth,
@@ -88,6 +98,7 @@ public class ShipTextureBlender : MonoBehaviour
 
 	public void SetColor(Color newColor)
 	{
+		ShipEnhancements.WriteDebugMessage(newColor);
 		overlayColor = newColor;
 	}
 }

@@ -7,7 +7,7 @@ namespace ShipEnhancements.Utils;
 public static class BlendMatManager
 {
     private static readonly object Synchro = new();
-    private static readonly Dictionary<Texture, MatData> MatByBase = new();
+    private static readonly Dictionary<Material, MatData> MatByBase = new();
     private static readonly Dictionary<object, MatData> MatByOwner = new();
     private static readonly Dictionary<MatData, int> MatUsers = new();
 
@@ -17,19 +17,23 @@ public static class BlendMatManager
         Texture baseTexture = null
     ) => Synchronized(() =>
     {
-        if (MatByOwner.TryGetValue(owner, out var mat)) return (mat.Mat, mat.MainTex);
+        if (MatByOwner.TryGetValue(owner, out var mat))
+        {
+            return (mat.Mat, mat.MainTex);
+        }
 
         baseTexture ??= baseMaterial.mainTexture;
-        if (!MatByBase.TryGetValue(baseTexture, out mat))
+        if (!MatByBase.TryGetValue(baseMaterial, out mat))
         {
             mat = new MatData(
+                baseMaterial,
                 baseTexture,
                 new RenderTexture(baseTexture.width, baseTexture.height, 0, RenderTextureFormat.ARGB32),
                 new Material(baseMaterial)
             );
-            MatByBase[mat.BaseTex] = mat;
+            MatByBase[baseMaterial] = mat;
             mat.MainTex.Create();
-            mat.Mat.mainTexture =  mat.MainTex;
+            mat.Mat.mainTexture = mat.MainTex;
         }
 
         MatByOwner[owner] = mat;
@@ -43,7 +47,7 @@ public static class BlendMatManager
         if (!MatByOwner.Remove(owner, out var mat)) return;
         if (0 < --MatUsers[mat]) return;
         MatUsers.Remove(mat);
-        MatByBase.Remove(mat.BaseTex);
+        MatByBase.Remove(mat.BaseMat);
         UnityEngine.Object.Destroy(mat.Mat);
         mat.MainTex.Release();
     });
@@ -59,6 +63,7 @@ public static class BlendMatManager
     }
 
     private record MatData(
+        Material BaseMat,
         Texture BaseTex,
         RenderTexture MainTex,
         Material Mat
