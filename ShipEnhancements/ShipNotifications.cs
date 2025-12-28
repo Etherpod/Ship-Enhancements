@@ -338,7 +338,7 @@ public static class ShipNotifications
 
     public static void PostStunDamageNotification(float time)
     {
-        _stunDamageNotification.minDuration = Mathf.Max(_stunDamageNotification.minDuration, time);
+        _stunDamageNotification.minDuration = Mathf.Max(1f, time - 0.2f);
         NotificationManager.SharedInstance.PostNotification(_stunDamageNotification, false);
     }
 }
