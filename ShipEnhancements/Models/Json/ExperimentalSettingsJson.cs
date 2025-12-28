@@ -17,6 +17,7 @@ public record ExperimentalSettingsJson(
     [JsonProperty] float Tether_ReelMultiplier,
     [JsonProperty] float ThrustModulator_OverdriveStrength,
     [JsonProperty] float Eject_SpeedMultiplier,
+    [JsonProperty] bool EngineSwitch_StartEnabled,
     [JsonProperty] bool RealisticClock,
     [JsonProperty] bool MakeWaterDamageEverythingDamage,
     [JsonProperty] bool UltraQuantumShip

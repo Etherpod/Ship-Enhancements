@@ -84,6 +84,11 @@ public class ShipEngineSwitch : CockpitInteractible
         _baseIndicatorLightIntensity = _powerIndicatorLight.intensity;
         _thrustersIndicatorLight.intensity = 0f;
         _powerIndicatorLight.intensity = 0f;
+
+        if (ShipEnhancements.ExperimentalSettings.EngineSwitch_StartEnabled)
+        {
+            InitializeEngineSwitch(true);
+        }
     }
     
     private void Update()
@@ -360,11 +365,13 @@ public class ShipEngineSwitch : CockpitInteractible
     
     public void InitializeEngineSwitch(bool completedIgnition)
     {
-        if (completedIgnition)
+        if (completedIgnition && !_completedIgnition)
         {
             _switchTransform.localRotation = _targetRotation;
             _completedTurn = true;
             _completedIgnition = true;
+            _turnSwitch = true;
+            _turningT = 1f;
             ShipEnhancements.Instance.SetEngineOn(true);
             /*ShipElectricalComponent electricalComponent = SELocator.GetShipDamageController()._shipElectricalComponent;
             if (!electricalComponent.isDamaged && !electricalComponent._electricalSystem.IsPowered())
