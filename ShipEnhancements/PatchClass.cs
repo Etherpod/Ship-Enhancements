@@ -5327,6 +5327,19 @@ public static class PatchClass
     #endregion
 
     [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipReactorComponent), nameof(ShipReactorComponent.Update))]
+    public static bool CustomReactorBehavior(ShipReactorComponent __instance)
+    {
+        if (__instance.TryGetComponent(out ReactorHeatController heatController))
+        {
+            heatController.OnReactorUpdate();
+            return false;
+        }
+        
+        return true;
+    }
+
+    [HarmonyPrefix]
     [HarmonyPatch(typeof(ShipAudioController), nameof(ShipAudioController.PlayEject))]
     public static bool FixEjectAudio(ShipAudioController __instance)
     {

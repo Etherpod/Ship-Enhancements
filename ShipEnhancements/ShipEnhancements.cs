@@ -1198,6 +1198,11 @@ public class ShipEnhancements : ModBehaviour
                 CreateObject(warpDamage, damageScreen.parent);
             }
         }
+        
+        SELocator.GetShipDamageController()._shipReactorComponent.gameObject.AddComponent<ReactorHeatController>();
+        
+        GameObject cockpitController = LoadPrefab("Assets/ShipEnhancements/CockpitEffectController.prefab");
+        CreateObject(cockpitController, SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry"));
 
         SetUpShipLogSplashScreen();
 
@@ -1565,12 +1570,6 @@ public class ShipEnhancements : ModBehaviour
                 collider.material = mat;
             }
         }
-        if (true || (float)rustLevel.GetProperty() > 0f || ((float)dirtAccumulationTime.GetProperty() > 0f
-            && (float)maxDirtAccumulation.GetProperty() > 0f))
-        {
-            GameObject cockpitController = LoadPrefab("Assets/ShipEnhancements/CockpitEffectController.prefab");
-            CreateObject(cockpitController, SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry"));
-        }
         if ((bool)addPortableTractorBeam.GetProperty())
         {
             GameObject tractorSocket = LoadPrefab("Assets/ShipEnhancements/PortableTractorBeamSocket.prefab");
@@ -1901,9 +1900,8 @@ public class ShipEnhancements : ModBehaviour
             GameObject leverObj = LoadPrefab("Assets/ShipEnhancements/WaterCoolingLever.prefab");
             CreateObject(leverObj, SELocator.GetShipTransform().Find("Module_Cabin/Geo_Cabin"));
         }
-        if ((bool)enableReactorOverload.GetProperty() || (bool)enableShipTemperature.GetProperty())
+        if ((bool)enableReactorOverload.GetProperty())
         {
-            SELocator.GetShipDamageController()._shipReactorComponent.gameObject.AddComponent<ReactorHeatController>();
             if ((bool)enableReactorOverload.GetProperty())
             {
                 GameObject overloadObj = LoadPrefab("Assets/ShipEnhancements/ReactorOverloadInteract.prefab");
@@ -3415,7 +3413,8 @@ public class ShipEnhancements : ModBehaviour
         headlightComponent._damaged = true;
         headlightComponent._repairFraction = 0f;
         headlightComponent.OnComponentDamaged();
-        FindObjectOfType<ShipCockpitController>()._externalLightsOn = false;
+        ShipCockpitController cockpitController = FindObjectOfType<ShipCockpitController>();
+        cockpitController._externalLightsOn = false;
 
         disableShipHeadlights = true;
     }

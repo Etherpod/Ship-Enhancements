@@ -38,7 +38,7 @@ public class ReactorOverloader : MonoBehaviour
 
     private void Update()
     {
-        if (_focused)
+        if (_focused && !_reactor.isDamaged)
         {
             bool was = _overloaded;
             if (!_overloaded && OWInput.IsPressed(InputLibrary.interact, InputMode.Character, _startupLength))
