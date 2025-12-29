@@ -866,7 +866,7 @@ public class ResourcePump : OWItem
             if (col.TryGetComponent(out SingleInteractionVolume vol))
             {
                 var eventDelegate = (MulticastDelegate)typeof(SingleInteractionVolume).GetField("OnPressInteract", 
-                    BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).GetValue(vol);
+                    BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public)?.GetValue(vol);
                 if (eventDelegate != null)
                 {
                     foreach (var handler in eventDelegate.GetInvocationList())
@@ -898,10 +898,19 @@ public class ResourcePump : OWItem
         {
             foreach (var col in cols)
             {
-                if (col.TryGetComponent(out FluidVolume vol) && vol.GetFluidType() is FluidVolume.Type.WATER or FluidVolume.Type.GEYSER)
+                if (!col.TryGetComponent(out FluidVolume vol) || 
+                    vol.GetFluidType() is not FluidVolume.Type.WATER and not FluidVolume.Type.GEYSER)
                 {
-                    _waterVolumes.Add(vol);
+                    continue;
                 }
+                
+                if (col.TryGetComponent(out OWCustomCollider customCol) &&
+                    !customCol.IsPointInCollider(transform.position))
+                {
+                    return;
+                }
+                
+                _waterVolumes.Add(vol);
             }
         }
     }

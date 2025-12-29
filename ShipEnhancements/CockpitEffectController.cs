@@ -102,12 +102,21 @@ public class CockpitEffectController : MonoBehaviour
 
     private void Update()
     {
+        if (_dirtBuildupTime == 0f && !SELocator.GetShipTemperatureDetector())
+        {
+            enabled = false;
+            return;
+        }
+        
         if (_dirtBuildupTime > 0f)
         {
             UpdateDirt();
         }
-        
-        UpdateIce();
+
+        if (SELocator.GetShipTemperatureDetector())
+        {
+            UpdateIce();
+        }
     }
 
     private void UpdateIce()

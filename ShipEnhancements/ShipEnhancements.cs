@@ -91,6 +91,7 @@ public class ShipEnhancements : ModBehaviour
     public int ThrustModulatorLevel { get; private set; }
     public float ThrustModulatorFactor => ThrustModulatorLevel / 5f;
     public AudioClip ShipHorn { get; private set; }
+    public List<AntiRiverVolume> AntiRiverVolumes { get; private set; } = [];
 
     public GameObject DebugObjects { get; private set; }
 
@@ -1203,6 +1204,19 @@ public class ShipEnhancements : ModBehaviour
         
         GameObject cockpitController = LoadPrefab("Assets/ShipEnhancements/CockpitEffectController.prefab");
         CreateObject(cockpitController, SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry"));
+
+        AntiRiverVolumes.Clear();
+        
+        GameObject darkSideVol = LoadPrefab("Assets/ShipEnhancements/AntiRiverVolume_DarkSideDockingBay.prefab");
+        GameObject lightSideVol = LoadPrefab("Assets/ShipEnhancements/AntiRiverVolume_LightSideDockingBay.prefab");
+        AntiRiverVolumes.Add(CreateObject(darkSideVol,
+            GameObject.Find("RingWorld_Body").transform
+                .Find("Sector_RingWorld/Sector_DarkSideDockingBay/Volumes_DarkSideDockingBay"))
+            .GetComponent<AntiRiverVolume>());
+        AntiRiverVolumes.Add(CreateObject(lightSideVol,
+            GameObject.Find("RingWorld_Body").transform
+                .Find("Sector_RingWorld/Sector_LightSideDockingBay/Volumes_LightSideDockingBay"))
+            .GetComponent<AntiRiverVolume>());
 
         SetUpShipLogSplashScreen();
 

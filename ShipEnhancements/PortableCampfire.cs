@@ -54,7 +54,7 @@ public class PortableCampfire : Campfire
     {
         if (!_shipDestroyed && _insideShip && !_extinguished)
         {
-            float oxygenDrain = 10f * Time.deltaTime;
+            float oxygenDrain = 5f * Time.deltaTime;
             SELocator.GetShipResources().DrainOxygen(oxygenDrain);
 
             if (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost())
@@ -119,18 +119,32 @@ public class PortableCampfire : Campfire
         {
             _waterVolumes.Clear();
 
-            Collider[] cols = Physics.OverlapSphere(_fluidDetector.transform.position, 0.6f, OWLayerMask.effectVolumeMask);
-            ShipEnhancements.WriteDebugMessage("cols: " + cols);
+            var cols = Physics.OverlapSphere(_fluidDetector.transform.position, 0.6f, OWLayerMask.effectVolumeMask);
             if (cols.Length > 0)
             {
                 foreach (var col in cols)
                 {
-                    ShipEnhancements.WriteDebugMessage("test " + col);
-                    if (col.TryGetComponent(out FluidVolume vol) && vol.GetFluidType() is FluidVolume.Type.WATER or FluidVolume.Type.GEYSER)
+                    if (!col.TryGetComponent(out FluidVolume vol) || 
+                        vol.GetFluidType() is not FluidVolume.Type.WATER and not FluidVolume.Type.GEYSER)
                     {
-                        ShipEnhancements.WriteDebugMessage("add " + vol);
-                        _waterVolumes.Add(vol);
+                        continue;
                     }
+
+                    if (col.TryGetComponent(out OWCustomCollider customCol))
+                    {
+                        if (customCol is OWRingRiverCollider ringRiverCollider &&
+                            !PatchClass.CheckPointInRingWorldRiver(ringRiverCollider, transform.position))
+                        {
+                            continue;
+                        }
+
+                        if (!customCol.IsPointInCollider(transform.position))
+                        {
+                            continue;
+                        }
+                    }
+                    
+                    _waterVolumes.Add(vol);
                 }
             }
 

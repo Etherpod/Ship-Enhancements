@@ -106,7 +106,7 @@ public class ShipFluidDamageController : MonoBehaviour
                 * (float)shipDamageMultiplier.GetProperty());
             var eventDelegate1 = (System.MulticastDelegate)typeof(ShipHull).GetField("OnDamaged",
                 System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic
-                | System.Reflection.BindingFlags.Public).GetValue(targetHull);
+                | System.Reflection.BindingFlags.Public)?.GetValue(targetHull);
             if (eventDelegate1 != null)
             {
                 foreach (var handler in eventDelegate1.GetInvocationList())
