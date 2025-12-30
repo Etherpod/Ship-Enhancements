@@ -280,7 +280,8 @@ public class ShipEnhancements : ModBehaviour
         exteriorWoodColorBlend,
         fuelRegenerationMultiplier,
         disableSignalscopeBrackets,
-        enableShipSignalscopeZoom
+        enableShipSignalscopeZoom,
+        shipForceMultiplier,
     }
 
     private readonly string[] startupMessages =
@@ -1956,6 +1957,11 @@ public class ShipEnhancements : ModBehaviour
 
             SELocator.GetShipBody().GetComponentInChildren<ShipAudioController>()
                 .gameObject.AddComponent<SmokeDetectorChirp>();
+        }
+        if ((float)shipForceMultiplier.GetProperty() != 1f)
+        {
+            SELocator.GetShipDetector().GetComponent<AlignmentForceDetector>()._fieldMultiplier =
+                (float)shipForceMultiplier.GetProperty();
         }
 
         SetDamageColors();

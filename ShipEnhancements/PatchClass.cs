@@ -5370,6 +5370,41 @@ public static class PatchClass
     }
     
     #endregion
+    
+    [HarmonyReversePatch]
+    [HarmonyPatch(typeof(FluidDetector), nameof(FluidDetector.AddDrag))]
+    public static void FluidDetector_AddDrag(FluidDetector __instance, 
+        FluidVolume fluidVolume, float fractionSubmerged) { }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ShipFluidDetector), nameof(ShipFluidDetector.AddDrag))]
+    public static bool ApplyFieldMultiplierSignToAlignment(ShipFluidDetector __instance, 
+        FluidVolume fluidVolume, float fractionSubmerged)
+    {
+        if ((float)shipForceMultiplier.GetProperty() < 0f && fluidVolume.AllowShipAutoroll())
+        {
+            Vector3 vector = fluidVolume.GetAttachedOWRigidbody().GetPosition() - __instance._owRigidbody.GetPosition();
+            vector *= -1f;
+            Vector3 forward = __instance._owRigidbody.transform.forward;
+            float num = Vector3.Angle(vector, forward);
+            num = 1f - Mathf.Abs(num - 90f) / 90f;
+            Vector3 vector2 = Vector3.Cross(forward, vector);
+            Vector3 right = __instance._owRigidbody.transform.right;
+            float num2 = Vector3.Angle(vector2, right) * 
+                Mathf.Sign(Vector3.Dot(__instance._owRigidbody.transform.up, vector2));
+            num2 = Mathf.Min(num2, 90f) * 0.015f * num;
+            __instance._netAngularAcceleration += forward * num2;
+            return false;
+        }
+
+        if ((float)shipForceMultiplier.GetProperty() == 0f)
+        {
+            FluidDetector_AddDrag(__instance, fluidVolume, fractionSubmerged);
+            return false;
+        }
+
+        return true;
+    }
 
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ShipReactorComponent), nameof(ShipReactorComponent.Update))]

@@ -383,6 +383,12 @@
       "value": 1,
       "tooltip": "Larger numbers increase how much the ship is slowed down by air. Set to zero to disable air drag."
     },
+    "shipForceMultiplier": {
+      "title": "Ship Force Multiplier",
+      "type": "number",
+      "value": 1,
+      "tooltip": "Larger numbers increase how strong the force of gravity is for the ship."
+    },
     "cycloneChaos": {
       "title": "Cyclone Chaos",
       "type": "slider",
