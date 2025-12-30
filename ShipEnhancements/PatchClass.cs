@@ -1063,11 +1063,13 @@ public static class PatchClass
             SELocator.GetShipTransform().GetComponentInChildren<ShipNoiseMaker>()._noiseRadius += 100f;
         }
 
-        if (!(bool)enableAutoHatch.GetProperty() || ShipEnhancements.InMultiplayer) return;
+        if ((!(bool)enableAutoHatch.GetProperty() || ShipEnhancements.InMultiplayer) && 
+            (float)tractorBeamLengthMultiplier.GetProperty() >= 0f) return;
 
         ShipTractorBeamSwitch beamSwitch = SELocator.GetShipBody().GetComponentInChildren<ShipTractorBeamSwitch>();
 
-        if (!__instance.IsPlayerInShip() && beamSwitch._functional)
+        if ((!__instance.IsPlayerInShip() || (float)tractorBeamLengthMultiplier.GetProperty() < 0f) && 
+            beamSwitch._functional)
         {
             beamSwitch.ActivateTractorBeam();
         }
@@ -1077,6 +1079,12 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipTractorBeamSwitch), nameof(ShipTractorBeamSwitch.OnTriggerExit))]
     public static bool CloseHatchOutsideShip(ShipTractorBeamSwitch __instance)
     {
+        if ((float)tractorBeamLengthMultiplier.GetProperty() < 0f && !PlayerState.IsInsideShip())
+        {
+            __instance.DeactivateTractorBeam();
+            return false;
+        }
+        
         if (!(bool)enableAutoHatch.GetProperty() || ShipEnhancements.InMultiplayer || (bool)disableHatch.GetProperty()) return true;
 
         HatchController hatch = SELocator.GetShipBody().GetComponentInChildren<HatchController>();
@@ -3119,7 +3127,8 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipTractorBeamSwitch), nameof(ShipTractorBeamSwitch.ActivateTractorBeam))]
     public static bool PreventTractorBeamActivate()
     {
-        if ((bool)singleUseTractorBeam.GetProperty())
+        if ((bool)singleUseTractorBeam.GetProperty() || 
+            (float)tractorBeamLengthMultiplier.GetProperty() == 0f)
         {
             return false;
         }

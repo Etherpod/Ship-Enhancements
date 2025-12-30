@@ -282,6 +282,7 @@ public class ShipEnhancements : ModBehaviour
         disableSignalscopeBrackets,
         enableShipSignalscopeZoom,
         shipForceMultiplier,
+        tractorBeamLengthMultiplier,
     }
 
     private readonly string[] startupMessages =
@@ -1963,6 +1964,35 @@ public class ShipEnhancements : ModBehaviour
             SELocator.GetShipDetector().GetComponent<AlignmentForceDetector>()._fieldMultiplier =
                 (float)shipForceMultiplier.GetProperty();
         }
+        if ((float)tractorBeamLengthMultiplier.GetProperty() != 1f)
+        {
+            var beamSwitch = SELocator.GetShipTransform().GetComponentInChildren<ShipTractorBeamSwitch>();
+            var fluid = beamSwitch.GetComponentInChildren<TractorBeamFluid>();
+
+            if ((float)tractorBeamLengthMultiplier.GetProperty() != 0f)
+            {
+                float oldHeight = fluid._height;
+                fluid._height *= Mathf.Abs((float)tractorBeamLengthMultiplier.GetProperty());
+                float diff = fluid._height - oldHeight;
+            
+                if ((float)tractorBeamLengthMultiplier.GetProperty() < 0f)
+                {
+                    fluid._reversed = true;
+                
+                    var col = beamSwitch.GetComponent<CapsuleCollider>();
+                    col.height += diff;
+                    col.center += new Vector3(0f, diff / 2, 0f);
+                    col.gameObject.AddComponent<OWTriggerVolume>();
+                }
+            
+                fluid.OnValidate();
+            }
+
+            if ((float)tractorBeamLengthMultiplier.GetProperty() <= 0f)
+            {
+                beamSwitch.DeactivateTractorBeam();
+            }
+        }
 
         SetDamageColors();
 
@@ -3301,6 +3331,17 @@ public class ShipEnhancements : ModBehaviour
             hatchController._interactVolume.DisableInteraction();
             hatchController.GetComponent<SphereShape>().radius = 3.5f;
             hatchController.transform.localRotation = Quaternion.Euler(-90f, 0f, 0f);
+        }
+
+        if ((float)tractorBeamLengthMultiplier.GetProperty() < 0f &&
+            (bool)disableHatch.GetProperty())
+        {
+            ShipTractorBeamSwitch beamSwitch =
+                SELocator.GetShipTransform().GetComponentInChildren<ShipTractorBeamSwitch>();
+            if (beamSwitch.GetComponent<OWTriggerVolume>().IsTrackingObject(Locator.GetPlayerDetector()))
+            {
+                beamSwitch.ActivateTractorBeam();
+            }
         }
     }
 

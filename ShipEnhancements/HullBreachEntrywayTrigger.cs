@@ -1,5 +1,5 @@
-﻿using System;
-using UnityEngine;
+﻿using UnityEngine;
+using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -36,13 +36,13 @@ public class HullBreachEntrywayTrigger : MonoBehaviour
 
         if (hitObj.CompareTag("PlayerDetector"))
         {
-            if (!(bool)ShipEnhancements.Settings.enableAutoHatch.GetProperty() && !ShipEnhancements.InMultiplayer)
+            if (!(bool)enableAutoHatch.GetProperty() && !ShipEnhancements.InMultiplayer)
             {
-                if (!(bool)ShipEnhancements.Settings.disableHatch.GetProperty())
+                if (!(bool)disableHatch.GetProperty())
                 {
                     _hatch.OpenHatch();
                 }
-                if (_tractorBeam._functional)
+                if (_tractorBeam._functional && (float)tractorBeamLengthMultiplier.GetProperty() >= 0f)
                 {
                     _tractorBeam.ActivateTractorBeam();
                 }

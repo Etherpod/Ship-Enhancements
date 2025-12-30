@@ -457,6 +457,12 @@
       "value": false,
       "tooltip": "Makes explosions apply damage to the ship and to fragments of Brittle Hollow. Also lets you kill anglerfish."
     },
+    "tractorBeamLengthMultiplier": {
+      "title": "Ship Tractor Beam Length Multiplier",
+      "type": "number",
+      "value": 1.0,
+      "tooltip": "Larger numbers increase the length of the ship's tractor beam."
+    },
     "disableAutoLights": {
       "title": "Keep Power On",
       "type": "toggle",
