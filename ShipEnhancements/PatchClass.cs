@@ -5371,6 +5371,8 @@ public static class PatchClass
     
     #endregion
     
+    #region ShipForceMultiplier
+    
     [HarmonyReversePatch]
     [HarmonyPatch(typeof(FluidDetector), nameof(FluidDetector.AddDrag))]
     public static void FluidDetector_AddDrag(FluidDetector __instance, 
@@ -5405,7 +5407,11 @@ public static class PatchClass
 
         return true;
     }
+    
+    #endregion
 
+    #region ReactorUpgrades
+    
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ShipReactorComponent), nameof(ShipReactorComponent.Update))]
     public static bool CustomReactorBehavior(ShipReactorComponent __instance)
@@ -5418,7 +5424,11 @@ public static class PatchClass
         
         return true;
     }
+    
+    #endregion
 
+    #region EjectAudioFix
+    
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ShipAudioController), nameof(ShipAudioController.PlayEject))]
     public static bool FixEjectAudio(ShipAudioController __instance)
@@ -5427,4 +5437,6 @@ public static class PatchClass
             .PlayOneShot(AudioType.ShipCockpitEject);
         return false;
     }
+    
+    #endregion
 }
