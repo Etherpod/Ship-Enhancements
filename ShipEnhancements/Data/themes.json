@@ -123,6 +123,11 @@
     "Ghost Matter": "Assets/ShipEnhancements/ShipSkins/CockpitMaterials/Terrain_GM_Crystal_mat.mat",
     "Egg": "Assets/ShipEnhancements/ShipSkins/CockpitMaterials/Props_DB_Egg_mat.mat"
   },
+  "plantTypePaths": {
+    "Cactus": "Assets/ShipEnhancements/ShipPlants/ShipPlant_Cactus.prefab",
+    "Ember Twin": "Assets/ShipEnhancements/ShipPlants/ShipPlant_ETGrass.prefab",
+    "Giant's Deep": "Assets/ShipEnhancements/ShipPlants/ShipPlant_GDGrass.prefab"
+  },
   "lightThemes": [
     {
       "name": "Red",

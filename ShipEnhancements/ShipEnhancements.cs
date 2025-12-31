@@ -283,6 +283,7 @@ public class ShipEnhancements : ModBehaviour
         enableShipSignalscopeZoom,
         shipForceMultiplier,
         tractorBeamLengthMultiplier,
+        shipPlantType,
     }
 
     private readonly string[] startupMessages =
@@ -1155,6 +1156,8 @@ public class ShipEnhancements : ModBehaviour
             LoadMaterial("Assets/ShipEnhancements/ShipInterior_NOM_Sandstone_mat.mat"),
             LoadMaterial("Assets/ShipEnhancements/CockpitWindowFrost_Material.mat"),
             LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_WaterGaugeMetal_mat.mat"),
+            LoadMaterial("Assets/ShipEnhancements/ShipPlants/ShipInterior_Cactus_mat.mat"),
+            LoadMaterial("Assets/ShipEnhancements/ShipPlants/ShipInterior_CactusFlower_mat.mat"),
             _customGlassMat,
         };
 
@@ -1180,7 +1183,7 @@ public class ShipEnhancements : ModBehaviour
 
         MeshRenderer chassisRenderer = SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry/Cockpit_Interior/Cockpit_Interior_Chassis")
             .GetComponent<MeshRenderer>();
-        Texture2D blackTex = (Texture2D)LoadAsset("Assets/ShipEnhancements/Black_d.png");
+        Texture2D blackTex = LoadAsset<Texture2D>("Assets/ShipEnhancements/Black_d.png");
         chassisRenderer.sharedMaterials[6].SetTexture("_OcclusionMap", blackTex);
         chassisRenderer.sharedMaterials[6].SetFloat("_OcclusionStrength", 0.75f);
 
@@ -1323,7 +1326,6 @@ public class ShipEnhancements : ModBehaviour
         {
             SELocator.GetShipResources().SetOxygen(0f);
             oxygenDepleted = true;
-            SELocator.GetShipTransform().Find("Module_Cockpit/Props_Cockpit/Props_HEA_ShipFoliage").gameObject.SetActive(false);
         }
         if ((bool)enableShipFuelTransfer.GetProperty())
         {
@@ -1476,7 +1478,7 @@ public class ShipEnhancements : ModBehaviour
 
                     ThrusterTheme thrusterColors = ThemeManager.GetThrusterTheme(color);
                     rend.material.SetTexture("_MainTex",
-                        (Texture2D)LoadAsset("Assets/ShipEnhancements/ThrusterColors/"
+                        LoadAsset<Texture2D>("Assets/ShipEnhancements/ThrusterColors/"
                         + thrusterColors.ThrusterColor));
 
                     Color thrustColor = Color.white * Mathf.Pow(2, thrusterColors.ThrusterIntensity);
@@ -1501,6 +1503,7 @@ public class ShipEnhancements : ModBehaviour
 
         ApplyHullDecoration();
         SetGlassMaterial();
+        SetShipPlantDecoration();
 
         if ((bool)addTether.GetProperty())
         {
@@ -1554,14 +1557,14 @@ public class ShipEnhancements : ModBehaviour
                     friction = Mathf.Lerp(0.6f, 1f, ((float)shipFriction.GetProperty() - 0.5f) * 2f);
                 }
 
-                mat = (PhysicMaterial)LoadAsset("Assets/ShipEnhancements/FrictionlessBouncyShip.physicMaterial");
+                mat = LoadAsset<PhysicMaterial>("Assets/ShipEnhancements/FrictionlessBouncyShip.physicMaterial");
                 mat.dynamicFriction = friction;
                 mat.staticFriction = friction;
                 mat.bounciness = (float)shipBounciness.GetProperty();
             }
             else if (physicsBounce)
             {
-                mat = (PhysicMaterial)LoadAsset("Assets/ShipEnhancements/BouncyShip.physicMaterial");
+                mat = LoadAsset<PhysicMaterial>("Assets/ShipEnhancements/BouncyShip.physicMaterial");
                 mat.bounciness = (float)shipBounciness.GetProperty();
             }
             else
@@ -1576,7 +1579,7 @@ public class ShipEnhancements : ModBehaviour
                     friction = Mathf.Lerp(0.6f, 1f, ((float)shipFriction.GetProperty() - 0.5f) * 2f);
                 }
 
-                mat = (PhysicMaterial)LoadAsset("Assets/ShipEnhancements/FrictionlessShip.physicMaterial");
+                mat = LoadAsset<PhysicMaterial>("Assets/ShipEnhancements/FrictionlessShip.physicMaterial");
                 mat.dynamicFriction = friction;
                 mat.staticFriction = friction;
             }
@@ -2775,7 +2778,8 @@ public class ShipEnhancements : ModBehaviour
                     );
                 }
                 else if (rend.sharedMaterials[i] == _defaultInteriorWoodMat &&
-                    (blendInteriorWood || interiorWood != "Default" || interiorWoodTex))
+                    (blendInteriorWood || interiorWood != "Default" || interiorWoodTex) &&
+                    rend.gameObject.name != "Cockpit_Dirt")
                 {
                     var blender = rend.gameObject.AddComponent<ShipTextureBlender>();
                     interiorWoodBlenders.Add(blender);
@@ -2899,9 +2903,9 @@ public class ShipEnhancements : ModBehaviour
     {
         //UpdateHullMaterials(baseMat, ref customMat, false);
         
-        Texture2D color = (Texture2D)LoadAsset(hullTexture.path + "_d.png");
-        Texture2D normal = (Texture2D)LoadAsset(hullTexture.path + "_n.png");
-        Texture2D smooth = (Texture2D)LoadAsset(hullTexture.path + "_s.png");
+        Texture2D color = LoadAsset<Texture2D>(hullTexture.path + "_d.png");
+        Texture2D normal = LoadAsset<Texture2D>(hullTexture.path + "_n.png");
+        Texture2D smooth = LoadAsset<Texture2D>(hullTexture.path + "_s.png");
 
         blender.SetTexture(color, normal, smooth, hullTexture.normalScale, hullTexture.smoothness);
     }
@@ -2910,40 +2914,11 @@ public class ShipEnhancements : ModBehaviour
     {
         //UpdateHullMaterials(baseMat, ref customMat, false);
 
-        Texture2D color = (Texture2D)LoadAsset(woodTexture.path + "_d.png");
-        Texture2D normal = (Texture2D)LoadAsset(woodTexture.path + "_n.png");
-        Texture2D smooth = (Texture2D)LoadAsset(woodTexture.path + "_s.png");
+        Texture2D color = LoadAsset<Texture2D>(woodTexture.path + "_d.png");
+        Texture2D normal = LoadAsset<Texture2D>(woodTexture.path + "_n.png");
+        Texture2D smooth = LoadAsset<Texture2D>(woodTexture.path + "_s.png");
 
         blender.SetTexture(color, normal, smooth, woodTexture.normalScale, woodTexture.smoothness);
-    }
-
-    private void UpdateHullMaterials(Material baseMat, ref Material customMat, bool reset)
-    {
-        Material mat1 = reset ? customMat : baseMat;
-        Material mat2 = reset ? baseMat : customMat;
-        
-        foreach (MeshRenderer rend in SELocator.GetShipTransform().GetComponentsInChildren<MeshRenderer>())
-        {
-            for (int i = 0; i < rend.sharedMaterials.Length; i++)
-            {
-                if (rend.sharedMaterials[i] == null) continue;
-                    
-                if (rend.sharedMaterials[i] == mat1)
-                {
-                    // use a list to change sharedMaterials because
-                    // changing a single material doesn't work for some reason
-                    List<Material> mats = new List<Material>();
-                    mats.AddRange(rend.sharedMaterials);
-                    mats[i] = mat2;
-                    rend.sharedMaterials = mats.ToArray();
-                }
-            }
-        }
-
-        if (reset)
-        {
-            customMat = new Material(baseMat);
-        }
     }
 
     private void SetGlassMaterial()
@@ -3000,6 +2975,20 @@ public class ShipEnhancements : ModBehaviour
                 }
             }
         }
+    }
+
+    private void SetShipPlantDecoration()
+    {
+        string plantType = (string)shipPlantType.GetProperty();
+        if (plantType == "Default") return;
+
+        Transform parent = SELocator.GetShipTransform().Find("Module_Cockpit/Props_Cockpit");
+        parent.Find("Props_HEA_ShipFoliage").gameObject.SetActive(false);
+        
+        if (plantType == "None") return;
+
+        GameObject prefab = LoadPrefab(ThemeManager.GetPlantTypePath(plantType));
+        CreateObject(prefab, parent);
     }
     
     private void SetDamageColors()
@@ -3588,9 +3577,9 @@ public class ShipEnhancements : ModBehaviour
         return mat;
     }
 
-    public static object LoadAsset(string path)
+    public static T LoadAsset<T>(string path) where T : UnityEngine.Object
     {
-        return Instance._shipEnhancementsBundle.LoadAsset(path);
+        return Instance._shipEnhancementsBundle.LoadAsset<T>(path);
     }
 
     public static GameObject CreateObject(GameObject obj)

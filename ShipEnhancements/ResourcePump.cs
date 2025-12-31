@@ -186,7 +186,7 @@ public class ResourcePump : OWItem
 
             ThrusterTheme thrusterColors = ShipEnhancements.ThemeManager.GetThrusterTheme(color);
             rend.material.SetTexture("_MainTex",
-                (Texture2D)ShipEnhancements.LoadAsset("Assets/ShipEnhancements/ThrusterColors/"
+                ShipEnhancements.LoadAsset<Texture2D>("Assets/ShipEnhancements/ThrusterColors/"
                 + thrusterColors.ThrusterColor));
 
             Color thrustColor = Color.white * Mathf.Pow(2, thrusterColors.ThrusterIntensity);

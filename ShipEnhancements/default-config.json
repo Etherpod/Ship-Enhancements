@@ -181,7 +181,7 @@
       "tooltip": "Allows fluids like sand and water to enter your ship."
     },
     "disableHazardPrevention": {
-      "title": "Disable Hazard Prevention",
+      "title": "Disable Hazard Protection",
       "type": "toggle",
       "value": false,
       "tooltip": "Allows hazards like heat and ghost matter to damage you while inside of the ship."
@@ -889,6 +889,37 @@
       "title": "Decoration"
     },
 
+    "shipPlantType": {
+      "title": "Cockpit Plant",
+      "type": "selector",
+      "options": [
+        "Default",
+        "Ember Twin",
+        "Giant's Deep",
+        "Cactus",
+        "None"
+      ],
+      "value": "Default",
+      "tooltip": "Changes what kind of plant is in the planter box in the cockpit."
+    },
+    "shipGlassTexture": {
+      "title": "Ship Glass Texture",
+      "type": "selector",
+      "options": [
+        "None",
+        "Nomai Glass",
+        "Stranger Glass",
+        "Thick Glass",
+        "Geode",
+        "Ice",
+        "Gravity Crystal",
+        "Ghost Matter",
+        "Egg"
+      ],
+      "value": "None",
+      "tooltip": "Changes the outside texture of the cockpit and the hatch."
+    },
+
     "enableColorBlending": {
       "title": "Color Blending",
       "yes": "Enable",
@@ -999,23 +1030,6 @@
         "Rainbow"
       ],
       "tooltip": "Changes the color of the interior and exterior ship lights."
-    },
-    "shipGlassTexture": {
-      "title": "Ship Glass Texture",
-      "type": "selector",
-      "options": [
-        "None",
-        "Nomai Glass",
-        "Stranger Glass",
-        "Thick Glass",
-        "Geode",
-        "Ice",
-        "Gravity Crystal",
-        "Ghost Matter",
-        "Egg"
-      ],
-      "value": "None",
-      "tooltip": "Changes the outside texture of the cockpit and the hatch."
     },
     "interiorHullTexture": {
       "title": "Interior Hull Texture",

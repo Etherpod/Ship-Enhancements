@@ -17,6 +17,7 @@ public class ThemeManager
     private IDictionary<string, HullTexturePath> _hullTexturePaths;
     private IDictionary<string, WoodTexturePath> _woodTexturePaths;
     private IDictionary<string, string> _glassMaterialPaths;
+    private IDictionary<string, string> _plantTypePaths;
 
     public ThemeManager(string resourceName)
     {
@@ -30,6 +31,7 @@ public class ThemeManager
     public HullTexturePath GetHullTexturePath(string name) => _hullTexturePaths[name];
     public WoodTexturePath GetWoodTexturePath(string name) => _woodTexturePaths[name];
     public string GetGlassMaterialPath(string name) => _glassMaterialPaths[name];
+    public string GetPlantTypePath(string name) => _plantTypePaths[name];
     public LightTheme GetLightTheme(string name) => _nameToLightTheme[name];
     public HullTheme GetHullTheme(string name) => _nameToHullTheme[name];
     public ThrusterTheme GetThrusterTheme(string name) => _nameToThrusterTheme[name];
@@ -94,6 +96,15 @@ public class ThemeManager
             if (value is string str)
             {
                 _glassMaterialPaths.Add(key, str);
+            }
+        }
+        
+        _plantTypePaths = new Dictionary<string, string>();
+        foreach (var (key, value) in data.PlantTypePaths)
+        {
+            if (value is string str)
+            {
+                _plantTypePaths.Add(key, str);
             }
         }
     }

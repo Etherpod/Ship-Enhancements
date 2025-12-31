@@ -23,10 +23,10 @@ public class ShipThrusterBlendController : ColorBlendController
         _thrustMat = _rend?.material;
         _light = GetComponentInChildren<Light>();
         _indicator = SELocator.GetShipTransform().GetComponentInChildren<ThrustAndAttitudeIndicator>(true);
-        _rainbowTex = (Texture2D)ShipEnhancements.LoadAsset("Assets/ShipEnhancements/ThrusterColors/ThrusterFlames_White.png");
+        _rainbowTex = ShipEnhancements.LoadAsset<Texture2D>("Assets/ShipEnhancements/ThrusterColors/ThrusterFlames_White.png");
         _editedTex = new Texture2D(_rainbowTex.width, _rainbowTex.height);
 
-        var tex = (Texture2D)ShipEnhancements.LoadAsset("Assets/ShipEnhancements/ThrusterColors/ThrusterFlames_Default.png");
+        var tex = ShipEnhancements.LoadAsset<Texture2D>("Assets/ShipEnhancements/ThrusterColors/ThrusterFlames_Default.png");
         _defaultTheme = [tex, 3.325167f, _light.color * 255f, _indicator._rendererBack.material.GetColor("_BarColor") * 255f,
             0f, _indicator._lightsBack[0].color * 255f];
 
@@ -42,7 +42,7 @@ public class ShipThrusterBlendController : ColorBlendController
         }
 
         ThrusterTheme theme = ShipEnhancements.ThemeManager.GetThrusterTheme(themeName);
-        Texture2D tex = (Texture2D)ShipEnhancements.LoadAsset("Assets/ShipEnhancements/ThrusterColors/"
+        Texture2D tex = ShipEnhancements.LoadAsset<Texture2D>("Assets/ShipEnhancements/ThrusterColors/"
             + theme.ThrusterColor);
         _blendThemes[i] = [tex, theme.ThrusterIntensity, theme.ThrusterLight,
             theme.IndicatorColor, theme.IndicatorIntensity, theme.IndicatorLight];
