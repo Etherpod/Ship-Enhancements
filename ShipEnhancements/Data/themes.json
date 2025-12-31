@@ -126,7 +126,9 @@
   "plantTypePaths": {
     "Cactus": "Assets/ShipEnhancements/ShipPlants/ShipPlant_Cactus.prefab",
     "Ember Twin": "Assets/ShipEnhancements/ShipPlants/ShipPlant_ETGrass.prefab",
-    "Giant's Deep": "Assets/ShipEnhancements/ShipPlants/ShipPlant_GDGrass.prefab"
+    "Brittle Hollow": "Assets/ShipEnhancements/ShipPlants/ShipPlant_BHGrass.prefab",
+    "Giant's Deep": "Assets/ShipEnhancements/ShipPlants/ShipPlant_GDGrass.prefab",
+    "The Stranger": "Assets/ShipEnhancements/ShipPlants/ShipPlant_DWGrass.prefab",
   },
   "lightThemes": [
     {
