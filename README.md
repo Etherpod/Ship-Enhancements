@@ -51,6 +51,7 @@ Permanently remove useless or very important parts of the ship.
 
 ### *Navigation*
 - **Lock-on**: Removes your ability to lock on to objects. No autopilot, no distances, and no way of knowing how fast you're going.
+- **Signalscope Brackets**: Removes the signalscope's guiding brackets that tell you where a signal is. Good luck tracking anything down!
 - **HUD Markers**: Hides the on-screen markers that tell you the location of your ship, your scout, and any marked ship log locations. Ship log locations inside The Stranger are left visible until you arrive.
 - **Minimap Markers**: Hides the icons on the minimap globe that tell you the location of your ship, your scout, and yourself.
 
@@ -62,7 +63,8 @@ Change some of the ways the ship works to make gameplay easier, harder, or just 
 - **Fuel Drain Multiplier**: Larger numbers make your ship's fuel drain faster.
 - **Oxygen Tank Drain Multiplier**: Larger numbers increase the amount of oxygen that drains when the ship's oxygen tank is damaged.
 - **Fuel Tank Drain Multiplier**: Larger numbers increase the amount of fuel that drains when the ship's fuel tank is damaged.
-- **Idle Fuel Consumption Multiplier**: Larger numbers increase how quickly your fuel drains over time. If the **Engine Switch** is enabled, it will not drain fuel while the ship is off.
+- **Passive Fuel Regeneration Multiplier**: Larger numbers increase the rate at which your ship fuel passively regenerates. If the **Engine Switch** is enabled, fuel will only regenerate if the ship is turned OFF.
+- **Passive Fuel Drain Multiplier**: Larger numbers increase how quickly your fuel drains over time. If the **Engine Switch** is enabled, fuel will only drain if the ship is turned ON.
 - **Jetpack Refuel Drain**: Drains the ship's fuel reserve when you refuel your jetpack. You cannot duplicate fuel by transferring it back into the ship.
 
 ### *Ship Damage*
@@ -82,6 +84,7 @@ Change some of the ways the ship works to make gameplay easier, harder, or just 
 - **Atmosphere/Space Angular Drag Multiplier**: Larger numbers make it harder to turn your ship. Setting this to 0 lets you spin your ship forever.
 - **Disable Rotation Speed Limit**: Lets you spin your ship as quickly as you want. Enabling this may quickly lead to motion sickness.
 - **Air Drag Multiplier**: Larger numbers make atmospheres slow you down more. Setting this to 0 lets your ship drift endlessly through the air.
+- **Ship Force Multiplier**: Larger numbers increase the force of gravity on the ship.
 - **Cyclone Chaos**: Determines how violently cyclones should affect your ship.
 - **Ship Friction**: Lets you adjust how much friction to apply to the ship.
 - **Ship Bounciness**: Larger numbers increase the bounciness of the ship. Values above 1 will be less accurate and will no longer affect players.
@@ -92,6 +95,7 @@ Change some of the ways the ship works to make gameplay easier, harder, or just 
 - **Reactor Lifetime Multiplier**: Larger numbers increase the time it takes for the reactor to blow up when it has been damaged. Set this to something small to give yourself a panic attack every time the master alarm goes off.
 - **Ship Explosion Multiplier**: Larger numbers increase the size of the explosion that is created when your ship blows up. Don't go above 30.
 - **Extra Explosion Damage**: Gives explosions the ability to damage your ship and fragments of Brittle Hollow. Also lets you kill anglerfish.
+- **Ship Tractor Beam Length Multiplier**: Larger numbers increase the length of the ship's tractor beam, allowing you to enter the ship from farther away.
 - **Keep Power On**: Prevents the lights and other electrical parts from turning off when you leave the ship.
 
 ### *Miscellaneous*
@@ -118,6 +122,7 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Ship Scout Photo Mode**: Lets you switch to photo mode on the ship's scout launcher. It will default to photo mode if scout launching is disabled.
 - **Signalscope Component**: Turns the ship's signalscope into a fully functioning ship component. If you damage it, you won't be able to receive or broadcast signals from the ship until you repair it.
 - **Ship Signal**: Adds a signal for the ship on the Outer Wilds Ventures frequency. The signal will stop if the ship's signalscope is damaged. Slate also said they added a "command transmitter" to your signalscope, whatever that means.
+- **Ship Signalscope Zoom**: Lets you zoom in using the ship's signalscope, making for a very cinematic view. The controls for zooming in/out are the same as the handheld signalscope.
 
 ### *Items*
 - **Portable Campfire**: Adds a portable campfire to the ship next to your suit. Set it up wherever you want and roast a marshmallow.
@@ -163,10 +168,12 @@ Some new stuff that Slate didn't have time to include in the ship.
   - The bottom right button (dark orange) activates position hold. It will remain at whatever position you activate it at relative to the lock-on target.
     - If you fly above a tree and activate position hold, the ship will try to stay above the tree. If it gets knocked away by something, it'll fly back to where it was.
 - **Engine Switch**: Controls your ship's power and engine. The switch needs to be turned on if you want to fly your ship.
-  - If the **Idle Fuel Consumption Multiplier** is above 0, it will only consume fuel when the ship is on.
+  - Turning the ship off will disable your controls, but will also prevent the reactor from exploding.
+  - If the **Passive Fuel Regeneration Multiplier** is above 0, it will only regenerate fuel when the ship is turned OFF.
+  - If the **Passive Fuel Drain Multiplier** is above 0, it will only consume fuel when the ship is turned ON.
 
 ### *Temperature*
-- **Enable Ship Temperature** Unlocks the settings below and implements a temperature mechanic for the ship, which uses the existing "TEMP" (temperature) dial and a new "SHIP TEMP" (ship temperature) dial.
+- Enabling **Ship Temperature** unlocks the settings below and implements a temperature mechanic for the ship, which uses the existing "TEMP" (temperature) dial and a new "SHIP TEMP" (ship temperature) dial.
   - Extreme temperatures, indicated by the flashing light on the TEMP dial, will cause your SHIP TEMP to change over time. As your SHIP TEMP approaches extreme temperatures, your ship will begin experiencing side effects:
     - On the hot side, your ship will take random damage over time and the outside of the ship will become dangerous to touch. Your reactor will also heat up, reducing the time before explosion if it were to get damaged, but as a byproduct your ship thrust will become more powerful. At higher temperature difficulties, the **Portable Fuel Tank** can also heat up and explode.
     - On the cold side, it's actually safe to leave your ship alone. However, your ship engine has a chance to stall for a short time when starting up, and has a chance to damage your ship while doing so. Your ship thrust is weaker, and your ship hull is more fragile, making it take damage even with gentler collisions. If your reactor starts heating up, the cockpit glass will freeze over, making it harder to see where you're going.
@@ -193,7 +200,7 @@ Temperature zones are not only added to the vanilla solar system, but are also a
 ---
 
 ### *Water*
-- **Use Water Tank**: Unlocks the settings below and adds water as a new resource to your ship. Other features will drain it to function.
+- Enabling **Ship Water Tank** unlocks the settings below and adds water as a new resource to your ship. Other features will drain it to function.
 - **Water Drain Multiplier**: Larger numbers make the ship's water drain faster.
 - **Add Water Cooling**: Adds a lever next to the ship log that turns on water cooling, which will drain water to prevent your ship from getting hot (meant to be used along with ship temperature).
 
@@ -207,9 +214,14 @@ Temperature zones are not only added to the vanilla solar system, but are also a
 - **Ernesto**: Adds Ernesto to the cockpit. You can talk to him if you're bored.
 
 ## Decoration
-Haven't you ever wished your ship had a little more color?
-- **Ship Light Color**: Changes the color of the ship's interior and exterior lights from a wide variety of options. Set this to Divine at your own risk, for mere Hearthians were never meant to see creations blessed by a god.
-- **Interior/Exterior Hull Color**: Select from a variety of colors to change the inside or outside color of your ship. Just don't pick Rainbow.
+Let's you customize your ship's appearance with a decently large variety of colors, textures, and extra details.
+- **Cockpit Plant**: Lets you pick which type of plant to put the cockpit.
+- **Ship Glass Texture**: Changes the appearance of the outside glass.
+- **Ship Light Color**: Changes the color of the ship's interior and exterior lights. Set this to Divine at your own risk, for mere Hearthians were never meant to see creations blessed by a god.
+- **Interior/Exterior Hull Color**: Gives the ship hull a colored tint. This will also change the tint of the selected texture.
+- **Interior/Exterior Hull Texture**: Gives the ship hull an entirely new look using textures from other areas of the game.
+- **Interior/Exterior Wood Color**: Functions the same as the **Hull Color**, but gets applied to the wooden planks on the ship instead.
+- **Interior/Exterior Wood Texture**: Functions the same as the **Hull Texture**, but gets applied to the wooden planks on the ship instead.
 - **Ship Thruster Flame Color**: Changes the color of the ship's thruster flames as well as the color of the thruster indicator inside of the ship.
 - **Damage Indicator Color**: Changes the color of the ship damage display, the master alarm, the reactor, and the damage indicator lights.
 
@@ -225,6 +237,10 @@ Enabling color blending lets you fade the ship decoration between different colo
 - **Gravity**: Changes colors as your ship experiences a stronger gravitational pull.
 - **Temperature**: Changes colors as the environment becomes warmer or colder.
 - **Ship Temperature**: Changes colors as your ship becomes warmer or colder.
+
+---
+
+As part of decoration, you can also change the image displayed on the ship log! If that sounds interesting to you, head to the folder for this mod and find the folder named "ShipLogIcons".
 
 ---
 
@@ -257,12 +273,14 @@ In case there are too many settings to deal with, there are some pre-made preset
 ## API
 To use the API, copy the **IShipEnhancements** script from this mod's GitHub repository into your own project, then follow [these instructions](https://owml.outerwildsmods.com/guides/apis.html#consuming-apis) on the OWML docs.
 
-- **CreateTemperatureZone()** - In case you're a modder and want to add your own high/low temperature zones. Temperature zones can stack, and will just take the sum of the temperatures.
+- **AddTemperatureZone()** - In case you're a modder and want to add your own high/low temperature zones. Temperature zones can stack, and will just take the sum of the temperatures.
+  - **CreateTemperatureZone()** is obselete, as it doesn't include the optionide.browser.jcef.gpu.disable to make a day/night temperature zone.
 - **GetSettingsProperty()** - Returns the value of a config setting as seen from the player. These values only update at the beginning of the loop, so changing the mod settings doesn't affect them.
 - **SetSettingsProperty()** - Lets you change the value of a config setting in the middle of the loop. Note that this change will be reverted on the next loop.
 - **SetSettingsOptionVisible()** - Lets you set the visibility of a settings option in the mod settings menu. If an option is hidden, it cannot be changed by the user but can still be changed in code.
-- **HideAllSettings()** - Removes all of the settings from the mod settings menu.
+- **HideAllSettings()** - Removes all of the settings from the mod settings menu. Useful if you want full control of the settings.
 - **ShowAllSettings()** - Returns any hidden settings to the mod settings menu.
+- **ResetSettings()** - Sets every setting to their default values.
 - **GetPreShipInitializeEvent()** and **GetPostShipInitializeEvent()** - Subscribe to these events to run code before and after Ship Enhancements makes any changes to the ship.
 
 ## Known Bugs
@@ -279,6 +297,7 @@ Some Outer Wilds bugs that this mod fixes automatically. These bugs are mostly c
 - Equipping the suit with no oxygen present would completely drain the suit oxygen
 - Free look inside the ship would be unusable while the ship gravity was disabled
 - The fuel/oxygen tank leak effects would continue playing after the associated resource had run out
+- The river in The Stranger would affect the ship if it was parked in the docking bay of The Stranger
 - Two moving objects with their own gravity sources would crash the game if they both entered each other's gravity fields
 - Sounds in the cockpit (like the autopilot beeping) could be heard from anywhere in the universe while outside the ship
 - Anglerfish would always target you instead of the thing making the noise (also patched by **Vanilla Fix**)
@@ -287,14 +306,15 @@ Some Outer Wilds bugs that this mod fixes automatically. These bugs are mostly c
 
 # Credits
 Big thanks to **ditzy** for all of their help! There's so much I have to put it in a list:
-- Helping program shaders
+- Making almost every custom shader
 - Helping with one of Ernesto's special abilities
-- Coding pretty much the entire program for the orbital autopilot
-- Helping refactor the ship decoration code
+- Coding pretty much the entire program for the advanced autopilot controls
+- Helping refactor the ship decoration code and helping add new decoration features
+- Helping brainstorm ideas
 
-Big thanks to **ColumbidaeCafe** for helping develop most of the ideas and sound effects!
+Big thanks to **ColumbidaeCafe** for helping brainstorm most of the early ideas and for helping with some sound effects!
 
-Thank you **harperlr** for making the radio model and for helping to playtest QSB support!
+Thank you **harperlr** for making the **Radio** model and for helping playtest QSB support!
 
 Thank you **SpatialX** for making an awesome [Ship Enhancements trailer](https://youtu.be/FT8VdG_Bzo0)!
 

@@ -254,13 +254,13 @@
       "tooltip": "Larger numbers increase the amount of fuel that drains when the fuel tank is damaged in addition to the regular drain rate. The default speed is about 10 times faster."
     },
     "fuelRegenerationMultiplier": {
-      "title": "Fuel Regeneration Multiplier",
+      "title": "Passive Fuel Regeneration Multiplier",
       "type": "number",
       "value": 0,
       "tooltip": "Larger numbers increase the rate at which your ship's fuel passively regenerates. A value of 1 takes about an hour to fill the tank."
     },
     "idleFuelConsumptionMultiplier": {
-      "title": "Idle Fuel Consumption Multiplier",
+      "title": "Passive Fuel Drain Multiplier",
       "type": "number",
       "value": 0,
       "tooltip": "Larger numbers increase the rate at which your ship's fuel passively drains. A value of 1 is about 100 times slower than the thruster consumption rate."
