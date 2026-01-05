@@ -284,6 +284,7 @@ public class ShipEnhancements : ModBehaviour
         shipForceMultiplier,
         tractorBeamLengthMultiplier,
         shipPlantType,
+        shipStringLights,
     }
 
     private readonly string[] startupMessages =
@@ -1504,6 +1505,7 @@ public class ShipEnhancements : ModBehaviour
         ApplyHullDecoration();
         SetGlassMaterial();
         SetShipPlantDecoration();
+        SetStringLightDecoration();
 
         if ((bool)addTether.GetProperty())
         {
@@ -2989,6 +2991,43 @@ public class ShipEnhancements : ModBehaviour
 
         GameObject prefab = LoadPrefab(ThemeManager.GetPlantTypePath(plantType));
         CreateObject(prefab, parent);
+    }
+
+    private void SetStringLightDecoration()
+    {
+        string stringLights = (string)shipStringLights.GetProperty();
+        if (stringLights == null) return;
+
+        GameObject prefab = LoadPrefab(ThemeManager.GetStringLightPath(stringLights));
+        Transform parent = CreateObject(prefab).transform;
+        for (int i = parent.childCount - 1; i >= 0; i--)
+        {
+            Transform child = parent.GetChild(i);
+            string path;
+            if (child.name.Contains("Cabin"))
+            {
+                path = "Module_Cabin/Lights_Cabin";
+            }
+            else if (child.name.Contains("Supplies"))
+            {
+                path = "Module_Supplies/Lights_Supplies";
+            }
+            else if (child.name.Contains("Engine"))
+            {
+                path = "Module_Engine";
+            }
+            else
+            {
+                continue;
+            }
+            
+            child.SetParent(SELocator.GetShipTransform().Find(path));
+            child.transform.localPosition = Vector3.zero;
+            child.transform.localRotation = Quaternion.identity;
+            child.transform.localScale = Vector3.one;
+        }
+        
+        Destroy(parent.gameObject);
     }
     
     private void SetDamageColors()

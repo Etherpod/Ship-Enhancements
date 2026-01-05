@@ -130,6 +130,11 @@
     "Giant's Deep": "Assets/ShipEnhancements/ShipPlants/ShipPlant_GDGrass.prefab",
     "The Stranger": "Assets/ShipEnhancements/ShipPlants/ShipPlant_DWGrass.prefab",
   },
+  "stringLightPaths": {
+    "Christmas": "Assets/ShipEnhancements/ShipLights/Lights_Christmas.prefab",
+    "Stars": "Assets/ShipEnhancements/ShipLights/Lights_Stars.prefab",
+    "Nomai": "Assets/ShipEnhancements/ShipLights/Lights_Nomai.prefab",
+  },
   "lightThemes": [
     {
       "name": "Red",

@@ -9,6 +9,7 @@ public record ThemeDataJsonTheme(
     [JsonProperty("woodTexturePaths")] Dictionary<string, object> WoodTexturePaths,
     [JsonProperty("glassMaterialPaths")] Dictionary<string, object> GlassMaterialPaths,
     [JsonProperty("plantTypePaths")] Dictionary<string, object> PlantTypePaths,
+    [JsonProperty("stringLightPaths")] Dictionary<string, object> StringLightPaths,
     [JsonProperty("lightThemes")] List<LightThemeDataJson> LightThemes,
     [JsonProperty("hullThemes")] List<HullThemeDataJson> HullThemes,
     [JsonProperty("thrusterThemes")] List<ThrusterThemeDataJson> ThrusterThemes,

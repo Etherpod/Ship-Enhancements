@@ -904,6 +904,18 @@
       "value": "Default",
       "tooltip": "Changes what kind of plant is in the planter box in the cockpit."
     },
+    "shipStringLights": {
+      "title": "String Lights",
+      "type": "selector",
+      "options": [
+        "None",
+        "Christmas",
+        "Stars",
+        "Nomai"
+      ],
+      "value": "None",
+      "tooltip": "Adds some decorative lighting to the cabin."
+    },
     "shipGlassTexture": {
       "title": "Ship Glass Texture",
       "type": "selector",
