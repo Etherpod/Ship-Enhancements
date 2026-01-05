@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ShipEnhancements.Textures;
 using UnityEngine;
 
 namespace ShipEnhancements;
@@ -54,7 +55,9 @@ public class ShipHullBlendController : ColorBlendController
         Color color = (Color)theme[0] / 255f;
         foreach (var blender in _textureBlenders)
         {
-            blender.SetColor(color);
+            blender.OverlayColor = color;
+            blender.BlendFactor = color.a;
+            blender.UpdateBlend();
         }
     }
 
