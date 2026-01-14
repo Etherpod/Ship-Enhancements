@@ -59,6 +59,7 @@ public class ShipEnhancements : ModBehaviour
     public static INewHorizons NHAPI;
     public static INHInteraction NHInteraction;
     public static IGEInteraction GEInteraction;
+    public static SuitLog.API.ISuitLogAPI SuitLogAPI;
     public static ThemeManager ThemeManager;
     public static ExperimentalSettingsJson ExperimentalSettings;
     public static SaveDataJson SaveData;
@@ -411,6 +412,7 @@ public class ShipEnhancements : ModBehaviour
         InitializeQSB();
         InitializeNH();
         InitializeGE();
+        InitializeSuitLogAPI();
         ModCompatibility.InitCompatibility();
         ErnestoModListHandler.Initialize();
         SettingsPresets.InitializePresets();
@@ -1069,6 +1071,11 @@ public class ShipEnhancements : ModBehaviour
     public void AssignGEInterface(IGEInteraction geInterface)
     {
         GEInteraction = geInterface;
+    }
+
+    private void InitializeSuitLogAPI()
+    {
+        SuitLogAPI = ModHelper.Interaction.TryGetModApi<SuitLog.API.ISuitLogAPI>("dgarro.SuitLog");
     }
 
     private void InitializeShip()
