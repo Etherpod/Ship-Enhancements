@@ -32,8 +32,8 @@ public class ShipEnhancements : ModBehaviour
     public delegate void EngineEvent(bool enabled);
     public event EngineEvent OnEngineStateChanged;
 
-    public UnityEvent PreShipInitialize;
-    public UnityEvent PostShipInitialize;
+    public UnityEvent PreShipInitialize = new();
+    public UnityEvent PostShipInitialize = new();
 
     public static ShipEnhancements Instance;
     public bool oxygenDepleted;
