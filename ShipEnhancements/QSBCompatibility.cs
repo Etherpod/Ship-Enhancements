@@ -76,8 +76,8 @@ public class QSBCompatibility
         _api.RegisterHandler<int>("disconnect-tether", ReceiveDisconnectTether);
         _api.RegisterHandler<(int, int)>("transfer-tether", ReceiveTransferTether);
         _api.RegisterHandler<NoData>("ship-fuel-max", ReceiveShipFuelMax);
-        _api.RegisterHandler<(int, float, float, int, float, float, float)>("cockpit-effect-state", ReceiveCockpitEffectState);
-        _api.RegisterHandler<float>("dirt-state", ReceiveDirtState);
+        _api.RegisterHandler<(int, float, float, int, float, float, float)>("initial-cockpit-effect-state", ReceiveInitialCockpitEffectState);
+        _api.RegisterHandler<(float, float)>("current-cockpit-effect-state", ReceiveCurrentCockpitEffectState);
         _api.RegisterHandler<SerializedVector3>("detach-all-players", ReceiveDetachAllPlayers);
         _api.RegisterHandler<SerializedVector3>("persistent-input", ReceivePersistentInput);
         _api.RegisterHandler<float>("initial-black-hole", ReceiveInitialBlackHoleState);
@@ -677,26 +677,26 @@ public class QSBCompatibility
 
     #region CockpitFlith
 
-    public void SendInitialRustState(uint id, int rustIndex, Vector2 rustOffset, int dirtIndex, Vector2 dirtOffset, float dirtProgression)
+    public void SendInitialCockpitEffectState(uint id, int rustIndex, Vector2 rustOffset, int dirtIndex, Vector2 dirtOffset, float dirtProgression)
     {
-        _api.SendMessage("rust-state", (rustIndex, rustOffset.x, rustOffset.y, dirtIndex, dirtOffset.x, dirtOffset.y, dirtProgression), id, false);
+        _api.SendMessage("initial-cockpit-effect-state", (rustIndex, rustOffset.x, rustOffset.y, dirtIndex, dirtOffset.x, dirtOffset.y, dirtProgression), id, false);
     }
 
-    private void ReceiveCockpitEffectState(uint id, (int rustIndex, float rustOffsetX, float rustOffsetY, 
+    private void ReceiveInitialCockpitEffectState(uint id, (int rustIndex, float rustOffsetX, float rustOffsetY, 
         int dirtIndex, float dirtOffsetX, float dirtOffsetY, float dirtProgression) data)
     {
         SELocator.GetCockpitFilthController()?.SetInitialEffectState(data.rustIndex, new Vector2(data.rustOffsetX, data.rustOffsetY),
             data.dirtIndex, new Vector2(data.dirtOffsetX, data.dirtOffsetY), data.dirtProgression);
     }
 
-    public void SendDirtState(uint id, float progression)
+    public void SendCurrentCockpitEffectState(uint id, float dirtProgression, float iceBuildup)
     {
-        _api.SendMessage("dirt-state", progression, id, false);
+        _api.SendMessage("current-cockpit-effect-state", (dirtProgression, iceBuildup), id, false);
     }
 
-    private void ReceiveDirtState(uint id, float progression)
+    private void ReceiveCurrentCockpitEffectState(uint id, (float dirtProgression, float iceBuildup) data)
     {
-        SELocator.GetCockpitFilthController()?.UpdateDirtState(progression);
+        SELocator.GetCockpitFilthController()?.UpdateEffectState(data.dirtProgression, data.iceBuildup);
     }
 
     #endregion

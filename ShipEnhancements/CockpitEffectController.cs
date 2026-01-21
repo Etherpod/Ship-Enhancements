@@ -235,37 +235,44 @@ public class CockpitEffectController : MonoBehaviour
         {
             foreach (uint id in ShipEnhancements.PlayerIDs)
             {
-                ShipEnhancements.QSBCompat.SendInitialRustState(id, _rustTexIndex, _filthMat.GetTextureOffset(_rustTexPropID),
+                ShipEnhancements.QSBCompat.SendInitialCockpitEffectState(id, _rustTexIndex, _filthMat.GetTextureOffset(_rustTexPropID),
                     _dirtTexIndex, _filthMat.GetTextureOffset(_dirtTexPropID), _dirtBuildupProgression);
             }
         }
     }
 
-    public void SetInitialEffectState(int rustIndex, Vector2 rustOffset, int dirtIndex, Vector2 dirtOffset, float dirtProgression)
+    public void SetInitialEffectState(int rustIndex, Vector2 rustOffset, int dirtIndex, 
+        Vector2 dirtOffset, float dirtProgression)
     {
         _filthMat.SetTexture(_rustTexPropID, _rustTextures[rustIndex]);
         _filthMat.SetTextureOffset(_rustTexPropID, rustOffset);
 
         _filthMat.SetTextureOffset(_dirtTexPropID, dirtOffset);
         _dirtBuildupProgression = dirtProgression;
-        _filthMat.SetFloat(_dirtCutoffPropID, 1 - _dirtBuildupProgression);
+        _filthMat.SetFloat(_dirtCutoffPropID, _dirtBuildupProgression);
     }
 
-    public void BroadcastDirtState()
+    public void BroadcastCurrentEffectState()
     {
         if (ShipEnhancements.InMultiplayer && ShipEnhancements.QSBAPI.GetIsHost())
         {
             foreach (uint id in ShipEnhancements.PlayerIDs)
             {
-                ShipEnhancements.QSBCompat.SendDirtState(id, _dirtBuildupProgression);
+                ShipEnhancements.QSBCompat.SendCurrentCockpitEffectState(id, _dirtBuildupProgression, _iceBuildup);
             }
         }
     }
 
-    public void UpdateDirtState(float progression)
+    public void UpdateEffectState(float dirtProgression, float iceBuildup)
     {
-        _dirtBuildupProgression = progression;
-        _filthMat.SetFloat(_dirtCutoffPropID, progression);
+        if (_dirtBuildupTime != 0f)
+        {
+            _dirtBuildupProgression = dirtProgression;
+            _filthMat.SetFloat(_dirtCutoffPropID, iceBuildup);
+        }
+
+        _iceBuildup = iceBuildup;
+        _iceMat.SetFloat(_iceCutoffPropID, iceBuildup);
     }
     
     private void OnDestroy()
