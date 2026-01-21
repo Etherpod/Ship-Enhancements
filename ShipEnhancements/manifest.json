@@ -4,7 +4,7 @@
   "author": "Etherpod",
   "name": "Ship Enhancements",
   "uniqueName": "Etherpod.ShipEnhancements",
-  "version": "2.2.0",
+  "version": "2.2.1",
   "owmlVersion": "2.9.8",
   "dependencies": []
 }

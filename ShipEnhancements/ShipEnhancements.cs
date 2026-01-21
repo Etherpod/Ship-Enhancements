@@ -15,6 +15,8 @@ using System.Globalization;
 using UnityEngine.UI;
 using Newtonsoft.Json;
 using ShipEnhancements.Models.Json;
+using HarmonyLib;
+using UnityEngine.SceneManagement;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
@@ -36,6 +38,7 @@ public class ShipEnhancements : ModBehaviour
     public UnityEvent PostShipInitialize;
 
     public static ShipEnhancements Instance;
+    public static Harmony PatchInstance;
     public bool oxygenDepleted;
     public bool refillingOxygen;
     public bool fuelDepleted;
@@ -394,12 +397,9 @@ public class ShipEnhancements : ModBehaviour
     private void Awake()
     {
         Instance = this;
-        new HarmonyLib.Harmony("Etherpod.ShipEnhancements").PatchAll(Assembly.GetExecutingAssembly());
-
-        if (true)
-        {
-            gameObject.AddComponent<PersistentShipState>();
-        }
+        PatchInstance = new Harmony("Etherpod.ShipEnhancements");
+        PatchInstance.PatchAll(Assembly.GetExecutingAssembly());
+        gameObject.AddComponent<PersistentShipState>();
     }
 
     private void Start()
@@ -432,6 +432,14 @@ public class ShipEnhancements : ModBehaviour
         SEItemAudioController.Initialize();
 
         PrintStartupMessage();
+
+        SceneManager.sceneUnloaded += _ =>
+        {
+            if (LoadManager.s_previousScene == OWScene.EyeOfTheUniverse)
+            {
+                PatchInstance.PatchAll(Assembly.GetExecutingAssembly());
+            }
+        };
 
         LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
         {
@@ -512,6 +520,11 @@ public class ShipEnhancements : ModBehaviour
                 {
                     UpdateProperties();
                 }
+            }
+
+            if (loadScene == OWScene.EyeOfTheUniverse)
+            {
+                PatchInstance.UnpatchAll();
             }
 
             if (scene != OWScene.SolarSystem) return;
