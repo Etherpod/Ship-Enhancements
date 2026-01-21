@@ -102,7 +102,7 @@ public class CockpitEffectController : MonoBehaviour
 
     private void Update()
     {
-        if (_dirtBuildupTime == 0f && _reactorHeat == null)
+        if (_dirtBuildupTime == 0f && !_reactorHeat)
         {
             enabled = false;
             return;
@@ -112,7 +112,7 @@ public class CockpitEffectController : MonoBehaviour
         {
             UpdateDirt();
         }
-        if (SELocator.GetShipTemperatureDetector().GetTemperatureRatio() < 0f && _reactorHeat != null)
+        if (_reactorHeat && SELocator.GetShipTemperatureDetector().GetTemperatureRatio() < 0f)
         {
             UpdateIce();
         }

@@ -1843,7 +1843,7 @@ public class ShipEnhancements : ModBehaviour
             GameObject leverObj = LoadPrefab("Assets/ShipEnhancements/WaterCoolingLever.prefab");
             CreateObject(leverObj, SELocator.GetShipTransform().Find("Module_Cabin/Geo_Cabin"));
         }
-        if ((bool)enableReactorOverload.GetProperty() || (bool)enableShipTemperature.GetProperty())
+        if ((bool)enableReactorOverload.GetProperty() && (bool)enableShipTemperature.GetProperty())
         {
             SELocator.GetShipDamageController()._shipReactorComponent.gameObject.AddComponent<ReactorHeatController>();
             if ((bool)enableReactorOverload.GetProperty())
