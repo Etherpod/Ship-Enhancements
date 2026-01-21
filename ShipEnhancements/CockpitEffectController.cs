@@ -40,7 +40,7 @@ public class CockpitEffectController : MonoBehaviour
     {
         { FluidVolume.Type.WATER, 5f },
         { FluidVolume.Type.GEYSER, 2f },
-        { FluidVolume.Type.SAND, 20f },
+        { FluidVolume.Type.SAND, 12f },
         { FluidVolume.Type.CLOUD, 7f }
     };
 
@@ -51,10 +51,10 @@ public class CockpitEffectController : MonoBehaviour
         _filthMat = _filthRenderer.sharedMaterial;
         _iceMat = _iceRenderer.sharedMaterial;
 
-        _rustProgression = Mathf.Lerp(1f, 0.15f, (float)rustLevel.GetProperty());
+        _rustProgression = Mathf.Lerp(0.15f, 1f, (float)rustLevel.GetProperty());
         _dirtBuildupTime = (float)dirtAccumulationTime.GetProperty();
 
-        if (_dirtBuildupTime > 0f)
+        if (_dirtBuildupTime != 0f)
         {
             _cockpitDetector.OnEnterFluidType += OnEnterFluidType;
             _cockpitDetector.OnExitFluidType += OnExitFluidType;
@@ -80,9 +80,10 @@ public class CockpitEffectController : MonoBehaviour
             _filthMat.SetFloat(_rustCutoffPropID, 0f);
         }
 
-        if (_dirtBuildupTime > 0f && (float)maxDirtAccumulation.GetProperty() > 0f)
+        _filthMat.SetFloat(_dirtCutoffPropID, 0f);
+
+        if (_dirtBuildupTime != 0f && (float)maxDirtAccumulation.GetProperty() > 0f)
         {
-            _filthMat.SetFloat(_dirtCutoffPropID, 1f);
             if (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost())
             {
                 _dirtTexIndex = Random.Range(0, _dirtTextures.Length);
@@ -92,7 +93,6 @@ public class CockpitEffectController : MonoBehaviour
         }
         else
         {
-            _filthMat.SetFloat(_dirtCutoffPropID, 0f);
             _dirtBuildupTime = 0f;
             //enabled = false;
         }
@@ -108,7 +108,7 @@ public class CockpitEffectController : MonoBehaviour
             return;
         }
 
-        if (_dirtBuildupTime > 0f)
+        if (_dirtBuildupTime != 0f)
         {
             UpdateDirt();
         }
@@ -156,7 +156,7 @@ public class CockpitEffectController : MonoBehaviour
                 shockPercent = shockSpeedPercent;
             }
         }
-
+        
         if (_clearDirt || spinPercent > 0 || shockPercent > 0)
         {
             if (spinPercent > 0)
@@ -184,14 +184,16 @@ public class CockpitEffectController : MonoBehaviour
                 }
             }
 
-            _filthMat.SetFloat(_dirtCutoffPropID, 1 - _dirtBuildupProgression);
-            _dirtBuildupProgression = Mathf.Clamp01(_dirtBuildupProgression - Time.deltaTime / clearTime);
+            _filthMat.SetFloat(_dirtCutoffPropID, _dirtBuildupProgression);
+            _dirtBuildupProgression = Mathf.Clamp(_dirtBuildupProgression - Time.deltaTime / clearTime 
+                * Mathf.Sign(_dirtBuildupTime), 0f, (float)maxDirtAccumulation.GetProperty());
         }
-        else if (_addDirtBuildup && _dirtBuildupProgression < (float)maxDirtAccumulation.GetProperty())
+        else if (_addDirtBuildup)
         {
-            _filthMat.SetFloat(_dirtCutoffPropID, 1 - _dirtBuildupProgression);
-            _dirtBuildupProgression = Mathf.Clamp01(_dirtBuildupProgression
-                + Time.deltaTime * (float)maxDirtAccumulation.GetProperty() / _dirtBuildupTime);
+            _filthMat.SetFloat(_dirtCutoffPropID, _dirtBuildupProgression);
+            _dirtBuildupProgression = Mathf.Clamp(_dirtBuildupProgression
+                + Time.deltaTime * (float)maxDirtAccumulation.GetProperty() / _dirtBuildupTime,
+                0f, (float)maxDirtAccumulation.GetProperty());
         }
     }
 
@@ -263,7 +265,7 @@ public class CockpitEffectController : MonoBehaviour
     public void UpdateDirtState(float progression)
     {
         _dirtBuildupProgression = progression;
-        _filthMat.SetFloat(_dirtCutoffPropID, 1 - _dirtBuildupProgression);
+        _filthMat.SetFloat(_dirtCutoffPropID, progression);
     }
     
     private void OnDestroy()
