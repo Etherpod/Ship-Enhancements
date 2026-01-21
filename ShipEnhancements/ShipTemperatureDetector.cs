@@ -31,42 +31,53 @@ public class ShipTemperatureDetector : TemperatureDetector
 
         if ((string)passiveTemperatureGain.GetProperty() != "None")
         {
-            bool heating = (string)passiveTemperatureGain.GetProperty() == "Hot";
-            float resistance = (float)temperatureResistanceMultiplier.GetProperty();
+            UpdatePassiveTemperature();
+        }
+    }
 
-            // Reduce effect in opposite temperature
-            float multiplier = 0.25f + (0.75f * Mathf.InverseLerp(_highTempCutoff / 4f * (heating ? -1f : 1f), 0f, _currentTemperature));
+    private void UpdatePassiveTemperature()
+    {
+        bool heating = (string)passiveTemperatureGain.GetProperty() == "Hot";
 
-            // Reactor increases heat and decreases cold
-            float additiveMultiplier = 0f;
-            if (SELocator.GetShipDamageController().IsReactorCritical())
+        if ((heating && IsHeatingLocked()) || (!heating && IsCoolingLocked()))
+        {
+            return;
+        }
+            
+        float resistance = (float)temperatureResistanceMultiplier.GetProperty();
+
+        // Reduce effect in opposite temperature
+        float multiplier = 0.25f + (0.75f * Mathf.InverseLerp(_highTempCutoff / 4f * (heating ? -1f : 1f), 0f, _currentTemperature));
+
+        // Reactor increases heat and decreases cold
+        float additiveMultiplier = 0f;
+        if (SELocator.GetShipDamageController().IsReactorCritical())
+        {
+            if (heating)
             {
-                if (heating)
-                {
-                    additiveMultiplier = 1.5f;
-                }
-                else
-                {
-                    additiveMultiplier = -0.5f;
-                }
+                additiveMultiplier = 1.5f;
             }
-
-            if (multiplier > 0 || additiveMultiplier > 0)
+            else
             {
-                if (resistance == 0)
-                {
-                    ErnestoDetectiveController.ItWasExplosion(fromTemperature: true);
-                    SELocator.GetShipDamageController().Explode();
-                }
-                else
-                {
-                    // Change faster when close to zero
-                    float scalar = 1 + (1f * Mathf.InverseLerp(_highTempCutoff, 0f, Mathf.Abs(_currentTemperature)));
+                additiveMultiplier = -0.5f;
+            }
+        }
 
-                    _currentInternalTemperature = Mathf.Clamp(_currentInternalTemperature + Time.deltaTime
-                        * Mathf.Max((multiplier * scalar) + additiveMultiplier, 0f) * (heating ? 1f : -1f) * Mathf.Sign(resistance),
-                        -_maxInternalTemperature, _maxInternalTemperature);
-                }
+        if (multiplier > 0 || additiveMultiplier > 0)
+        {
+            if (resistance == 0)
+            {
+                ErnestoDetectiveController.ItWasExplosion(fromTemperature: true);
+                SELocator.GetShipDamageController().Explode();
+            }
+            else
+            {
+                // Change faster when close to zero
+                float scalar = 1 + (1f * Mathf.InverseLerp(_highTempCutoff, 0f, Mathf.Abs(_currentTemperature)));
+
+                _currentInternalTemperature = Mathf.Clamp(_currentInternalTemperature + Time.deltaTime
+                    * Mathf.Max((multiplier * scalar) + additiveMultiplier, 0f) * (heating ? 1f : -1f) * Mathf.Sign(resistance),
+                    -_maxInternalTemperature, _maxInternalTemperature);
             }
         }
     }

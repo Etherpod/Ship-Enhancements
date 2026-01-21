@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -74,8 +75,13 @@ public class ReactorOverloader : MonoBehaviour
         if (_overloaded)
         {
             float tempLerp = _temperatureDetector.GetTemperatureRatio() * -1f;
-            float diffLerp = (float)ShipEnhancements.Settings.temperatureDifficulty.GetProperty();
-            float heat = Mathf.Lerp(0f, 0.8f, tempLerp * diffLerp);
+            float diffLerp = (float)temperatureDifficulty.GetProperty();
+            float passiveAdditive = 0f;
+            if ((string)passiveTemperatureGain.GetProperty() == "Cold")
+            {
+                passiveAdditive = 0.3f;
+            }
+            float heat = Mathf.Lerp(0f, 0.8f, (tempLerp + passiveAdditive) * diffLerp);
             _reactorHeat.SetOverloadHeat(heat);
         }
     }
