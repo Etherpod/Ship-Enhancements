@@ -267,7 +267,15 @@ To use the API, copy the **IShipEnhancements** script from this mod's GitHub rep
 - **GetPreShipInitializeEvent()** and **GetPostShipInitializeEvent()** - Subscribe to these events to run code before and after Ship Enhancements makes any changes to the ship.
 
 ## Known Bugs
-Some bugs introduced by this mod that I have no idea how to fix.
+The bugs introduced by this mod. Some of these are getting fixed soon, others I have no idea how to fix.
+- Ship Enhancements will temporarily disable itself while you're at the Eye of the Universe. This isn't a bug, but it does prevent a million other bugs from happening.
+- If playing with **Suit Log**, interacting with the **Resource Pump** or using the tether can sometimes open the suit log by accident (fixed in the next update)
+- Leaving the ship in the docking bay of the Stranger and being inside the Stranger when the dam breaks will place the ship underwater (fixed in the next update)
+- The **Interactable Ship Curtain** is way too bright (fixed in the next update)
+- Changing the **Interior/Exterior Hull Color** will also change the other traveler's ships (fixed in the next update)
+- The **Gravity Landing Gear** will sometimes cause the ship to touch lava from further away (fixed in the next update)
+- The **AddTemperatureZone()** method in the API does not work (fixed in the next update)
+- The **HideAllSettings()** method in the API does not affect the preset setting (fixed in the next update)
 - When playing in multiplayer and using **Ship Input Latency**, the delayed inputs of the non-hosts will not work once they leave the flight console
 - If you attach yourself to an object with a tether and the object enters a black hole, there is a chance you will be violently thrown across the solar system
 - Reeling in towards a tether hook on the other side of a wall will sometimes produce unintended side effects
