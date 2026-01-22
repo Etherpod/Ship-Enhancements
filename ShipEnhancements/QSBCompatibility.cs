@@ -106,6 +106,7 @@ public class QSBCompatibility
         _api.RegisterHandler<(int, bool)>("pump-mode", ReceivePumpMode);
         _api.RegisterHandler<bool>("water-cooling", ReceiveWaterCoolingState);
         _api.RegisterHandler<bool>("reactor-overload", ReceiveReactorOverload);
+        _api.RegisterHandler<(bool, int)>("engine-sputter", ReceiveEngineSputter);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -1173,5 +1174,19 @@ public class QSBCompatibility
     {
         GameObject.FindObjectOfType<ReactorOverloader>().SetOverloadedRemote(overload);
     }
+    #endregion
+    
+    #region EngineSputter
+
+    public void SendEngineSputter(uint to, bool started, int num)
+    {
+        _api.SendMessage("engine-sputter", (started, num), to);
+    }
+
+    private void ReceiveEngineSputter(uint from, (bool started, int num) data)
+    {
+        PatchHandler.Instance.EngineSputterRemote(data.started, data.num);
+    }
+    
     #endregion
 }

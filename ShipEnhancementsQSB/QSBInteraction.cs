@@ -57,6 +57,11 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
         return ShipManager.Instance.CurrentFlyer != uint.MaxValue;
     }
 
+    public uint GetFlyerID()
+    {
+        return ShipManager.Instance.CurrentFlyer;
+    }
+
     public Vector3 GetShipAcceleration()
     {
         return ShipTransformSync.LocalInstance?.ThrusterVariableSyncer?.AccelerationSyncer?.Value

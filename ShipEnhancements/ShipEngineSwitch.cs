@@ -139,7 +139,21 @@ public class ShipEngineSwitch : CockpitInteractible
                         float rand = (float)new System.Random().NextDouble();
                         if (rand < maxChance * tempLerp)
                         {
-                            PatchHandler.Instance.StartSputter();
+                            float difficulty = (float)temperatureDifficulty.GetProperty();
+                            int min = (int)Mathf.Lerp(1f, 3.1f, difficulty * tempLerp);
+                            int max = (int)Mathf.Lerp(3f, 7.1f, difficulty * tempLerp);
+
+                            int num = Random.Range(min, max);
+                            
+                            PatchHandler.Instance.StartSputter(num);
+                            
+                            if (ShipEnhancements.InMultiplayer)
+                            {
+                                foreach (var id in ShipEnhancements.PlayerIDs)
+                                {
+                                    ShipEnhancements.QSBCompat.SendEngineSputter(id, true, num);
+                                }
+                            }
                         }
                         else
                         {
@@ -315,6 +329,14 @@ public class ShipEngineSwitch : CockpitInteractible
             if (SELocator.GetShipTemperatureDetector() != null)
             {
                 PatchHandler.Instance.StopSputter();
+                
+                if (ShipEnhancements.InMultiplayer)
+                {
+                    foreach (var id in ShipEnhancements.PlayerIDs)
+                    {
+                        ShipEnhancements.QSBCompat.SendEngineSputter(id, false, 0);
+                    }
+                }
             }
             GlobalMessenger.FireEvent("CancelShipIgnition");
             if (_audioSource.isPlaying)
