@@ -4863,11 +4863,6 @@ public static class PatchClass
     [HarmonyPatch(typeof(AlignmentForceDetector), nameof(AlignmentForceDetector.AccumulateAcceleration))]
     public static bool InheritableForcesFix_AccumulateAcceleration_Alignment(AlignmentForceDetector __instance)
     {
-        if (Keyboard.current.mKey.isPressed)
-        {
-            ShipEnhancements.WriteDebugMessage((__instance is AlignmentForceDetector) + " - " + __instance);
-        }
-
         bool clearDetectors = false;
 
         var detector = __instance as AlignmentForceDetector;
@@ -4896,31 +4891,14 @@ public static class PatchClass
                 }
             }
         }
-        if (Keyboard.current.nKey.isPressed)
-        {
-            ShipEnhancements.WriteDebugMessage("Process on " + __instance.GetAttachedOWRigidbody());
-            ShipEnhancements.WriteDebugMessage("Seen detectors: ");
-            foreach (var d in seenDetectors)
-            {
-                ShipEnhancements.WriteDebugMessage(d);
-            }
-        }
         if (detector._activeInheritedDetector != null && !seenDetectors.Contains(detector._activeInheritedDetector))
         {
             if (seenDetectors.Count == 0)
             {
                 clearDetectors = true;
             }
-            if (Keyboard.current.nKey.isPressed)
-            {
-                ShipEnhancements.WriteDebugMessage("Add " + __instance);
-            }
             seenDetectors.Add(__instance);
             detector._netAcceleration += detector._activeInheritedDetector.GetForceAcceleration();
-        }
-        else if (Keyboard.current.nKey.isPressed)
-        {
-            ShipEnhancements.WriteDebugMessage("Cancel");
         }
 
         if (clearDetectors)
