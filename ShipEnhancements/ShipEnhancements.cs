@@ -103,6 +103,7 @@ public class ShipEnhancements : ModBehaviour
     public float ThrustModulatorFactor => ThrustModulatorLevel / 5f;
     public AudioClip ShipHorn { get; private set; }
     public List<Settings> HiddenSettings { get; private set; } = [];
+    public bool HidePreset = false;
 
     private SettingsPresets.PresetName _currentPreset = (SettingsPresets.PresetName)(-1);
     private bool _advancedColors = false;
@@ -3203,7 +3204,7 @@ public class ShipEnhancements : ModBehaviour
 
     public static void WriteDebugMessage(object msg, bool warning = false, bool error = false)
     {
-        //return;
+        return;
 
         msg ??= "null";
 
@@ -3980,6 +3981,11 @@ public class ShipEnhancements : ModBehaviour
             {
                 return true;
             }
+        }
+
+        if (name == "preset" && HidePreset)
+        {
+            return true;
         }
 
         if (_currentPreset != SettingsPresets.PresetName.Random)
