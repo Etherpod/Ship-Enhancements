@@ -2,6 +2,7 @@
 using ShipEnhancements;
 using HarmonyLib;
 using System.Reflection;
+using NewHorizons;
 using NewHorizons.Components.Stars;
 using NewHorizons.Components.SizeControllers;
 using static ShipEnhancements.ShipEnhancements.Settings;
@@ -47,6 +48,8 @@ public class NHInteraction : MonoBehaviour, INHInteraction
     {
         return AstroObjectBuilder.CenterOfUniverse;
     }
+
+    public bool IsWarpingBackToEye() => Main.Instance.IsWarpingBackToEye;
 }
 
 [HarmonyPatch]

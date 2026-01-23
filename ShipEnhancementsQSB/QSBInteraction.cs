@@ -39,7 +39,9 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
 
         LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
         {
-            if (loadScene != OWScene.SolarSystem || !ShipEnhancements.ShipEnhancements.InMultiplayer)
+            if (loadScene != OWScene.SolarSystem ||
+                ShipEnhancements.ShipEnhancements.Instance.IsWarpingBackToEye ||
+                !ShipEnhancements.ShipEnhancements.InMultiplayer)
             {
                 return;
             }

@@ -8,7 +8,7 @@ namespace ShipEnhancements;
 
 public class PersistentShipState : MonoBehaviour
 {
-    public bool PreserveSettings { get => !_skipNextLoad; }
+    public bool PreserveSettings => (bool)persistentShipState.GetProperty() && !_skipNextLoad;
 
     private bool _everInitialized = false;
     private bool _skipNextLoad = false;
@@ -27,31 +27,31 @@ public class PersistentShipState : MonoBehaviour
     private void Start()
     {
         GlobalMessenger.AddListener("TriggerFlashback", OnTriggerFlashback);
+    }
 
-        LoadManager.OnStartSceneLoad += (scene, loadScene) =>
+    public void OnStartSceneLoad(OWScene scene, OWScene loadScene)
+    {
+        if (scene == OWScene.SolarSystem && !ShipEnhancements.Instance.IsWarpingBackToEye)
         {
-            if (scene == OWScene.SolarSystem)
-            {
-                SaveState();
-            }
-            else if (loadScene != OWScene.SolarSystem)
-            {
-                _skipNextLoad = true;
-            }
-        };
+            SaveState();
+        }
+        else if (loadScene != OWScene.SolarSystem || ShipEnhancements.Instance.IsWarpingBackToEye)
+        {
+            _skipNextLoad = true;
+        }
+    }
 
-        LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
+    public void OnCompleteSceneLoad(OWScene scene, OWScene loadScene)
+    {
+        if (loadScene == OWScene.SolarSystem && !ShipEnhancements.Instance.IsWarpingBackToEye)
         {
-            if (loadScene == OWScene.SolarSystem)
+            if (_skipNextLoad)
             {
-                if (_skipNextLoad)
-                {
-                    _skipNextLoad = false;
-                    return;
-                }
-                LoadState();
+                _skipNextLoad = false;
+                return;
             }
-        };
+            LoadState();
+        }
     }
 
     private void SaveState()

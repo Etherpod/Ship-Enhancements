@@ -34,8 +34,8 @@ public class ShipEnhancements : ModBehaviour
     public delegate void EngineEvent(bool enabled);
     public event EngineEvent OnEngineStateChanged;
 
-    public UnityEvent PreShipInitialize;
-    public UnityEvent PostShipInitialize;
+    public UnityEvent PreShipInitialize = new();
+    public UnityEvent PostShipInitialize = new();
 
     public static ShipEnhancements Instance;
     public static Harmony PatchInstance;
@@ -65,6 +65,8 @@ public class ShipEnhancements : ModBehaviour
     public static ThemeManager ThemeManager;
     public static ExperimentalSettingsJson ExperimentalSettings;
     public static SaveDataJson SaveData;
+
+    public bool IsWarpingBackToEye = false;
 
     public static uint[] PlayerIDs
     {
@@ -435,6 +437,8 @@ public class ShipEnhancements : ModBehaviour
 
         SceneManager.sceneUnloaded += _ =>
         {
+            IsWarpingBackToEye = NHInteraction != null && NHInteraction.IsWarpingBackToEye();
+            
             if (LoadManager.s_previousScene == OWScene.EyeOfTheUniverse)
             {
                 PatchInstance.PatchAll(Assembly.GetExecutingAssembly());
@@ -443,7 +447,16 @@ public class ShipEnhancements : ModBehaviour
 
         LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
         {
-            if (loadScene != OWScene.SolarSystem) return;
+            GetComponent<PersistentShipState>()?.OnCompleteSceneLoad(scene, loadScene);
+            
+            if (loadScene != OWScene.SolarSystem || IsWarpingBackToEye)
+            {
+                if (loadScene == OWScene.EyeOfTheUniverse)
+                {
+                    IsWarpingBackToEye = false;
+                }
+                return;
+            }
 
             GlobalMessenger.AddListener("SuitUp", OnPlayerSuitUp);
             GlobalMessenger.AddListener("RemoveSuit", OnPlayerRemoveSuit);
@@ -514,20 +527,31 @@ public class ShipEnhancements : ModBehaviour
 
         LoadManager.OnStartSceneLoad += (scene, loadScene) =>
         {
-            if (scene == OWScene.TitleScreen)
+            GetComponent<PersistentShipState>()?.OnStartSceneLoad(scene, loadScene);
+
+            if (loadScene == OWScene.EyeOfTheUniverse || IsWarpingBackToEye)
+            {
+                PatchInstance.UnpatchAll();
+                if (IsWarpingBackToEye) return;
+            }
+
+            if (scene != OWScene.SolarSystem)
             {
                 if (!InMultiplayer || QSBAPI.GetIsHost())
                 {
                     UpdateProperties();
+                    
+                    if (InMultiplayer && scene != OWScene.TitleScreen)
+                    {
+                        foreach (uint id in PlayerIDs)
+                        {
+                            QSBCompat.SendSettingsData(id);
+                        }
+                    }
                 }
+                
+                return;
             }
-
-            if (loadScene == OWScene.EyeOfTheUniverse)
-            {
-                PatchInstance.UnpatchAll();
-            }
-
-            if (scene != OWScene.SolarSystem) return;
 
             GlobalMessenger.RemoveListener("SuitUp", OnPlayerSuitUp);
             GlobalMessenger.RemoveListener("RemoveSuit", OnPlayerRemoveSuit);
@@ -616,7 +640,7 @@ public class ShipEnhancements : ModBehaviour
             {
                 UpdateProperties();
 
-                if (InMultiplayer && QSBAPI.GetIsHost())
+                if (InMultiplayer)
                 {
                     foreach (uint id in PlayerIDs)
                     {
@@ -659,7 +683,8 @@ public class ShipEnhancements : ModBehaviour
 
     private void Update()
     {
-        if (!shipLoaded || LoadManager.GetCurrentScene() != OWScene.SolarSystem || _shipDestroyed) return;
+        if (!shipLoaded || LoadManager.GetCurrentScene() != OWScene.SolarSystem ||
+            IsWarpingBackToEye || _shipDestroyed) return;
 
         if (SELocator.GetShipBody().GetAngularVelocity().sqrMagnitude > maxSpinSpeed * maxSpinSpeed)
         {
@@ -819,7 +844,8 @@ public class ShipEnhancements : ModBehaviour
 
     private void LateUpdate()
     {
-        if (!shipLoaded || LoadManager.GetCurrentScene() != OWScene.SolarSystem) return;
+        if (!shipLoaded || LoadManager.GetCurrentScene() != OWScene.SolarSystem || 
+            IsWarpingBackToEye) return;
 
         if (!SELocator.GetPlayerResources()._refillingOxygen && refillingOxygen)
         {

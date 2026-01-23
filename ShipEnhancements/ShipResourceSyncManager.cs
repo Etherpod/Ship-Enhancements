@@ -18,7 +18,8 @@ public class ShipResourceSyncManager
 
     public void Update()
     {
-        if (LoadManager.GetCurrentScene() != OWScene.SolarSystem)
+        if (LoadManager.GetCurrentScene() != OWScene.SolarSystem || 
+            ShipEnhancements.Instance.IsWarpingBackToEye)
         {
             return;
         }
