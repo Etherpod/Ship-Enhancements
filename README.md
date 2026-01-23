@@ -11,6 +11,11 @@ To answer some questions you may have...
 ## Is this mod compatible with [Quantum Space Buddies](https://outerwildsmods.com/mods/quantumspacebuddies/)?
 Yep! Whoever hosts the game will have control over the settings.
 
+## Is this mod compatible with [Nomai VR](https://outerwildsmods.com/mods/nomaivr/)?
+Sort of.
+
+It won't break if you play in VR, but it isn't exactly the best experience. Custom interactions with the new items are usually annoying and sometimes impossible. I haven't tested most of the features in VR, so you can expect to find bugs. I'm hoping I can add proper support for VR, but I'm not sure when I'll get to it.
+
 ## How am I supposed to carry all of these new items?
 I made a mod called [Traveler's Pack](https://outerwildsmods.com/mods/travelerspack/) to address this problem. Try playing with it enabled if you run into the issue of there being too many items.
 
@@ -164,6 +169,7 @@ Some new stuff that Slate didn't have time to include in the ship.
     - If you fly above a tree and activate position hold, the ship will try to stay above the tree. If it gets knocked away by something, it'll fly back to where it was.
 - **Engine Switch**: Controls your ship's power and engine. The switch needs to be turned on if you want to fly your ship.
   - If the **Idle Fuel Consumption Multiplier** is above 0, it will only consume fuel when the ship is on.
+  - If you want the loop to start with the ship turned off, look for the **ExperimentalSettings.json** file in the mod folder.
 
 ### *Temperature*
 - **Enable Ship Temperature** Unlocks the settings below and implements a temperature mechanic for the ship, which uses the existing "TEMP" (temperature) dial and a new "SHIP TEMP" (ship temperature) dial.
@@ -178,7 +184,7 @@ Some new stuff that Slate didn't have time to include in the ship.
 
 ---
 
-Temperature zones are not only added to the vanilla solar system, but are also added to the mods listed below! If you think a mod is missing from the list, feel free to contact me (Etherpod) or make a GitHub issue about it. If I haven't given up on modding yet, I'll update Ship Enhancements to add temperature zones to your mod.
+Temperature zones are not only added to the vanilla solar system, but are also added to the mods listed below!
  - Axiom's Refuge
  - Christmas Story
  - Echo Hike
@@ -189,6 +195,10 @@ Temperature zones are not only added to the vanilla solar system, but are also a
  - On A Rail
  - The Stranger They Are
  - Unnamed Mystery
+ 
+ If you think a mod is missing from the list, feel free to contact me (Etherpod) or make a GitHub issue about it. If I haven't given up on modding yet, I'll update Ship Enhancements to add temperature zones to your mod.
+
+ You can also add your own temperature zones using the API if you don't feel like waiting for me to do it.
 
 ---
 
@@ -258,7 +268,8 @@ In case there are too many settings to deal with, there are some pre-made preset
 ## API
 To use the API, copy the **IShipEnhancements** script from this mod's GitHub repository into your own project, then follow [these instructions](https://owml.outerwildsmods.com/guides/apis.html#consuming-apis) on the OWML docs.
 
-- **CreateTemperatureZone()** - In case you're a modder and want to add your own high/low temperature zones. Temperature zones can stack, and will just take the sum of the temperatures.
+- **AddTemperatureZone()** - In case you're a modder and want to add your own high/low temperature zones. Temperature zones can stack, and will just take the sum of the temperatures.
+  - **CreateTemperatureZone()** is the deprecated version of this method that doesn't include any of the day/night functionality.
 - **GetSettingsProperty()** - Returns the value of a config setting as seen from the player. These values only update at the beginning of the loop, so changing the mod settings doesn't affect them.
 - **SetSettingsProperty()** - Lets you change the value of a config setting in the middle of the loop. Note that this change will be reverted on the next loop.
 - **SetSettingsOptionVisible()** - Lets you set the visibility of a settings option in the mod settings menu. If an option is hidden, it cannot be changed by the user but can still be changed in code.
@@ -274,7 +285,7 @@ The bugs introduced by this mod. Some of these are getting fixed soon, others I 
 - The **Interactable Ship Curtain** is way too bright (fixed in the next update)
 - Changing the **Interior/Exterior Hull Color** will also change the other traveler's ships (fixed in the next update)
 - The **Gravity Landing Gear** will sometimes cause the ship to touch lava from further away (fixed in the next update)
-- The **AddTemperatureZone()** method in the API does not work (fixed in the next update)
+- One of the codes used for the **Radio** does not work (fixed in the next update)
 - The **HideAllSettings()** method in the API does not affect the preset setting (fixed in the next update)
 - When playing in multiplayer and using **Ship Input Latency**, the delayed inputs of the non-hosts will not work once they leave the flight console
 - If you attach yourself to an object with a tether and the object enters a black hole, there is a chance you will be violently thrown across the solar system
