@@ -275,6 +275,7 @@ To use the API, copy the **IShipEnhancements** script from this mod's GitHub rep
 - **SetSettingsOptionVisible()** - Lets you set the visibility of a settings option in the mod settings menu. If an option is hidden, it cannot be changed by the user but can still be changed in code.
 - **HideAllSettings()** - Removes all of the settings from the mod settings menu.
 - **ShowAllSettings()** - Returns any hidden settings to the mod settings menu.
+- **ResetSettings()** - Sets all of the settings to their default values. Useful when trying to prevent the player from editing the settings.
 - **GetPreShipInitializeEvent()** and **GetPostShipInitializeEvent()** - Subscribe to these events to run code before and after Ship Enhancements makes any changes to the ship.
 
 ## Known Bugs
@@ -286,7 +287,6 @@ The bugs introduced by this mod. Some of these are getting fixed soon, others I 
 - Changing the **Interior/Exterior Hull Color** will also change the other traveler's ships (fixed in the next update)
 - The **Gravity Landing Gear** will sometimes cause the ship to touch lava from further away (fixed in the next update)
 - One of the codes used for the **Radio** does not work (fixed in the next update)
-- The **HideAllSettings()** method in the API does not affect the preset setting (fixed in the next update)
 - When playing in multiplayer and using **Ship Input Latency**, the delayed inputs of the non-hosts will not work once they leave the flight console
 - If you attach yourself to an object with a tether and the object enters a black hole, there is a chance you will be violently thrown across the solar system
 - Reeling in towards a tether hook on the other side of a wall will sometimes produce unintended side effects
