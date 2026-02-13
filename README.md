@@ -102,6 +102,7 @@ Change some of the ways the ship works to make gameplay easier, harder, or just 
 ### *Miscellaneous*
 - **Prolong Digestion**: Lets you survive for a short period of time while your ship is being digested.
 - **Ship Noise Multiplier**: Larger numbers increase the distance your ship can be detected by noise detectors.
+- **Enable Quantum Ship**: Makes your ship quantum while on the Quantum Moon, which lets it shift around on the surface and move between planets with everything else.
 - **Extra Noise**: Makes noisy parts of the ship, like the master alarm, alert noise detectors.
 - **Ship Input Latency**: This basically simulates internet lag, where larger numbers increase the time it takes for the ship to process your inputs. A value of 1 means it takes 1 second for your "upwards thrust" input to register.
 - **Funny Sounds**: Replaces some of the in-game sounds with silly sound effects.
