@@ -422,6 +422,14 @@ public class ResourcePump : OWItem
         {
             _powerPrompt.SetVisibility(flag);
         }
+        if (flag)
+        {
+            ShipEnhancements.SuitLogAPI?.LockSuitLog(this);
+        }
+        else
+        {
+            ShipEnhancements.SuitLogAPI?.UnlockSuitLog(this);
+        }
     }
 
     private void UpdateGeyserLoopingAudioPosition()
