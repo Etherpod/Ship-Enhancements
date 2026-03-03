@@ -19,6 +19,7 @@ public class ReactorOverloader : MonoBehaviour
     private ReactorHeatController _reactorHeat;
     private ShipTemperatureDetector _temperatureDetector;
     private bool _focused = false;
+    private bool _ignoreNextInput = false;
     private bool _overloaded = false;
 
     private void Start()
@@ -42,7 +43,7 @@ public class ReactorOverloader : MonoBehaviour
         if (_focused && !_reactor.isDamaged)
         {
             bool was = _overloaded;
-            if (!_overloaded && OWInput.IsPressed(InputLibrary.interact, InputMode.Character, _startupLength))
+            if (!_overloaded && !_ignoreNextInput && OWInput.IsPressed(InputLibrary.interact, InputMode.Character, _startupLength))
             {
                 _interactReceiver.ChangePrompt("Reset Reactor");
                 _interactReceiver.ResetInteraction();
@@ -116,6 +117,10 @@ public class ReactorOverloader : MonoBehaviour
     private void OnLoseFocus()
     {
         _focused = false;
+        if (!_reactor._damaged)
+        {
+            _ignoreNextInput = false;
+        }
     }
 
     private void OnPressInteract()
@@ -134,6 +139,7 @@ public class ReactorOverloader : MonoBehaviour
         if (!_overloaded)
         {
             _startupSource.Stop();
+            _interactReceiver.ResetInteraction();
         }
     }
 
@@ -145,6 +151,14 @@ public class ReactorOverloader : MonoBehaviour
     private void OnReactorRepaired(ShipComponent component)
     {
         _interactReceiver.EnableInteraction();
+        _ignoreNextInput = true;
+        ShipEnhancements.Instance.ModHelper.Events.Unity.FireInNUpdates(() =>
+        {
+            if (!_interactReceiver.IsFocused())
+            {
+                _ignoreNextInput = false;
+            }
+        }, 2);
     }
 
     private void OnShipSystemFailure()

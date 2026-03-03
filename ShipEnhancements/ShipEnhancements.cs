@@ -1144,6 +1144,9 @@ public class ShipEnhancements : ModBehaviour
             (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_NOM_Sandstone_mat.mat"),
             (Material)LoadAsset("Assets/ShipEnhancements/CockpitWindowFrost_Material.mat"),
             (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_WaterGaugeMetal_mat.mat"),
+            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_ShipCurtain_Cloth_mat.mat"),
+            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_ShipCurtain_Metal_mat.mat"),
+            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_ShipCurtain_CampsiteProps_mat.mat"),
         };
         Transform cockpitLight = SELocator.GetShipTransform().Find("Module_Cockpit/Lights_Cockpit/Pointlight_HEA_ShipCockpit");
         List<Material> materials = [.. cockpitLight.GetComponent<LightmapController>()._materials];

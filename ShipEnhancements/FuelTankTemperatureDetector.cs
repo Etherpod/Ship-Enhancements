@@ -55,4 +55,15 @@ public class FuelTankTemperatureDetector : TemperatureDetector
             _fuelTank.Explode();
         }
     }
+
+    protected override float CalculateCurrentTemperature()
+    {
+        if (gameObject.GetAttachedOWRigidbody() is ShipBody && 
+            SELocator.GetShipTemperatureDetector())
+        {
+            return SELocator.GetShipTemperatureDetector().GetCurrentInternalTemperature();
+        }
+
+        return base.CalculateCurrentTemperature();
+    }
 }

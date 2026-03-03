@@ -63,8 +63,6 @@ public class CockpitEffectController : MonoBehaviour
 
     private void Start()
     {
-        _reactorHeat = SELocator.GetShipTransform().GetComponentInChildren<ReactorHeatController>();
-
         if ((float)rustLevel.GetProperty() > 0)
         {
             _filthMat.SetFloat(_rustCutoffPropID, _rustProgression);
@@ -97,7 +95,15 @@ public class CockpitEffectController : MonoBehaviour
             //enabled = false;
         }
 
-        _iceMat.SetFloat(_iceCutoffPropID, 0f);
+        if ((bool)enableShipTemperature.GetProperty())
+        {
+            _reactorHeat = SELocator.GetShipTransform().GetComponentInChildren<ReactorHeatController>();
+            _iceMat.SetFloat(_iceCutoffPropID, 0f);
+        }
+        else
+        {
+            _iceRenderer.gameObject.SetActive(false);
+        }
     }
 
     private void Update()

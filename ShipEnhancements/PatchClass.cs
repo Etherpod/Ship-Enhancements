@@ -670,6 +670,18 @@ public static class PatchClass
             ShipEnhancements.CreateObject(gravityPadObj, __instance.transform);
         }
     }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(VanishVolume), nameof(VanishVolume.OnTriggerEnter))]
+    public static bool PreventShipDestructionByGravityGear(VanishVolume __instance, Collider hitCollider)
+    {
+        if (hitCollider.GetComponent<GravityRepelVolume>())
+        {
+            return false;
+        }
+
+        return true;
+    }
     #endregion
 
     #region DisableAutoRoll

@@ -102,8 +102,8 @@ Change some of the ways the ship works to make gameplay easier, harder, or just 
 ### *Miscellaneous*
 - **Prolong Digestion**: Lets you survive for a short period of time while your ship is being digested.
 - **Ship Noise Multiplier**: Larger numbers increase the distance your ship can be detected by noise detectors.
-- **Enable Quantum Ship**: Makes your ship quantum while on the Quantum Moon, which lets it shift around on the surface and move between planets with everything else.
 - **Extra Noise**: Makes noisy parts of the ship, like the master alarm, alert noise detectors.
+- **Enable Quantum Ship**: Makes your ship quantum while on the Quantum Moon, which lets it shift around on the surface and move between planets with everything else.
 - **Ship Input Latency**: This basically simulates internet lag, where larger numbers increase the time it takes for the ship to process your inputs. A value of 1 means it takes 1 second for your "upwards thrust" input to register.
 - **Funny Sounds**: Replaces some of the in-game sounds with silly sound effects.
 
@@ -282,13 +282,10 @@ To use the API, copy the **IShipEnhancements** script from this mod's GitHub rep
 ## Known Bugs
 The bugs introduced by this mod. Some of these are getting fixed soon, others I have no idea how to fix.
 - Ship Enhancements will temporarily disable itself while you're at the Eye of the Universe. This isn't a bug, but it does prevent a million other bugs from happening.
-- The lock-on UI will be cut off near the edge of the screen (fixed in the next udpate)
+- The lock-on UI will be cut off near the edge of the screen if **Ship Temperature** is enabled (fixed in the next udpate)
 - If playing with **Suit Log**, interacting with the **Resource Pump** or using the tether can sometimes open the suit log by accident (fixed in the next update)
 - Leaving the ship in the docking bay of the Stranger and being inside the Stranger when the dam breaks will place the ship underwater (fixed in the next update)
-- The **Interactable Ship Curtain** is way too bright (fixed in the next update)
 - Changing the **Interior/Exterior Hull Color** will also change the other traveler's ships (fixed in the next update)
-- The **Gravity Landing Gear** will sometimes cause the ship to touch lava from further away (fixed in the next update)
-- One of the codes used for the **Radio** does not work (fixed in the next update)
 - When playing in multiplayer and using **Ship Input Latency**, the delayed inputs of the non-hosts will not work once they leave the flight console
 - If you attach yourself to an object with a tether and the object enters a black hole, there is a chance you will be violently thrown across the solar system
 - Reeling in towards a tether hook on the other side of a wall will sometimes produce unintended side effects

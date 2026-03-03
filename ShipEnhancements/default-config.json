@@ -463,19 +463,19 @@
       "title": "Ship Noise Multiplier",
       "type": "number",
       "value": 1,
-      "tooltip": "Larger numbers increase the distance your ship can be heard by noise detectors."
-    },
-    "enableQuantumShip": {
-      "title": "Enable Quantum Ship",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Makes your ship quantum while on the Quantum Moon. This is not entirely lore accurate."
+      "tooltip": "Larger numbers increase the distance your ship can be heard by noise detectors. The default distance is about 400 meters."
     },
     "extraNoise": {
       "title": "Extra Noise",
       "type": "toggle",
       "value": false,
       "tooltip": "Makes noisy parts of the ship like the master alarm detectable by noise detectors."
+    },
+    "enableQuantumShip": {
+      "title": "Enable Quantum Ship",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Makes your ship quantum while on the Quantum Moon. This is not entirely lore accurate."
     },
     "shipInputLatency": {
       "title": "Ship Input Latency",
