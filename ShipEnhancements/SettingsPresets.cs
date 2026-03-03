@@ -767,7 +767,7 @@ public static class SettingsPresets
             ("Gravity", (1f, 1f)),
             ("Temperature", (1f, 1f)),
             ("Ship Temperature", (1f, 1f)),
-        ], (1f, 1f), "Time") },
+        ], (0.5f, 0.5f), "Time") },
         { "shipLightColorOptions", new RandomSettingValue(
         [
             ("2", (1f, 1f)),
@@ -791,7 +791,7 @@ public static class SettingsPresets
             ("Black", (1f, 1f)),
             ("Divine", (0f, 0.5f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "shipLightColor2", new RandomSettingValue(
         [
             ("Red", (1f, 1f)),
@@ -810,7 +810,7 @@ public static class SettingsPresets
             ("Black", (1f, 1f)),
             ("Divine", (0f, 0.5f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "shipLightColor3", new RandomSettingValue(
         [
             ("Red", (1f, 1f)),
@@ -829,7 +829,7 @@ public static class SettingsPresets
             ("Black", (1f, 1f)),
             ("Divine", (0f, 0.5f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "hotThrusters", new RandomSettingValue((0.2f, 0.8f)) },
         { "extraNoise", new RandomSettingValue((0f, 0.8f)) },
         { "interiorHullColorBlend", new RandomSettingValue(
@@ -843,7 +843,7 @@ public static class SettingsPresets
             ("Gravity", (1f, 1f)),
             ("Temperature", (1f, 1f)),
             ("Ship Temperature", (1f, 1f)),
-        ], (1f, 1f), "Time") },
+        ], (0.5f, 0.5f), "Time") },
         { "interiorHullColorOptions", new RandomSettingValue(
         [
             ("2", (1f, 1f)),
@@ -863,7 +863,7 @@ public static class SettingsPresets
             ("Hot Pink", (1f, 1f)),
             ("Dark Gray", (1f, 1f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "interiorHullColor2", new RandomSettingValue(
         [
             ("Red", (1f, 1f)),
@@ -878,7 +878,7 @@ public static class SettingsPresets
             ("Hot Pink", (1f, 1f)),
             ("Dark Gray", (1f, 1f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "interiorHullColor3", new RandomSettingValue(
         [
             ("Red", (1f, 1f)),
@@ -893,7 +893,7 @@ public static class SettingsPresets
             ("Hot Pink", (1f, 1f)),
             ("Dark Gray", (1f, 1f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "exteriorHullColorBlend", new RandomSettingValue(
         [
             ("Time", (1f, 1f)),
@@ -905,7 +905,7 @@ public static class SettingsPresets
             ("Gravity", (1f, 1f)),
             ("Temperature", (1f, 1f)),
             ("Ship Temperature", (1f, 1f)),
-        ], (1f, 1f), "Time") },
+        ], (0.5f, 0.5f), "Time") },
         { "exteriorHullColorOptions", new RandomSettingValue(
         [
             ("2", (1f, 1f)),
@@ -925,7 +925,7 @@ public static class SettingsPresets
             ("Hot Pink", (1f, 1f)),
             ("Dark Gray", (1f, 1f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "exteriorHullColor2", new RandomSettingValue(
         [
             ("Red", (1f, 1f)),
@@ -940,7 +940,7 @@ public static class SettingsPresets
             ("Hot Pink", (1f, 1f)),
             ("Dark Gray", (1f, 1f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "exteriorHullColor3", new RandomSettingValue(
         [
             ("Red", (1f, 1f)),
@@ -955,7 +955,7 @@ public static class SettingsPresets
             ("Hot Pink", (1f, 1f)),
             ("Dark Gray", (1f, 1f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "addTether", new RandomSettingValue((0.5f, 0.5f)) },
         { "disableDamageIndicators", new RandomSettingValue((0f, 0.5f)) },
         { "addShipSignal", new RandomSettingValue((0.5f, 0.5f)) },
@@ -999,7 +999,7 @@ public static class SettingsPresets
             ("Gravity", (1f, 1f)),
             ("Temperature", (1f, 1f)),
             ("Ship Temperature", (1f, 1f)),
-        ], (1f, 1f), "Time") },
+        ], (0.5f, 0.5f), "Time") },
         { "thrusterColorOptions", new RandomSettingValue(
         [
             ("2", (1f, 1f)),
@@ -1019,7 +1019,7 @@ public static class SettingsPresets
             ("White", (1f, 1f)),
             ("Gray", (1f, 1f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "thrusterColor2", new RandomSettingValue(
         [
             ("Red", (1f, 1f)),
@@ -1034,7 +1034,7 @@ public static class SettingsPresets
             ("White", (1f, 1f)),
             ("Gray", (1f, 1f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "thrusterColor3", new RandomSettingValue(
         [
             ("Red", (1f, 1f)),
@@ -1049,7 +1049,7 @@ public static class SettingsPresets
             ("White", (1f, 1f)),
             ("Gray", (1f, 1f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "disableSeatbelt", new RandomSettingValue((0f, 0.5f)) },
         { "addPortableTractorBeam", new RandomSettingValue((0.5f, 0.5f)) },
         { "disableShipSuit", new RandomSettingValue((0f, 0.02f)) },
@@ -1064,7 +1064,7 @@ public static class SettingsPresets
             ("Gravity", (1f, 1f)),
             ("Temperature", (1f, 1f)),
             ("Ship Temperature", (1f, 1f)),
-        ], (1f, 1f), "Time") },
+        ], (0.5f, 0.5f), "Time") },
         { "indicatorColorOptions", new RandomSettingValue(
         [
             ("2", (1f, 1f)),
@@ -1085,7 +1085,7 @@ public static class SettingsPresets
             ("White", (1f, 1f)),
             ("Black", (1f, 1f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "indicatorColor2", new RandomSettingValue(
         [
             ("Orange", (1f, 1f)),
@@ -1101,7 +1101,7 @@ public static class SettingsPresets
             ("White", (1f, 1f)),
             ("Black", (1f, 1f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "indicatorColor3", new RandomSettingValue(
         [
             ("Orange", (1f, 1f)),
@@ -1117,7 +1117,7 @@ public static class SettingsPresets
             ("White", (1f, 1f)),
             ("Black", (1f, 1f)),
             ("Rainbow", (0f, 1f)),
-        ], (0.1f, 0.25f), "Default") },
+        ], (0.3f, 0.8f), "Default") },
         { "disableAutoLights", new RandomSettingValue((0.5f, 0.5f)) },
         { "addExpeditionFlag", new RandomSettingValue((0.5f, 0.5f)) },
         { "addFuelCanister", new RandomSettingValue((0.5f, 0.5f)) },

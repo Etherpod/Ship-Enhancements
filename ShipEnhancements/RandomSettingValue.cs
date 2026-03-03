@@ -65,7 +65,7 @@ public class RandomSettingValue
             {
                 float weight = Mathf.Lerp(_possibleValues[i].weightRange.minWeight, _possibleValues[i].weightRange.maxWeight, lerp);
                 sum += weight;
-                if (rand < sum)
+                if (rand <= sum)
                 {
                     object value = _possibleValues[i].value;
                     if (value is float)

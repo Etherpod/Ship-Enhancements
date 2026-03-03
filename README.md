@@ -284,7 +284,6 @@ The bugs introduced by this mod. Some of these are getting fixed soon, others I 
 - Ship Enhancements will temporarily disable itself while you're at the Eye of the Universe. This isn't a bug, but it does prevent a million other bugs from happening.
 - The lock-on UI will be cut off near the edge of the screen if **Ship Temperature** is enabled (fixed in the next udpate)
 - If playing with **Suit Log**, interacting with the **Resource Pump** or using the tether can sometimes open the suit log by accident (fixed in the next update)
-- Leaving the ship in the docking bay of the Stranger and being inside the Stranger when the dam breaks will place the ship underwater (fixed in the next update)
 - Changing the **Interior/Exterior Hull Color** will also change the other traveler's ships (fixed in the next update)
 - When playing in multiplayer and using **Ship Input Latency**, the delayed inputs of the non-hosts will not work once they leave the flight console
 - If you attach yourself to an object with a tether and the object enters a black hole, there is a chance you will be violently thrown across the solar system

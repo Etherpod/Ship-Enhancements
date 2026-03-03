@@ -78,13 +78,7 @@ public class ShipEnhancements : ModBehaviour
 
     private ShipResourceSyncManager _shipResourceSync;
 
-    public static bool InMultiplayer
-    {
-        get
-        {
-            return QSBAPI != null && QSBAPI.GetIsInMultiplayer();
-        }
-    }
+    public static bool InMultiplayer => QSBAPI != null && QSBAPI.GetIsInMultiplayer();
 
     public UITextType ProbeLauncherName { get; private set; }
     public UITextType SignalscopeName { get; private set; }
@@ -107,6 +101,7 @@ public class ShipEnhancements : ModBehaviour
 
     private SettingsPresets.PresetName _currentPreset = (SettingsPresets.PresetName)(-1);
     private bool _advancedColors = false;
+    public List<AntiRiverVolume> AntiRiverVolumes { get; private set; } = [];
 
     public GameObject DebugObjects { get; private set; }
 
@@ -266,7 +261,7 @@ public class ShipEnhancements : ModBehaviour
         enableGasLeak,
     }
 
-    private string[] startupMessages =
+    private readonly string[] startupMessages =
     {
         "Did you know that two opposite sides of a 6-sided dice will always add up to 7?",
         "Did you know that \"dreamt\" is the only word in the English language that ends with \"mt\"?",
@@ -995,11 +990,14 @@ public class ShipEnhancements : ModBehaviour
                 {
                     if (SettingsPresets.RandomSettings.ContainsKey(settingsToRandomize[k].GetName()))
                     {
-                        sum += SettingsPresets.RandomSettings[settingsToRandomize[k].GetName()].GetRandomChance();
-                        if (rand < sum)
+                        float add = SettingsPresets.RandomSettings[settingsToRandomize[k].GetName()].GetRandomChance();
+                        sum += add;
+                        if (rand <= sum)
                         {
                             settingsToRandomize[k].SetProperty(SettingsPresets.RandomSettings[settingsToRandomize[k].GetName()]
-                                .GetRandomValue(true));
+                                .GetRandomValue());
+                            total -= add;
+                            settingsToRandomize.RemoveAt(k);
                             break;
                         }
                     }
@@ -1186,6 +1184,19 @@ public class ShipEnhancements : ModBehaviour
                 CreateObject(warpDamage, damageScreen.parent);
             }
         }
+
+        AntiRiverVolumes.Clear();
+        
+        GameObject darkSideVol = LoadPrefab("Assets/ShipEnhancements/AntiRiverVolume_DarkSideDockingBay.prefab");
+        GameObject lightSideVol = LoadPrefab("Assets/ShipEnhancements/AntiRiverVolume_LightSideDockingBay.prefab");
+        AntiRiverVolumes.Add(CreateObject(darkSideVol,
+            GameObject.Find("RingWorld_Body").transform
+                .Find("Sector_RingWorld/Sector_DarkSideDockingBay/Volumes_DarkSideDockingBay"))
+            .GetComponent<AntiRiverVolume>());
+        AntiRiverVolumes.Add(CreateObject(lightSideVol,
+            GameObject.Find("RingWorld_Body").transform
+                .Find("Sector_RingWorld/Sector_LightSideDockingBay/Volumes_LightSideDockingBay"))
+            .GetComponent<AntiRiverVolume>());
 
         SetUpShipAudio();
 

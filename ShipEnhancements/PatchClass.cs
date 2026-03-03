@@ -4621,8 +4621,10 @@ public static class PatchClass
         IOptionsMenuManager OptionsMenuManager = menuManager.OptionsMenuManager;
 
         var menus = typeof(MenuManager).GetField("ModSettingsMenus", BindingFlags.Public
-            | BindingFlags.NonPublic | BindingFlags.Static).GetValue(menuManager)
+            | BindingFlags.NonPublic | BindingFlags.Static)?.GetValue(menuManager)
             as List<(IModBehaviour behaviour, Menu modMenu)>;
+
+        if (menus == null) return;
 
         for (int i = 0; i < menus.Count; i++)
         {
@@ -4646,8 +4648,10 @@ public static class PatchClass
     public static void PreventRepeatActivation(MenuManager __instance, bool force)
     {
         var menus = typeof(MenuManager).GetField("ModSettingsMenus", BindingFlags.Public
-            | BindingFlags.NonPublic | BindingFlags.Static).GetValue(__instance)
+            | BindingFlags.NonPublic | BindingFlags.Static)?.GetValue(__instance)
             as List<(IModBehaviour behaviour, Menu modMenu)>;
+
+        if (menus == null) return;
 
         for (int i = 0; i < menus.Count; i++)
         {
@@ -4665,8 +4669,10 @@ public static class PatchClass
     {
         MenuManager menuManager = StartupPopupPatches.menuManager;
         var menus = typeof(MenuManager).GetField("ModSettingsMenus", BindingFlags.Public
-            | BindingFlags.NonPublic | BindingFlags.Static).GetValue(menuManager)
+            | BindingFlags.NonPublic | BindingFlags.Static)?.GetValue(menuManager)
             as List<(IModBehaviour behaviour, Menu modMenu)>;
+
+        if (menus == null) return;
 
         Menu modMenu = null;
         for (int i = 0; i < menus.Count; i++)
@@ -5036,6 +5042,51 @@ public static class PatchClass
             PatchHandler.SetLastFocusedRepairReciver(__instance._focusedRepairReceiver);
         }
     }
+    #endregion
+    
+    #region DockingBayFix
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(OWRingRiverCollider), nameof(OWRingRiverCollider.IsTrackerInCollider))]
+    public static bool PreventDockingBayRiver(OWRingRiverCollider __instance, OWCustomCollider.TrackedTransform tracker, 
+        ref bool __result)
+    {
+        if (tracker.fluidDetector is StaticFluidDetector or ShipFluidDetector)
+        {
+            __result = CheckPointInRingWorldRiver(__instance, tracker.transform.position);
+            return false;
+        }
+
+        return true;
+    }
+    
+    public static bool CheckPointInRingWorldRiver(OWRingRiverCollider __instance, Vector3 worldPoint)
+    {
+        bool inRiver;
+        Vector3 vector = __instance.transform.InverseTransformPoint(worldPoint);
+        if (vector.y > __instance._cylinderHalfHeight || vector.y < -__instance._cylinderHalfHeight)
+        {
+            inRiver = false;
+        }
+        else
+        {
+            float num = Mathf.Sqrt(vector.x * vector.x + vector.z * vector.z);
+            inRiver = num > __instance.GetInnerRadiusAtLocalPosition(vector) && num < __instance._outerRadius;
+        }
+
+        if (!inRiver) return false;
+        
+        foreach (var vol in ShipEnhancements.Instance.AntiRiverVolumes)
+        {
+            if (vol.CheckPointInside(worldPoint))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    
     #endregion
 
     [HarmonyPrefix]
