@@ -3617,6 +3617,16 @@ public static class PatchClass
         }
         else if (module.GetComponent<ShipHull>().section == ShipHull.Section.Right)
         {
+            var suppliesSystem = module.transform.Find("Systems_Supplies/SuppliesElectricalSystem")
+                    .GetComponent<ElectricalSystem>();
+            var cabinSystem = __instance.transform.Find("Module_Cabin/Systems_Cabin/CabinElectricalSystem")
+                .GetComponent<ElectricalSystem>();
+            
+            var connectedSystems = cabinSystem._connectedSystems.ToList();
+            connectedSystems.Remove(suppliesSystem);
+            cabinSystem._connectedSystems = connectedSystems.ToArray();
+            suppliesSystem.SetPowered(false);
+            
             __instance.GetComponent<ShipThrusterModel>().SetThrusterBankEnabled(ThrusterBank.Right, false);
             hullBreachTrigger.EnableSuppliesEntryway();
         }
