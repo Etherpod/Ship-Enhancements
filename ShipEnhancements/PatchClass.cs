@@ -2847,7 +2847,7 @@ public static class PatchClass
         if ((bool)disableSeatbelt.GetProperty() && PlayerState.AtFlightConsole() && impact.speed > 25f)
         {
             _lastImpactVelocity = impact.velocity.normalized * -impact.speed / 40f;
-            ShipCockpitController cockpit = SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitController>();
+            ShipCockpitController cockpit = SELocator.GetShipCockpitController();
             if (cockpit != null)
             {
                 cockpit.ExitFlightConsole();
@@ -2886,7 +2886,7 @@ public static class PatchClass
             if (impactVelocity.magnitude > 10f)
             {
                 _lastImpactVelocity = -impactVelocity / 25f;
-                ShipCockpitController cockpit = SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitController>();
+                ShipCockpitController cockpit = SELocator.GetShipCockpitController();
                 if (cockpit != null)
                 {
                     cockpit.ExitFlightConsole();
@@ -3421,7 +3421,7 @@ public static class PatchClass
             return;
         }
         
-        __instance.GetComponentInChildren<ShipCockpitController>().LockUpControls(time);
+        SELocator.GetShipCockpitController().LockUpControls(time);
         ShipNotifications.PostStunDamageNotification(time);
         __instance.GetComponent<ShipThrusterController>().SetRollMode(false, 1);
     }
@@ -3590,6 +3590,7 @@ public static class PatchClass
         }
 
         HullBreachEntrywayTrigger hullBreachTrigger = __instance.GetComponentInChildren<HullBreachEntrywayTrigger>();
+        ShipEnhancements.WriteDebugMessage("trigger: " + hullBreachTrigger);
 
         if (!hullBreachTrigger.HasBreached())
         {
@@ -5085,6 +5086,17 @@ public static class PatchClass
         }
 
         return true;
+    }
+    
+    #endregion
+    
+    #region PersistentShipState
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(DestructionVolume), nameof(DestructionVolume.VanishShip))]
+    public static void OnShipVanished()
+    {
+        ShipEnhancements.Instance.GetComponent<PersistentShipState>().OnShipVanished();
     }
     
     #endregion

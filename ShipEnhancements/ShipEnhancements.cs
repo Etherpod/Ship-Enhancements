@@ -428,7 +428,7 @@ public class ShipEnhancements : ModBehaviour
         ShipSignalName = EnumUtils.Create<SignalName>("Ship");
 
         SEItemAudioController.Initialize();
-
+        UpdateExperimentalSettings();
         PrintStartupMessage();
 
         SceneManager.sceneUnloaded += _ =>
@@ -472,7 +472,6 @@ public class ShipEnhancements : ModBehaviour
             ShipRepairLimitController.SetRepairLimit(-1);
             ShipRepairLimitController.SetPartsRepaired(0);
             ErnestoDetectiveController.Initialize();
-            UpdateExperimentalSettings();
 
             SaveData = ModHelper.Storage.Load<SaveDataJson>("save.json");
             if (SaveData == null)
@@ -523,6 +522,7 @@ public class ShipEnhancements : ModBehaviour
 
         LoadManager.OnStartSceneLoad += (scene, loadScene) =>
         {
+            UpdateExperimentalSettings();
             GetComponent<PersistentShipState>()?.OnStartSceneLoad(scene, loadScene);
 
             if (loadScene == OWScene.EyeOfTheUniverse || IsWarpingBackToEye)
@@ -535,7 +535,32 @@ public class ShipEnhancements : ModBehaviour
             {
                 if (!InMultiplayer || QSBAPI.GetIsHost())
                 {
-                    UpdateProperties();
+                    if (ExperimentalSettings.UltraPersistentShip)
+                    {
+                        var settings = GetComponent<PersistentShipState>().GetActiveSettings();
+                        if (settings != null)
+                        {
+                            foreach (var (setting, value) in settings)
+                            {
+                                var prop = value;
+                                if (float.TryParse(value.ToString(), out var result))
+                                {
+                                    prop = result;
+                                }
+                                setting.AsEnum<Settings>().SetProperty(prop);
+                            }
+                        }
+                        else
+                        {
+                            ShipEnhancements.WriteDebugMessage("--------------- settings are null");
+                            UpdateProperties();
+                        }
+                    }
+                    else
+                    {
+                        ShipEnhancements.WriteDebugMessage("--------------- persistent ship disabled");
+                        UpdateProperties();
+                    }
                     
                     if (InMultiplayer && scene != OWScene.TitleScreen)
                     {
@@ -631,9 +656,10 @@ public class ShipEnhancements : ModBehaviour
                 _unsubFromShipSpawn = false;
             }
 
-            bool skipSettings = GetComponent<PersistentShipState>()?.PreserveSettings ?? false;
-            if ((!InMultiplayer || QSBAPI.GetIsHost()) && !skipSettings)
+            bool preserveSettings = GetComponent<PersistentShipState>().PreserveSettings;
+            if ((!InMultiplayer || QSBAPI.GetIsHost()) && !preserveSettings)
             {
+                ShipEnhancements.WriteDebugMessage("--------------- ignore settings preserve");
                 UpdateProperties();
 
                 if (InMultiplayer)
@@ -662,7 +688,7 @@ public class ShipEnhancements : ModBehaviour
         ModHelper.Console.WriteLine(startupMessages[index], MessageType.Info);
     }
 
-    private void UpdateExperimentalSettings()
+    public void UpdateExperimentalSettings()
     {
         var data = JsonConvert.DeserializeObject<ExperimentalSettingsJson>(
             File.ReadAllText(Path.Combine(ModHelper.Manifest.ModFolderPath, "ExperimentalSettings.json"))
@@ -1117,8 +1143,8 @@ public class ShipEnhancements : ModBehaviour
         ThrustIndicatorManager.Initialize();
         ShipRepairLimitController.Initialize();
 
-        SELocator.GetShipBody().GetComponentInChildren<ShipCockpitController>()
-            ._interactVolume.gameObject.AddComponent<FlightConsoleInteractController>();
+        SELocator.GetShipCockpitController()._interactVolume.gameObject
+            .AddComponent<FlightConsoleInteractController>();
 
         var debugObjectsPrefab = LoadPrefab("Assets/ShipEnhancements/DebugObjects.prefab");
         DebugObjects = CreateObject(debugObjectsPrefab, SELocator.GetShipBody().transform);
@@ -1205,7 +1231,8 @@ public class ShipEnhancements : ModBehaviour
             audio.spatialBlend = 1f;
         }
 
-        shipLoaded = true;
+        // gets set to true lower down
+        //shipLoaded = true;
         UpdateSuitOxygen();
 
         if (AchievementsAPI != null)
@@ -1508,7 +1535,8 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)addShipSignal.GetProperty())
         {
             GameObject signal = LoadPrefab("Assets/ShipEnhancements/ShipSignal.prefab");
-            CreateObject(signal, SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitUI>()._sigScopeDish);
+            CreateObject(signal, SELocator.GetShipCockpitController()
+                .transform.parent.GetComponentInChildren<ShipCockpitUI>()._sigScopeDish);
 
             SELocator.GetPlayerBody().GetComponentInChildren<Signalscope>().gameObject.AddComponent<ShipRemoteControl>();
         }
@@ -1959,7 +1987,6 @@ public class ShipEnhancements : ModBehaviour
 
         ModHelper.Events.Unity.RunWhen(() => Locator._shipBody != null, () =>
         {
-            shipLoaded = true;
             if ((bool)disableGravityCrystal.GetProperty())
             {
                 DisableGravityCrystal();
@@ -2090,7 +2117,10 @@ public class ShipEnhancements : ModBehaviour
             if ((bool)preventSystemFailure.GetProperty())
             {
                 GameObject entrywayTriggersObj = LoadPrefab("Assets/ShipEnhancements/BreachEntryTriggers.prefab");
-                OWTriggerVolume entrywayVol = CreateObject(entrywayTriggersObj, SELocator.GetShipTransform().Find("Volumes")).GetComponent<OWTriggerVolume>();
+                OWTriggerVolume entrywayVol = CreateObject(entrywayTriggersObj, 
+                    SELocator.GetShipTransform().Find("Volumes")).GetComponent<OWTriggerVolume>();
+                
+                ShipEnhancements.WriteDebugMessage("entry: " + entrywayVol);
 
                 PlayerSpawner spawner = GameObject.FindGameObjectWithTag("Player").GetRequiredComponent<PlayerSpawner>();
                 SpawnPoint shipSpawn = spawner.GetSpawnPoint(SpawnLocation.Ship);
@@ -2109,9 +2139,11 @@ public class ShipEnhancements : ModBehaviour
             {
                 SELocator.GetShipDamageController().Explode();
             }
-
+            
             ShipRepairLimitController.RefreshRepairPrompt();
             InitializeConditions();
+            
+            shipLoaded = true;
         });
     }
 
@@ -2624,7 +2656,7 @@ public class ShipEnhancements : ModBehaviour
         headlightComponent._damaged = true;
         headlightComponent._repairFraction = 0f;
         headlightComponent.OnComponentDamaged();
-        SELocator.GetShipBody().GetComponentInChildren<ShipCockpitController>()._externalLightsOn = false;
+        SELocator.GetShipCockpitController()._externalLightsOn = false;
 
         disableShipHeadlights = true;
     }
@@ -2746,7 +2778,7 @@ public class ShipEnhancements : ModBehaviour
             damageScreenMat.SetColor("_DamagedComponentFill", theme.CompColor / 255f * theme.CompIntensity);
 
             masterAlarmMat.SetColor("_Color", theme.AlarmColor / 255f);
-            SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitUI>()._damageLightColor = theme.AlarmLitColor / 255f
+            SELocator.GetShipCockpitController().transform.parent.GetComponentInChildren<ShipCockpitUI>()._damageLightColor = theme.AlarmLitColor / 255f
                 * Mathf.Pow(2, theme.AlarmLitIntensity);
             masterAlarmLight.color = theme.IndicatorLight / 255f;
 
@@ -3153,7 +3185,7 @@ public class ShipEnhancements : ModBehaviour
         headlightComponent._damaged = true;
         headlightComponent._repairFraction = 0f;
         headlightComponent.OnComponentDamaged();
-        FindObjectOfType<ShipCockpitController>()._externalLightsOn = false;
+        SELocator.GetShipCockpitController()._externalLightsOn = false;
 
         disableShipHeadlights = true;
     }
@@ -3218,7 +3250,7 @@ public class ShipEnhancements : ModBehaviour
 
     public static void WriteDebugMessage(object msg, bool warning = false, bool error = false)
     {
-        return;
+        //return;
 
         msg ??= "null";
 

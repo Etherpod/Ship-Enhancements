@@ -29,7 +29,8 @@ public class ShipIndicatorBlendController : ColorBlendController
         _reactorLight = transform.Find("Module_Engine/Systems_Engine/ReactorComponent/ReactorDamageLight").GetComponent<Light>();
         _reactorGlow = transform.Find("Module_Engine/Systems_Engine/ReactorComponent/Structure_HEA_PlayerShip_ReactorDamageDecal")
             .GetComponent<MeshRenderer>().material;
-        _cockpitUI = GetComponentInChildren<ShipCockpitUI>();
+        _cockpitUI = SELocator.GetShipCockpitController()
+            .transform.parent.GetComponentInChildren<ShipCockpitUI>();
         _damageEffects = GetComponentsInChildren<DamageEffect>()
             .Where(effect => effect._damageLight != null || effect._damageLightRenderer != null).ToArray();
 

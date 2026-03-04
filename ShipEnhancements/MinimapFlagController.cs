@@ -93,7 +93,7 @@ public class MinimapFlagController : MonoBehaviour
     {
         if (!_activeFlags.ContainsKey(flag))
         {
-            ShipCockpitUI cockpitUI = SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitUI>();
+            ShipCockpitUI cockpitUI = SELocator.GetShipCockpitController().transform.parent.GetComponentInChildren<ShipCockpitUI>();
             Transform markerTransform = ShipEnhancements.CreateObject(_flagMarkerPrefab, transform).transform;
             _activeFlags.Add(flag, markerTransform);
             foreach (var rend in markerTransform.GetComponentsInChildren<Renderer>())

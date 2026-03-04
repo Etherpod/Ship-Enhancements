@@ -83,6 +83,7 @@ public class QuantumShip : VisibilityObject
         }
 
         GlobalMessenger.FireEvent("ShipDestroyed");
+        ShipEnhancements.Instance.GetComponent<PersistentShipState>().OnShipVanished();
         enabled = false;
     }
 

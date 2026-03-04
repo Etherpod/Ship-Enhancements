@@ -28,7 +28,7 @@ public class RainbowShipDamage : MonoBehaviour
         _masterAlarmMat = transform.Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry/Cockpit_Interior/Cockpit_Interior_Chassis")
                 .GetComponent<MeshRenderer>().sharedMaterials[6];
         _masterAlarmLight = transform.Find("Module_Cabin/Lights_Cabin/PointLight_HEA_MasterAlarm").GetComponent<Light>();
-        _cockpitUI = GetComponentInChildren<ShipCockpitUI>();
+        _cockpitUI = SELocator.GetShipCockpitController().transform.parent.GetComponentInChildren<ShipCockpitUI>();
         _damageEffects = GetComponentsInChildren<DamageEffect>()
             .Where(effect => effect._damageLight != null || effect._damageLightRenderer != null).ToArray();
     }

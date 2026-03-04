@@ -740,17 +740,17 @@
       <Page>So the other hatchlings and I made a white flag for Feldspar. That way when they finally made it to another planet, they could set it up there for everyone to see.</Page>
       <Page>When the space program was founded, we put the Outer Wilds Ventures sticker on that flag, so it looks a little different. But that's still the same flag Feldspar used when they landed on the Attlerock for the first time.</Page>
       <Page>Plan was to put one on every planet, but I guess that never happened, with Feldspar going missing and all that.</Page>
-      <Page>Anyway, we had a few more that we made in storage, so I thought, you know, since you're going into space, maybe you could bring one with you. Just to put down somewhere out there.</Page>
+      <Page>Anyway, I found a few extras in storage, so I figured it'd make sense for you to get your own flag. You're not exactly the first one going into space, but there's still a lot left to explore! I'm sure somewhere among those stars is a place worthy of planting your flag.</Page>
     </Dialogue>
 
     <DialogueOptionsList>
       <DialogueOption>
-        <Text>Yeah. I can do that.</Text>
+        <Text>If there is, I'll make sure I find it!</Text>
         <DialogueTarget>SE_ExpeditionFlag_11</DialogueTarget>
       </DialogueOption>
       <DialogueOption>
         <RequiredPersistentCondition>MetFeldspar</RequiredPersistentCondition>
-        <Text>Maybe I'll pay Feldspar a visit and bring them a flag.</Text>
+        <Text>Maybe I'll pay Feldspar a visit and bring them a flag!</Text>
         <DialogueTarget>SE_ExpeditionFlag_12</DialogueTarget>
       </DialogueOption>
     </DialogueOptionsList>
@@ -759,18 +759,33 @@
   <DialogueNode>
     <Name>SE_ExpeditionFlag_11</Name>
     <Dialogue>
-      <Page>Heh, maybe you can finish the job and set one up on each planet.</Page>
-      <Page>If you do that, take some photos to show me when you get back, will you?</Page>
+      <Page>That's the spirit! Now, enough reminiscing about the past. Start thinking about the future and go launch that ship already!</Page>
+      <Page>Just make sure the ship comes back in one piece, wherever you go.</Page>
     </Dialogue>
   </DialogueNode>
 
   <DialogueNode>
     <Name>SE_ExpeditionFlag_12</Name>
     <Dialogue>
-      <Page>Wish I could visit Feldspar too, hatchling, but until someone finds them, they won't be getting their flag.</Page>
-      <Page>You know what, though? If you somehow find Feldspar out there, be sure to come back here and tell me.</Page>
+      <Page>Wish I could visit Feldspar too, hatchling. But until someone finds them, they won't be getting their flag.</Page>
     </Dialogue>
+      
+      <DialogueOptionsList>
+          <DialogueOption>
+              <Text>I already found Feldspar! They're at a campsite inside Dark Bramble.</Text>
+              <DialogueTarget>SE_ExpeditionFlag_120</DialogueTarget>
+          </DialogueOption>
+      </DialogueOptionsList>
   </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_ExpeditionFlag_120</Name>
+        <Dialogue>
+            <Page>Are they? <![CDATA[<i>]]>Ha!<![CDATA[</i>]]> They were always looking for a challenge.</Page>
+            <Page>I'd go visit them myself, but visitors are probably the last thing they want to see if they're camping in a place like Dark Bramble.</Page>
+            <Page>Anyway, you've spent enough time talking to me. Go take that ship for another spin! I didn't build it just to sit there and look good, you know.</Page>
+        </Dialogue>
+    </DialogueNode>
 
   <!--Ship Warp Core-->
 

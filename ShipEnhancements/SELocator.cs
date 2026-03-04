@@ -30,6 +30,7 @@ public static class SELocator
     private static ShipWarpCoreComponent _warpCoreComponent;
     private static AutopilotPanelController _autopilotPanelController;
     private static ShipWaterResource _waterResource;
+    private static ShipCockpitController _shipCockpitController;
 
     private static ReferenceFrame _shipRF;
     private static ReferenceFrame _playerRF;
@@ -46,6 +47,7 @@ public static class SELocator
         _shipOxygenVolume = _shipBody.GetComponentInChildren<OxygenVolume>();
         _playerResources = _playerBody.GetComponent<PlayerResources>();
         _shipDamageController = _shipTransform.GetComponent<ShipDamageController>();
+        _shipCockpitController = _shipTransform.GetComponentInChildren<ShipCockpitController>();
 
         _shipRF = null;
         _playerRF = null;
@@ -226,6 +228,11 @@ public static class SELocator
     public static ShipWaterResource GetShipWaterResource()
     {
         return _waterResource;
+    }
+
+    public static ShipCockpitController GetShipCockpitController()
+    {
+        return _shipCockpitController;
     }
 
     public static ReferenceFrame GetReferenceFrame(bool shipFrame = true, bool ignorePassiveFrame = true)
