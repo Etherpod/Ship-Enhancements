@@ -1,5 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using MonoMod.Utils;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,12 +23,14 @@ public class CockpitErnesto : MonoBehaviour
     private bool _bigHeadMode = false;
     private bool _showShipFailNextTime = false;
     private int _riddleConversationCountdown;
+    private int _queryCount;
+    private readonly int _maxQueries = 3;
 
-    private readonly int _questionsCount = 29;
+    private int _questionCount;
     private readonly float _commentLifetime = 10f;
 
-    private List<string> _availableHeavyImpactComments = [];
-    private string[] _heavyImpactComments =
+    private readonly List<string> _availableHeavyImpactComments = [];
+    private readonly string[] _heavyImpactComments =
     [
         "You'd better watch where you're flying that thing.",
         "Ouch. That's gonna be tough to repair.",
@@ -37,8 +42,8 @@ public class CockpitErnesto : MonoBehaviour
         "Hey, that was my favorite part!"
     ];
 
-    private List<string> _availableShockComments = [];
-    private string[] _shockComments =
+    private readonly List<string> _availableShockComments = [];
+    private readonly string[] _shockComments =
     [
         "I don't think that's going to recharge the ship.",
         "I'd appreciate it if you didn't try electrocuting us.",
@@ -49,8 +54,8 @@ public class CockpitErnesto : MonoBehaviour
         "Good job. Now go fix the electricity so I can watch my TV."
     ];
 
-    private List<string> _availableEjectComments = [];
-    private string[] _ejectComments =
+    private readonly List<string> _availableEjectComments = [];
+    private readonly string[] _ejectComments =
     [
         "What'd you do that for?",
         "Nice job, you just ruined a perfectly good cockpit.",
@@ -60,14 +65,76 @@ public class CockpitErnesto : MonoBehaviour
         "Well, at least now we know it works.",
     ];
 
-    private List<string> _availableReactorComments = [];
-    private string[] _reactorComments =
+    private readonly List<string> _availableReactorComments = [];
+    private readonly string[] _reactorComments =
     [
         "You might want to check on your reactor.",
         "Is it just me, or is it getting hot in here? It might just be me.",
         "Isn't there supposed to an alarm going off or something?",
         "Is your reactor supposed to be glowing red?"
     ];
+
+    private readonly Dictionary<DeathType, List<string>> _availableDeathComments = [];
+
+    private readonly Dictionary<DeathType, string[]> _deathComments = new()
+    {
+        {
+            DeathType.Meditation,
+            [
+                "What? You're meditating already?",
+                "Goodnight, sleep tight, don't let the anglerfish bite. Specifically me. I'm the anglerfish. I'm going to bite you.",
+                "Wait, where are you going? You're just leaving me here? How am I going to survive on my own?",
+                "Well, it's been nice knowing you for MINS minutes and SECS seconds."
+            ]
+        },
+        {
+            DeathType.Asphyxiation,
+            [
+                "You're suffocating here? You could have suffocated anywhere, and you wanted to suffocate here? Right next to me?",
+                "Can you hurry it up? I'm trying to listen to a podcast right now. They're making some great points about the stock market situation in Dark Bramble and you're being very distracting."
+            ]
+        },
+        {
+            DeathType.Digestion,
+            [
+                "I've always wondered what my insides looked like."
+            ]
+        },
+        {
+            DeathType.Lava,
+            [
+                "Hey, isn't lava supposed to be deadly? Why are you touching it?"
+            ]
+        },
+        {
+            DeathType.TimeLoop,
+            [
+                "Hey, hatchling? I have something really important I need to tell you. Can you come here for a second?",
+                "Wanna hear a fun fact? Just give me like 10 seconds to come up with one."
+            ]
+        },
+        {
+            DeathType.Impact,
+            [
+                "Uhh... are you okay?",
+                "That killed you? Your bones must be incredibly fragile.",
+                "Well, that's embarrasing."
+            ]
+        },
+        {
+            DeathType.Default,
+            [
+                "Wait! Don't die yet, I need to record this. It's gonna do numbers on Vine."
+            ]
+        },
+        {
+            DeathType.Crushed,
+            [
+                "What's that sound? Sounds like a beetle getting squished. A blue, four-eyed beetle.",
+                "Are you being crushed by the weight of your responsibilities? Or was that for another time?"
+            ]
+        }
+    };
 
     private void Awake()
     {
@@ -80,7 +147,30 @@ public class CockpitErnesto : MonoBehaviour
         GlobalMessenger.AddListener("ExitFlightConsole", OnExitFlightConsole);
         GlobalMessenger.AddListener("EnableBigHeadMode", OnEnableBigHeadMode);
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+        GlobalMessenger<DeathType>.AddListener("PlayerDeath", OnPlayerDeath);
 
+        // pull dialogue from github
+        //var injection = (TextAsset)ShipEnhancements.LoadAsset("Assets/ShipEnhancements/TextAsset/TestErnestoQuestions.txt");
+        var injection = ErnestoNetworkHandler.GetErnestoQuestions();
+        var dialogue = _dialogueTree._xmlCharacterDialogueAsset;
+        int index = dialogue.text.IndexOf("DIALOGUE_OPTION_PLACEHOLDER");
+        if (index > 0)
+        {
+            var regex = new Regex(@"(<\/DialogueOption>)(?=[\s\S]*(DIALOGUE_BODY_SEPARATOR))");
+            int matches = regex.Matches(injection.text).Count;
+            ShipEnhancements.WriteDebugMessage("matches: " + matches);
+            if (matches > 0)
+            {
+                _questionCount = matches;
+                var splitIndex = injection.text.IndexOf("DIALOGUE_BODY_SEPARATOR");
+                var injectOptions = injection.text.Substring(0, splitIndex);
+                var injectBody = injection.text.Substring(splitIndex + 23);
+                var newText = dialogue.text.Replace("DIALOGUE_OPTION_PLACEHOLDER", injectOptions);
+                newText = newText.Replace("DIALOGUE_BODY_PLACEHOLDER", injectBody);
+                _dialogueTree._xmlCharacterDialogueAsset = new TextAsset(newText);
+            }
+        }
+        
         ResetAvailableQuestions();
     }
 
@@ -91,10 +181,15 @@ public class CockpitErnesto : MonoBehaviour
         _availableEjectComments.AddRange(_ejectComments);
         _availableReactorComments.AddRange(_reactorComments);
 
-        if (ErnestoModListHandler.GetNumberErnestos() > 0)
+        foreach (var (type, array) in _deathComments)
+        {
+            _availableDeathComments.Add(type, array.ToList());
+        }
+
+        /*if (ErnestoModListHandler.GetNumberErnestos() > 0)
         {
             SetConditionState("SE_MULTIPLE_ERNESTOS", true);
-        }
+        }*/
 
         _commentText.gameObject.SetActive(false);
         _riddleConversationCountdown = _random.Next(5, 10);
@@ -105,15 +200,12 @@ public class CockpitErnesto : MonoBehaviour
         _questions.Clear();
         _availableQuestions.Clear();
 
-        for (int i = 1; i <= _questionsCount; i++)
+        for (int i = 1; i <= _questionCount; i++)
         {
-            if (Random.value < 0.5f)
-            {
-                _questions.Add(i);
-            }
+            _questions.Add(i);
         }
 
-        if (GetConditionState("SE_ERNESTO_GESWALDO_PART_ONE"))
+        /*if (GetConditionState("SE_ERNESTO_GESWALDO_PART_ONE"))
         {
             _questions.Add(101);
         }
@@ -134,8 +226,8 @@ public class CockpitErnesto : MonoBehaviour
             && !PlayerData.GetPersistentCondition("SE_HAS_ERNESTONIAN_TRANSLATOR"))
         {
             _questions.Add(203);
-        }
-
+        }*/
+        
         _availableQuestions.AddRange(_questions);
     }
 
@@ -148,9 +240,22 @@ public class CockpitErnesto : MonoBehaviour
             _currentComment = null;
         }
 
-        int num = _availableQuestions[_random.Next(0, _availableQuestions.Count)];
-        SetConditionState("SE_ERNESTO_OPTION_" + num, true);
-        _availableQuestions.Remove(num);
+        if (_availableQuestions.Count > 0)
+        {
+            int num = _availableQuestions[_random.Next(0, _availableQuestions.Count)];
+            SetConditionState("SE_ERNESTO_OPTION_" + num, true);
+            _availableQuestions.Remove(num);
+        }
+        else if (!PlayerData.GetPersistentCondition("SE_ERNESTO_IS_AWARE") &&
+            (!PlayerData.GetPersistentCondition("SE_ERNESTO_TOLD_RIDDLE") || 
+                GetConditionState("SE_ERNESTO_REPEATED_RIDDLE")))
+        {
+            SetConditionState("SE_ERNESTO_FAILSAFE_QUESTION", true);
+        }
+        else
+        {
+            SetConditionState("SE_ERNESTO_FAILSAFE_QUESTION", false);
+        }
 
         if (_showShipFailNextTime)
         {
@@ -189,7 +294,18 @@ public class CockpitErnesto : MonoBehaviour
             ResetAvailableQuestions();
         }
 
-        if (ErnestoModListHandler.GetNumberErnestos() > 0 && PlayerData.GetPersistentCondition("SE_KNOWS_ERNESTO") 
+        if (GetConditionState("SE_ERNESTO_ASKED_QUESTION"))
+        {
+            _queryCount = Mathf.Min(_maxQueries, _queryCount + 1);
+            SetConditionState("SE_ERNESTO_ASKED_QUESTION", false);
+        }
+        
+        if (!GetConditionState("SE_ERNESTO_NO_QUESTIONS") && _queryCount >= _maxQueries)
+        {
+            SetConditionState("SE_ERNESTO_NO_QUESTIONS", true);
+        }
+
+        if (ErnestoNetworkHandler.GetNumberErnestos() > 0 && PlayerData.GetPersistentCondition("SE_KNOWS_ERNESTO") 
             && !PlayerData.GetPersistentCondition("SE_ERNESTO_IS_AWARE")
             && !GetConditionState("SE_ERNESTO_AWARE_NEXT_TIME"))
         {
@@ -357,14 +473,66 @@ public class CockpitErnesto : MonoBehaviour
             _bigHeadMode = true;
             transform.Find("Beast_Anglerfish").transform.localScale *= 2f;
             transform.position += new Vector3(0f, 0.11f, 0f);
-            _questions.Add(200);
-            _availableQuestions.Add(200);
+            SetConditionState("SE_ERNESTO_BIG_HEAD", true);
         }
     }
 
     private void OnShipSystemFailure()
     {
         _showShipFailNextTime = true;
+    }
+
+    private void OnPlayerDeath(DeathType deathType)
+    {
+        if (!_deathComments.ContainsKey(deathType)) return;
+        
+        var distSqr = (SELocator.GetPlayerBody().transform.position - 
+            transform.position).sqrMagnitude;
+        if (distSqr < 5f * 5f)
+        {
+            var comments = _availableDeathComments[deathType];
+            if (comments.Count > 0)
+            {
+                var com = comments[_random.Next(0, comments.Count)];
+                
+                if (deathType == DeathType.Meditation)
+                {
+                    if (com.Contains("MINS"))
+                    {
+                        var mins = (int)(Time.timeSinceLevelLoad / 60f);
+                        if (mins == 0)
+                        {
+                            com = com.Replace("MINS minutes and ", "");
+                        }
+                        else
+                        {
+                            com = com.Replace("MINS", mins.ToString());
+                        }
+                    }
+
+                    if (com.Contains("SECS"))
+                    {
+                        var secs = (int)(Time.timeSinceLevelLoad % 60f);
+                        if (secs == 0)
+                        {
+                            com = "Well, it's been nice knowing you for... zero seconds? That doesn't sound right.";
+                        }
+                        else
+                        {
+                            com = com.Replace("SECS", secs.ToString());
+                        }
+                    }
+                }
+                
+                MakeComment(com);
+                _availableDeathComments[deathType].Remove(com);
+
+                if (_availableDeathComments[deathType].Count == 0)
+                {
+                    _availableDeathComments[deathType].AddRange(_deathComments[deathType]);
+                }
+            }
+        }
     }
 
     private void OnDestroy()
@@ -375,23 +543,16 @@ public class CockpitErnesto : MonoBehaviour
         GlobalMessenger.RemoveListener("ExitFlightConsole", OnExitFlightConsole);
         GlobalMessenger.RemoveListener("EnableBigHeadMode", OnEnableBigHeadMode);
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
+        GlobalMessenger<DeathType>.RemoveListener("PlayerDeath", OnPlayerDeath);
     }
 
     private bool GetConditionState(string id)
     {
-        if (DialogueConditionManager.SharedInstance.ConditionExists(id))
-        {
-            return DialogueConditionManager.SharedInstance.GetConditionState(id);
-        }
-
-        return false;
+        return DialogueConditionManager.SharedInstance.GetConditionState(id);
     }
 
     private void SetConditionState(string id, bool value)
     {
-        if (DialogueConditionManager.SharedInstance.ConditionExists(id))
-        {
-            DialogueConditionManager.SharedInstance.SetConditionState(id, value);
-        }
+        DialogueConditionManager.SharedInstance.SetConditionState(id, value);
     }
 }

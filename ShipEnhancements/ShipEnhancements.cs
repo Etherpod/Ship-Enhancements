@@ -410,7 +410,7 @@ public class ShipEnhancements : ModBehaviour
         InitializeNH();
         InitializeGE();
         ModCompatibility.InitCompatibility();
-        ErnestoModListHandler.Initialize();
+        ErnestoNetworkHandler.Initialize();
         SettingsPresets.InitializePresets();
 
         ProbeLauncherName = EnumUtils.Create<UITextType>("ScoutLauncher");

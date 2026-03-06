@@ -3720,7 +3720,7 @@ public static class PatchClass
     {
         if (key == "SE_Ernesto_ErnestosERNESTO_PLACEHOLDER")
         {
-            int numErnestos = ErnestoModListHandler.GetNumberErnestos();
+            int numErnestos = ErnestoNetworkHandler.GetNumberErnestos();
             string[] lines =
             [
                 "I dunno, I can't really feel anything right now.",
@@ -3785,7 +3785,7 @@ public static class PatchClass
                     $"Yeah, there's a surplus of magical talking anglerfish right now because {numErnestos} Ernestos decided to cross into our world.",
                 ];
             }
-            else if (numErnestos > 15 && numErnestos < ErnestoModListHandler.GetMaxErnestos())
+            else if (numErnestos > 15 && numErnestos < ErnestoNetworkHandler.GetMaxErnestos())
             {
                 lines =
                 [
@@ -3796,7 +3796,7 @@ public static class PatchClass
                     $"Yeah, {numErnestos} other magical anglerfish that I could be talking to instead of you.",
                 ];
             }
-            else if (numErnestos == ErnestoModListHandler.GetMaxErnestos())
+            else if (numErnestos == ErnestoNetworkHandler.GetMaxErnestos())
             {
                 lines =
                 [
