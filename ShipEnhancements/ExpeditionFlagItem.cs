@@ -52,7 +52,8 @@ public class ExpeditionFlagItem : OWItem
             "*.png", SearchOption.AllDirectories));
         if (files.Count > 0)
         {
-            fileData = File.ReadAllBytes(files[Random.Range(0, files.Count)]);
+            var rand = new System.Random();
+            fileData = File.ReadAllBytes(files[rand.Next(0, files.Count)]);
             tex = new Texture2D(2, 2);
             tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
         }

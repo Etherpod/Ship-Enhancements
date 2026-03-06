@@ -2028,7 +2028,8 @@ public class ShipEnhancements : ModBehaviour
                 int iterations = (int)(lerp * hulls.Count + 0.1f);
                 for (int i = 0; i < iterations; i++)
                 {
-                    int index = UnityEngine.Random.Range(0, hulls.Count);
+                    var rand = new System.Random();
+                    int index = rand.Next(0, hulls.Count);
                     float damage = UnityEngine.Random.Range(Mathf.Lerp(0f, 0.4f, lerp), Mathf.Lerp(0f, 0.8f, lerp));
                     ShipHull hull = hulls[index];
 
@@ -2108,7 +2109,8 @@ public class ShipEnhancements : ModBehaviour
                 int iterations = (int)(lerp * components.Count + 0.1f);
                 for (int i = 0; i < iterations; i++)
                 {
-                    int index = UnityEngine.Random.Range(0, components.Count);
+                    var rand = new System.Random();
+                    int index = rand.Next(0, components.Count);
                     components[index].SetDamaged(true);
                     components.RemoveAt(index);
                     anyPartDamaged = true;

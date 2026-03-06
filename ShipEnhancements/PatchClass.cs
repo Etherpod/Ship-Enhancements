@@ -3815,8 +3815,9 @@ public static class PatchClass
         }
         else if (key == "SE_Ernesto_ClockERNESTO_PLACEHOLDER")
         {
-            int randomHour = UnityEngine.Random.Range(1, 13);
-            int randomMinute = UnityEngine.Random.Range(10, 60);
+            var rand = new System.Random();
+            int randomHour = rand.Next(1, 13);
+            int randomMinute = rand.Next(10, 60);
             __result = $"It's {randomHour}:{randomMinute} if I'm reading that clock correctly.";
             return false;
         }

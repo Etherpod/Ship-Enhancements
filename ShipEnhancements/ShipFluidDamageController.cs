@@ -72,8 +72,10 @@ public class ShipFluidDamageController : MonoBehaviour
         }
         else
         {
-            ShipModule module = _trackedModules[Random.Range(0, _trackedModules.Count)];
-            ShipHull hull = module._hulls[Random.Range(0, module._hulls.Length)];
+            var rand = new System.Random();
+            
+            ShipModule module = _trackedModules[rand.Next(0, _trackedModules.Count)];
+            ShipHull hull = module._hulls[rand.Next(0, module._hulls.Length)];
             RandomDamageToModule(hull, _currentDamagePercent);
 
             float mult = Mathf.Lerp(10f, 1f, _currentDamagePercent);
@@ -90,7 +92,8 @@ public class ShipFluidDamageController : MonoBehaviour
 
         if (components.Length > 0 && Random.value < 0.1f + (damagePercent * 0.3f))
         {
-            int index = Random.Range(0, components.Length);
+            var rand = new System.Random();
+            int index = rand.Next(0, components.Length);
             if (components[index] is ShipReactorComponent && !components[index].isDamaged)
             {
                 ErnestoDetectiveController.SetReactorCause("fluid");

@@ -63,12 +63,14 @@ public class CockpitEffectController : MonoBehaviour
 
     private void Start()
     {
+        var rand = new System.Random();
+        
         if ((float)rustLevel.GetProperty() > 0)
         {
             _filthMat.SetFloat(_rustCutoffPropID, _rustProgression);
             if (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost())
             {
-                _rustTexIndex = Random.Range(0, _rustTextures.Length);
+                _rustTexIndex = rand.Next(0, _rustTextures.Length);
                 _filthMat.SetTexture(_rustTexPropID, _rustTextures[_rustTexIndex]);
                 _filthMat.SetTextureOffset(_rustTexPropID, new Vector2(Random.Range(0f, 1f), Random.Range(0f, 1f)));
             }
@@ -84,7 +86,7 @@ public class CockpitEffectController : MonoBehaviour
         {
             if (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost())
             {
-                _dirtTexIndex = Random.Range(0, _dirtTextures.Length);
+                _dirtTexIndex = rand.Next(0, _dirtTextures.Length);
                 _filthMat.SetTexture(_dirtTexPropID, _dirtTextures[_dirtTexIndex]);
                 _filthMat.SetTextureOffset(_dirtTexPropID, new Vector2(Random.Range(0f, 1f), Random.Range(0f, 1f)));
             }

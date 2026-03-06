@@ -196,16 +196,17 @@ public class PatchHandler : MonoBehaviour
                 float tempLerp = Mathf.Sqrt(Mathf.InverseLerp(-0.5f, -1f, ratio));
                 float maxChance = Mathf.Lerp(0f, 1f, Mathf.Pow((float)temperatureDifficulty.GetProperty() * 1.5f, 1/1.75f));
 
-                float rand = (float)new System.Random().NextDouble();
+                var rand = new System.Random();
+                float randValue = (float)rand.NextDouble();
                 if ((!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBInteraction.GetFlyerID() == 
                         ShipEnhancements.QSBAPI.GetLocalPlayerID()) &&
-                    rand < maxChance * tempLerp)
+                    randValue < maxChance * tempLerp)
                 {
                     float difficulty = (float)temperatureDifficulty.GetProperty();
                     int min = (int)Mathf.Lerp(1f, 3.1f, difficulty * tempLerp);
                     int max = (int)Mathf.Lerp(3f, 7.1f, difficulty * tempLerp);
 
-                    int numTimes = UnityEngine.Random.Range(min, max);
+                    int numTimes = rand.Next(min, max);
                             
                     Instance.StartSputter(numTimes);
                             
@@ -295,12 +296,14 @@ public class PatchHandler : MonoBehaviour
     {
         if (ShipEnhancements.InMultiplayer && !ShipEnhancements.QSBAPI.GetIsHost() || (float)shipDamageMultiplier.GetProperty() <= 0f) return;
 
+        var rand = new System.Random();
+        
         ShipComponent[] components = SELocator.GetShipDamageController()._shipComponents
             .Where((component) => component.repairFraction == 1f && !component.isDamaged).ToArray();
         ShipHull[] hulls = SELocator.GetShipDamageController()._shipHulls.Where((hull) => hull.integrity > 0f).ToArray();
         if (componentDamage && components.Length > 0 && UnityEngine.Random.value < 0.5f)
         {
-            int index = UnityEngine.Random.Range(0, components.Length);
+            int index = rand.Next(0, components.Length);
             if (!string.IsNullOrWhiteSpace(damageCause)
                 && components[index] is ShipReactorComponent && !components[index].isDamaged)
             {
@@ -310,14 +313,14 @@ public class PatchHandler : MonoBehaviour
         }
         else if (hulls.Length > 0)
         {
-            ShipHull targetHull = hulls[UnityEngine.Random.Range(0, hulls.Length)];
+            ShipHull targetHull = hulls[rand.Next(0, hulls.Length)];
 
             bool wasDamaged = targetHull._damaged;
             targetHull._damaged = true;
             targetHull._integrity = Mathf.Max(0f, targetHull._integrity - UnityEngine.Random.Range(0.05f, 0.15f) * (float)shipDamageMultiplier.GetProperty());
             var eventDelegate1 = (MulticastDelegate)typeof(ShipHull).GetField("OnDamaged",
                 BindingFlags.Instance | BindingFlags.NonPublic
-                | BindingFlags.Public).GetValue(targetHull);
+                | BindingFlags.Public)?.GetValue(targetHull);
             if (eventDelegate1 != null)
             {
                 foreach (var handler in eventDelegate1.GetInvocationList())
@@ -361,12 +364,13 @@ public class PatchHandler : MonoBehaviour
             Instance._lastFocusedRepairReceiver = receiver;
             if (receiver != null)
             {
+                var rand = new System.Random();
                 Instance._swapRepairPrompt = UnityEngine.Random.value < 0.01f;
 
                 var allTexts = Enum.GetValues(typeof(UITextType)) as UITextType[];
                 var parts = allTexts.Where(text => text != receiver.GetRepairableName()
                     && text.ToString().Contains("ShipPart")).ToArray();
-                Instance._fakeRepairPrompt = parts[UnityEngine.Random.Range(0, parts.Length)];
+                Instance._fakeRepairPrompt = parts[rand.Next(0, parts.Length)];
             }
         }
     }

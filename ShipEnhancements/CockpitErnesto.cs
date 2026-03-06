@@ -16,6 +16,7 @@ public class CockpitErnesto : MonoBehaviour
     private List<int> _questions = [];
     private List<int> _availableQuestions = [];
     private Coroutine _currentComment = null;
+    private System.Random _random;
     private bool _bigHeadMode = false;
     private bool _showShipFailNextTime = false;
     private int _riddleConversationCountdown;
@@ -71,6 +72,7 @@ public class CockpitErnesto : MonoBehaviour
     private void Awake()
     {
         _dialogueTree = _conversationZone.GetComponent<CharacterDialogueTree>();
+        _random = new System.Random();
 
         _dialogueTree.OnStartConversation += OnStartConversation;
         _dialogueTree.OnEndConversation += OnEndConversation;
@@ -95,7 +97,7 @@ public class CockpitErnesto : MonoBehaviour
         }
 
         _commentText.gameObject.SetActive(false);
-        _riddleConversationCountdown = Random.Range(5, 10);
+        _riddleConversationCountdown = _random.Next(5, 10);
     }
 
     private void ResetAvailableQuestions()
@@ -146,7 +148,7 @@ public class CockpitErnesto : MonoBehaviour
             _currentComment = null;
         }
 
-        int num = _availableQuestions[Random.Range(0, _availableQuestions.Count)];
+        int num = _availableQuestions[_random.Next(0, _availableQuestions.Count)];
         SetConditionState("SE_ERNESTO_OPTION_" + num, true);
         _availableQuestions.Remove(num);
 
@@ -283,7 +285,7 @@ public class CockpitErnesto : MonoBehaviour
 
     public void OnHeavyImpact()
     {
-        string comment = _availableHeavyImpactComments[Random.Range(0, _availableHeavyImpactComments.Count)];
+        string comment = _availableHeavyImpactComments[_random.Next(0, _availableHeavyImpactComments.Count)];
         MakeComment(comment);
         _availableHeavyImpactComments.Remove(comment);
 
@@ -295,7 +297,7 @@ public class CockpitErnesto : MonoBehaviour
 
     public void OnElectricalShock()
     {
-        string comment = _availableShockComments[Random.Range(0, _availableShockComments.Count)];
+        string comment = _availableShockComments[_random.Next(0, _availableShockComments.Count)];
         MakeComment(comment);
         _availableShockComments.Remove(comment);
 
@@ -307,7 +309,7 @@ public class CockpitErnesto : MonoBehaviour
 
     public void OnCockpitDetached()
     {
-        string comment = _availableEjectComments[Random.Range(0, _availableEjectComments.Count)];
+        string comment = _availableEjectComments[_random.Next(0, _availableEjectComments.Count)];
         MakeComment(comment);
         _availableEjectComments.Remove(comment);
 
@@ -319,7 +321,7 @@ public class CockpitErnesto : MonoBehaviour
 
     public void ReactorDamagedComment()
     {
-        string comment = _availableReactorComments[Random.Range(0, _availableReactorComments.Count)];
+        string comment = _availableReactorComments[_random.Next(0, _availableReactorComments.Count)];
         MakeComment(comment);
         _availableReactorComments.Remove(comment);
 
