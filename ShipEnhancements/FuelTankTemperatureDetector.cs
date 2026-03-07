@@ -58,8 +58,9 @@ public class FuelTankTemperatureDetector : TemperatureDetector
 
     protected override float CalculateCurrentTemperature()
     {
-        if (gameObject.GetAttachedOWRigidbody() is ShipBody && 
-            SELocator.GetShipTemperatureDetector())
+        if ((gameObject.GetAttachedOWRigidbody() is ShipBody || 
+                (Locator.GetToolModeSwapper().GetItemCarryTool().GetHeldItem() == _fuelTank &&
+                    PlayerState.IsInsideShip())) && SELocator.GetShipTemperatureDetector())
         {
             return SELocator.GetShipTemperatureDetector().GetCurrentInternalTemperature();
         }

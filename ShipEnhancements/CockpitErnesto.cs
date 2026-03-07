@@ -175,11 +175,6 @@ public class CockpitErnesto : MonoBehaviour
                 
                 var splitRegex = new Regex(@"\bSEPARATOR_.*\b");
                 var splits = splitRegex.Split(injection.text);
-                ShipEnhancements.WriteDebugMessage("split matches: " + splitRegex.Matches(injection.text).Count);
-                
-                ShipEnhancements.WriteDebugMessage(splits[0]);
-                ShipEnhancements.WriteDebugMessage(splits[2]);
-                ShipEnhancements.WriteDebugMessage(splits[3]);
                 
                 var newText = dialogue.text.Replace("DIALOGUE_OPTION_PLACEHOLDER", splits[0]);
                 newText = newText.Replace("DIALOGUE_BODY_PLACEHOLDER", splits[1]);
@@ -216,10 +211,6 @@ public class CockpitErnesto : MonoBehaviour
             var b = new BitArray([mask]);
             bool[] bits = new bool[b.Count];
             b.CopyTo(bits, 0);
-            foreach (var thing in bits)
-            {
-                ShipEnhancements.WriteDebugMessage(thing);
-            }
             if (!b[3])
             {
                 SetConditionState("SE_ERNESTO_RADIO_CODE", true);

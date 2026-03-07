@@ -17,6 +17,7 @@ public class PersistentShipState : MonoBehaviour
 
     private bool _everInitialized;
     private bool _skipNextLoad;
+    private bool _processItems;
 
     private float _shipFuel;
     private float _shipOxygen;
@@ -82,6 +83,8 @@ public class PersistentShipState : MonoBehaviour
 
     private void SaveState()
     {
+        _processItems = false;
+        
         _shipFuel = SELocator.GetShipResources()._currentFuel;
         _shipOxygen = SELocator.GetShipResources()._currentOxygen;
         _shipWater = SELocator.GetShipWaterResource()?.GetWater() ?? 0f;
@@ -141,6 +144,7 @@ public class PersistentShipState : MonoBehaviour
                     .Load<ShipStateJson>("ShipStateSave.json");
                 if (state == null) return;
                 LoadJson(state);
+                _processItems = true;
             }
             else
             {
@@ -220,6 +224,8 @@ public class PersistentShipState : MonoBehaviour
                 _shipVanished = false;
             }
         });
+
+        _processItems = true;
     }
 
     private void CreateJson()
@@ -319,6 +325,9 @@ public class PersistentShipState : MonoBehaviour
 
     private void OnShipInitialized()
     {
+        if (!_processItems || (!(bool)persistentShipState.GetProperty() &&
+            !ShipEnhancements.ExperimentalSettings.UltraPersistentShip)) return;
+        
         foreach (var path in _emptySocketPaths)
         {
             ShipEnhancements.WriteDebugMessage("checking " + path);
