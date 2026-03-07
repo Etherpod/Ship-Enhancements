@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using MonoMod.Utils;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
+using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -28,6 +30,9 @@ public class CockpitErnesto : MonoBehaviour
 
     private int _questionCount;
     private readonly float _commentLifetime = 10f;
+
+    private Dictionary<string, string> _shipFailureComments = [];
+    private Dictionary<int, Dictionary<string, object>> _dialogueOptionConditions = [];
 
     private readonly List<string> _availableHeavyImpactComments = [];
     private readonly string[] _heavyImpactComments =
@@ -156,18 +161,32 @@ public class CockpitErnesto : MonoBehaviour
         int index = dialogue.text.IndexOf("DIALOGUE_OPTION_PLACEHOLDER");
         if (index > 0)
         {
-            var regex = new Regex(@"(<\/DialogueOption>)(?=[\s\S]*(DIALOGUE_BODY_SEPARATOR))");
+            var regex = new Regex(@"(<\/DialogueOption>)(?=[\s\S]*(SEPARATOR_DIALOGUE_BODY))");
             int matches = regex.Matches(injection.text).Count;
             ShipEnhancements.WriteDebugMessage("matches: " + matches);
             if (matches > 0)
             {
                 _questionCount = matches;
-                var splitIndex = injection.text.IndexOf("DIALOGUE_BODY_SEPARATOR");
-                var injectOptions = injection.text.Substring(0, splitIndex);
-                var injectBody = injection.text.Substring(splitIndex + 23);
-                var newText = dialogue.text.Replace("DIALOGUE_OPTION_PLACEHOLDER", injectOptions);
-                newText = newText.Replace("DIALOGUE_BODY_PLACEHOLDER", injectBody);
+                
+                //var splitIndex = injection.text.IndexOf("DIALOGUE_BODY_SEPARATOR");
+                //var splitIndex2 = injection.text.IndexOf("SHIP_FAILURE_DIALOGUE");
+                //var injectOptions = injection.text.Substring(0, splitIndex);
+                //var injectBody = injection.text.Substring(splitIndex + 23, splitIndex2);
+                
+                var splitRegex = new Regex(@"\bSEPARATOR_.*\b");
+                var splits = splitRegex.Split(injection.text);
+                ShipEnhancements.WriteDebugMessage("split matches: " + splitRegex.Matches(injection.text).Count);
+                
+                ShipEnhancements.WriteDebugMessage(splits[0]);
+                ShipEnhancements.WriteDebugMessage(splits[2]);
+                ShipEnhancements.WriteDebugMessage(splits[3]);
+                
+                var newText = dialogue.text.Replace("DIALOGUE_OPTION_PLACEHOLDER", splits[0]);
+                newText = newText.Replace("DIALOGUE_BODY_PLACEHOLDER", splits[1]);
                 _dialogueTree._xmlCharacterDialogueAsset = new TextAsset(newText);
+
+                _dialogueOptionConditions = JsonConvert.DeserializeObject<Dictionary<int, Dictionary<string, object>>>(splits[2]);
+                _shipFailureComments = JsonConvert.DeserializeObject<Dictionary<string, string>>(splits[3]);
             }
         }
         
@@ -191,8 +210,24 @@ public class CockpitErnesto : MonoBehaviour
             SetConditionState("SE_MULTIPLE_ERNESTOS", true);
         }*/
 
+        if ((bool)addRadio.GetProperty())
+        {
+            int mask = ShipEnhancements.SaveData.LearnedRadioCodes;
+            var b = new BitArray([mask]);
+            bool[] bits = new bool[b.Count];
+            b.CopyTo(bits, 0);
+            foreach (var thing in bits)
+            {
+                ShipEnhancements.WriteDebugMessage(thing);
+            }
+            if (!b[3])
+            {
+                SetConditionState("SE_ERNESTO_RADIO_CODE", true);
+            }
+        }
+
         _commentText.gameObject.SetActive(false);
-        _riddleConversationCountdown = _random.Next(5, 10);
+        _riddleConversationCountdown = _random.Next(3, 6);
     }
 
     private void ResetAvailableQuestions()
@@ -202,31 +237,33 @@ public class CockpitErnesto : MonoBehaviour
 
         for (int i = 1; i <= _questionCount; i++)
         {
-            _questions.Add(i);
-        }
+            bool valid = true;
+            if (_dialogueOptionConditions.ContainsKey(i))
+            {
+                var dict = _dialogueOptionConditions[i];
+                foreach (var (setting, value) in dict)
+                {
+                    var actual = setting.AsEnum<ShipEnhancements.Settings>().GetProperty();
+                    var prop = value;
+                    if (float.TryParse(value.ToString(), out var result))
+                    {
+                        prop = result;
+                    }
 
-        /*if (GetConditionState("SE_ERNESTO_GESWALDO_PART_ONE"))
-        {
-            _questions.Add(101);
-        }
-        else
-        {
-            _questions.Add(100);
-        }
+                    ShipEnhancements.WriteDebugMessage("compare " + actual.GetType() + " to " + value.GetType());
+                    if (!actual.Equals(prop))
+                    {
+                        valid = false;
+                        break;
+                    }
+                }
+            }
 
-        if ((bool)ShipEnhancements.Settings.addRadio.GetProperty())
-        {
-            _questions.Add(201);
+            if (valid)
+            {
+                _questions.Add(i);
+            }
         }
-        if ((bool)ShipEnhancements.Settings.addShipClock.GetProperty())
-        {
-            _questions.Add(202);
-        }
-        if (PlayerData.GetPersistentCondition("SE_ERNESTO_TOLD_RIDDLE")
-            && !PlayerData.GetPersistentCondition("SE_HAS_ERNESTONIAN_TRANSLATOR"))
-        {
-            _questions.Add(203);
-        }*/
         
         _availableQuestions.AddRange(_questions);
     }
@@ -284,6 +321,7 @@ public class CockpitErnesto : MonoBehaviour
             _conversationZone.DisableInteraction();
         }
 
+        // Reset
         foreach (int i in _questions)
         {
             SetConditionState("SE_ERNESTO_OPTION_" + i, false);
@@ -294,6 +332,7 @@ public class CockpitErnesto : MonoBehaviour
             ResetAvailableQuestions();
         }
 
+        // Question limit
         if (GetConditionState("SE_ERNESTO_ASKED_QUESTION"))
         {
             _queryCount = Mathf.Min(_maxQueries, _queryCount + 1);
@@ -305,6 +344,7 @@ public class CockpitErnesto : MonoBehaviour
             SetConditionState("SE_ERNESTO_NO_QUESTIONS", true);
         }
 
+        // Awareness
         if (ErnestoNetworkHandler.GetNumberErnestos() > 0 && PlayerData.GetPersistentCondition("SE_KNOWS_ERNESTO") 
             && !PlayerData.GetPersistentCondition("SE_ERNESTO_IS_AWARE")
             && !GetConditionState("SE_ERNESTO_AWARE_NEXT_TIME"))
@@ -316,13 +356,27 @@ public class CockpitErnesto : MonoBehaviour
             PlayerData.SetPersistentCondition("SE_ERNESTO_BECOME_AWARE", true);
             SetConditionState("SE_ERNESTO_AWARE_NEXT_TIME", false);
         }
-
-        if (GetConditionState("SE_ERNESTO_GESWALDO_PART_TWO"))
+        
+        // Disable riddle
+        if (PlayerData.GetPersistentCondition("SE_ERNESTO_TOLD_RIDDLE"))
         {
-            SetConditionState("SE_ERNESTO_GESWALDO_PART_ONE", false);
-            SetConditionState("SE_ERNESTO_GESWALDO_PART_TWO", false);
+            SetConditionState("SE_ERNESTO_RIDDLE", false);
         }
+        
+        // Disable found text
+        if (PlayerData.GetPersistentCondition("SE_FOUND_ERNESTONIAN_TEXT")
+            && PlayerData.GetPersistentCondition("SE_HAS_ERNESTONIAN_TRANSLATOR"))
+        {
+            PlayerData.SetPersistentCondition("SE_FOUND_ERNESTONIAN_TEXT", false);
+            SetConditionState("SE_ASKED_ERNESTONIAN", false);
+            SetConditionState("SE_ASKED_POEM", false);
+        }
+        
+        HandleDialogueEvents();
+    }
 
+    private void HandleDialogueEvents()
+    {
         if (GetConditionState("SE_ERNESTO_EXPLODE_SHIP"))
         {
             SetConditionState("SE_ERNESTO_EXPLODE_SHIP", false);
@@ -334,7 +388,14 @@ public class CockpitErnesto : MonoBehaviour
                 }
                 else
                 {
-                    ErnestoDetectiveController.ItWasExplosion(fromErnesto: true);
+                    if (_shipFailureComments.ContainsKey("SE_ERNESTO_EXPLODE_SHIP"))
+                    {
+                        ErnestoDetectiveController.SetCustomText(_shipFailureComments["SE_ERNESTO_EXPLODE_SHIP"]);
+                    }
+                    else
+                    {
+                        ErnestoDetectiveController.ItWasExplosion();
+                    }
                 }
                 
                 SELocator.GetShipDamageController().Explode();
@@ -346,20 +407,93 @@ public class CockpitErnesto : MonoBehaviour
             }
         }
 
-        if (PlayerData.GetPersistentCondition("SE_ERNESTO_TOLD_RIDDLE"))
+        if (GetConditionState("SE_ERNESTO_BREAK_SHIP"))
         {
-            SetConditionState("SE_ERNESTO_RIDDLE", false);
+            SetConditionState("SE_ERNESTO_BREAK_SHIP", false);
+            if (!(bool)preventSystemFailure.GetProperty())
+            {
+                //ErnestoDetectiveController.ItWasHullBreach(noWalls: true);
+                if (_shipFailureComments.ContainsKey("SE_ERNESTO_BREAK_SHIP"))
+                {
+                    ErnestoDetectiveController.SetCustomText(_shipFailureComments["SE_ERNESTO_BREAK_SHIP"]);
+                }
+                else
+                {
+                    ErnestoDetectiveController.ItWasHullBreach();
+                }
+            }
+            var supplies = SELocator.GetShipTransform().Find("Module_Supplies");
+            if (supplies)
+            {
+                supplies.GetComponent<ShipDetachableModule>().Detach();
+            }
+            var engine = SELocator.GetShipTransform().Find("Module_Engine");
+            if (engine)
+            {
+                engine.GetComponent<ShipDetachableModule>().Detach();
+            }
         }
 
-        if (PlayerData.GetPersistentCondition("SE_FOUND_ERNESTONIAN_TEXT")
-            && PlayerData.GetPersistentCondition("SE_HAS_ERNESTONIAN_TRANSLATOR"))
+        if (GetConditionState("SE_ERNESTO_EJECT_COCKPIT"))
         {
-            PlayerData.SetPersistentCondition("SE_FOUND_ERNESTONIAN_TEXT", false);
+            SetConditionState("SE_ERNESTO_EJECT_COCKPIT", false);
+            if (_shipFailureComments.ContainsKey("SE_ERNESTO_EJECT_COCKPIT"))
+            {
+                ErnestoDetectiveController.SetCustomText(_shipFailureComments["SE_ERNESTO_EJECT_COCKPIT"]);
+            }
+            else
+            {
+                ErnestoDetectiveController.ItWasHullBreach();
+            }
+
+            var eject = SELocator.GetShipTransform().Find("Module_Cockpit")?
+                .GetComponentInChildren<ShipEjectionSystem>();
+            if (eject)
+            {
+                eject._ejectPressed = true;
+                eject.enabled = true;
+            }
         }
 
-        SetConditionState("SE_ERNESTO_SHIP_FAILURE", false);
-        SetConditionState("SE_ASKED_ERNESTONIAN", false);
-        SetConditionState("SE_ASKED_POEM", false);
+        if (GetConditionState("SE_ERNESTO_DAMAGE_REACTOR"))
+        {
+            SetConditionState("SE_ERNESTO_DAMAGE_REACTOR", false);
+            if (_shipFailureComments.ContainsKey("SE_ERNESTO_DAMAGE_REACTOR"))
+            {
+                ErnestoDetectiveController.SetCustomReactorCause(_shipFailureComments["SE_ERNESTO_DAMAGE_REACTOR"]);
+            }
+
+            var reactor = SELocator.GetShipDamageController()._shipReactorComponent;
+            if (!reactor.isDamaged)
+            {
+                reactor.SetDamaged(true);
+            }
+            else
+            {
+                ErnestoDetectiveController.ItWasExplosion(fromReactor: true);
+                SELocator.GetShipDamageController().Explode();
+            }
+        }
+
+        if (GetConditionState("SE_ERNESTO_DAMAGE_ELECTRICAL"))
+        {
+            SetConditionState("SE_ERNESTO_DAMAGE_ELECTRICAL", false);
+            if (!SELocator.GetShipDamageController().IsElectricalFailed())
+            {
+                SELocator.GetShipDamageController().TriggerElectricalFailure();
+            }
+            else
+            {
+                if (_shipFailureComments.ContainsKey("SE_ERNESTO_DAMAGE_ELECTRICAL"))
+                {
+                    ErnestoDetectiveController.SetCustomReactorCause(_shipFailureComments["SE_ERNESTO_DAMAGE_ELECTRICAL"]);
+                }
+                
+                SELocator.GetShipDetector().GetComponent<HazardDetector>().PlayElectricityEffects();
+                SELocator.GetShipDamageController()._shipReactorComponent.SetDamaged(true);
+                SELocator.GetShipCockpitController().LockUpControls(3f);
+            }
+        }
     }
 
     public void MakeComment(string comment)
@@ -451,7 +585,7 @@ public class CockpitErnesto : MonoBehaviour
     {
         _conversationZone.DisableInteraction();
 
-        if ((bool)ShipEnhancements.Settings.disableDamageIndicators.GetProperty() && Random.value < 0.25f)
+        if ((bool)disableDamageIndicators.GetProperty() && Random.value < 0.25f)
         {
             ShipReactorComponent reactor = SELocator.GetShipDamageController()._shipReactorComponent;
             if (reactor != null && reactor.isDamaged)

@@ -1,0 +1,155 @@
+﻿<DialogueOption>
+                <RequiredCondition>SE_ERNESTO_OPTION_1</RequiredCondition>
+                <Text>Where do you see yourself in five years?</Text>
+                <DialogueTarget>SE_Ernesto_JobInterview</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <RequiredCondition>SE_ERNESTO_OPTION_2</RequiredCondition>
+                <Text>Do you wanna play Dungeons and Dragons?</Text>
+                <DialogueTarget>SE_Ernesto_Dnd</DialogueTarget>
+            </DialogueOption>
+            
+SEPARATOR_DIALOGUE_BODY
+
+<DialogueNode>
+        <Name>SE_Ernesto_JobInterview</Name>
+        <Dialogue>
+            <Page>Inside your walls.</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>How exactly do you plan to do that?</Text>
+                <DialogueTarget>SE_Ernesto_JobInterview_1</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>Walls? We got rid of those. There's no more walls.</Text>
+                <DialogueTarget>SE_Ernesto_JobInterview_2</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_JobInterview_1</Name>
+        <Dialogue>
+            <Page>With a spoon. I heard they're very efficient at digging holes.</Page>
+        </Dialogue>
+
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>Right... good luck with that.</Text>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+
+    <DialogueNode>
+        <Name>SE_Ernesto_JobInterview_2</Name>
+        <Dialogue>
+            <Page>Oh. I guess you won't be needing these, then.</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>What are you gonna do, break my ship in half?</Text>
+                <ConditionToSet>SE_ERNESTO_BREAK_SHIP</ConditionToSet>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>Wait! I was joking!</Text>
+                <DialogueTarget>SE_Ernesto_JobInterview_22</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+
+    <DialogueNode>
+        <Name>SE_Ernesto_JobInterview_22</Name>
+        <Dialogue>
+            <Page>Says who?</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>Uhh... me? I said it.</Text>
+                <DialogueTarget>SE_Ernesto_JobInterview_221</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>I've had enough of this.</Text>
+                <DialogueTarget>SE_Ernesto_JobInterview_222</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_JobInterview_221</Name>
+        <Dialogue>
+            <Page>Oh, okay. You can keep your walls then.</Page>
+        </Dialogue>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_JobInterview_222</Name>
+        <SetCondition>SE_ERNESTO_BREAK_SHIP</SetCondition>
+        <Dialogue>
+            <Page>You know what I've had enough of? These walls.</Page>
+        </Dialogue>
+    </DialogueNode>
+
+    <DialogueNode>
+        <Name>SE_Ernesto_Dnd</Name>
+        <Dialogue>
+            <Page>Yeah, sure. Roll for persuasion.</Page>
+        </Dialogue>
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>I rolled... a 7.</Text>
+                <DialogueTarget>SE_Ernesto_Dnd_1</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>I rolled... a 20.</Text>
+                <DialogueTarget>SE_Ernesto_Dnd_2</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>I rolled... a 1.</Text>
+                <DialogueTarget>SE_Ernesto_Dnd_3</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+
+    <DialogueNode>
+        <Name>SE_Ernesto_Dnd_1</Name>
+        <Dialogue>
+            <Page>Tough luck. You need at least a 12 to persuade me.</Page>
+        </Dialogue>
+    </DialogueNode>
+
+    <DialogueNode>
+        <Name>SE_Ernesto_Dnd_2</Name>
+        <Dialogue>
+            <Page>Ha, nice try. That was a D12 you just rolled.</Page>
+        </Dialogue>
+    </DialogueNode>
+
+    <DialogueNode>
+        <Name>SE_Ernesto_Dnd_3</Name>
+        <Dialogue>
+            <Page>Uh oh.</Page>
+            <Page>Your attempts to persuade me are so miserable that the ship blows up.</Page>
+        </Dialogue>
+        <SetCondition>SE_ERNESTO_EXPLODE_SHIP</SetCondition>
+    </DialogueNode>
+    
+SEPARATOR_CONDITIONAL_OPTIONS
+
+{
+    1: {
+        "warpCoreType": "Enabled"
+    }
+}
+    
+SEPARATOR_SHIP_FAILURE
+
+{
+    "SE_ERNESTO_BREAK_SHIP": "I took away your walls.",
+    "SE_ERNESTO_EXPLODE_SHIP": "You rolled a 1. You said so yourself.",
+    "SE_ERNESTO_EJECT_COCKPIT": "Why worry about the ship when you have me all to yourself?",
+    "SE_ERNESTO_DAMAGE_ELECTRICAL": "ZAPZAPZAP",
+}

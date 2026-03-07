@@ -317,7 +317,7 @@ public class ShipEnhancements : ModBehaviour
         "Did you know Outer Wilds isn't scientifically accurate? This is because in Outer Wilds the planets are round, which doesn't match real life as the Earth is in fact-",
         "What's the hardest achievement to get in Outer Wilds?",
         "What's your favorite planet in Outer Wilds?",
-        "Have you played the mod Nomai's Sky? It's aims to mimic the game No Man's Sky, a space exploration game with literal billions of procedurally generated galaxies to explore.",
+        "Have you played the mod Nomai's Sky? It aims to mimic the game No Man's Sky, a space exploration game with literal billions of procedurally generated galaxies to explore.",
         "Which Outer Wilds modding jam is your favorite?",
         "Which mod has your favorite Ernesto easter egg?",
         "Which traveler is your favorite?",
@@ -332,8 +332,7 @@ public class ShipEnhancements : ModBehaviour
         "Have you played The Legend of Zelda: Breath of the Wild? Outer Wilds was partially inspried by that game.",
         "Instead of saying you had pizza for dinner, say you had aged organic milk tossed over seasoned tomato purée spread on baked whole wheat.",
         "Have you heard of the game Blue Prince? It's really cool. If you're into puzzles, I would suggest playing it or watching a playthrough.",
-        "Have you heard of Aliensrock? They make YouTube videos on a lot of puzzle/strategy games.",
-        "If your keyboard has a number pad, you can turn on \"num lock\" and hold Alt while pressing numbers to insert special symbols (™, °, ¼, etc).\nHere are some codes: 0153 (™), 0176 (°), 0149 (•), 0173 (empty character)",
+        "If your keyboard has a number pad, you can turn on \"num lock\" and hold Alt while pressing numbers to insert special symbols (™, °, ¼, etc).\nHere are some codes: 0153 (™), 0176 (°), 0173 (empty character)",
         "Did you know the smallest angle of a triangle is always adjacent to the hypotenuse?",
         "At what age do you become \"old\"? 30? 50? 80?",
         "Have you heard of Kane Pixels? He popularized the \"found footage\" videos of The Backrooms."

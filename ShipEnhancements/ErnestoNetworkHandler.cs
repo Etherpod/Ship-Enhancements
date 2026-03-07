@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -27,7 +28,7 @@ public static class ErnestoNetworkHandler
             client => client.Timeout = System.TimeSpan.FromMilliseconds(2500)
         );
 
-        var modListResponse = LoadFile(_modListClientGenerator.Client);
+        var modListResponse = DownloadFile(_modListClientGenerator.Client);
         if (modListResponse != null)
         {
             var jsonValues = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(modListResponse.Result);
@@ -54,8 +55,7 @@ public static class ErnestoNetworkHandler
         }
         else
         {
-            var modList = ShipEnhancements.Instance.ModHelper.Storage
-                .Load<string>("dialogue/ErnestoModList.json");
+            var modList = LoadLocalFile("dialogue/ErnestoModList.json");
             if (modList != null)
             {
                 var jsonValues = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(modList);
@@ -81,8 +81,8 @@ public static class ErnestoNetworkHandler
             }
         }
 
-        var dialogueResponse = LoadFile(_dialogueClientGenerator.Client);
-        if (dialogueResponse != null)
+        var dialogueResponse = DownloadFile(_dialogueClientGenerator.Client);
+        if (dialogueResponse != null && dialogueResponse.Result != "404: Not Found")
         {
             ActiveDialogue = new TextAsset(dialogueResponse.Result);
             ShipEnhancements.Instance.ModHelper.Storage.Save(dialogueResponse.Result, 
@@ -90,8 +90,7 @@ public static class ErnestoNetworkHandler
         }
         else
         {
-            var dialogue = ShipEnhancements.Instance.ModHelper.Storage
-                .Load<string>("dialogue/ErnestoDialogue.txt");
+            var dialogue = LoadLocalFile("dialogue/ErnestoDialogue.txt");
             if (dialogue != null)
             {
                 ActiveDialogue = new TextAsset(dialogue);
@@ -103,7 +102,7 @@ public static class ErnestoNetworkHandler
         }
     }
 
-    private static Task<string> LoadFile(HttpClient httpClient)
+    private static Task<string> DownloadFile(HttpClient httpClient)
     {
         var response = httpClient.GetAsync(httpClient.BaseAddress);
         try
@@ -118,6 +117,13 @@ public static class ErnestoNetworkHandler
 
         var httpResponse = response.Result;
         return httpResponse.Content.ReadAsStringAsync();
+    }
+
+    private static string LoadLocalFile(string path)
+    {
+        return File.ReadAllText(Path.Combine(
+            ShipEnhancements.Instance.ModHelper.Manifest.ModFolderPath,
+            path));
     }
 
     public static int GetNumberErnestos()

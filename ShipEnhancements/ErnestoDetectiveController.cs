@@ -5,18 +5,27 @@ namespace ShipEnhancements;
 public static class ErnestoDetectiveController
 {
     private static string _hypothesis;
-    private static string _reactorCause;
+    private static string _reactorHypothesis;
     private static bool _reachedConclusion;
 
     public static void Initialize()
     {
         _hypothesis = "I got no clue. Maybe it just felt like breaking today.";
+        _reactorHypothesis =
+            "The reactor got too hot and blew up. It's kind of strange that they put a bomb in your ship, don't you think?";
         _reachedConclusion = false;
     }
 
     public static string GetHypothesis()
     {
         return _hypothesis;
+    }
+
+    public static void SetCustomText(string text)
+    {
+        if (_reachedConclusion) return;
+        _hypothesis = text;
+        _reachedConclusion = true;
     }
 
     public static void ItWasTemperatureDamage(bool hot)
@@ -94,7 +103,51 @@ public static class ErnestoDetectiveController
 
     public static void SetReactorCause(string cause)
     {
-        _reactorCause = cause;
+        if (cause == "overdrive")
+        {
+            _reactorHypothesis = "The reactor blew up after you damaged it with the overdrive. You should probably be more careful with your ship.";
+        }
+        else if (cause == "campfire")
+        {
+            _reactorHypothesis = "You lit a fire inside the ship, that's what happened.";
+        }
+        else if (cause == "electricity")
+        {
+            _reactorHypothesis = "You zapped your ship one too many times and the reactor blew up. What? Why do you look so shocked?";
+        }
+        else if (cause == "temperature_hot")
+        {
+            _reactorHypothesis = "Your ship got too hot, reactor was set off, and the rest is history. Don't you think the reactor was hot enough already?";
+        }
+        else if (cause == "temperature_cold")
+        {
+            _reactorHypothesis = "Your ship got too cold, reactor was damaged, and the rest is history. Did you really think you could cool down the reactor?";
+        }
+        else if (cause == "anglerfish")
+        {
+            _reactorHypothesis = "An anglerfish tried to eat your ship and damaged the reactor. You can guess what happened next.";
+        }
+        else if (cause == "warp")
+        {
+            _reactorHypothesis = "Your reactor got damaged when you warped and it blew up the ship. Next time fix the warp core before warping.";
+        }
+        else if (cause == "fluid")
+        {
+            _reactorHypothesis = "Did you forget your ship is afraid of tiny particles? You left it sitting in something for too long and the reactor got damaged, and then the ship blew up.";
+        }
+        else if (cause == "engine_stall")
+        {
+            _reactorHypothesis = "They say to \"never try starting a cold engine\", you know. But you went ahead and did it anyways, didn't you? No wonder your reactor blew up.";
+        }
+        else if (cause == "overloaded")
+        {
+            _reactorHypothesis = "You tried overloading the reactor while it was damaged. Talk about adding fuel to the fire.";
+        }
+    }
+
+    public static void SetCustomReactorCause(string text)
+    {
+        _reactorHypothesis = text;
     }
 
     public static void ItWasExplosion(bool fromReactor = false, bool fromSpeed = false, bool fromOverdrive = false, bool sabotage = false,
@@ -104,57 +157,7 @@ public static class ErnestoDetectiveController
 
         if (fromReactor)
         {
-            if (_reactorCause == "overdrive")
-            {
-                _hypothesis = "The reactor blew up after you damaged it with the overdrive. You should probably be more careful with your ship.";
-            }
-            else if (_reactorCause == "campfire")
-            {
-                _hypothesis = "You lit a fire inside the ship, that's what happened.";
-            }
-            else if (_reactorCause == "electricity")
-            {
-                _hypothesis = "You zapped your ship one too many times and the reactor blew up. What? Why do you look so shocked?";
-            }
-            else if (_reactorCause == "temperature_hot")
-            {
-                _hypothesis = "Your ship got too hot, reactor was set off, and the rest is history. Don't you think the reactor was hot enough already?";
-            }
-            else if (_reactorCause == "temperature_cold")
-            {
-                _hypothesis = "Your ship got too cold, reactor was damaged, and the rest is history. Did you really think you could cool down the reactor?";
-            }
-            else if (_reactorCause == "anglerfish")
-            {
-                _hypothesis = "An anglerfish tried to eat your ship and damaged the reactor. You can guess what happened next.";
-            }
-            else if (_reactorCause == "warp")
-            {
-                _hypothesis = "Your reactor got damaged when you warped and it blew up the ship. Next time fix the warp core before warping.";
-            }
-            else if (_reactorCause == "fluid")
-            {
-                _hypothesis = "Did you forget your ship is afraid of tiny particles? You left it sitting in something for too long and the reactor got damaged, and then the ship blew up.";
-            }
-            else if (_reactorCause == "engine_stall")
-            {
-                _hypothesis = "They say to \"never try starting a cold engine\", you know. But you went ahead and did it anyways, didn't you? No wonder your reactor blew up.";
-            }
-            else if (_reactorCause == "overloaded")
-            {
-                _hypothesis = "You tried overloading the reactor while it was damaged. Talk about adding fuel to the fire.";
-            }
-            else
-            {
-                if (ShipEnhancements.Instance.engineOn && !(bool)disableDamageIndicators.GetProperty())
-                {
-                    _hypothesis = "The reactor overheated and blew up the ship. There was an alarm going off and everything, it was kinda cool.";
-                }
-                else
-                {
-                    _hypothesis = "The reactor got too hot and blew up. It's kind of strange that they put a bomb in your ship, don't you think?";
-                }
-            }
+            _hypothesis = _reactorHypothesis;
         }
         else if (fromSpeed)
         {
@@ -176,10 +179,6 @@ public static class ErnestoDetectiveController
         {
             _hypothesis = "Your ship touched something it didn't like, so it blew up. Doesn't get much simpler than that.";
         }
-        else if (fromErnesto)
-        {
-            _hypothesis = "You rolled a 1. You said so yourself.";
-        }
         else if (fromRiddle)
         {
             _hypothesis = "You had it coming.";
@@ -195,7 +194,8 @@ public static class ErnestoDetectiveController
         _reachedConclusion = true;
     }
 
-    public static void ItWasHullBreach(bool ejected = false, bool sabotage = false, bool impact = false)
+    public static void ItWasHullBreach(bool ejected = false, bool sabotage = false, bool impact = false,
+        bool noWalls = false, string customText = null)
     {
         if (_reachedConclusion) return;
 
