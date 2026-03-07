@@ -24,12 +24,12 @@ public static class ErnestoNetworkHandler
         );
         
         _dialogueClientGenerator = new HttpClientGenerator(
-            "https://raw.githubusercontent.com/Etherpod/Ship-Enhancements/refs/heads/temp/ShipEnhancements/dialogue/ErnestoTestQuestions",
+            "https://raw.githubusercontent.com/Etherpod/Ship-Enhancements/refs/heads/main/ShipEnhancements/dialogue/ErnestoDialogue.txt",
             client => client.Timeout = System.TimeSpan.FromMilliseconds(2500)
         );
 
         var modListResponse = DownloadFile(_modListClientGenerator.Client);
-        if (modListResponse != null)
+        if (modListResponse != null && modListResponse.Result != "404: Not Found")
         {
             var jsonValues = JsonConvert.DeserializeObject<Dictionary<string, List<string>>>(modListResponse.Result);
             ModList = jsonValues["Mods"];

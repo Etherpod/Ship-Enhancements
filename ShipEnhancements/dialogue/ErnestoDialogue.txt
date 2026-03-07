@@ -18,6 +18,11 @@
                 <Text>How's the weather?</Text>
                 <DialogueTarget>SE_Ernesto_Weather</DialogueTarget>
             </DialogueOption>
+            <DialogueOption>
+                <RequiredCondition>SE_ERNESTO_OPTION_5</RequiredCondition>
+                <Text>Who would win: one trillion anglerfish, or the sun?</Text>
+                <DialogueTarget>SE_Ernesto_Battle</DialogueTarget>
+            </DialogueOption>
             
 SEPARATOR_DIALOGUE_BODY
 
@@ -382,6 +387,231 @@ SEPARATOR_DIALOGUE_BODY
         </DialogueOptionsList>
     </DialogueNode>
     
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle</Name>
+        <Dialogue>
+            <Page>That depends, are the anglerfish magical?</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>Yeah.</Text>
+                <DialogueTarget>SE_Ernesto_Battle_1</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>No.</Text>
+                <DialogueTarget>SE_Ernesto_Battle_2</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_2</Name>
+        <Dialogue>
+            <Page>Oh. They would lose, then.</Page>
+        </Dialogue>
+
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>How would being magical help them at all?</Text>
+                <DialogueTarget>SE_Ernesto_Battle_21</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>Okay, fine. The anglerfish are magical.</Text>
+                <DialogueTarget>SE_Ernesto_Battle_1</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_21</Name>
+        <Dialogue>
+            <Page>It wouldn't, I just think it'd be cooler if they were magical.</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>Really? Fine, let's say they're magical.</Text>
+                <DialogueTarget>SE_Ernesto_Battle_1</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_1</Name>
+        <Dialogue>
+            <Page>Would the anglerfish also happen to be named Ernesto?</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>Sure.</Text>
+                <DialogueTarget>SE_Ernesto_Battle_11</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>What? No.</Text>
+                <DialogueTarget>SE_Ernesto_Battle_12</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_12</Name>
+        <Dialogue>
+            <Page>Okay, then the sun would win.</Page>
+        </Dialogue>
+
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>It's just a name! How are they losing because of a name?</Text>
+                <DialogueTarget>SE_Ernesto_Battle_121</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>Alright, the anglerfish are magical and they're also named Ernesto. Now do they win?</Text>
+                <DialogueTarget>SE_Ernesto_Battle_11</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_121</Name>
+        <Dialogue>
+            <Page>Names are very important, if I didn't have a name I would be very sad.</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>What? Okay, let's say they're magical and they're also named Ernesto.</Text>
+                <DialogueTarget>SE_Ernesto_Battle_11</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_11</Name>
+        <Dialogue>
+            <Page>Would they also happen to possess the abililty to speak?</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>Yes, the anglerfish can talk.</Text>
+                <DialogueTarget>SE_Ernesto_Battle_111</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>Uhh... no.</Text>
+                <DialogueTarget>SE_Ernesto_Battle_112</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_112</Name>
+        <Dialogue>
+            <Page>Then that's game. The sun wins.</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>I don't understand your reasoning behind this.</Text>
+                <DialogueTarget>SE_Ernesto_Battle_1121</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>Fine! The anglerfish are magical, they're all named Ernesto, and they can all talk.</Text>
+                <DialogueTarget>SE_Ernesto_Battle_111</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_1121</Name>
+        <Dialogue>
+            <Page>I wouldn't expect you to, this involves some very high-level thinking and mental strategizing.</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>Well, using your high-level thinking and mental strategizing, what happens if the anglerfish are all magical, they're all named Ernesto, and they all have the ability to talk?</Text>
+                <DialogueTarget>SE_Ernesto_Battle_111</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_111</Name>
+        <Dialogue>
+            <Page>Okay yeah, if that's the case the anglerfish would win for sure.</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>How exactly would they win?</Text>
+                <DialogueTarget>SE_Ernesto_Battle_1111</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>Wait, you're just describing yourself!</Text>
+                <DialogueTarget>SE_Ernesto_Battle_1112</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_1111</Name>
+        <Dialogue>
+            <Page>Through the power of friendship. You should know that better than anyone.</Page>
+        </Dialogue>
+    </DialogueNode>
+
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_1112</Name>
+        <Dialogue>
+            <Page>What are you trying to say? That I can't beat the sun?</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>I mean, I guess if there were a trillion of you it might be possible.</Text>
+                <DialogueTarget>SE_Ernesto_Battle_11121</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>That's exactly what I'm saying!</Text>
+                <ConditionToSet>SE_ERNESTO_EXPLODE_SHIP</ConditionToSet>
+                <DialogueTarget>SE_Ernesto_Battle_11122</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_11121</Name>
+        <Dialogue>
+            <Page>Yes, we would all band together and use the power of friendship to achieve victory.</Page>
+        </Dialogue>
+    </DialogueNode>
+
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_11122</Name>
+        <Dialogue>
+            <Page>Clearly you underestimate my power. Allow me to put things into perspective.</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>What are you gonna do? Blow up the ship?</Text>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>Wait! I'm sorry! I take it back!</Text>
+                <DialogueTarget>SE_Ernesto_Battle_111222</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_111222</Name>
+        <Dialogue>
+            <Page>Too late.</Page>
+        </Dialogue>
+    </DialogueNode>
+    
 SEPARATOR_CONDITIONAL_OPTIONS
 
 {
@@ -391,5 +621,6 @@ SEPARATOR_CONDITIONAL_OPTIONS
 SEPARATOR_SHIP_FAILURE
 
 {
-    "SE_ERNESTO_BREAK_SHIP": "I took away your walls."
+    "SE_ERNESTO_BREAK_SHIP": "I took away your walls.",
+    "SE_ERNESTO_EXPLODE_SHIP": "That was just a taste of my true power. My true power is a little bit stronger than that, but it could probably beat the sun."
 }
