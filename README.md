@@ -282,7 +282,6 @@ To use the API, copy the **IShipEnhancements** script from this mod's GitHub rep
 ## Known Bugs
 The bugs introduced by this mod. Some of these are getting fixed soon, others I have no idea how to fix.
 - Ship Enhancements will temporarily disable itself while you're at the Eye of the Universe. This isn't a bug, but it does prevent a million other bugs from happening.
-- The lock-on UI will be cut off near the edge of the screen if **Ship Temperature** is enabled (fixed in the next udpate)
 - If playing with **Suit Log**, interacting with the **Resource Pump** or using the tether can sometimes open the suit log by accident (fixed in the next update)
 - Changing the **Interior/Exterior Hull Color** will also change the other traveler's ships (fixed in the next update)
 - When playing in multiplayer and using **Ship Input Latency**, the delayed inputs of the non-hosts will not work once they leave the flight console
