@@ -1,7 +1,8 @@
 ﻿using OWML.ModHelper.Events;
 using System.Collections.Generic;
 using UnityEngine;
-using static ShipEnhancements.ShipEnhancements.Settings;
+using static ShipEnhancements.Settings;
+using ShipEnhancements.Buttons;
 
 namespace ShipEnhancements;
 

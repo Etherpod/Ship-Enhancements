@@ -1,6 +1,9 @@
 ﻿using System.Linq;
 using UnityEngine;
-using static ShipEnhancements.ShipEnhancements.Settings;
+using static ShipEnhancements.Settings;
+using ShipEnhancements.Ernesto;
+using ShipEnhancements.Buttons;
+using ShipEnhancements.Temperature;
 
 namespace ShipEnhancements;
 

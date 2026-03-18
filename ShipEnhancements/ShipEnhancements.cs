@@ -4,7 +4,6 @@ using UnityEngine;
 using System.IO;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using OWML.Utils;
 using System.Reflection;
 using System.Linq;
@@ -12,13 +11,16 @@ using UnityEngine.Events;
 using UnityEngine.UI;
 using Newtonsoft.Json;
 using ShipEnhancements.Models.Json;
-using ShipEnhancements.ModMenu;
-using ShipEnhancements.Textures;
+using ShipEnhancements.ModSettings;
+using ShipEnhancements.Decoration;
 using ShipEnhancements.Utils;
-using UnityEngine.Experimental.Rendering;
 using HarmonyLib;
 using UnityEngine.SceneManagement;
-using static ShipEnhancements.ShipEnhancements.Settings;
+using static ShipEnhancements.Settings;
+using ShipEnhancements.Items;
+using ShipEnhancements.Buttons;
+using ShipEnhancements.Interaction;
+using ShipEnhancements.Temperature;
 
 namespace ShipEnhancements;
 
@@ -113,184 +115,6 @@ public class ShipEnhancements : ModBehaviour
     private ShipDetachableLeg _frontLeg = null;
     private List<OWAudioSource> _shipAudioToChange = [];
 
-    public Material textureBlendMat;
-    
-    private Material _defaultInteriorHullMat;
-    private Material _defaultExteriorHullMat;
-    private Material _defaultInteriorWoodMat;
-    private Material _defaultExteriorWoodMat;
-    private Material _defaultGlassMat;
-    private Material _customGlassMat;
-    private Material _defaultSEInteriorMat1;
-    private Material _defaultSEInteriorMat2;
-
-    private readonly Dictionary<Material, ShipTextureBlender> _textureBlenders = new();
-
-    public enum Settings
-    {
-        disableGravityCrystal,
-        disableEjectButton,
-        disableHeadlights,
-        disableLandingCamera,
-        disableShipLights,
-        disableShipOxygen,
-        oxygenDrainMultiplier,
-        fuelDrainMultiplier,
-        shipDamageMultiplier,
-        shipDamageSpeedMultiplier,
-        shipOxygenRefill,
-        enableGravityLandingGear,
-        disableAirAutoRoll,
-        disableWaterAutoRoll,
-        enableThrustModulator,
-        temperatureZonesAmount,
-        enableShipFuelTransfer,
-        enableJetpackRefuelDrain,
-        disableReferenceFrame,
-        disableMapMarkers,
-        gravityMultiplier,
-        fuelTransferMultiplier,
-        oxygenRefillMultiplier,
-        temperatureResistanceMultiplier,
-        enableAutoHatch,
-        oxygenTankDrainMultiplier,
-        fuelTankDrainMultiplier,
-        atmosphereAngularDragMultiplier,
-        spaceAngularDragMultiplier,
-        disableRotationSpeedLimit,
-        gravityDirection,
-        disableScoutRecall,
-        disableScoutLaunching,
-        enableScoutLauncherComponent,
-        enableManualScoutRecall,
-        enableShipItemPlacement,
-        addPortableCampfire,
-        keepHelmetOn,
-        showWarningNotifications,
-        shipExplosionMultiplier,
-        shipBounciness,
-        enableEnhancedAutopilot,
-        shipInputLatency,
-        addEngineSwitch,
-        idleFuelConsumptionMultiplier,
-        shipLightColorOptions,
-        shipLightColor1,
-        shipLightColor2,
-        shipLightColor3,
-        shipLightColorBlend,
-        hotThrusters,
-        extraNoise,
-        interiorHullColorOptions,
-        interiorHullColor1,
-        interiorHullColor2,
-        interiorHullColor3,
-        interiorHullColorBlend,
-        exteriorHullColorOptions,
-        exteriorHullColor1,
-        exteriorHullColor2,
-        exteriorHullColor3,
-        exteriorHullColorBlend,
-        addTether,
-        disableDamageIndicators,
-        addShipSignal,
-        reactorLifetimeMultiplier,
-        shipFriction,
-        enableSignalscopeComponent,
-        rustLevel,
-        dirtAccumulationTime,
-        thrusterColorOptions,
-        thrusterColor1,
-        thrusterColor2,
-        thrusterColor3,
-        thrusterColorBlend,
-        disableSeatbelt,
-        addPortableTractorBeam,
-        disableShipSuit,
-        indicatorColorOptions,
-        indicatorColor1,
-        indicatorColor2,
-        indicatorColor3,
-        indicatorColorBlend,
-        disableAutoLights,
-        addExpeditionFlag,
-        addFuelCanister,
-        cycloneChaos,
-        moreExplosionDamage,
-        singleUseTractorBeam,
-        disableThrusters,
-        maxDirtAccumulation,
-        shipWarpCoreType,
-        repairTimeMultiplier,
-        airDragMultiplier,
-        addShipClock,
-        enableStunDamage,
-        enableRepairConfirmation,
-        enableRemovableGravityCrystal,
-        randomHullDamage,
-        randomComponentDamage,
-        enableFragileShip,
-        addErnesto,
-        repairLimit,
-        extraEjectButtons,
-        preventSystemFailure,
-        addShipCurtain,
-        repairWrenchType,
-        funnySounds,
-        alwaysAllowLockOn,
-        disableShipMedkit,
-        addRadio,
-        disableFluidPrevention,
-        disableHazardPrevention,
-        prolongDigestion,
-        unlimitedItems,
-        noiseMultiplier,
-        waterDamage,
-        sandDamage,
-        disableMinimapMarkers,
-        scoutPhotoMode,
-        enableAutoAlign,
-        shipHornType,
-        randomIterations,
-        randomDifficulty,
-        disableHatch,
-        splitLockOn,
-        enableColorBlending,
-        enableShipTemperature,
-        temperatureDifficulty,
-        passiveTemperatureGain,
-        addResourcePump,
-        addWaterTank,
-        waterDrainMultiplier,
-        addWaterCooling,
-        enableReactorOverload,
-        buttonsRequireFlightChair,
-        enableQuantumShip,
-        persistentShipState,
-        enableGasLeak,
-        interiorHullTexture,
-        exteriorHullTexture,
-        shipGlassTexture,
-        interiorWoodTexture,
-        interiorWoodColorOptions,
-        interiorWoodColor1,
-        interiorWoodColor2,
-        interiorWoodColor3,
-        interiorWoodColorBlend,
-        exteriorWoodTexture,
-        exteriorWoodColorOptions,
-        exteriorWoodColor1,
-        exteriorWoodColor2,
-        exteriorWoodColor3,
-        exteriorWoodColorBlend,
-        fuelRegenerationMultiplier,
-        disableSignalscopeBrackets,
-        enableShipSignalscopeZoom,
-        shipForceMultiplier,
-        tractorBeamLengthMultiplier,
-        shipPlantType,
-        shipStringLights,
-    }
-
     private readonly string[] startupMessages =
     {
         "Did you know that two opposite sides of a 6-sided dice will always add up to 7?",
@@ -380,16 +204,14 @@ public class ShipEnhancements : ModBehaviour
     {
         _shipEnhancementsBundle = AssetBundle.LoadFromFile(Path.Combine(ModHelper.Manifest.ModFolderPath, "assets/shipenhancements"));
         ThemeManager = new ThemeManager("ShipEnhancements.Data.themes.json");
-        
-        textureBlendMat = LoadMaterial("Assets/ShipEnhancements/ShipSkins/ShipTextureBlend.mat");
 
         InitializeAchievements();
         InitializeQSB();
         InitializeNH();
         InitializeGE();
         ModCompatibility.InitCompatibility();
-        ErnestoNetworkHandler.Initialize();
-        SettingsPresets.InitializePresets();
+        Ernesto.ErnestoNetworkHandler.Initialize();
+        SettingPresets.InitializePresets();
 
         ProbeLauncherName = EnumUtils.Create<UITextType>("ScoutLauncher");
         SignalscopeName = EnumUtils.Create<UITextType>("Signalscope");
@@ -449,7 +271,7 @@ public class ShipEnhancements : ModBehaviour
             ThrustModulatorLevel = 5;
             ShipRepairLimitController.SetRepairLimit(-1);
             ShipRepairLimitController.SetPartsRepaired(0);
-            ErnestoDetectiveController.Initialize();
+            Ernesto.ErnestoDetectiveController.Initialize();
 
             SaveData = ModHelper.Storage.Load<SaveDataJson>("save.json");
             if (SaveData == null)
@@ -478,7 +300,7 @@ public class ShipEnhancements : ModBehaviour
                     DialogueBuilder.Make(slate.gameObject, "ConversationZone_RSci", "dialogue/Slate.xml", this);
                     if (!InMultiplayer || QSBAPI.GetIsHost())
                     {
-                        if (SEMenuManager.CurrentPreset == SettingsPresets.PresetName.Random)
+                        if (SEMenuManager.CurrentPreset == SettingPresets.PresetName.Random)
                         {
                             slate.Find("ConversationZone_RSci").GetComponent<CharacterDialogueTree>().OnEndConversation += OnEndConversation;
                             _checkEndConversation = true;
@@ -486,7 +308,7 @@ public class ShipEnhancements : ModBehaviour
                     }
                     else
                     {
-                        if (QSBCompat.GetHostPreset() == SettingsPresets.PresetName.Random)
+                        if (QSBCompat.GetHostPreset() == SettingPresets.PresetName.Random)
                         {
                             slate.Find("ConversationZone_RSci").GetComponent<CharacterDialogueTree>().OnEndConversation += OnEndConversation;
                             _checkEndConversation = true;
@@ -701,7 +523,7 @@ public class ShipEnhancements : ModBehaviour
                 fuelTank._damageEffect._particleSystem.Stop();
                 fuelTank._damageEffect._particleAudioSource.Stop();
             }
-            ErnestoDetectiveController.ItWasExplosion(fromTorque: true);
+            Ernesto.ErnestoDetectiveController.ItWasExplosion(fromTorque: true);
             SELocator.GetShipDamageController().Explode();
 
             if (!SEAchievementTracker.TorqueExplosion && AchievementsAPI != null)
@@ -987,9 +809,9 @@ public class ShipEnhancements : ModBehaviour
                     setting.SetProperty(ModHelper.Config.GetSettingsValue<object>(setting.GetName()));
                 }
 
-                if (settingsToRandomize.Contains(setting) && SettingsPresets.RandomSettings.ContainsKey(setting.GetName()))
+                if (settingsToRandomize.Contains(setting) && SettingPresets.RandomSettings.ContainsKey(setting.GetName()))
                 {
-                    total += SettingsPresets.RandomSettings[setting.GetName()].GetRandomChance();
+                    total += SettingPresets.RandomSettings[setting.GetName()].GetRandomChance();
                 }
             }
 
@@ -1002,13 +824,13 @@ public class ShipEnhancements : ModBehaviour
                 float sum = 0;
                 for (int k = 0; k < settingsToRandomize.Count; k++)
                 {
-                    if (SettingsPresets.RandomSettings.ContainsKey(settingsToRandomize[k].GetName()))
+                    if (SettingPresets.RandomSettings.ContainsKey(settingsToRandomize[k].GetName()))
                     {
-                        float add = SettingsPresets.RandomSettings[settingsToRandomize[k].GetName()].GetRandomChance();
+                        float add = SettingPresets.RandomSettings[settingsToRandomize[k].GetName()].GetRandomChance();
                         sum += add;
                         if (rand <= sum)
                         {
-                            settingsToRandomize[k].SetProperty(SettingsPresets.RandomSettings[settingsToRandomize[k].GetName()]
+                            settingsToRandomize[k].SetProperty(SettingPresets.RandomSettings[settingsToRandomize[k].GetName()]
                                 .GetRandomValue());
                             total -= add;
                             settingsToRandomize.RemoveAt(k);
@@ -1130,6 +952,7 @@ public class ShipEnhancements : ModBehaviour
         SELocator.Initalize();
         ThrustIndicatorManager.Initialize();
         ShipRepairLimitController.Initialize();
+        ShipDecorationManager.Initialize();
 
         SELocator.GetShipCockpitController()._interactVolume.gameObject
             .AddComponent<FlightConsoleInteractController>();
@@ -1139,105 +962,6 @@ public class ShipEnhancements : ModBehaviour
 
         GameObject buttonConsole = LoadPrefab("Assets/ShipEnhancements/ButtonConsole.prefab");
         CreateObject(buttonConsole, SELocator.GetShipBody().transform.Find("Module_Cockpit"));
-        
-        if (_defaultInteriorHullMat == null)
-        {
-            MeshRenderer suppliesRenderer = SELocator.GetShipTransform().
-                Find("Module_Supplies/Geo_Supplies/Supplies_Geometry/Supplies_Interior").GetComponent<MeshRenderer>();
-            _defaultInteriorHullMat = suppliesRenderer.sharedMaterials[0];
-        }
-        
-        if (_defaultExteriorHullMat == null)
-        {
-            MeshRenderer cabinRenderer = SELocator.GetShipTransform().
-                Find("Module_Cabin/Geo_Cabin/Cabin_Geometry/Cabin_Exterior").GetComponent<MeshRenderer>();
-            _defaultExteriorHullMat = cabinRenderer.sharedMaterials[3];
-        }
-
-        if (_defaultGlassMat == null)
-        {
-            MeshRenderer cockpitRenderer = SELocator.GetShipTransform()
-                .Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry/Cockpit_Exterior/CockpitExterior_GoldGlass")
-                .GetComponent<MeshRenderer>();
-            _defaultGlassMat = cockpitRenderer.sharedMaterial;
-        }
-        _customGlassMat = new Material(_defaultGlassMat);
-        
-        if (_defaultInteriorWoodMat == null)
-        {
-            MeshRenderer suppliesRenderer = SELocator.GetShipTransform().
-                            Find("Module_Supplies/Geo_Supplies/Supplies_Geometry/Supplies_Interior").GetComponent<MeshRenderer>();
-            _defaultInteriorWoodMat = suppliesRenderer.sharedMaterials[2];
-        }
-        
-        if (_defaultExteriorWoodMat == null)
-        {
-            MeshRenderer cabinRenderer = SELocator.GetShipTransform().
-                Find("Module_Cabin/Geo_Cabin/Cabin_Geometry/Cabin_Exterior").GetComponent<MeshRenderer>();
-            _defaultExteriorWoodMat = cabinRenderer.sharedMaterials[2];
-        }
-
-        if (_defaultSEInteriorMat1 == null)
-        {
-            _defaultSEInteriorMat1 = LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_VillageCabin_Recolored_mat.mat");
-        }
-
-        if (_defaultSEInteriorMat2 == null)
-        {
-            _defaultSEInteriorMat2 = LoadMaterial("Assets/ShipEnhancements/ShipInterior_SE_VillageCabin_mat.mat");
-        }
-
-        CustomMatManager.ClearMaterials(true);
-        
-        Material[] lightmapMaterials =
-        {
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_SE_VillageCabin_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_VillageCabin_Recolored_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_SE_VillageMetal_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_VillageMetal_Recolored_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_VillagePlanks_Recolored_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_SE_CampsiteProps_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_CampsiteProps_Recolored_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_SE_SignsDecal_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_SignsDecal_Recolored_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_VillageCloth_Recolored_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_NOM_CopperOld_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_NOM_Sandstone_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/CockpitWindowFrost_Material.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_WaterGaugeMetal_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_ShipCurtain_Cloth_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_ShipCurtain_Metal_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_ShipCurtain_CampsiteProps_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipPlants/ShipInterior_Cactus_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipPlants/ShipInterior_CactusFlower_mat.mat"),
-            _customGlassMat,
-        };
-
-        foreach (var mat in lightmapMaterials)
-        {
-            LightmapManager.AddMaterial(mat);
-        }
-        
-        /*Transform cockpitLight = SELocator.GetShipTransform().Find("Module_Cockpit/Lights_Cockpit/Pointlight_HEA_ShipCockpit");
-        List<Material> materials = [.. cockpitLight.GetComponent<LightmapController>()._materials];
-        materials.AddRange(newMaterials);
-        cockpitLight.GetComponent<LightmapController>()._materials = [.. materials];
-
-        Transform shipLogLight = SELocator.GetShipTransform().Find("Module_Cabin/Lights_Cabin/Pointlight_HEA_ShipCabin");
-        List<Material> materials2 = [.. shipLogLight.GetComponent<LightmapController>()._materials];
-        materials2.AddRange(newMaterials);
-        shipLogLight.GetComponent<LightmapController>()._materials = [.. materials2];
-
-        Transform suppliesLight = SELocator.GetShipTransform().Find("Module_Supplies/Lights_Supplies/Pointlight_HEA_ShipSupplies_Top");
-        List<Material> materials3 = [.. suppliesLight.GetComponent<LightmapController>()._materials];
-        materials3.AddRange(newMaterials);
-        suppliesLight.GetComponent<LightmapController>()._materials = [.. materials3];*/
-
-        MeshRenderer chassisRenderer = SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry/Cockpit_Interior/Cockpit_Interior_Chassis")
-            .GetComponent<MeshRenderer>();
-        Texture2D blackTex = LoadAsset<Texture2D>("Assets/ShipEnhancements/Black_d.png");
-        chassisRenderer.sharedMaterials[6].SetTexture("_OcclusionMap", blackTex);
-        chassisRenderer.sharedMaterials[6].SetFloat("_OcclusionStrength", 0.75f);
 
         if ((bool)enableScoutLauncherComponent.GetProperty()
             || (string)shipWarpCoreType.GetProperty() == "Component")
@@ -1274,8 +998,6 @@ public class ShipEnhancements : ModBehaviour
             GameObject.Find("RingWorld_Body").transform
                 .Find("Sector_RingWorld/Sector_LightSideDockingBay/Volumes_LightSideDockingBay"))
             .GetComponent<AntiRiverVolume>());
-
-        SetUpShipLogSplashScreen();
 
         SetUpShipAudio();
 
@@ -1553,11 +1275,6 @@ public class ShipEnhancements : ModBehaviour
             reactor._minCountdown *= multiplier;
             reactor._maxCountdown *= multiplier;
         }
-
-        ApplyHullDecoration();
-        SetGlassMaterial();
-        SetShipPlantDecoration();
-        SetStringLightDecoration();
 
         if ((bool)addTether.GetProperty())
         {
@@ -2051,8 +1768,6 @@ public class ShipEnhancements : ModBehaviour
                 beamSwitch.DeactivateTractorBeam();
             }
         }
-
-        SetDamageColors();
 
         engineOn = !(bool)addEngineSwitch.GetProperty();
 
@@ -2766,392 +2481,6 @@ public class ShipEnhancements : ModBehaviour
         cameraComponent._landingCamera.SetDamaged(true);
     }
 
-    private void ApplyHullDecoration()
-    {
-        string interiorHull = (string)interiorHullColor1.GetProperty();
-        string exteriorHull = (string)exteriorHullColor1.GetProperty();
-        string interiorWood = (string)interiorWoodColor1.GetProperty();
-        string exteriorWood = (string)exteriorWoodColor1.GetProperty();
-        
-        WriteDebugMessage("interior hull setting: " + interiorHull);
-        WriteDebugMessage("exterior hull setting: " + exteriorHull);
-        
-        bool interiorHullTex = (string)interiorHullTexture.GetProperty() != "None";
-        bool exteriorHullTex = (string)exteriorHullTexture.GetProperty() != "None";
-        bool interiorWoodTex = (string)interiorWoodTexture.GetProperty() != "None";
-        bool exteriorWoodTex = (string)exteriorWoodTexture.GetProperty() != "None";
-
-        bool blendInteriorHull = ((bool)enableColorBlending.GetProperty()
-            && int.Parse((string)interiorHullColorOptions.GetProperty()) > 1)
-            || interiorHull == "Rainbow";
-        bool blendExteriorHull = ((bool)enableColorBlending.GetProperty()
-                && int.Parse((string)exteriorHullColorOptions.GetProperty()) > 1)
-            || exteriorHull == "Rainbow";
-        bool blendInteriorWood = ((bool)enableColorBlending.GetProperty()
-                && int.Parse((string)interiorWoodColorOptions.GetProperty()) > 1)
-            || interiorWood == "Rainbow";
-        bool blendExteriorWood = ((bool)enableColorBlending.GetProperty()
-                && int.Parse((string)exteriorWoodColorOptions.GetProperty()) > 1)
-            || exteriorWood == "Rainbow";
-        
-        var customizeInteriorHull = blendInteriorHull || interiorHull != "Default" || interiorHullTex;
-        var customizeExteriorHull = blendExteriorHull || exteriorHull != "Default" || exteriorHullTex;
-        var customizeInteriorWood = blendInteriorWood || interiorWood != "Default" || interiorWoodTex;
-        var customizeExteriorWood = blendExteriorWood || exteriorWood != "Default" || exteriorWoodTex;
-
-        Material[] interiorMats =
-        [
-            _defaultInteriorHullMat,
-            _defaultSEInteriorMat1,
-            _defaultSEInteriorMat2
-        ];
-
-        foreach (var blender in _textureBlenders.Values) blender.Dispose();
-        _textureBlenders.Clear();
-
-        foreach (var mat in interiorMats)
-        {
-            AddBlender(mat, false);
-        }
-        AddBlender(_defaultExteriorHullMat, false);
-        AddBlender(_defaultInteriorWoodMat, true);
-        AddBlender(_defaultExteriorWoodMat, true);
-        
-        // DumpMats("D:/misc/files/mats_02.json");
-
-        foreach (MeshRenderer rend in SELocator.GetShipTransform().GetComponentsInChildren<MeshRenderer>())
-        {
-            rend.sharedMaterials = rend.sharedMaterials.Select(mat =>
-            {
-                if (mat == null) return mat;
-
-                var isCustom = new[]
-                {
-                    interiorMats.Contains(mat) && customizeInteriorHull,
-                    mat == _defaultExteriorHullMat && customizeExteriorHull,
-                    mat == _defaultInteriorWoodMat && customizeInteriorWood,
-                    mat == _defaultExteriorWoodMat && customizeExteriorWood
-                }.Any(b => b);
-                if (isCustom) return _textureBlenders[mat].BlendedMaterial;
-
-                return mat;
-            }).ToArray();
-        }
-        
-        // DumpMats("D:/misc/files/mats_03.json");
-
-        var intHullTex = LoadCustomTexture(interiorHullTex, interiorHullTexture, true);
-        var extHullTex = LoadCustomTexture(exteriorHullTex, exteriorHullTexture, true);
-        var intWoodTex = LoadCustomTexture(interiorWoodTex, interiorWoodTexture, false);
-        var extWoodTex = LoadCustomTexture(exteriorWoodTex, exteriorWoodTexture, false);
-        
-        var intHullBlendController = SELocator.GetShipBody().gameObject.GetAddComponent<InteriorHullBlendController>();
-        var extHullBlendController = SELocator.GetShipBody().gameObject.GetAddComponent<ExteriorHullBlendController>();
-        var intWoodBlendController = SELocator.GetShipBody().gameObject.GetAddComponent<InteriorWoodBlendController>();
-        var extWoodBlendController = SELocator.GetShipBody().gameObject.GetAddComponent<ExteriorWoodBlendController>();
-        
-        foreach (var mat in interiorMats)
-        {
-            ConfigureBlender(
-                mat,
-                interiorHullTex,
-                intHullTex,
-                blendInteriorHull,
-                intHullBlendController,
-                interiorHull
-            );
-        }
-
-        ConfigureBlender(
-            _defaultExteriorHullMat,
-            exteriorHullTex,
-            extHullTex,
-            blendExteriorHull,
-            extHullBlendController,
-            exteriorHull
-        );
-        
-        ConfigureBlender(
-            _defaultInteriorWoodMat,
-            interiorWoodTex,
-            intWoodTex,
-            blendInteriorWood,
-            intWoodBlendController,
-            interiorWood
-        );
-        
-        ConfigureBlender(
-            _defaultExteriorWoodMat,
-            exteriorWoodTex,
-            extWoodTex,
-            blendExteriorWood,
-            extWoodBlendController,
-            exteriorWood
-        );
-        
-        foreach (var blender in _textureBlenders.Values)
-        {
-            // $"[Q6J] try to full update {blender.BlendedMaterial.name}".Log();
-            blender.UpdateFullTexture();
-        }
-        
-        // DumpMats("D:/misc/files/mats_04.json");
-    }
-
-    private void ConfigureBlender(
-        Material material,
-        bool textureCondition,
-        ShipTextureInfo sourceTexture,
-        bool blendCondition,
-        ShipHullBlendController blendController,
-        string themeName
-    )
-    {
-        var blender = _textureBlenders[material];
-        if (textureCondition)
-            blender.SourceTexture = sourceTexture;
-        else
-            blender.SourceTexture = blender.BaseTexture;
-
-        if (blendCondition)
-            blendController.AddTextureBlender(blender);
-        else if (themeName != "Default")
-            blender.OverlayColor = ThemeManager.GetHullTheme(themeName).HullColor / 255f;
-    }
-
-    private void AddBlender(Material baseMaterial, bool isWood)
-    {
-        var woodZone = new Vector4(0, 0, 1, 1);
-        var nonWoodZone = new Vector4(.5f, 0f, 1f, .5f);
-        var exclusionZone = new Vector4(.9f, 0f, 1f, .2f);
-        CustomMatManager.InitializeMaterial(baseMaterial);
-        _textureBlenders[baseMaterial] = new ShipTextureBlender(
-            textureBlendMat,
-            baseMaterial,
-            isWood ? woodZone : nonWoodZone,
-            destExclusionZone: isWood ? null : exclusionZone
-        );
-    }
-
-    private ShipTextureInfo LoadCustomTexture(bool condition, Settings textureSetting, bool hasGloss)
-    {
-        if (!condition) return null;
-
-        return new ShipTextureInfo(
-            ThemeManager.GetHullTexturePath((string)textureSetting.GetProperty()).path,
-            hasGloss
-        );
-    }
-    
-
-    // private void SetHullTexture(ShipTextureBlender blender, HullTexturePath hullTexture)
-    // {
-    //     //UpdateHullMaterials(baseMat, ref customMat, false);
-    //     
-    //     Texture2D color = (Texture2D)LoadAsset(hullTexture.path + "_d.png");
-    //     Texture2D normal = (Texture2D)LoadAsset(hullTexture.path + "_n.png");
-    //     Texture2D smooth = (Texture2D)LoadAsset(hullTexture.path + "_s.png");
-    //
-    //     blender.SetTexture(color, normal, smooth, hullTexture.normalScale, hullTexture.smoothness);
-    // }
-    
-    // private void SetWoodTexture(ShipTextureBlender blender, WoodTexturePath woodTexture)
-    // {
-    //     //UpdateHullMaterials(baseMat, ref customMat, false);
-    //
-    //     var texInfo = new ShipTextureInfo(woodTexture.path);
-    //
-    //     blender.SetTexture(color, normal, smooth, woodTexture.normalScale, woodTexture.smoothness);
-    // }
-
-    // private void UpdateHullMaterials(Material baseMat, ref Material customMat, bool reset)
-    // {
-    //     Material mat1 = reset ? customMat : baseMat;
-    //     Material mat2 = reset ? baseMat : customMat;
-    //     
-    //     foreach (MeshRenderer rend in SELocator.GetShipTransform().GetComponentsInChildren<MeshRenderer>())
-    //     {
-    //         for (int i = 0; i < rend.sharedMaterials.Length; i++)
-    //         {
-    //             if (rend.sharedMaterials[i] == null) continue;
-    //                 
-    //             if (rend.sharedMaterials[i] == mat1)
-    //             {
-    //                 // use a list to change sharedMaterials because
-    //                 // changing a single material doesn't work for some reason
-    //                 List<Material> mats = new List<Material>();
-    //                 mats.AddRange(rend.sharedMaterials);
-    //                 mats[i] = mat2;
-    //                 rend.sharedMaterials = mats.ToArray();
-    //             }
-    //         }
-    //     }
-    //
-    //     if (reset)
-    //     {
-    //         customMat = new Material(baseMat);
-    //     }
-    // }
-
-    private void SetGlassMaterial()
-    {
-        string tex = (string)shipGlassTexture.GetProperty();
-        string[] paths =
-        [
-            "Module_Cockpit/Geo_Cockpit/Cockpit_Geometry/Cockpit_Exterior/CockpitExterior_GoldGlass",
-            "Module_Cockpit/Geo_Cockpit/Cockpit_Geometry/Cockpit_Exterior/CockpitExterior_Chassis",
-            "Module_Cabin/Geo_Cabin/Cabin_Tech/Cabin_Tech_Exterior/HatchPivot/Hatch_GoldGlass"
-        ];
-
-        if (tex == "None")
-        {
-            foreach (string child in paths)
-            {
-                MeshRenderer rend = SELocator.GetShipTransform().Find(child).GetComponent<MeshRenderer>();
-                for (int i = 0; i < rend.sharedMaterials.Length; i++)
-                {
-                    if (rend.sharedMaterials[i] == null) continue;
-                    
-                    if (rend.sharedMaterials[i] == _customGlassMat)
-                    {
-                        List<Material> mats = new List<Material>();
-                        mats.AddRange(rend.sharedMaterials);
-                        mats[i] = _defaultGlassMat;
-                        rend.sharedMaterials = mats.ToArray();
-                    }
-                }
-            }
-            
-            _customGlassMat = new Material(_defaultGlassMat);
-        }
-        else
-        {
-            string path = ThemeManager.GetGlassMaterialPath((string)shipGlassTexture.GetProperty());
-            Material newMat = LoadMaterial(path);
-            _customGlassMat = new Material(newMat);
-            
-            foreach (string child in paths)
-            {
-                MeshRenderer rend = SELocator.GetShipTransform().Find(child).GetComponent<MeshRenderer>();
-                for (int i = 0; i < rend.sharedMaterials.Length; i++)
-                {
-                    if (rend.sharedMaterials[i] == null) continue;
-                    
-                    if (rend.sharedMaterials[i] == _defaultGlassMat)
-                    {
-                        List<Material> mats = new List<Material>();
-                        mats.AddRange(rend.sharedMaterials);
-                        mats[i] = _customGlassMat;
-                        rend.sharedMaterials = mats.ToArray();
-                    }
-                }
-            }
-        }
-    }
-
-    private void SetShipPlantDecoration()
-    {
-        string plantType = (string)shipPlantType.GetProperty();
-        if (plantType == "Default") return;
-
-        Transform parent = SELocator.GetShipTransform().Find("Module_Cockpit/Props_Cockpit");
-        parent.Find("Props_HEA_ShipFoliage").gameObject.SetActive(false);
-        
-        if (plantType == "None") return;
-
-        GameObject prefab = LoadPrefab(ThemeManager.GetPlantTypePath(plantType));
-        CreateObject(prefab, parent);
-    }
-
-    private void SetStringLightDecoration()
-    {
-        string stringLights = (string)shipStringLights.GetProperty();
-        if (stringLights == "None") return;
-
-        GameObject prefab = LoadPrefab(ThemeManager.GetStringLightPath(stringLights));
-        Transform parent = CreateObject(prefab).transform;
-        for (int i = parent.childCount - 1; i >= 0; i--)
-        {
-            Transform child = parent.GetChild(i);
-            string path;
-            if (child.name.Contains("Cabin"))
-            {
-                path = "Module_Cabin/Lights_Cabin";
-            }
-            else if (child.name.Contains("Supplies"))
-            {
-                path = "Module_Supplies/Lights_Supplies";
-            }
-            else if (child.name.Contains("Engine"))
-            {
-                path = "Module_Engine";
-            }
-            else
-            {
-                continue;
-            }
-            
-            child.SetParent(SELocator.GetShipTransform().Find(path));
-            child.transform.localPosition = Vector3.zero;
-            child.transform.localRotation = Quaternion.identity;
-            child.transform.localScale = Vector3.one;
-        }
-        
-        Destroy(parent.gameObject);
-    }
-    
-    private void SetDamageColors()
-    {
-        string color = (string)indicatorColor1.GetProperty();
-        bool indicatorBlend = ((bool)enableColorBlending.GetProperty()
-            && int.Parse((string)indicatorColorOptions.GetProperty()) > 1)
-            || color == "Rainbow";
-
-        if (indicatorBlend)
-        {
-            SELocator.GetShipTransform().gameObject.AddComponent<ShipIndicatorBlendController>();
-        }
-        else if (color != "Default")
-        {
-            var damageScreenMat = SELocator.GetShipTransform().Find("Module_Cockpit/Systems_Cockpit/ShipCockpitUI/DamageScreen/HUD_ShipDamageDisplay")
-                .GetComponent<MeshRenderer>().material;
-            var masterAlarmMat = SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry/Cockpit_Interior/Cockpit_Interior_Chassis")
-                .GetComponent<MeshRenderer>().sharedMaterials[6];
-            var masterAlarmLight = SELocator.GetShipTransform().Find("Module_Cabin/Lights_Cabin/PointLight_HEA_MasterAlarm").GetComponent<Light>();
-            var reactorLight = SELocator.GetShipTransform().Find("Module_Engine/Systems_Engine/ReactorComponent/ReactorDamageLight").GetComponent<Light>();
-            var reactorGlow = SELocator.GetShipTransform().Find("Module_Engine/Systems_Engine/ReactorComponent/Structure_HEA_PlayerShip_ReactorDamageDecal")
-                .GetComponent<MeshRenderer>().material;
-
-            DamageTheme theme = ThemeManager.GetDamageTheme(color);
-
-            damageScreenMat.SetColor("_DamagedHullFill", theme.HullColor / 255f * Mathf.Pow(2, theme.HullIntensity));
-            damageScreenMat.SetColor("_DamagedComponentFill", theme.CompColor / 255f * theme.CompIntensity);
-
-            masterAlarmMat.SetColor("_Color", theme.AlarmColor / 255f);
-            SELocator.GetShipCockpitController().transform.parent.GetComponentInChildren<ShipCockpitUI>()._damageLightColor = theme.AlarmLitColor / 255f
-                * Mathf.Pow(2, theme.AlarmLitIntensity);
-            masterAlarmLight.color = theme.IndicatorLight / 255f;
-
-            Color reactorColor = theme.ReactorColor;
-            reactorColor /= 191f;
-            reactorColor.a = 1;
-            reactorGlow.SetColor("_EmissionColor", reactorColor * Mathf.Pow(2, theme.ReactorIntensity));
-            reactorLight.color = theme.ReactorLight / 255f;
-
-            foreach (DamageEffect effect in SELocator.GetShipTransform().GetComponentsInChildren<DamageEffect>())
-            {
-                if (effect._damageLight)
-                {
-                    effect._damageLight.GetLight().color = theme.IndicatorLight / 255f;
-                }
-                if (effect._damageLightRenderer)
-                {
-                    effect._damageLightRendererColor = theme.AlarmLitColor / 255f * Mathf.Pow(2, theme.AlarmLitIntensity);
-                }
-            }
-        }
-    }
-
     private void InitializeConditions()
     {
         if ((bool)enableManualScoutRecall.GetProperty())
@@ -3175,7 +2504,7 @@ public class ShipEnhancements : ModBehaviour
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_RETRO_ROCKETS_DISABLED", true);
         }
-        if (SEMenuManager.CurrentPreset == SettingsPresets.PresetName.Random)
+        if (SEMenuManager.CurrentPreset == SettingPresets.PresetName.Random)
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_USING_RANDOM_PRESET", true);
         }
@@ -3206,32 +2535,6 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)addRadio.GetProperty())
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_RADIO_ENABLED", true);
-        }
-    }
-
-    private void SetUpShipLogSplashScreen()
-    {
-        GameObject go = SELocator.GetShipBody().GetComponentInChildren<ShipLogSplashScreen>().gameObject;
-        MeshRenderer rend = go.GetComponent<MeshRenderer>();
-
-        Texture2D tex = null;
-        
-        List<string> files = [];
-        files.AddRange(Directory.GetFiles(Path.Combine(ModHelper.Manifest.ModFolderPath, "ShipLogIcons"), 
-            "*.jpg", SearchOption.AllDirectories));
-        files.AddRange(Directory.GetFiles(Path.Combine(ModHelper.Manifest.ModFolderPath, "ShipLogIcons"),
-            "*.png", SearchOption.AllDirectories));
-        
-        if (files.Count > 0)
-        {
-            byte[] fileData = File.ReadAllBytes(files[UnityEngine.Random.Range(0, files.Count)]);
-            tex = new Texture2D(2, 2);
-            tex.LoadImage(fileData); //..this will auto-resize the texture dimensions.
-        }
-
-        if (tex != null)
-        {
-            rend.sharedMaterial.SetTexture("_MainTex", tex);
         }
     }
 
@@ -3693,12 +2996,12 @@ public class ShipEnhancements : ModBehaviour
 
     public override void Configure(IModConfig config)
     {
-        if (!SettingsPresets.Initialized())
+        if (!SettingPresets.Initialized())
         {
             return;
         }
 
-        SEMenuManager.CurrentPreset = SettingsPresets.GetPresetFromConfig(config.GetSettingsValue<string>("preset"));
+        SEMenuManager.CurrentPreset = SettingPresets.GetPresetFromConfig(config.GetSettingsValue<string>("preset"));
         var allSettings = Enum.GetValues(typeof(Settings)) as Settings[];
 
         foreach (Settings setting in allSettings)
@@ -3710,30 +3013,5 @@ public class ShipEnhancements : ModBehaviour
     public override object GetApi()
     {
         return new ShipEnhancementsAPI();
-    }
-
-    public static void DumpMats(string filepath)
-    {
-        var q = new List<Dictionary<string, object>>();
-        foreach (var r in SELocator.GetShipBody().GetComponentsInChildren<MeshRenderer>())
-        {
-            var p = new Dictionary<string, object>();
-            q.Add(p);
-            p.Add("GOID", r.gameObject.GetInstanceID());
-            var ms = new List<Dictionary<string, object>>();
-            p.Add("materials", ms);
-            foreach (var m in r.sharedMaterials)
-            {
-                var md = new Dictionary<string, object>();
-                ms.Add(md);
-                md.Add("matID", m?.GetInstanceID());
-                md.Add("hash", m?.GetHashCode());
-                md.Add("name", m?.name);
-            }
-        }
-
-        File.WriteAllText(filepath, JsonConvert.SerializeObject(q));
-        
-        WriteDebugMessage("[X0A] mats dumped");
     }
 }

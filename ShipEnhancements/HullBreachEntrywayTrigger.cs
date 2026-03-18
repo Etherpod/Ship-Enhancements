@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using static ShipEnhancements.ShipEnhancements.Settings;
+using static ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -66,9 +66,9 @@ public class HullBreachEntrywayTrigger : MonoBehaviour
         {
             _hatch._triggerVolume.RemoveObjectFromVolume(Locator.GetPlayerDetector().gameObject);
             SELocator.GetShipBody().GetComponentInChildren<ShipDirectionalForceVolume>()._triggerVolume.RemoveObjectFromVolume(Locator.GetPlayerDetector().gameObject);
-            if (!(bool)ShipEnhancements.Settings.enableAutoHatch.GetProperty() && !ShipEnhancements.InMultiplayer)
+            if (!(bool)enableAutoHatch.GetProperty() && !ShipEnhancements.InMultiplayer)
             {
-                if (!(bool)ShipEnhancements.Settings.disableHatch.GetProperty())
+                if (!(bool)disableHatch.GetProperty())
                 {
                     _hatch.OpenHatch();
                 }

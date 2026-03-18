@@ -1,5 +1,5 @@
 ﻿using QSB.WorldSync;
-using ShipEnhancements;
+using ShipEnhancements.Buttons;
 
 namespace ShipEnhancementsQSB;
 

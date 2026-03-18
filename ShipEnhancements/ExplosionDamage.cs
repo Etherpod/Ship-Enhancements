@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
-using static ShipEnhancements.ShipEnhancements.Settings;
+using static ShipEnhancements.Settings;
+using ShipEnhancements.Items;
 
 namespace ShipEnhancements;
 
@@ -147,7 +148,7 @@ public class ExplosionDamage : MonoBehaviour
                     ShipDetachableModule module = hull.shipModule as ShipDetachableModule;
                     if (hull.integrity <= 0f && !module.isDetached)
                     {
-                        ErnestoDetectiveController.ItWasExplosionDamage();
+                        Ernesto.ErnestoDetectiveController.ItWasExplosionDamage();
                         module.Detach();
                     }
                 }
@@ -183,7 +184,7 @@ public class ExplosionDamage : MonoBehaviour
         {
             if (tank.GetComponentInParent<ShipBody>() && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
             {
-                ErnestoDetectiveController.ItWasFuelTank(chain: true);
+                Ernesto.ErnestoDetectiveController.ItWasFuelTank(chain: true);
             }
 
             tank.Explode();

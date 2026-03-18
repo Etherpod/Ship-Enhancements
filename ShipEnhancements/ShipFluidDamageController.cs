@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static ShipEnhancements.ShipEnhancements.Settings;
+using static ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -96,7 +96,7 @@ public class ShipFluidDamageController : MonoBehaviour
             int index = rand.Next(0, components.Length);
             if (components[index] is ShipReactorComponent && !components[index].isDamaged)
             {
-                ErnestoDetectiveController.SetReactorCause("fluid");
+                Ernesto.ErnestoDetectiveController.SetReactorCause("fluid");
             }
             components[index].SetDamaged(true);
         }
@@ -125,7 +125,7 @@ public class ShipFluidDamageController : MonoBehaviour
             if (targetHull._integrity <= 0f && targetHull.shipModule is ShipDetachableModule
             && (!(bool)preventSystemFailure.GetProperty() || targetHull.section == ShipHull.Section.Front))
             {
-                ErnestoDetectiveController.ItWasFluidDamage();
+                Ernesto.ErnestoDetectiveController.ItWasFluidDamage();
             }
 
             if (ShipEnhancements.InMultiplayer)
@@ -148,7 +148,7 @@ public class ShipFluidDamageController : MonoBehaviour
             _currentDamagePercent = (float)waterDamage.GetProperty();
             if (_currentDamagePercent >= 1f)
             {
-                ErnestoDetectiveController.ItWasExplosion(fromFluid: true);
+                Ernesto.ErnestoDetectiveController.ItWasExplosion(fromFluid: true);
                 SELocator.GetShipDamageController().Explode();
             }
             return;
@@ -172,7 +172,7 @@ public class ShipFluidDamageController : MonoBehaviour
         _currentDamagePercent = _damageFluids[vol.GetFluidType()];
         if (_currentDamagePercent >= 1f)
         {
-            ErnestoDetectiveController.ItWasExplosion(fromFluid: true);
+            Ernesto.ErnestoDetectiveController.ItWasExplosion(fromFluid: true);
             SELocator.GetShipDamageController().Explode();
         }
     }

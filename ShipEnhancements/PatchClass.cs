@@ -5,12 +5,16 @@ using System.Linq;
 using System.Reflection;
 using HarmonyLib;
 using OWML.Common;
-using ShipEnhancements.ModMenu;
+using ShipEnhancements.ModSettings;
 using OWML.ModHelper.Menus.CustomInputs;
 using OWML.ModHelper.Menus.NewMenuSystem;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using static ShipEnhancements.ShipEnhancements.Settings;
+using static ShipEnhancements.Settings;
+using ShipEnhancements.Ernesto;
+using ShipEnhancements.Items;
+using ShipEnhancements.Buttons;
+using ShipEnhancements.Temperature;
 
 namespace ShipEnhancements;
 
@@ -4854,7 +4858,8 @@ public static class PatchClass
         if (flag && __instance._translationTimeElapsed == 0f
             && !__instance._nomaiTextComponent.IsTranslated(__instance._currentTextID))
         {
-            __instance._textField.text = TranslationHandler.GetTranslation("<!> Untranslated Ernestonian writing <!>", TranslationHandler.TextType.UI);
+            __instance._textField.text = Utils.TranslationHandler
+                .GetTranslation("<!> Untranslated Ernestonian writing <!>", Utils.TranslationHandler.TextType.UI);
         }
     }
     #endregion

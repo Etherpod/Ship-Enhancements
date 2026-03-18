@@ -3,7 +3,7 @@ using System.Collections;
 using System.Linq;
 using System.Reflection;
 using UnityEngine;
-using static ShipEnhancements.ShipEnhancements.Settings;
+using static ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -307,7 +307,7 @@ public class PatchHandler : MonoBehaviour
             if (!string.IsNullOrWhiteSpace(damageCause)
                 && components[index] is ShipReactorComponent && !components[index].isDamaged)
             {
-                ErnestoDetectiveController.SetReactorCause(damageCause);
+                Ernesto.ErnestoDetectiveController.SetReactorCause(damageCause);
             }
             components[index].SetDamaged(true);
         }

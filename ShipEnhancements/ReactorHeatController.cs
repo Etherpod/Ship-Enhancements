@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using ShipEnhancements.Items;
 
 namespace ShipEnhancements;
 
@@ -104,7 +105,7 @@ public class ReactorHeatController : MonoBehaviour
 		_targetHeatRatio = _additiveHeat + _overloadHeat;
 		if (_targetHeatRatio >= 1f)
 		{
-            ErnestoDetectiveController.SetReactorCause("overloaded");
+            Ernesto.ErnestoDetectiveController.SetReactorCause("overloaded");
             _reactor._shipDamageController.Explode();
 		}
 	}

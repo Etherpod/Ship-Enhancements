@@ -29,9 +29,6 @@
         <PackageReference Include="OuterWildsGameLibs" Version="1.1.16.1372"/>
     </ItemGroup>
     <ItemGroup>
-        <None Include="default-config.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
         <None Include="manifest.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
@@ -53,16 +50,21 @@
         <None Include="ShipLogIcons/**/*.*">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Include="RandomizerSettings.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <None Update="default-config.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <None Include="ExperimentalSettings.json">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <None Update="ExperimentalSettings.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
-        <EmbeddedResource Include="Data/themes.json"/>
+        <None Update="RandomizerSettings.json">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
     <ItemGroup>
         <Content Include="ShipEnhancements.csproj.user"/>
+    </ItemGroup>
+    <ItemGroup>
+      <EmbeddedResource Include="Decoration\themes.json" />
     </ItemGroup>
     <ProjectExtensions>
         <VisualStudio>

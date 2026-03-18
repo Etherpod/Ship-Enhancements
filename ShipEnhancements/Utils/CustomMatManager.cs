@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using ShipEnhancements.Textures;
+using ShipEnhancements.Decoration;
 using UnityEngine;
 
 namespace ShipEnhancements.Utils;

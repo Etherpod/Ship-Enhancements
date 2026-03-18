@@ -4,7 +4,8 @@ using OWML.ModHelper;
 using System.Reflection;
 using ShipEnhancements;
 using GeneralEnhancements;
-using static ShipEnhancements.ShipEnhancements.Settings;
+using static ShipEnhancements.Settings;
+using ShipEnhancements.Interaction;
 
 namespace ShipEnhancementsGE;
 
