@@ -40,7 +40,7 @@ public class CockpitEffectController : MonoBehaviour
     {
         { FluidVolume.Type.WATER, 5f },
         { FluidVolume.Type.GEYSER, 2f },
-        { FluidVolume.Type.SAND, 20f },
+        { FluidVolume.Type.SAND, 12f },
         { FluidVolume.Type.CLOUD, 7f }
     };
 
@@ -51,10 +51,10 @@ public class CockpitEffectController : MonoBehaviour
         _filthMat = _filthRenderer.sharedMaterial;
         _iceMat = _iceRenderer.sharedMaterial;
 
-        _rustProgression = Mathf.Lerp(1f, 0.15f, (float)rustLevel.GetProperty());
+        _rustProgression = Mathf.Lerp(0.15f, 1f, (float)rustLevel.GetProperty());
         _dirtBuildupTime = (float)dirtAccumulationTime.GetProperty();
 
-        if (_dirtBuildupTime > 0f)
+        if (_dirtBuildupTime != 0f)
         {
             _cockpitDetector.OnEnterFluidType += OnEnterFluidType;
             _cockpitDetector.OnExitFluidType += OnExitFluidType;
@@ -63,14 +63,14 @@ public class CockpitEffectController : MonoBehaviour
 
     private void Start()
     {
-        _reactorHeat = SELocator.GetShipTransform().GetComponentInChildren<ReactorHeatController>();
-
+        var rand = new System.Random();
+        
         if ((float)rustLevel.GetProperty() > 0)
         {
             _filthMat.SetFloat(_rustCutoffPropID, _rustProgression);
             if (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost())
             {
-                _rustTexIndex = Random.Range(0, _rustTextures.Length);
+                _rustTexIndex = rand.Next(0, _rustTextures.Length);
                 _filthMat.SetTexture(_rustTexPropID, _rustTextures[_rustTexIndex]);
                 _filthMat.SetTextureOffset(_rustTexPropID, new Vector2(Random.Range(0f, 1f), Random.Range(0f, 1f)));
             }
@@ -80,40 +80,48 @@ public class CockpitEffectController : MonoBehaviour
             _filthMat.SetFloat(_rustCutoffPropID, 0f);
         }
 
-        if (_dirtBuildupTime > 0f && (float)maxDirtAccumulation.GetProperty() > 0f)
+        _filthMat.SetFloat(_dirtCutoffPropID, 0f);
+
+        if (_dirtBuildupTime != 0f && (float)maxDirtAccumulation.GetProperty() > 0f)
         {
-            _filthMat.SetFloat(_dirtCutoffPropID, 1f);
             if (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost())
             {
-                _dirtTexIndex = Random.Range(0, _dirtTextures.Length);
+                _dirtTexIndex = rand.Next(0, _dirtTextures.Length);
                 _filthMat.SetTexture(_dirtTexPropID, _dirtTextures[_dirtTexIndex]);
                 _filthMat.SetTextureOffset(_dirtTexPropID, new Vector2(Random.Range(0f, 1f), Random.Range(0f, 1f)));
             }
         }
         else
         {
-            _filthMat.SetFloat(_dirtCutoffPropID, 0f);
             _dirtBuildupTime = 0f;
             //enabled = false;
         }
 
-        _iceMat.SetFloat(_iceCutoffPropID, 0f);
+        if ((bool)enableShipTemperature.GetProperty())
+        {
+            _reactorHeat = SELocator.GetShipTransform().GetComponentInChildren<ReactorHeatController>();
+            _iceMat.SetFloat(_iceCutoffPropID, 0f);
+        }
+        else
+        {
+            _iceRenderer.gameObject.SetActive(false);
+        }
     }
 
     private void Update()
     {
-        if (_dirtBuildupTime == 0f && !SELocator.GetShipTemperatureDetector())
+        if (_dirtBuildupTime == 0f && !_reactorHeat)
         {
             enabled = false;
             return;
         }
-        
-        if (_dirtBuildupTime > 0f)
+
+        if (_dirtBuildupTime != 0f)
         {
             UpdateDirt();
         }
 
-        if (SELocator.GetShipTemperatureDetector())
+        if (SELocator.GetShipTemperatureDetector() && _reactorHeat != null)
         {
             UpdateIce();
         }
@@ -172,7 +180,7 @@ public class CockpitEffectController : MonoBehaviour
                 shockPercent = shockSpeedPercent;
             }
         }
-
+        
         if (_clearDirt || spinPercent > 0 || shockPercent > 0)
         {
             if (spinPercent > 0)
@@ -200,14 +208,16 @@ public class CockpitEffectController : MonoBehaviour
                 }
             }
 
-            _filthMat.SetFloat(_dirtCutoffPropID, 1 - _dirtBuildupProgression);
-            _dirtBuildupProgression = Mathf.Clamp01(_dirtBuildupProgression - Time.deltaTime / clearTime);
+            _filthMat.SetFloat(_dirtCutoffPropID, _dirtBuildupProgression);
+            _dirtBuildupProgression = Mathf.Clamp(_dirtBuildupProgression - Time.deltaTime / clearTime 
+                * Mathf.Sign(_dirtBuildupTime), 0f, (float)maxDirtAccumulation.GetProperty());
         }
-        else if (_addDirtBuildup && _dirtBuildupProgression < (float)maxDirtAccumulation.GetProperty())
+        else if (_addDirtBuildup)
         {
-            _filthMat.SetFloat(_dirtCutoffPropID, 1 - _dirtBuildupProgression);
-            _dirtBuildupProgression = Mathf.Clamp01(_dirtBuildupProgression
-                + Time.deltaTime * (float)maxDirtAccumulation.GetProperty() / _dirtBuildupTime);
+            _filthMat.SetFloat(_dirtCutoffPropID, _dirtBuildupProgression);
+            _dirtBuildupProgression = Mathf.Clamp(_dirtBuildupProgression
+                + Time.deltaTime * (float)maxDirtAccumulation.GetProperty() / _dirtBuildupTime,
+                0f, (float)maxDirtAccumulation.GetProperty());
         }
     }
 
@@ -249,37 +259,44 @@ public class CockpitEffectController : MonoBehaviour
         {
             foreach (uint id in ShipEnhancements.PlayerIDs)
             {
-                ShipEnhancements.QSBCompat.SendInitialRustState(id, _rustTexIndex, _filthMat.GetTextureOffset(_rustTexPropID),
+                ShipEnhancements.QSBCompat.SendInitialCockpitEffectState(id, _rustTexIndex, _filthMat.GetTextureOffset(_rustTexPropID),
                     _dirtTexIndex, _filthMat.GetTextureOffset(_dirtTexPropID), _dirtBuildupProgression);
             }
         }
     }
 
-    public void SetInitialEffectState(int rustIndex, Vector2 rustOffset, int dirtIndex, Vector2 dirtOffset, float dirtProgression)
+    public void SetInitialEffectState(int rustIndex, Vector2 rustOffset, int dirtIndex, 
+        Vector2 dirtOffset, float dirtProgression)
     {
         _filthMat.SetTexture(_rustTexPropID, _rustTextures[rustIndex]);
         _filthMat.SetTextureOffset(_rustTexPropID, rustOffset);
 
         _filthMat.SetTextureOffset(_dirtTexPropID, dirtOffset);
         _dirtBuildupProgression = dirtProgression;
-        _filthMat.SetFloat(_dirtCutoffPropID, 1 - _dirtBuildupProgression);
+        _filthMat.SetFloat(_dirtCutoffPropID, _dirtBuildupProgression);
     }
 
-    public void BroadcastDirtState()
+    public void BroadcastCurrentEffectState()
     {
         if (ShipEnhancements.InMultiplayer && ShipEnhancements.QSBAPI.GetIsHost())
         {
             foreach (uint id in ShipEnhancements.PlayerIDs)
             {
-                ShipEnhancements.QSBCompat.SendDirtState(id, _dirtBuildupProgression);
+                ShipEnhancements.QSBCompat.SendCurrentCockpitEffectState(id, _dirtBuildupProgression, _iceBuildup);
             }
         }
     }
 
-    public void UpdateDirtState(float progression)
+    public void UpdateEffectState(float dirtProgression, float iceBuildup)
     {
-        _dirtBuildupProgression = progression;
-        _filthMat.SetFloat(_dirtCutoffPropID, 1 - _dirtBuildupProgression);
+        if (_dirtBuildupTime != 0f)
+        {
+            _dirtBuildupProgression = dirtProgression;
+            _filthMat.SetFloat(_dirtCutoffPropID, iceBuildup);
+        }
+
+        _iceBuildup = iceBuildup;
+        _iceMat.SetFloat(_iceCutoffPropID, iceBuildup);
     }
     
     private void OnDestroy()

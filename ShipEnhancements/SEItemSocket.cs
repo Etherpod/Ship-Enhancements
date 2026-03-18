@@ -17,6 +17,7 @@ public class SEItemSocket : OWItemSocket
     protected List<OWItem> _itemPool = [];
     protected List<OWItem> _spawnedItems = [];
     protected readonly int _numItemsToSpawn = 30;
+    protected bool _skipCreateOnStart;
 
     public override void Awake()
     {
@@ -63,6 +64,8 @@ public class SEItemSocket : OWItemSocket
             }
         }
 
+        if (_skipCreateOnStart) return;
+        
         if (ShipEnhancements.InMultiplayer && ShipEnhancements.QSBAPI.GetIsHost()
             && (bool)unlimitedItems.GetProperty())
         {
@@ -169,6 +172,11 @@ public class SEItemSocket : OWItemSocket
                 PlaceIntoSocket(item);
             }
         }
+    }
+
+    public void SkipItemCreation()
+    {
+        _skipCreateOnStart = true;
     }
 
     public OWItem[] GetSpawnedItems()

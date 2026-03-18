@@ -146,10 +146,25 @@ public class ShipEngineSwitch : CockpitInteractible
                         float tempLerp = Mathf.Sqrt(Mathf.InverseLerp(-0.5f, -1f, ratio));
                         float maxChance = Mathf.Lerp(0f, 1f, (float)temperatureDifficulty.GetProperty() * 1.5f);
 
-                        float rand = (float)new System.Random().NextDouble();
-                        if (rand < maxChance * tempLerp)
+                        var rand = new System.Random();
+                        float randValue = (float)rand.NextDouble();
+                        if (randValue < maxChance * tempLerp)
                         {
-                            PatchHandler.Instance.StartSputter();
+                            float difficulty = (float)temperatureDifficulty.GetProperty();
+                            int min = (int)Mathf.Lerp(1f, 3.1f, difficulty * tempLerp);
+                            int max = (int)Mathf.Lerp(3f, 7.1f, difficulty * tempLerp);
+
+                            int num = rand.Next(min, max);
+                            
+                            PatchHandler.Instance.StartSputter(num);
+                            
+                            if (ShipEnhancements.InMultiplayer)
+                            {
+                                foreach (var id in ShipEnhancements.PlayerIDs)
+                                {
+                                    ShipEnhancements.QSBCompat.SendEngineSputter(id, true, num);
+                                }
+                            }
                         }
                         else
                         {
@@ -325,6 +340,14 @@ public class ShipEngineSwitch : CockpitInteractible
             if (SELocator.GetShipTemperatureDetector() != null)
             {
                 PatchHandler.Instance.StopSputter();
+                
+                if (ShipEnhancements.InMultiplayer)
+                {
+                    foreach (var id in ShipEnhancements.PlayerIDs)
+                    {
+                        ShipEnhancements.QSBCompat.SendEngineSputter(id, false, 0);
+                    }
+                }
             }
             GlobalMessenger.FireEvent("CancelShipIgnition");
             if (_audioSource.isPlaying)

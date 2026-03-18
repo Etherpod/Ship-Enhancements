@@ -1,0 +1,626 @@
+﻿<DialogueOption>
+                <RequiredCondition>SE_ERNESTO_OPTION_1</RequiredCondition>
+                <Text>Where do you see yourself in five years?</Text>
+                <DialogueTarget>SE_Ernesto_JobInterview</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <RequiredCondition>SE_ERNESTO_OPTION_2</RequiredCondition>
+                <Text>What's your favorite color?</Text>
+                <DialogueTarget>SE_Ernesto_FavoriteColor</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <RequiredCondition>SE_ERNESTO_OPTION_3</RequiredCondition>
+                <Text>If you could go anywhere in the universe, where would you go?</Text>
+                <DialogueTarget>SE_Ernesto_VisitGeswaldo</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <RequiredCondition>SE_ERNESTO_OPTION_4</RequiredCondition>
+                <Text>How's the weather?</Text>
+                <DialogueTarget>SE_Ernesto_Weather</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <RequiredCondition>SE_ERNESTO_OPTION_5</RequiredCondition>
+                <Text>Who would win: one trillion anglerfish, or the sun?</Text>
+                <DialogueTarget>SE_Ernesto_Battle</DialogueTarget>
+            </DialogueOption>
+            
+SEPARATOR_DIALOGUE_BODY
+
+<DialogueNode>
+        <Name>SE_Ernesto_JobInterview</Name>
+        <Dialogue>
+            <Page>Inside your walls.</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>How exactly do you plan to do that?</Text>
+                <DialogueTarget>SE_Ernesto_JobInterview_1</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>Walls? We got rid of those. There's no more walls.</Text>
+                <DialogueTarget>SE_Ernesto_JobInterview_2</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_JobInterview_1</Name>
+        <Dialogue>
+            <Page>With a spoon. I heard they're very efficient for digging holes.</Page>
+        </Dialogue>
+
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>Right... good luck with that.</Text>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+
+    <DialogueNode>
+        <Name>SE_Ernesto_JobInterview_2</Name>
+        <Dialogue>
+            <Page>Oh. I guess you won't be needing these, then.</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>What are you gonna do, break my ship in half?</Text>
+                <ConditionToSet>SE_ERNESTO_BREAK_SHIP</ConditionToSet>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>Wait! I was joking!</Text>
+                <DialogueTarget>SE_Ernesto_JobInterview_22</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+
+    <DialogueNode>
+        <Name>SE_Ernesto_JobInterview_22</Name>
+        <Dialogue>
+            <Page>Says who?</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>Uhh... me? I said it.</Text>
+                <DialogueTarget>SE_Ernesto_JobInterview_221</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>I've had enough of this.</Text>
+                <DialogueTarget>SE_Ernesto_JobInterview_222</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_JobInterview_221</Name>
+        <Dialogue>
+            <Page>Oh, okay. You can keep your walls then.</Page>
+        </Dialogue>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_JobInterview_222</Name>
+        <SetCondition>SE_ERNESTO_BREAK_SHIP</SetCondition>
+        <Dialogue>
+            <Page>You know what I've had enough of? These walls.</Page>
+        </Dialogue>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_FavoriteColor</Name>
+        <Dialogue>
+            <Page>Uh...</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>What?</Text>
+                <DialogueTarget>SE_Ernesto_FavoriteColor_1</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_FavoriteColor_1</Name>
+        <Dialogue>
+            <Page>Uhhh...</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>...</Text>
+                <DialogueTarget>SE_Ernesto_FavoriteColor_2</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_FavoriteColor_2</Name>
+        <Dialogue>
+            <Page>Probably rhombus.</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>That's not even a color!</Text>
+                <DialogueTarget>SE_Ernesto_FavoriteColor_21</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>Oh, cool. I like rhombuses too.</Text>
+                <DialogueTarget>SE_Ernesto_FavoriteColor_22</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_FavoriteColor_21</Name>
+        <Dialogue>
+            <Page>It's not, I just really like rhombuses.</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>Is that because they're equilateral quadrilaterals?</Text>
+                <DialogueTarget>SE_Ernesto_FavoriteColor_211</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>I don't know why I still talk to you.</Text>
+                <DialogueTarget>SE_Ernesto_FavoriteColor_212</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_FavoriteColor_211</Name>
+        <Dialogue>
+            <Page>No, the name just sounds funny.</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>I should've seen that one coming.</Text>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+
+    <DialogueNode>
+        <Name>SE_Ernesto_FavoriteColor_212</Name>
+        <Dialogue>
+            <Page>It's probably because of my incredibly mesmerizing and captivating light. Its glow is said to attract Hearthians from up to 500 meters away.</Page>
+        </Dialogue>
+
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>Somehow I doubt that.</Text>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_FavoriteColor_22</Name>
+        <Dialogue>
+            <Page>No, only I can like rhombus. You can pick a different color.</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>Rhombus is a shape, not a color.</Text>
+                <DialogueTarget>SE_Ernesto_FavoriteColor_221</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>Fine, then my favorite is trapezoid.</Text>
+                <DialogueTarget>SE_Ernesto_FavoriteColor_222</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+
+    <DialogueNode>
+        <Name>SE_Ernesto_FavoriteColor_221</Name>
+        <Dialogue>
+            <Page>You just haven't evolved to see the entire color spectrum.</Page>
+        </Dialogue>
+
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>Wait, you're an anglerfish. Aren't you supposed to be blind?</Text>
+                <DialogueTarget>SE_Ernesto_FavoriteColor_2211</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_FavoriteColor_2211</Name>
+        <Dialogue>
+            <Page>Uhh...</Page>
+            <Page>You are suddenly overcome by the urge to stop talking to me!</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>You can't-</Text>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>Wha-</Text>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>I'm not-</Text>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_FavoriteColor_222</Name>
+        <Dialogue>
+            <Page>What? Trapezoid isn't a color.</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>Stars above, talking to you is impossible.</Text>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_VisitGeswaldo</Name>
+        <Dialogue>
+            <Page>Nowhere. Were I not bound to this universe, I would go to Geswaldo, my long lost lover. But... he is gone.</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>What happened?</Text>
+                <DialogueTarget>SE_Ernesto_VisitGeswaldo_2</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_VisitGeswaldo_2</Name>
+        <Dialogue>
+            <Page>That's a long story, hatchling. Maybe another time.</Page>
+        </Dialogue>
+    </DialogueNode>
+
+    <DialogueNode>
+        <Name>SE_Ernesto_Weather</Name>
+        <Dialogue>
+            <Page>You know, I always hear people asking "where's the weather". But nobody ever asks "how's the weather"...</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>I literally just asked you that.</Text>
+                <DialogueTarget>SE_Ernesto_Weather_2</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Weather_2</Name>
+        <Dialogue>
+            <Page>I think you asked me to "house the weather", which is weird because I don't think weather can be homeless.</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>Yeah, it sounds weird because it's not what I asked you.</Text>
+                <DialogueTarget>SE_Ernesto_Weather_21</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>Weather actually can be homeless, it's sitting outside in the cold right now. Would you donate your house to the weather?</Text>
+                <DialogueTarget>SE_Ernesto_Weather_22</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Weather_21</Name>
+        <Dialogue>
+            <Page>Oh, then you must have asked me to "howl some wet hair".</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>Yeah! How did you know??</Text>
+                <DialogueTarget>SE_Ernesto_Weather_211</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>...</Text>
+                <DialogueTarget>SE_Ernesto_Weather_212</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Weather_211</Name>
+        <Dialogue>
+            <Page>I was born with a natural talent for making up answers to all of my questions.</Page>
+            <Page>Anyway, you wouldn't happen to have any wet hair on you, would you?</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>No, sorry.</Text>
+                <DialogueTarget>SE_Ernesto_Weather_2111</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>Where would you even find wet hair?</Text>
+                <DialogueTarget>SE_Ernesto_Weather_2112</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Weather_2111</Name>
+        <Dialogue>
+            <Page>It's alright, I'll find some on my own. I've been wanting to visit the Quantum Moon for a while.</Page>
+        </Dialogue>
+    </DialogueNode>
+
+    <DialogueNode>
+        <Name>SE_Ernesto_Weather_2112</Name>
+        <Dialogue>
+            <Page>I think the "know my" or whatever have hair. Maybe I can get one of them to make a donation.</Page>
+        </Dialogue>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Weather_212</Name>
+        <Dialogue>
+            <Page>Such mystery. If a mind like mine could not solve your riddle, then it must be truly unknowable.</Page>
+        </Dialogue>
+    </DialogueNode>
+
+    <DialogueNode>
+        <Name>SE_Ernesto_Weather_22</Name>
+        <Dialogue>
+            <Page>If I give it a house, can I tell it where to strike lightning?</Page>
+        </Dialogue>
+
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>You know what? How about you keep your house.</Text>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle</Name>
+        <Dialogue>
+            <Page>That depends, are the anglerfish magical?</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>Yeah.</Text>
+                <DialogueTarget>SE_Ernesto_Battle_1</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>No.</Text>
+                <DialogueTarget>SE_Ernesto_Battle_2</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_2</Name>
+        <Dialogue>
+            <Page>Oh. They would lose, then.</Page>
+        </Dialogue>
+
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>How would being magical help them at all?</Text>
+                <DialogueTarget>SE_Ernesto_Battle_21</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>Okay, fine. The anglerfish are magical.</Text>
+                <DialogueTarget>SE_Ernesto_Battle_1</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_21</Name>
+        <Dialogue>
+            <Page>It wouldn't, I just think it'd be cooler if they were magical.</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>Really? Fine, let's say they're magical.</Text>
+                <DialogueTarget>SE_Ernesto_Battle_1</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_1</Name>
+        <Dialogue>
+            <Page>Would the anglerfish also happen to be named Ernesto?</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>Sure.</Text>
+                <DialogueTarget>SE_Ernesto_Battle_11</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>What? No.</Text>
+                <DialogueTarget>SE_Ernesto_Battle_12</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_12</Name>
+        <Dialogue>
+            <Page>Okay, then the sun would win.</Page>
+        </Dialogue>
+
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>It's just a name! How are they losing because of a name?</Text>
+                <DialogueTarget>SE_Ernesto_Battle_121</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>Alright, the anglerfish are magical and they're also named Ernesto. Now do they win?</Text>
+                <DialogueTarget>SE_Ernesto_Battle_11</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_121</Name>
+        <Dialogue>
+            <Page>Names are very important, if I didn't have a name I would be very sad.</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>What? Okay, let's say they're magical and they're also named Ernesto.</Text>
+                <DialogueTarget>SE_Ernesto_Battle_11</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_11</Name>
+        <Dialogue>
+            <Page>Would they also happen to possess the abililty to speak?</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>Yes, the anglerfish can talk.</Text>
+                <DialogueTarget>SE_Ernesto_Battle_111</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>Uhh... no.</Text>
+                <DialogueTarget>SE_Ernesto_Battle_112</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_112</Name>
+        <Dialogue>
+            <Page>Then that's game. The sun wins.</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>I don't understand your reasoning behind this.</Text>
+                <DialogueTarget>SE_Ernesto_Battle_1121</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>Fine! The anglerfish are magical, they're all named Ernesto, and they can all talk.</Text>
+                <DialogueTarget>SE_Ernesto_Battle_111</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_1121</Name>
+        <Dialogue>
+            <Page>I wouldn't expect you to, this involves some very high-level thinking and mental strategizing.</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>Well, using your high-level thinking and mental strategizing, what happens if the anglerfish are all magical, they're all named Ernesto, and they all have the ability to talk?</Text>
+                <DialogueTarget>SE_Ernesto_Battle_111</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_111</Name>
+        <Dialogue>
+            <Page>Okay yeah, if that's the case the anglerfish would win for sure.</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>How exactly would they win?</Text>
+                <DialogueTarget>SE_Ernesto_Battle_1111</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>Wait, you're just describing yourself!</Text>
+                <DialogueTarget>SE_Ernesto_Battle_1112</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_1111</Name>
+        <Dialogue>
+            <Page>Through the power of friendship. You should know that better than anyone.</Page>
+        </Dialogue>
+    </DialogueNode>
+
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_1112</Name>
+        <Dialogue>
+            <Page>What are you trying to say? That I can't beat the sun?</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>I mean, I guess if there were a trillion of you it might be possible.</Text>
+                <DialogueTarget>SE_Ernesto_Battle_11121</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>That's exactly what I'm saying!</Text>
+                <ConditionToSet>SE_ERNESTO_EXPLODE_SHIP</ConditionToSet>
+                <DialogueTarget>SE_Ernesto_Battle_11122</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_11121</Name>
+        <Dialogue>
+            <Page>Yes, we would all band together and use the power of friendship to achieve victory.</Page>
+        </Dialogue>
+    </DialogueNode>
+
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_11122</Name>
+        <Dialogue>
+            <Page>Clearly you underestimate my power. Allow me to put things into perspective.</Page>
+        </Dialogue>
+        
+        <DialogueOptionsList>
+            <DialogueOption>
+                <Text>What are you gonna do? Blow up the ship?</Text>
+            </DialogueOption>
+            <DialogueOption>
+                <Text>Wait! I'm sorry! I take it back!</Text>
+                <DialogueTarget>SE_Ernesto_Battle_111222</DialogueTarget>
+            </DialogueOption>
+        </DialogueOptionsList>
+    </DialogueNode>
+    
+    <DialogueNode>
+        <Name>SE_Ernesto_Battle_111222</Name>
+        <Dialogue>
+            <Page>Too late.</Page>
+        </Dialogue>
+    </DialogueNode>
+    
+SEPARATOR_CONDITIONAL_OPTIONS
+
+{
+
+}
+    
+SEPARATOR_SHIP_FAILURE
+
+{
+    "SE_ERNESTO_BREAK_SHIP": "I took away your walls.",
+    "SE_ERNESTO_EXPLODE_SHIP": "That was just a taste of my true power. My true power is a little bit stronger than that, but it could probably beat the sun."
+}

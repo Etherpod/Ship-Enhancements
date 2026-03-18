@@ -9,4 +9,6 @@ public interface INHInteraction
     public (Transform, Vector3) GetShipSpawnPoint();
 
     public GameObject GetCenterOfUniverse();
+
+    public bool IsWarpingBackToEye();
 }

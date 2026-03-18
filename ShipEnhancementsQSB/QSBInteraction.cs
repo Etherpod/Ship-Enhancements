@@ -39,7 +39,9 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
 
         LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
         {
-            if (loadScene != OWScene.SolarSystem || !ShipEnhancements.ShipEnhancements.InMultiplayer)
+            if (loadScene != OWScene.SolarSystem ||
+                ShipEnhancements.ShipEnhancements.Instance.IsWarpingBackToEye ||
+                !ShipEnhancements.ShipEnhancements.InMultiplayer)
             {
                 return;
             }
@@ -55,6 +57,11 @@ public class QSBInteraction : MonoBehaviour, IQSBInteraction
     public bool FlightConsoleOccupied()
     {
         return ShipManager.Instance.CurrentFlyer != uint.MaxValue;
+    }
+
+    public uint GetFlyerID()
+    {
+        return ShipManager.Instance.CurrentFlyer;
     }
 
     public Vector3 GetShipAcceleration()

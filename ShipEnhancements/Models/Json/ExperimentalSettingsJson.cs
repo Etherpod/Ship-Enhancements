@@ -20,5 +20,6 @@ public record ExperimentalSettingsJson(
     [JsonProperty] bool EngineSwitch_StartEnabled,
     [JsonProperty] bool RealisticClock,
     [JsonProperty] bool MakeWaterDamageEverythingDamage,
+    [JsonProperty] bool UltraPersistentShip,
     [JsonProperty] bool UltraQuantumShip
 );

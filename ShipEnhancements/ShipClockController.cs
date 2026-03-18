@@ -50,8 +50,11 @@ public class ShipClockController : MonoBehaviour
             _minuteHand.transform.localRotation = Quaternion.Euler(0f, 180f + 6f * seconds, 0f);
             _hourHand.transform.localRotation = Quaternion.Euler(0f, 180f + minuteStep * minutes, 0f);
 
+            var rand = new System.Random();
             List<AudioClip> clips = [.. _tickSounds];
-            AudioClip nextClip = _tickSounds.Where(clip => clips.IndexOf(clip) != _lastTickIndex).ToArray()[Random.Range(0, _tickSounds.Length - 1)];
+            AudioClip nextClip = _tickSounds
+                .Where(clip => clips.IndexOf(clip) != _lastTickIndex)
+                .ToArray()[rand.Next(0, _tickSounds.Length - 1)];
             _audioSource.PlayOneShot(nextClip, 0.025f);
             _lastTickIndex = clips.IndexOf(nextClip);
             _lastSeconds = seconds;

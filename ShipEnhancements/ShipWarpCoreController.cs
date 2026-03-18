@@ -327,16 +327,18 @@ public class ShipWarpCoreController : CockpitInteractible
     {
         if (ShipEnhancements.InMultiplayer && !ShipEnhancements.QSBAPI.GetIsHost() || (float)shipDamageMultiplier.GetProperty() <= 0f) return;
 
+        var rand = new System.Random();
+        
         ShipComponent[] components = SELocator.GetShipDamageController()._shipComponents
             .Where((component) => component.repairFraction == 1f && !component.isDamaged).ToArray();
         if (components.Length > 0 && Random.value < 0.3f)
         {
-            components[Random.Range(0, components.Length)].SetDamaged(true);
+            components[rand.Next(0, components.Length)].SetDamaged(true);
         }
         else
         {
             ShipHull[] hulls = SELocator.GetShipDamageController()._shipHulls.Where((hull) => hull.integrity > 0f).ToArray();
-            ShipHull targetHull = hulls[Random.Range(0, hulls.Length)];
+            ShipHull targetHull = hulls[rand.Next(0, hulls.Length)];
 
             bool wasDamaged = targetHull._damaged;
             targetHull._damaged = true;

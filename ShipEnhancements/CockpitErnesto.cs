@@ -1,7 +1,12 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.RegularExpressions;
+using MonoMod.Utils;
+using Newtonsoft.Json;
 using UnityEngine;
 using UnityEngine.UI;
+using static ShipEnhancements.ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -16,15 +21,21 @@ public class CockpitErnesto : MonoBehaviour
     private List<int> _questions = [];
     private List<int> _availableQuestions = [];
     private Coroutine _currentComment = null;
+    private System.Random _random;
     private bool _bigHeadMode = false;
     private bool _showShipFailNextTime = false;
     private int _riddleConversationCountdown;
+    private int _queryCount;
+    private readonly int _maxQueries = 3;
 
-    private readonly int _questionsCount = 29;
+    private int _questionCount;
     private readonly float _commentLifetime = 10f;
 
-    private List<string> _availableHeavyImpactComments = [];
-    private string[] _heavyImpactComments =
+    private Dictionary<string, string> _shipFailureComments = [];
+    private Dictionary<int, Dictionary<string, object>> _dialogueOptionConditions = [];
+
+    private readonly List<string> _availableHeavyImpactComments = [];
+    private readonly string[] _heavyImpactComments =
     [
         "You'd better watch where you're flying that thing.",
         "Ouch. That's gonna be tough to repair.",
@@ -36,8 +47,8 @@ public class CockpitErnesto : MonoBehaviour
         "Hey, that was my favorite part!"
     ];
 
-    private List<string> _availableShockComments = [];
-    private string[] _shockComments =
+    private readonly List<string> _availableShockComments = [];
+    private readonly string[] _shockComments =
     [
         "I don't think that's going to recharge the ship.",
         "I'd appreciate it if you didn't try electrocuting us.",
@@ -48,8 +59,8 @@ public class CockpitErnesto : MonoBehaviour
         "Good job. Now go fix the electricity so I can watch my TV."
     ];
 
-    private List<string> _availableEjectComments = [];
-    private string[] _ejectComments =
+    private readonly List<string> _availableEjectComments = [];
+    private readonly string[] _ejectComments =
     [
         "What'd you do that for?",
         "Nice job, you just ruined a perfectly good cockpit.",
@@ -59,8 +70,8 @@ public class CockpitErnesto : MonoBehaviour
         "Well, at least now we know it works.",
     ];
 
-    private List<string> _availableReactorComments = [];
-    private string[] _reactorComments =
+    private readonly List<string> _availableReactorComments = [];
+    private readonly string[] _reactorComments =
     [
         "You might want to check on your reactor.",
         "Is it just me, or is it getting hot in here? It might just be me.",
@@ -68,9 +79,72 @@ public class CockpitErnesto : MonoBehaviour
         "Is your reactor supposed to be glowing red?"
     ];
 
+    private readonly Dictionary<DeathType, List<string>> _availableDeathComments = [];
+
+    private readonly Dictionary<DeathType, string[]> _deathComments = new()
+    {
+        {
+            DeathType.Meditation,
+            [
+                "What? You're meditating already?",
+                "Goodnight, sleep tight, don't let the anglerfish bite. Specifically me. I'm the anglerfish. I'm going to bite you.",
+                "Wait, where are you going? You're just leaving me here? How am I going to survive on my own?",
+                "Well, it's been nice knowing you for MINS minutes and SECS seconds."
+            ]
+        },
+        {
+            DeathType.Asphyxiation,
+            [
+                "You're suffocating here? You could have suffocated anywhere, and you wanted to suffocate here? Right next to me?",
+                "Can you hurry it up? I'm trying to listen to a podcast right now. They're making some great points about the stock market situation in Dark Bramble and you're being very distracting."
+            ]
+        },
+        {
+            DeathType.Digestion,
+            [
+                "I've always wondered what my insides looked like."
+            ]
+        },
+        {
+            DeathType.Lava,
+            [
+                "Hey, isn't lava supposed to be deadly? Why are you touching it?"
+            ]
+        },
+        {
+            DeathType.TimeLoop,
+            [
+                "Hey, hatchling? I have something really important I need to tell you. Can you come here for a second?",
+                "Wanna hear a fun fact? Just give me like 10 seconds to come up with one."
+            ]
+        },
+        {
+            DeathType.Impact,
+            [
+                "Uhh... are you okay?",
+                "That killed you? Your bones must be incredibly fragile.",
+                "Well, that's embarrasing."
+            ]
+        },
+        {
+            DeathType.Default,
+            [
+                "Wait! Don't die yet, I need to record this. It's gonna do numbers on Vine."
+            ]
+        },
+        {
+            DeathType.Crushed,
+            [
+                "What's that sound? Sounds like a beetle getting squished. A blue, four-eyed beetle.",
+                "Are you being crushed by the weight of your responsibilities? Or was that for another time?"
+            ]
+        }
+    };
+
     private void Awake()
     {
         _dialogueTree = _conversationZone.GetComponent<CharacterDialogueTree>();
+        _random = new System.Random();
 
         _dialogueTree.OnStartConversation += OnStartConversation;
         _dialogueTree.OnEndConversation += OnEndConversation;
@@ -78,7 +152,39 @@ public class CockpitErnesto : MonoBehaviour
         GlobalMessenger.AddListener("ExitFlightConsole", OnExitFlightConsole);
         GlobalMessenger.AddListener("EnableBigHeadMode", OnEnableBigHeadMode);
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+        GlobalMessenger<DeathType>.AddListener("PlayerDeath", OnPlayerDeath);
 
+        // pull dialogue from github
+        //var injection = (TextAsset)ShipEnhancements.LoadAsset("Assets/ShipEnhancements/TextAsset/TestErnestoQuestions.txt");
+        var injection = ErnestoNetworkHandler.GetErnestoQuestions();
+        var dialogue = _dialogueTree._xmlCharacterDialogueAsset;
+        int index = dialogue.text.IndexOf("DIALOGUE_OPTION_PLACEHOLDER");
+        if (index > 0)
+        {
+            var regex = new Regex(@"(<\/DialogueOption>)(?=[\s\S]*(SEPARATOR_DIALOGUE_BODY))");
+            int matches = regex.Matches(injection.text).Count;
+            ShipEnhancements.WriteDebugMessage("matches: " + matches);
+            if (matches > 0)
+            {
+                _questionCount = matches;
+                
+                //var splitIndex = injection.text.IndexOf("DIALOGUE_BODY_SEPARATOR");
+                //var splitIndex2 = injection.text.IndexOf("SHIP_FAILURE_DIALOGUE");
+                //var injectOptions = injection.text.Substring(0, splitIndex);
+                //var injectBody = injection.text.Substring(splitIndex + 23, splitIndex2);
+                
+                var splitRegex = new Regex(@"\bSEPARATOR_.*\b");
+                var splits = splitRegex.Split(injection.text);
+                
+                var newText = dialogue.text.Replace("DIALOGUE_OPTION_PLACEHOLDER", splits[0]);
+                newText = newText.Replace("DIALOGUE_BODY_PLACEHOLDER", splits[1]);
+                _dialogueTree._xmlCharacterDialogueAsset = new TextAsset(newText);
+
+                _dialogueOptionConditions = JsonConvert.DeserializeObject<Dictionary<int, Dictionary<string, object>>>(splits[2]);
+                _shipFailureComments = JsonConvert.DeserializeObject<Dictionary<string, string>>(splits[3]);
+            }
+        }
+        
         ResetAvailableQuestions();
     }
 
@@ -89,13 +195,30 @@ public class CockpitErnesto : MonoBehaviour
         _availableEjectComments.AddRange(_ejectComments);
         _availableReactorComments.AddRange(_reactorComments);
 
-        if (ErnestoModListHandler.GetNumberErnestos() > 0)
+        foreach (var (type, array) in _deathComments)
+        {
+            _availableDeathComments.Add(type, array.ToList());
+        }
+
+        /*if (ErnestoModListHandler.GetNumberErnestos() > 0)
         {
             SetConditionState("SE_MULTIPLE_ERNESTOS", true);
+        }*/
+
+        if ((bool)addRadio.GetProperty())
+        {
+            int mask = ShipEnhancements.SaveData.LearnedRadioCodes;
+            var b = new BitArray([mask]);
+            bool[] bits = new bool[b.Count];
+            b.CopyTo(bits, 0);
+            if (!b[3])
+            {
+                SetConditionState("SE_ERNESTO_RADIO_CODE", true);
+            }
         }
 
         _commentText.gameObject.SetActive(false);
-        _riddleConversationCountdown = Random.Range(5, 10);
+        _riddleConversationCountdown = _random.Next(3, 6);
     }
 
     private void ResetAvailableQuestions()
@@ -103,37 +226,36 @@ public class CockpitErnesto : MonoBehaviour
         _questions.Clear();
         _availableQuestions.Clear();
 
-        for (int i = 1; i <= _questionsCount; i++)
+        for (int i = 1; i <= _questionCount; i++)
         {
-            if (Random.value < 0.5f)
+            bool valid = true;
+            if (_dialogueOptionConditions.ContainsKey(i))
+            {
+                var dict = _dialogueOptionConditions[i];
+                foreach (var (setting, value) in dict)
+                {
+                    var actual = setting.AsEnum<ShipEnhancements.Settings>().GetProperty();
+                    var prop = value;
+                    if (float.TryParse(value.ToString(), out var result))
+                    {
+                        prop = result;
+                    }
+
+                    ShipEnhancements.WriteDebugMessage("compare " + actual.GetType() + " to " + value.GetType());
+                    if (!actual.Equals(prop))
+                    {
+                        valid = false;
+                        break;
+                    }
+                }
+            }
+
+            if (valid)
             {
                 _questions.Add(i);
             }
         }
-
-        if (GetConditionState("SE_ERNESTO_GESWALDO_PART_ONE"))
-        {
-            _questions.Add(101);
-        }
-        else
-        {
-            _questions.Add(100);
-        }
-
-        if ((bool)ShipEnhancements.Settings.addRadio.GetProperty())
-        {
-            _questions.Add(201);
-        }
-        if ((bool)ShipEnhancements.Settings.addShipClock.GetProperty())
-        {
-            _questions.Add(202);
-        }
-        if (PlayerData.GetPersistentCondition("SE_ERNESTO_TOLD_RIDDLE")
-            && !PlayerData.GetPersistentCondition("SE_HAS_ERNESTONIAN_TRANSLATOR"))
-        {
-            _questions.Add(203);
-        }
-
+        
         _availableQuestions.AddRange(_questions);
     }
 
@@ -146,9 +268,22 @@ public class CockpitErnesto : MonoBehaviour
             _currentComment = null;
         }
 
-        int num = _availableQuestions[Random.Range(0, _availableQuestions.Count)];
-        SetConditionState("SE_ERNESTO_OPTION_" + num, true);
-        _availableQuestions.Remove(num);
+        if (_availableQuestions.Count > 0)
+        {
+            int num = _availableQuestions[_random.Next(0, _availableQuestions.Count)];
+            SetConditionState("SE_ERNESTO_OPTION_" + num, true);
+            _availableQuestions.Remove(num);
+        }
+        else if (!PlayerData.GetPersistentCondition("SE_ERNESTO_IS_AWARE") &&
+            (!PlayerData.GetPersistentCondition("SE_ERNESTO_TOLD_RIDDLE") || 
+                GetConditionState("SE_ERNESTO_REPEATED_RIDDLE")))
+        {
+            SetConditionState("SE_ERNESTO_FAILSAFE_QUESTION", true);
+        }
+        else
+        {
+            SetConditionState("SE_ERNESTO_FAILSAFE_QUESTION", false);
+        }
 
         if (_showShipFailNextTime)
         {
@@ -177,6 +312,7 @@ public class CockpitErnesto : MonoBehaviour
             _conversationZone.DisableInteraction();
         }
 
+        // Reset
         foreach (int i in _questions)
         {
             SetConditionState("SE_ERNESTO_OPTION_" + i, false);
@@ -187,7 +323,20 @@ public class CockpitErnesto : MonoBehaviour
             ResetAvailableQuestions();
         }
 
-        if (ErnestoModListHandler.GetNumberErnestos() > 0 && PlayerData.GetPersistentCondition("SE_KNOWS_ERNESTO") 
+        // Question limit
+        if (GetConditionState("SE_ERNESTO_ASKED_QUESTION"))
+        {
+            _queryCount = Mathf.Min(_maxQueries, _queryCount + 1);
+            SetConditionState("SE_ERNESTO_ASKED_QUESTION", false);
+        }
+        
+        if (!GetConditionState("SE_ERNESTO_NO_QUESTIONS") && _queryCount >= _maxQueries)
+        {
+            SetConditionState("SE_ERNESTO_NO_QUESTIONS", true);
+        }
+
+        // Awareness
+        if (ErnestoNetworkHandler.GetNumberErnestos() > 0 && PlayerData.GetPersistentCondition("SE_KNOWS_ERNESTO") 
             && !PlayerData.GetPersistentCondition("SE_ERNESTO_IS_AWARE")
             && !GetConditionState("SE_ERNESTO_AWARE_NEXT_TIME"))
         {
@@ -198,13 +347,27 @@ public class CockpitErnesto : MonoBehaviour
             PlayerData.SetPersistentCondition("SE_ERNESTO_BECOME_AWARE", true);
             SetConditionState("SE_ERNESTO_AWARE_NEXT_TIME", false);
         }
-
-        if (GetConditionState("SE_ERNESTO_GESWALDO_PART_TWO"))
+        
+        // Disable riddle
+        if (PlayerData.GetPersistentCondition("SE_ERNESTO_TOLD_RIDDLE"))
         {
-            SetConditionState("SE_ERNESTO_GESWALDO_PART_ONE", false);
-            SetConditionState("SE_ERNESTO_GESWALDO_PART_TWO", false);
+            SetConditionState("SE_ERNESTO_RIDDLE", false);
         }
+        
+        // Disable found text
+        if (PlayerData.GetPersistentCondition("SE_FOUND_ERNESTONIAN_TEXT")
+            && PlayerData.GetPersistentCondition("SE_HAS_ERNESTONIAN_TRANSLATOR"))
+        {
+            PlayerData.SetPersistentCondition("SE_FOUND_ERNESTONIAN_TEXT", false);
+            SetConditionState("SE_ASKED_ERNESTONIAN", false);
+            SetConditionState("SE_ASKED_POEM", false);
+        }
+        
+        HandleDialogueEvents();
+    }
 
+    private void HandleDialogueEvents()
+    {
         if (GetConditionState("SE_ERNESTO_EXPLODE_SHIP"))
         {
             SetConditionState("SE_ERNESTO_EXPLODE_SHIP", false);
@@ -216,7 +379,14 @@ public class CockpitErnesto : MonoBehaviour
                 }
                 else
                 {
-                    ErnestoDetectiveController.ItWasExplosion(fromErnesto: true);
+                    if (_shipFailureComments.ContainsKey("SE_ERNESTO_EXPLODE_SHIP"))
+                    {
+                        ErnestoDetectiveController.SetCustomText(_shipFailureComments["SE_ERNESTO_EXPLODE_SHIP"]);
+                    }
+                    else
+                    {
+                        ErnestoDetectiveController.ItWasExplosion();
+                    }
                 }
                 
                 SELocator.GetShipDamageController().Explode();
@@ -228,20 +398,93 @@ public class CockpitErnesto : MonoBehaviour
             }
         }
 
-        if (PlayerData.GetPersistentCondition("SE_ERNESTO_TOLD_RIDDLE"))
+        if (GetConditionState("SE_ERNESTO_BREAK_SHIP"))
         {
-            SetConditionState("SE_ERNESTO_RIDDLE", false);
+            SetConditionState("SE_ERNESTO_BREAK_SHIP", false);
+            if (!(bool)preventSystemFailure.GetProperty())
+            {
+                //ErnestoDetectiveController.ItWasHullBreach(noWalls: true);
+                if (_shipFailureComments.ContainsKey("SE_ERNESTO_BREAK_SHIP"))
+                {
+                    ErnestoDetectiveController.SetCustomText(_shipFailureComments["SE_ERNESTO_BREAK_SHIP"]);
+                }
+                else
+                {
+                    ErnestoDetectiveController.ItWasHullBreach();
+                }
+            }
+            var supplies = SELocator.GetShipTransform().Find("Module_Supplies");
+            if (supplies)
+            {
+                supplies.GetComponent<ShipDetachableModule>().Detach();
+            }
+            var engine = SELocator.GetShipTransform().Find("Module_Engine");
+            if (engine)
+            {
+                engine.GetComponent<ShipDetachableModule>().Detach();
+            }
         }
 
-        if (PlayerData.GetPersistentCondition("SE_FOUND_ERNESTONIAN_TEXT")
-            && PlayerData.GetPersistentCondition("SE_HAS_ERNESTONIAN_TRANSLATOR"))
+        if (GetConditionState("SE_ERNESTO_EJECT_COCKPIT"))
         {
-            PlayerData.SetPersistentCondition("SE_FOUND_ERNESTONIAN_TEXT", false);
+            SetConditionState("SE_ERNESTO_EJECT_COCKPIT", false);
+            if (_shipFailureComments.ContainsKey("SE_ERNESTO_EJECT_COCKPIT"))
+            {
+                ErnestoDetectiveController.SetCustomText(_shipFailureComments["SE_ERNESTO_EJECT_COCKPIT"]);
+            }
+            else
+            {
+                ErnestoDetectiveController.ItWasHullBreach();
+            }
+
+            var eject = SELocator.GetShipTransform().Find("Module_Cockpit")?
+                .GetComponentInChildren<ShipEjectionSystem>();
+            if (eject)
+            {
+                eject._ejectPressed = true;
+                eject.enabled = true;
+            }
         }
 
-        SetConditionState("SE_ERNESTO_SHIP_FAILURE", false);
-        SetConditionState("SE_ASKED_ERNESTONIAN", false);
-        SetConditionState("SE_ASKED_POEM", false);
+        if (GetConditionState("SE_ERNESTO_DAMAGE_REACTOR"))
+        {
+            SetConditionState("SE_ERNESTO_DAMAGE_REACTOR", false);
+            if (_shipFailureComments.ContainsKey("SE_ERNESTO_DAMAGE_REACTOR"))
+            {
+                ErnestoDetectiveController.SetCustomReactorCause(_shipFailureComments["SE_ERNESTO_DAMAGE_REACTOR"]);
+            }
+
+            var reactor = SELocator.GetShipDamageController()._shipReactorComponent;
+            if (!reactor.isDamaged)
+            {
+                reactor.SetDamaged(true);
+            }
+            else
+            {
+                ErnestoDetectiveController.ItWasExplosion(fromReactor: true);
+                SELocator.GetShipDamageController().Explode();
+            }
+        }
+
+        if (GetConditionState("SE_ERNESTO_DAMAGE_ELECTRICAL"))
+        {
+            SetConditionState("SE_ERNESTO_DAMAGE_ELECTRICAL", false);
+            if (!SELocator.GetShipDamageController().IsElectricalFailed())
+            {
+                SELocator.GetShipDamageController().TriggerElectricalFailure();
+            }
+            else
+            {
+                if (_shipFailureComments.ContainsKey("SE_ERNESTO_DAMAGE_ELECTRICAL"))
+                {
+                    ErnestoDetectiveController.SetCustomReactorCause(_shipFailureComments["SE_ERNESTO_DAMAGE_ELECTRICAL"]);
+                }
+                
+                SELocator.GetShipDetector().GetComponent<HazardDetector>().PlayElectricityEffects();
+                SELocator.GetShipDamageController()._shipReactorComponent.SetDamaged(true);
+                SELocator.GetShipCockpitController().LockUpControls(3f);
+            }
+        }
     }
 
     public void MakeComment(string comment)
@@ -283,7 +526,7 @@ public class CockpitErnesto : MonoBehaviour
 
     public void OnHeavyImpact()
     {
-        string comment = _availableHeavyImpactComments[Random.Range(0, _availableHeavyImpactComments.Count)];
+        string comment = _availableHeavyImpactComments[_random.Next(0, _availableHeavyImpactComments.Count)];
         MakeComment(comment);
         _availableHeavyImpactComments.Remove(comment);
 
@@ -295,7 +538,7 @@ public class CockpitErnesto : MonoBehaviour
 
     public void OnElectricalShock()
     {
-        string comment = _availableShockComments[Random.Range(0, _availableShockComments.Count)];
+        string comment = _availableShockComments[_random.Next(0, _availableShockComments.Count)];
         MakeComment(comment);
         _availableShockComments.Remove(comment);
 
@@ -307,7 +550,7 @@ public class CockpitErnesto : MonoBehaviour
 
     public void OnCockpitDetached()
     {
-        string comment = _availableEjectComments[Random.Range(0, _availableEjectComments.Count)];
+        string comment = _availableEjectComments[_random.Next(0, _availableEjectComments.Count)];
         MakeComment(comment);
         _availableEjectComments.Remove(comment);
 
@@ -319,7 +562,7 @@ public class CockpitErnesto : MonoBehaviour
 
     public void ReactorDamagedComment()
     {
-        string comment = _availableReactorComments[Random.Range(0, _availableReactorComments.Count)];
+        string comment = _availableReactorComments[_random.Next(0, _availableReactorComments.Count)];
         MakeComment(comment);
         _availableReactorComments.Remove(comment);
 
@@ -333,7 +576,7 @@ public class CockpitErnesto : MonoBehaviour
     {
         _conversationZone.DisableInteraction();
 
-        if ((bool)ShipEnhancements.Settings.disableDamageIndicators.GetProperty() && Random.value < 0.25f)
+        if ((bool)disableDamageIndicators.GetProperty() && Random.value < 0.25f)
         {
             ShipReactorComponent reactor = SELocator.GetShipDamageController()._shipReactorComponent;
             if (reactor != null && reactor.isDamaged)
@@ -355,14 +598,66 @@ public class CockpitErnesto : MonoBehaviour
             _bigHeadMode = true;
             transform.Find("Beast_Anglerfish").transform.localScale *= 2f;
             transform.position += new Vector3(0f, 0.11f, 0f);
-            _questions.Add(200);
-            _availableQuestions.Add(200);
+            SetConditionState("SE_ERNESTO_BIG_HEAD", true);
         }
     }
 
     private void OnShipSystemFailure()
     {
         _showShipFailNextTime = true;
+    }
+
+    private void OnPlayerDeath(DeathType deathType)
+    {
+        if (!_deathComments.ContainsKey(deathType)) return;
+        
+        var distSqr = (SELocator.GetPlayerBody().transform.position - 
+            transform.position).sqrMagnitude;
+        if (distSqr < 5f * 5f)
+        {
+            var comments = _availableDeathComments[deathType];
+            if (comments.Count > 0)
+            {
+                var com = comments[_random.Next(0, comments.Count)];
+                
+                if (deathType == DeathType.Meditation)
+                {
+                    if (com.Contains("MINS"))
+                    {
+                        var mins = (int)(Time.timeSinceLevelLoad / 60f);
+                        if (mins == 0)
+                        {
+                            com = com.Replace("MINS minutes and ", "");
+                        }
+                        else
+                        {
+                            com = com.Replace("MINS", mins.ToString());
+                        }
+                    }
+
+                    if (com.Contains("SECS"))
+                    {
+                        var secs = (int)(Time.timeSinceLevelLoad % 60f);
+                        if (secs == 0)
+                        {
+                            com = "Well, it's been nice knowing you for... zero seconds? That doesn't sound right.";
+                        }
+                        else
+                        {
+                            com = com.Replace("SECS", secs.ToString());
+                        }
+                    }
+                }
+                
+                MakeComment(com);
+                _availableDeathComments[deathType].Remove(com);
+
+                if (_availableDeathComments[deathType].Count == 0)
+                {
+                    _availableDeathComments[deathType].AddRange(_deathComments[deathType]);
+                }
+            }
+        }
     }
 
     private void OnDestroy()
@@ -373,23 +668,16 @@ public class CockpitErnesto : MonoBehaviour
         GlobalMessenger.RemoveListener("ExitFlightConsole", OnExitFlightConsole);
         GlobalMessenger.RemoveListener("EnableBigHeadMode", OnEnableBigHeadMode);
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
+        GlobalMessenger<DeathType>.RemoveListener("PlayerDeath", OnPlayerDeath);
     }
 
     private bool GetConditionState(string id)
     {
-        if (DialogueConditionManager.SharedInstance.ConditionExists(id))
-        {
-            return DialogueConditionManager.SharedInstance.GetConditionState(id);
-        }
-
-        return false;
+        return DialogueConditionManager.SharedInstance.GetConditionState(id);
     }
 
     private void SetConditionState(string id, bool value)
     {
-        if (DialogueConditionManager.SharedInstance.ConditionExists(id))
-        {
-            DialogueConditionManager.SharedInstance.SetConditionState(id, value);
-        }
+        DialogueConditionManager.SharedInstance.SetConditionState(id, value);
     }
 }

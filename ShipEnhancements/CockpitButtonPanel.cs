@@ -1,4 +1,5 @@
-﻿using static ShipEnhancements.ShipEnhancements.Settings;
+﻿using System;
+using static ShipEnhancements.ShipEnhancements.Settings;
 using UnityEngine;
 
 namespace ShipEnhancements;
@@ -48,6 +49,7 @@ public class CockpitButtonPanel : MonoBehaviour
     private float _extensionTime = 0.4f;
     private int _focusedButtons = 0;
 
+    [Serializable]
     public struct ButtonStates
     {
         public bool gravState;

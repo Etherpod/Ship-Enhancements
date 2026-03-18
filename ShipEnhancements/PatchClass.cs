@@ -6,6 +6,7 @@ using System.Reflection;
 using HarmonyLib;
 using OWML.Common;
 using ShipEnhancements.ModMenu;
+using OWML.ModHelper.Menus.CustomInputs;
 using OWML.ModHelper.Menus.NewMenuSystem;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -669,6 +670,18 @@ public static class PatchClass
             GameObject gravityPadObj = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/GravityLandingPad.prefab");
             ShipEnhancements.CreateObject(gravityPadObj, __instance.transform);
         }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(VanishVolume), nameof(VanishVolume.OnTriggerEnter))]
+    public static bool PreventShipDestructionByGravityGear(VanishVolume __instance, Collider hitCollider)
+    {
+        if (hitCollider.GetComponent<GravityRepelVolume>())
+        {
+            return false;
+        }
+
+        return true;
     }
     #endregion
 
@@ -2843,7 +2856,7 @@ public static class PatchClass
         if ((bool)disableSeatbelt.GetProperty() && PlayerState.AtFlightConsole() && impact.speed > 25f)
         {
             _lastImpactVelocity = impact.velocity.normalized * -impact.speed / 40f;
-            ShipCockpitController cockpit = SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitController>();
+            ShipCockpitController cockpit = SELocator.GetShipCockpitController();
             if (cockpit != null)
             {
                 cockpit.ExitFlightConsole();
@@ -2882,7 +2895,7 @@ public static class PatchClass
             if (impactVelocity.magnitude > 10f)
             {
                 _lastImpactVelocity = -impactVelocity / 25f;
-                ShipCockpitController cockpit = SELocator.GetShipTransform().GetComponentInChildren<ShipCockpitController>();
+                ShipCockpitController cockpit = SELocator.GetShipCockpitController();
                 if (cockpit != null)
                 {
                     cockpit.ExitFlightConsole();
@@ -3418,7 +3431,7 @@ public static class PatchClass
             return;
         }
         
-        __instance.GetComponentInChildren<ShipCockpitController>().LockUpControls(time);
+        SELocator.GetShipCockpitController().LockUpControls(time);
         ShipNotifications.PostStunDamageNotification(time);
         __instance.GetComponent<ShipThrusterController>().SetRollMode(false, 1);
     }
@@ -3613,6 +3626,16 @@ public static class PatchClass
         }
         else if (module.GetComponent<ShipHull>().section == ShipHull.Section.Right)
         {
+            var suppliesSystem = module.transform.Find("Systems_Supplies/SuppliesElectricalSystem")
+                    .GetComponent<ElectricalSystem>();
+            var cabinSystem = __instance.transform.Find("Module_Cabin/Systems_Cabin/CabinElectricalSystem")
+                .GetComponent<ElectricalSystem>();
+            
+            var connectedSystems = cabinSystem._connectedSystems.ToList();
+            connectedSystems.Remove(suppliesSystem);
+            cabinSystem._connectedSystems = connectedSystems.ToArray();
+            suppliesSystem.SetPowered(false);
+            
             __instance.GetComponent<ShipThrusterModel>().SetThrusterBankEnabled(ThrusterBank.Right, false);
             hullBreachTrigger.EnableSuppliesEntryway();
         }
@@ -3706,7 +3729,7 @@ public static class PatchClass
     {
         if (key == "SE_Ernesto_ErnestosERNESTO_PLACEHOLDER")
         {
-            int numErnestos = ErnestoModListHandler.GetNumberErnestos();
+            int numErnestos = ErnestoNetworkHandler.GetNumberErnestos();
             string[] lines =
             [
                 "I dunno, I can't really feel anything right now.",
@@ -3771,7 +3794,7 @@ public static class PatchClass
                     $"Yeah, there's a surplus of magical talking anglerfish right now because {numErnestos} Ernestos decided to cross into our world.",
                 ];
             }
-            else if (numErnestos > 15 && numErnestos < ErnestoModListHandler.GetMaxErnestos())
+            else if (numErnestos > 15 && numErnestos < ErnestoNetworkHandler.GetMaxErnestos())
             {
                 lines =
                 [
@@ -3782,7 +3805,7 @@ public static class PatchClass
                     $"Yeah, {numErnestos} other magical anglerfish that I could be talking to instead of you.",
                 ];
             }
-            else if (numErnestos == ErnestoModListHandler.GetMaxErnestos())
+            else if (numErnestos == ErnestoNetworkHandler.GetMaxErnestos())
             {
                 lines =
                 [
@@ -3801,8 +3824,9 @@ public static class PatchClass
         }
         else if (key == "SE_Ernesto_ClockERNESTO_PLACEHOLDER")
         {
-            int randomHour = UnityEngine.Random.Range(1, 13);
-            int randomMinute = UnityEngine.Random.Range(10, 60);
+            var rand = new System.Random();
+            int randomHour = rand.Next(1, 13);
+            int randomMinute = rand.Next(10, 60);
             __result = $"It's {randomHour}:{randomMinute} if I'm reading that clock correctly.";
             return false;
         }
@@ -4878,11 +4902,6 @@ public static class PatchClass
     [HarmonyPatch(typeof(AlignmentForceDetector), nameof(AlignmentForceDetector.AccumulateAcceleration))]
     public static bool InheritableForcesFix_AccumulateAcceleration_Alignment(AlignmentForceDetector __instance)
     {
-        if (Keyboard.current.mKey.isPressed)
-        {
-            ShipEnhancements.WriteDebugMessage((__instance is AlignmentForceDetector) + " - " + __instance);
-        }
-
         bool clearDetectors = false;
 
         var detector = __instance as AlignmentForceDetector;
@@ -4911,31 +4930,14 @@ public static class PatchClass
                 }
             }
         }
-        if (Keyboard.current.nKey.isPressed)
-        {
-            ShipEnhancements.WriteDebugMessage("Process on " + __instance.GetAttachedOWRigidbody());
-            ShipEnhancements.WriteDebugMessage("Seen detectors: ");
-            foreach (var d in seenDetectors)
-            {
-                ShipEnhancements.WriteDebugMessage(d);
-            }
-        }
         if (detector._activeInheritedDetector != null && !seenDetectors.Contains(detector._activeInheritedDetector))
         {
             if (seenDetectors.Count == 0)
             {
                 clearDetectors = true;
             }
-            if (Keyboard.current.nKey.isPressed)
-            {
-                ShipEnhancements.WriteDebugMessage("Add " + __instance);
-            }
             seenDetectors.Add(__instance);
             detector._netAcceleration += detector._activeInheritedDetector.GetForceAcceleration();
-        }
-        else if (Keyboard.current.nKey.isPressed)
-        {
-            ShipEnhancements.WriteDebugMessage("Cancel");
         }
 
         if (clearDetectors)
@@ -5061,6 +5063,62 @@ public static class PatchClass
             PatchHandler.SetLastFocusedRepairReciver(__instance._focusedRepairReceiver);
         }
     }
+    #endregion
+    
+    #region DockingBayFix
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(OWRingRiverCollider), nameof(OWRingRiverCollider.IsTrackerInCollider))]
+    public static bool PreventDockingBayRiver(OWRingRiverCollider __instance, OWCustomCollider.TrackedTransform tracker, 
+        ref bool __result)
+    {
+        if (tracker.fluidDetector is StaticFluidDetector or ShipFluidDetector)
+        {
+            __result = CheckPointInRingWorldRiver(__instance, tracker.transform.position);
+            return false;
+        }
+
+        return true;
+    }
+    
+    public static bool CheckPointInRingWorldRiver(OWRingRiverCollider __instance, Vector3 worldPoint)
+    {
+        bool inRiver;
+        Vector3 vector = __instance.transform.InverseTransformPoint(worldPoint);
+        if (vector.y > __instance._cylinderHalfHeight || vector.y < -__instance._cylinderHalfHeight)
+        {
+            inRiver = false;
+        }
+        else
+        {
+            float num = Mathf.Sqrt(vector.x * vector.x + vector.z * vector.z);
+            inRiver = num > __instance.GetInnerRadiusAtLocalPosition(vector) && num < __instance._outerRadius;
+        }
+
+        if (!inRiver) return false;
+        
+        foreach (var vol in ShipEnhancements.Instance.AntiRiverVolumes)
+        {
+            if (vol.CheckPointInside(worldPoint))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    
+    #endregion
+    
+    #region PersistentShipState
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(DestructionVolume), nameof(DestructionVolume.VanishShip))]
+    public static void OnShipVanished()
+    {
+        ShipEnhancements.Instance.GetComponent<PersistentShipState>().OnShipVanished();
+    }
+    
     #endregion
 
     #region ShipSignalscopeZoom

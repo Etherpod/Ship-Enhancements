@@ -50,6 +50,9 @@
   // Makes the Ship Water Damage setting apply to everything (even air will damage you)
   "MakeWaterDamageEverythingDamage": false,
 
+  // Similar to the Remember Ship State setting, but it won't ever reset
+  "UltraPersistentShip": false,
+
   // If you look away from your ship, it disappears. Forever.
-  "UltraQuantumShip": false
+  "UltraQuantumShip": false,
 }

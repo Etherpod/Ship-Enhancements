@@ -40,7 +40,7 @@ public class PatchHandler : MonoBehaviour
         _shipThrusterAudio = SELocator.GetShipBody().GetComponentInChildren<ShipThrusterAudio>();
     }
 
-    public void StartSputter()
+    public void StartSputter(int numTimes)
     {
         AudioClip startClip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/ShipEngineSputter_Start.ogg");
         _shipThrusterAudio._ignitionSource.Stop();
@@ -55,32 +55,31 @@ public class PatchHandler : MonoBehaviour
             StopCoroutine(_sputterCoroutine);
             _sputterCoroutine = null;
         }
-        _sputterCoroutine = StartCoroutine(SputterSequence());
+        _sputterCoroutine = StartCoroutine(SputterSequence(numTimes));
     }
 
-    private IEnumerator SputterSequence()
+    private IEnumerator SputterSequence(int numTimes)
     {
         yield return new WaitForSeconds(_currentSputterClip.length - 0.005f);
 
         AudioClip loopClip = ShipEnhancements.LoadAudio("Assets/ShipEnhancements/AudioClip/ShipEngineSputter_Loop.ogg");
         _currentSputterClip = loopClip;
-
+        
         float ratio = SELocator.GetShipTemperatureDetector().GetInternalTemperatureRatio();
         float tempLerp = Mathf.Sqrt(Mathf.InverseLerp(-0.5f, -1f, ratio));
         float difficulty = (float)temperatureDifficulty.GetProperty();
-
-        int min = (int)Mathf.Lerp(1f, 3.1f, difficulty * tempLerp);
-        int max = (int)Mathf.Lerp(3f, 7.1f, difficulty * tempLerp);
-
-        int num = UnityEngine.Random.Range(min, max);
-        for (int i = 0; i < num; i++)
+        
+        for (int i = 0; i < numTimes; i++)
         {
             _shipThrusterAudio._ignitionSource.PlayOneShot(_currentSputterClip);
 
-            float damageChance = Mathf.Lerp(0f, 0.3f, 0.5f + (difficulty / 2f));
-            if (UnityEngine.Random.value < damageChance * tempLerp)
+            if (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost())
             {
-                RandomShipDamage(componentDamage: difficulty > 0.75f, damageCause: "engine_stall");
+                float damageChance = Mathf.Lerp(0f, 0.3f, 0.5f + (difficulty / 2f));
+                if (UnityEngine.Random.value < damageChance * tempLerp)
+                {
+                    RandomShipDamage(componentDamage: difficulty > 0.75f, damageCause: "engine_stall");
+                }
             }
 
             yield return new WaitForSeconds(_currentSputterClip.length - 0.005f);
@@ -104,7 +103,32 @@ public class PatchHandler : MonoBehaviour
             _sputterCoroutine = null;
         }
     }
+    
+    // Where did I leave off??
+    //
+    // I just switched out the host check with a flyer ID check
+    // to see if it fixes the problem of the clients being unable
+    // to cause the ship to stutter.
+    //
+    // I also need to confirm that the thrust indicator shows inputs
+    // for the client when the host is using it, because it wasn't
+    // when I was testing the stuttering
+    //
+    // Also double check that the initial state for the engine switch works
+    // It got desynced at one point
 
+    public void EngineSputterRemote(bool start, int numTimes)
+    {
+        if (start)
+        {
+            StartSputter(numTimes);
+        }
+        else
+        {
+            StopSputter();
+        }
+    }
+    
     private void OnDestroy()
     {
         instance = null;
@@ -172,10 +196,27 @@ public class PatchHandler : MonoBehaviour
                 float tempLerp = Mathf.Sqrt(Mathf.InverseLerp(-0.5f, -1f, ratio));
                 float maxChance = Mathf.Lerp(0f, 1f, Mathf.Pow((float)temperatureDifficulty.GetProperty() * 1.5f, 1/1.75f));
 
-                float rand = (float)new System.Random().NextDouble();
-                if (rand < maxChance * tempLerp)
+                var rand = new System.Random();
+                float randValue = (float)rand.NextDouble();
+                if ((!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBInteraction.GetFlyerID() == 
+                        ShipEnhancements.QSBAPI.GetLocalPlayerID()) &&
+                    randValue < maxChance * tempLerp)
                 {
-                    Instance.StartSputter();
+                    float difficulty = (float)temperatureDifficulty.GetProperty();
+                    int min = (int)Mathf.Lerp(1f, 3.1f, difficulty * tempLerp);
+                    int max = (int)Mathf.Lerp(3f, 7.1f, difficulty * tempLerp);
+
+                    int numTimes = rand.Next(min, max);
+                            
+                    Instance.StartSputter(numTimes);
+                            
+                    if (ShipEnhancements.InMultiplayer)
+                    {
+                        foreach (var id in ShipEnhancements.PlayerIDs)
+                        {
+                            ShipEnhancements.QSBCompat.SendEngineSputter(id, true, numTimes);
+                        }
+                    }
                 }
                 else
                 {
@@ -188,8 +229,21 @@ public class PatchHandler : MonoBehaviour
                 if (fullThrust.y <= 0f)
                 {
                     __instance._isIgniting = false;
-                    Instance.StopSputter();
                     GlobalMessenger.FireEvent("CancelShipIgnition");
+
+                    if (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBInteraction.GetFlyerID() == 
+                        ShipEnhancements.QSBAPI.GetLocalPlayerID())
+                    {
+                        Instance.StopSputter();
+                
+                        if (ShipEnhancements.InMultiplayer)
+                        {
+                            foreach (var id in ShipEnhancements.PlayerIDs)
+                            {
+                                ShipEnhancements.QSBCompat.SendEngineSputter(id, false, 0);
+                            }
+                        }
+                    }
                 }
                 else
                 {
@@ -242,12 +296,14 @@ public class PatchHandler : MonoBehaviour
     {
         if (ShipEnhancements.InMultiplayer && !ShipEnhancements.QSBAPI.GetIsHost() || (float)shipDamageMultiplier.GetProperty() <= 0f) return;
 
+        var rand = new System.Random();
+        
         ShipComponent[] components = SELocator.GetShipDamageController()._shipComponents
             .Where((component) => component.repairFraction == 1f && !component.isDamaged).ToArray();
         ShipHull[] hulls = SELocator.GetShipDamageController()._shipHulls.Where((hull) => hull.integrity > 0f).ToArray();
         if (componentDamage && components.Length > 0 && UnityEngine.Random.value < 0.5f)
         {
-            int index = UnityEngine.Random.Range(0, components.Length);
+            int index = rand.Next(0, components.Length);
             if (!string.IsNullOrWhiteSpace(damageCause)
                 && components[index] is ShipReactorComponent && !components[index].isDamaged)
             {
@@ -257,14 +313,14 @@ public class PatchHandler : MonoBehaviour
         }
         else if (hulls.Length > 0)
         {
-            ShipHull targetHull = hulls[UnityEngine.Random.Range(0, hulls.Length)];
+            ShipHull targetHull = hulls[rand.Next(0, hulls.Length)];
 
             bool wasDamaged = targetHull._damaged;
             targetHull._damaged = true;
             targetHull._integrity = Mathf.Max(0f, targetHull._integrity - UnityEngine.Random.Range(0.05f, 0.15f) * (float)shipDamageMultiplier.GetProperty());
             var eventDelegate1 = (MulticastDelegate)typeof(ShipHull).GetField("OnDamaged",
                 BindingFlags.Instance | BindingFlags.NonPublic
-                | BindingFlags.Public).GetValue(targetHull);
+                | BindingFlags.Public)?.GetValue(targetHull);
             if (eventDelegate1 != null)
             {
                 foreach (var handler in eventDelegate1.GetInvocationList())
@@ -308,12 +364,13 @@ public class PatchHandler : MonoBehaviour
             Instance._lastFocusedRepairReceiver = receiver;
             if (receiver != null)
             {
+                var rand = new System.Random();
                 Instance._swapRepairPrompt = UnityEngine.Random.value < 0.01f;
 
                 var allTexts = Enum.GetValues(typeof(UITextType)) as UITextType[];
                 var parts = allTexts.Where(text => text != receiver.GetRepairableName()
                     && text.ToString().Contains("ShipPart")).ToArray();
-                Instance._fakeRepairPrompt = parts[UnityEngine.Random.Range(0, parts.Length)];
+                Instance._fakeRepairPrompt = parts[rand.Next(0, parts.Length)];
             }
         }
     }

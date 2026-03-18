@@ -6,6 +6,8 @@ namespace ShipEnhancements;
 public interface IQSBInteraction
 {
     bool FlightConsoleOccupied();
+    
+    uint GetFlyerID();
 
     Vector3 GetShipAcceleration();
 

@@ -41,6 +41,12 @@ public class ShipWaterResource : MonoBehaviour
             {
                 amount /= 2f;
             }
+
+            if ((string)passiveTemperatureGain.GetProperty() == "Hot")
+            {
+                amount += 1.5f;
+            }
+            
             DrainWater(amount * Time.deltaTime);
         }
     }

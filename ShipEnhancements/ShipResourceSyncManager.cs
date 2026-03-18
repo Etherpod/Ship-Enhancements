@@ -9,7 +9,6 @@ public class ShipResourceSyncManager
     private QSBCompatibility _qsbCompat;
 
     private bool TempSync => (bool)enableShipTemperature.GetProperty();
-    private bool FilthSync => (float)dirtAccumulationTime.GetProperty() > 0f && (float)maxDirtAccumulation.GetProperty() > 0f;
 
     public ShipResourceSyncManager(QSBCompatibility qsbCompatibility)
     {
@@ -19,7 +18,8 @@ public class ShipResourceSyncManager
 
     public void Update()
     {
-        if (LoadManager.GetCurrentScene() != OWScene.SolarSystem)
+        if (LoadManager.GetCurrentScene() != OWScene.SolarSystem || 
+            ShipEnhancements.Instance.IsWarpingBackToEye)
         {
             return;
         }
@@ -30,13 +30,11 @@ public class ShipResourceSyncManager
             {
                 _qsbCompat.SendShipOxygenValue(id, SELocator.GetShipResources()._currentOxygen);
                 _qsbCompat.SendShipFuelValue(id, SELocator.GetShipResources()._currentFuel);
+                SELocator.GetCockpitFilthController()?.BroadcastCurrentEffectState();
+                
                 if (TempSync)
                 {
                     _qsbCompat.SendShipHullTemp(id, SELocator.GetShipTemperatureDetector().GetCurrentInternalTemperature());
-                }
-                if (FilthSync)
-                {
-                    SELocator.GetCockpitFilthController().BroadcastDirtState();
                 }
             }
             _currentFrameDelay = _frameDelay;
