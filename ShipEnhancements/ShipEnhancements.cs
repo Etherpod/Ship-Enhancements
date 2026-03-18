@@ -636,7 +636,7 @@ public class ShipEnhancements : ModBehaviour
 
             CustomMatManager.ClearMaterials(true);
 
-            bool skipSettings = GetComponent<PersistentShipState>().PreserveSettings ?? false;
+            bool skipSettings = GetComponent<PersistentShipState>().PreserveSettings;
             if ((!InMultiplayer || QSBAPI.GetIsHost()) && !skipSettings)
             {
                 UpdateProperties();
@@ -3066,7 +3066,7 @@ public class ShipEnhancements : ModBehaviour
     private void SetStringLightDecoration()
     {
         string stringLights = (string)shipStringLights.GetProperty();
-        if (stringLights == null) return;
+        if (stringLights == "None") return;
 
         GameObject prefab = LoadPrefab(ThemeManager.GetStringLightPath(stringLights));
         Transform parent = CreateObject(prefab).transform;
