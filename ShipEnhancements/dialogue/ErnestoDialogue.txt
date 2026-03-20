@@ -23,6 +23,16 @@
                 <Text>Who would win: one trillion anglerfish, or the sun?</Text>
                 <DialogueTarget>SE_Ernesto_Battle</DialogueTarget>
             </DialogueOption>
+            <DialogueOption>
+                <RequiredCondition>SE_ERNESTO_OPTION_6</RequiredCondition>
+                <Text>Are you a leprechaun?</Text>
+                <DialogueTarget>SE_Ernesto_Lep</DialogueTarget>
+            </DialogueOption>
+            <DialogueOption>
+                <RequiredCondition>SE_ERNESTO_OPTION_7</RequiredCondition>
+                <Text>Do you have holidays in Dark Bramble?</Text>
+                <DialogueTarget>SE_Ernesto_Holidays</DialogueTarget>
+            </DialogueOption>
             
 SEPARATOR_DIALOGUE_BODY
 
@@ -611,6 +621,101 @@ SEPARATOR_DIALOGUE_BODY
             <Page>Too late.</Page>
         </Dialogue>
     </DialogueNode>
+    
+    <DialogueNode>
+            <Name>SE_Ernesto_Lep</Name>
+            <Dialogue>
+                <Page>What kind of question is that? Of course I am.</Page>
+            </Dialogue>
+            
+            <DialogueOptionsList>
+                <DialogueOption>
+                    <Text>Are you also hiding a pot of gold at the end of a rainbow?</Text>
+                    <DialogueTarget>SE_Ernesto_Lep_2</DialogueTarget>
+                </DialogueOption>
+            </DialogueOptionsList>
+        </DialogueNode>
+        
+        <DialogueNode>
+            <Name>SE_Ernesto_Lep_2</Name>
+            <Dialogue>
+                <Page>Uhh... no. Who told you that?</Page>
+            </Dialogue>
+            
+            <DialogueOptionsList>
+                <DialogueOption>
+                    <Text>Slate.</Text>
+                    <DialogueTarget>SE_Ernesto_Lep_21</DialogueTarget>
+                </DialogueOption>
+                <DialogueOption>
+                    <Text>Geswaldo.</Text>
+                    <DialogueTarget>SE_Ernesto_Lep_22</DialogueTarget>
+                </DialogueOption>
+                <DialogueOption>
+                    <Text>I made it up!</Text>
+                    <DialogueTarget>SE_Ernesto_Lep_23</DialogueTarget>
+                </DialogueOption>
+            </DialogueOptionsList>
+        </DialogueNode>
+        
+        <DialogueNode>
+            <Name>SE_Ernesto_Lep_21</Name>
+            <Dialogue>
+                <Page>Impossible... the only way Slate could know about the pot of gold was if they were also a leprechaun...</Page>
+            </Dialogue>
+            
+            <DialogueOptionsList>
+                <DialogueOption>
+                    <Text>Wait, so there <![CDATA[<i>]]>is<![CDATA[</i>]]> a pot of gold at the end of the rainbow?</Text>
+                    <DialogueTarget>SE_Ernesto_Lep_211</DialogueTarget>
+                </DialogueOption>
+            </DialogueOptionsList>
+        </DialogueNode>
+        
+        <DialogueNode>
+            <Name>SE_Ernesto_Lep_211</Name>
+            <Dialogue>
+                <Page>No, of course not, what an absurd idea. Rainbows don't have an end, they just disappear.</Page>
+                <Page>There is a pot of gold, though. I hid it somewhere. Probably would have been useful when the stock market crashed in Dark Bramble.</Page>
+            </Dialogue>
+        </DialogueNode>
+        
+        <DialogueNode>
+            <Name>SE_Ernesto_Lep_22</Name>
+            <Dialogue>
+                <Page>Nice try. If you had really talked to Geswaldo, I would know. I'm always watching...</Page>
+                <Page>You know, sometimes I wish I could stop. You do some weird stuff.</Page>
+            </Dialogue>
+        </DialogueNode>
+    
+        <DialogueNode>
+            <Name>SE_Ernesto_Lep_23</Name>
+            <Dialogue>
+                <Page>Oh. I guess you learned from the best, then.</Page>
+            </Dialogue>
+        </DialogueNode>
+        
+        <DialogueNode>
+            <Name>SE_Ernesto_Holidays</Name>
+            <Dialogue>
+                <Page>Yeah, we have something called Saint Angler's Day. You get eaten if you aren't wearing green.</Page>
+            </Dialogue>
+            
+            <DialogueOptionsList>
+                <DialogueOption>
+                    <Text>How are you supposed to wear green, though? Nothing in Dark Bramble is green.</Text>
+                    <DialogueTarget>SE_Ernesto_Holidays_2</DialogueTarget>
+                </DialogueOption>
+            </DialogueOptionsList>
+        </DialogueNode>
+        
+        <DialogueNode>
+            <Name>SE_Ernesto_Holidays_2</Name>
+            <Dialogue>
+                <Page>Well, anglerfish are also blind, so they can't see who's wearing green anyway.</Page>
+                <Page>I think anglerfish just use it as an excuse to eat other anglerfish. Some of us have started calling it Purge Day.</Page>
+            </Dialogue>
+        </DialogueNode>
     
 SEPARATOR_CONDITIONAL_OPTIONS
 
