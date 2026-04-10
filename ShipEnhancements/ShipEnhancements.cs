@@ -259,6 +259,8 @@ public class ShipEnhancements : ModBehaviour
         enableQuantumShip,
         persistentShipState,
         enableGasLeak,
+        disableSignalscopeBrackets,
+        enableShipSignalscopeZoom
     }
 
     private readonly string[] startupMessages =
