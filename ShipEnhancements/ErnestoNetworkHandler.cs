@@ -47,7 +47,7 @@ public static class ErnestoNetworkHandler
                 }
 
                 ActiveModList = activeMods;
-                ShipEnhancements.Instance.ModHelper.Storage.Save(modListResponse.Result, 
+                ShipEnhancements.Instance.ModHelper.Storage.Save(jsonValues, 
                     "dialogue/ErnestoModList.json");
             
                 ShipEnhancements.WriteDebugMessage("Number of Ernestos: " + ActiveModList.Count);
@@ -85,8 +85,8 @@ public static class ErnestoNetworkHandler
         if (dialogueResponse != null && dialogueResponse.Result != "404: Not Found")
         {
             ActiveDialogue = new TextAsset(dialogueResponse.Result);
-            ShipEnhancements.Instance.ModHelper.Storage.Save(dialogueResponse.Result, 
-                "dialogue/ErnestoDialogue.txt");
+            File.WriteAllText(Path.Combine(ShipEnhancements.Instance.ModHelper.Manifest.ModFolderPath +
+                "dialogue/ErnestoDialogue.txt"), dialogueResponse.Result.Replace("\n", System.Environment.NewLine));
         }
         else
         {
