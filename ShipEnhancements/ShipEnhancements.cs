@@ -2890,6 +2890,19 @@ public class ShipEnhancements : ModBehaviour
 
         Destroy(toolRef.gameObject);
 
+        Transform cockpitAudioParent = new GameObject("ShipCockpitAudio").transform;
+        cockpitAudioParent.parent = SELocator.GetShipTransform().Find("Module_Cockpit");
+        cockpitAudioParent.localPosition = Vector3.zero;
+        cockpitAudioParent.localRotation = Quaternion.identity;
+
+        shipAudio._cockpitSource.transform.parent = cockpitAudioParent;
+        shipAudio._cockpitInstrumentsAudioSource.transform.parent = cockpitAudioParent;
+        shipAudio._cockpitInstrumentsAudioSource2.transform.parent = cockpitAudioParent;
+        shipAudio._glassCrackSource.transform.parent = cockpitAudioParent;
+        shipAudio._ejectCoverSource.transform.parent = cockpitAudioParent;
+        shipAudio._signalscopeSource.transform.parent = cockpitAudioParent;
+        shipAudio._probeScreenSource.transform.parent = cockpitAudioParent;
+
         GameObject ejectAudioObj = LoadPrefab("Assets/ShipEnhancements/EjectAudio.prefab");
         CreateObject(ejectAudioObj, shipAudio.transform.Find("ShipInteriorAudio")).name = "EjectAudio";
     }
