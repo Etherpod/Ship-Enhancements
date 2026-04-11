@@ -12,6 +12,7 @@ using OWML.ModHelper.Menus.NewMenuSystem;
 using Newtonsoft.Json.Linq;
 using UnityEngine.InputSystem;
 using System.Globalization;
+using System.Text.RegularExpressions;
 using UnityEngine.UI;
 using Newtonsoft.Json;
 using ShipEnhancements.Models.Json;
@@ -3266,8 +3267,6 @@ public class ShipEnhancements : ModBehaviour
 
     public static void WriteDebugMessage(object msg, bool warning = false, bool error = false)
     {
-        return;
-
         msg ??= "null";
 
         if (warning)
@@ -3536,7 +3535,7 @@ public class ShipEnhancements : ModBehaviour
         IOptionsMenuManager OptionsMenuManager = menuManager.OptionsMenuManager;
 
         var menus = typeof(MenuManager).GetField("ModSettingsMenus", BindingFlags.Public
-            | BindingFlags.NonPublic | BindingFlags.Static).GetValue(menuManager)
+            | BindingFlags.NonPublic | BindingFlags.Static)?.GetValue(menuManager)
             as List<(IModBehaviour behaviour, Menu modMenu)>;
 
         Menu newModTab = null;
@@ -3567,6 +3566,8 @@ public class ShipEnhancements : ModBehaviour
 
         if (startSetting == "")
         {
+            CreateChangelogButton(newModTab, OptionsMenuManager);
+            
             OptionsMenuManager.AddSeparator(newModTab, true);
             OptionsMenuManager.CreateLabel(newModTab, "Any changes to the settings are applied on the next loop!");
             OptionsMenuManager.AddSeparator(newModTab, true);
@@ -3884,9 +3885,112 @@ public class ShipEnhancements : ModBehaviour
         }, 5);
     }
 
-    private void CreateSideLabel(Menu menu, string label)
+    private void CreateChangelogButton(Menu modMenu, IOptionsMenuManager optionsManager)
     {
-        var newObj = new GameObject("Label");
+        //var popupController = StartupPopupPatches.menuManager.PopupMenuManager;
+        
+        var submitAction = optionsManager.CreateButton(modMenu, "View Changelog",
+            "Opens a menu showing the release notes for each update.", MenuSide.CENTER);
+        
+        submitAction.OnSubmitAction += () =>
+        {
+            StreamReader reader = new StreamReader("E:/Downloads/testchangelog.txt");
+            
+            var newTab = optionsManager.CreateStandardTab("CHANGELOG");
+            var newMenu = newTab.menu;
+
+            optionsManager.CreateLabel(newMenu, "Ship Enhancements - Release Notes");
+
+            var returnButton = optionsManager.CreateButton(newMenu, "Close", 
+                "Return to the Ship Enhancements settings menu.", MenuSide.CENTER);
+            returnButton.OnSubmitAction += () =>
+            {
+                //optionsManager.OpenOptionsAtTab(modMenu);
+
+                // Give time for the modsMenu to activate before switching tabs
+                var modsMenu = newMenu.transform.parent.Find("Menu-MODS").GetComponent<TabbedMenu>();
+                var seButton = modsMenu.transform
+                    .Find("MenuMODS/Scroll View/Viewport/Content/UIElement-Ship Enhancements")
+                    .GetComponentInChildren<SubmitAction>();
+                ModHelper.Events.Unity.FireInNUpdates(() => seButton.Submit(), 2);
+            };
+
+            optionsManager.AddSeparator(newMenu, true);
+            
+            newMenu.OnActivateMenu += () =>
+            {
+                var settingsMenuView = FindObjectOfType<SettingsMenuView>();
+                settingsMenuView._resetToDefaultsPrompt.SetText($"This button does nothing");
+                settingsMenuView._resetToDefaultButton.RefreshTextAndImages(false);
+            };
+
+            var logText = reader.ReadToEnd();
+            logText = Regex.Replace(logText, @"(\*\*)([^\*]*)(\*\*)", "<b>$2</b>");
+            logText = Regex.Replace(logText, @"(\n?\r?)*(?<=\n|^)#\s(.*)\b(\n?\r?)*", "\n\n\n<size=36><b>$2</b></size>\n\n");
+            logText = Regex.Replace(logText, @"(?<=\n|^)-\s(?!\s)", "\t\u2022  ");
+            string[] logs = Regex.Split(logText, @"(?<=\n|^)---\b");
+
+            // shave one off because of weird whitespace split at start
+            int stepCount = logs.Length - 1;
+            for (int i = 1; i < logs.Length; i++)
+            {
+                if (logs[i].Length < 15)
+                {
+                    ShipEnhancements.WriteDebugMessage("die");
+                    continue;
+                }
+                ShipEnhancements.WriteDebugMessage("Processing " + logs[i].Substring(0, 15));
+                var titleText = Regex.Match(logs[i], @"^.*\b");
+                logs[i] = Regex.Replace(logs[i], $@"({titleText})(\n?\r?)*", "");
+                CreateSideLabel(newMenu, titleText.Value, 45);
+                optionsManager.AddSeparator(newMenu, true);
+                optionsManager.CreateLabel(newMenu, logs[i]);
+            }
+
+            ModHelper.Events.Unity.FireOnNextUpdate(() =>
+            {
+                var labelParent = newMenu.transform.Find("Scroll View/Viewport/Content");
+                for (int i = labelParent.childCount - 1; i >= 0; i--)
+                {
+                    if (labelParent.GetChild(i).name == "Label")
+                    {
+                        var text = labelParent.GetChild(i).Find("Text").GetComponent<Text>();
+                        text.alignment = TextAnchor.MiddleLeft;
+                        text.fontSize = (int)(text.fontSize * 0.75f);
+                        text.font = TextTranslation.GetFont(true);
+                        labelParent.GetChild(i).GetComponent<VerticalLayoutGroup>().childAlignment = TextAnchor.MiddleLeft;
+
+                        ShipEnhancements.WriteDebugMessage(stepCount);
+                        stepCount--;
+                        if (stepCount <= 0)
+                        {
+                            break;
+                        }
+                    }
+                }
+            });
+
+            newMenu.OnDeactivateMenu += () =>
+            {
+                // Fixes tab dissapearing when you click on it again
+                // Clicking on a tab closes and opens it again
+                ModHelper.Events.Unity.FireOnNextUpdate(() =>
+                {
+                    if (!newMenu._isActivated)
+                    {
+                        optionsManager.RemoveTab(newMenu);
+                    }
+                });
+            };
+            
+            optionsManager.OpenOptionsAtTab(newTab.button);
+            Locator.GetMenuAudioController().PlayChangeTab();
+        };
+    }
+
+    private void CreateSideLabel(Menu menu, string label, int fontSize = 36)
+    {
+        var newObj = new GameObject("SideLabel");
 
         var layoutElement = newObj.AddComponent<LayoutElement>();
         layoutElement.flexibleWidth = 1;
@@ -3907,7 +4011,7 @@ public class ShipEnhancements : ModBehaviour
         var text = textObj.AddComponent<Text>();
         text.text = label;
         text.font = Resources.Load<Font>("fonts/english - latin/Adobe - SerifGothicStd");
-        text.fontSize = 36;
+        text.fontSize = fontSize;
         text.alignment = TextAnchor.MiddleLeft;
         text.horizontalOverflow = HorizontalWrapMode.Wrap;
         text.verticalOverflow = VerticalWrapMode.Truncate;
