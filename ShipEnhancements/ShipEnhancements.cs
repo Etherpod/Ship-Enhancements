@@ -428,6 +428,15 @@ public class ShipEnhancements : ModBehaviour
         RadioType = EnumUtils.Create<ItemType>("Radio");
         ResourcePumpType = EnumUtils.Create<ItemType>("ResourcePump");
         ShipSignalName = EnumUtils.Create<SignalName>("Ship");
+        
+        SaveData = ModHelper.Storage.Load<SaveDataJson>("save.json");
+        ShipEnhancements.WriteDebugMessage("Save data: " + SaveData?.LastChangelogVersion);
+        if (SaveData == null)
+        {
+            ShipEnhancements.WriteDebugMessage("update save");
+            SaveData = new SaveDataJson();
+            ModHelper.Storage.Save(SaveData, "save.json");
+        }
 
         SEItemAudioController.Initialize();
         UpdateExperimentalSettings();
@@ -445,6 +454,15 @@ public class ShipEnhancements : ModBehaviour
 
         LoadManager.OnCompleteSceneLoad += (scene, loadScene) =>
         {
+            SaveData = ModHelper.Storage.Load<SaveDataJson>("save.json");
+            ShipEnhancements.WriteDebugMessage("Save data: " + SaveData);
+            if (SaveData == null)
+            {
+                ShipEnhancements.WriteDebugMessage("update save");
+                SaveData = new SaveDataJson();
+                ModHelper.Storage.Save(SaveData, "save.json");
+            }
+            
             GetComponent<PersistentShipState>()?.OnCompleteSceneLoad(scene, loadScene);
             
             if (loadScene != OWScene.SolarSystem || IsWarpingBackToEye)
@@ -474,13 +492,6 @@ public class ShipEnhancements : ModBehaviour
             ShipRepairLimitController.SetRepairLimit(-1);
             ShipRepairLimitController.SetPartsRepaired(0);
             ErnestoDetectiveController.Initialize();
-
-            SaveData = ModHelper.Storage.Load<SaveDataJson>("save.json");
-            if (SaveData == null)
-            {
-                SaveData = new SaveDataJson();
-                ModHelper.Storage.Save(SaveData, "save.json");
-            }
 
             if (AchievementsAPI != null)
             {
@@ -703,6 +714,26 @@ public class ShipEnhancements : ModBehaviour
     {
         if (SaveData == null) SaveData = new();
         Instance.ModHelper.Storage.Save(SaveData, "save.json");
+    }
+
+    private bool IsChangelogUpdated()
+    {
+        var currentVersion = "Release v" + ModHelper.Manifest.Version;
+        return currentVersion == SaveData.LastChangelogVersion;
+    }
+
+    private bool TryUpdateChangelogVersion()
+    {
+        var currentVersion = "Release v" + ModHelper.Manifest.Version;
+        if (currentVersion != SaveData.LastChangelogVersion)
+        {
+            ShipEnhancements.WriteDebugMessage($"Updated from {SaveData.LastChangelogVersion} to {currentVersion}");
+            SaveData.LastChangelogVersion = currentVersion;
+            UpdateSaveFile();
+            return true;
+        }
+
+        return false;
     }
 
     private void Update()
@@ -3887,14 +3918,22 @@ public class ShipEnhancements : ModBehaviour
 
     private void CreateChangelogButton(Menu modMenu, IOptionsMenuManager optionsManager)
     {
-        //var popupController = StartupPopupPatches.menuManager.PopupMenuManager;
-        
-        var submitAction = optionsManager.CreateButton(modMenu, "View Changelog",
-            "Opens a menu showing the release notes for each update.", MenuSide.CENTER);
+        SubmitAction submitAction;
+        if (IsChangelogUpdated())
+        {
+            submitAction = optionsManager.CreateButton(modMenu, "View Changelog",
+                "Opens a menu showing the release notes for each update.", MenuSide.CENTER);
+        }
+        else
+        {
+            submitAction = CreateButtonWithIndicator(modMenu, "View Changelog",
+                "Opens a menu showing the release notes for each update.", MenuSide.CENTER);
+        }
         
         submitAction.OnSubmitAction += () =>
         {
-            StreamReader reader = new StreamReader("E:/Downloads/testchangelog.txt");
+            var path = Path.Combine(ModHelper.Manifest.ModFolderPath, "dialogue/changelog.txt");
+            StreamReader reader = new StreamReader(path);
             
             var newTab = optionsManager.CreateStandardTab("CHANGELOG");
             var newMenu = newTab.menu;
@@ -3902,7 +3941,7 @@ public class ShipEnhancements : ModBehaviour
             optionsManager.CreateLabel(newMenu, "Ship Enhancements - Release Notes");
 
             var returnButton = optionsManager.CreateButton(newMenu, "Close", 
-                "Return to the Ship Enhancements settings menu.", MenuSide.CENTER);
+                "Close the changelog to return to the Ship Enhancements settings menu.", MenuSide.CENTER);
             returnButton.OnSubmitAction += () =>
             {
                 //optionsManager.OpenOptionsAtTab(modMenu);
@@ -3925,50 +3964,32 @@ public class ShipEnhancements : ModBehaviour
             };
 
             var logText = reader.ReadToEnd();
-            logText = Regex.Replace(logText, @"(\*\*)([^\*]*)(\*\*)", "<b>$2</b>");
+            logText = Regex.Replace(logText, @"\*\*((.(?!\*\*))*[^*]?)\*\*", "<b>$1</b>");
             logText = Regex.Replace(logText, @"(\n?\r?)*(?<=\n|^)#\s(.*)\b(\n?\r?)*", "\n\n\n<size=36><b>$2</b></size>\n\n");
             logText = Regex.Replace(logText, @"(?<=\n|^)-\s(?!\s)", "\t\u2022  ");
+            logText = Regex.Replace(logText, @"(?<=\n|^)\s\s-\s(?!\s)", "\t\t\u25E6  ");
             string[] logs = Regex.Split(logText, @"(?<=\n|^)---\b");
-
+            
             // shave one off because of weird whitespace split at start
-            int stepCount = logs.Length - 1;
             for (int i = 1; i < logs.Length; i++)
             {
-                if (logs[i].Length < 15)
+                if (string.IsNullOrWhiteSpace(logs[i]))
                 {
-                    ShipEnhancements.WriteDebugMessage("die");
                     continue;
                 }
-                ShipEnhancements.WriteDebugMessage("Processing " + logs[i].Substring(0, 15));
+                
                 var titleText = Regex.Match(logs[i], @"^.*\b");
+                
+                if (!IsChangelogUpdated() && titleText.Value == SaveData.LastChangelogVersion)
+                {
+                    CreateUnreadSeparator(newMenu);
+                }
+                
                 logs[i] = Regex.Replace(logs[i], $@"({titleText})(\n?\r?)*", "");
                 CreateSideLabel(newMenu, titleText.Value, 45);
                 optionsManager.AddSeparator(newMenu, true);
-                optionsManager.CreateLabel(newMenu, logs[i]);
+                CreateTextField(newMenu, logs[i], 27, true);
             }
-
-            ModHelper.Events.Unity.FireOnNextUpdate(() =>
-            {
-                var labelParent = newMenu.transform.Find("Scroll View/Viewport/Content");
-                for (int i = labelParent.childCount - 1; i >= 0; i--)
-                {
-                    if (labelParent.GetChild(i).name == "Label")
-                    {
-                        var text = labelParent.GetChild(i).Find("Text").GetComponent<Text>();
-                        text.alignment = TextAnchor.MiddleLeft;
-                        text.fontSize = (int)(text.fontSize * 0.75f);
-                        text.font = TextTranslation.GetFont(true);
-                        labelParent.GetChild(i).GetComponent<VerticalLayoutGroup>().childAlignment = TextAnchor.MiddleLeft;
-
-                        ShipEnhancements.WriteDebugMessage(stepCount);
-                        stepCount--;
-                        if (stepCount <= 0)
-                        {
-                            break;
-                        }
-                    }
-                }
-            });
 
             newMenu.OnDeactivateMenu += () =>
             {
@@ -3985,7 +4006,223 @@ public class ShipEnhancements : ModBehaviour
             
             optionsManager.OpenOptionsAtTab(newTab.button);
             Locator.GetMenuAudioController().PlayChangeTab();
+            
+            TryUpdateChangelogVersion();
         };
+    }
+
+    private SubmitAction CreateButtonWithIndicator(Menu menu, string buttonLabel, string tooltip, MenuSide side)
+    {
+        var rootObj = new GameObject($"UIElement-{buttonLabel}");
+        var parent = menu.transform;
+
+        if (menu.transform.Find("Scroll View") != null)
+        {
+            parent = menu.transform.Find("Scroll View").Find("Viewport").Find("Content");
+        }
+
+        if (menu.transform.Find("Content") != null)
+        {
+            parent = menu.transform.Find("Content");
+        }
+
+        rootObj.transform.parent = parent;
+        rootObj.transform.localScale = Vector3.one;
+        rootObj.transform.localRotation = Quaternion.identity;
+        rootObj.transform.localPosition = Vector3.zero;
+
+        var layoutElement = rootObj.AddComponent<LayoutElement>();
+        layoutElement.minHeight = 70;
+        layoutElement.flexibleWidth = 1;
+
+        var existingHorizLayout = Resources.FindObjectsOfTypeAll<Menu>()
+            .Single(x => x.name == "GraphicsMenu").transform
+            .Find("Scroll View")
+            .Find("Viewport")
+            .Find("Content")
+            .Find("UIElement-ResolutionSelect")
+            .Find("HorizontalLayoutGroup").gameObject;
+
+        var newHorizLayout = Instantiate(existingHorizLayout, rootObj.transform);
+        newHorizLayout.name = "HorizontalLayoutGroup";
+        newHorizLayout.transform.localPosition = Vector3.zero;
+        newHorizLayout.transform.localScale = Vector3.one;
+        newHorizLayout.transform.localRotation = Quaternion.identity;
+
+        var hrt = newHorizLayout.GetComponent<RectTransform>();
+        var ohrt = existingHorizLayout.GetComponent<RectTransform>();
+        //hrt.anchorMin = ohrt.anchorMin;
+        //hrt.anchorMax = ohrt.anchorMax;
+        hrt.offsetMin = ohrt.offsetMin;
+        hrt.offsetMax = ohrt.offsetMax;
+        hrt.anchoredPosition3D = ohrt.anchoredPosition3D;
+        hrt.sizeDelta = ohrt.sizeDelta;
+
+        hrt.anchorMax = new Vector2(0.5f, 1f);
+        switch (side)
+        {
+            case MenuSide.LEFT:
+                hrt.anchorMin = new Vector2(0f, 1f);
+                break;
+            case MenuSide.CENTER:
+                hrt.anchorMin = new Vector2(0.25f, 1f);
+                break;
+            case MenuSide.RIGHT:
+                hrt.anchorMin = new Vector2(0.5f, 1f);
+                break;
+        }
+
+        Destroy(newHorizLayout.GetComponentInChildren<LocalizedText>());
+
+        var oldLabelComponent = newHorizLayout.transform
+            .Find("LabelBlock")
+            .Find("HorizontalLayoutGroup")
+            .Find("Label")
+            .GetComponent<Text>();
+        var labelFont = Resources.FindObjectsOfTypeAll<Font>().First(x => x.name == "Adobe - SerifGothicStd-ExtraBold");
+        var labelFontSize = 28;
+
+        Destroy(newHorizLayout.transform.Find("LabelBlock").gameObject);
+
+        var controlBlock = newHorizLayout.transform.Find("ControlBlock");
+        Destroy(controlBlock.Find("OptionSelectorBG").gameObject);
+        Destroy(controlBlock.Find("HorizontalLayoutGroup").gameObject);
+
+        var existingButton = Resources.FindObjectsOfTypeAll<Button>().First(x => x.name == "UIElement-ButtonContinue");
+
+        var newButtonObj = Instantiate(existingButton, controlBlock);
+        newButtonObj.transform.localPosition = Vector3.zero;
+        newButtonObj.transform.localScale = Vector3.one;
+        newButtonObj.name = $"UIElement-Button-{buttonLabel}";
+        newButtonObj.transform.localRotation = Quaternion.identity;
+
+        Destroy(newButtonObj.transform.Find("ForegroundLayoutGroup/RightSpacer").gameObject);
+        Destroy(newButtonObj.transform.Find("ForegroundLayoutGroup/LeftSpacer").gameObject);
+
+        Destroy(newButtonObj.GetComponent<SubmitAction>());
+        var submitAction = newButtonObj.gameObject.AddComponent<SubmitAction>();
+
+        Destroy(newButtonObj.gameObject.GetComponentInChildren<LocalizedText>());
+
+        var menuOption = newButtonObj.gameObject.GetAddComponent<MenuOption>();
+        menuOption._tooltipTextType = UITextType.None;
+        menuOption._overrideTooltipText = tooltip;
+        menuOption._label = newButtonObj.GetComponentInChildren<Text>();
+        menuOption._label.text = buttonLabel;
+        menuOption._label.font = labelFont;
+        menuOption._label.fontSize = labelFontSize;
+
+        menu._menuOptions = menu._menuOptions.Add(menuOption);
+        
+        var textObj = new GameObject("Text");
+
+        var text = textObj.AddComponent<Text>();
+        text.text = "NEW!";
+        text.font = labelFont;
+        text.fontSize = 20;
+        text.alignment = TextAnchor.MiddleRight;
+        text.horizontalOverflow = HorizontalWrapMode.Wrap;
+        text.verticalOverflow = VerticalWrapMode.Truncate;
+        text.raycastTarget = false;
+
+        var textLayoutElement = textObj.AddComponent<LayoutElement>();
+        textLayoutElement.minHeight = 70;
+
+        textObj.transform.parent = newButtonObj.transform;
+        textObj.transform.localScale = Vector3.one;
+        textObj.transform.localPosition = Vector3.zero;
+        textObj.transform.localRotation = Quaternion.identity;
+
+        var rect = textObj.GetComponent<RectTransform>();
+        rect.sizeDelta = new Vector2(550f, rect.sizeDelta.y);
+
+        textObj.AddComponent<UIFlashingText>();
+
+        if (menu._selectOnActivate == null)
+        {
+            menu._selectOnActivate = newButtonObj.GetComponent<Selectable>();
+        }
+
+        return submitAction;
+    }
+
+    private GameObject CreateUnreadSeparator(Menu menu)
+    {
+        var separatorObj = new GameObject("separator");
+        var layoutElement = separatorObj.AddComponent<LayoutElement>();
+        layoutElement.flexibleWidth = 1;
+        layoutElement.preferredHeight = 70;
+
+        var parent = menu.transform;
+
+        if (menu.transform.Find("Scroll View") != null)
+        {
+            parent = menu.transform.Find("Scroll View").Find("Viewport").Find("Content");
+        }
+
+        if (menu.transform.Find("Content") != null)
+        {
+            parent = menu.transform.Find("Content");
+        }
+
+        separatorObj.transform.parent = parent;
+        separatorObj.transform.localScale = Vector3.one;
+
+        /*var dotsSprite = Resources.FindObjectsOfTypeAll<TabbedSubMenu>()
+            .Single(x => x.name == "GameplayMenu").transform
+            .Find("MenuGameplayBasic/Scroll View/Viewport/Content")
+            .Find("UIElement-ControllerProfile")
+            .Find("HorizontalLayoutGroup")
+            .Find("LabelBlock")
+            .Find("LineBreak_Dots")
+            .GetComponent<Image>()
+            .sprite;*/
+        
+        var dotsImage = (Texture2D)LoadAsset("Assets/ShipEnhancements/UI_Menu_ChangelogUnreadSeparator.png");
+        var dotsSprite = Sprite.Create(dotsImage, new Rect(0f, 0f, 1512f, 59f), new Vector2(0.5f, 0.5f));
+
+        var imageObj = new GameObject("dots");
+        imageObj.transform.parent = separatorObj.transform;
+        imageObj.transform.localPosition = Vector3.zero;
+        imageObj.transform.localScale = Vector3.one;
+
+        var rt = imageObj.GetAddComponent<RectTransform>();
+        rt.anchorMin = new Vector2(0, 0.5f);
+        rt.anchorMax = new Vector2(1, 0.5f);
+        rt.pivot = new Vector2(0.5f, 0.5f);
+        rt.sizeDelta = new Vector2(0, 29.25f);
+        rt.offsetMin = new Vector2(0, rt.offsetMin.y);
+        rt.offsetMax = new Vector2(0, rt.offsetMax.y);
+        rt.anchoredPosition = new Vector2(0, 0);
+        rt.localScale = Vector3.one;
+
+        var image = imageObj.AddComponent<Image>();
+        image.sprite = dotsSprite;
+        //image.color = new Color(0.2196079f, 0.2196079f, 0.2196079f);
+        image.type = Image.Type.Tiled;
+        image.pixelsPerUnitMultiplier = 2f;
+        image.preserveAspect = true;
+        
+        var labelImage = (Texture2D)LoadAsset("Assets/ShipEnhancements/UI_Menu_ChangelogUnreadLabel.png");
+        var labelSprite = Sprite.Create(labelImage, new Rect(0f, 0f, 1512f, 59f), new Vector2(0.5f, 0.5f));
+
+        var labelObj = Instantiate(imageObj, imageObj.transform);
+        labelObj.name = "label";
+        labelObj.transform.parent = separatorObj.transform;
+        labelObj.transform.localPosition = Vector3.zero;
+        labelObj.transform.localScale = Vector3.one;
+        
+        rt = labelObj.GetAddComponent<RectTransform>();
+        rt.pivot = new Vector2(0f, 0.5f);
+        
+        var image2 = labelObj.GetComponent<Image>();
+        image2.sprite = labelSprite;
+        //image2.color = new Color(0.2196079f, 0.2196079f, 0.2196079f);
+        image2.type = Image.Type.Simple;
+        image2.pixelsPerUnitMultiplier = 2f;
+        image2.preserveAspect = true;
+
+        return separatorObj;
     }
 
     private void CreateSideLabel(Menu menu, string label, int fontSize = 36)
@@ -4011,6 +4248,67 @@ public class ShipEnhancements : ModBehaviour
         var text = textObj.AddComponent<Text>();
         text.text = label;
         text.font = Resources.Load<Font>("fonts/english - latin/Adobe - SerifGothicStd");
+        text.fontSize = fontSize;
+        text.alignment = TextAnchor.MiddleLeft;
+        text.horizontalOverflow = HorizontalWrapMode.Wrap;
+        text.verticalOverflow = VerticalWrapMode.Truncate;
+
+        var textLayoutElement = textObj.AddComponent<LayoutElement>();
+        textLayoutElement.minHeight = 70;
+
+        textObj.transform.parent = newObj.transform;
+        textObj.transform.localScale = Vector3.one;
+        textObj.transform.localPosition = Vector3.zero;
+        textObj.transform.localRotation = Quaternion.identity;
+
+        var parent = menu.transform;
+
+        if (menu.transform.Find("Scroll View") != null)
+        {
+            parent = menu.transform.Find("Scroll View").Find("Viewport").Find("Content");
+        }
+
+        if (menu.transform.Find("Content") != null)
+        {
+            parent = menu.transform.Find("Content");
+        }
+
+        newObj.transform.parent = parent;
+        newObj.transform.localScale = Vector3.one;
+        newObj.transform.localPosition = Vector3.zero;
+        newObj.transform.localRotation = Quaternion.identity;
+    }
+
+    private void CreateTextField(Menu menu, string data, int fontSize = 36, bool dynamic = false)
+    {
+        var newObj = new GameObject("TextField");
+
+        var layoutElement = newObj.AddComponent<LayoutElement>();
+        layoutElement.flexibleWidth = 1;
+
+        var verticalLayout = newObj.AddComponent<VerticalLayoutGroup>();
+        verticalLayout.padding = new RectOffset(100, 100, 0, 0);
+        verticalLayout.spacing = 0;
+        verticalLayout.childAlignment = TextAnchor.MiddleLeft;
+        verticalLayout.childForceExpandHeight = false;
+        verticalLayout.childForceExpandWidth = false;
+        verticalLayout.childControlHeight = true;
+        verticalLayout.childControlWidth = true;
+        verticalLayout.childScaleHeight = false;
+        verticalLayout.childScaleWidth = false;
+
+        var textObj = new GameObject("Text");
+
+        var text = textObj.AddComponent<Text>();
+        text.text = data;
+        if (dynamic)
+        {
+            text.font = TextTranslation.GetFont(true);
+        }
+        else
+        {
+            text.font = Resources.Load<Font>("fonts/english - latin/Adobe - SerifGothicStd");
+        }
         text.fontSize = fontSize;
         text.alignment = TextAnchor.MiddleLeft;
         text.horizontalOverflow = HorizontalWrapMode.Wrap;
