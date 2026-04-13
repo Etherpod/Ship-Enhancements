@@ -2645,22 +2645,110 @@ public static class PatchClass
     [HarmonyPatch(typeof(AudioSignal), nameof(AudioSignal.UpdateSignalStrength))]
     public static bool RemoveSignalFromShip(AudioSignal __instance, Signalscope scope, float distToClosestScopeObstruction)
     {
-        if (OWInput.IsInputMode(InputMode.ShipCockpit) && SELocator.GetSignalscopeComponent() != null
-            && SELocator.GetSignalscopeComponent().isDamaged)
-        {
-            __instance._canBePickedUpByScope = false;
-            __instance._signalStrength = 0f;
-            __instance._degreesFromScope = 180f;
-            return false;
-        }
-
         if (__instance is ShipAudioSignal)
         {
             (__instance as ShipAudioSignal).UpdateShipSignalStrength(scope, distToClosestScopeObstruction);
             return false;
         }
 
-        return true;
+        if (!OWInput.IsInputMode(InputMode.ShipCockpit) || SELocator.GetSignalscopeComponent() == null
+            || !SELocator.GetSignalscopeComponent().isDamaged)
+        {
+            return true;
+        }
+        
+        __instance._canBePickedUpByScope = false;
+        
+		if (__instance._sunController != null && __instance._sunController.IsPointInsideSupernova(__instance.transform.position))
+		{
+			__instance._signalStrength = 0f;
+			__instance._degreesFromScope = 180f;
+			return false;
+		}
+        
+		if (Locator.GetQuantumMoon() != null && Locator.GetQuantumMoon().IsPlayerInside() && __instance._name != SignalName.Quantum_QM)
+		{
+			__instance._signalStrength = 0f;
+			__instance._degreesFromScope = 180f;
+			return false;
+		}
+        
+		if (!__instance._active || !__instance.gameObject.activeInHierarchy || 
+            __instance._outerFogWarpVolume != PlayerState.GetOuterFogWarpVolume() || 
+            (scope.GetFrequencyFilter() & __instance._frequency) != __instance._frequency)
+		{
+			__instance._signalStrength = 0f;
+			__instance._degreesFromScope = 180f;
+			return false;
+		}
+        
+		__instance._scopeToSignal = __instance.transform.position - scope.transform.position;
+		__instance._distToScope = __instance._scopeToSignal.magnitude;
+        
+		if (__instance._outerFogWarpVolume == null && distToClosestScopeObstruction < 1000f && __instance._distToScope > 1000f)
+		{
+			__instance._signalStrength = 0f;
+			__instance._degreesFromScope = 180f;
+			return false;
+		}
+        
+		__instance._canBePickedUpByScope = true;
+        
+		if (__instance._distToScope < __instance._sourceRadius)
+		{
+			__instance._signalStrength = 1f;
+		}
+		else
+		{
+			__instance._degreesFromScope = Vector3.Angle(scope.GetScopeDirection(), __instance._scopeToSignal);
+            
+			float distLerp = Mathf.InverseLerp(2000f, 1000f, __instance._distToScope);
+            float distLerp2 = Mathf.InverseLerp(5000f, 500f, __instance._distToScope);
+			float minStrengthCutoff = Mathf.Lerp(71f, 90f, distLerp);
+            
+			float sourceAngle = 57.29578f * Mathf.Atan2(__instance._sourceRadius, __instance._distToScope);
+			float clampedSourceAngle = Mathf.Lerp(Mathf.Max(sourceAngle, Mathf.Lerp(50f, 40f, distLerp2 * distLerp2)), 
+                Mathf.Max(sourceAngle, Mathf.Lerp(30f, 20f, distLerp2 * distLerp2)), scope.GetZoomFraction());
+
+            var noise = Mathf.PerlinNoise(Time.timeSinceLevelLoad + Mathf.Cos(__instance._distToScope / 1400f), 
+                __instance._degreesFromScope / 45f + 5f * Mathf.Sin(__instance._distToScope / 1800f));
+            var angleDiff = Mathf.Lerp(20f, 3f, distLerp2);
+            clampedSourceAngle += Mathf.LerpUnclamped(-angleDiff, angleDiff, noise);
+            var strengthFactor = Mathf.LerpUnclamped(1.5f, 3f, noise);
+            
+            __instance._signalStrength = Mathf.Clamp01(
+                Mathf.InverseLerp(minStrengthCutoff, clampedSourceAngle, __instance._degreesFromScope)) / strengthFactor;
+        }
+        
+		if (Locator.GetCloakFieldController() != null)
+		{
+			float cloakMult = 1f - Locator.GetCloakFieldController().playerCloakFactor;
+			__instance._signalStrength *= cloakMult;
+			if (OWMath.ApproxEquals(cloakMult, 0f))
+			{
+				__instance._signalStrength = 0f;
+				__instance._degreesFromScope = 180f;
+				return false;
+			}
+		}
+        
+		if (__instance._distToScope < __instance._identificationDistance + __instance._sourceRadius && __instance._signalStrength > 0.9f)
+		{
+			if (!PlayerData.KnowsFrequency(__instance._frequency) && !__instance._preventIdentification)
+			{
+				__instance.IdentifyFrequency();
+			}
+			if (!PlayerData.KnowsSignal(__instance._name) && !__instance._preventIdentification)
+			{
+				__instance.IdentifySignal();
+			}
+			if (__instance._revealFactID.Length > 0)
+			{
+				Locator.GetShipLogManager().RevealFact(__instance._revealFactID, true, true);
+			}
+		}
+
+        return false;
     }
     #endregion
 
