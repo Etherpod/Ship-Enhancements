@@ -3194,8 +3194,34 @@ public static class PatchClass
         {
             OWRigidbody requiredComponent = collision.rigidbody.GetRequiredComponent<OWRigidbody>();
             ImpactData impactData = new ImpactData(__instance._owRigidbody, requiredComponent, collision);
-            item.OnImpact(impactData, parent);
+            item.OnImpact(impactData.speed, parent);
         }
+        
+        foreach (var contact in collision.contacts)
+        {
+            if (contact.thisCollider.TryGetComponent(out FuelTankCollider col))
+            {
+                OWRigidbody requiredComponent = collision.rigidbody.GetRequiredComponent<OWRigidbody>();
+                ImpactData impactData = new ImpactData(__instance._owRigidbody, requiredComponent, collision);
+                col.OnCollision(impactData);
+                return;
+            }
+        }
+    }
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ProbeAnchor), nameof(ProbeAnchor.AnchorToObject))]
+    public static bool ProbeTankExplosion(GameObject hitObject, ProbeAnchor __instance)
+    {
+        if (hitObject.TryGetComponent(out FuelTankCollider col))
+        {
+            Vector3 relativeVelocity = __instance._probeBody.GetVelocity() - 
+                hitObject.GetAttachedOWRigidbody().GetPointVelocity(__instance._probeBody.GetPosition());
+            col.GetComponentInParent<FuelTankItem>().OnImpact(relativeVelocity.magnitude);
+            return false;
+        }
+
+        return true;
     }
     #endregion
 

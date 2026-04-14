@@ -74,7 +74,8 @@ public class GravityRepelVolume : MonoBehaviour
     {
         for (int i = 0; i < _trackedObjects.Count; i++)
         {
-            if (!_trackedObjects[i].activeInHierarchy)
+            if (_trackedObjects[i] == null ||
+                !_trackedObjects[i].activeInHierarchy)
             {
                 _trackedObjects.RemoveAt(i);
                 i--;
@@ -82,7 +83,8 @@ public class GravityRepelVolume : MonoBehaviour
         }
         for (int k = 0; k < _trackedFluids.Count; k++)
         {
-            if (!_trackedFluids[k].activeInHierarchy)
+            if (_trackedFluids[k] == null ||
+                !_trackedFluids[k].activeInHierarchy)
             {
                 _trackedFluids.RemoveAt(k);
                 k--;

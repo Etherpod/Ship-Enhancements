@@ -90,8 +90,9 @@ public class SignalscopeComponent : ShipComponent
         }
     }
 
-    private void OnDestroy()
+    public override void OnDestroy()
     {
+        base.OnDestroy();
         GlobalMessenger<Signalscope>.RemoveListener("EquipSignalscope", OnEquipSignalscope);
         GlobalMessenger.RemoveListener("UnequipSignalscope", OnUnequipSignalscope);
     }

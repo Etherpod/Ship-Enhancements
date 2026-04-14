@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static ShipEnhancements.ShipEnhancements.Settings;
+using Random = UnityEngine.Random;
 
 namespace ShipEnhancements;
 
@@ -277,9 +279,9 @@ public class FuelTankItem : OWItem
         return _currentFuel / _maxFuel;
     }
 
-    public void OnImpact(ImpactData impact, Transform explosionParent = null)
+    public void OnImpact(float speed, Transform explosionParent = null)
     {
-        if (impact.speed > _explosionSpeed && _currentFuel > 0f)
+        if (speed > _explosionSpeed && _currentFuel > 0f)
         {
             if (GetComponentInParent<ShipBody>() && (!ShipEnhancements.InMultiplayer || ShipEnhancements.QSBAPI.GetIsHost()))
             {

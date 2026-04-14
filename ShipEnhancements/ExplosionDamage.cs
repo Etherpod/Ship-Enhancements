@@ -84,12 +84,17 @@ public class ExplosionDamage : MonoBehaviour
             _collider.enabled = false;
             return;
         }
+
+        float lerp = Mathf.Clamp01(_explosion._timer / _explosion._length);
+        _collider.radius = Mathf.Lerp(0.1f, 1f, lerp * 2f);
+    }
+
+    private void FixedUpdate()
+    {
         if (_unparent)
         {
             transform.position = _explosion.transform.position;
         }
-        float lerp = Mathf.Clamp01(_explosion._timer / _explosion._length);
-        _collider.radius = Mathf.Lerp(0.1f, 1f, lerp * 2f);
     }
 
     private void OnTriggerEnter(Collider hitObj)
