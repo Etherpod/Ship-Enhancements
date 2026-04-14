@@ -8,45 +8,9 @@ namespace ShipEnhancements;
 
 public class ExplosionDamage : MonoBehaviour
 {
-    public bool damageShip
-    {
-        get
-        {
-            return _damageShip;
-        }
-        set
-        {
-            _damageShip = value;
-        }
-    }
-
-    public bool damageFragment
-    {
-        get
-        {
-            return _damageFragment;
-        }
-        set
-        {
-            _damageFragment = value;
-        }
-    }
-
-    public bool unparent
-    {
-        get
-        {
-            return _unparent;
-        }
-        set
-        {
-            _unparent = value;
-        }
-    }
-
-    private bool _damageShip;
-    private bool _damageFragment;
-    private bool _unparent;
+    public bool damageShip { get; set; }
+    public bool damageFragment { get; set; }
+    public bool unparent { get; set; }
 
     private List<ShipHull> _trackedHulls = [];
     private SphereCollider _collider;
@@ -60,16 +24,16 @@ public class ExplosionDamage : MonoBehaviour
 
     private void Start()
     {
-        _collider.enabled = false;
+        _collider.GetComponent<OWCollider>().SetActivation(false);
         enabled = false;
     }
 
     public void OnExplode()
     {
         _collider.radius = 0.1f;
-        _collider.enabled = true;
+        _collider.GetComponent<OWCollider>().SetActivation(true);
         gameObject.layer = 0;
-        if (_unparent)
+        if (unparent)
         {
             transform.parent = null;
         }
@@ -81,7 +45,7 @@ public class ExplosionDamage : MonoBehaviour
         if (_explosion == null)
         {
             enabled = false;
-            _collider.enabled = false;
+            _collider.GetComponent<OWCollider>().SetActivation(false);
             return;
         }
 
@@ -91,7 +55,7 @@ public class ExplosionDamage : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (_unparent)
+        if (unparent)
         {
             transform.position = _explosion.transform.position;
         }
@@ -104,7 +68,7 @@ public class ExplosionDamage : MonoBehaviour
             return;
         }
 
-        if (_damageShip && (float)shipExplosionMultiplier.GetProperty() > 0 && (float)shipDamageMultiplier > 0)
+        if (damageShip && (float)shipExplosionMultiplier.GetProperty() > 0 && (float)shipDamageMultiplier > 0)
         {
             ShipHull hull = hitObj.GetComponentInParent<ShipHull>();
             if (hull != null && !_trackedHulls.Contains(hull))
@@ -128,7 +92,7 @@ public class ExplosionDamage : MonoBehaviour
                     newlyDamaged = true;
 
                     var eventDelegate = (MulticastDelegate)typeof(ShipHull).GetField("OnDamaged", BindingFlags.Instance
-                        | BindingFlags.NonPublic | BindingFlags.Public).GetValue(hull);
+                        | BindingFlags.NonPublic | BindingFlags.Public)?.GetValue(hull);
                     if (eventDelegate != null)
                     {
                         foreach (var handler in eventDelegate.GetInvocationList())
@@ -166,7 +130,7 @@ public class ExplosionDamage : MonoBehaviour
                 }
             }
         }
-        if (_damageFragment)
+        if (damageFragment)
         {
             FragmentIntegrity fragment = hitObj.GetComponentInParent<FragmentIntegrity>();
             if (fragment != null)

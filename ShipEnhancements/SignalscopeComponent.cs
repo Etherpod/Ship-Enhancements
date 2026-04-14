@@ -66,12 +66,15 @@ public class SignalscopeComponent : ShipComponent
         _startRotation = _dishTransform.localEulerAngles;
         _dishT = 0f;
 
-        _audioController._staticSource.Stop();
-        _audioController._staticSource._audioLibraryClip = AudioType.None;
-        _audioController._staticSource.clip = _brokenStatic;
-        if (_signalscope.IsEquipped())
+        if (PlayerState.AtFlightConsole())
         {
-            _audioController._staticSource.Play();
+            _audioController._staticSource.Stop();
+            _audioController._staticSource._audioLibraryClip = AudioType.None;
+            _audioController._staticSource.clip = _brokenStatic;
+            if (_signalscope.IsEquipped())
+            {
+                _audioController._staticSource.Play();
+            }
         }
     }
 
@@ -81,12 +84,15 @@ public class SignalscopeComponent : ShipComponent
         {
             enabled = true;
         }
-        
-        _audioController._staticSource.Stop();
-        _audioController._staticSource.AssignAudioLibraryClip(AudioType.ToolScopeStatic);
-        if (_signalscope.IsEquipped())
+
+        if (PlayerState.AtFlightConsole())
         {
-            _audioController._staticSource.Play();
+            _audioController._staticSource.Stop();
+            _audioController._staticSource.AssignAudioLibraryClip(AudioType.ToolScopeStatic);
+            if (_signalscope.IsEquipped())
+            {
+                _audioController._staticSource.Play();
+            }
         }
     }
 
