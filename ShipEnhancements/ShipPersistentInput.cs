@@ -28,7 +28,8 @@ public class ShipPersistentInput : ThrusterController
 
     public override Vector3 ReadTranslationalInput()
     {
-        if (SELocator.GetAutopilotPanelController().IsAutopilotActive() || _currentInput == Vector3.zero)
+        if (SELocator.GetAutopilotPanelController().IsAutopilotActive(false, false) || 
+            _currentInput == Vector3.zero)
         {
             enabled = false;
             return Vector3.zero;
@@ -47,7 +48,7 @@ public class ShipPersistentInput : ThrusterController
 
     public void ReadNextInput()
     {
-        if (!SELocator.GetAutopilotPanelController().IsAutopilotActive())
+        if (!SELocator.GetAutopilotPanelController().IsAutopilotActive(false, false))
         {
             _currentInput = _thrustController._lastTranslationalInput;
             SetInputEnabled(true);

@@ -1556,6 +1556,7 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((bool)extraEjectButtons.GetProperty())
         {
+            ShipEnhancements.WriteDebugMessage("Add eject buttons");
             GameObject suppliesButton = LoadPrefab("Assets/ShipEnhancements/SuppliesEjectButton.prefab");
             CreateObject(suppliesButton, SELocator.GetShipTransform().Find("Module_Cabin"));
 
@@ -1564,14 +1565,6 @@ public class ShipEnhancements : ModBehaviour
 
             GameObject landingGearButton = LoadPrefab("Assets/ShipEnhancements/LandingGearEjectButton.prefab");
             CreateObject(landingGearButton, SELocator.GetShipTransform().Find("Module_Cabin"));
-        }
-        if ((bool)addShipSignal.GetProperty())
-        {
-            GameObject signal = LoadPrefab("Assets/ShipEnhancements/ShipSignal.prefab");
-            CreateObject(signal, SELocator.GetShipCockpitController()
-                .transform.parent.GetComponentInChildren<ShipCockpitUI>()._sigScopeDish);
-
-            SELocator.GetPlayerBody().GetComponentInChildren<Signalscope>().gameObject.AddComponent<ShipRemoteControl>();
         }
         bool physicsBounce = (float)shipBounciness.GetProperty() > 0f && (float)shipBounciness.GetProperty() <= 1f;
         if ((float)shipFriction.GetProperty() != 0.5f || physicsBounce)
@@ -2169,6 +2162,14 @@ public class ShipEnhancements : ModBehaviour
                 playerMarker.SetActive(false);
                 GameObject geMarker = GameObject.Find("SecondaryGroup/HUD_Minimap/Minimap_Root/AboveGroundMarker/Arrow");
                 geMarker?.SetActive(false);
+            }
+            if ((bool)addShipSignal.GetProperty())
+            {
+                GameObject signal = LoadPrefab("Assets/ShipEnhancements/ShipSignal.prefab");
+                CreateObject(signal, SELocator.GetShipCockpitController()
+                    .transform.parent.GetComponentInChildren<ShipCockpitUI>()._sigScopeDish);
+
+                SELocator.GetPlayerBody().GetComponentInChildren<Signalscope>().gameObject.AddComponent<ShipRemoteControl>();
             }
             if ((!InMultiplayer || QSBAPI.GetIsHost()) && (float)shipDamageSpeedMultiplier.GetProperty() < 0f)
             {

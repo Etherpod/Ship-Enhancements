@@ -1,5 +1,8 @@
-﻿using OWML.ModHelper.Events;
+﻿using System;
+using OWML.ModHelper.Events;
 using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 using static ShipEnhancements.ShipEnhancements.Settings;
 
@@ -8,70 +11,38 @@ namespace ShipEnhancements;
 public class ShipRemoteControl : MonoBehaviour
 {
     private AudioSignal _shipAudioSignal;
-    private ShipWarpCoreController _warpCoreController;
     private ShipCommand _currentCommand;
+    private ScreenPrompt _interactPrompt;
     private ScreenPrompt _commandPrompt;
     private ScreenPrompt _cyclePrompt;
+    private InputMode _lastInputMode;
     private bool _scopeEquipped = false;
+    private bool _tuned = false;
 
-    private ShipEjectionSystem _cockpitEjectSystem;
-    private ShipModuleEjectionSystem _suppliesEjectSystem;
-    private ShipModuleEjectionSystem _engineEjectSystem;
-    private ShipModuleEjectionSystem _landingGearEjectSystem;
-    private Autopilot _autopilot;
-    private PidAutopilot _pidAutopilot;
-    private bool _lastAutopilotState = false;
-    private readonly string _engageAutopilotText = "Engage Autopilot";
-    private readonly string _disengageAutopilotText = "Disengage Autopilot";
-
-    private List<ShipCommand> _commands = new()
-    {
-        ShipCommand.Explode,
-        ShipCommand.Autopilot,
-        ShipCommand.TurnOff,
-        ShipCommand.Warp,
-        ShipCommand.Eject,
-        ShipCommand.EjectSupplies,
-        ShipCommand.EjectEngine,
-        ShipCommand.DetachLandingGear
-    };
-
-    private Dictionary<ShipCommand, string> _commandNames = new()
-    {
-        { ShipCommand.Autopilot, "Engage Autopilot" },
-        { ShipCommand.TurnOff, "Turn Off Engine" },
-        { ShipCommand.Warp, "Activate Return Warp" },
-        { ShipCommand.Explode, "Explode" },
-        { ShipCommand.Eject, "Eject Cockpit" },
-        { ShipCommand.EjectSupplies, "Eject Supplies" },
-        { ShipCommand.EjectEngine, "Eject Engine" },
-        { ShipCommand.DetachLandingGear, "Detach Landing Gear" },
-    };
+    private List<ShipCommand> _commands = 
+    [
+        new ShipCommand_Explode(),
+        new ShipCommand_EngineSwitch(),
+        new ShipCommand_ReturnWarp(),
+        new ShipCommand_HonkHorn(),
+        new ShipCommand_Autopilot(),
+        new ShipCommand_OrbitAutopilot(),
+        new ShipCommand_MatchVelocity(),
+        new ShipCommand_HoldPosition(),
+        new ShipCommand_CockpitEject(),
+        new ShipCommand_EngineEject(),
+        new ShipCommand_SuppliesEject(),
+        new ShipCommand_LandingGearEject(),
+    ];
 
     private void Awake()
     {
-        _currentCommand = ShipCommand.Explode;
-        _commandPrompt = new ScreenPrompt(InputLibrary.interact, _commandNames[_currentCommand], 0, ScreenPrompt.DisplayState.Normal, false);
-        _cyclePrompt = new PriorityScreenPrompt(InputLibrary.toolOptionY, "Cycle Command", 0, ScreenPrompt.DisplayState.Normal, false);
-
-        _autopilot = SELocator.GetShipBody().GetComponent<Autopilot>();
-        _cockpitEjectSystem = SELocator.GetShipTransform().GetComponentInChildren<ShipEjectionSystem>();
-        ShipModuleEjectionSystem[] ejects = SELocator.GetShipTransform().GetComponentsInChildren<ShipModuleEjectionSystem>();
-        foreach (ShipModuleEjectionSystem eject in ejects)
-        {
-            if (eject.GetEjectType() == ShipModuleEjectionSystem.EjectableModule.Supplies)
-            {
-                _suppliesEjectSystem = eject;
-            }
-            else if (eject.GetEjectType() == ShipModuleEjectionSystem.EjectableModule.Engine)
-            {
-                _engineEjectSystem = eject;
-            }
-            else if (eject.GetEjectType() == ShipModuleEjectionSystem.EjectableModule.LandingGear)
-            {
-                _landingGearEjectSystem = eject;
-            }
-        }
+        _currentCommand = _commands[0];
+        _interactPrompt = new ScreenPrompt(InputLibrary.interact, "Tune In");
+        _commandPrompt = new ScreenPrompt(InputLibrary.interact, _currentCommand.GetDisplayName());
+        _cyclePrompt = new PriorityScreenPrompt(InputLibrary.toolOptionY, "Cycle Command");
+        
+        GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
     }
 
     private void Start()
@@ -83,122 +54,66 @@ public class ShipRemoteControl : MonoBehaviour
                 _shipAudioSignal = signal;
             }
         }
-
-        _warpCoreController = SELocator.GetShipTransform().GetComponentInChildren<ShipWarpCoreController>();
-        _pidAutopilot = SELocator.GetShipBody().GetComponent<PidAutopilot>();
     }
 
     private void Update()
     {
-        UpdateAutopilotText();
-
         if (Locator.GetToolModeSwapper().GetToolMode() == ToolMode.SignalScope
-            && OWInput.IsInputMode(InputMode.Character))
+            && OWInput.IsInputMode(InputMode.Character | InputMode.SatelliteCam))
         {
             if (!_scopeEquipped)
             {
+                Locator.GetPromptManager().AddScreenPrompt(_interactPrompt, PromptPosition.Center);
                 Locator.GetPromptManager().AddScreenPrompt(_commandPrompt, PromptPosition.Center);
                 Locator.GetPromptManager().AddScreenPrompt(_cyclePrompt, PromptPosition.Center);
                 _scopeEquipped = true;
             }
 
+            _interactPrompt.SetVisibility(false);
             _commandPrompt.SetVisibility(false);
             _cyclePrompt.SetVisibility(false);
 
-            if (_shipAudioSignal.GetSignalStrength() == 1f)
+            if (!_tuned && _shipAudioSignal.GetSignalStrength() == 1f)
             {
+                if (OWInput.IsNewlyPressed(InputLibrary.interact))
+                {
+                    Locator.GetPlayerTransform().GetComponent<PlayerLockOnTargeting>().LockOn(_shipAudioSignal.transform);
+                    _lastInputMode = OWInput.GetInputMode();
+                    OWInput.ChangeInputMode(InputMode.SatelliteCam);
+                    _tuned = true;
+                    return;
+                }
+                
+                _interactPrompt.SetVisibility(true);
+            }
+            
+            if (_tuned)
+            {
+                if (OWInput.IsNewlyPressed(InputLibrary.cancel) || _shipAudioSignal.GetSignalStrength() <= 0f)
+                {
+                    Locator.GetPlayerTransform().GetComponent<PlayerLockOnTargeting>().BreakLock();
+                    OWInput.ChangeInputMode(_lastInputMode);
+                    _tuned = false;
+                    return;
+                }
+                
                 _commandPrompt.SetVisibility(true);
+                _commandPrompt.SetText(_currentCommand.GetDisplayName());
                 _cyclePrompt.SetVisibility(true);
 
-                if (ShipCommandAvailable(_currentCommand))
+                if (_currentCommand.CanActivate())
                 {
                     _commandPrompt.SetDisplayState(ScreenPrompt.DisplayState.Normal);
 
                     if (OWInput.IsNewlyPressed(InputLibrary.interact))
                     {
-                        bool run = true;
-                        if (_currentCommand == ShipCommand.Explode
-                            && !SELocator.GetShipDamageController()._exploded)
-                        {
-                            SELocator.GetShipDamageController().Explode();
-                            run = false;
-                        }
-                        else if (_currentCommand == ShipCommand.Warp)
-                        {
-                            _warpCoreController.ActivateWarp();
-                            _warpCoreController.SendWarpMessage();
-                            run = false;
-                        }
-                        else if (_currentCommand == ShipCommand.TurnOff)
-                        {
-                            SELocator.GetShipTransform().GetComponentInChildren<ShipEngineSwitch>().TurnOffEngine();
-                        }
-                        else if (_currentCommand == ShipCommand.Autopilot)
-                        {
-                            if ((bool)enableEnhancedAutopilot.GetProperty())
-                            {
-                                if (_autopilot.enabled || _pidAutopilot.enabled)
-                                {
-                                    SELocator.GetAutopilotPanelController().CancelAutopilot();
-                                }
-                                else
-                                {
-                                    SELocator.GetAutopilotPanelController().ActivateAutopilot();
-                                }
-                            }
-                            else
-                            {
-                                if (!_autopilot.enabled)
-                                {
-                                    ReferenceFrame rf = SELocator.GetReferenceFrame();
-                                    if (rf != null)
-                                    {
-                                        _autopilot.FlyToDestination(rf);
-                                    }
-                                }
-                                else
-                                {
-                                    _autopilot.Abort();
-                                }
-                            }
-                        }
-                        else if (_currentCommand == ShipCommand.Eject
-                            && !SELocator.GetShipDamageController()._cockpitDetached)
-                        {
-                            _cockpitEjectSystem._ejectPressed = true;
-                            _cockpitEjectSystem.enabled = true;
-                        }
-                        else if (_currentCommand == ShipCommand.EjectSupplies)
-                        {
-                            if (_suppliesEjectSystem != null && _suppliesEjectSystem.CanEject())
-                            {
-                                _suppliesEjectSystem.Eject();
-                            }
-                        }
-                        else if (_currentCommand == ShipCommand.EjectEngine)
-                        {
-                            if (_engineEjectSystem != null && _engineEjectSystem.CanEject())
-                            {
-                                _engineEjectSystem.Eject();
-                            }
-                        }
-                        else if (_currentCommand == ShipCommand.DetachLandingGear)
-                        {
-                            if (_landingGearEjectSystem != null && _landingGearEjectSystem.CanEject())
-                            {
-                                _landingGearEjectSystem.Eject();
-                            }
-                        }
-                        else
-                        {
-                            run = false;
-                        }
+                        _currentCommand.Activate();
 
-                        if (run && ShipEnhancements.InMultiplayer)
+                        if (ShipEnhancements.InMultiplayer)
                         {
                             foreach (uint id in ShipEnhancements.PlayerIDs)
                             {
-                                ShipEnhancements.QSBCompat.SendShipCommand(id, _currentCommand);
+                                ShipEnhancements.QSBCompat.SendShipCommand(id, _currentCommand.GetType().Name);
                             }
                         }
                     }
@@ -223,16 +138,26 @@ public class ShipRemoteControl : MonoBehaviour
 
                 if (changed)
                 {
-                    _commandPrompt.SetText(_commandNames[_currentCommand]);
-                    _commandPrompt.SetDisplayState(ShipCommandAvailable(_currentCommand) ? ScreenPrompt.DisplayState.Normal : ScreenPrompt.DisplayState.GrayedOut);
+                    _commandPrompt.SetText(_currentCommand.GetDisplayName());
+                    _commandPrompt.SetDisplayState(_currentCommand.CanActivate() ? 
+                        ScreenPrompt.DisplayState.Normal : ScreenPrompt.DisplayState.GrayedOut);
                     Locator.GetPlayerAudioController()._oneShotSource.PlayOneShot(AudioType.Menu_LeftRight);
                 }
             }
         }
         else if (_scopeEquipped)
         {
+            Locator.GetPromptManager().RemoveScreenPrompt(_interactPrompt, PromptPosition.Center);
             Locator.GetPromptManager().RemoveScreenPrompt(_commandPrompt, PromptPosition.Center);
             Locator.GetPromptManager().RemoveScreenPrompt(_cyclePrompt, PromptPosition.Center);
+
+            if (_tuned)
+            {
+                Locator.GetPlayerTransform().GetComponent<PlayerLockOnTargeting>().BreakLock();
+                OWInput.ChangeInputMode(_lastInputMode);
+                _tuned = false;
+            }
+            
             _scopeEquipped = false;
         }
     }
@@ -261,7 +186,7 @@ public class ShipRemoteControl : MonoBehaviour
                 _currentCommand = _commands[index];
             }
 
-            if (!ShipCommandHidden(_currentCommand))
+            if (_currentCommand.CanShow())
             {
                 break;
             }
@@ -270,170 +195,39 @@ public class ShipRemoteControl : MonoBehaviour
         }
     }
 
-    private bool ShipCommandAvailable(ShipCommand cmd)
+    public void ReceiveCommandRemote(string commandName)
     {
-        switch (cmd)
+        ShipCommand command = null;
+        foreach (var cmd in _commands)
         {
-            case ShipCommand.Explode:
-                return _engineEjectSystem == null || _engineEjectSystem.CanEject();
-            case ShipCommand.Warp:
-                return !_warpCoreController.IsWarping();
-            case ShipCommand.TurnOff:
-                return ShipEnhancements.Instance.engineOn;
-            case ShipCommand.Autopilot:
-                return AutopilotCommandAvailable();
-            case ShipCommand.Eject:
-                return !SELocator.GetShipDamageController().IsCockpitDetached();
-            case ShipCommand.EjectSupplies:
-                return _suppliesEjectSystem != null && _suppliesEjectSystem.CanEject();
-            case ShipCommand.EjectEngine:
-                return _engineEjectSystem != null && _engineEjectSystem.CanEject();
-            case ShipCommand.DetachLandingGear:
-                return _landingGearEjectSystem != null && _landingGearEjectSystem.CanEject();
-            default:
-                return true;
+            if (cmd.GetType().Name == commandName)
+            {
+                command = cmd;
+            }
+        }
+
+        if (command == null) return;
+        
+        if (command.CanActivate())
+        {
+            command.Activate();
         }
     }
 
-    private bool AutopilotCommandAvailable()
-    {
-        if (!ShipEnhancements.Instance.engineOn || _autopilot.IsDamaged())
-        {
-            return false;
-        }
+    public bool IsTuned() => _tuned;
 
-        if ((bool)enableEnhancedAutopilot.GetProperty() 
-            && SELocator.GetAutopilotPanelController().IsOrbitSelected())
+    private void OnShipSystemFailure()
+    {
+        if (_tuned)
         {
-            ReferenceFrame rf = SELocator.GetReferenceFrame(ignorePassiveFrame: false);
-            return _pidAutopilot.enabled || rf != null;
-        }
-        else
-        {
-            ReferenceFrame referenceFrame = SELocator.GetReferenceFrame();
-            return _autopilot.enabled || (referenceFrame != null && referenceFrame.GetAllowAutopilot()
-                && (PlayerData.GetAutopilotEnabled() || (bool)enableEnhancedAutopilot.GetProperty())
-                && Vector3.Distance(SELocator.GetShipBody().GetPosition(), referenceFrame.GetPosition())
-                > referenceFrame.GetAutopilotArrivalDistance());
+            Locator.GetPlayerTransform().GetComponent<PlayerLockOnTargeting>().BreakLock();
+            OWInput.ChangeInputMode(_lastInputMode);
+            _tuned = false;
         }
     }
 
-    private bool ShipCommandHidden(ShipCommand cmd)
+    private void OnDestroy()
     {
-        switch (cmd)
-        {
-            case ShipCommand.Warp:
-                return (string)shipWarpCoreType.GetProperty() == "Disabled" || _warpCoreController == null;
-            case ShipCommand.TurnOff:
-                return !(bool)addEngineSwitch.GetProperty();
-            case ShipCommand.Autopilot:
-                return !(bool)enableEnhancedAutopilot.GetProperty() &&
-                    ((bool)disableReferenceFrame.GetProperty() || !PlayerData.GetAutopilotEnabled());
-            case ShipCommand.EjectSupplies:
-                return !(bool)extraEjectButtons.GetProperty();
-            case ShipCommand.EjectEngine:
-                return !(bool)extraEjectButtons.GetProperty();
-            case ShipCommand.DetachLandingGear:
-                return !(bool)extraEjectButtons.GetProperty();
-            default:
-                return false;
-        }
+        GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
     }
-
-    private void UpdateAutopilotText()
-    {
-        if (_currentCommand != ShipCommand.Autopilot) return;
-
-        if ((bool)enableEnhancedAutopilot.GetProperty())
-        {
-            if (_lastAutopilotState != (_autopilot.enabled || _pidAutopilot.enabled))
-            {
-                _lastAutopilotState = _autopilot.enabled || _pidAutopilot.enabled;
-                if (_lastAutopilotState)
-                {
-                    _commandNames[_currentCommand] = _disengageAutopilotText;
-                }
-                else
-                {
-                    _commandNames[_currentCommand] = _engageAutopilotText;
-                }
-                _commandPrompt.SetText(_commandNames[_currentCommand]);
-            }
-        }
-        else
-        {
-            if (_lastAutopilotState != _autopilot.enabled)
-            {
-                _lastAutopilotState = _autopilot.enabled;
-                if (_lastAutopilotState)
-                {
-                    _commandNames[_currentCommand] = _disengageAutopilotText;
-                }
-                else
-                {
-                    _commandNames[_currentCommand] = _engageAutopilotText;
-                }
-                _commandPrompt.SetText(_commandNames[_currentCommand]);
-            }
-        }
-    }
-
-    public void ReceiveCommandRemote(ShipCommand command)
-    {
-        if (ShipCommandAvailable(command))
-        {
-            if (command == ShipCommand.Explode
-                && !SELocator.GetShipDamageController()._exploded)
-            {
-                SELocator.GetShipDamageController().Explode();
-            }
-            else if (command == ShipCommand.Warp)
-            {
-                _warpCoreController.ActivateWarp();
-            }
-            else if (command == ShipCommand.TurnOff)
-            {
-                SELocator.GetShipTransform().GetComponentInChildren<ShipEngineSwitch>().TurnOffEngine();
-            }
-            else if (command == ShipCommand.Eject
-                && !SELocator.GetShipDamageController()._cockpitDetached)
-            {
-                _cockpitEjectSystem._ejectPressed = true;
-                _cockpitEjectSystem.enabled = true;
-            }
-            else if (_currentCommand == ShipCommand.EjectSupplies)
-            {
-                if (_suppliesEjectSystem != null && _suppliesEjectSystem.CanEject())
-                {
-                    _suppliesEjectSystem.Eject();
-                }
-            }
-            else if (_currentCommand == ShipCommand.EjectEngine)
-            {
-                if (_engineEjectSystem != null && _engineEjectSystem.CanEject())
-                {
-                    _engineEjectSystem.Eject();
-                }
-            }
-            else if (_currentCommand == ShipCommand.DetachLandingGear)
-            {
-                if (_landingGearEjectSystem != null && _landingGearEjectSystem.CanEject())
-                {
-                    _landingGearEjectSystem.Eject();
-                }
-            }
-        }
-    }
-}
-
-public enum ShipCommand
-{
-    Explode, 
-    Warp,
-    TurnOff,
-    Autopilot,
-    Eject,
-    EjectEngine,
-    EjectSupplies,
-    DetachLandingGear,
 }

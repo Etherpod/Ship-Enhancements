@@ -42,7 +42,7 @@ public class MatchVelocityButton : CockpitButtonSwitch
     {
         return base.CanActivate()
             && SELocator.GetReferenceFrame(ignorePassiveFrame: false) != null && !_autopilot.IsDamaged()
-            && !SELocator.GetAutopilotPanelController().IsAutopilotActive()
+            && !SELocator.GetAutopilotPanelController().IsAutopilotActive(false, false)
             && SELocator.GetShipResources().AreThrustersUsable();
     }
 }

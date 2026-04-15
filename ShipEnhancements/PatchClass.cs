@@ -24,8 +24,7 @@ public static class PatchClass
         if ((string)shipHornType.GetProperty() != "None"
             && OWInput.IsNewlyPressed(InputLibrary.flashlight, InputMode.ShipCockpit)
             && !__instance._shipSystemFailure
-            && SELocator.GetShipTransform().GetComponentInChildren<Signalscope>().IsEquipped()
-            && (SELocator.GetSignalscopeComponent() == null || !SELocator.GetSignalscopeComponent().isDamaged))
+            && SELocator.GetShipTransform().GetComponentInChildren<Signalscope>().IsEquipped())
         {
             SELocator.GetShipTransform().GetComponentInChildren<ShipHornController>()?.PlayHorn();
             if (ShipEnhancements.InMultiplayer)
@@ -2359,7 +2358,7 @@ public static class PatchClass
 
         if ((bool)enableEnhancedAutopilot.GetProperty())
         {
-            if (SELocator.GetAutopilotPanelController().IsAutopilotActive()
+            if (SELocator.GetAutopilotPanelController().IsAutopilotActive(false, false)
                 || SELocator.GetAutopilotPanelController().IsPersistentInputActive())
             {
                 __result = Vector3.zero;
@@ -2642,12 +2641,32 @@ public static class PatchClass
     }
 
     [HarmonyPrefix]
+    [HarmonyPatch(typeof(AudioSignal), nameof(AudioSignal.GetSignalVolume))]
+    public static bool LowerShipSignalVolume(AudioSignal __instance, ref float __result)
+    {
+        if (__instance is ShipAudioSignal shipSignal)
+        {
+            __result = shipSignal.GetShipSignalVolume();
+            return false;
+        }
+
+        return true;
+    }
+
+    [HarmonyPrefix]
     [HarmonyPatch(typeof(AudioSignal), nameof(AudioSignal.UpdateSignalStrength))]
     public static bool RemoveSignalFromShip(AudioSignal __instance, Signalscope scope, float distToClosestScopeObstruction)
     {
-        if (__instance is ShipAudioSignal)
+        if (__instance is ShipAudioSignal shipSignal)
         {
-            (__instance as ShipAudioSignal).UpdateShipSignalStrength(scope, distToClosestScopeObstruction);
+            shipSignal.UpdateShipSignalStrength(scope, distToClosestScopeObstruction);
+            return false;
+        }
+
+        if (Locator.GetPlayerCamera().GetComponentInChildren<ShipRemoteControl>().IsTuned())
+        {
+            __instance._signalStrength = 0f;
+            __instance._degreesFromScope = 180f;
             return false;
         }
 
@@ -4608,7 +4627,7 @@ public static class PatchClass
     {
         if ((bool)enableEnhancedAutopilot.GetProperty() && SELocator.GetAutopilotPanelController() != null)
         {
-            if (SELocator.GetAutopilotPanelController().IsAutopilotActive())
+            if (SELocator.GetAutopilotPanelController().IsAutopilotActive(true, true))
             {
                 if (!__instance._autopilotLight.enabled)
                 {
@@ -4642,7 +4661,8 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.IsLandingModeAvailable))]
     public static bool OverrideLandingModeAvailable(ref bool __result)
     {
-        if ((bool)enableEnhancedAutopilot.GetProperty() && (SELocator.GetAutopilotPanelController().IsAutopilotActive()
+        if ((bool)enableEnhancedAutopilot.GetProperty() && 
+            (SELocator.GetAutopilotPanelController().IsAutopilotActive(false, false)
             || SELocator.GetAutopilotPanelController().IsPersistentInputActive()))
         {
             __result = false;

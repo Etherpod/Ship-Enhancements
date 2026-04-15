@@ -21,6 +21,11 @@ public class ShipAudioSignal : AudioSignal
         _outerFogWarpVolume = warpVolume;
     }
 
+    public float GetShipSignalVolume()
+    {
+        return Mathf.InverseLerp(0.8f, 1f, _signalStrength) * 0.5f;
+    }
+
     public void UpdateShipSignalStrength(Signalscope scope, float distToClosestScopeObstruction)
     {
         _canBePickedUpByScope = false;

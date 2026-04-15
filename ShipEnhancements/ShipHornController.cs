@@ -23,4 +23,9 @@ public class ShipHornController : MonoBehaviour
         _hornSource.time = 0;
         _hornSource.Play();
     }
+
+    public bool IsPlaying()
+    {
+        return _hornSource.isPlaying;
+    }
 }

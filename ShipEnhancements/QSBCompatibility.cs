@@ -81,7 +81,7 @@ public class QSBCompatibility
         _api.RegisterHandler<SerializedVector3>("detach-all-players", ReceiveDetachAllPlayers);
         _api.RegisterHandler<SerializedVector3>("persistent-input", ReceivePersistentInput);
         _api.RegisterHandler<float>("initial-black-hole", ReceiveInitialBlackHoleState);
-        _api.RegisterHandler<ShipCommand>("send-ship-command", ReceiveShipCommand);
+        _api.RegisterHandler<string>("send-ship-command", ReceiveShipCommand);
         _api.RegisterHandler<(bool, string, SerializedVector3)>("activate-warp", ReceiveActivateWarp);
         _api.RegisterHandler<(int, bool)>("toggle-fuel-tank-drain", ReceiveToggleFuelTankDrain);
         _api.RegisterHandler<int>("fuel-tank-explosion", ReceiveFuelTankExplosion);
@@ -728,14 +728,14 @@ public class QSBCompatibility
     #endregion
 
     #region ShipCommands
-    public void SendShipCommand(uint id, ShipCommand command)
+    public void SendShipCommand(uint id, string commandName)
     {
-        _api.SendMessage("send-ship-command", command, id, false);
+        _api.SendMessage("send-ship-command", commandName, id, false);
     }
 
-    private void ReceiveShipCommand(uint id, ShipCommand command)
+    private void ReceiveShipCommand(uint id, string commandName)
     {
-        SELocator.GetPlayerBody().GetComponentInChildren<ShipRemoteControl>()?.ReceiveCommandRemote(command);
+        SELocator.GetPlayerBody().GetComponentInChildren<ShipRemoteControl>()?.ReceiveCommandRemote(commandName);
     }
     #endregion
 
