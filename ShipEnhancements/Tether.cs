@@ -6,6 +6,7 @@ public class Tether : MonoBehaviour
 {
     private bool _tethered = false;
     private TetherAudioController _audioController;
+    private FirstPersonManipulator _firstPersonManipulator;
     private SpringJoint _joint;
     private Transform _tetherMesh;
     private GameObject _tether;
@@ -48,6 +49,7 @@ public class Tether : MonoBehaviour
     {
         _hook = GetComponent<TetherHookItem>();
         _audioController = SELocator.GetPlayerBody().GetComponentInChildren<TetherAudioController>();
+        _firstPersonManipulator = SELocator.GetPlayerBody().GetComponentInChildren<FirstPersonManipulator>();
         _maxTetherDistance = Mathf.Max(0.5f, ShipEnhancements.ExperimentalSettings?.Tether_MaxLength ?? _maxTetherDistance);
         _reelSpeed *= ShipEnhancements.ExperimentalSettings?.Tether_ReelMultiplier ?? 1f;
     }
@@ -78,7 +80,8 @@ public class Tether : MonoBehaviour
             if (_connectedRigidbody == SELocator.GetPlayerBody())
             {
                 float tetherDist = (_connectedTransform.TransformPoint(_connectedAnchor) - transform.TransformPoint(_anchor)).sqrMagnitude;
-                if (OWInput.IsPressed(InputLibrary.toolOptionDown) && _joint.minDistance < _maxTetherDistance)
+                if (OWInput.IsPressed(InputLibrary.toolOptionDown, InputMode.Character) && 
+                    _joint.minDistance < _maxTetherDistance && _firstPersonManipulator._interactReceiver == null)
                 {
                     _joint.minDistance += Time.deltaTime * _reelSpeed;
                     // Play reel noise
@@ -89,7 +92,9 @@ public class Tether : MonoBehaviour
                         _audioController.PlayReelAudio(false);
                     }
                 }
-                else if (tetherDist < Mathf.Pow(_joint.minDistance + 2f, 2) && OWInput.IsPressed(InputLibrary.toolOptionUp) && _joint.minDistance > _minTetherDistance)
+                else if (tetherDist < Mathf.Pow(_joint.minDistance + 2f, 2) && 
+                    OWInput.IsPressed(InputLibrary.toolOptionUp, InputMode.Character) && 
+                    _joint.minDistance > _minTetherDistance && _firstPersonManipulator._interactReceiver == null)
                 {
                     _joint.minDistance -= Time.deltaTime * _reelSpeed;
                     // Play reel noise
@@ -107,8 +112,9 @@ public class Tether : MonoBehaviour
                     _audioController.StopReelAudio();
                 }
 
-                if (!PlayerState.AtFlightConsole() && 
-                    OWInput.IsPressed(InputLibrary.freeLook) && OWInput.IsNewlyPressed(InputLibrary.interact))
+                if (OWInput.IsPressed(InputLibrary.freeLook, InputMode.Character) && 
+                    OWInput.IsNewlyPressed(InputLibrary.interact, InputMode.Character) && 
+                    _firstPersonManipulator._interactReceiver == null)
                 {
                     _hook.DisconnectTether();
                 }
