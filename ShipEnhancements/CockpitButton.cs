@@ -171,7 +171,7 @@ public class CockpitButton : CockpitInteractible
         return _onLabel;
     }
 
-    private void OnShipSystemFailure()
+    protected virtual void OnShipSystemFailure()
     {
         enabled = false;
         _interactReceiver.DisableInteraction();

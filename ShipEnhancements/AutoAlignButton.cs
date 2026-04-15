@@ -4,6 +4,7 @@ public class AutoAlignButton : CockpitButton
 {
     private ShipAutoAlign _shipAlign;
     private bool _lastThrusterState = true;
+    private bool _shipDestroyed;
 
     protected override void Start()
     {
@@ -31,11 +32,15 @@ public class AutoAlignButton : CockpitButton
 
     public override void OnChangeStateEvent()
     {
+        if (_shipDestroyed) return;
+        
         _shipAlign.enabled = _on;
     }
 
     private void OnThrustersUsable()
     {
+        if (_shipDestroyed) return;
+        
         _shipAlign.enabled = _on 
             && SELocator.GetReferenceFrame(shipFrame: true) != SELocator.GetShipBody().GetReferenceFrame()
             && !SELocator.GetShipDamageController().IsElectricalFailed()
@@ -47,5 +52,12 @@ public class AutoAlignButton : CockpitButton
         base.SetPowered(powered);
         if (_electricalDisrupted) return;
         OnThrustersUsable();
+    }
+
+    protected override void OnShipSystemFailure()
+    {
+        base.OnShipSystemFailure();
+        _shipAlign.enabled = false;
+        _shipDestroyed = true;
     }
 }
