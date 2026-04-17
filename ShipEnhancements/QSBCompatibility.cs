@@ -735,7 +735,7 @@ public class QSBCompatibility
 
     private void ReceiveShipCommand(uint id, string commandName)
     {
-        SELocator.GetPlayerBody().GetComponentInChildren<ShipRemoteControl>()?.ReceiveCommandRemote(commandName);
+        SELocator.GetRemoteControl()?.ReceiveCommandRemote(commandName);
     }
     #endregion
 

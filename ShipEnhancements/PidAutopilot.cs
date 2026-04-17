@@ -110,14 +110,12 @@ public class PidAutopilot : ThrusterController
             }
             return;
         }
-        else if (active)
+        
+        _mode = mode;
+        if (enabled)
         {
-            _mode = mode;
-            if (enabled)
-            {
-                ShipNotifications.RemoveOrbitAutopilotActiveNotification();
-                ShipNotifications.RemoveHoldPositionAutopilotNotification();
-            }
+            ShipNotifications.RemoveOrbitAutopilotActiveNotification();
+            ShipNotifications.RemoveHoldPositionAutopilotNotification();
         }
 
         _referenceFrame = SELocator.GetReferenceFrame(ignorePassiveFrame: false);

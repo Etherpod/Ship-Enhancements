@@ -31,9 +31,12 @@ public static class SELocator
     private static AutopilotPanelController _autopilotPanelController;
     private static ShipWaterResource _waterResource;
     private static ShipCockpitController _shipCockpitController;
+    private static ShipRemoteControl _remoteControl;
 
-    private static ReferenceFrame _shipRF;
+    private static ReferenceFrame _shipTargetRF;
+    private static ReferenceFrame _playerTargetRF;
     private static ReferenceFrame _playerRF;
+    private static ReferenceFrame _probeRF;
 
     public static void Initalize()
     {
@@ -49,8 +52,10 @@ public static class SELocator
         _shipDamageController = _shipTransform.GetComponent<ShipDamageController>();
         _shipCockpitController = _shipTransform.GetComponentInChildren<ShipCockpitController>();
 
-        _shipRF = null;
-        _playerRF = null;
+        _shipTargetRF = null;
+        _playerTargetRF = null;
+        _playerRF = new PlayerReferenceFrame(_playerBody);
+        _probeRF = new ProbeReferenceFrame(_probe._owRigidbody);
 
         if ((bool)shipOxygenRefill.GetProperty())
         {
@@ -235,54 +240,115 @@ public static class SELocator
         return _shipCockpitController;
     }
 
+    public static void SetRemoteControl(ShipRemoteControl remoteControl)
+    {
+        _remoteControl = remoteControl;
+    }
+
+    public static ShipRemoteControl GetRemoteControl() => _remoteControl;
+
     public static ReferenceFrame GetReferenceFrame(bool shipFrame = true, bool ignorePassiveFrame = true)
     {
-        if ((bool)splitLockOn.GetProperty() && (shipFrame || PlayerState.AtFlightConsole()))
+        if (((bool)splitLockOn.GetProperty() || _shipTargetRF != null) && (shipFrame || PlayerState.AtFlightConsole()))
         {
-            if (_shipRF == null && !ignorePassiveFrame)
+            bool targetingDockedProbe = IsShipTargetingProbe() && _probe != null && !_probe.IsLaunched();
+            bool targetingDestroyedProbe = IsShipTargetingProbe() && _probe == null;
+            if ((_shipTargetRF == null || ((IsShipTargetingPlayer() || targetingDockedProbe) && 
+                        PlayerState.IsInsideShip()) || targetingDestroyedProbe) && 
+                !ignorePassiveFrame)
             {
                 return GetShipBody().GetComponentInChildren<SectorDetector>().GetPassiveReferenceFrame();
             }
+            
+            return _shipTargetRF;
+        }
+        
+        return Locator.GetReferenceFrame(ignorePassiveFrame);
+    }
 
-            return _shipRF;
+    public static void SetShipReferenceFrame(ReferenceFrame rf)
+    {
+        if (rf == _playerRF || rf == _probeRF)
+        {
+            _shipTargetRF = rf;
+            _playerTargetRF = null;
+            return;
+        }
+        
+        PatchClass.SkipNextRFUpdate = true;
+        
+        if ((bool)splitLockOn.GetProperty())
+        {
+            _shipTargetRF = rf;
         }
         else
         {
-            return Locator.GetReferenceFrame(ignorePassiveFrame);
+            _playerTargetRF = rf;
+            _shipTargetRF = null;
+        }
+        
+        if (!(bool)splitLockOn.GetProperty() || Locator._rfTracker._shipTargetingActive)
+        {
+            Locator._rfTracker.TargetReferenceFrame(rf);
         }
     }
 
+    public static void TargetPlayerWithShip() => SetShipReferenceFrame(_playerRF);
+    
+    public static void TargetProbeWithShip() => SetShipReferenceFrame(_probeRF);
+
+    public static bool IsShipTargetingPlayer() => _shipTargetRF == _playerRF;
+    
+    public static bool IsShipTargetingProbe() => _shipTargetRF == _probeRF;
+
     public static void OnTargetReferenceFrame(ReferenceFrame rf)
     {
+        if (rf == _playerRF || rf == _probeRF) return;
+
+        if (!(bool)splitLockOn.GetProperty())
+        {
+            _shipTargetRF = null;
+            _playerTargetRF = rf;
+            return;
+        }
+        
         if (Locator._rfTracker?._shipTargetingActive ?? false)
         {
-            _shipRF = rf;
+            _shipTargetRF = rf;
         }
         else
         {
-            _playerRF = rf;
+            _playerTargetRF = rf;
         }
     }
 
     public static void OnUntargetReferenceFrame()
     {
+        if (!(bool)splitLockOn.GetProperty())
+        {
+            _shipTargetRF = null;
+            _playerTargetRF = null;
+            return;
+        }
+        
         if (Locator._rfTracker?._shipTargetingActive ?? false)
         {
-            _shipRF = null;
+            _shipTargetRF = null;
         }
         else
         {
-            _playerRF = null;
+            _playerTargetRF = null;
         }
     }
 
     public static void OnEnterShip()
     {
         PatchClass.SkipNextRFUpdate = true;
-        ShipEnhancements.WriteDebugMessage(_shipRF);
-        if (_shipRF != null)
+        ShipEnhancements.WriteDebugMessage(_shipTargetRF);
+        if (_shipTargetRF != null && _shipTargetRF != _playerRF && 
+            _shipTargetRF != _probeRF)
         {
-            Locator._rfTracker.TargetReferenceFrame(_shipRF);
+            Locator._rfTracker.TargetReferenceFrame(_shipTargetRF);
         }
         else
         {
@@ -293,10 +359,10 @@ public static class SELocator
     public static void OnExitShip()
     {
         PatchClass.SkipNextRFUpdate = true;
-        ShipEnhancements.WriteDebugMessage(_playerRF);
-        if (_playerRF != null)
+        ShipEnhancements.WriteDebugMessage(_playerTargetRF);
+        if (_playerTargetRF != null)
         {
-            Locator._rfTracker.TargetReferenceFrame(_playerRF);
+            Locator._rfTracker.TargetReferenceFrame(_playerTargetRF);
         }
         else
         {

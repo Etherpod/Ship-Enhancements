@@ -4,11 +4,8 @@ namespace ShipEnhancements;
 
 public class ShipAutoAlign : AlignWithDirection
 {
-    private ReferenceFrameTracker _rfTracker;
-
     public override void Awake()
     {
-        //_localAlignmentAxis = new Vector3(0, -1, 0);
         _localAlignmentAxis = new Vector3(0, 0, 1);
         _interpolationMode = InterpolationMode.Exponential;
         _interpolationRate = 0.015f;
@@ -30,7 +27,7 @@ public class ShipAutoAlign : AlignWithDirection
 
     public override bool CheckAlignmentRequirements()
     {
-        return true;
+        return !SELocator.IsShipTargetingPlayer() || !PlayerState.IsInsideShip();
     }
 
     public override void UpdateRotation(Vector3 currentDirection, Vector3 targetDirection, float slerpRate, bool usePhysics)

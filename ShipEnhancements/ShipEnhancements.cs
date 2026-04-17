@@ -2147,8 +2147,6 @@ public class ShipEnhancements : ModBehaviour
                 GameObject entrywayTriggersObj = LoadPrefab("Assets/ShipEnhancements/BreachEntryTriggers.prefab");
                 OWTriggerVolume entrywayVol = CreateObject(entrywayTriggersObj, 
                     SELocator.GetShipTransform().Find("Volumes")).GetComponent<OWTriggerVolume>();
-                
-                ShipEnhancements.WriteDebugMessage("entry: " + entrywayVol);
 
                 PlayerSpawner spawner = GameObject.FindGameObjectWithTag("Player").GetRequiredComponent<PlayerSpawner>();
                 SpawnPoint shipSpawn = spawner.GetSpawnPoint(SpawnLocation.Ship);
@@ -2169,7 +2167,10 @@ public class ShipEnhancements : ModBehaviour
                 CreateObject(signal, SELocator.GetShipCockpitController()
                     .transform.parent.GetComponentInChildren<ShipCockpitUI>()._sigScopeDish);
 
-                SELocator.GetPlayerBody().GetComponentInChildren<Signalscope>().gameObject.AddComponent<ShipRemoteControl>();
+                //SELocator.GetPlayerBody().GetComponentInChildren<Signalscope>().gameObject.AddComponent<ShipRemoteControl>();
+                var canvas = LoadPrefab("Assets/ShipEnhancements/SignalscopeCommandCanvas.prefab");
+                var parent = GameObject.Find("PlayerHUD/HelmetOffUI").transform;
+                SELocator.SetRemoteControl(CreateObject(canvas, parent).GetComponent<ShipRemoteControl>());
             }
             if ((!InMultiplayer || QSBAPI.GetIsHost()) && (float)shipDamageSpeedMultiplier.GetProperty() < 0f)
             {

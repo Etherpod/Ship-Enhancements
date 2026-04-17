@@ -1,23 +1,31 @@
-﻿using System;
-using OWML.ModHelper.Events;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
-using static ShipEnhancements.ShipEnhancements.Settings;
+using UnityEngine.UI;
 
 namespace ShipEnhancements;
 
 public class ShipRemoteControl : MonoBehaviour
 {
+    [SerializeField]
+    private SignalscopeCommandList _canvasList;
+    [SerializeField]
+    private Text _groupHeader;
+    [SerializeField]
+    private CanvasGroupAnimator _animator;
+    
     private AudioSignal _shipAudioSignal;
     private ShipCommand _currentCommand;
+    private ShipCommand.CommandGroup _groupMask;
     private ScreenPrompt _interactPrompt;
     private ScreenPrompt _commandPrompt;
-    private ScreenPrompt _cyclePrompt;
+    private ScreenPrompt _cycleCommandPrompt;
+    private ScreenPrompt _cycleGroupPrompt;
     private InputMode _lastInputMode;
-    private bool _scopeEquipped = false;
-    private bool _tuned = false;
+    private bool _scopeEquipped;
+    // should probably just combine these two
+    private bool _visible;
+    private bool _tuned;
 
     private List<ShipCommand> _commands = 
     [
@@ -25,24 +33,76 @@ public class ShipRemoteControl : MonoBehaviour
         new ShipCommand_EngineSwitch(),
         new ShipCommand_ReturnWarp(),
         new ShipCommand_HonkHorn(),
-        new ShipCommand_Autopilot(),
-        new ShipCommand_OrbitAutopilot(),
-        new ShipCommand_MatchVelocity(),
-        new ShipCommand_HoldPosition(),
         new ShipCommand_CockpitEject(),
         new ShipCommand_EngineEject(),
         new ShipCommand_SuppliesEject(),
         new ShipCommand_LandingGearEject(),
+        new ShipCommand_Autopilot(),
+        new ShipCommand_OrbitAutopilot(),
+        new ShipCommand_MatchVelocity(),
+        new ShipCommand_HoldPosition(),
+        new ShipCommand_TargetPlayerPlanet(),
+        new ShipCommand_TargetCurrentLockOn(),
+        new ShipCommand_TargetPlayer(),
+        new ShipCommand_TargetProbe(),
     ];
+
+    private Dictionary<ShipCommand.CommandGroup, string> _groupToDisplayName = new()
+    {
+        { ShipCommand.CommandGroup.Reactor, "Reactor Commands" },
+        { ShipCommand.CommandGroup.Components, "Component Commands" },
+        { ShipCommand.CommandGroup.Modules, "Module Commands" },
+        { ShipCommand.CommandGroup.Autopilot, "Autopilot Commands" },
+        { ShipCommand.CommandGroup.LockOn, "Targeting Commands" },
+    };
+
+    private Dictionary<ShipCommand.CommandGroup, List<ShipCommand>> _commandsByGroup = [];
 
     private void Awake()
     {
-        _currentCommand = _commands[0];
+        foreach (var cmd in _commands)
+        {
+            if (!_commandsByGroup.ContainsKey(cmd.GetCommandGroup()))
+            {
+                _commandsByGroup.Add(cmd.GetCommandGroup(), [cmd]);
+            }
+            else
+            {
+                _commandsByGroup[cmd.GetCommandGroup()].Add(cmd);
+            }
+        }
+        
+        _groupMask = ShipCommand.CommandGroup.Reactor;
+        _currentCommand = _commandsByGroup[_groupMask][0];
         _interactPrompt = new ScreenPrompt(InputLibrary.interact, "Tune In");
         _commandPrompt = new ScreenPrompt(InputLibrary.interact, _currentCommand.GetDisplayName());
-        _cyclePrompt = new PriorityScreenPrompt(InputLibrary.toolOptionY, "Cycle Command");
+        _cycleCommandPrompt = new PriorityScreenPrompt(InputLibrary.up, InputLibrary.down, 
+            "Cycle Command", ScreenPrompt.MultiCommandType.POS_NEG);
+        _cycleGroupPrompt = new PriorityScreenPrompt(InputLibrary.left, InputLibrary.right, 
+            "Cycle Group", ScreenPrompt.MultiCommandType.POS_NEG);
+
+        // Locator should be ready by the time this obj gets created
+        var canvas = GetComponent<Canvas>();
+        canvas.worldCamera = Locator.GetPlayerCamera().mainCamera;
+        canvas.planeDistance = 9f;
+        AddMaterials();
         
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+    }
+
+    public void AddMaterials()
+    {
+        var refMat = GameObject.Find("PlayerHUD/HelmetOffUI/SignalscopeCanvas/SigScopeDisplay/FrequencyLabel")
+            .GetComponent<Text>().material;
+        
+        foreach (var image in GetComponentsInChildren<Image>(true))
+        {
+            image.material = new Material(refMat);
+        }
+        foreach (var text in GetComponentsInChildren<Text>(true))
+        {
+            text.material = new Material(refMat);
+        }
     }
 
     private void Start()
@@ -54,6 +114,8 @@ public class ShipRemoteControl : MonoBehaviour
                 _shipAudioSignal = signal;
             }
         }
+        
+        _animator.SetImmediate(0f, new Vector3(1f, 0f, 1f));
     }
 
     private void Update()
@@ -64,14 +126,16 @@ public class ShipRemoteControl : MonoBehaviour
             if (!_scopeEquipped)
             {
                 Locator.GetPromptManager().AddScreenPrompt(_interactPrompt, PromptPosition.Center);
-                Locator.GetPromptManager().AddScreenPrompt(_commandPrompt, PromptPosition.Center);
-                Locator.GetPromptManager().AddScreenPrompt(_cyclePrompt, PromptPosition.Center);
+                //Locator.GetPromptManager().AddScreenPrompt(_commandPrompt, PromptPosition.Center);
+                Locator.GetPromptManager().AddScreenPrompt(_cycleCommandPrompt, PromptPosition.UpperRight);
+                Locator.GetPromptManager().AddScreenPrompt(_cycleGroupPrompt, PromptPosition.UpperRight);
                 _scopeEquipped = true;
             }
 
             _interactPrompt.SetVisibility(false);
-            _commandPrompt.SetVisibility(false);
-            _cyclePrompt.SetVisibility(false);
+            //_commandPrompt.SetVisibility(false);
+            _cycleCommandPrompt.SetVisibility(false);
+            _cycleGroupPrompt.SetVisibility(false);
 
             if (!_tuned && _shipAudioSignal.GetSignalStrength() == 1f)
             {
@@ -80,30 +144,40 @@ public class ShipRemoteControl : MonoBehaviour
                     Locator.GetPlayerTransform().GetComponent<PlayerLockOnTargeting>().LockOn(_shipAudioSignal.transform);
                     _lastInputMode = OWInput.GetInputMode();
                     OWInput.ChangeInputMode(InputMode.SatelliteCam);
+
+                    _groupHeader.text = _groupToDisplayName[_groupMask];
+                    _canvasList.SetCommands(_commandsByGroup[_groupMask].Where(c => c.CanShow()).ToList());
+                    SetVisible(true);
+                    Locator.GetPlayerAudioController()._oneShotSource.PlayOneShot(AudioType.ShipLogHighlightEntry);
+                        
                     _tuned = true;
                     return;
                 }
-                
+
                 _interactPrompt.SetVisibility(true);
             }
             
             if (_tuned)
             {
-                if (OWInput.IsNewlyPressed(InputLibrary.cancel) || _shipAudioSignal.GetSignalStrength() <= 0f)
+                if (OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.SatelliteCam) || 
+                    _shipAudioSignal.GetSignalStrength() <= 0f)
                 {
                     Locator.GetPlayerTransform().GetComponent<PlayerLockOnTargeting>().BreakLock();
                     OWInput.ChangeInputMode(_lastInputMode);
+                    SetVisible(false);
+                    Locator.GetPlayerAudioController()._oneShotSource.PlayOneShot(AudioType.ShipLogDeselectEntry);
                     _tuned = false;
                     return;
                 }
                 
-                _commandPrompt.SetVisibility(true);
-                _commandPrompt.SetText(_currentCommand.GetDisplayName());
-                _cyclePrompt.SetVisibility(true);
+                //_commandPrompt.SetVisibility(true);
+                //_commandPrompt.SetText(_currentCommand.GetDisplayName());
+                _cycleCommandPrompt.SetVisibility(true);
+                _cycleGroupPrompt.SetVisibility(true);
 
                 if (_currentCommand.CanActivate())
                 {
-                    _commandPrompt.SetDisplayState(ScreenPrompt.DisplayState.Normal);
+                    //_commandPrompt.SetDisplayState(ScreenPrompt.DisplayState.Normal);
 
                     if (OWInput.IsNewlyPressed(InputLibrary.interact))
                     {
@@ -120,36 +194,41 @@ public class ShipRemoteControl : MonoBehaviour
                 }
                 else
                 {
-                    _commandPrompt.SetDisplayState(ScreenPrompt.DisplayState.GrayedOut);
+                    //_commandPrompt.SetDisplayState(ScreenPrompt.DisplayState.GrayedOut);
                 }
 
-                bool changed = false;
+                bool changeGroup = OWInput.IsNewlyPressed(InputLibrary.left) ||
+                    OWInput.IsNewlyPressed(InputLibrary.right);
+                bool changeCommand = OWInput.IsNewlyPressed(InputLibrary.up) ||
+                    OWInput.IsNewlyPressed(InputLibrary.down);
 
-                if (OWInput.IsNewlyPressed(InputLibrary.toolOptionUp))
+                if (changeGroup)
                 {
-                    CycleCommand(false);
-                    changed = true;
+                    CycleGroup(OWInput.IsNewlyPressed(InputLibrary.right));
+                    _groupHeader.text = _groupToDisplayName[_groupMask];
+                    _canvasList.SetCommands(_commandsByGroup[_groupMask].Where(c => c.CanShow()).ToList());
                 }
-                else if (OWInput.IsNewlyPressed(InputLibrary.toolOptionDown))
+                if (changeCommand)
                 {
-                    CycleCommand(true);
-                    changed = true;
+                    CycleCommand(OWInput.IsNewlyPressed(InputLibrary.up));
                 }
 
-                if (changed)
+                if (changeGroup || changeCommand)
                 {
-                    _commandPrompt.SetText(_currentCommand.GetDisplayName());
-                    _commandPrompt.SetDisplayState(_currentCommand.CanActivate() ? 
-                        ScreenPrompt.DisplayState.Normal : ScreenPrompt.DisplayState.GrayedOut);
-                    Locator.GetPlayerAudioController()._oneShotSource.PlayOneShot(AudioType.Menu_LeftRight);
+                    //_commandPrompt.SetText(_currentCommand.GetDisplayName());
+                    //_commandPrompt.SetDisplayState(_currentCommand.CanActivate() ? 
+                        //ScreenPrompt.DisplayState.Normal : ScreenPrompt.DisplayState.GrayedOut);
+                    Locator.GetPlayerAudioController()._oneShotSource
+                        .PlayOneShot(changeGroup ? AudioType.Menu_LeftRight : AudioType.Menu_UpDown);
                 }
             }
         }
-        else if (_scopeEquipped)
+        else if (_scopeEquipped && !OWInput.IsInputMode(InputMode.Menu))
         {
             Locator.GetPromptManager().RemoveScreenPrompt(_interactPrompt, PromptPosition.Center);
-            Locator.GetPromptManager().RemoveScreenPrompt(_commandPrompt, PromptPosition.Center);
-            Locator.GetPromptManager().RemoveScreenPrompt(_cyclePrompt, PromptPosition.Center);
+            //Locator.GetPromptManager().RemoveScreenPrompt(_commandPrompt, PromptPosition.Center);
+            Locator.GetPromptManager().RemoveScreenPrompt(_cycleCommandPrompt, PromptPosition.UpperRight);
+            Locator.GetPromptManager().RemoveScreenPrompt(_cycleGroupPrompt, PromptPosition.UpperRight);
 
             if (_tuned)
             {
@@ -165,26 +244,11 @@ public class ShipRemoteControl : MonoBehaviour
     private void CycleCommand(bool forward)
     {
         int cycle = 0;
-        while (cycle < _commands.Count)
+        var commands = _commandsByGroup[_groupMask];
+        while (cycle < commands.Count)
         {
-            if (forward)
-            {
-                int index = _commands.IndexOf(_currentCommand) + 1;
-                if (index > _commands.Count - 1)
-                {
-                    index = 0;
-                }
-                _currentCommand = _commands[index];
-            }
-            else
-            {
-                int index = _commands.IndexOf(_currentCommand) - 1;
-                if (index < 0)
-                {
-                    index = _commands.Count - 1;
-                }
-                _currentCommand = _commands[index];
-            }
+            int index = (commands.IndexOf(_currentCommand) + commands.Count + (forward ? 1 : -1)) % commands.Count;
+            _currentCommand = commands[index];
 
             if (_currentCommand.CanShow())
             {
@@ -192,6 +256,34 @@ public class ShipRemoteControl : MonoBehaviour
             }
 
             cycle++;
+        }
+    }
+    
+    private void CycleGroup(bool forward)
+    {
+        int cycle = 0;
+        var groups = _commandsByGroup.Keys.ToList();
+        while (cycle < groups.Count)
+        {
+            int index = (groups.IndexOf(_currentCommand.GetCommandGroup()) + groups.Count + (forward ? 1 : -1)) % groups.Count;
+            _groupMask = groups[index];
+            _currentCommand = _commandsByGroup[_groupMask][0];
+
+            if (_commandsByGroup[_groupMask].Any(c => c.CanShow()))
+            {
+                break;
+            }
+
+            cycle++;
+        }
+    }
+
+    public void SetVisible(bool visible)
+    {
+        if (_visible != visible)
+        {
+            _visible = visible;
+            _animator.AnimateTo(_visible ? 1f : 0f, _visible ? Vector3.one : new Vector3(1f, 0f, 1f), 0.1f);
         }
     }
 
@@ -222,6 +314,8 @@ public class ShipRemoteControl : MonoBehaviour
         {
             Locator.GetPlayerTransform().GetComponent<PlayerLockOnTargeting>().BreakLock();
             OWInput.ChangeInputMode(_lastInputMode);
+            SetVisible(false);
+            Locator.GetPlayerAudioController()._oneShotSource.PlayOneShot(AudioType.ShipLogDeselectEntry);
             _tuned = false;
         }
     }

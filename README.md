@@ -56,6 +56,7 @@ Permanently remove useless or very important parts of the ship.
 
 ### *Navigation*
 - **Lock-on**: Removes your ability to lock on to objects. No autopilot, no distances, and no way of knowing how fast you're going.
+- **Signalscope Brackets**: Removes the guiding brackets on the signalscope that indicate the direction of the signal. You'll have to find the signals based on sound alone.
 - **HUD Markers**: Hides the on-screen markers that tell you the location of your ship, your scout, and any marked ship log locations. Ship log locations inside The Stranger are left visible until you arrive.
 - **Minimap Markers**: Hides the icons on the minimap globe that tell you the location of your ship, your scout, and yourself.
 
@@ -122,8 +123,35 @@ Some new stuff that Slate didn't have time to include in the ship.
 ### *Components*
 - **Scout Launcher Component**: Turns the ship's scout launcher into a fully functioning ship component. If you damage it, you won't be able to launch or recall your scout from the ship until you repair it.
 - **Ship Scout Photo Mode**: Lets you switch to photo mode on the ship's scout launcher. It will default to photo mode if scout launching is disabled.
-- **Signalscope Component**: Turns the ship's signalscope into a fully functioning ship component. If you damage it, you won't be able to receive or broadcast signals from the ship until you repair it.
-- **Ship Signal**: Adds a signal for the ship on the Outer Wilds Ventures frequency. The signal will stop if the ship's signalscope is damaged. Slate also said they added a "command transmitter" to your signalscope, whatever that means.
+- **Signalscope Component**: Turns the ship's signalscope into a fully functioning ship component. If you damage it, you might have some trouble hearing signals through it.
+- **Ship Signal**: Adds a signal for the ship on the Outer Wilds Ventures frequency. The signal will stop if the ship's signalscope is damaged.
+- **Ship Signalscope Zoom**: Lets you zoom in using the ship's signalscope. It works the same as the handheld signalscope, except the screen won't be covered by the scope.
+
+---
+
+The **Ship Signal** has a special use to it! If you find the ship's signal on your signalscope, you can "Tune In" to the signal to broadcast commands to the ship from afar. There are a lot of commands you can use, which are sorted into groups to make it easier to navigate.
+
+- Reactor Commands
+  - **Explode** - Instantly blows up the ship.
+  - **Turn Off Engine** - Turns off the ship. (Requires the **Engine Switch**)
+- Component Commands
+  - **Activate Return Warp** - Warps the ship home. (Requires the **Ship Warp Core**)
+  - **Honk Horn** - Honks the horn. (Requires the **Ship Horn**)
+- Module Commands
+  - **Eject Cockpit** - Ejects the cockpit. This will destroy the ship.
+  - **Eject Engine** - Ejects the left side of the ship, which has the reactor and the ship's gravity. (Requires the **Extra Eject Buttons**)
+  - **Eject Supplies** - Ejects the right side of the ship, which has your spacesuit and resource refill. (Requires the **Extra Eject Buttons**)
+  - **Detach Landing Gear** - Detaches all of the landing gear. This won't destroy the ship, but it might make getting out of the ship a little difficult. (Requires the **Extra Eject Buttons**)
+- Autopilot Commands
+  - **Activate Autopilot** - Autopilots the ship to the current lock-on target. This can't be activated if the ship is too close or if the lock-on target can't be autopiloted to.
+  - **Activate Orbital Autopilot** - Begins orbiting the current lock-on target, or the nearest planet if nothing is targeted. It will orbit at whatever distance you activated it at. (Requires the **Autopilot Controls**)
+  - **Activate Match Velocity** - Starts matching velocity with the current lock-on target, or the nearest planet if nothing is targeted. It will automatically turn off after matching velocity, but this can be prevented by using the **Continuous Velocity Match** feature from **General Enhancements**.
+  - **Activate Position Hold** - Tries to stay in the same position relative to the current lock-on target, or the nearest planet if nothing is target. (Requires the **Autopilot Controls**)
+- Targeting Commands
+  - **Target My Planet** - Sets the ship's target to the planet you're on, ignoring your current lock-on target.
+  - **Target Current Lock-on** - Sets the ship's target to your current lock-on target. (Requires **Split Ship Lock-on**)
+  - **Target Me** - Sets the ship's target to you. Autopilot and related features that require a target will treat you as if you were a planet.
+  - **Target Scout** - Sets the ship's target to your scout. Autopilot and related features that require a target will treat the scout as if it were a planet.
 
 ### *Items*
 - **Portable Campfire**: Adds a portable campfire to the ship next to your suit. Set it up wherever you want and roast a marshmallow.

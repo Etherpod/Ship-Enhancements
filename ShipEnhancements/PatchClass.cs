@@ -2663,7 +2663,7 @@ public static class PatchClass
             return false;
         }
 
-        if (Locator.GetPlayerCamera().GetComponentInChildren<ShipRemoteControl>().IsTuned())
+        if (SELocator.GetRemoteControl().IsTuned())
         {
             __instance._signalStrength = 0f;
             __instance._degreesFromScope = 180f;
@@ -4856,7 +4856,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ReferenceFrameTracker), nameof(ReferenceFrameTracker.TargetReferenceFrame))]
     public static void StoreShipRF(ReferenceFrameTracker __instance, ReferenceFrame frame)
     {
-        if (!(bool)splitLockOn.GetProperty()) return;
+        //if (!(bool)splitLockOn.GetProperty()) return;
 
         if (SkipNextRFUpdate)
         {
@@ -4870,7 +4870,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ReferenceFrameTracker), nameof(ReferenceFrameTracker.UntargetReferenceFrame), typeof(bool))]
     public static void RemoveShipRF(ReferenceFrameTracker __instance)
     {
-        if (!(bool)splitLockOn.GetProperty()) return;
+        //if (!(bool)splitLockOn.GetProperty()) return;
 
         if (SkipNextRFUpdate)
         {
@@ -4902,7 +4902,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.OnUntargetReferenceFrame))]
     public static bool KeepAutopilotOnRemoveRF(ShipCockpitController __instance)
     {
-        if (!(bool)splitLockOn.GetProperty()) return true;
+        //if (!(bool)splitLockOn.GetProperty()) return true;
 
         if (SELocator.GetReferenceFrame() == null)
         {
@@ -4916,7 +4916,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipCockpitController), nameof(ShipCockpitController.OnTargetReferenceFrame))]
     public static bool KeepAutopilotOnSwitchRF(ShipCockpitController __instance, ReferenceFrame referenceFrame)
     {
-        if (!(bool)splitLockOn.GetProperty()) return true;
+        //if (!(bool)splitLockOn.GetProperty()) return true;
 
         if (PlayerState.AtFlightConsole() && SELocator.GetReferenceFrame() != referenceFrame)
         {
@@ -5514,6 +5514,81 @@ public static class PatchClass
             __instance._clonedRightBrackets.Clear();
         }
         return false;
+    }
+    
+    #endregion
+    
+    #region CustomRF
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ReferenceFrame), nameof(ReferenceFrame.GetHUDDisplayName))]
+    public static bool OverrideRFDisplay(ReferenceFrame __instance, ref string __result)
+    {
+        if (__instance is PlayerReferenceFrame player)
+        {
+            __result = player.GetHUDDisplayName_New();
+            return false;
+        }
+        
+        if (__instance is ProbeReferenceFrame probe)
+        {
+            __result = probe.GetHUDDisplayName_New();
+            return false;
+        }
+
+        return true;
+    }
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ReferenceFrame), nameof(ReferenceFrame.GetOWRigidBody))]
+    public static bool OverrideRFPosition(ReferenceFrame __instance, ref OWRigidbody __result)
+    {
+        if (__instance is ProbeReferenceFrame probe)
+        {
+            __result = probe.GetOWRigidBody_New();
+            return false;
+        }
+
+        return true;
+    }
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ReferenceFrame), nameof(ReferenceFrame.GetPosition))]
+    public static bool OverrideRFPosition(ReferenceFrame __instance, ref Vector3 __result)
+    {
+        if (__instance is ProbeReferenceFrame probe)
+        {
+            __result = probe.GetPosition_New();
+            return false;
+        }
+
+        return true;
+    }
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ReferenceFrame), nameof(ReferenceFrame.GetVelocity))]
+    public static bool OverrideRFVelocity(ReferenceFrame __instance, ref Vector3 __result)
+    {
+        if (__instance is ProbeReferenceFrame probe)
+        {
+            __result = probe.GetVelocity_New();
+            return false;
+        }
+
+        return true;
+    }
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(ReferenceFrame), nameof(ReferenceFrame.GetAcceleration))]
+    public static bool OverrideRFAcceleration(ReferenceFrame __instance, ref Vector3 __result)
+    {
+        if (__instance is ProbeReferenceFrame probe)
+        {
+            __result = probe.GetAcceleration_New();
+            return false;
+        }
+
+        return true;
     }
     
     #endregion

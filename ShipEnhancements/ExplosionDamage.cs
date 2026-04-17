@@ -55,7 +55,7 @@ public class ExplosionDamage : MonoBehaviour
 
     private void FixedUpdate()
     {
-        if (unparent)
+        if (unparent && _explosion != null)
         {
             transform.position = _explosion.transform.position;
         }

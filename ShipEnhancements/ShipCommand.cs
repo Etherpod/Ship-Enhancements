@@ -129,10 +129,16 @@ public class ShipCommand_HonkHorn : ShipCommand
 public class ShipCommand_Autopilot : ShipCommand
 {
 	private Autopilot _autopilot;
+	private AutopilotPanelController _controller;
 	
 	public ShipCommand_Autopilot()
 	{
 		_autopilot = SELocator.GetShipBody().GetComponent<Autopilot>();
+
+		if ((bool)enableEnhancedAutopilot.GetProperty())
+		{
+			_controller = SELocator.GetAutopilotPanelController();
+		}
 	}
 
 	public override string GetDisplayName()
@@ -153,18 +159,32 @@ public class ShipCommand_Autopilot : ShipCommand
 		}
 		
 		ReferenceFrame referenceFrame = SELocator.GetReferenceFrame();
-		return _autopilot.enabled || (referenceFrame != null && referenceFrame.GetAllowAutopilot() && 
-			(PlayerData.GetAutopilotEnabled() || (bool)enableEnhancedAutopilot.GetProperty()) && 
+		return _autopilot.IsFlyingToDestination() || (referenceFrame != null && referenceFrame.GetAllowAutopilot() && 
 			Vector3.Distance(SELocator.GetShipBody().GetPosition(), referenceFrame.GetPosition()) > 
 			referenceFrame.GetAutopilotArrivalDistance());
 	}
 
 	public override void Activate()
 	{
-		if ((bool)enableEnhancedAutopilot.GetProperty() && 
-			!SELocator.GetAutopilotPanelController().IsApproachSelected())
+		if (_controller != null)
 		{
-			SELocator.GetAutopilotPanelController().SetAutopilotMode(false);
+			if (!_controller.IsApproachSelected())
+			{
+				_controller.SetAutopilotMode(false);
+			}
+			
+			_controller.CancelMatchVelocity();
+			
+			if (!_autopilot.IsFlyingToDestination())
+			{
+				_controller.ActivateAutopilot();
+			}
+			else
+			{
+				_controller.CancelAutopilot();
+			}
+
+			return;
 		}
 		
 		if (!_autopilot.IsFlyingToDestination())
@@ -186,6 +206,7 @@ public class ShipCommand_OrbitAutopilot : ShipCommand
 {
 	private Autopilot _autopilot;
 	private PidAutopilot _pidAutopilot;
+	private AutopilotPanelController _controller;
 	
 	public ShipCommand_OrbitAutopilot()
 	{
@@ -193,18 +214,19 @@ public class ShipCommand_OrbitAutopilot : ShipCommand
 		if ((bool)enableEnhancedAutopilot.GetProperty())
 		{
 			_pidAutopilot = SELocator.GetShipBody().GetComponent<PidAutopilot>();
+			_controller = SELocator.GetAutopilotPanelController();
 		}
 	}
 
 	public override string GetDisplayName()
 	{
-		return (_pidAutopilot.enabled && _pidAutopilot.GetCurrentMode() == PidMode.Orbit) ? 
+		return _pidAutopilot.enabled && _pidAutopilot.GetCurrentMode() == PidMode.Orbit ? 
 			"Disengage Orbital Autopilot" : "Activate Orbital Autopilot";
 	}
 	
 	public override CommandGroup GetCommandGroup() => CommandGroup.Autopilot;
 
-	public override bool CanShow() => _autopilot != null && _pidAutopilot != null;
+	public override bool CanShow() => _autopilot != null && _pidAutopilot != null && _controller != null;
 
 	public override bool CanActivate()
 	{
@@ -220,18 +242,20 @@ public class ShipCommand_OrbitAutopilot : ShipCommand
 
 	public override void Activate()
 	{
-		if (!SELocator.GetAutopilotPanelController().IsOrbitSelected())
+		if (!_controller.IsOrbitSelected())
 		{
-			SELocator.GetAutopilotPanelController().SetAutopilotMode(true);
+			_controller.SetAutopilotMode(true);
 		}
+
+		_controller.CancelMatchVelocity();
 
 		if (!_pidAutopilot.enabled)
 		{
-			SELocator.GetAutopilotPanelController().ActivateAutopilot();
+			_controller.ActivateAutopilot();
 		}
 		else
 		{
-			SELocator.GetAutopilotPanelController().CancelAutopilot();
+			_controller.CancelAutopilot();
 		}
 	}
 }
@@ -239,15 +263,22 @@ public class ShipCommand_OrbitAutopilot : ShipCommand
 public class ShipCommand_MatchVelocity : ShipCommand
 {
 	private Autopilot _autopilot;
+	private AutopilotPanelController _controller;
 	
 	public ShipCommand_MatchVelocity()
 	{
 		_autopilot = SELocator.GetShipBody().GetComponent<Autopilot>();
+
+		if ((bool)enableEnhancedAutopilot.GetProperty())
+		{
+			_controller = SELocator.GetAutopilotPanelController();
+		}
 	}
 
 	public override string GetDisplayName()
 	{
-		return _autopilot.IsMatchingVelocity() ? "Disengage Match Velocity" : "Activate Match Velocity";
+		return _autopilot.IsMatchingVelocity() && !_autopilot.IsFlyingToDestination() ? 
+			"Disengage Match Velocity" : "Activate Match Velocity";
 	}
 	
 	public override CommandGroup GetCommandGroup() => CommandGroup.Autopilot;
@@ -262,35 +293,45 @@ public class ShipCommand_MatchVelocity : ShipCommand
 			return false;
 		}
 
-		if ((bool)enableEnhancedAutopilot.GetProperty() && 
-			SELocator.GetAutopilotPanelController().IsAutopilotActive(true, false))
-		{
-			return false;
-		}
-
-		return !_autopilot.IsFlyingToDestination() && 
+		return _autopilot.IsMatchingVelocity() || 
 			SELocator.GetReferenceFrame(ignorePassiveFrame: false) != null;
 	}
 
 	public override void Activate()
 	{
-		if ((bool)enableEnhancedAutopilot.GetProperty())
+		if (_controller != null)
 		{
-			if (!SELocator.GetAutopilotPanelController().IsMatchVelocitySelected())
+			if (!_controller.IsMatchVelocitySelected())
 			{
-				SELocator.GetAutopilotPanelController().SetMatchMode(false);
+				_controller.SetMatchMode(false);
 			}
 			
-			if (_autopilot.IsMatchingVelocity())
+			_controller.CancelAutopilot();
+			
+			if (!_autopilot.IsMatchingVelocity())
 			{
-				SELocator.GetAutopilotPanelController().CancelMatchVelocity();
+				if (ShipEnhancements.GEInteraction != null)
+				{
+					ShipEnhancements.GEInteraction.EnableContinuousMatchVelocity();
+				}
+				_controller.ActivateMatchVelocity();
+			}
+			else if (ShipEnhancements.GEInteraction != null 
+				&& ShipEnhancements.GEInteraction.IsContinuousMatchVelocityEnabled())
+			{
+				ShipEnhancements.GEInteraction.StopContinuousMatchVelocity();
 			}
 			else
 			{
-				SELocator.GetAutopilotPanelController().ActivateMatchVelocity();
+				_controller.CancelMatchVelocity();
 			}
 
 			return;
+		}
+
+		if (_autopilot.IsFlyingToDestination())
+		{
+			_autopilot.Abort();
 		}
 		
 		if (!_autopilot.IsMatchingVelocity())
@@ -321,6 +362,7 @@ public class ShipCommand_HoldPosition : ShipCommand
 {
 	private Autopilot _autopilot;
 	private PidAutopilot _pidAutopilot;
+	private AutopilotPanelController _controller;
 	
 	public ShipCommand_HoldPosition()
 	{
@@ -328,6 +370,7 @@ public class ShipCommand_HoldPosition : ShipCommand
 		if ((bool)enableEnhancedAutopilot.GetProperty())
 		{
 			_pidAutopilot = SELocator.GetShipBody().GetComponent<PidAutopilot>();
+			_controller = SELocator.GetAutopilotPanelController();
 		}
 	}
 
@@ -339,7 +382,7 @@ public class ShipCommand_HoldPosition : ShipCommand
 	
 	public override CommandGroup GetCommandGroup() => CommandGroup.Autopilot;
 
-	public override bool CanShow() => _autopilot != null && _pidAutopilot != null;
+	public override bool CanShow() => _autopilot != null && _pidAutopilot != null && _controller != null;
 
 	public override bool CanActivate()
 	{
@@ -355,18 +398,20 @@ public class ShipCommand_HoldPosition : ShipCommand
 
 	public override void Activate()
 	{
-		if (!SELocator.GetAutopilotPanelController().IsHoldPositionSelected())
+		if (!_controller.IsHoldPositionSelected())
 		{
-			SELocator.GetAutopilotPanelController().SetMatchMode(true);
+			_controller.SetMatchMode(true);
 		}
+		
+		_controller.CancelAutopilot();
 
 		if (!_pidAutopilot.enabled)
 		{
-			SELocator.GetAutopilotPanelController().ActivateMatchVelocity();
+			_controller.ActivateMatchVelocity();
 		}
 		else
 		{
-			SELocator.GetAutopilotPanelController().CancelMatchVelocity();
+			_controller.CancelMatchVelocity();
 		}
 	}
 }
@@ -473,5 +518,74 @@ public class ShipCommand_LandingGearEject : ShipCommand
 	public override void Activate()
 	{
 		_ejectSystem.Eject();
+	}
+}
+
+public class ShipCommand_TargetPlayerPlanet : ShipCommand
+{
+	public override string GetDisplayName() => "Target My Planet";
+	
+	public override CommandGroup GetCommandGroup() => CommandGroup.LockOn;
+
+	public override bool CanShow() => true;
+
+	public override bool CanActivate() => Locator.GetPlayerSectorDetector().GetPassiveReferenceFrame() != null &&
+		SELocator.GetReferenceFrame() != Locator.GetPlayerSectorDetector().GetPassiveReferenceFrame();
+
+	public override void Activate()
+	{
+		SELocator.SetShipReferenceFrame(Locator.GetPlayerSectorDetector().GetPassiveReferenceFrame());
+	}
+}
+
+public class ShipCommand_TargetCurrentLockOn : ShipCommand
+{
+	public override string GetDisplayName() => "Target Current Lock-on";
+	
+	public override CommandGroup GetCommandGroup() => CommandGroup.LockOn;
+
+	public override bool CanShow() => (bool)splitLockOn.GetProperty();
+
+	public override bool CanActivate() => SELocator.GetReferenceFrame() != Locator.GetReferenceFrame();
+
+	public override void Activate()
+	{
+		SELocator.SetShipReferenceFrame(Locator.GetReferenceFrame());
+	}
+}
+
+public class ShipCommand_TargetPlayer : ShipCommand
+{
+	public override string GetDisplayName() => "Target Me";
+	
+	public override CommandGroup GetCommandGroup() => CommandGroup.LockOn;
+
+	public override bool CanShow() => true;
+
+	public override bool CanActivate() => !SELocator.IsShipTargetingPlayer();
+
+	public override void Activate()
+	{
+		Locator._rfTracker.UntargetReferenceFrame(false);
+		SELocator.TargetPlayerWithShip();
+		Locator.GetPlayerAudioController().PlayLockOn();
+	}
+}
+
+public class ShipCommand_TargetProbe : ShipCommand
+{
+	public override string GetDisplayName() => "Target Scout";
+	
+	public override CommandGroup GetCommandGroup() => CommandGroup.LockOn;
+
+	public override bool CanShow() => true;
+
+	public override bool CanActivate() => !SELocator.IsShipTargetingProbe();
+
+	public override void Activate()
+	{
+		Locator._rfTracker.UntargetReferenceFrame(false);
+		SELocator.TargetProbeWithShip();
+		Locator.GetPlayerAudioController().PlayLockOn();
 	}
 }
