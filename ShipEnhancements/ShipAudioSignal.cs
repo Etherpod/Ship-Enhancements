@@ -80,7 +80,7 @@ public class ShipAudioSignal : AudioSignal
             float num = Mathf.InverseLerp(2000f, 1000f, _distToScope);
             float num2 = Mathf.Lerp(45f, 90f, num);
             float num3 = 57.29578f * Mathf.Atan2(_sourceRadius, _distToScope);
-            float num4 = Mathf.Lerp(Mathf.Max(num3, 5f), Mathf.Max(num3, 1f), scope.GetZoomFraction());
+            float num4 = Mathf.Lerp(Mathf.Max(num3, 10f), Mathf.Max(num3, 2f), scope.GetZoomFraction());
             _signalStrength = Mathf.Clamp01(Mathf.InverseLerp(num2, num4, _degreesFromScope));
         }
         if (Locator.GetCloakFieldController() != null)

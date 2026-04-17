@@ -9,7 +9,6 @@ public abstract class ShipCommand
 	public enum CommandGroup
 	{
 		Modules,
-		Reactor,
 		Components,
 		Autopilot,
 		LockOn
@@ -30,7 +29,7 @@ public class ShipCommand_Explode : ShipCommand
 {
 	public override string GetDisplayName() => "Explode";
 
-	public override CommandGroup GetCommandGroup() => CommandGroup.Reactor;
+	public override CommandGroup GetCommandGroup() => CommandGroup.Components;
 
 	public override bool CanShow() => true;
 	
@@ -60,7 +59,7 @@ public class ShipCommand_EngineSwitch : ShipCommand
 	
 	public override string GetDisplayName() => "Turn Off Engine";
 	
-	public override CommandGroup GetCommandGroup() => CommandGroup.Reactor;
+	public override CommandGroup GetCommandGroup() => CommandGroup.Components;
 
 	public override bool CanShow() => _engineSwitch != null;
 	

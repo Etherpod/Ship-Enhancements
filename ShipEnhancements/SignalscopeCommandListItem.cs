@@ -8,7 +8,13 @@ public class SignalscopeCommandListItem : MonoBehaviour
 	[SerializeField]
 	private Text _text;
 	[SerializeField]
+	private Color _defaultColor = Color.white;
+	[SerializeField]
 	private Color _inactiveColor = Color.gray;
+	[SerializeField]
+	private Color _highlightColor = Color.cyan;
+	[SerializeField]
+	private GameObject _selectMarker;
 	
 	private ShipCommand _command;
 	private bool _lastActive;
@@ -30,7 +36,7 @@ public class SignalscopeCommandListItem : MonoBehaviour
 		if (_lastActive != canActivate)
 		{
 			_lastActive = canActivate;
-			_text.color = _lastActive ? Color.white : _inactiveColor;
+			RefreshTextColor();
 		}
 
 		string displayName = _command.GetDisplayName();
@@ -45,8 +51,14 @@ public class SignalscopeCommandListItem : MonoBehaviour
 		_command = command;
 		_text.text = command.GetDisplayName();
 		_lastActive = command.CanActivate();
-		_text.color = _lastActive ? Color.white : _inactiveColor;
+		RefreshTextColor();
 		gameObject.SetActive(true);
+	}
+
+	private void RefreshTextColor()
+	{
+		var activeColor = _selectMarker.activeSelf ? _highlightColor : _defaultColor;
+		_text.color = _lastActive ? activeColor : _inactiveColor;
 	}
 
 	public void Clear()
@@ -54,4 +66,18 @@ public class SignalscopeCommandListItem : MonoBehaviour
 		_command = null;
 		_text.text = string.Empty;
 	}
+
+	public void Select()
+	{
+		_selectMarker.SetActive(true);
+		RefreshTextColor();
+	}
+
+	public void Deselect()
+	{
+		_selectMarker.SetActive(false);
+		RefreshTextColor();
+	}
+
+	public ShipCommand GetCommand() => _command;
 }

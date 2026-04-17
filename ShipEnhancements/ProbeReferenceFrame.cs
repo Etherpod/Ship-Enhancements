@@ -16,7 +16,7 @@ public class ProbeReferenceFrame : ReferenceFrame
 
 	public string GetHUDDisplayName_New()
 	{
-		return "Probe";
+		return "Scout";
 	}
 
 	public OWRigidbody GetOWRigidBody_New()
