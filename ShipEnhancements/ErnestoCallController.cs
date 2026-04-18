@@ -9,13 +9,25 @@ public class ErnestoCallController : MonoBehaviour
 	[SerializeField]
 	private OWAudioSource _dialAudio;
 
+	private bool _remoteConversation;
+
 	private void Awake()
 	{
+		_dialogueTree.OnStartConversation += OnStartConversation;
 		_dialogueTree.OnEndConversation += OnEndConversation;
+	}
+
+	private void OnStartConversation()
+	{
+		if (!_dialogueTree.enabled)
+		{
+			_remoteConversation = true;
+		}
 	}
 
 	private void OnEndConversation()
 	{
+		_remoteConversation = false;
 		DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_LONGPICKUP");
 		DialogueConditionManager.SharedInstance.SetConditionState("SE_ERNESTO_CLOSECALL");
 
@@ -37,8 +49,12 @@ public class ErnestoCallController : MonoBehaviour
 		_dialAudio.Stop();
 	}
 
+	public bool InRemoteConversation() => 
+		ShipEnhancements.InMultiplayer && _remoteConversation;
+
 	private void OnDestroy()
 	{
+		_dialogueTree.OnStartConversation -= OnStartConversation;
 		_dialogueTree.OnEndConversation -= OnEndConversation;
 	}
 }

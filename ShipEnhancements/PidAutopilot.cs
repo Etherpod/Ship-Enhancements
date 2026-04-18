@@ -186,7 +186,7 @@ public class PidAutopilot : ThrusterController
             {
                 OnAbortHoldPosition?.Invoke();
             }
-            ShipEnhancements.WriteDebugMessage("nothing to orbit");
+            ShipEnhancements.WriteDebugMessage("abort pid autopilot");
             return Vector3.zero;
         }
 

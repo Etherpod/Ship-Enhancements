@@ -151,6 +151,7 @@ The **Ship Signal** has a special use to it! If you find the ship's signal on yo
   - **Target Current Lock-on** - Sets the ship's target to your current lock-on target. (Requires **Split Ship Lock-on**)
   - **Target Me** - Sets the ship's target to you. Autopilot and related features that require a target will treat you as if you were a planet.
   - **Target Scout** - Sets the ship's target to your scout. Autopilot and related features that require a target will treat the scout as if it were a planet.
+    - Unfortunately, both the **Target Me** and **Target Scout** are unavailable in multiplayer due to technical complications. (The fake players that you see in your game don't have any physics, which breaks autopilot and everything else)
 - Other Commands
   - **Call Ernesto** - Calls Ernesto. (Requires **Ernesto**)
 

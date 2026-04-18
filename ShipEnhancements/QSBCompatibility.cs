@@ -107,6 +107,7 @@ public class QSBCompatibility
         _api.RegisterHandler<bool>("water-cooling", ReceiveWaterCoolingState);
         _api.RegisterHandler<bool>("reactor-overload", ReceiveReactorOverload);
         _api.RegisterHandler<(bool, int)>("engine-sputter", ReceiveEngineSputter);
+        _api.RegisterHandler<NoData>("ship-explode", ReceiveShipExplosion);
     }
 
     private void OnPlayerJoin(uint playerID)
@@ -128,7 +129,7 @@ public class QSBCompatibility
         var allSettings = Enum.GetValues(typeof(ShipEnhancements.Settings)) as ShipEnhancements.Settings[];
         foreach (var setting in allSettings)
         {
-            _api.SendMessage("settings-data", (setting.GetName(), setting.GetProperty()), id, false);
+            _api.SendMessage("settings-data", (setting.GetName(), setting.GetProperty()), id);
         }
     }
 
@@ -148,7 +149,7 @@ public class QSBCompatibility
 
     public void SendHostPreset(uint id)
     {
-        _api.SendMessage("host-preset", (int)ShipEnhancements.Instance.GetCurrentPreset(), id, false);
+        _api.SendMessage("host-preset", (int)ShipEnhancements.Instance.GetCurrentPreset(), id);
     }
 
     private void ReceiveHostPreset(uint id, int preset)
@@ -166,11 +167,11 @@ public class QSBCompatibility
     public void SendInitializedShip(uint id)
     {
         _neverInitialized = false;
-        _api.SendMessage("ship-initialized", new NoData(), id, false);
+        _api.SendMessage("ship-initialized", new NoData(), id);
         ShipEnhancements.Instance.ModHelper.Events.Unity.RunWhen(
             ShipEnhancements.QSBInteraction.WorldObjectsLoaded, () =>
             {
-                _api.SendMessage("world-objects-ready", new NoData(), id, false);
+                _api.SendMessage("world-objects-ready", new NoData(), id);
             });
     }
 
@@ -183,7 +184,7 @@ public class QSBCompatibility
 
         if (_engineSwitch != null)
         {
-            _api.SendMessage("initialize-engine-switch", ShipEnhancements.Instance.engineOn, id, false);
+            _api.SendMessage("initialize-engine-switch", ShipEnhancements.Instance.engineOn, id);
         }
         if ((bool)addPortableCampfire.GetProperty())
         {
@@ -275,7 +276,7 @@ public class QSBCompatibility
     #region Switches
     public void SendSwitchState(uint id, CockpitSwitch cockpitSwitch, bool state)
     {
-        _api.SendMessage("switch-state", (ShipEnhancements.QSBInteraction.GetIDFromSwitch(cockpitSwitch), state), id, false);
+        _api.SendMessage("switch-state", (ShipEnhancements.QSBInteraction.GetIDFromSwitch(cockpitSwitch), state), id);
     }
 
     private void ReceiveSwitchState(uint id, (int switchID, bool state) data)
@@ -289,7 +290,7 @@ public class QSBCompatibility
 
     public void SendButtonState(uint id, CockpitButton button, bool state, bool doEvent = true, bool doAction = true)
     {
-        _api.SendMessage("button-state", (ShipEnhancements.QSBInteraction.GetIDFromButton(button), state, doEvent, doAction), id, false);
+        _api.SendMessage("button-state", (ShipEnhancements.QSBInteraction.GetIDFromButton(button), state, doEvent, doAction), id);
     }
 
     private void ReceiveButtonState(uint id, (int buttonID, bool state, bool doEvent, bool doAction) data)
@@ -316,7 +317,7 @@ public class QSBCompatibility
     public void SendButtonSwitchState(uint id, CockpitButtonSwitch buttonSwitch, bool state, bool activated, bool doEvent = true, bool doAction = true)
     {
         _api.SendMessage("button-switch-state", (ShipEnhancements.QSBInteraction.GetIDFromButton(buttonSwitch), state, activated,
-            doEvent, doAction), id, false);
+            doEvent, doAction), id);
     }
 
     private void ReceiveButtonSwitchState(uint id, (int bsID, bool state, bool activated, bool doEvent, bool doAction) data)
@@ -367,7 +368,7 @@ public class QSBCompatibility
 
     public void SendEngineSwitchState(uint id, bool wasPressed, bool turnOff)
     {
-        _api.SendMessage("engine-switch-state", (wasPressed, turnOff), id, false);
+        _api.SendMessage("engine-switch-state", (wasPressed, turnOff), id);
     }
 
     private void ReceiveEngineSwitchState(uint id, (bool wasPressed, bool turnOff) data)
@@ -384,7 +385,7 @@ public class QSBCompatibility
     #region Resource Sync
     public void SendShipOxygenDrain(uint id, float drainAmount, bool applyMultipliers)
     {
-        _api.SendMessage("ship-oxygen-drain", (drainAmount, applyMultipliers), id, false);
+        _api.SendMessage("ship-oxygen-drain", (drainAmount, applyMultipliers), id);
     }
 
     private void ReceiveShipOxygenDrain(uint id, (float, bool) data)
@@ -410,7 +411,7 @@ public class QSBCompatibility
 
     public void SendShipFuelDrain(uint id, float drainAmount, bool applyMultipliers)
     {
-        _api.SendMessage("ship-fuel-drain", (drainAmount, applyMultipliers), id, false);
+        _api.SendMessage("ship-fuel-drain", (drainAmount, applyMultipliers), id);
     }
 
     private void ReceiveShipFuelDrain(uint id, (float, bool) data)
@@ -436,7 +437,7 @@ public class QSBCompatibility
 
     public void SendShipOxygenValue(uint id, float newValue)
     {
-        _api.SendMessage("set-ship-oxygen", newValue, id, false);
+        _api.SendMessage("set-ship-oxygen", newValue, id);
     }
 
     private void ReceiveShipOxygenValue(uint id, float newValue)
@@ -446,7 +447,7 @@ public class QSBCompatibility
 
     public void SendShipFuelValue(uint id, float newValue)
     {
-        _api.SendMessage("set-ship-fuel", newValue, id, false);
+        _api.SendMessage("set-ship-fuel", newValue, id);
     }
 
     private void ReceiveShipFuelValue(uint id, float newValue)
@@ -456,7 +457,7 @@ public class QSBCompatibility
 
     public void SendShipWaterValue(uint id, float newValue)
     {
-        _api.SendMessage("set-ship-water", newValue, id, false);
+        _api.SendMessage("set-ship-water", newValue, id);
     }
 
     private void ReceiveShipWaterValue(uint id, float newValue)
@@ -466,7 +467,7 @@ public class QSBCompatibility
 
     public void SendShipFuelMax(uint id)
     {
-        _api.SendMessage("ship-fuel-max", new NoData(), id, false);
+        _api.SendMessage("ship-fuel-max", new NoData(), id);
     }
 
     private void ReceiveShipFuelMax(uint id, NoData noData)
@@ -478,7 +479,7 @@ public class QSBCompatibility
     #region Button Panel
     public void SendPanelExtended(uint id, bool extended)
     {
-        _api.SendMessage("panel-state", extended, id, false);
+        _api.SendMessage("panel-state", extended, id);
     }
 
     private void ReceivePanelExtended(uint id, bool extended)
@@ -490,7 +491,7 @@ public class QSBCompatibility
     #region Thrust Modulator
     public void SendModulatorButtonState(uint id, int level, bool pressed)
     {
-        _api.SendMessage("modulator-button-state", (level, pressed), id, false);
+        _api.SendMessage("modulator-button-state", (level, pressed), id);
     }
 
     private void ReceiveModulatorButtonState(uint id, (int, bool) data)
@@ -511,7 +512,7 @@ public class QSBCompatibility
 
     public void SendOverdriveButtonState(uint id, bool isPrimeButton, bool pressed, bool reset = false)
     {
-        _api.SendMessage("overdrive-button-state", (isPrimeButton, pressed, reset), id, false);
+        _api.SendMessage("overdrive-button-state", (isPrimeButton, pressed, reset), id);
     }
 
     private void ReceiveOverdriveButtonState(uint id, (bool, bool, bool) data)
@@ -548,7 +549,7 @@ public class QSBCompatibility
 
     public void SendStopOverdriveCoroutines(uint id)
     {
-        _api.SendMessage("overdrive-stop-coroutines", new NoData(), id, false);
+        _api.SendMessage("overdrive-stop-coroutines", new NoData(), id);
     }
 
     private void ReceiveStopOverdriveCoroutines(uint id, NoData noData)
@@ -560,7 +561,7 @@ public class QSBCompatibility
     #region Portable Campfire
     public void SendCampfireReactorDamaged(uint id, OWItem item)
     {
-        _api.SendMessage("campfire-reactor-delay", ShipEnhancements.QSBInteraction.GetIDFromItem(item), id, false);
+        _api.SendMessage("campfire-reactor-delay", ShipEnhancements.QSBInteraction.GetIDFromItem(item), id);
     }
 
     private void ReceiveCampfireReactorDamaged(uint id, int itemID)
@@ -574,7 +575,7 @@ public class QSBCompatibility
 
     public void SendCampfireExtinguishState(uint id, OWItem item)
     {
-        _api.SendMessage("campfire-extinguished", ShipEnhancements.QSBInteraction.GetIDFromItem(item), id, false);
+        _api.SendMessage("campfire-extinguished", ShipEnhancements.QSBInteraction.GetIDFromItem(item), id);
     }
 
     private void ReceiveCampfireExtinguished(uint id, int itemID)
@@ -588,7 +589,7 @@ public class QSBCompatibility
 
     public void SendCampfireInitialState(uint id, OWItem item, bool dropped, bool unpacked, bool lit)
     {
-        _api.SendMessage("campfire-initial-state", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), dropped, unpacked, lit), id, false);
+        _api.SendMessage("campfire-initial-state", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), dropped, unpacked, lit), id);
     }
 
     private void ReceiveCampfireInitialState(uint id, (int itemID, bool dropped, bool unpacked, bool lit) data)
@@ -616,7 +617,7 @@ public class QSBCompatibility
     #region Temperature
     public void SendShipHullTemp(uint id, float temperature)
     {
-        _api.SendMessage("ship-temp-meter", temperature, id, false);
+        _api.SendMessage("ship-temp-meter", temperature, id);
     }
 
     private void ReceiveShipHullTemp(uint id, float temperature)
@@ -628,7 +629,7 @@ public class QSBCompatibility
     #region Tether
     public void SendAttachTether(uint id, TetherHookItem hook)
     {
-        _api.SendMessage("attach-tether", ShipEnhancements.QSBInteraction.GetIDFromItem(hook), id, false);
+        _api.SendMessage("attach-tether", ShipEnhancements.QSBInteraction.GetIDFromItem(hook), id);
     }
 
     private void ReceiveAttachTether(uint id, int hookID)
@@ -639,7 +640,7 @@ public class QSBCompatibility
 
     public void SendDisconnectTether(uint id, TetherHookItem hook)
     {
-        _api.SendMessage("disconnect-tether", ShipEnhancements.QSBInteraction.GetIDFromItem(hook), id, false);
+        _api.SendMessage("disconnect-tether", ShipEnhancements.QSBInteraction.GetIDFromItem(hook), id);
     }
 
     private void ReceiveDisconnectTether(uint id, int hookID)
@@ -652,7 +653,7 @@ public class QSBCompatibility
     {
         int newID = ShipEnhancements.QSBInteraction.GetIDFromItem(newHook);
         int lastID = ShipEnhancements.QSBInteraction.GetIDFromItem(lastHook);
-        _api.SendMessage("transfer-tether", (newID, lastID), id, false);
+        _api.SendMessage("transfer-tether", (newID, lastID), id);
     }
 
     private void ReceiveTransferTether(uint id, (int newID, int lastID) data)
@@ -680,7 +681,8 @@ public class QSBCompatibility
 
     public void SendInitialCockpitEffectState(uint id, int rustIndex, Vector2 rustOffset, int dirtIndex, Vector2 dirtOffset, float dirtProgression)
     {
-        _api.SendMessage("initial-cockpit-effect-state", (rustIndex, rustOffset.x, rustOffset.y, dirtIndex, dirtOffset.x, dirtOffset.y, dirtProgression), id, false);
+        _api.SendMessage("initial-cockpit-effect-state", (rustIndex, rustOffset.x, rustOffset.y, 
+            dirtIndex, dirtOffset.x, dirtOffset.y, dirtProgression), id);
     }
 
     private void ReceiveInitialCockpitEffectState(uint id, (int rustIndex, float rustOffsetX, float rustOffsetY, 
@@ -692,7 +694,7 @@ public class QSBCompatibility
 
     public void SendCurrentCockpitEffectState(uint id, float dirtProgression, float iceBuildup)
     {
-        _api.SendMessage("current-cockpit-effect-state", (dirtProgression, iceBuildup), id, false);
+        _api.SendMessage("current-cockpit-effect-state", (dirtProgression, iceBuildup), id);
     }
 
     private void ReceiveCurrentCockpitEffectState(uint id, (float dirtProgression, float iceBuildup) data)
@@ -705,7 +707,7 @@ public class QSBCompatibility
     #region DisableSeatbelt
     public void SendDetachAllPlayers(uint id, Vector3 velocity)
     {
-        _api.SendMessage("detach-all-players", new SerializedVector3(velocity), id, false);
+        _api.SendMessage("detach-all-players", new SerializedVector3(velocity), id);
     }
 
     private void ReceiveDetachAllPlayers(uint id, SerializedVector3 velocity)
@@ -717,7 +719,7 @@ public class QSBCompatibility
     #region BlackHoleExplosion
     public void SendInitialBlackHoleState(uint id, float scale)
     {
-        _api.SendMessage("initial-black-hole", scale, id, false);
+        _api.SendMessage("initial-black-hole", scale, id);
     }
 
     private void ReceiveInitialBlackHoleState(uint id, float scale)
@@ -730,7 +732,7 @@ public class QSBCompatibility
     #region ShipCommands
     public void SendShipCommand(uint id, string commandName)
     {
-        _api.SendMessage("send-ship-command", commandName, id, false);
+        _api.SendMessage("send-ship-command", commandName, id);
     }
 
     private void ReceiveShipCommand(uint id, string commandName)
@@ -742,7 +744,7 @@ public class QSBCompatibility
     #region ShipWarpCore
     public void SendActivateWarp(uint id, bool playerInShip, string targetCannonEntryID, Vector3 randomPos)
     {
-        _api.SendMessage("activate-warp", (playerInShip, targetCannonEntryID, new SerializedVector3(randomPos)), id, false);
+        _api.SendMessage("activate-warp", (playerInShip, targetCannonEntryID, new SerializedVector3(randomPos)), id);
     }
 
     private void ReceiveActivateWarp(uint id, (bool playerInShip, string targetCannonEntryID, SerializedVector3 randomPos) data)
@@ -755,7 +757,7 @@ public class QSBCompatibility
     #region FuelTankItem
     public void SendToggleFuelTankDrain(uint id, OWItem item, bool started)
     {
-        _api.SendMessage("toggle-fuel-tank-drain", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), started), id, false);
+        _api.SendMessage("toggle-fuel-tank-drain", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), started), id);
     }
 
     private void ReceiveToggleFuelTankDrain(uint id, (int itemID, bool started) data)
@@ -769,7 +771,7 @@ public class QSBCompatibility
 
     public void SendFuelTankExplosion(uint id, OWItem item)
     {
-        _api.SendMessage("fuel-tank-explosion", ShipEnhancements.QSBInteraction.GetIDFromItem(item), id, false);
+        _api.SendMessage("fuel-tank-explosion", ShipEnhancements.QSBInteraction.GetIDFromItem(item), id);
     }
 
     private void ReceiveFuelTankExplosion(uint id, int itemID)
@@ -783,7 +785,7 @@ public class QSBCompatibility
 
     public void SendFuelTankCapacity(uint id, OWItem item, float fuel)
     {
-        _api.SendMessage("fuel-tank-capacity", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), fuel), id, false);
+        _api.SendMessage("fuel-tank-capacity", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), fuel), id);
     }
 
     private void ReceiveFuelTankCapacity(uint id, (int itemID, float fuel) data)
@@ -799,7 +801,7 @@ public class QSBCompatibility
     #region ShipItemPlacement
     public void SendItemModuleParent(uint id, OWItem item, int shipModulesIndex)
     {
-        _api.SendMessage("item-module-parent", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), shipModulesIndex), id, false);
+        _api.SendMessage("item-module-parent", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), shipModulesIndex), id);
     }
 
     private void ReceiveItemModuleParent(uint id, (int itemID, int shipModulesIndex) data)
@@ -823,7 +825,7 @@ public class QSBCompatibility
     #region PortableTractorBeam
     public void SendTractorBeamTurbo(uint id, PortableTractorBeamItem item, bool enableTurbo)
     {
-        _api.SendMessage("tractor-beam-turbo", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), enableTurbo), id, false);
+        _api.SendMessage("tractor-beam-turbo", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), enableTurbo), id);
     }
 
     private void ReceiveTractorBeamTurbo(uint id, (int itemID, bool enableTurbo) data)
@@ -839,7 +841,7 @@ public class QSBCompatibility
     #region Curtains
     public void SendCurtainState(uint id, bool open)
     {
-        _api.SendMessage("set-curtain-state", open, id, false);
+        _api.SendMessage("set-curtain-state", open, id);
     }
 
     public void ReceiveCurtainState(uint id, bool open)
@@ -855,7 +857,7 @@ public class QSBCompatibility
     #region Ernesto
     public void SendErnestoComment(uint id, string comment)
     {
-        _api.SendMessage("send-ernesto-comment", comment, id, false);
+        _api.SendMessage("send-ernesto-comment", comment, id);
     }
 
     private void ReceiveErnestoComment(uint id, string comment)
@@ -867,7 +869,7 @@ public class QSBCompatibility
     #region EjectLandingGear
     public void SendDetachLandingGear(uint id, float ejectImpulse)
     {
-        _api.SendMessage("detach-landing-gear", ejectImpulse, id, false);
+        _api.SendMessage("detach-landing-gear", ejectImpulse, id);
     }
 
     private void ReceiveDetachLandingGear(uint id, float ejectImpulse)
@@ -898,7 +900,7 @@ public class QSBCompatibility
     #region Radio
     public void SendRadioPower(uint id, OWItem item, bool powered)
     {
-        _api.SendMessage("radio-power", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), powered), id, false);
+        _api.SendMessage("radio-power", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), powered), id);
     }
 
     private void ReceiveRadioPower(uint id, (int itemID, bool powered) data)
@@ -912,7 +914,7 @@ public class QSBCompatibility
 
     public void SendRadioCodes(uint id, OWItem item, int[] codes)
     {
-        _api.SendMessage("radio-codes", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), codes), id, false);
+        _api.SendMessage("radio-codes", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), codes), id);
     }
 
     private void ReceiveRadioCodes(uint id, (int itemID, int[] codes) data)
@@ -926,7 +928,7 @@ public class QSBCompatibility
 
     public void SendRadioCancelTuning(uint id, OWItem item)
     {
-        _api.SendMessage("radio-cancel-tuning", ShipEnhancements.QSBInteraction.GetIDFromItem(item), id, false);
+        _api.SendMessage("radio-cancel-tuning", ShipEnhancements.QSBInteraction.GetIDFromItem(item), id);
     }
 
     private void ReceiveRadioCancelTuning(uint id, int itemID)
@@ -940,7 +942,7 @@ public class QSBCompatibility
 
     public void SendRadioVolume(uint id, OWItem item, float volume)
     {
-        _api.SendMessage("radio-volume", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), volume), id, false);
+        _api.SendMessage("radio-volume", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), volume), id);
     }
 
     private void ReceiveRadioVolume(uint id, (int itemID, float volume) data)
@@ -958,7 +960,7 @@ public class QSBCompatibility
     {
         _api.SendMessage("create-item", 
             (ShipEnhancements.QSBInteraction.GetIDFromItem(item), 
-            ShipEnhancements.QSBInteraction.GetIDFromSocket(socket), socketItem), id, false);
+            ShipEnhancements.QSBInteraction.GetIDFromSocket(socket), socketItem), id);
     }
 
     private void ReceiveCreateItem(uint id, (int itemID, int socketID, bool socketItem) data)
@@ -997,7 +999,7 @@ public class QSBCompatibility
     #region ExplosionDamage
     public void SendAnglerDeath(uint id, AnglerfishController angler)
     {
-        _api.SendMessage("angler-death", ShipEnhancements.QSBInteraction.GetIDFromAngler(angler), id, false);
+        _api.SendMessage("angler-death", ShipEnhancements.QSBInteraction.GetIDFromAngler(angler), id);
     }
 
     private void ReceiveAnglerDeath(uint id, int anglerID)
@@ -1018,11 +1020,14 @@ public class QSBCompatibility
     #endregion
 
     #region Autopilot
-    public void SendAutopilotState(uint id, OWRigidbody targetBody, bool destination = false, bool startMatch = false, bool stopMatch = false, bool abort = false)
+    public void SendAutopilotState(uint id, OWRigidbody targetBody, bool destination = false, bool startMatch = false,
+        bool stopMatch = false, bool abort = false)
     {
+        ShipEnhancements.WriteDebugMessage("\n\n\n" + new System.Diagnostics.StackTrace().ToString());
+        
         _api.SendMessage("autopilot-state", 
             (targetBody != null ? ShipEnhancements.QSBInteraction.GetIDFromBody(targetBody) : -1,
-            destination, startMatch, stopMatch, abort), id, false);
+            destination, startMatch, stopMatch, abort), id);
     }
 
     private void ReceiveAutopilotState(uint id, (int targetBodyID, bool destination, bool startMatch, bool stopMatch, bool abort) data)
@@ -1036,9 +1041,10 @@ public class QSBCompatibility
             autopilot.Abort();
             return;
         }
-        else if (data.stopMatch)
+        
+        if (data.stopMatch)
         {
-            autopilot.StopMatchVelocity();
+            SELocator.GetAutopilotPanelController().CancelMatchVelocity();
             return;
         }
 
@@ -1058,7 +1064,7 @@ public class QSBCompatibility
 
     public void SendPidAutopilotState(uint id, bool orbit = false, bool matchPosition = false, bool abort = false)
     {
-        _api.SendMessage("pid-autopilot-state", (orbit, matchPosition, abort), id, false);
+        _api.SendMessage("pid-autopilot-state", (orbit, matchPosition, abort), id);
     }
 
     private void ReceivePidAutopilotState(uint id, (bool orbit, bool matchPosition, bool abort) data)
@@ -1085,7 +1091,7 @@ public class QSBCompatibility
 
     public void SendPersistentInput(uint id, Vector3 input)
     {
-        _api.SendMessage("persistent-input", new SerializedVector3(input), id, false);
+        _api.SendMessage("persistent-input", new SerializedVector3(input), id);
     }
 
     private void ReceivePersistentInput(uint id, SerializedVector3 input)
@@ -1099,7 +1105,7 @@ public class QSBCompatibility
     #region ShipHorn
     public void SendHonkHorn(uint id)
     {
-        _api.SendMessage("honk-horn", new NoData(), id, false);
+        _api.SendMessage("honk-horn", new NoData(), id);
     }
 
     private void ReceiveHonkHorn(uint id, NoData noData)
@@ -1111,7 +1117,7 @@ public class QSBCompatibility
     #region ResourcePump
     public void SendPumpType(uint id, OWItem item, int typeIndex)
     {
-        _api.SendMessage("pump-type", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), typeIndex), id, false);
+        _api.SendMessage("pump-type", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), typeIndex), id);
     }
 
     private void ReceivePumpType(uint from, (int itemID, int typeIndex) data)
@@ -1125,7 +1131,7 @@ public class QSBCompatibility
 
     public void SendPumpPowered(uint id, OWItem item, bool powered)
     {
-        _api.SendMessage("pump-powered", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), powered), id, false);
+        _api.SendMessage("pump-powered", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), powered), id);
     }
 
     private void ReceivePumpPowered(uint from, (int itemID, bool powered) data)
@@ -1139,7 +1145,7 @@ public class QSBCompatibility
 
     public void SendPumpMode(uint id, OWItem item, bool output)
     {
-        _api.SendMessage("pump-mode", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), output), id, false);
+        _api.SendMessage("pump-mode", (ShipEnhancements.QSBInteraction.GetIDFromItem(item), output), id);
     }
 
     private void ReceivePumpMode(uint from, (int itemID, bool output) data)
@@ -1155,7 +1161,7 @@ public class QSBCompatibility
     #region WaterCooling
     public void SendWaterCoolingState(uint id, bool state)
     {
-        _api.SendMessage("water-cooling", state, id, false);
+        _api.SendMessage("water-cooling", state, id);
     }
 
     private void ReceiveWaterCoolingState(uint from, bool state)
@@ -1167,7 +1173,7 @@ public class QSBCompatibility
     #region ReactorOverload
     public void SendReactorOverload(uint id, bool overload)
     {
-        _api.SendMessage("reactor-overload", overload, id, false);
+        _api.SendMessage("reactor-overload", overload, id);
     }
 
     private void ReceiveReactorOverload(uint from, bool overload)
@@ -1189,4 +1195,19 @@ public class QSBCompatibility
     }
     
     #endregion
+
+    public void SendShipExplosion(uint to)
+    {
+        _api.SendMessage("ship-explode", new NoData(), to);
+    }
+
+    private void ReceiveShipExplosion(uint from, NoData _)
+    {
+        var damage = SELocator.GetShipDamageController();
+        if (damage != null && !damage._exploded)
+        {
+            damage._explosion.Play();
+            damage._exploded = true;
+        }
+    }
 }

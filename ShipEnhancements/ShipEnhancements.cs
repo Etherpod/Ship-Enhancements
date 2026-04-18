@@ -2010,6 +2010,16 @@ public class ShipEnhancements : ModBehaviour
 
         SELocator.LateInitialize();
         ShipNotifications.Initialize();
+        
+        CharacterDialogueTree ernestoCallDialogue = null;
+        if ((string)shipSignalType.GetProperty() == "Advanced" && (bool)addErnesto.GetProperty())
+        {
+            var prefab = LoadPrefab("Assets/ShipEnhancements/ErnestoCallDialogue.prefab");
+            var obj = CreateObject(prefab, SELocator.GetPlayerBody().transform.Find("PlayerCamera"));
+            obj.transform.localPosition = new Vector3(0, 0, 1.5f);
+            ernestoCallDialogue = obj.GetComponentInChildren<CharacterDialogueTree>();
+            DialogueBuilder.FixCustomDialogue(obj, "ConversationZone");
+        }
 
         ModHelper.Events.Unity.RunWhen(() => Locator._shipBody != null, () =>
         {
@@ -2172,6 +2182,7 @@ public class ShipEnhancements : ModBehaviour
                     var canvas = LoadPrefab("Assets/ShipEnhancements/SignalscopeCommandCanvas.prefab");
                     var parent = GameObject.Find("PlayerHUD/HelmetOffUI").transform;
                     SELocator.SetRemoteControl(CreateObject(canvas, parent).GetComponent<ShipRemoteControl>());
+                    SELocator.GetRemoteControl().AssignErnestoCallDialogue(ernestoCallDialogue);
                 }
             }
             if ((!InMultiplayer || QSBAPI.GetIsHost()) && (float)shipDamageSpeedMultiplier.GetProperty() < 0f)

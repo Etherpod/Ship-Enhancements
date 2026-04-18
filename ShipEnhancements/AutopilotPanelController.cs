@@ -305,6 +305,21 @@ public class AutopilotPanelController : MonoBehaviour
             }
         }
     }
+    
+    public void CancelMatchVelocityRemote()
+    {
+        if (IsMatchVelocitySelected() && ShipEnhancements.GEInteraction != null 
+            && ShipEnhancements.GEInteraction.IsContinuousMatchVelocityEnabled())
+        {
+            return;
+        }
+
+        if (_activeMatch.IsActivated())
+        {
+            _activeMatch.SetActive(false);
+            _activeMatch.OnChangeActiveEvent();
+        }
+    }
 
     public void SetAutopilotMode(bool orbit)
     {

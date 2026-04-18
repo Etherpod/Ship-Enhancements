@@ -147,7 +147,7 @@ public class ShipModuleEjectionSystem : MonoBehaviour
                     num = 1f;
                 }
                 _shipBody.AddLocalImpulse(-_ejectDirection * num);
-                owrigidbody.AddLocalImpulse(_ejectDirection * num);
+                owrigidbody?.AddLocalImpulse(_ejectDirection * num);
             }
 
             _audioController.PlayEject();

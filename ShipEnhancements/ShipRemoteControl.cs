@@ -38,6 +38,7 @@ public class ShipRemoteControl : MonoBehaviour
         new ShipCommand_OrbitAutopilot(),
         new ShipCommand_MatchVelocity(),
         new ShipCommand_HoldPosition(),
+        new ShipCommand_RemoveTarget(),
         new ShipCommand_TargetPlayerPlanet(),
         new ShipCommand_TargetCurrentLockOn(),
         new ShipCommand_TargetPlayer(),
@@ -58,17 +59,6 @@ public class ShipRemoteControl : MonoBehaviour
 
     private void Awake()
     {
-        CharacterDialogueTree dialogueTree = null;
-        if ((bool)ShipEnhancements.Settings.addErnesto.GetProperty())
-        {
-            var prefab = ShipEnhancements
-                .LoadPrefab("Assets/ShipEnhancements/ErnestoCallDialogue.prefab");
-            var obj = ShipEnhancements.CreateObject(prefab, Locator.GetPlayerCamera().transform);
-            obj.transform.localPosition = new Vector3(0, 0, 1.5f);
-            dialogueTree = obj.GetComponentInChildren<CharacterDialogueTree>();
-            DialogueBuilder.FixCustomDialogue(obj, "ConversationZone");
-        }
-        
         foreach (var cmd in _commands)
         {
             if (!_commandsByGroup.ContainsKey(cmd.GetCommandGroup()))
@@ -78,11 +68,6 @@ public class ShipRemoteControl : MonoBehaviour
             else
             {
                 _commandsByGroup[cmd.GetCommandGroup()].Add(cmd);
-            }
-
-            if (dialogueTree != null && cmd is ShipCommand_CallErnesto ernestoCmd)
-            {
-                ernestoCmd.AssignDialogue(dialogueTree);
             }
         }
         
@@ -103,7 +88,7 @@ public class ShipRemoteControl : MonoBehaviour
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
     }
 
-    public void AddMaterials()
+    private void AddMaterials()
     {
         var refMat = GameObject.Find("PlayerHUD/HelmetOffUI/SignalscopeCanvas/SigScopeDisplay/FrequencyLabel")
             .GetComponent<Text>().material;
@@ -115,6 +100,20 @@ public class ShipRemoteControl : MonoBehaviour
         foreach (var text in GetComponentsInChildren<Text>(true))
         {
             text.material = new Material(refMat);
+        }
+    }
+
+    public void AssignErnestoCallDialogue(CharacterDialogueTree dialogueTree)
+    {
+        if (dialogueTree == null) return;
+
+        foreach (var cmd in _commands)
+        {
+            if (cmd is ShipCommand_CallErnesto ernestoCmd)
+            {
+                ernestoCmd.AssignDialogue(dialogueTree);
+                return;
+            }
         }
     }
 
@@ -322,7 +321,7 @@ public class ShipRemoteControl : MonoBehaviour
         
         if (command.CanActivate())
         {
-            command.Activate();
+            command.ActivateRemote();
         }
     }
 

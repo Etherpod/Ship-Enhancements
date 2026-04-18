@@ -24,6 +24,8 @@ public abstract class ShipCommand
 	public abstract bool CanActivate();
 	
 	public abstract void Activate();
+
+	public virtual void ActivateRemote() => Activate();
 }
 
 public class ShipCommand_Explode : ShipCommand
@@ -521,6 +523,22 @@ public class ShipCommand_LandingGearEject : ShipCommand
 	}
 }
 
+public class ShipCommand_RemoveTarget : ShipCommand
+{
+	public override string GetDisplayName() => "Remove Target";
+	
+	public override CommandGroup GetCommandGroup() => CommandGroup.LockOn;
+
+	public override bool CanShow() => true;
+
+	public override bool CanActivate() => SELocator.GetReferenceFrame() != null;
+
+	public override void Activate()
+	{
+		SELocator.SetShipReferenceFrame(null);
+	}
+}
+
 public class ShipCommand_TargetPlayerPlanet : ShipCommand
 {
 	public override string GetDisplayName() => "Target My Planet";
@@ -560,7 +578,7 @@ public class ShipCommand_TargetPlayer : ShipCommand
 	
 	public override CommandGroup GetCommandGroup() => CommandGroup.LockOn;
 
-	public override bool CanShow() => true;
+	public override bool CanShow() => !ShipEnhancements.InMultiplayer;
 
 	public override bool CanActivate() => !SELocator.IsShipTargetingPlayer();
 
@@ -578,7 +596,7 @@ public class ShipCommand_TargetProbe : ShipCommand
 	
 	public override CommandGroup GetCommandGroup() => CommandGroup.LockOn;
 
-	public override bool CanShow() => true;
+	public override bool CanShow() => !ShipEnhancements.InMultiplayer;
 
 	public override bool CanActivate() => !SELocator.IsShipTargetingProbe();
 
@@ -593,6 +611,7 @@ public class ShipCommand_TargetProbe : ShipCommand
 public class ShipCommand_CallErnesto : ShipCommand
 {
 	private CharacterDialogueTree _dialogue;
+	private ErnestoCallController _callController;
 	
 	public override string GetDisplayName() => "Call Ernesto";
 	
@@ -600,7 +619,8 @@ public class ShipCommand_CallErnesto : ShipCommand
 
 	public override bool CanShow() => _dialogue != null;
 	
-	public override bool CanActivate() => !_dialogue.InConversation();
+	public override bool CanActivate() => 
+		!_dialogue.InConversation() && !_callController.InRemoteConversation();
 
 	public override void Activate()
 	{
@@ -625,8 +645,11 @@ public class ShipCommand_CallErnesto : ShipCommand
 		_dialogue.StartConversation();
 	}
 
+	public override void ActivateRemote() { }
+
 	public void AssignDialogue(CharacterDialogueTree dialogueTree)
 	{
 		_dialogue = dialogueTree;
+		_callController = _dialogue.transform.parent.GetComponent<ErnestoCallController>();
 	}
 }

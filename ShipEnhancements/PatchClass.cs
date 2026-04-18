@@ -2461,6 +2461,14 @@ public static class PatchClass
         {
             __instance._explosion.GetComponentInChildren<ExplosionDamage>()?.OnExplode();
         }
+
+        if (ShipEnhancements.InMultiplayer)
+        {
+            foreach (var id in ShipEnhancements.PlayerIDs)
+            {
+                ShipEnhancements.QSBCompat.SendShipExplosion(id);
+            }
+        }
     }
 
     [HarmonyPostfix]
@@ -4555,10 +4563,10 @@ public static class PatchClass
             }
         }
         // cancel if left flight chair
-        if (!OWInput.IsInputMode(InputMode.ShipCockpit | InputMode.LandingCam))
+        if (!OWInput.IsInputMode(InputMode.ShipCockpit | InputMode.LandingCam) && 
+            __instance._autopilot._isMatchingVelocity)
         {
             SELocator.GetAutopilotPanelController().CancelMatchVelocity();
-            SendAutopilotState(stopMatch: true);
             return false;
         }
         __instance.UpdateShipLightInput();
@@ -4568,12 +4576,10 @@ public static class PatchClass
             if (OWInput.IsNewlyPressed(InputLibrary.autopilot, InputMode.All))
             {
                 SELocator.GetAutopilotPanelController().CancelAutopilot();
-                SendAutopilotState(abort: true);
             }
             if (OWInput.IsNewlyPressed(InputLibrary.matchVelocity, InputMode.All))
             {
                 SELocator.GetAutopilotPanelController().CancelMatchVelocity();
-                SendAutopilotState(stopMatch: true);
             }
         }
         else
@@ -4585,21 +4591,18 @@ public static class PatchClass
                 InputLibrary.lockOn.BlockNextRelease();
 
                 SELocator.GetAutopilotPanelController().ActivateAutopilot();
-                SendAutopilotState(SELocator.GetReferenceFrame()?.GetOWRigidBody(), destination: true);
             }
             // start velocity match
             if (__instance._playerAtFlightConsole && !__instance._shipSystemFailure
                 && OWInput.IsNewlyPressed(InputLibrary.matchVelocity, InputMode.All))
             {
                 SELocator.GetAutopilotPanelController().ActivateMatchVelocity();
-                SendAutopilotState(SELocator.GetReferenceFrame(ignorePassiveFrame: false)?.GetOWRigidBody(), startMatch: true);
             }
             // stop velocity match
             else if (OWInput.IsNewlyReleased(InputLibrary.matchVelocity, InputMode.All)
                 && (ShipEnhancements.GEInteraction == null || !ShipEnhancements.GEInteraction.IsContinuousMatchVelocityEnabled()))
             {
                 SELocator.GetAutopilotPanelController().CancelMatchVelocity();
-                SendAutopilotState(stopMatch: true);
             }
         }
         if (!__instance._enteringLandingCam)
@@ -4641,18 +4644,6 @@ public static class PatchClass
         __instance._playerAttachPoint.SetAttachOffset(__instance._playerAttachOffset);
 
         return false;
-    }
-
-    public static void SendAutopilotState(OWRigidbody body = null, bool destination = false,
-        bool startMatch = false, bool stopMatch = false, bool abort = false)
-    {
-        if (ShipEnhancements.InMultiplayer)
-        {
-            foreach (uint id in ShipEnhancements.PlayerIDs)
-            {
-                ShipEnhancements.QSBCompat.SendAutopilotState(id, body, destination, startMatch, stopMatch, abort);
-            }
-        }
     }
 
     [HarmonyPostfix]

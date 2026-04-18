@@ -12,7 +12,7 @@ public class PlayerReferenceFrame : ReferenceFrame
 		_bracketsRadius = 0f;
 	}
 	
-	public new string GetHUDDisplayName_New()
+	public string GetHUDDisplayName_New()
 	{
 		return "Player";
 	}

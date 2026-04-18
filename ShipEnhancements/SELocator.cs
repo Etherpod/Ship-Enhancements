@@ -289,7 +289,14 @@ public static class SELocator
         
         if (!(bool)splitLockOn.GetProperty() || Locator._rfTracker._shipTargetingActive)
         {
-            Locator._rfTracker.TargetReferenceFrame(rf);
+            if (rf == null)
+            {
+                Locator._rfTracker.UntargetReferenceFrame(true);
+            }
+            else
+            {
+                Locator._rfTracker.TargetReferenceFrame(rf);
+            }
         }
     }
 
