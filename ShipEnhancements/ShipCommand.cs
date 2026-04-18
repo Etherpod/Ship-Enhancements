@@ -608,6 +608,19 @@ public class ShipCommand_CallErnesto : ShipCommand
 		{
 			SELocator.GetRemoteControl().SetVisible(false);
 		}
+
+		var val = Random.value;
+		ShipEnhancements.WriteDebugMessage(val);
+		if (Vector3.Distance(Locator.GetPlayerTransform().position, SELocator.GetShipTransform().position) < 10f)
+		{
+			DialogueConditionManager.SharedInstance
+				.SetConditionState("SE_ERNESTO_CLOSECALL", true);
+		}
+		else if (val < 0.1f)
+		{
+			DialogueConditionManager.SharedInstance
+				.SetConditionState("SE_ERNESTO_LONGPICKUP", true);
+		}
 		
 		_dialogue.StartConversation();
 	}
