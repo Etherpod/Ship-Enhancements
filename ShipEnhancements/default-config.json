@@ -574,11 +574,16 @@
       "value": false,
       "tooltip": "Turns the ship's signalscope into a fully functioning component. You won't be able to track signals in the ship or hear the ship's signal if the signalscope is damaged."
     },
-    "addShipSignal": {
-      "title": "Add Ship Signal",
-      "type": "toggle",
-      "value": false,
-      "tooltip": "Allows you to track your ship with the signalscope on the Outer Wilds Ventures frequency. Slate also mentioned something about sending commands with your signalscope."
+    "shipSignalType": {
+      "title": "Ship Signal Type",
+      "type": "selector",
+      "value": "Disabled",
+      "options": [
+        "Disabled",
+        "Simple",
+        "Advanced"
+      ],
+      "tooltip": "Allows you to track your ship with the signalscope on the Outer Wilds Ventures frequency."
     },
     "enableShipSignalscopeZoom": {
       "title": "Enable Ship Signalscope Zoom",

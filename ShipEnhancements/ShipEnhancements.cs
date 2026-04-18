@@ -185,7 +185,7 @@ public class ShipEnhancements : ModBehaviour
         exteriorHullColorBlend,
         addTether,
         disableDamageIndicators,
-        addShipSignal,
+        shipSignalType,
         reactorLifetimeMultiplier,
         shipFriction,
         enableSignalscopeComponent,
@@ -2161,16 +2161,18 @@ public class ShipEnhancements : ModBehaviour
                 GameObject geMarker = GameObject.Find("SecondaryGroup/HUD_Minimap/Minimap_Root/AboveGroundMarker/Arrow");
                 geMarker?.SetActive(false);
             }
-            if ((bool)addShipSignal.GetProperty())
+            if ((string)shipSignalType.GetProperty() != "Disabled")
             {
                 GameObject signal = LoadPrefab("Assets/ShipEnhancements/ShipSignal.prefab");
                 CreateObject(signal, SELocator.GetShipCockpitController()
                     .transform.parent.GetComponentInChildren<ShipCockpitUI>()._sigScopeDish);
 
-                //SELocator.GetPlayerBody().GetComponentInChildren<Signalscope>().gameObject.AddComponent<ShipRemoteControl>();
-                var canvas = LoadPrefab("Assets/ShipEnhancements/SignalscopeCommandCanvas.prefab");
-                var parent = GameObject.Find("PlayerHUD/HelmetOffUI").transform;
-                SELocator.SetRemoteControl(CreateObject(canvas, parent).GetComponent<ShipRemoteControl>());
+                if ((string)shipSignalType.GetProperty() == "Advanced")
+                {
+                    var canvas = LoadPrefab("Assets/ShipEnhancements/SignalscopeCommandCanvas.prefab");
+                    var parent = GameObject.Find("PlayerHUD/HelmetOffUI").transform;
+                    SELocator.SetRemoteControl(CreateObject(canvas, parent).GetComponent<ShipRemoteControl>());
+                }
             }
             if ((!InMultiplayer || QSBAPI.GetIsHost()) && (float)shipDamageSpeedMultiplier.GetProperty() < 0f)
             {
@@ -2874,7 +2876,7 @@ public class ShipEnhancements : ModBehaviour
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_AUTOPILOT_CONTROLS_ENABLED", true);
         }
-        if ((bool)addShipSignal.GetProperty())
+        if ((string)shipSignalType.GetProperty() == "Advanced")
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_SHIP_SIGNAL_ENABLED", true);
         }
@@ -3550,6 +3552,11 @@ public class ShipEnhancements : ModBehaviour
         if (name == "repairWrenchType" && !newValue.Equals(oldValue))
         {
             RedrawSettingsMenu("repairWrenchType", "repairWrenchType");
+        }
+        
+        if (name == "shipSignalType" && !newValue.Equals(oldValue))
+        {
+            RedrawSettingsMenu("shipSignalType", "shipSignalType");
         }
     }
 
@@ -4601,6 +4608,19 @@ public class ShipEnhancements : ModBehaviour
             else
             {
                 tooltip = "Adds a repair wrench to the cockpit. You need to be holding the wrench to make repairs to the ship.";
+            }
+            return true;
+        }
+        
+        if (settingName == "shipSignalType" && (string)shipSignalType.GetValue() != "Disabled")
+        {
+            if ((string)shipSignalType.GetValue() == "Simple")
+            {
+                tooltip = "Simple mode will just add a regular signal to the ship that you can use to track it.";
+            }
+            else
+            {
+                tooltip = "Advanced mode will add a signal to the ship that can be used to send commands. To do this, focus on the signal using your signalscope and interact with it to open the command menu.";
             }
             return true;
         }

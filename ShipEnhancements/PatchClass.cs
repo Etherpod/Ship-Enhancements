@@ -2591,7 +2591,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(SignalscopeReticleController), nameof(SignalscopeReticleController.UpdateText))]
     public static bool InsertShipSignalText(SignalscopeReticleController __instance)
     {
-        if (!(bool)addShipSignal.GetProperty())
+        if ((string)shipSignalType.GetProperty() != "Disabled")
         {
             return true;
         }
@@ -2663,7 +2663,7 @@ public static class PatchClass
             return false;
         }
 
-        if (SELocator.GetRemoteControl().IsVisible())
+        if (SELocator.GetRemoteControl() != null && SELocator.GetRemoteControl().IsVisible())
         {
             __instance._signalStrength = 0f;
             __instance._degreesFromScope = 180f;
