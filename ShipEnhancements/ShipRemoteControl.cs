@@ -22,9 +22,7 @@ public class ShipRemoteControl : MonoBehaviour
     private ScreenPrompt _cycleGroupPrompt;
     private InputMode _lastInputMode;
     private bool _scopeEquipped;
-    // should probably just combine these two
     private bool _visible;
-    private bool _tuned;
 
     private List<ShipCommand> _commands = 
     [
@@ -44,6 +42,7 @@ public class ShipRemoteControl : MonoBehaviour
         new ShipCommand_TargetCurrentLockOn(),
         new ShipCommand_TargetPlayer(),
         new ShipCommand_TargetProbe(),
+        new ShipCommand_CallErnesto(),
     ];
 
     private Dictionary<ShipCommand.CommandGroup, string> _groupToDisplayName = new()
@@ -52,12 +51,24 @@ public class ShipRemoteControl : MonoBehaviour
         { ShipCommand.CommandGroup.Modules, "Module Commands" },
         { ShipCommand.CommandGroup.Autopilot, "Autopilot Commands" },
         { ShipCommand.CommandGroup.LockOn, "Targeting Commands" },
+        { ShipCommand.CommandGroup.Misc, "Other Commands" },
     };
 
     private Dictionary<ShipCommand.CommandGroup, List<ShipCommand>> _commandsByGroup = [];
 
     private void Awake()
     {
+        CharacterDialogueTree dialogueTree = null;
+        if ((bool)ShipEnhancements.Settings.addErnesto.GetProperty())
+        {
+            var prefab = ShipEnhancements
+                .LoadPrefab("Assets/ShipEnhancements/ErnestoCallDialogue.prefab");
+            var obj = ShipEnhancements.CreateObject(prefab, Locator.GetPlayerCamera().transform);
+            obj.transform.localPosition = new Vector3(0, 0, 1.5f);
+            dialogueTree = obj.GetComponentInChildren<CharacterDialogueTree>();
+            DialogueBuilder.FixCustomDialogue(obj, "ConversationZone");
+        }
+        
         foreach (var cmd in _commands)
         {
             if (!_commandsByGroup.ContainsKey(cmd.GetCommandGroup()))
@@ -67,6 +78,11 @@ public class ShipRemoteControl : MonoBehaviour
             else
             {
                 _commandsByGroup[cmd.GetCommandGroup()].Add(cmd);
+            }
+
+            if (dialogueTree != null && cmd is ShipCommand_CallErnesto ernestoCmd)
+            {
+                ernestoCmd.AssignDialogue(dialogueTree);
             }
         }
         
@@ -132,37 +148,23 @@ public class ShipRemoteControl : MonoBehaviour
             _cycleCommandPrompt.SetVisibility(false);
             _cycleGroupPrompt.SetVisibility(false);
 
-            if (!_tuned && _shipAudioSignal.GetSignalStrength() == 1f)
+            if (!_visible && _shipAudioSignal.GetSignalStrength() == 1f)
             {
                 if (OWInput.IsNewlyPressed(InputLibrary.interact))
                 {
-                    Locator.GetPlayerTransform().GetComponent<PlayerLockOnTargeting>().LockOn(_shipAudioSignal.transform);
-                    _lastInputMode = OWInput.GetInputMode();
-                    OWInput.ChangeInputMode(InputMode.SatelliteCam);
-
-                    RefreshCommand();
-                    _groupHeader.text = _groupToDisplayName[_groupMask];
-                    _canvasList.SetCommands(_commandsByGroup[_groupMask].Where(c => c.CanShow()).ToList());
                     SetVisible(true);
-                    Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.ShipLogSelectEntry);
-                        
-                    _tuned = true;
                     return;
                 }
 
                 _interactPrompt.SetVisibility(true);
             }
             
-            if (_tuned)
+            if (_visible)
             {
                 if (OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.SatelliteCam) || 
                     _shipAudioSignal.GetSignalStrength() <= 0f)
                 {
-                    Locator.GetPlayerTransform().GetComponent<PlayerLockOnTargeting>().BreakLock();
-                    OWInput.ChangeInputMode(_lastInputMode);
                     SetVisible(false);
-                    Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.ShipLogDeselectEntry);
-                    _tuned = false;
                     return;
                 }
                 
@@ -215,11 +217,9 @@ public class ShipRemoteControl : MonoBehaviour
             Locator.GetPromptManager().RemoveScreenPrompt(_cycleCommandPrompt, PromptPosition.UpperRight);
             Locator.GetPromptManager().RemoveScreenPrompt(_cycleGroupPrompt, PromptPosition.UpperRight);
 
-            if (_tuned)
+            if (_visible)
             {
-                Locator.GetPlayerTransform().GetComponent<PlayerLockOnTargeting>().BreakLock();
-                OWInput.ChangeInputMode(_lastInputMode);
-                _tuned = false;
+                SetVisible(false);
             }
             
             _scopeEquipped = false;
@@ -283,7 +283,27 @@ public class ShipRemoteControl : MonoBehaviour
         if (_visible != visible)
         {
             _visible = visible;
-            _animator.AnimateTo(_visible ? 1f : 0f, _visible ? Vector3.one : new Vector3(1f, 0f, 1f), 0.1f);
+
+            if (_visible)
+            {
+                Locator.GetPlayerTransform().GetComponent<PlayerLockOnTargeting>().LockOn(_shipAudioSignal.transform);
+                _lastInputMode = OWInput.GetInputMode();
+                OWInput.ChangeInputMode(InputMode.SatelliteCam);
+                
+                RefreshCommand();
+                _groupHeader.text = _groupToDisplayName[_groupMask];
+                _canvasList.SetCommands(_commandsByGroup[_groupMask].Where(c => c.CanShow()).ToList());
+                Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.ShipLogSelectEntry);
+                _animator.AnimateTo(1f, Vector3.one, 0.1f);
+            }
+            else
+            {
+                Locator.GetPlayerTransform().GetComponent<PlayerLockOnTargeting>().BreakLock();
+                OWInput.ChangeInputMode(_lastInputMode);
+                SetVisible(false);
+                Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.ShipLogDeselectEntry);
+                _animator.AnimateTo(0f, new Vector3(1f, 0f, 1f), 0.1f);
+            }
         }
     }
 
@@ -306,17 +326,13 @@ public class ShipRemoteControl : MonoBehaviour
         }
     }
 
-    public bool IsTuned() => _tuned;
+    public bool IsVisible() => _visible;
 
     private void OnShipSystemFailure()
     {
-        if (_tuned)
+        if (_visible)
         {
-            Locator.GetPlayerTransform().GetComponent<PlayerLockOnTargeting>().BreakLock();
-            OWInput.ChangeInputMode(_lastInputMode);
             SetVisible(false);
-            Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.ShipLogDeselectEntry);
-            _tuned = false;
         }
     }
 

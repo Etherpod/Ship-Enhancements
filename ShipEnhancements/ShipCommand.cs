@@ -11,7 +11,8 @@ public abstract class ShipCommand
 		Modules,
 		Components,
 		Autopilot,
-		LockOn
+		LockOn,
+		Misc
 	}
 	
 	public abstract string GetDisplayName();
@@ -586,5 +587,33 @@ public class ShipCommand_TargetProbe : ShipCommand
 		Locator._rfTracker.UntargetReferenceFrame(false);
 		SELocator.TargetProbeWithShip();
 		Locator.GetPlayerAudioController().PlayLockOn();
+	}
+}
+
+public class ShipCommand_CallErnesto : ShipCommand
+{
+	private CharacterDialogueTree _dialogue;
+	
+	public override string GetDisplayName() => "Call Ernesto";
+	
+	public override CommandGroup GetCommandGroup() => CommandGroup.Misc;
+
+	public override bool CanShow() => _dialogue != null;
+	
+	public override bool CanActivate() => !_dialogue.InConversation();
+
+	public override void Activate()
+	{
+		if (SELocator.GetRemoteControl().IsVisible())
+		{
+			SELocator.GetRemoteControl().SetVisible(false);
+		}
+		
+		_dialogue.StartConversation();
+	}
+
+	public void AssignDialogue(CharacterDialogueTree dialogueTree)
+	{
+		_dialogue = dialogueTree;
 	}
 }

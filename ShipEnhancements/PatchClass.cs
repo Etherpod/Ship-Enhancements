@@ -2663,7 +2663,7 @@ public static class PatchClass
             return false;
         }
 
-        if (SELocator.GetRemoteControl().IsTuned())
+        if (SELocator.GetRemoteControl().IsVisible())
         {
             __instance._signalStrength = 0f;
             __instance._degreesFromScope = 180f;
@@ -3946,7 +3946,8 @@ public static class PatchClass
             __result = lines[rand2];
             return false;
         }
-        else if (key == "SE_Ernesto_ClockERNESTO_PLACEHOLDER")
+        
+        if (key == "SE_Ernesto_ClockERNESTO_PLACEHOLDER")
         {
             var rand = new System.Random();
             int randomHour = rand.Next(1, 13);
@@ -3954,12 +3955,45 @@ public static class PatchClass
             __result = $"It's {randomHour}:{randomMinute} if I'm reading that clock correctly.";
             return false;
         }
-        else if (key == "SE_Ernesto_ShipFailureERNESTO_PLACEHOLDER")
+        
+        if (key == "SE_Ernesto_ShipFailureERNESTO_PLACEHOLDER")
         {
             __result = ErnestoDetectiveController.GetHypothesis();
             return false;
         }
+        
         return true;
+    }
+
+    [HarmonyPostfix]
+    [HarmonyPatch(typeof(DialogueBoxVer2), nameof(DialogueBoxVer2.SetMainFieldDialogueText))]
+    public static void ApplyDialogueTextAnimator(DialogueBoxVer2 __instance, string richText)
+    {
+        if (richText == "ERNESTO_CALL_WAIT_PLACEHOLDER")
+        {
+            __instance._mainTextField.gameObject.AddComponent<ErnestoCallTextAnimator>();
+        }
+        else if (__instance._mainTextField.TryGetComponent(out ErnestoCallTextAnimator animator))
+        {
+            UnityEngine.Object.Destroy(animator);
+        }
+    }
+    
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(CharacterDialogueTree), nameof(CharacterDialogueTree.InputDialogueOption))]
+    public static void ErnestoCallHangUp(CharacterDialogueTree __instance, ref int optionIndex)
+    {
+        if (__instance._currentNode._name.Contains("SE_Ernesto_WaitForCall"))
+        {
+            optionIndex = -1;
+        }
+    }
+
+    [HarmonyReversePatch]
+    [HarmonyPatch(typeof(CharacterDialogueTree), nameof(CharacterDialogueTree.InputDialogueOption))]
+    public static bool BypassDialogueOptionLock(CharacterDialogueTree __instance, int optionIndex)
+    {
+        return false;
     }
 
     [HarmonyPrefix]

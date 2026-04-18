@@ -131,10 +131,9 @@ Some new stuff that Slate didn't have time to include in the ship.
 
 The **Ship Signal** has a special use to it! If you find the ship's signal on your signalscope, you can "Tune In" to the signal to broadcast commands to the ship from afar. There are a lot of commands you can use, which are sorted into groups to make it easier to navigate.
 
-- Reactor Commands
+- Component Commands
   - **Explode** - Instantly blows up the ship.
   - **Turn Off Engine** - Turns off the ship. (Requires the **Engine Switch**)
-- Component Commands
   - **Activate Return Warp** - Warps the ship home. (Requires the **Ship Warp Core**)
   - **Honk Horn** - Honks the horn. (Requires the **Ship Horn**)
 - Module Commands
@@ -152,6 +151,8 @@ The **Ship Signal** has a special use to it! If you find the ship's signal on yo
   - **Target Current Lock-on** - Sets the ship's target to your current lock-on target. (Requires **Split Ship Lock-on**)
   - **Target Me** - Sets the ship's target to you. Autopilot and related features that require a target will treat you as if you were a planet.
   - **Target Scout** - Sets the ship's target to your scout. Autopilot and related features that require a target will treat the scout as if it were a planet.
+- Other Commands
+  - **Call Ernesto** - Calls Ernesto. (Requires **Ernesto**)
 
 ### *Items*
 - **Portable Campfire**: Adds a portable campfire to the ship next to your suit. Set it up wherever you want and roast a marshmallow.
