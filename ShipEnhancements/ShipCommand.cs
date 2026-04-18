@@ -653,3 +653,21 @@ public class ShipCommand_CallErnesto : ShipCommand
 		_callController = _dialogue.transform.parent.GetComponent<ErnestoCallController>();
 	}
 }
+
+public class ShipCommand_ViewShip : ShipCommand
+{
+	public override string GetDisplayName() => "Enter Ship Viewer";
+	
+	public override CommandGroup GetCommandGroup() => CommandGroup.Misc;
+
+	public override bool CanShow() => true;
+
+	public override bool CanActivate() => true;
+
+	public override void Activate()
+	{
+		SELocator.GetRemoteControl().EnterShipViewerMode();
+	}
+
+	public override void ActivateRemote() { }
+}

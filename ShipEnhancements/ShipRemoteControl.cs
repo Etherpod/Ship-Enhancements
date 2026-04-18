@@ -13,6 +13,10 @@ public class ShipRemoteControl : MonoBehaviour
     private Text _groupHeader;
     [SerializeField]
     private CanvasGroupAnimator _animator;
+    [SerializeField]
+    private GameObject _shipViewerParent;
+    [SerializeField]
+    private Image _viewerImage;
     
     private AudioSignal _shipAudioSignal;
     private ShipCommand _currentCommand;
@@ -20,9 +24,16 @@ public class ShipRemoteControl : MonoBehaviour
     private ScreenPrompt _interactPrompt;
     private ScreenPrompt _cycleCommandPrompt;
     private ScreenPrompt _cycleGroupPrompt;
+    private ScreenPrompt _changeCameraPrompt;
+
+    private List<ShipViewerCamera> _shipCameras = [];
+    private int _shipCameraIndex;
+    private RenderTexture _shipViewerTexture;
+    
     private InputMode _lastInputMode;
     private bool _scopeEquipped;
     private bool _visible;
+    private bool _controllingShip;
 
     private List<ShipCommand> _commands = 
     [
@@ -44,6 +55,7 @@ public class ShipRemoteControl : MonoBehaviour
         new ShipCommand_TargetPlayer(),
         new ShipCommand_TargetProbe(),
         new ShipCommand_CallErnesto(),
+        new ShipCommand_ViewShip()
     ];
 
     private Dictionary<ShipCommand.CommandGroup, string> _groupToDisplayName = new()
@@ -78,12 +90,26 @@ public class ShipRemoteControl : MonoBehaviour
             "Cycle Command", ScreenPrompt.MultiCommandType.POS_NEG);
         _cycleGroupPrompt = new PriorityScreenPrompt(InputLibrary.left, InputLibrary.right, 
             "Cycle Group", ScreenPrompt.MultiCommandType.POS_NEG);
+        _changeCameraPrompt = new PriorityScreenPrompt(InputLibrary.left, InputLibrary.right, 
+            "Change Camera", ScreenPrompt.MultiCommandType.POS_NEG);
 
         // Locator should be ready by the time this obj gets created
         var canvas = GetComponent<Canvas>();
         canvas.worldCamera = Locator.GetPlayerCamera().mainCamera;
         canvas.planeDistance = 9f;
         AddMaterials();
+
+        var launcherParent = SELocator.GetShipTransform().Find("Module_Cockpit/Systems_Cockpit/ProbeLauncher");
+        var launcherCam = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipViewer_LauncherCamera.prefab");
+        _shipCameras.Add(ShipEnhancements.CreateObject(launcherCam, launcherParent).GetComponent<ShipViewerCamera>());
+        var landingParent = SELocator.GetShipTransform().Find("Module_Cockpit/Systems_Cockpit");
+        var landingCam = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipViewer_LandingCamera.prefab");
+        _shipCameras.Add(ShipEnhancements.CreateObject(landingCam, landingParent).GetComponent<ShipViewerCamera>());
+
+        _shipViewerTexture = new RenderTexture(512, 512, 16);
+        _shipViewerTexture.name = "ShipViewerTexture";
+        _shipViewerTexture.hideFlags = HideFlags.HideAndDontSave;
+        _shipViewerTexture.Create();
         
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
     }
@@ -140,12 +166,14 @@ public class ShipRemoteControl : MonoBehaviour
                 Locator.GetPromptManager().AddScreenPrompt(_interactPrompt, PromptPosition.Center);
                 Locator.GetPromptManager().AddScreenPrompt(_cycleCommandPrompt, PromptPosition.UpperRight);
                 Locator.GetPromptManager().AddScreenPrompt(_cycleGroupPrompt, PromptPosition.UpperRight);
+                Locator.GetPromptManager().AddScreenPrompt(_changeCameraPrompt, PromptPosition.UpperRight);
                 _scopeEquipped = true;
             }
 
             _interactPrompt.SetVisibility(false);
             _cycleCommandPrompt.SetVisibility(false);
             _cycleGroupPrompt.SetVisibility(false);
+            _changeCameraPrompt.SetVisibility(false);
 
             if (!_visible && _shipAudioSignal.GetSignalStrength() == 1f)
             {
@@ -160,10 +188,39 @@ public class ShipRemoteControl : MonoBehaviour
             
             if (_visible)
             {
-                if (OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.SatelliteCam) || 
-                    _shipAudioSignal.GetSignalStrength() <= 0f)
+                if (_shipAudioSignal.GetSignalStrength() <= 0f)
                 {
                     SetVisible(false);
+                    return;
+                }
+                
+                if (OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.SatelliteCam))
+                {
+                    if (_controllingShip)
+                    {
+                        ExitShipViewerMode();
+                    }
+                    else
+                    {
+                        SetVisible(false);
+                    }
+                    return;
+                }
+
+                if (_controllingShip)
+                {
+                    _changeCameraPrompt.SetVisibility(true);
+                    
+                    bool changeCamera = OWInput.IsNewlyPressed(InputLibrary.left) ||
+                        OWInput.IsNewlyPressed(InputLibrary.right);
+                    
+                    if (changeCamera)
+                    {
+                        CycleCamera(OWInput.IsNewlyPressed(InputLibrary.right));
+                        Locator.GetMenuAudioController()._audioSource
+                            .PlayOneShot(AudioType.Menu_LeftRight);
+                    }
+
                     return;
                 }
                 
@@ -175,7 +232,7 @@ public class ShipRemoteControl : MonoBehaviour
                     if (OWInput.IsNewlyPressed(InputLibrary.interact))
                     {
                         _currentCommand.Activate();
-                        Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.ShipLogHighlightEntry);
+                        Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.ShipLogMoveBetweenEntries);
 
                         if (ShipEnhancements.InMultiplayer)
                         {
@@ -215,6 +272,7 @@ public class ShipRemoteControl : MonoBehaviour
             Locator.GetPromptManager().RemoveScreenPrompt(_interactPrompt, PromptPosition.Center);
             Locator.GetPromptManager().RemoveScreenPrompt(_cycleCommandPrompt, PromptPosition.UpperRight);
             Locator.GetPromptManager().RemoveScreenPrompt(_cycleGroupPrompt, PromptPosition.UpperRight);
+            Locator.GetPromptManager().RemoveScreenPrompt(_changeCameraPrompt, PromptPosition.UpperRight);
 
             if (_visible)
             {
@@ -277,6 +335,24 @@ public class ShipRemoteControl : MonoBehaviour
         }
     }
 
+    private void CycleCamera(bool forward)
+    {
+        int cycle = 0;
+        while (cycle < _shipCameras.Count)
+        {
+            int index = (_shipCameraIndex + _shipCameras.Count + (forward ? 1 : -1)) % _shipCameras.Count;
+
+            if (_shipCameras[index] != null)
+            {
+                _shipCameras[_shipCameraIndex].Disable();
+                _shipCameraIndex = index;
+                _shipCameras[_shipCameraIndex].Enable(_shipViewerTexture);
+                
+                break;
+            }
+        }
+    }
+
     public void SetVisible(bool visible)
     {
         if (_visible != visible)
@@ -297,6 +373,11 @@ public class ShipRemoteControl : MonoBehaviour
             }
             else
             {
+                if (_controllingShip)
+                {
+                    ExitShipViewerMode();
+                }
+                
                 Locator.GetPlayerTransform().GetComponent<PlayerLockOnTargeting>().BreakLock();
                 OWInput.ChangeInputMode(_lastInputMode);
                 SetVisible(false);
@@ -304,6 +385,65 @@ public class ShipRemoteControl : MonoBehaviour
                 _animator.AnimateTo(0f, new Vector3(1f, 0f, 1f), 0.1f);
             }
         }
+    }
+
+    public void EnterShipViewerMode()
+    {
+        _canvasList.gameObject.SetActive(false);
+        _shipViewerParent.SetActive(true);
+        _groupHeader.text = "Ship Viewer";
+
+        var detector = SELocator.GetShipDetector().GetComponent<SectorDetector>();
+        var tempList = new List<Sector>();
+        tempList.AddRange(detector._sectorList);
+        for (int i = detector._sectorList.Count - 1; i >= 0; i--)
+        {
+            detector.RemoveSector(detector._sectorList[i]);
+        }
+        
+        detector.SetOccupantType(DynamicOccupant.Probe);
+        foreach (var sector in tempList)
+        {
+            detector.AddSector(sector);
+        }
+        
+        _viewerImage.material.SetTexture("_MainTex", _shipViewerTexture);
+        _viewerImage.SetMaterialDirty();
+
+        _shipCameras[_shipCameraIndex].Enable(_shipViewerTexture);
+
+        Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.ShipLogSelectPlanet);
+
+        _controllingShip = true;
+    }
+
+    public void ExitShipViewerMode()
+    {
+        _shipCameras[_shipCameraIndex].Disable();
+        _viewerImage.material.SetTexture("_MainTex", null);
+        _viewerImage.SetMaterialDirty();
+        
+        var detector = SELocator.GetShipDetector().GetComponent<SectorDetector>();
+        var tempList = new List<Sector>();
+        tempList.AddRange(detector._sectorList);
+        for (int i = detector._sectorList.Count - 1; i >= 0; i--)
+        {
+            detector.RemoveSector(detector._sectorList[i]);
+        }
+        
+        detector.SetOccupantType(DynamicOccupant.Ship);
+        foreach (var sector in tempList)
+        {
+            detector.AddSector(sector);
+        }
+        
+        _shipViewerParent.SetActive(false);
+        _canvasList.gameObject.SetActive(true);
+        _groupHeader.text = _groupToDisplayName[_groupMask];
+        
+        Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.ShipLogDeselectPlanet);
+
+        _controllingShip = false;
     }
 
     public void ReceiveCommandRemote(string commandName)
@@ -337,6 +477,7 @@ public class ShipRemoteControl : MonoBehaviour
 
     private void OnDestroy()
     {
+        _shipViewerTexture = null;
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
     }
 }
