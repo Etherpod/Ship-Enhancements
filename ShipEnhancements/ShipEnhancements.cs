@@ -412,7 +412,7 @@ public class ShipEnhancements : ModBehaviour
         InitializeNH();
         InitializeGE();
         ModCompatibility.InitCompatibility();
-        ErnestoNetworkHandler.Initialize();
+        NetworkFileHandler.Initialize();
         SettingsPresets.InitializePresets();
 
         ProbeLauncherName = EnumUtils.Create<UITextType>("ScoutLauncher");
@@ -703,9 +703,20 @@ public class ShipEnhancements : ModBehaviour
 
     public void UpdateExperimentalSettings()
     {
-        var data = JsonConvert.DeserializeObject<ExperimentalSettingsJson>(
-            File.ReadAllText(Path.Combine(ModHelper.Manifest.ModFolderPath, "ExperimentalSettings.json"))
-        );
+        var fullPath = Path.Combine(ModHelper.Manifest.ModFolderPath, "ExperimentalSettings.json");
+        ExperimentalSettingsJson data = null;
+        
+        if (File.Exists(fullPath))
+        {
+            data = JsonConvert.DeserializeObject<ExperimentalSettingsJson>(File.ReadAllText(fullPath));
+        }
+
+        if (data is null)
+        {
+            LogMessage("Could not load ExperimentalSettings.json!\n" +
+                "Make sure the file exists and is formated correctly.", warning: true);
+            return;
+        }
         ExperimentalSettings = data;
         ShipEnhancements.WriteDebugMessage(data);
     }
@@ -1074,13 +1085,18 @@ public class ShipEnhancements : ModBehaviour
 
     private (string[] inclusive, string[] exclusive) LoadData()
     {
-        var data = JsonConvert.DeserializeObject<RandomizerSettingsJson>(
-            File.ReadAllText(Path.Combine(ModHelper.Manifest.ModFolderPath, "RandomizerSettings.json"))
-        );
+        var fullPath = Path.Combine(ModHelper.Manifest.ModFolderPath, "RandomizerSettings.json");
+        RandomizerSettingsJson data = null;
+        
+        if (File.Exists(fullPath))
+        {
+            data = JsonConvert.DeserializeObject<RandomizerSettingsJson>(File.ReadAllText(fullPath));
+        }
 
         if (data is null)
         {
-            LogMessage("Couldn't load RandomizerSettings.json! Did you make a typo?", warning: true);
+            LogMessage("Could not load RandomizerSettings.json!\n" + 
+                "Make sure the file exists and is formatted correctly.", warning: true);
             return (null, null);
         }
 
@@ -3952,9 +3968,6 @@ public class ShipEnhancements : ModBehaviour
         
         submitAction.OnSubmitAction += () =>
         {
-            var path = Path.Combine(ModHelper.Manifest.ModFolderPath, "dialogue/changelog.txt");
-            StreamReader reader = new StreamReader(path);
-            
             var newTab = optionsManager.CreateStandardTab("CHANGELOG");
             var newMenu = newTab.menu;
 
@@ -3983,7 +3996,7 @@ public class ShipEnhancements : ModBehaviour
                 settingsMenuView._resetToDefaultButton.RefreshTextAndImages(false);
             };
 
-            var logText = reader.ReadToEnd();
+            var logText = NetworkFileHandler.GetChangelog().text;
             logText = Regex.Replace(logText, @"\*\*((.(?!\*\*))*[^*]?)\*\*", "<b>$1</b>");
             logText = Regex.Replace(logText, @"(\n?\r?)*(?<=\n|^)#\s(.*)\b(\n?\r?)*", "\n\n\n<size=36><b>$2</b></size>\n\n");
             logText = Regex.Replace(logText, @"(?<=\n|^)-\s(?!\s)", "\t\u2022  ");

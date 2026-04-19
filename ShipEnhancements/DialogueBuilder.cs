@@ -13,7 +13,13 @@ public static class DialogueBuilder
 {
     public static void Make(GameObject go, string dialoguePath, string xmlPath, IModBehaviour mod)
     {
-        var xml = File.ReadAllText(Path.Combine(mod.ModHelper.Manifest.ModFolderPath, xmlPath));
+        var fullPath = Path.Combine(mod.ModHelper.Manifest.ModFolderPath, xmlPath);
+        if (!File.Exists(fullPath))
+        {
+            ShipEnhancements.LogMessage("Could not find dialogue at " + xmlPath + "!");
+        }
+        
+        var xml = File.ReadAllText(fullPath);
         var dialogueName = Path.GetFileNameWithoutExtension(xmlPath);
         AddToExistingDialogue(go, dialoguePath, xml, dialogueName);
     }

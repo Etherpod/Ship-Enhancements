@@ -156,7 +156,7 @@ public class CockpitErnesto : MonoBehaviour
 
         // pull dialogue from github
         //var injection = (TextAsset)ShipEnhancements.LoadAsset("Assets/ShipEnhancements/TextAsset/TestErnestoQuestions.txt");
-        var injection = ErnestoNetworkHandler.GetErnestoQuestions();
+        var injection = NetworkFileHandler.GetErnestoQuestions();
         var dialogue = _dialogueTree._xmlCharacterDialogueAsset;
         int index = dialogue.text.IndexOf("DIALOGUE_OPTION_PLACEHOLDER");
         if (index > 0)
@@ -336,7 +336,7 @@ public class CockpitErnesto : MonoBehaviour
         }
 
         // Awareness
-        if (ErnestoNetworkHandler.GetNumberErnestos() > 0 && PlayerData.GetPersistentCondition("SE_KNOWS_ERNESTO") 
+        if (NetworkFileHandler.GetNumberErnestos() > 0 && PlayerData.GetPersistentCondition("SE_KNOWS_ERNESTO") 
             && !PlayerData.GetPersistentCondition("SE_ERNESTO_IS_AWARE")
             && !GetConditionState("SE_ERNESTO_AWARE_NEXT_TIME"))
         {

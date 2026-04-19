@@ -1,0 +1,372 @@
+---Release v2.2.2
+
+More bug fixes! (among other minor changes)
+
+- The lock-on UI will no longer be cut off on the edges of the screen (thank you @dit-zy!)
+- Items that detect water will now properly detect the river inside The Stranger
+- Parking the ship in the docking bay of The Stranger and being inside when the dam breaks will no longer place the ship underwater
+- Enabling the **Gravity Landing Gear** no longer lets the ship touch lava wirelessly
+- Enabling **Reactor Overload** and repairing the reactor no longer automatically overloads it
+- Added a code that was missing from the **Radio**
+- The **Interactable Ship Curtain** is no longer imbued with divine light
+- Placing the **Portable Fuel Canister** inside the ship will now use the temperature of the ship instead of the outside temperature
+- The **Remember Ship State** setting will now remember when the ship is destroyed and will leave behind items that are not inside the ship
+- Added a new setting to **ExperimentalSettings.json**
+- Gave Ernesto a new question system
+- Made some slight changes to Slate's dialogue
+- Improved the logic for the Random preset
+
+---Release v2.2.1
+
+# Feature Changes
+
+- **Dirt Accumulation Time** can now be made negative, which adds dirt instead of clearing and clears dirt instead of adding
+- If the **Engine Switch** is enabled, the ship will now be turned on by default at the start of the loop (can be changed in **ExperimentalSettings.json**)
+- Added **ResetSettings()** to the API, which just sets every config setting to their default values
+
+
+# Bug Fixes
+
+- Fixed a bug where going to the Eye would break the game
+- Fixed a bug where enabling Nomai VR would break the game
+- Fixed a bug where ice would form on the cockpit when it wasn't cold outside
+- Fixed a bug where enabling water cooling and overloading the reactor would have no effect on **Passive Temperature Gain**
+- Fixed a bug where rust and dirt would have the opposite effect from the settings
+- Fixed a bug where disabling **Remember Ship State** and warping to a new system would still remember the settings
+- Fixed a bug where **Disable Rotation Speed Limit** would also increase the ship's look sensitivity
+- Fixed a bug where the reactor could be overloaded while repairing it
+- Fixed a bug where holding the roll button when the ship takes stun damage would prevent roll mode from disabling
+- Fixed a bug where the tether could be accidentally detached while piloting the ship and using free look
+- Fixed a bug where the cockpit ice would sometimes become desynced while in multiplayer
+- Fixed a bug where the ship would desync when the engine sputtered while in multiplayer
+- Fixed a bug where the preset setting could not be made hidden using the API
+- Fixed a bug where the **AddTemperatureZone()** function in the API was broken
+
+---Release v2.2.0
+
+# New Settings
+- **Enable Quantum Ship** - Makes the ship quantum while on the Quantum Moon
+- **Add Resource Pump** - Adds a pump to the back of your ship that allows you to refill your ship's resources (fuel, oxygen, water) or fire them out of the pump in a very wasteful manner
+- **Use Water Tank** - Makes water one of your ship's resources and adds a gauge for it in the cockpit, other features will need to consume water to function
+- **Water Drain Multiplier** - Adjusts how quickly devices drain your water reserves
+- **Add Water Cooling** - Adds a lever next to the ship log that turns on water cooling, which consumes water to prevent your ship from getting hot
+- **Allow Reactor Overload** - Lets you interact with the reactor component to overload it, which prevents your ship from getting cold but makes the reactor explode faster
+- **Temperature Difficulty** - Controls how dangerous the side effects of high/low temperature are
+- **Buttons Require Flight Chair** - Prevents you from interacting with buttons in the cockpit unless you're piloting the ship
+- **Remember Ship State** - Preserves the currently selected settings and the state of the ship (resource levels, damage, etc) while warping between solar systems, when you die the ship will reset and the settings will update
+- **Enable Gas Leak** - Not recommended
+- Added **ExperimentalSettings.json** to the mod folder
+
+# Feature Changes
+- The ship gravity crystal can now be duplicated with the **Unlimited Items** setting
+- Split the **Enable Repair Wrench** setting into Disabled/Enabled/Required, where Enabled speeds up repairs while holding the wrench and Required requires you to be holding the wrench
+- Replaced the **Faulty Heat Regulators** setting with **Passive Temperature Gain**, which lets you gain "passive cold-ness" as well
+- Higher values of **Cyclone Chaos** will now make cyclones deal damage to the ship
+- Renamed **Disable Automatic Lights** to **Keep Power On**
+
+# Temperature Rework
+- Cold areas no longer apply passive damage to the ship
+- Cold areas now make the ship more vurnerable to impact damage
+- The ship engine will now start like usual after stalling at the cost of damage to the ship
+- The inside glass of the cockpit will now freeze over if the reactor heats up and the outside temperature is low
+- Hot areas now increase the strength of the ship thrusters
+- Hot areas now passively make the reactor hotter
+
+# Compatibility Fixes
+- Made the continuous velocity match from **General Enhancements** compatible with the **Autopilot Controls**
+- Added extra temperature zones to **The Stranger They Are**, **Heliostudy**, **Unnamed Mystery**, **Evacuation**, **Fret's Quest 2**, **On A Rail**, **Misfired Jump**, **Christmas Story**, **Echo Hike**, and **Axiom's Refuge**
+- Made every item compatible with the **Throwable Items** mod
+- Fixed a bug where the player marker would still be visible if **Disable Minimap Markers** was used with **General Enhancements**
+
+# Minor Changes
+- Previously entered radio codes now appear in the ship
+- Repair prompts now display the number of parts you can repair
+- Added temperature zones to the Quantum Moon
+- Added console notifications for **Fragile Ship** and **Stun Damage**
+- Added brackets to the ship scout screen when **Scout Photo Mode** is enabled and being used
+- Made explosions push the ship around a lot more
+- The **Radio** now plays music in both ears while being held
+- Reduced some loading times in the settings menu
+- Organized the settings menu, including moving settings around and adding subsections
+
+# Bug Fixes
+- Fixed a bug where giving two moving objects a gravity crystal would crash the game
+- Fixed a bug where no audio would play when a ship module was ejected
+- Fixed a bug where components added by the mod wouldn't count towards total ship damage
+- Fixed a bug where the "Activate Overdrive" button would sometimes be interactable at the wrong time
+- Fixed a bug where the added button panel wouldn't match the **Interior Hull Color** setting
+- Fixed a bug where the **Repair Wrench** was required to repair the satellite in the Zero-G cave
+
+---Release v2.1.3
+
+- Made the tether less springy and harder to snap
+- Removed debug messages that were added in a previous hotfix
+
+---Release v2.1.2
+
+- Fix a memory leak caused by enabling color blending for the ship thruster color
+
+---Release v2.1.1
+
+# Feature Changes
+
+- Added a file named **RandomizerSettings.json** to the mod folder that lets you customize the Random preset
+- Removed the **Remove Masi Sicker** setting because the devs fixed it
+
+# Bug Fixes
+
+- Fixed a bug where ending the loop while locked onto something with Split Ship Lock-on enabled would cause errors
+- Fixed a bug where the Default Settings button in the settings menu would sometimes not work properly
+- Fixed some bugs with the moving parts on the radio
+- Added a tooltip to the selected preset explaining what it does
+
+---Release v2.1.0
+
+# New Settings
+
+- Split Ship Lock-On - Makes the ship lock-on target independent from the player lock-on target (QOL setting, disabled by default)
+- Enable Color Blending - Overcomplicates the ship decoration
+- Remove Masi Sticker - Restores the ship to its former glory (QOL setting)
+
+# Feature Changes
+
+- Overhauled the SFX for larger ship explosions
+- Overhauled the ship decoration settings
+
+# Bug Fixes + Minor Changes
+
+- Fixed a bug where enabling auto alignment and locking onto the ship would crash the game
+- Fixed a bug where the Portable Campfire would have no temperature zone when temperature zones were set to "Hot"
+- Fixed a bug where setting a thruster color would turn on thruster flame damage
+- Fixed a bug where the ship warp core wouldn't work in the vanilla solar system when New Horizons was enabled
+- Fixed a vanilla bug where the light above the ship log wouldn't update the emission scale correctly
+- Fixed a bug where some buttons on the extendable panel couldn't be reached while in the cockpit chair
+- Made decoration and QOL settings independent from presets
+- Changed the radio volume keybinds to left/right instead of up/down
+- Added damage icons to the ship damage screen for the scout launcher and warp core
+
+---Release v2.0.0
+
+# New Settings
+
+- **Add Ernesto** - Self explanatory
+- **Extra Eject Buttons** - Adds a few more eject buttons to the ship that eject different modules
+- **Prevent System Failure** - Forces the ship to stay functional as long as the cockpit is attached
+- **Interactable Ship Curtain** - Lets you close the curtain in the cabin to block off the cockpit
+- **Add Repair Wrench** - Adds a wrench to the ship that you need to be holding if you want to repair anything
+- **Funny Sounds** - Adds some silly sound effects
+- **Always Allow Map Lock-on** - Lets you use the lock-on feature with the map while on a planet (QOL setting)
+- **Ship Warp Core Component** - A modifier for the ship warp core that turns it into a damageable component (part of the Ship Warp Core setting)
+- **Disable Ship Medkit** - Takes away your ability to heal yourself in the ship
+- **Add Radio** - Adds a radio to the ship cockpit that you can listen to music on
+- **Disable Fluid Prevention** - Makes it so stuff like sand and water can enter the ship
+- **Disable Hazard Prevention** - Makes it so hazards like heat and ghost matter can damage you inside the ship
+- **Prolong Digestion** - Gives you some time to rethink your life decisions while being digested by an anglerfish
+- **Unlimited Items** - Lets you duplicate items inside of the ship
+- **Ship Noise Multiplier** - Lets you make your ship louder or quieter from the perspective of anglerfish
+- **Ship Water/Sand Damage** - Damages your ship when you touch water/falling sand
+- **Disable Minimap Markers** - Turns off the icons shown on your minimap
+- **Ship Scout Photo Mode** - Lets you switch to photo mode with the ship's scout launcher
+- **Add Autopilot Controls** - Adds a new interface to the cockpit that gives you access to the new autopilot features Slate was working on (replaces **Persistent Input**)
+- **Fix Ship Thrust Indicator** - Fixes a bug where the ship's thrust display turns off when you leave the flight chair (QOL setting)
+- **Add Auto Align Controls** - Adds an interface to the cockpit that lets you rotate your ship torwards the current lock-on target
+- **Ship Horn Variant** - Lets you honk by equipping the ship's signalscope and pressing the flashlight button
+- **Randomizer Iterations/Difficulty** - Controls how the settings are randomized on the Random preset
+- **Disable Ship Hatch** - Completely removes the hatch from the ship
+
+# Feature Changes
+
+- Replaced **Disable Retro Rockets** with **Disable Thrusters**, which lets you choose a thrust direction to disable
+- Replaced **Disable Ship Friction** with **Ship Friction**, which lets you adjust how much friction to apply to the ship
+- Replaced **Disable Ship Repair** with **Repair Limit**, which lets you set a limit on how many parts you're allowed to repair
+- Replaced **Chaotic Cyclones** with a **Cyclone Chaos** slider, which lets you make cyclones even more chaotic
+- Removed **Add Persistent Input**
+- Renamed **Enable Manual Scout Recall** to **Disable Handheld Scout Recall** and moved it to the appropriate section
+- Renamed **Disable Map Markers** to **Disable HUD Markers**
+- Replaced the **Relaxed**, **Hardcore**, and **Wanderer** presets with **Impossible** and **New Stuff**
+- Added "Hot" and "Cold" as options to the **Add Temperature Zones** setting
+- Added 3 new achievements for the **Achievements+** mod
+- Changed the ship explosion for when the **Ship Explosion Multiplier** is set to a high enough number
+- Added more commands to the ship signal
+- Overhauled item sound effects
+- Warping to gravity cannons can now also be done through lock-on
+- Added a temperature increase when traveling through an atmosphere quickly while temperature zones are enabled
+- Cockpit dirt can now be removed through extremely violent spinning and high-speed atmospheric re-entry
+- Temperature will now increase faster if **Faulty Heat Regulators** is enabled and the reactor is damaged
+- Made it possible for explosions to kill anglerfish and cause the portable fuel tank to explode
+- Added an effect to the screen for when you spin too quickly
+- Made it possible to put custom images onto the **Expedition Flag**, check the mod page for more info
+- Added a marker to the minimap when the **Expedition Flag** is placed down
+- Made the **Gravity Landing Gear** more powerful and added a new switch
+- Limited ship temperature to the current temperature
+- Setting **Ship Temperature Resistance** to zero or a negative value actually does something now
+
+# Bug Fixes + Minor Edits
+
+- Fixed a bug where the headlights indicator in the cockpit would stay lit if the headlights were disabled
+- Fixed a bug where the temperature for the portable fuel canister was being calculated using the ship's position
+- Fixed a bug where the overdrive was still usable when both thrusters were broken
+- Fixed a bug where you could pick up the probe, place the probe in the ship, and transfer fuel to the ship without wearing your suit
+- Fixed a bug where the engine switch would sometimes desync in multiplayer
+- Fixed some wacky behavior with tethering modules to the ship and ejecting them
+- Removed floating shadows and fixed missing shadows
+- Fixed a bug where opening the settings menu twice after selecting a preset would change the preset back to **Custom**
+- Fixed a bug where button prompts for new items would sometimes appear in the pause menu
+- Fixed a bug where you could get the **Hulk Smash!** achievement without actually doing anything
+- Fixed a bug introduced by a QSB update where all the new items would break in multiplayer
+- Fixed a bug where using the return warp with the cockpit detached would sometimes mess up your HUD
+- Fixed a bug where anglerfish would use the player position to detect noise from the ship (re-implemented from Vanilla Fix)
+- Fixed a bug where **Ship Bounciness** would always apply maximum bounce when using a value between 0 and 1
+- Fixed a bug where the **Ship Warp Core** wouldn't warp to the correct location in custom star systems
+- Fixed a bug where a couple switches on the extendable panel were sometimes unreachable
+- Fixed a bug where interactibles on the extendable panel were disabled when the power was flickering
+- Fixed a bug where some models inside the ship were still affected by ambient light (doesn't apply to items)
+- Fixed a bug where items in the ship would disappear when you exited the ship
+- Fixed a bug where the **Portable Fuel Canister** had no audio when exploding
+- Fixed a bug where **Single-Use Tractor Beam** wouldn't work in multiplayer
+- Fixed a bug where the landing camera and headlights were still usable after the front leg detached
+- Fixed a bug where placing a tether hook on the landing gear in multiplayer would throw an error
+- Fixed a bug where placing a tether hook on objects with rotated sectors would break the tether physics
+- Fixed a bug where some of the ship's audio could be heard from anywhere in the universe
+- Fixed a bug where the ship explosion's light source wasn't scaled properly
+- Fixed a bug where explosions would sometimes apply damage to things before actually reaching them
+- Fixed a bug where changing the preset in the settings menu wouldn't show any changes until closing and opening the menu
+- Changed the engine switch prompt to a hold prompt
+- Added temperature zones to custom stars made with New Horizons
+- Made the clock slightly louder
+- Extended the max tether length
+- Made some changes to Slate's dialogue
+- Edited the extendable panel to highlight the button you're looking at
+- Changed the mod banner
+- Added dividers and a warning to the settings menu
+
+---Release v1.1.0
+
+# New Settings
+
+- **Disable Automatic Lights** - Keeps all the lights on when you leave the ship.
+- **Add Expedition Flag** - Adds a flag item to the ship that you can place down.
+- **Add Portable Fuel Canister** - Adds a fuel tank to the ship that you can bring around with you. Place it down somewhere to refuel your jetpack.
+- **Chaotic Cyclones** - Changes cyclones to apply an additional upwards spin to the ship.
+- **Extra Explosion Damage** - Makes explosions damage the ship and Brittle Hollow fragments.
+- **Single-Use Tractor Beam** - Your ship's tractor beam can now only be used once.
+- **Disable Retro Rockets** - Disables your backwards thrusters, making it much harder to slow down.
+- **Max Dirt Accumulation** - Adds a limit to the amount of dirt that can build up on the cockpit.
+- **Add Ship Warp Core** - Integrates a Nomai warp core into your cockpit that can return you back to Timber Hearth.
+- **Repair Time Multiplier** - Adjust the time it takes to repair parts of your ship.
+- **Air Drag Multiplier** - Adjusts how much your ship is slowed down by air from atmospheres.
+- **Add Ship Clock** - Adds a clock to the cockpit that tells the time in seconds and minutes.
+- **Enable Stun Damage** - Locks up your controls for a few seconds if your ship hits something too hard.
+- **Enable Repair Confirmation** - Plays a sound when everything has been repaired.
+- **Fix Ship Gravity** - A quality of life feature that gets rid of a bug that made moving in your ship impossible when in areas of high gravity.
+- **Enable Removable Gravity Crystal** - Lets you remove your ship's gravity crystal and place it down somewhere else.
+- **Random Hull + Component Damage** - Applies a random amount of damage to a random set of parts at the start of the loop.
+- **Enable Fragile Ship** - Prevents you from piloting your ship if it has taken any damage.
+- **Faulty Heat Regulators** - Your ship can no longer shed heat, meaning it constantly gains temperature. You'll have to find somewhere cold to cool it down.
+
+# Feature Changes
+
+- Added the ability to send commands to the ship using the Ship Signal
+- Added more temperature zones around the Solar System and added a temperature zone to every campfire
+- Low ship temperatures now lower your maximum thrust output and make it possible for the engine to stall
+- High ship temperatures now make the ship hull damage you on contact
+- The ship can now take temperature damage while cooling down
+- Reorganized settings to place similar settings next to each other and make things easier to find
+- Added a bunch of new dialogue to Slate
+- Moved the tether prompts to the bottom left and changed the tether disconnect keybind from the **Scout Reverse Snapshot** keybind to a combination of the **Free Look** keybind and the **Interact** keybind
+- Changed Ship Bounciness between 0 and 1 to use a Unity physics material for more accurate bouncing, which also makes players bounce off the ship
+- Added more sounds to the Extra Noise setting
+- **Atmosphere Angular Drag Multiplier** only applies to air and fog now
+- Changed the color of some new switches
+- Added a turbo feature to the **Portable Tractor Beam**
+
+# Bug Fixes
+
+- Fixed an error with map markers at the Eye
+- Fixed a bug where you could sleep at the Portable Campfire on the Quantum Moon
+- Fixed a bug where the damage and damage speed multipliers would break when set to zero
+- Fixed a bug where certain items would equip a tool after interacting with them
+- Fixed a bug where the ship would still explode when the Ship Explosion Multiplier was set to zero
+- Fixed a bug where turning off the ship would sometimes preserve the last persistent input
+- Removed the small spaces between the Thrust Modulator buttons
+- Fixed a bug where the ship’s signal couldn’t be detected inside Dark Bramble or The Stranger
+- Fixed a bug where items placed on detachable parts of the ship would not move with the part if it detached
+- Fixed a bug where connecting a tether between a non-static body and a static body would sometimes cause the tether to not work
+- Fixed a bug where connecting two different things with a tether would sometimes cause them to jolt towards each other
+- Fixed a bug where disabling button prompts in the settings would remove a few button prompts that were meant to stay visible
+- Fixed a bug where larger values for the Ship Explosion Multiplier would cause the explosion to move around unnaturally
+- Fixed a bug where the Engine Switch indicator light for the thrusters would sometimes show the incorrect status
+- Prevented some of the auto hatch code from running in multiplayer
+- Fixed a bug where the mod would implode if you tried to load a singleplayer game while Quantum Space Buddies was enabled
+- Fixed a bug where the pick up prompt for the ship's scout launcher would sometimes appear at the wrong time
+- Fixed a bug where items inside the ship would turn invisible when it was destroyed
+
+---Release v1.0.1
+
+- Fixed a bug where disabling the gravity crystal would break everything
+
+---Release v1.0.0
+
+**Ship Enhancements is fully compatible with QSB now!**
+
+# New Settings
+- **Disable Ship Suit** - Removes your spacesuit from the ship. Not recommended for exploring anywhere without oxygen.
+- **Damage Indicator Color** - Lets you change the overall color of the damage indicators on the ship, like making the master alarm flash green instead of red.
+
+# New Features
+- Added some easter eggs for settings that would previously break trying to process negative numbers
+- Added a new hidden achievement for the **Achievements+** mod to go with one of the easter eggs
+
+# Bug Fixes + Improvements
+- Fixed a bug where the Sun's temperature zone wouldn't scale properly over the course of the loop
+- Fixed a bug where damaging the fuel tank with ship repair disabled would prevent you from transferring fuel
+- Adjusted ship oxygen to drain based on how many players are inside
+- Changed the ship signal sound and moved it to the Outer Wilds Ventures frequency for New Horizons compatibility
+- Fixed the bounce math for the Ship Bounciness setting again
+- Potentially fixed bug with mod config causing errors after an update
+
+---Release v0.2.0
+
+# New Settings
+- **Reactor Lifetime Multiplier**
+  - Controls how long it takes for the ship's reactor to explode.
+- **Disable Ship Friction**
+  - Removes friction from the ship so that it slides around everywhere. Also makes the inside of the ship slippery.
+- **Add Signalscope Component**
+  - Turns the ship's signalscope into a damageable component.
+- **Cockpit Rust**
+  - Applies a permanent layer of rust to the cockpit that obscures your vision. The amount of rust is controlled by a slider in the settings.
+- **Cockpit Dirt Accumulation Rate**
+  - Controls how quickly dirt builds up on the cockpit. It will obscure your vision, but you can wash it off with some water.
+- **Ship Thruster Color**
+  - Changes the color of the ship's thrusters and the color of the thrust indicator inside.
+- **Disable Seatbelt**
+  - Removes your seatbelt. If you crash the ship too hard you'll go flying out of your chair.
+- **Add Portable Tractor Beam**
+  - Adds a portable Nomai tractor beam inside of the ship. You can place it on the ground for an extra boost in height.
+
+# New Features
+- "Random" Preset
+  - A new preset in the mod settings that randomizes all of the options each loop.
+- Achievements
+  - Added 8 achievements for the **Achievements+** mod.
+
+# Minor Changes
+- Slightly improved the math for the Ship Bounciness setting
+- Gravity Landing Gear now temporarily disables when applying upwards thrust
+- Overdrive now temporarily changes the color of the thrust indicator inside of the ship
+- Added notifications for when the scout is unable to be launched due to it being in a different launcher
+- Moved the Ship Signal to the Outer Wilds Ventures frequency to avoid conflicts with New Horizons
+- Changed the sound of the Ship Signal to be quieter
+
+# Bug Fixes
+- Fixed some incorrectly named ship light colors
+- Fixed a bug where overdrive was still useable when fuel was depleted
+- Fixed a bug where Persistent Input was still useable when fuel was depleted
+- Fixed a bug where the Thrust Modulator buttons would break when losing power during the overdrive sequence
+- Fixed a bug where the mod **General Enhancements** would override Ship Input Latency
+- Fixed a bug where turning on Disable Ship Scout Recall would occasionally cause issues at the beginning of the next loop
+
+---Release v0.1.0
+
+- Initial release

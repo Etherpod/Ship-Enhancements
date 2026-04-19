@@ -7,14 +7,16 @@ using UnityEngine;
 
 namespace ShipEnhancements;
 
-public static class ErnestoNetworkHandler
+public static class NetworkFileHandler
 {
     private static List<string> ModList { get; set; }
     private static List<string> ActiveModList { get; set; }
     private static TextAsset ActiveDialogue { get; set; }
+    private static TextAsset ActiveChangelog { get; set; }
 
     private static HttpClientGenerator _modListClientGenerator;
     private static HttpClientGenerator _dialogueClientGenerator;
+    private static HttpClientGenerator _changelogClientGenerator;
 
     public static void Initialize()
     {
@@ -25,6 +27,11 @@ public static class ErnestoNetworkHandler
         
         _dialogueClientGenerator = new HttpClientGenerator(
             "https://raw.githubusercontent.com/Etherpod/Ship-Enhancements/refs/heads/main/ShipEnhancements/dialogue/ErnestoDialogue.txt",
+            client => client.Timeout = System.TimeSpan.FromMilliseconds(2500)
+        );
+        
+        _changelogClientGenerator = new HttpClientGenerator(
+            "https://raw.githubusercontent.com/Etherpod/Ship-Enhancements/refs/heads/version-2.3.0/ShipEnhancements/dialogue/changelog.txt",
             client => client.Timeout = System.TimeSpan.FromMilliseconds(2500)
         );
 
@@ -100,6 +107,29 @@ public static class ErnestoNetworkHandler
                 ActiveDialogue = new TextAsset(" DIALOGUE_BODY_SEPARATOR ");
             }
         }
+
+        var changelogResponse = DownloadFile(_changelogClientGenerator.Client);
+        if (changelogResponse != null && changelogResponse.Result != "404: Not Found")
+        {
+            ActiveChangelog = new TextAsset(changelogResponse.Result);
+            File.WriteAllText(Path.Combine(ShipEnhancements.Instance.ModHelper.Manifest.ModFolderPath +
+                "dialogue/changelog.txt"), changelogResponse.Result.Replace("\n", System.Environment.NewLine));
+        }
+        else
+        {
+            var changelog = LoadLocalFile("dialogue/changelog.txt");
+            if (changelog != null)
+            {
+                ActiveChangelog = new TextAsset(changelog);
+            }
+            else
+            {
+                ActiveChangelog = new TextAsset(
+                    "---404: Not Found\nCould not load the changelog!\nReinstall Ship Enhancements and check back here. " +
+                    "If it still isn't working, please don't hesitate to contact me! (Etherpod)"
+                );
+            }
+        }
     }
 
     private static Task<string> DownloadFile(HttpClient httpClient)
@@ -121,9 +151,16 @@ public static class ErnestoNetworkHandler
 
     private static string LoadLocalFile(string path)
     {
-        return File.ReadAllText(Path.Combine(
+        var fullPath = Path.Combine(
             ShipEnhancements.Instance.ModHelper.Manifest.ModFolderPath,
-            path));
+            path);
+        
+        if (File.Exists(fullPath))
+        {
+            return File.ReadAllText(fullPath);
+        }
+
+        return null;
     }
 
     public static int GetNumberErnestos()
@@ -139,5 +176,10 @@ public static class ErnestoNetworkHandler
     public static TextAsset GetErnestoQuestions()
     {
         return ActiveDialogue;
+    }
+
+    public static TextAsset GetChangelog()
+    {
+        return ActiveChangelog;
     }
 }
