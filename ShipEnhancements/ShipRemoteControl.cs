@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Rendering;
 using UnityEngine.UI;
 
 namespace ShipEnhancements;
@@ -9,6 +10,8 @@ public class ShipRemoteControl : MonoBehaviour
 {
     [SerializeField]
     private SignalscopeCommandList _canvasList;
+    [SerializeField]
+    private SignalscopeCommandGroupIcon[] _groupIcons;
     [SerializeField]
     private Text _groupHeader;
     [SerializeField]
@@ -21,6 +24,7 @@ public class ShipRemoteControl : MonoBehaviour
     private AudioSignal _shipAudioSignal;
     private ShipCommand _currentCommand;
     private ShipCommand.CommandGroup _groupMask;
+    private SignalscopeCommandGroupIcon _selectedIcon;
     private ScreenPrompt _interactPrompt;
     private ScreenPrompt _cycleCommandPrompt;
     private ScreenPrompt _cycleGroupPrompt;
@@ -37,9 +41,13 @@ public class ShipRemoteControl : MonoBehaviour
 
     private List<ShipCommand> _commands = 
     [
-        new ShipCommand_Explode(),
-        new ShipCommand_EngineSwitch(),
         new ShipCommand_ReturnWarp(),
+        new ShipCommand_ToggleAutoAlign(),
+        new ShipCommand_ToggleAlignDirection(),
+        new ShipCommand_ToggleGravityGear(),
+        new ShipCommand_ToggleGravityGearInvert(),
+        new ShipCommand_EngineSwitch(),
+        new ShipCommand_Explode(),
         new ShipCommand_HonkHorn(),
         new ShipCommand_CockpitEject(),
         new ShipCommand_EngineEject(),
@@ -54,8 +62,8 @@ public class ShipRemoteControl : MonoBehaviour
         new ShipCommand_TargetCurrentLockOn(),
         new ShipCommand_TargetPlayer(),
         new ShipCommand_TargetProbe(),
+        new ShipCommand_ViewShip(),
         new ShipCommand_CallErnesto(),
-        new ShipCommand_ViewShip()
     ];
 
     private Dictionary<ShipCommand.CommandGroup, string> _groupToDisplayName = new()
@@ -100,11 +108,32 @@ public class ShipRemoteControl : MonoBehaviour
         AddMaterials();
 
         var launcherParent = SELocator.GetShipTransform().Find("Module_Cockpit/Systems_Cockpit/ProbeLauncher");
-        var launcherCam = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipViewer_LauncherCamera.prefab");
-        _shipCameras.Add(ShipEnhancements.CreateObject(launcherCam, launcherParent).GetComponent<ShipViewerCamera>());
+        var launcherCamObj = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipViewer_LauncherCamera.prefab");
+        var launcherCamViewer = ShipEnhancements.CreateObject(launcherCamObj, launcherParent)
+            .GetComponent<ShipViewerCamera>();
+        if (SELocator.GetProbeLauncherComponent() != null)
+        {
+            launcherCamViewer.SetShipComponent(SELocator.GetProbeLauncherComponent());
+        }
+        _shipCameras.Add(launcherCamViewer);
+        
         var landingParent = SELocator.GetShipTransform().Find("Module_Cockpit/Systems_Cockpit");
-        var landingCam = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipViewer_LandingCamera.prefab");
-        _shipCameras.Add(ShipEnhancements.CreateObject(landingCam, landingParent).GetComponent<ShipViewerCamera>());
+        var landingCamObj = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipViewer_LandingCamera.prefab");
+        var landingCam = ShipEnhancements.CreateObject(landingCamObj, landingParent).GetComponent<OWCamera>();
+        var landingCamViewer = landingCam.GetComponent<ShipViewerCamera>();
+        landingCamViewer.SetShipComponent(SELocator.GetShipTransform().GetComponentInChildren<ShipCameraComponent>());
+        _shipCameras.Add(landingCam.GetComponent<ShipViewerCamera>());
+
+        foreach (var rendState in SELocator.GetShipTransform()
+            .GetComponentsInChildren<PerCameraRendererState>(true))
+        {
+            rendState.gameObject.SetActive(false);
+            var newState = rendState.gameObject.AddComponent<PerCameraRendererState>();
+            newState._owCamera = landingCam;
+            newState._enabled = false;
+            newState._shadowCastingMode = ShadowCastingMode.Off;
+            rendState.gameObject.SetActive(true);
+        }
 
         _shipViewerTexture = new RenderTexture(512, 512, 16);
         _shipViewerTexture.name = "ShipViewerTexture";
@@ -150,6 +179,7 @@ public class ShipRemoteControl : MonoBehaviour
             if (signal.GetName() == ShipEnhancements.Instance.ShipSignalName)
             {
                 _shipAudioSignal = signal;
+                break;
             }
         }
         
@@ -252,7 +282,7 @@ public class ShipRemoteControl : MonoBehaviour
                 if (changeGroup)
                 {
                     CycleGroup(OWInput.IsNewlyPressed(InputLibrary.right));
-                    _groupHeader.text = _groupToDisplayName[_groupMask];
+                    UpdateGroupVisuals();
                     _canvasList.SetCommands(_commandsByGroup[_groupMask].Where(c => c.CanShow()).ToList());
                 }
                 if (changeCommand)
@@ -335,6 +365,27 @@ public class ShipRemoteControl : MonoBehaviour
         }
     }
 
+    private void UpdateGroupVisuals()
+    {
+        if (_selectedIcon != null)
+        {
+            _selectedIcon.Deselect();
+            _selectedIcon = null;
+        }
+
+        foreach (var icon in _groupIcons)
+        {
+            if (icon.GetCommandGroup() == _groupMask)
+            {
+                icon.Select();
+                _selectedIcon = icon;
+                break;
+            }
+        }
+        
+        _groupHeader.text = _groupToDisplayName[_groupMask];
+    }
+
     private void CycleCamera(bool forward)
     {
         int cycle = 0;
@@ -366,7 +417,7 @@ public class ShipRemoteControl : MonoBehaviour
                 OWInput.ChangeInputMode(InputMode.SatelliteCam);
                 
                 RefreshCommand();
-                _groupHeader.text = _groupToDisplayName[_groupMask];
+                UpdateGroupVisuals();
                 _canvasList.SetCommands(_commandsByGroup[_groupMask].Where(c => c.CanShow()).ToList());
                 Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.ShipLogSelectEntry);
                 _animator.AnimateTo(1f, Vector3.one, 0.1f);
@@ -391,6 +442,9 @@ public class ShipRemoteControl : MonoBehaviour
     {
         _canvasList.gameObject.SetActive(false);
         _shipViewerParent.SetActive(true);
+        
+        _selectedIcon.Deselect();
+        _selectedIcon = null;
         _groupHeader.text = "Ship Viewer";
 
         var detector = SELocator.GetShipDetector().GetComponent<SectorDetector>();
@@ -439,7 +493,7 @@ public class ShipRemoteControl : MonoBehaviour
         
         _shipViewerParent.SetActive(false);
         _canvasList.gameObject.SetActive(true);
-        _groupHeader.text = _groupToDisplayName[_groupMask];
+        UpdateGroupVisuals();
         
         Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.ShipLogDeselectPlanet);
 
@@ -454,6 +508,7 @@ public class ShipRemoteControl : MonoBehaviour
             if (cmd.GetType().Name == commandName)
             {
                 command = cmd;
+                break;
             }
         }
 

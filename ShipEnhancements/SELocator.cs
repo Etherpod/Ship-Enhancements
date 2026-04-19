@@ -268,6 +268,11 @@ public static class SELocator
 
     public static void SetShipReferenceFrame(ReferenceFrame rf)
     {
+        if (rf == _shipBody.GetReferenceFrame())
+        {
+            rf = null;
+        }
+        
         if (rf == _playerRF || rf == _probeRF)
         {
             _shipTargetRF = rf;

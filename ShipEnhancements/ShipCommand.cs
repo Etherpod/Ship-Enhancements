@@ -128,6 +128,118 @@ public class ShipCommand_HonkHorn : ShipCommand
 	}
 }
 
+public class ShipCommand_ToggleAutoAlign : ShipCommand
+{
+	private AutoAlignButton _alignButton;
+	
+	public ShipCommand_ToggleAutoAlign()
+	{
+		if ((bool)enableAutoAlign.GetProperty())
+		{
+			_alignButton = SELocator.GetShipTransform().GetComponentInChildren<AutoAlignButton>();
+		}
+	}
+	
+	public override string GetDisplayName() => 
+		_alignButton.IsOn() ? "Disable Auto Align" : "Enable Auto Align";
+	
+	public override CommandGroup GetCommandGroup() => CommandGroup.Components;
+
+	public override bool CanShow() => _alignButton != null;
+
+	public override bool CanActivate() => true;
+
+	public override void Activate()
+	{
+		_alignButton.SetState(!_alignButton.IsOn());
+		_alignButton.OnChangeStateEvent();
+		_alignButton.RaiseChangeStateEvent();
+	}
+}
+
+public class ShipCommand_ToggleAlignDirection : ShipCommand
+{
+	private AutoAlignDirectionButton _alignDirectionButton;
+	
+	public ShipCommand_ToggleAlignDirection()
+	{
+		if ((bool)enableAutoAlign.GetProperty())
+		{
+			_alignDirectionButton = SELocator.GetShipTransform().GetComponentInChildren<AutoAlignDirectionButton>();
+		}
+	}
+	
+	public override string GetDisplayName() => 
+		_alignDirectionButton.IsOn() ? "Set Alignment Forward" : "Set Alignment Down";
+	
+	public override CommandGroup GetCommandGroup() => CommandGroup.Components;
+
+	public override bool CanShow() => _alignDirectionButton != null;
+
+	public override bool CanActivate() => true;
+
+	public override void Activate()
+	{
+		_alignDirectionButton.SetState(!_alignDirectionButton.IsOn());
+		_alignDirectionButton.OnChangeStateEvent();
+		_alignDirectionButton.RaiseChangeStateEvent();
+	}
+}
+
+public class ShipCommand_ToggleGravityGear : ShipCommand
+{
+	private GravityLandingGearSwitch _gravitySwitch;
+	
+	public ShipCommand_ToggleGravityGear()
+	{
+		if ((bool)enableGravityLandingGear.GetProperty())
+		{
+			_gravitySwitch = SELocator.GetShipTransform().GetComponentInChildren<GravityLandingGearSwitch>();
+		}
+	}
+	
+	public override string GetDisplayName() => 
+		_gravitySwitch.IsOn() ? "Disable Gravity Landing Gear" : "Enable Gravity Landing Gear";
+	
+	public override CommandGroup GetCommandGroup() => CommandGroup.Components;
+
+	public override bool CanShow() => _gravitySwitch != null;
+
+	public override bool CanActivate() => true;
+
+	public override void Activate()
+	{
+		_gravitySwitch.SetState(!_gravitySwitch.IsOn());
+	}
+}
+
+public class ShipCommand_ToggleGravityGearInvert : ShipCommand
+{
+	private GravityGearInvertSwitch _invertSwitch;
+	
+	public ShipCommand_ToggleGravityGearInvert()
+	{
+		if ((bool)enableGravityLandingGear.GetProperty())
+		{
+			_invertSwitch = SELocator.GetShipTransform().GetComponentInChildren<GravityGearInvertSwitch>();
+		}
+	}
+	
+	public override string GetDisplayName() => 
+		_invertSwitch.IsOn() ? "Reset Gravity Gear" : "Invert Gravity Gear";
+	
+	public override CommandGroup GetCommandGroup() => CommandGroup.Components;
+
+	public override bool CanShow() => _invertSwitch != null;
+
+	public override bool CanActivate() => true;
+
+	public override void Activate()
+	{
+		_invertSwitch.SetState(!_invertSwitch.IsOn());
+	}
+}
+
 public class ShipCommand_Autopilot : ShipCommand
 {
 	private Autopilot _autopilot;
@@ -564,7 +676,8 @@ public class ShipCommand_TargetCurrentLockOn : ShipCommand
 
 	public override bool CanShow() => (bool)splitLockOn.GetProperty();
 
-	public override bool CanActivate() => SELocator.GetReferenceFrame() != Locator.GetReferenceFrame();
+	public override bool CanActivate() => Locator.GetReferenceFrame() != null && 
+		SELocator.GetReferenceFrame() != Locator.GetReferenceFrame();
 
 	public override void Activate()
 	{
@@ -584,7 +697,11 @@ public class ShipCommand_TargetPlayer : ShipCommand
 
 	public override void Activate()
 	{
-		Locator._rfTracker.UntargetReferenceFrame(false);
+		if (!(bool)splitLockOn.GetProperty())
+		{
+			Locator._rfTracker.UntargetReferenceFrame(false);
+		}
+		
 		SELocator.TargetPlayerWithShip();
 		Locator.GetPlayerAudioController().PlayLockOn();
 	}
@@ -602,7 +719,11 @@ public class ShipCommand_TargetProbe : ShipCommand
 
 	public override void Activate()
 	{
-		Locator._rfTracker.UntargetReferenceFrame(false);
+		if (!(bool)splitLockOn.GetProperty())
+		{
+			Locator._rfTracker.UntargetReferenceFrame(false);
+		}
+		
 		SELocator.TargetProbeWithShip();
 		Locator.GetPlayerAudioController().PlayLockOn();
 	}
@@ -628,15 +749,13 @@ public class ShipCommand_CallErnesto : ShipCommand
 		{
 			SELocator.GetRemoteControl().SetVisible(false);
 		}
-
-		var val = Random.value;
-		ShipEnhancements.WriteDebugMessage(val);
+		
 		if (Vector3.Distance(Locator.GetPlayerTransform().position, SELocator.GetShipTransform().position) < 10f)
 		{
 			DialogueConditionManager.SharedInstance
 				.SetConditionState("SE_ERNESTO_CLOSECALL", true);
 		}
-		else if (val < 0.1f)
+		else if (Random.value < 0.1f)
 		{
 			DialogueConditionManager.SharedInstance
 				.SetConditionState("SE_ERNESTO_LONGPICKUP", true);

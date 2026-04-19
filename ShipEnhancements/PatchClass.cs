@@ -3859,6 +3859,8 @@ public static class PatchClass
     [HarmonyPatch(typeof(TextTranslation), nameof(TextTranslation.Translate))]
     public static bool TextTranslation_Translate(TextTranslation __instance, string key, ref string __result)
     {
+        if (!(bool)addErnesto.GetProperty()) return true;
+        
         if (key == "SE_Ernesto_ErnestosERNESTO_PLACEHOLDER")
         {
             int numErnestos = ErnestoNetworkHandler.GetNumberErnestos();
@@ -3967,6 +3969,30 @@ public static class PatchClass
         if (key == "SE_Ernesto_ShipFailureERNESTO_PLACEHOLDER")
         {
             __result = ErnestoDetectiveController.GetHypothesis();
+            return false;
+        }
+
+        if (key == "SE_Ernesto_LocationERNESTO_LOCATION_PLACEHOLDER")
+        {
+            var passiveRF = SELocator.GetShipDetector()
+                .GetComponent<SectorDetector>().GetPassiveReferenceFrame();
+            if (passiveRF != null)
+            {
+                if (passiveRF == SELocator.GetPlayerBody().GetComponentInChildren<SectorDetector>()
+                    .GetPassiveReferenceFrame())
+                {
+                    __result = "I'm on the same planet you're on. Do we get to be planet buddies?";
+                    return false;
+                }
+                
+                if (passiveRF.GetHUDDisplayName() != "")
+                {
+                    __result = "I think I'm on " + passiveRF.GetHUDDisplayName() + ". Don't take my word for it, though.";
+                    return false;
+                }
+            }
+            
+            __result = "Uhh... no clue. Somewhere in space, probably.";
             return false;
         }
         

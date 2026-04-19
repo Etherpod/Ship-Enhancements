@@ -153,6 +153,7 @@ The **Ship Signal** has a special use to it! If you find the ship's signal on yo
   - **Target Scout** - Sets the ship's target to your scout. Autopilot and related features that require a target will treat the scout as if it were a planet.
     - Unfortunately, both the **Target Me** and **Target Scout** are unavailable in multiplayer due to technical complications. (The fake players that you see in your game don't have any physics, which breaks autopilot and everything else)
 - Other Commands
+  - **Enter Ship Viewer** - Connects to the cameras on the ship and displays a live feed.
   - **Call Ernesto** - Calls Ernesto. (Requires **Ernesto**)
 
 ### *Items*
