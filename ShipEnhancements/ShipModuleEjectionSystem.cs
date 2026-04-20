@@ -108,29 +108,36 @@ public class ShipModuleEjectionSystem : MonoBehaviour
                 List<OWRigidbody> legs = [];
                 foreach (ShipDetachableLeg leg in _landingGear.GetLegs())
                 {
-                    legs.Add(leg.Detach());
-                }
-
-                //_shipBody.transform.position -= _shipBody.transform.TransformVector(_ejectDirection);
-                float num = _ejectImpulse;
-                num *= ShipEnhancements.ExperimentalSettings?.Eject_SpeedMultiplier ?? 1f;
-                if (Locator.GetShipDetector().GetComponent<ShipFluidDetector>().InOceanBarrierZone())
-                {
-                    MonoBehaviour.print("Ship in ocean barrier zone, reducing eject impulse.");
-                    num = 1f;
-                }
-                _shipBody.AddLocalImpulse(-_ejectDirection * num / 2f);
-                foreach (OWRigidbody leg in legs)
-                {
-                    Vector3 toShip = leg.transform.position - _shipBody.transform.position;
-                    leg.AddLocalImpulse(-toShip.normalized * num);
-                }
-
-                if (ShipEnhancements.InMultiplayer)
-                {
-                    foreach (uint id in ShipEnhancements.PlayerIDs)
+                    var detachedLeg = leg.Detach();
+                    if (detachedLeg != null)
                     {
-                        ShipEnhancements.QSBCompat.SendDetachLandingGear(id, _ejectImpulse);
+                        legs.Add(detachedLeg);
+                    }
+                }
+
+                if (legs.Count > 0)
+                {
+                    //_shipBody.transform.position -= _shipBody.transform.TransformVector(_ejectDirection);
+                    float num = _ejectImpulse;
+                    num *= ShipEnhancements.ExperimentalSettings?.Eject_SpeedMultiplier ?? 1f;
+                    if (Locator.GetShipDetector().GetComponent<ShipFluidDetector>().InOceanBarrierZone())
+                    {
+                        MonoBehaviour.print("Ship in ocean barrier zone, reducing eject impulse.");
+                        num = 1f;
+                    }
+                    _shipBody.AddLocalImpulse(-_ejectDirection * num / 2f);
+                    foreach (OWRigidbody leg in legs)
+                    {
+                        Vector3 toShip = leg.transform.position - _shipBody.transform.position;
+                        leg.AddLocalImpulse(-toShip.normalized * num);
+                    }
+
+                    if (ShipEnhancements.InMultiplayer)
+                    {
+                        foreach (uint id in ShipEnhancements.PlayerIDs)
+                        {
+                            ShipEnhancements.QSBCompat.SendDetachLandingGear(id, _ejectImpulse);
+                        }
                     }
                 }
             }
@@ -139,15 +146,19 @@ public class ShipModuleEjectionSystem : MonoBehaviour
                 ErnestoDetectiveController.ItWasHullBreach(ejected: true);
 
                 OWRigidbody owrigidbody = _detachableModule.Detach();
-                _shipBody.transform.position -= _shipBody.transform.TransformVector(_ejectDirection);
-                float num = _ejectImpulse;
-                if (Locator.GetShipDetector().GetComponent<ShipFluidDetector>().InOceanBarrierZone())
+
+                if (owrigidbody != null)
                 {
-                    MonoBehaviour.print("Ship in ocean barrier zone, reducing eject impulse.");
-                    num = 1f;
+                    _shipBody.transform.position -= _shipBody.transform.TransformVector(_ejectDirection);
+                    float num = _ejectImpulse;
+                    if (Locator.GetShipDetector().GetComponent<ShipFluidDetector>().InOceanBarrierZone())
+                    {
+                        MonoBehaviour.print("Ship in ocean barrier zone, reducing eject impulse.");
+                        num = 1f;
+                    }
+                    _shipBody.AddLocalImpulse(-_ejectDirection * num);
+                    owrigidbody.AddLocalImpulse(_ejectDirection * num);
                 }
-                _shipBody.AddLocalImpulse(-_ejectDirection * num);
-                owrigidbody?.AddLocalImpulse(_ejectDirection * num);
             }
 
             _audioController.PlayEject();

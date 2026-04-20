@@ -5131,11 +5131,15 @@ public static class PatchClass
     public static bool AddEjectSpeedMultiplier(ShipEjectionSystem __instance)
     {
         float multiplier = ShipEnhancements.ExperimentalSettings?.Eject_SpeedMultiplier ?? 1f;
-        if (multiplier == 1f) return true;
+        if (!ShipEnhancements.InMultiplayer && multiplier == 1f) return true;
 
         if (__instance._ejectPressed)
         {
             OWRigidbody owrigidbody = __instance._cockpitModule.Detach();
+            
+            // QSB causes a null ref with the detach method sometimes, this makes sure it doesn't happen
+            if (owrigidbody == null) return false;
+            
             __instance._shipBody.transform.position -= __instance._shipBody.transform.forward * 2f;
             float num = __instance._ejectImpulse;
             num *= multiplier;
@@ -5644,6 +5648,8 @@ public static class PatchClass
     
     #endregion
 
+    #region EjectFixes
+    
     [HarmonyPrefix]
     [HarmonyPatch(typeof(ShipAudioController), nameof(ShipAudioController.PlayEject))]
     public static bool FixEjectAudio(ShipAudioController __instance)
@@ -5652,4 +5658,6 @@ public static class PatchClass
             .PlayOneShot(AudioType.ShipCockpitEject);
         return false;
     }
+    
+    #endregion
 }

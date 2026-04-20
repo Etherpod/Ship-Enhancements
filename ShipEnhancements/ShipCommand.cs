@@ -23,9 +23,9 @@ public abstract class ShipCommand
 
 	public abstract bool CanActivate();
 	
+	public virtual bool ShouldSyncMultiplayer() => false;
+	
 	public abstract void Activate();
-
-	public virtual void ActivateRemote() => Activate();
 }
 
 public class ShipCommand_Explode : ShipCommand
@@ -67,6 +67,8 @@ public class ShipCommand_EngineSwitch : ShipCommand
 	public override bool CanShow() => _engineSwitch != null;
 	
 	public override bool CanActivate() => ShipEnhancements.Instance.engineOn;
+
+	public override bool ShouldSyncMultiplayer() => true;
 
 	public override void Activate()
 	{
@@ -121,6 +123,8 @@ public class ShipCommand_HonkHorn : ShipCommand
 	public override bool CanShow() => _hornController != null;
 
 	public override bool CanActivate() => !_hornController.IsPlaying();
+	
+	public override bool ShouldSyncMultiplayer() => true;
 
 	public override void Activate()
 	{
@@ -148,6 +152,8 @@ public class ShipCommand_ToggleAutoAlign : ShipCommand
 	public override bool CanShow() => _alignButton != null;
 
 	public override bool CanActivate() => true;
+	
+	public override bool ShouldSyncMultiplayer() => true;
 
 	public override void Activate()
 	{
@@ -177,6 +183,8 @@ public class ShipCommand_ToggleAlignDirection : ShipCommand
 	public override bool CanShow() => _alignDirectionButton != null;
 
 	public override bool CanActivate() => true;
+	
+	public override bool ShouldSyncMultiplayer() => true;
 
 	public override void Activate()
 	{
@@ -206,6 +214,8 @@ public class ShipCommand_ToggleGravityGear : ShipCommand
 	public override bool CanShow() => _gravitySwitch != null;
 
 	public override bool CanActivate() => true;
+	
+	public override bool ShouldSyncMultiplayer() => true;
 
 	public override void Activate()
 	{
@@ -233,6 +243,8 @@ public class ShipCommand_ToggleGravityGearInvert : ShipCommand
 	public override bool CanShow() => _invertSwitch != null;
 
 	public override bool CanActivate() => true;
+	
+	public override bool ShouldSyncMultiplayer() => true;
 
 	public override void Activate()
 	{
@@ -307,11 +319,27 @@ public class ShipCommand_Autopilot : ShipCommand
 			if (rf != null)
 			{
 				_autopilot.FlyToDestination(rf);
+
+				if (ShipEnhancements.InMultiplayer)
+				{
+					foreach (var id in ShipEnhancements.PlayerIDs)
+					{
+						ShipEnhancements.QSBCompat.SendAutopilotState(id, rf.GetOWRigidBody(), destination: true);
+					}
+				}
 			}
 		}
 		else
 		{
 			_autopilot.Abort();
+			
+			if (ShipEnhancements.InMultiplayer)
+			{
+				foreach (var id in ShipEnhancements.PlayerIDs)
+				{
+					ShipEnhancements.QSBCompat.SendAutopilotState(id, null, abort: true);
+				}
+			}
 		}
 	}
 }
@@ -446,6 +474,14 @@ public class ShipCommand_MatchVelocity : ShipCommand
 		if (_autopilot.IsFlyingToDestination())
 		{
 			_autopilot.Abort();
+			
+			if (ShipEnhancements.InMultiplayer)
+			{
+				foreach (var id in ShipEnhancements.PlayerIDs)
+				{
+					ShipEnhancements.QSBCompat.SendAutopilotState(id, null, abort: true);
+				}
+			}
 		}
 		
 		if (!_autopilot.IsMatchingVelocity())
@@ -457,7 +493,16 @@ public class ShipCommand_MatchVelocity : ShipCommand
 				{
 					ShipEnhancements.GEInteraction.EnableContinuousMatchVelocity();
 				}
+				
 				_autopilot.StartMatchVelocity(rf);
+				
+				if (ShipEnhancements.InMultiplayer)
+				{
+					foreach (var id in ShipEnhancements.PlayerIDs)
+					{
+						ShipEnhancements.QSBCompat.SendAutopilotState(id, rf.GetOWRigidBody(), startMatch: true);
+					}
+				}
 			}
 		}
 		else if (ShipEnhancements.GEInteraction != null 
@@ -468,6 +513,14 @@ public class ShipCommand_MatchVelocity : ShipCommand
 		else
 		{
 			_autopilot.StopMatchVelocity();
+			
+			if (ShipEnhancements.InMultiplayer)
+			{
+				foreach (var id in ShipEnhancements.PlayerIDs)
+				{
+					ShipEnhancements.QSBCompat.SendAutopilotState(id, null, stopMatch: true);
+				}
+			}
 		}
 	}
 }
@@ -764,8 +817,6 @@ public class ShipCommand_CallErnesto : ShipCommand
 		_dialogue.StartConversation();
 	}
 
-	public override void ActivateRemote() { }
-
 	public void AssignDialogue(CharacterDialogueTree dialogueTree)
 	{
 		_dialogue = dialogueTree;
@@ -787,6 +838,4 @@ public class ShipCommand_ViewShip : ShipCommand
 	{
 		SELocator.GetRemoteControl().EnterShipViewerMode();
 	}
-
-	public override void ActivateRemote() { }
 }

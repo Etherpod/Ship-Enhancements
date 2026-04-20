@@ -1023,8 +1023,6 @@ public class QSBCompatibility
     public void SendAutopilotState(uint id, OWRigidbody targetBody, bool destination = false, bool startMatch = false,
         bool stopMatch = false, bool abort = false)
     {
-        ShipEnhancements.WriteDebugMessage("\n\n\n" + new System.Diagnostics.StackTrace().ToString());
-        
         _api.SendMessage("autopilot-state", 
             (targetBody != null ? ShipEnhancements.QSBInteraction.GetIDFromBody(targetBody) : -1,
             destination, startMatch, stopMatch, abort), id);
@@ -1032,7 +1030,7 @@ public class QSBCompatibility
 
     private void ReceiveAutopilotState(uint id, (int targetBodyID, bool destination, bool startMatch, bool stopMatch, bool abort) data)
     {
-        if (!(bool)enableEnhancedAutopilot.GetProperty()) return;
+        //if (!(bool)enableEnhancedAutopilot.GetProperty()) return;
 
         Autopilot autopilot = SELocator.GetShipBody().GetComponent<Autopilot>();
 
@@ -1044,7 +1042,15 @@ public class QSBCompatibility
         
         if (data.stopMatch)
         {
-            SELocator.GetAutopilotPanelController().CancelMatchVelocity();
+            if ((bool)enableEnhancedAutopilot.GetProperty())
+            {
+                SELocator.GetAutopilotPanelController().CancelMatchVelocity();
+            }
+            else
+            {
+                autopilot.StopMatchVelocity();
+            }
+            
             return;
         }
 

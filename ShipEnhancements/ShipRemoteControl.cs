@@ -264,7 +264,7 @@ public class ShipRemoteControl : MonoBehaviour
                         _currentCommand.Activate();
                         Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.ShipLogMoveBetweenEntries);
 
-                        if (ShipEnhancements.InMultiplayer)
+                        if (ShipEnhancements.InMultiplayer && _currentCommand.ShouldSyncMultiplayer())
                         {
                             foreach (uint id in ShipEnhancements.PlayerIDs)
                             {
@@ -516,7 +516,7 @@ public class ShipRemoteControl : MonoBehaviour
         
         if (command.CanActivate())
         {
-            command.ActivateRemote();
+            command.Activate();
         }
     }
 

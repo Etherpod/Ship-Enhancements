@@ -317,8 +317,9 @@ To use the API, copy the **IShipEnhancements** script from this mod's GitHub rep
 ## Known Bugs
 The bugs introduced by this mod. Some of these are getting fixed soon, others I have no idea how to fix.
 - Ship Enhancements will temporarily disable itself while you're at the Eye of the Universe. This isn't a bug, but it does prevent a million other bugs from happening.
-- If playing with **Suit Log**, interacting with the **Resource Pump** or using the tether can sometimes open the suit log by accident (fixed in the next update)
-- Changing the **Interior/Exterior Hull Color** will also change the other traveler's ships (fixed in the next update)
+- If playing with **Suit Log**, interacting with the **Resource Pump** or using the tether can sometimes open the suit log by accident (fixed in an upcoming update)
+- Changing the **Interior/Exterior Hull Color** will also change the other traveler's ships (fixed in an upcoming update)
+- When playing in multiplayer and using the **Autopilot Controls**, the position hold and orbital autopilot features may only work while every player has the same lock-on target (fixed in an upcoming update)
 - When playing in multiplayer and using **Ship Input Latency**, the delayed inputs of the non-hosts will not work once they leave the flight console
 - If you attach yourself to an object with a tether and the object enters a black hole, there is a chance you will be violently thrown across the solar system
 - Reeling in towards a tether hook on the other side of a wall will sometimes produce unintended side effects
