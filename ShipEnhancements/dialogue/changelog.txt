@@ -1,3 +1,46 @@
+---Release v2.3.0
+
+I've decided to switch to a new style of updates, which will usually be smaller and will focus on a specific theme. This update is the first of that new style, and the main focus is the ship's signalscope!
+
+
+# New Settings
+
+- **Enable Ship Signalscope Zoom** - Lets you zoom in while using the ship's signalscope
+- **Disable Signalscope Brackets** - Makes finding signals more difficult by turning off the guiding brackets
+- **Mod Changelog** - Brings up a list of all the release notes for previous updates so you can see what changed (copied over from GitHub)
+
+
+# Signalscope Commands
+
+In previous updates, enabling the **Ship Signal** would allow you to cycle through a list of commands while the signal was in focus on your signalscope. That feature received a big upgrade in this update, including a new UI and many more commands to mess around with!
+
+To make finding them easier, the commands are also separated into different groups now, which are listed below. (head to the modding website page for a full list of commands)
+
+- **Component Commands** - Controls specific parts of the ship, like the reactor and cockpit buttons
+- **Module Commands** - Ejects different parts of the ship
+- **Autopilot Commands** - Lets you toggle any of the autopilot functions (except **Input Hold**)
+- **Targeting Commands** - Sets the ship's lock-on target without needing to be in the ship
+- **Other Commands** - Miscellaneous commands that didn't fit in any of the other groups
+
+
+# Feature Changes
+
+- Renamed the **Add Ship Signal** setting to **Ship Signal Type** to allow for using a regular signal
+- Signals will now be visible on the ship's signalscope when it is damaged, but will be much more difficult to track
+- The **Portable Fuel Tank** will now react to collisions when placed on moving objects (shuttles, rafts, etc)
+- The scout can now blow up the **Portable Fuel Tank**
+
+
+# Bug Fixes
+
+- Going offline no longer breaks the mod
+- The signal dish on the outside of the ship no longer freezes in place after being repaired
+- Enabling **Auto Align** and blowing up the ship no longer causes the ship's carcass to spiral away into deep space
+- Reeling the **Tether** in/out is now disabled when player movement is disabled
+- The sound of the cockpit being ejected can't be heard across the universe anymore
+- Fixed a bug where the ship explosion would only appear for one person in multiplayer
+- Fixed a bug where **Position Hold** would turn itself off in multiplayer
+
 ---Release v2.2.2
 
 More bug fixes! (among other minor changes)

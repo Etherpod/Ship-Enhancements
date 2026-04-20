@@ -132,20 +132,24 @@ Some new stuff that Slate didn't have time to include in the ship.
 The **Ship Signal** has a special use to it! If you find the ship's signal on your signalscope, you can "Tune In" to the signal to broadcast commands to the ship from afar. There are a lot of commands you can use, which are sorted into groups to make it easier to navigate.
 
 - Component Commands
-  - **Explode** - Instantly blows up the ship.
-  - **Turn Off Engine** - Turns off the ship. (Requires the **Engine Switch**)
   - **Activate Return Warp** - Warps the ship home. (Requires the **Ship Warp Core**)
+  - **Enable Auto Align** - Rotates the ship to face the current lock-on target. (Requires the **Auto Align Controls**)
+  - **Set Alignment Down/Forward** - Toggles which direction the ship should face the lock-on target with. (Requires the **Auto Align Controls**)
+  - **Enable Gravity Landing Gear** - Powers the landing gear with gravity to stick it to the ground. (Requires the **Gravity Landing Gear**)
+  - **Invert Gravity Gear** - Modifies the landing gear to push the ship away from the ground instead of sticking to it. (Requires the **Gravity Landing Gear**)
+  - **Turn Off Engine** - Turns off the ship. To turn it back on, you need to go into the ship. (Requires the **Engine Switch**)
+  - **Explode** - Instantly blows up the reactor, and by extension the ship.
   - **Honk Horn** - Honks the horn. (Requires the **Ship Horn**)
 - Module Commands
   - **Eject Cockpit** - Ejects the cockpit. This will destroy the ship.
   - **Eject Engine** - Ejects the left side of the ship, which has the reactor and the ship's gravity. (Requires the **Extra Eject Buttons**)
   - **Eject Supplies** - Ejects the right side of the ship, which has your spacesuit and resource refill. (Requires the **Extra Eject Buttons**)
-  - **Detach Landing Gear** - Detaches all of the landing gear. This won't destroy the ship, but it might make getting out of the ship a little difficult. (Requires the **Extra Eject Buttons**)
+  - **Detach Landing Gear** - Detaches all of the landing legs. This won't destroy the ship, but it might make getting out of the ship a little difficult. (Requires the **Extra Eject Buttons**)
 - Autopilot Commands
-  - **Activate Autopilot** - Autopilots the ship to the current lock-on target. This can't be activated if the ship is too close or if the lock-on target can't be autopiloted to.
+  - **Activate Autopilot** - Autopilots the ship to the current lock-on target. This can't be activated if the ship is too close to the lock-on target or if the lock-on target doesn't allow autopilot (like the sun).
   - **Activate Orbital Autopilot** - Begins orbiting the current lock-on target, or the nearest planet if nothing is targeted. It will orbit at whatever distance you activated it at. (Requires the **Autopilot Controls**)
   - **Activate Match Velocity** - Starts matching velocity with the current lock-on target, or the nearest planet if nothing is targeted. It will automatically turn off after matching velocity, but this can be prevented by using the **Continuous Velocity Match** feature from **General Enhancements**.
-  - **Activate Position Hold** - Tries to stay in the same position relative to the current lock-on target, or the nearest planet if nothing is target. (Requires the **Autopilot Controls**)
+  - **Activate Position Hold** - Tries to stay in the same position relative to the current lock-on target, or the nearest planet if nothing is targeted. (Requires the **Autopilot Controls**)
 - Targeting Commands
   - **Target My Planet** - Sets the ship's target to the planet you're on, ignoring your current lock-on target.
   - **Target Current Lock-on** - Sets the ship's target to your current lock-on target. (Requires **Split Ship Lock-on**)
@@ -153,7 +157,7 @@ The **Ship Signal** has a special use to it! If you find the ship's signal on yo
   - **Target Scout** - Sets the ship's target to your scout. Autopilot and related features that require a target will treat the scout as if it were a planet.
     - Unfortunately, both the **Target Me** and **Target Scout** are unavailable in multiplayer due to technical complications. (The fake players that you see in your game don't have any physics, which breaks autopilot and everything else)
 - Other Commands
-  - **Enter Ship Viewer** - Connects to the cameras on the ship and displays a live feed.
+  - **Enter Ship Viewer** - Connects to the ship's scout launcher camera and landing camera, then displays a live feed in the command menu. If the scout launcher or landing camera is damaged, their cameras will only show static.
   - **Call Ernesto** - Calls Ernesto. (Requires **Ernesto**)
 
 ### *Items*

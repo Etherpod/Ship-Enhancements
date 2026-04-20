@@ -118,6 +118,7 @@ public class ShipEnhancements : ModBehaviour
     private ShipDetachableLeg _frontLeg = null;
     private List<OWAudioSource> _shipAudioToChange = [];
     private bool _detectValueChanged = true;
+    private int _resetButtonCount = 0;
 
     public enum Settings
     {
@@ -3968,6 +3969,8 @@ public class ShipEnhancements : ModBehaviour
         
         submitAction.OnSubmitAction += () =>
         {
+            _resetButtonCount = 0;
+            
             var newTab = optionsManager.CreateStandardTab("CHANGELOG");
             var newMenu = newTab.menu;
 
@@ -3994,6 +3997,13 @@ public class ShipEnhancements : ModBehaviour
                 var settingsMenuView = FindObjectOfType<SettingsMenuView>();
                 settingsMenuView._resetToDefaultsPrompt.SetText($"This button does nothing");
                 settingsMenuView._resetToDefaultButton.RefreshTextAndImages(false);
+                settingsMenuView._resetSettingsAction.OnSubmitAction += UpdateResetButtonPrompt;
+            };
+
+            newMenu.OnDeactivateMenu += () =>
+            {
+                var settingsMenuView = FindObjectOfType<SettingsMenuView>();
+                settingsMenuView._resetSettingsAction.OnSubmitAction -= UpdateResetButtonPrompt;
             };
 
             var logText = NetworkFileHandler.GetChangelog().text;
@@ -4042,6 +4052,77 @@ public class ShipEnhancements : ModBehaviour
             
             TryUpdateChangelogVersion();
         };
+    }
+
+    private void UpdateResetButtonPrompt()
+    {
+        _resetButtonCount++;
+        
+        string prompt;
+        switch (_resetButtonCount)
+        {
+            case 2:
+                prompt = "This button doesn't do anything";
+                break;
+            case 3:
+                prompt = "Why are you pressing it";
+                break;
+            case 4:
+                prompt = "Stop pressing it";
+                break;
+            case 5:
+                prompt = "Stop";
+                break;
+            case 6:
+                prompt = "You're not accomplishing anything";
+                break;
+            case 7:
+                prompt = "You're just wasting your time";
+                break;
+            case 8:
+                prompt = "What do you think is going to happen?";
+                break;
+            case 9:
+                prompt = "You think you're gonna get a prize?";
+                break;
+            case 10:
+                prompt = "There's no prize here for you";
+                break;
+            case 11:
+                prompt = "So stop pressing it";
+                break;
+            case 12:
+                prompt = "STOP";
+                break;
+            case 13:
+            case 14:
+            case 15:
+            case 16:
+            case 17:
+            case 18:
+                prompt = "";
+                break;
+            case 19:
+            case 20:
+                prompt = "...";
+                break;
+            case 21:
+                prompt = "Alright, fine. You can have your prize";
+                break;
+            case 22:
+                prompt = "If you press this button again, you'll get it";
+                break;
+            case 23:
+                Application.Quit();
+                return;
+            default:
+                prompt = "This button does nothing";
+                break;
+        }
+        
+        var settingsMenuView = FindObjectOfType<SettingsMenuView>();
+        settingsMenuView._resetToDefaultsPrompt.SetText(prompt);
+        settingsMenuView._resetToDefaultButton.RefreshTextAndImages();
     }
 
     private SubmitAction CreateButtonWithIndicator(Menu menu, string buttonLabel, string tooltip, MenuSide side)

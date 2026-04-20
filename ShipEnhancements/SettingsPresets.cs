@@ -121,6 +121,8 @@ public static class SettingsPresets
         { "addWaterCooling", false },
         { "enableReactorOverload", false },
         { "enableQuantumShip", false },
+        { "disableSignalscopeBrackets", false },
+        { "enableShipSignalscopeZoom", false },
     };
 
     public static readonly Dictionary<string, object> MinimalSettings = new Dictionary<string, object>()
@@ -237,6 +239,8 @@ public static class SettingsPresets
         { "addWaterCooling", false },
         { "enableReactorOverload", false },
         { "enableQuantumShip", false },
+        { "disableSignalscopeBrackets", true },
+        { "enableShipSignalscopeZoom", false },
     };
 
     public static readonly Dictionary<string, object> ImpossibleSettings = new Dictionary<string, object>()
@@ -353,6 +357,8 @@ public static class SettingsPresets
         { "addWaterCooling", false },
         { "enableReactorOverload", false },
         { "enableQuantumShip", true },
+        { "disableSignalscopeBrackets", true },
+        { "enableShipSignalscopeZoom", false },
     };
 
     public static readonly Dictionary<string, object> NewStuffSettings = new Dictionary<string, object>()
@@ -469,6 +475,8 @@ public static class SettingsPresets
         { "addWaterCooling", true },
         { "enableReactorOverload", true },
         { "enableQuantumShip", false },
+        { "disableSignalscopeBrackets", false },
+        { "enableShipSignalscopeZoom", true },
     };
 
     public static readonly Dictionary<string, object> PandemoniumSettings = new Dictionary<string, object>()
@@ -586,6 +594,8 @@ public static class SettingsPresets
         { "addWaterCooling", true },
         { "enableReactorOverload", true },
         { "enableQuantumShip", true },
+        { "disableSignalscopeBrackets", true },
+        { "enableShipSignalscopeZoom", true },
     };
 
     // Random preset composition
@@ -1263,6 +1273,8 @@ public static class SettingsPresets
         { "buttonsRequireFlightChair", new RandomSettingValue((0f, 0.5f)) },
         { "enableQuantumShip", new RandomSettingValue((0.3f, 0.8f)) },
         { "persistentShipState", new RandomSettingValue((0.25f, 0.8f)) },
+        { "disableSignalscopeBrackets", new RandomSettingValue((0f, 0.5f)) },
+        { "enableShipSignalscopeZoom", new RandomSettingValue((0.5f, 0.5f)) },
     };
 
     public static Dictionary<PresetName, Dictionary<string, object>> presetDicts { get; private set; }

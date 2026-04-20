@@ -31,7 +31,7 @@ public static class NetworkFileHandler
         );
         
         _changelogClientGenerator = new HttpClientGenerator(
-            "https://raw.githubusercontent.com/Etherpod/Ship-Enhancements/refs/heads/version-2.3.0/ShipEnhancements/dialogue/changelog.txt",
+            "https://raw.githubusercontent.com/Etherpod/Ship-Enhancements/refs/heads/main/ShipEnhancements/dialogue/changelog.txt",
             client => client.Timeout = System.TimeSpan.FromMilliseconds(2500)
         );
 
