@@ -31,6 +31,8 @@ public class CockpitErnesto : MonoBehaviour
     private int _questionCount;
     private readonly float _commentLifetime = 10f;
 
+    private List<RadioItem> _activeRadios = [];
+
     private Dictionary<string, string> _shipFailureComments = [];
     private Dictionary<int, Dictionary<string, object>> _dialogueOptionConditions = [];
 
@@ -303,6 +305,22 @@ public class CockpitErnesto : MonoBehaviour
                 SetConditionState("SE_ERNESTO_RIDDLE", true);
             }
         }
+
+        if (_activeRadios.Count > 0)
+        {
+            foreach (var radio in _activeRadios)
+            {
+                if (radio == null) continue;
+                
+                float volLerp = Mathf.InverseLerp(0.2f, 1f, radio.GetVolume());
+                float distCutoff = Mathf.Lerp(5f, 30f, volLerp);
+                if (radio.IsPlaying() && radio.GetVolume() >= 0.2f &&
+                    (radio.transform.position - transform.position).sqrMagnitude < distCutoff * distCutoff)
+                {
+                    SetConditionState("SE_ERNESTO_RADIO_CODE_REACT_TRIGGER", true);
+                }
+            }
+        }
     }
 
     private void OnEndConversation()
@@ -377,6 +395,12 @@ public class CockpitErnesto : MonoBehaviour
                 {
                     ErnestoDetectiveController.ItWasExplosion(fromRiddle: true);
                 }
+                else if (GetConditionState("SE_ERNESTO_HEARING_EXPLOSION"))
+                {
+                    ErnestoDetectiveController.SetCustomText("You asked me to increase your hearing capabilities. " + 
+                        "If you can hear a ringing in your ears then that means it's working.");
+                    ErnestoDetectiveController.ItWasExplosion();
+                }
                 else
                 {
                     if (_shipFailureComments.ContainsKey("SE_ERNESTO_EXPLODE_SHIP"))
@@ -391,6 +415,7 @@ public class CockpitErnesto : MonoBehaviour
                 
                 SELocator.GetShipDamageController().Explode();
                 SetConditionState("SE_ERNESTO_RIDDLE_EXPLOSION", false);
+                SetConditionState("SE_ERNESTO_HEARING_EXPLOSION", false);
             }
             else
             {
@@ -569,6 +594,22 @@ public class CockpitErnesto : MonoBehaviour
         if (_availableReactorComments.Count == 0)
         {
             _availableReactorComments.AddRange(_reactorComments);
+        }
+    }
+
+    public void AddRadio(RadioItem radio)
+    {
+        if (!_activeRadios.Contains(radio))
+        {
+            _activeRadios.Add(radio);
+        }
+    }
+
+    public void RemoveRadio(RadioItem radio)
+    {
+        if (_activeRadios.Contains(radio))
+        {
+            _activeRadios.Remove(radio);
         }
     }
 

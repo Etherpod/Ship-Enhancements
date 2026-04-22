@@ -445,58 +445,63 @@ public class RadioItem : OWItem
                     }
                 }
             }
-            else if (OWInput.IsNewlyPressed(InputLibrary.interactSecondary))
+            else if (_powerOn)
             {
-                Locator.GetToolModeSwapper().UnequipTool();
-                Locator.GetPlayerTransform().GetComponent<PlayerLockOnTargeting>().LockOn(transform, Vector3.zero);
-                //GlobalMessenger.FireEvent("EnterSatelliteCameraMode");
-                _lastInputMode = OWInput.GetInputMode();
-                OWInput.ChangeInputMode(InputMode.SatelliteCam);
-                Locator.GetPromptManager().AddScreenPrompt(_upDownPrompt, PromptPosition.UpperRight, true);
-                Locator.GetPromptManager().AddScreenPrompt(_leftRightPrompt, PromptPosition.UpperRight, true);
-                Locator.GetPromptManager().AddScreenPrompt(_leavePrompt, PromptPosition.UpperRight, true);
-                _codeLabels[_currentCodeIndex].color = _selectColor;
-                _playerInteracting = true;
-            }
-            else if (OWInput.IsNewlyPressed(InputLibrary.toolOptionRight))
-            {
-                _currentVolume = Mathf.Min(_currentVolume + 1f / _volumeSteps, 1f);
-                SetRadioVolume();
-
-                if (_powerOn)
+                if (OWInput.IsNewlyPressed(InputLibrary.interactSecondary))
                 {
-                    _needleStartRot = _volumeNeedleTransform.localEulerAngles.y;
-                    _needleTargetRot = Mathf.Lerp(_initialNeedleRotation, _initialNeedleRotation + _needleRotationDiff, _currentVolume);
-                    _needleT = 0f;
-                    _moveNeedle = true;
+                    Locator.GetToolModeSwapper().UnequipTool();
+                    Locator.GetPlayerTransform().GetComponent<PlayerLockOnTargeting>().LockOn(transform, Vector3.zero);
+                    //GlobalMessenger.FireEvent("EnterSatelliteCameraMode");
+                    _lastInputMode = OWInput.GetInputMode();
+                    OWInput.ChangeInputMode(InputMode.SatelliteCam);
+                    Locator.GetPromptManager().AddScreenPrompt(_upDownPrompt, PromptPosition.UpperRight, true);
+                    Locator.GetPromptManager().AddScreenPrompt(_leftRightPrompt, PromptPosition.UpperRight, true);
+                    Locator.GetPromptManager().AddScreenPrompt(_leavePrompt, PromptPosition.UpperRight, true);
+                    _codeLabels[_currentCodeIndex].color = _selectColor;
+                    _playerInteracting = true;
                 }
-
-                if (ShipEnhancements.InMultiplayer)
+                else if (OWInput.IsNewlyPressed(InputLibrary.toolOptionRight))
                 {
-                    foreach (uint id in ShipEnhancements.PlayerIDs)
+                    _currentVolume = Mathf.Min(_currentVolume + 1f / _volumeSteps, 1f);
+                    SetRadioVolume();
+
+                    if (_powerOn)
                     {
-                        ShipEnhancements.QSBCompat.SendRadioVolume(id, this, _currentVolume);
+                        _needleStartRot = _volumeNeedleTransform.localEulerAngles.y;
+                        _needleTargetRot = Mathf.Lerp(_initialNeedleRotation,
+                            _initialNeedleRotation + _needleRotationDiff, _currentVolume);
+                        _needleT = 0f;
+                        _moveNeedle = true;
+                    }
+
+                    if (ShipEnhancements.InMultiplayer)
+                    {
+                        foreach (uint id in ShipEnhancements.PlayerIDs)
+                        {
+                            ShipEnhancements.QSBCompat.SendRadioVolume(id, this, _currentVolume);
+                        }
                     }
                 }
-            }
-            else if (OWInput.IsNewlyPressed(InputLibrary.toolOptionLeft))
-            {
-                _currentVolume = Mathf.Max(_currentVolume - 1f / _volumeSteps, 0f);
-                SetRadioVolume();
-
-                if (_powerOn)
+                else if (OWInput.IsNewlyPressed(InputLibrary.toolOptionLeft))
                 {
-                    _needleStartRot = _volumeNeedleTransform.localEulerAngles.y;
-                    _needleTargetRot = Mathf.Lerp(_initialNeedleRotation, _initialNeedleRotation + _needleRotationDiff, _currentVolume);
-                    _needleT = 0f;
-                    _moveNeedle = true;
-                }
+                    _currentVolume = Mathf.Max(_currentVolume - 1f / _volumeSteps, 0f);
+                    SetRadioVolume();
 
-                if (ShipEnhancements.InMultiplayer)
-                {
-                    foreach (uint id in ShipEnhancements.PlayerIDs)
+                    if (_powerOn)
                     {
-                        ShipEnhancements.QSBCompat.SendRadioVolume(id, this, _currentVolume);
+                        _needleStartRot = _volumeNeedleTransform.localEulerAngles.y;
+                        _needleTargetRot = Mathf.Lerp(_initialNeedleRotation,
+                            _initialNeedleRotation + _needleRotationDiff, _currentVolume);
+                        _needleT = 0f;
+                        _moveNeedle = true;
+                    }
+
+                    if (ShipEnhancements.InMultiplayer)
+                    {
+                        foreach (uint id in ShipEnhancements.PlayerIDs)
+                        {
+                            ShipEnhancements.QSBCompat.SendRadioVolume(id, this, _currentVolume);
+                        }
                     }
                 }
             }
@@ -561,17 +566,18 @@ public class RadioItem : OWItem
     private void UpdatePromptVisibility()
     {
         bool flag = _lastFocused && _playerCam.enabled && OWInput.IsInputMode(InputMode.Character | InputMode.ShipCockpit);
+        bool flag2 = flag && _powerOn;
         if (flag != _powerPrompt.IsVisible())
         {
             _powerPrompt.SetVisibility(flag);
         }
-        if (flag != _tunePrompt.IsVisible())
+        if (flag2 != _tunePrompt.IsVisible())
         {
-            _tunePrompt.SetVisibility(flag);
+            _tunePrompt.SetVisibility(flag2);
         }
-        if (flag != _volumePrompt.IsVisible())
+        if (flag2 != _volumePrompt.IsVisible())
         {
-            _volumePrompt.SetVisibility(flag);
+            _volumePrompt.SetVisibility(flag2);
         }
     }
 
@@ -584,6 +590,18 @@ public class RadioItem : OWItem
         }
         if (_codesToAudio.ContainsKey(result))
         {
+            if (SELocator.GetErnesto() != null)
+            {
+                if (result == "4554")
+                {
+                    SELocator.GetErnesto().AddRadio(this);
+                }
+                else
+                {
+                    SELocator.GetErnesto().RemoveRadio(this);
+                }
+            }
+
             _codeNotes.OnEnterCode(result);
             return _codesToAudio[result];
         }
@@ -742,11 +760,18 @@ public class RadioItem : OWItem
 
         return Mathf.Lerp(0f, 450f, lerp);
     }
+    
+    public bool IsPlaying()
+    {
+        return _powerOn && _playingAudio;
+    }
 
     public bool ShouldOverrideTravelMusic()
     {
-        return _powerOn && _playingAudio && _connectedToShip;
+        return IsPlaying() && _connectedToShip;
     }
+
+    public float GetVolume() => _currentVolume;
 
     public override void SocketItem(Transform socketTransform, Sector sector)
     {

@@ -236,12 +236,12 @@ public class ShipWarpCoreController : CockpitInteractible
         if (_receiver == null || !_receiver.gameObject.activeInHierarchy) return;
 
         if (ShipLogEntryHUDMarker.s_entryLocationID == _brittleHollowCannonEntryID 
-            || Locator.GetReferenceFrame(true)?.GetOWRigidBody() == Locator.GetAstroObject(AstroObject.Name.BrittleHollow)?.GetOWRigidbody())
+            || SELocator.GetReferenceFrame()?.GetOWRigidBody() == Locator.GetAstroObject(AstroObject.Name.BrittleHollow)?.GetOWRigidbody())
         {
             _targetCannon = _brittleHollowCannon;
         }
         else if (ShipLogEntryHUDMarker.s_entryLocationID == _emberTwinCannonEntryID
-            || Locator.GetReferenceFrame(true)?.GetOWRigidBody() == Locator.GetAstroObject(AstroObject.Name.CaveTwin)?.GetOWRigidbody())
+            || SELocator.GetReferenceFrame()?.GetOWRigidBody() == Locator.GetAstroObject(AstroObject.Name.CaveTwin)?.GetOWRigidbody())
         {
             _targetCannon = _emberTwinCannon;
         }

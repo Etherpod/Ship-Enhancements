@@ -37,7 +37,7 @@ public class ShipRemoteControl : MonoBehaviour
     private InputMode _lastInputMode;
     private bool _scopeEquipped;
     private bool _visible;
-    private bool _controllingShip;
+    private bool _viewingShip;
 
     private List<ShipCommand> _commands = 
     [
@@ -226,7 +226,7 @@ public class ShipRemoteControl : MonoBehaviour
                 
                 if (OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.SatelliteCam))
                 {
-                    if (_controllingShip)
+                    if (_viewingShip)
                     {
                         ExitShipViewerMode();
                     }
@@ -237,7 +237,7 @@ public class ShipRemoteControl : MonoBehaviour
                     return;
                 }
 
-                if (_controllingShip)
+                if (_viewingShip)
                 {
                     _changeCameraPrompt.SetVisibility(true);
                     
@@ -424,7 +424,7 @@ public class ShipRemoteControl : MonoBehaviour
             }
             else
             {
-                if (_controllingShip)
+                if (_viewingShip)
                 {
                     ExitShipViewerMode();
                 }
@@ -452,13 +452,15 @@ public class ShipRemoteControl : MonoBehaviour
         tempList.AddRange(detector._sectorList);
         for (int i = detector._sectorList.Count - 1; i >= 0; i--)
         {
-            detector.RemoveSector(detector._sectorList[i]);
+            if (i > detector._sectorList.Count - 1) continue;
+            
+            detector._sectorList[i].OnExit(detector.gameObject);
         }
         
         detector.SetOccupantType(DynamicOccupant.Probe);
         foreach (var sector in tempList)
         {
-            detector.AddSector(sector);
+            sector.OnEntry(detector.gameObject);
         }
         
         _viewerImage.material.SetTexture("_MainTex", _shipViewerTexture);
@@ -468,7 +470,7 @@ public class ShipRemoteControl : MonoBehaviour
 
         Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.ShipLogSelectPlanet);
 
-        _controllingShip = true;
+        _viewingShip = true;
     }
 
     public void ExitShipViewerMode()
@@ -482,13 +484,15 @@ public class ShipRemoteControl : MonoBehaviour
         tempList.AddRange(detector._sectorList);
         for (int i = detector._sectorList.Count - 1; i >= 0; i--)
         {
-            detector.RemoveSector(detector._sectorList[i]);
+            if (i > detector._sectorList.Count - 1) continue;
+            
+            detector._sectorList[i].OnExit(detector.gameObject);
         }
         
         detector.SetOccupantType(DynamicOccupant.Ship);
         foreach (var sector in tempList)
         {
-            detector.AddSector(sector);
+            sector.OnEntry(detector.gameObject);
         }
         
         _shipViewerParent.SetActive(false);
@@ -497,7 +501,7 @@ public class ShipRemoteControl : MonoBehaviour
         
         Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.ShipLogDeselectPlanet);
 
-        _controllingShip = false;
+        _viewingShip = false;
     }
 
     public void ReceiveCommandRemote(string commandName)
@@ -521,6 +525,8 @@ public class ShipRemoteControl : MonoBehaviour
     }
 
     public bool IsVisible() => _visible;
+
+    public bool IsViewingShip() => _viewingShip;
 
     private void OnShipSystemFailure()
     {

@@ -2599,7 +2599,7 @@ public static class PatchClass
     [HarmonyPatch(typeof(SignalscopeReticleController), nameof(SignalscopeReticleController.UpdateText))]
     public static bool InsertShipSignalText(SignalscopeReticleController __instance)
     {
-        if ((string)shipSignalType.GetProperty() != "Disabled")
+        if ((string)shipSignalType.GetProperty() == "Disabled")
         {
             return true;
         }
@@ -4589,10 +4589,12 @@ public static class PatchClass
             }
         }
         // cancel if left flight chair
-        if (!OWInput.IsInputMode(InputMode.ShipCockpit | InputMode.LandingCam) && 
-            __instance._autopilot._isMatchingVelocity)
+        if (!OWInput.IsInputMode(InputMode.ShipCockpit | InputMode.LandingCam))
         {
-            SELocator.GetAutopilotPanelController().CancelMatchVelocity();
+            if (__instance._autopilot._isMatchingVelocity)
+            {
+                SELocator.GetAutopilotPanelController().CancelMatchVelocity();
+            }
             return false;
         }
         __instance.UpdateShipLightInput();
@@ -5660,4 +5662,56 @@ public static class PatchClass
     }
     
     #endregion
+
+    [HarmonyPrefix]
+    [HarmonyPatch(typeof(SectorStreaming), nameof(SectorStreaming.FixedUpdate))]
+    public static bool ForceLoadForShip(SectorStreaming __instance)
+    {
+        if (SELocator.GetRemoteControl() == null || !SELocator.GetRemoteControl().IsViewingShip())
+        {
+            return true;
+        }
+        
+        bool playerInRadius = (__instance._playerTransform.position - __instance._sector.transform.position).sqrMagnitude < 
+            __instance._softLoadRadius * __instance._softLoadRadius;
+        
+        bool probeInRadius = __instance._probe != null && __instance._probe.IsLaunched() && 
+            (__instance._probe.transform.position - __instance._sector.transform.position).sqrMagnitude < 
+            __instance._softLoadRadius * __instance._softLoadRadius;
+
+        if (!probeInRadius)
+        {
+            probeInRadius = (SELocator.GetShipTransform().position - __instance._sector.transform.position).sqrMagnitude <
+                __instance._softLoadRadius * __instance._softLoadRadius;
+        }
+        
+        if (PlayerState.OnQuantumMoon() && Locator.GetQuantumMoon().IsPlayerInsideShrine() && __instance._sector.GetName() != Sector.Name.QuantumMoon)
+        {
+            playerInRadius = false;
+            probeInRadius = false;
+        }
+        
+        if (!__instance._playerInSoftLoadRadius && playerInRadius)
+        {
+            __instance._streamingGroup.RequestRequiredAssets(0);
+        }
+        else if (__instance._playerInSoftLoadRadius && !playerInRadius)
+        {
+            __instance._streamingGroup.ReleaseRequiredAssets();
+        }
+        
+        if (!__instance._probeInSoftLoadRadius && probeInRadius)
+        {
+            __instance._streamingGroup.RequestRequiredAssets(0);
+        }
+        else if (__instance._probeInSoftLoadRadius && !probeInRadius)
+        {
+            __instance._streamingGroup.ReleaseRequiredAssets();
+        }
+        
+        __instance._playerInSoftLoadRadius = playerInRadius;
+        __instance._probeInSoftLoadRadius = probeInRadius;
+
+        return false;
+    }
 }

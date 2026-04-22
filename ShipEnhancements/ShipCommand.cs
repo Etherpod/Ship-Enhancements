@@ -700,6 +700,12 @@ public class ShipCommand_RemoveTarget : ShipCommand
 
 	public override void Activate()
 	{
+		if ((bool)splitLockOn.GetProperty() || SELocator.IsShipTargetingPlayer() || 
+			SELocator.IsShipTargetingProbe())
+		{
+			Locator.GetPlayerAudioController().PlayLockOff();
+		}
+		
 		SELocator.SetShipReferenceFrame(null);
 	}
 }
@@ -718,6 +724,11 @@ public class ShipCommand_TargetPlayerPlanet : ShipCommand
 	public override void Activate()
 	{
 		SELocator.SetShipReferenceFrame(Locator.GetPlayerSectorDetector().GetPassiveReferenceFrame());
+		
+		if ((bool)splitLockOn.GetProperty())
+		{
+			Locator.GetPlayerAudioController().PlayLockOn();
+		}
 	}
 }
 
@@ -735,6 +746,11 @@ public class ShipCommand_TargetCurrentLockOn : ShipCommand
 	public override void Activate()
 	{
 		SELocator.SetShipReferenceFrame(Locator.GetReferenceFrame());
+		
+		if ((bool)splitLockOn.GetProperty())
+		{
+			Locator.GetPlayerAudioController().PlayLockOn();
+		}
 	}
 }
 

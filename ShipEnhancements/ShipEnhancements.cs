@@ -339,7 +339,9 @@ public class ShipEnhancements : ModBehaviour
         "If your keyboard has a number pad, you can turn on \"num lock\" and hold Alt while pressing numbers to insert special symbols (™, °, ¼, etc).\nHere are some codes: 0153 (™), 0176 (°), 0173 (empty character)",
         "Did you know the smallest angle of a triangle is always adjacent to the hypotenuse?",
         "At what age do you become \"old\"? 30? 50? 80?",
-        "Have you heard of Kane Pixels? He popularized the \"found footage\" videos of The Backrooms."
+        "Have you heard of Kane Pixels? He popularized the \"found footage\" videos of The Backrooms.",
+        "Have you ever wished the ship was solar powered? There's a mod named Clean Energy that does just that!",
+        "If you think the surface of Timber Hearth looks a little bland, you should check out the mod Timber Hearth Forest."
     };
 
     private (string blendType, string suffix, Func<int, int, bool> canShow)[] _customSettingNames =

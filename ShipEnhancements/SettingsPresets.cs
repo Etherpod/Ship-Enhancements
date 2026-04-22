@@ -588,7 +588,6 @@ public static class SettingsPresets
         { "temperatureDifficulty", 1f },
         { "passiveTemperatureGain", "Hot" },
         { "addResourcePump", true },
-        { "buttonsRequireFlightChair", false },
         { "addWaterTank", true },
         { "waterDrainMultiplier", 3f },
         { "addWaterCooling", true },
@@ -1321,7 +1320,6 @@ public static class SettingsPresets
 
     public static void AddSetting(this PresetName preset, string name, object value)
     {
-
         // Is this setting in the dictionary
         if (settingsPresets.ContainsKey(name))
         {
@@ -1385,14 +1383,12 @@ public static class SettingsPresets
             return RandomSettings[setting].GetRandomValue();
         }
 
-        if (settingsPresets.ContainsKey(setting))
+        if (settingsPresets.ContainsKey(setting) && settingsPresets[setting].ContainsKey(preset))
         {
             return settingsPresets[setting][preset];
         }
-        else
-        {
-            return null;
-        }
+        
+        return null;
     }
 
     public static bool Initialized()

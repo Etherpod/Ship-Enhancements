@@ -286,7 +286,7 @@ public class ColorBlendController : MonoBehaviour
         }
         else if (_blendMode == "Velocity")
         {
-            ReferenceFrame rf = Locator.GetReferenceFrame();
+            ReferenceFrame rf = SELocator.GetReferenceFrame();
             if (rf == null || rf.GetOWRigidBody() == null)
             {
                 _targetLerp = 0.5f;

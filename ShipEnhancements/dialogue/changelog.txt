@@ -1,3 +1,16 @@
+--- Release v2.3.1
+
+- The **Ship Signal**  is now labeled "SHIP" instead of "UNKNOWN"
+- Viewing the ship using the **Ship Signal** will now properly load the terrain around the ship
+- Updates no longer erase your save data (but still reset the extra settings)
+- Fixed a bug where opening the map while piloting the ship and pressing the cancel button would softlock you
+- Fixed a bug in a couple features where enabling **Split Ship Lock-on** would continue using the player's target instead of the ship's target
+- Fixed a bug where the targeting commands from the **Ship Signal** wouldn't play the lock-on sounds while **Split Ship Lock-on** was enabled
+- Turning off the power on the **Radio** now prevents you from tuning it or changing the volume
+- Added some dialogue to Ernesto
+- Fixed some errors that were appearing in the console after changing certain settings in the settings menu
+
+
 ---Release v2.3.0
 
 I've decided to switch to a new style of updates, which will usually be smaller and will focus on a specific theme. This update is the first of that new style, and the main focus is the ship's signalscope!
