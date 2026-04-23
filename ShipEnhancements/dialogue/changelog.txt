@@ -1,4 +1,4 @@
---- Release v2.3.1
+---Release v2.3.1
 
 - The **Ship Signal**  is now labeled "SHIP" instead of "UNKNOWN"
 - Viewing the ship using the **Ship Signal** will now properly load the terrain around the ship
