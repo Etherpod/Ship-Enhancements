@@ -203,7 +203,7 @@ public class ShipEnhancements : ModBehaviour
     private void Start()
     {
         _shipEnhancementsBundle = AssetBundle.LoadFromFile(Path.Combine(ModHelper.Manifest.ModFolderPath, "assets/shipenhancements"));
-        ThemeManager = new ThemeManager("ShipEnhancements.Data.themes.json");
+        ThemeManager = new ThemeManager("ShipEnhancements.Decoration.themes.json");
 
         InitializeAchievements();
         InitializeQSB();
