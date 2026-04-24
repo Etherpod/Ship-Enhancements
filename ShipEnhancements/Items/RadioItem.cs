@@ -141,7 +141,7 @@ public class RadioItem : OWItem
 
     private void InitializeAudioDict()
     {
-        TextAsset file = (TextAsset)ShipEnhancements.LoadAsset("Assets/ShipEnhancements/TextAsset/RadioCodes.json");
+        TextAsset file = ShipEnhancements.LoadAsset<TextAsset>("Assets/ShipEnhancements/TextAsset/RadioCodes.json");
 
         var data = JsonConvert.DeserializeObject<List<RadioCodeJson>>(file.text);
 

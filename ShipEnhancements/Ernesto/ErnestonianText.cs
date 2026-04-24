@@ -18,7 +18,7 @@ public class ErnestonianText : NomaiWallText
         }
 
         string text = OWUtilities.RemoveByteOrderMark(_nomaiTextAsset);
-        TranslatorTextBuilder.AddTranslation(text);
+        Utils.TranslatorTextBuilder.AddTranslation(text);
     }
 
     public override bool CheckAllowFocus(float focusDistance, Vector3 focusDirection)

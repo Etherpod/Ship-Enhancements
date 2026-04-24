@@ -144,7 +144,7 @@ public class ShipModuleEjectionSystem : MonoBehaviour
             }
             else
             {
-                ErnestoDetectiveController.ItWasHullBreach(ejected: true);
+                Ernesto.ErnestoDetectiveController.ItWasHullBreach(ejected: true);
 
                 OWRigidbody owrigidbody = _detachableModule.Detach();
 

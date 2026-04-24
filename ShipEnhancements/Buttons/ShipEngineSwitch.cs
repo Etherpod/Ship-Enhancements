@@ -95,9 +95,9 @@ public class ShipEngineSwitch : CockpitInteractible
     {
         if (_completedIgnition)
         {
-            if ((float)idleFuelConsumptionMultiplier.GetProperty() > 0f)
+            if ((float)idleFuelConsumptionMultiplier.GetProperty() != 0f)
             {
-                float fuelDrain = 0.5f * (float)idleFuelConsumptionMultiplier.GetProperty() * Time.deltaTime;
+                float fuelDrain = (float)idleFuelConsumptionMultiplier.GetProperty() * Time.deltaTime / 2f;
                 SELocator.GetShipResources().DrainFuel(fuelDrain);
             }
 
@@ -116,6 +116,11 @@ public class ShipEngineSwitch : CockpitInteractible
                 _thrustersIndicator.SetEmissionColor(!thrustersUsable ? Color.black : _indicatorLightColor);
                 _thrustersIndicatorLight.intensity = !thrustersUsable ? 0f : _baseIndicatorLightIntensity;
             }
+        }
+        else if ((float)fuelRegenerationMultiplier.GetProperty() != 0f)
+        {
+            float fuelAdd = (float)fuelRegenerationMultiplier.GetProperty() * Time.deltaTime * 2.5f;
+            SELocator.GetShipResources().DrainFuel(-fuelAdd);
         }
     }
 

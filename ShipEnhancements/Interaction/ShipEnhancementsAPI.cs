@@ -1,11 +1,12 @@
 ﻿using System;
 using ShipEnhancements.ModSettings;
-using ShipEnhancements.Temperature;
 using UnityEngine;
 using UnityEngine.Events;
 using static ShipEnhancements.ShipEnhancements;
+using ShipEnhancements.Temperature;
 
 namespace ShipEnhancements.Interaction;
+
 public class ShipEnhancementsAPI : IShipEnhancements
 {
     [Obsolete("This method is deprecated, please use AddTemperatureZone instead.")]
@@ -111,7 +112,7 @@ public class ShipEnhancementsAPI : IShipEnhancements
     {
         if (configName == "preset")
         {
-            Instance.HidePreset = visible;
+            SEMenuManager.HidePreset = visible;
             if (forceRefresh)
             {
                 SEMenuManager.RedrawSettingsMenu();
@@ -124,13 +125,13 @@ public class ShipEnhancementsAPI : IShipEnhancements
         {
             if (setting.GetName() == configName)
             {
-                if (visible && Instance.HiddenSettings.Contains(setting))
+                if (visible && SEMenuManager.HiddenSettings.Contains(setting))
                 {
-                    Instance.HiddenSettings.Remove(setting);
+                    SEMenuManager.HiddenSettings.Remove(setting);
                 }
-                else if (!visible && !Instance.HiddenSettings.Contains(setting))
+                else if (!visible && !SEMenuManager.HiddenSettings.Contains(setting))
                 {
-                    Instance.HiddenSettings.Add(setting);
+                    SEMenuManager.HiddenSettings.Add(setting);
                 }
 
                 if (forceRefresh)
@@ -144,14 +145,14 @@ public class ShipEnhancementsAPI : IShipEnhancements
 
     public void HideAllSettings(bool forceRefresh = false)
     {
-        Instance.HiddenSettings.Clear();
+        SEMenuManager.HiddenSettings.Clear();
         var allSettings = Enum.GetValues(typeof(Settings)) as Settings[];
         foreach (var setting in allSettings)
         {
-            Instance.HiddenSettings.Add(setting);
+            SEMenuManager.HiddenSettings.Add(setting);
         }
 
-        Instance.HidePreset = true;
+        SEMenuManager.HidePreset = true;
 
         if (forceRefresh)
         {
@@ -161,8 +162,8 @@ public class ShipEnhancementsAPI : IShipEnhancements
 
     public void ShowAllSettings(bool forceRefresh = false)
     {
-        Instance.HiddenSettings.Clear();
-        Instance.HidePreset = false;
+        SEMenuManager.HiddenSettings.Clear();
+        SEMenuManager.HidePreset = false;
 
         if (forceRefresh)
         {

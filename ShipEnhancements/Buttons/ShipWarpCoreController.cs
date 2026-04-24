@@ -363,7 +363,7 @@ public class ShipWarpCoreController : CockpitInteractible
             if (targetHull._integrity <= 0f && targetHull.shipModule is ShipDetachableModule
             && (!(bool)preventSystemFailure.GetProperty() || targetHull.section == ShipHull.Section.Front))
             {
-                ErnestoDetectiveController.ItWasBrokenWarp();
+                Ernesto.ErnestoDetectiveController.ItWasBrokenWarp();
             }
 
             if (ShipEnhancements.InMultiplayer)

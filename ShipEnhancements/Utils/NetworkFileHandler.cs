@@ -5,7 +5,11 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using UnityEngine;
 
+<<<<<<<< HEAD:ShipEnhancements/Utils/NetworkFileHandler.cs
 namespace ShipEnhancements.Utils;
+========
+namespace ShipEnhancements.Ernesto;
+>>>>>>>> temp-version-3.0.0:ShipEnhancements/Ernesto/ErnestoNetworkHandler.cs
 
 public static class NetworkFileHandler
 {

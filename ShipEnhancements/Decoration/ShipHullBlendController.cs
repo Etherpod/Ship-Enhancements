@@ -1,15 +1,16 @@
 ﻿using System.Collections.Generic;
+using ShipEnhancements;
 using UnityEngine;
 
 namespace ShipEnhancements.Decoration;
 
 public class ShipHullBlendController : ColorBlendController
 {
-    private List<Material> _sharedMaterials = [];
+    private List<ShipTextureBlender> _textureBlenders = [];
 
     protected override void Awake()
     {
-        _defaultTheme = [Color.white * 255f];
+        _defaultTheme = [new Color(1f, 1f, 1f, 0f) * 255f];
         base.Awake();
     }
 
@@ -22,7 +23,9 @@ public class ShipHullBlendController : ColorBlendController
         }
 
         HullTheme theme = ShipEnhancements.ThemeManager.GetHullTheme(themeName);
-        _blendThemes[i] = [theme.HullColor];
+        Color color = theme.HullColor;
+        color.a = 255f;
+        _blendThemes[i] = [color];
     }
 
     protected override void UpdateLerp(List<object> start, List<object> end, float lerp)
@@ -33,6 +36,7 @@ public class ShipHullBlendController : ColorBlendController
     protected override List<object> GetLerp(List<object> start, List<object> end, float lerp)
     {
         var newColor = Color.Lerp((Color)start[0], (Color)end[0], lerp);
+        newColor.a = Mathf.Lerp(((Color)start[0]).a, ((Color)end[0]).a, lerp);
         return [newColor];
     }
 
@@ -48,10 +52,12 @@ public class ShipHullBlendController : ColorBlendController
 
     protected override void SetColor(List<object> theme)
     {
-        Color color = (Color)theme[0];
-        foreach (Material mat in _sharedMaterials)
+        Color color = (Color)theme[0] / 255f;
+        foreach (var blender in _textureBlenders)
         {
-            mat.SetColor("_Color", color / 255f);
+            blender.OverlayColor = color;
+            blender.BlendFactor = color.a;
+            blender.UpdateBlend();
         }
     }
 
@@ -61,8 +67,8 @@ public class ShipHullBlendController : ColorBlendController
         base.ResetColor();
     }
 
-    public void AddSharedMaterial(Material mat)
+    public void AddTextureBlender(ShipTextureBlender blender)
     {
-        _sharedMaterials.Add(mat);
+        _textureBlenders.Add(blender);
     }
 }

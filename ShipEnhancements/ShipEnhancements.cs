@@ -115,7 +115,7 @@ public class ShipEnhancements : ModBehaviour
 
     public GameObject DebugObjects { get; private set; }
 
-    private AssetBundle _shipEnhancementsBundle;
+    public AssetBundle _shipEnhancementsBundle;
     private float _lastSuitOxygen;
     private bool _shipDestroyed;
     private bool _checkEndConversation = false;
@@ -126,7 +126,6 @@ public class ShipEnhancements : ModBehaviour
     private bool _unsubFromShipSpawn = false;
     private ShipDetachableLeg _frontLeg = null;
     private List<OWAudioSource> _shipAudioToChange = [];
-    private bool _detectValueChanged = true;
 
     private readonly string[] startupMessages =
     {
@@ -205,59 +204,6 @@ public class ShipEnhancements : ModBehaviour
         "Have you heard of Kane Pixels? He popularized the \"found footage\" videos of The Backrooms.",
         "Have you ever wished the ship was solar powered? There's a mod named Clean Energy that does just that!",
         "If you think the surface of Timber Hearth looks a little bland, you should check out the mod Timber Hearth Forest."
-    };
-
-    private (string blendType, string suffix, Func<int, int, bool> canShow)[] _customSettingNames =
-    [
-        ("Time", "1", (index, num) => index == 1),
-        ("Time", "2", (index, num) => index == 2),
-        ("Time", "3", (index, num) => index == 3),
-        ("Temperature", "(Hot)", (index, num) => index == 1),
-        ("Temperature", "(Default)", (index, num) => index != 1 && index != num),
-        ("Temperature", "(Cold)", (index, num) => index == num),
-        ("Ship Temperature", "(Hot)", (index, num) => index == 1),
-        ("Ship Temperature", "(Default)", (index, num) => index != 1 && index != num),
-        ("Ship Temperature", "(Cold)", (index, num) => index == num),
-        ("Reactor State", "(Default)", (index, num) => index == num - 2),
-        ("Reactor State", "(Damaged)", (index, num) => index == num - 1),
-        ("Reactor State", "(Critical)", (index, num) => index == num),
-        ("Ship Damage %", "(No Damage)", (index, num) => index == num - 2),
-        ("Ship Damage %", "(Low Damage)", (index, num) => index == num - 1),
-        ("Ship Damage %", "(High Damage)", (index, num) => index == num),
-        ("Fuel", "(Max Fuel)", (index, num) => index == 1),
-        ("Fuel", "(Low Fuel)", (index, num) => index != 1 && index == num - 1),
-        ("Fuel", "(No Fuel)", (index, num) => index == num),
-        ("Oxygen", "(Max Oxygen)", (index, num) => index == 1),
-        ("Oxygen", "(Low Oxygen)", (index, num) => index != 1 && index == num - 1),
-        ("Oxygen", "(No Oxygen)", (index, num) => index == num),
-        ("Velocity", "(Positive)", (index, num) => index == 1),
-        ("Velocity", "(Matched)", (index, num) => index != 1 && index != num),
-        ("Velocity", "(Negative)", (index, num) => index == num),
-        ("Gravity", "(Zero Gravity)", (index, num) => index == num - 2),
-        ("Gravity", "(Low Gravity)", (index, num) => index == num - 1),
-        ("Gravity", "(High Gravity)", (index, num) => index == num),
-    ];
-
-    private Dictionary<string, string> _customTooltips = new()
-    {
-        { "Time", "Time mode blends between colors over a set amount of time." },
-        { "Temperature", "Temperature mode blends between colors based on the ship's temperature." },
-        { "Ship Temperature", "Ship Temperature mode blends between colors based on the ship's internal temperature." },
-        { "Reactor State", "Reactor State mode changes the color if the reactor is damaged or is about to explode." },
-        { "Ship Damage %", "Ship Damage % mode blends between colors based on how many parts of the ship are damaged." },
-        { "Fuel", "Fuel mode blends between colors based on the amount of fuel left in the ship." },
-        { "Oxygen", "Oxygen mode blends between colors based on the amount of oxygen left in the ship." },
-        { "Velocity", "Velocity mode blends between colors based on how fast you're moving towards your current lock-on target." },
-        { "Gravity", "Gravity mode blends between colors based on how high the gravity is." },
-    };
-
-    private Dictionary<string, string> _stemToSuffix = new()
-    {
-        {"shipLight", "Light Color"},
-        {"interiorHull", "Interior Color"},
-        {"exteriorHull", "Exterior Color"},
-        {"thruster", "Thruster Color"},
-        {"indicator", "Indicator Color"}
     };
 
     private void Awake()
@@ -379,7 +325,7 @@ public class ShipEnhancements : ModBehaviour
                     DialogueBuilder.Make(slate.gameObject, "ConversationZone_RSci", "dialogue/Slate.xml", this);
                     if (!InMultiplayer || QSBAPI.GetIsHost())
                     {
-                        if (_currentPreset == SettingPresets.PresetName.Random)
+                        if (SEMenuManager.CurrentPreset == SettingPresets.PresetName.Random)
                         {
                             slate.Find("ConversationZone_RSci").GetComponent<CharacterDialogueTree>().OnEndConversation += OnEndConversation;
                             _checkEndConversation = true;
@@ -535,10 +481,11 @@ public class ShipEnhancements : ModBehaviour
                 _unsubFromShipSpawn = false;
             }
 
-            bool preserveSettings = GetComponent<PersistentShipState>().PreserveSettings;
-            if ((!InMultiplayer || QSBAPI.GetIsHost()) && !preserveSettings)
+            CustomMatManager.ClearMaterials(true);
+
+            bool skipSettings = GetComponent<PersistentShipState>().PreserveSettings;
+            if ((!InMultiplayer || QSBAPI.GetIsHost()) && !skipSettings)
             {
-                ShipEnhancements.WriteDebugMessage("--------------- ignore settings preserve");
                 UpdateProperties();
 
                 if (InMultiplayer)
@@ -1037,6 +984,7 @@ public class ShipEnhancements : ModBehaviour
         SELocator.Initalize();
         ThrustIndicatorManager.Initialize();
         ShipRepairLimitController.Initialize();
+        ShipDecorationManager.Initialize();
 
         SELocator.GetShipCockpitController()._interactVolume.gameObject
             .AddComponent<FlightConsoleInteractController>();
@@ -1046,47 +994,6 @@ public class ShipEnhancements : ModBehaviour
 
         GameObject buttonConsole = LoadPrefab("Assets/ShipEnhancements/ButtonConsole.prefab");
         CreateObject(buttonConsole, SELocator.GetShipBody().transform.Find("Module_Cockpit"));
-
-        Material[] newMaterials =
-        {
-            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_SE_VillageCabin_mat.mat"),
-            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillageCabin_Recolored_mat.mat"),
-            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_SE_VillageMetal_mat.mat"),
-            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillageMetal_Recolored_mat.mat"),
-            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillagePlanks_Recolored_mat.mat"),
-            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_SE_CampsiteProps_mat.mat"),
-            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_CampsiteProps_Recolored_mat.mat"),
-            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_SE_SignsDecal_mat.mat"),
-            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_SignsDecal_Recolored_mat.mat"),
-            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillageCloth_Recolored_mat.mat"),
-            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_NOM_CopperOld_mat.mat"),
-            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_NOM_Sandstone_mat.mat"),
-            (Material)LoadAsset("Assets/ShipEnhancements/CockpitWindowFrost_Material.mat"),
-            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_WaterGaugeMetal_mat.mat"),
-            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_ShipCurtain_Cloth_mat.mat"),
-            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_ShipCurtain_Metal_mat.mat"),
-            (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_ShipCurtain_CampsiteProps_mat.mat"),
-        };
-        Transform cockpitLight = SELocator.GetShipTransform().Find("Module_Cockpit/Lights_Cockpit/Pointlight_HEA_ShipCockpit");
-        List<Material> materials = [.. cockpitLight.GetComponent<LightmapController>()._materials];
-        materials.AddRange(newMaterials);
-        cockpitLight.GetComponent<LightmapController>()._materials = [.. materials];
-
-        Transform shipLogLight = SELocator.GetShipTransform().Find("Module_Cabin/Lights_Cabin/Pointlight_HEA_ShipCabin");
-        List<Material> materials2 = [.. shipLogLight.GetComponent<LightmapController>()._materials];
-        materials2.AddRange(newMaterials);
-        shipLogLight.GetComponent<LightmapController>()._materials = [.. materials2];
-
-        Transform suppliesLight = SELocator.GetShipTransform().Find("Module_Supplies/Lights_Supplies/Pointlight_HEA_ShipSupplies_Top");
-        List<Material> materials3 = [.. suppliesLight.GetComponent<LightmapController>()._materials];
-        materials3.AddRange(newMaterials);
-        suppliesLight.GetComponent<LightmapController>()._materials = [.. materials3];
-
-        MeshRenderer chassisRenderer = SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry/Cockpit_Interior/Cockpit_Interior_Chassis")
-            .GetComponent<MeshRenderer>();
-        Texture2D blackTex = (Texture2D)LoadAsset("Assets/ShipEnhancements/Black_d.png");
-        chassisRenderer.sharedMaterials[6].SetTexture("_OcclusionMap", blackTex);
-        chassisRenderer.sharedMaterials[6].SetFloat("_OcclusionStrength", 0.75f);
 
         if ((bool)enableScoutLauncherComponent.GetProperty()
             || (string)shipWarpCoreType.GetProperty() == "Component")
@@ -1221,7 +1128,6 @@ public class ShipEnhancements : ModBehaviour
         {
             SELocator.GetShipResources().SetOxygen(0f);
             oxygenDepleted = true;
-            SELocator.GetShipTransform().Find("Module_Cockpit/Props_Cockpit/Props_HEA_ShipFoliage").gameObject.SetActive(false);
         }
         if ((bool)enableShipFuelTransfer.GetProperty())
         {
@@ -1374,7 +1280,7 @@ public class ShipEnhancements : ModBehaviour
 
                     ThrusterTheme thrusterColors = ThemeManager.GetThrusterTheme(color);
                     rend.material.SetTexture("_MainTex",
-                        (Texture2D)LoadAsset("Assets/ShipEnhancements/ThrusterColors/"
+                        LoadAsset<Texture2D>("Assets/ShipEnhancements/ThrusterColors/"
                         + thrusterColors.ThrusterColor));
 
                     Color thrustColor = Color.white * Mathf.Pow(2, thrusterColors.ThrusterIntensity);
@@ -1397,8 +1303,6 @@ public class ShipEnhancements : ModBehaviour
             reactor._maxCountdown *= multiplier;
         }
 
-        SetHullColor();
-
         if ((bool)addTether.GetProperty())
         {
             /*GameObject hook = LoadPrefab("Assets/ShipEnhancements/TetherHook.prefab");
@@ -1418,7 +1322,6 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((bool)extraEjectButtons.GetProperty())
         {
-            ShipEnhancements.WriteDebugMessage("Add eject buttons");
             GameObject suppliesButton = LoadPrefab("Assets/ShipEnhancements/SuppliesEjectButton.prefab");
             CreateObject(suppliesButton, SELocator.GetShipTransform().Find("Module_Cabin"));
 
@@ -1445,14 +1348,14 @@ public class ShipEnhancements : ModBehaviour
                     friction = Mathf.Lerp(0.6f, 1f, ((float)shipFriction.GetProperty() - 0.5f) * 2f);
                 }
 
-                mat = (PhysicMaterial)LoadAsset("Assets/ShipEnhancements/FrictionlessBouncyShip.physicMaterial");
+                mat = LoadAsset<PhysicMaterial>("Assets/ShipEnhancements/FrictionlessBouncyShip.physicMaterial");
                 mat.dynamicFriction = friction;
                 mat.staticFriction = friction;
                 mat.bounciness = (float)shipBounciness.GetProperty();
             }
             else if (physicsBounce)
             {
-                mat = (PhysicMaterial)LoadAsset("Assets/ShipEnhancements/BouncyShip.physicMaterial");
+                mat = LoadAsset<PhysicMaterial>("Assets/ShipEnhancements/BouncyShip.physicMaterial");
                 mat.bounciness = (float)shipBounciness.GetProperty();
             }
             else
@@ -1467,7 +1370,7 @@ public class ShipEnhancements : ModBehaviour
                     friction = Mathf.Lerp(0.6f, 1f, ((float)shipFriction.GetProperty() - 0.5f) * 2f);
                 }
 
-                mat = (PhysicMaterial)LoadAsset("Assets/ShipEnhancements/FrictionlessShip.physicMaterial");
+                mat = LoadAsset<PhysicMaterial>("Assets/ShipEnhancements/FrictionlessShip.physicMaterial");
                 mat.dynamicFriction = friction;
                 mat.staticFriction = friction;
             }
@@ -1857,8 +1760,6 @@ public class ShipEnhancements : ModBehaviour
             SELocator.GetShipBody().GetComponentInChildren<ShipAudioController>()
                 .gameObject.AddComponent<SmokeDetectorChirp>();
         }
-
-        SetDamageColors();
 
         engineOn = !(bool)addEngineSwitch.GetProperty();
 
@@ -2594,126 +2495,6 @@ public class ShipEnhancements : ModBehaviour
         cameraComponent._landingCamera.SetDamaged(true);
     }
 
-    private void SetHullColor()
-    {
-        string interior = (string)interiorHullColor1.GetProperty();
-        string exterior = (string)exteriorHullColor1.GetProperty();
-
-        if (!(bool)enableColorBlending.GetProperty()
-            && interior == "Defualt" && exterior == "Default")
-        {
-            return;
-        }
-
-        MeshRenderer suppliesRenderer = SELocator.GetShipTransform().
-            Find("Module_Supplies/Geo_Supplies/Supplies_Geometry/Supplies_Interior").GetComponent<MeshRenderer>();
-        Material inSharedMat = suppliesRenderer.sharedMaterials[0];
-        Material inSharedMat2 = (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_HEA_VillageCabin_Recolored_mat.mat");
-        Material inSharedMat3 = (Material)LoadAsset("Assets/ShipEnhancements/ShipInterior_SE_VillageCabin_mat.mat");
-
-        bool blendInterior = ((bool)enableColorBlending.GetProperty()
-            && int.Parse((string)interiorHullColorOptions.GetProperty()) > 1)
-            || interior == "Rainbow";
-
-        if (blendInterior)
-        {
-            InteriorHullBlendController hullBlend = SELocator.GetShipBody()
-                .gameObject.GetAddComponent<InteriorHullBlendController>();
-            hullBlend.AddSharedMaterial(inSharedMat);
-            hullBlend.AddSharedMaterial(inSharedMat2);
-            hullBlend.AddSharedMaterial(inSharedMat3);
-        }
-        else if (interior != "Default")
-        {
-            Color color = ThemeManager.GetHullTheme(interior).HullColor / 255f;
-            inSharedMat.SetColor("_Color", color);
-            inSharedMat2.SetColor("_Color", color);
-            inSharedMat3.SetColor("_Color", color);
-        }
-        else
-        {
-            inSharedMat.SetColor("_Color", Color.white);
-            inSharedMat2.SetColor("_Color", Color.white);
-            inSharedMat3.SetColor("_Color", Color.white);
-        }
-
-        MeshRenderer cabinRenderer = SELocator.GetShipTransform().
-            Find("Module_Cabin/Geo_Cabin/Cabin_Geometry/Cabin_Exterior").GetComponent<MeshRenderer>();
-        Material outSharedMat = cabinRenderer.sharedMaterials[3];
-
-        bool blendExterior = ((bool)enableColorBlending.GetProperty()
-            && int.Parse((string)exteriorHullColorOptions.GetProperty()) > 1)
-            || exterior == "Rainbow";
-
-        if (blendExterior)
-        {
-            ExteriorHullBlendController hullBlend = SELocator.GetShipBody()
-                .gameObject.GetAddComponent<ExteriorHullBlendController>();
-            hullBlend.AddSharedMaterial(outSharedMat);
-        }
-        else if (exterior != "Default")
-        {
-            Color color = ThemeManager.GetHullTheme(exterior).HullColor / 255f;
-            outSharedMat.SetColor("_Color", color);
-        }
-        else
-        {
-            outSharedMat.SetColor("_Color", Color.white);
-        }
-    }
-
-    private void SetDamageColors()
-    {
-        string color = (string)indicatorColor1.GetProperty();
-        bool indicatorBlend = ((bool)enableColorBlending.GetProperty()
-            && int.Parse((string)indicatorColorOptions.GetProperty()) > 1)
-            || color == "Rainbow";
-
-        if (indicatorBlend)
-        {
-            SELocator.GetShipTransform().gameObject.AddComponent<ShipIndicatorBlendController>();
-        }
-        else if (color != "Default")
-        {
-            var damageScreenMat = SELocator.GetShipTransform().Find("Module_Cockpit/Systems_Cockpit/ShipCockpitUI/DamageScreen/HUD_ShipDamageDisplay")
-                .GetComponent<MeshRenderer>().material;
-            var masterAlarmMat = SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry/Cockpit_Interior/Cockpit_Interior_Chassis")
-                .GetComponent<MeshRenderer>().sharedMaterials[6];
-            var masterAlarmLight = SELocator.GetShipTransform().Find("Module_Cabin/Lights_Cabin/PointLight_HEA_MasterAlarm").GetComponent<Light>();
-            var reactorLight = SELocator.GetShipTransform().Find("Module_Engine/Systems_Engine/ReactorComponent/ReactorDamageLight").GetComponent<Light>();
-            var reactorGlow = SELocator.GetShipTransform().Find("Module_Engine/Systems_Engine/ReactorComponent/Structure_HEA_PlayerShip_ReactorDamageDecal")
-                .GetComponent<MeshRenderer>().material;
-
-            DamageTheme theme = ThemeManager.GetDamageTheme(color);
-
-            damageScreenMat.SetColor("_DamagedHullFill", theme.HullColor / 255f * Mathf.Pow(2, theme.HullIntensity));
-            damageScreenMat.SetColor("_DamagedComponentFill", theme.CompColor / 255f * theme.CompIntensity);
-
-            masterAlarmMat.SetColor("_Color", theme.AlarmColor / 255f);
-            SELocator.GetShipCockpitController().transform.parent.GetComponentInChildren<ShipCockpitUI>()._damageLightColor = theme.AlarmLitColor / 255f
-                * Mathf.Pow(2, theme.AlarmLitIntensity);
-            masterAlarmLight.color = theme.IndicatorLight / 255f;
-
-            Color reactorColor = theme.ReactorColor;
-            reactorColor /= 191f;
-            reactorColor.a = 1;
-            reactorGlow.SetColor("_EmissionColor", reactorColor * Mathf.Pow(2, theme.ReactorIntensity));
-            reactorLight.color = theme.ReactorLight / 255f;
-
-            foreach (DamageEffect effect in SELocator.GetShipTransform().GetComponentsInChildren<DamageEffect>())
-            {
-                if (effect._damageLight)
-                {
-                    effect._damageLight.GetLight().color = theme.IndicatorLight / 255f;
-                }
-                if (effect._damageLightRenderer)
-                {
-                    effect._damageLightRendererColor = theme.AlarmLitColor / 255f * Mathf.Pow(2, theme.AlarmLitIntensity);
-                }
-            }
-        }
-    }
-
     private void InitializeConditions()
     {
         if ((bool)enableManualScoutRecall.GetProperty())
@@ -2737,7 +2518,7 @@ public class ShipEnhancements : ModBehaviour
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_RETRO_ROCKETS_DISABLED", true);
         }
-        if (_currentPreset == SettingPresets.PresetName.Random)
+        if (SEMenuManager.CurrentPreset == SettingPresets.PresetName.Random)
         {
             DialogueConditionManager.SharedInstance.SetConditionState("SE_USING_RANDOM_PRESET", true);
         }
@@ -3160,11 +2941,6 @@ public class ShipEnhancements : ModBehaviour
         }
     }
 
-    public SettingPresets.PresetName GetCurrentPreset()
-    {
-        return _currentPreset;
-    }
-
     public void AddShipAudioToChange(OWAudioSource audioSource)
     {
         _shipAudioToChange.Add(audioSource);
@@ -3175,40 +2951,13 @@ public class ShipEnhancements : ModBehaviour
 
     public static void WriteDebugMessage(object msg, bool warning = false, bool error = false)
     {
-        return;
-        
-        msg ??= "null";
-
-        if (warning)
-        {
-            Instance?.ModHelper?.Console?.WriteLine(msg.ToString(), MessageType.Warning);
-        }
-        else if (error)
-        {
-            Instance?.ModHelper?.Console?.WriteLine(msg.ToString(), MessageType.Error);
-        }
-        else
-        {
-            Instance?.ModHelper?.Console?.WriteLine(msg.ToString());
-        }
+        LogMessage(msg, warning, error);
     }
 
     public static void LogMessage(object msg, bool warning = false, bool error = false)
     {
-        msg ??= "null";
-
-        if (warning)
-        {
-            Instance?.ModHelper?.Console?.WriteLine(msg.ToString(), MessageType.Warning);
-        }
-        else if (error)
-        {
-            Instance?.ModHelper?.Console?.WriteLine(msg.ToString(), MessageType.Error);
-        }
-        else
-        {
-            Instance?.ModHelper?.Console?.WriteLine(msg.ToString());
-        }
+        var type = warning ? MessageType.Warning : error ? MessageType.Error : MessageType.Message;
+        Instance?.ModHelper?.Console?.WriteLine(msg?.ToString() ?? "null", type);
     }
 
     public static GameObject LoadPrefab(string path)
@@ -3222,10 +2971,17 @@ public class ShipEnhancements : ModBehaviour
     {
         return (AudioClip)Instance._shipEnhancementsBundle.LoadAsset(path);
     }
-
-    public static object LoadAsset(string path)
+    
+    public static Material LoadMaterial(string path)
     {
-        return Instance._shipEnhancementsBundle.LoadAsset(path);
+        Material mat = (Material)Instance._shipEnhancementsBundle.LoadAsset(path);
+        AssetBundleUtilities.ReplaceMaterialShader(mat);
+        return mat;
+    }
+
+    public static T LoadAsset<T>(string path) where T : UnityEngine.Object
+    {
+        return Instance._shipEnhancementsBundle.LoadAsset<T>(path);
     }
 
     public static GameObject CreateObject(GameObject obj)
@@ -3261,13 +3017,912 @@ public class ShipEnhancements : ModBehaviour
             return;
         }
 
-        _currentPreset = SettingPresets.GetPresetFromConfig(config.GetSettingsValue<string>("preset"));
+        SEMenuManager.CurrentPreset = SettingPresets.GetPresetFromConfig(config.GetSettingsValue<string>("preset"));
         var allSettings = Enum.GetValues(typeof(Settings)) as Settings[];
 
         foreach (Settings setting in allSettings)
         {
             setting.SetValue(config.GetSettingsValue<object>(EnumUtils.GetName(setting)));
         }
+    }
+
+    private List<string> GetDecorationSettings()
+    {
+        int start = ModHelper.Config.Settings.Keys.ToList()
+            .IndexOf("enableColorBlending");
+        int end = ModHelper.Config.Settings.Keys.ToList()
+            .IndexOf("indicatorColor3");
+
+        var range = ModHelper.Config.Settings.Keys.ToList()
+            .GetRange(start, end - start + 1);
+        return range;
+    }
+
+    private List<string> GetTemperatureSettings()
+    {
+        int start = ModHelper.Config.Settings.Keys.ToList()
+            .IndexOf("enableShipTemperature");
+        int end = ModHelper.Config.Settings.Keys.ToList()
+            .IndexOf("enableReactorOverload");
+
+        var range = ModHelper.Config.Settings.Keys.ToList()
+            .GetRange(start, end - start + 1);
+        return range;
+    }
+
+    private List<string> GetWaterSettings()
+    {
+        int start = ModHelper.Config.Settings.Keys.ToList()
+            .IndexOf("addWaterTank");
+        int end = ModHelper.Config.Settings.Keys.ToList()
+            .IndexOf("addWaterCooling");
+
+        var range = ModHelper.Config.Settings.Keys.ToList()
+            .GetRange(start, end - start + 1);
+        return range;
+    }
+
+    private void OnValueChanged(string name, object oldValue, object newValue)
+    {
+        if (!_detectValueChanged)
+        {
+            return;
+        }
+
+        if (GetDecorationSettings().Contains(name)
+            && !int.TryParse(name.Substring(name.Length - 1), out _))
+        {
+            int optionsNew;
+            int optionsOld;
+            if (name == "indicatorColorOptions")
+            {
+                optionsNew = int.Parse((string)newValue);
+                optionsOld = int.Parse((string)oldValue);
+            }
+            else
+            {
+                optionsNew = int.Parse((string)indicatorColorOptions.GetValue());
+                optionsOld = optionsNew;
+            }
+
+            if ((name == "enableColorBlending") ? (bool)oldValue : (bool)enableColorBlending.GetValue())
+            {
+                RedrawSettingsMenu("enableColorBlending", "indicatorColor" + optionsNew, "enableColorBlending", "indicatorColor" + optionsOld);
+            }
+            else
+            {
+                RedrawSettingsMenu("enableColorBlending", "indicatorColor" + optionsNew, "enableColorBlending", "indicatorColor1");
+            }
+
+            return;
+        }
+
+        if (name == "enableShipTemperature")
+        {
+            if ((bool)oldValue)
+            {
+                RedrawSettingsMenu("enableShipTemperature", "enableShipTemperature", "enableShipTemperature", "enableReactorOverload");
+            }
+            else
+            {
+                RedrawSettingsMenu("enableShipTemperature", "enableReactorOverload", "enableShipTemperature", "enableShipTemperature");
+            }
+            return;
+        }
+
+        if (name == "addWaterTank")
+        {
+            if ((bool)oldValue)
+            {
+                RedrawSettingsMenu("addWaterTank", "addWaterTank", "addWaterTank", "addWaterCooling");
+            }
+            else
+            {
+                RedrawSettingsMenu("addWaterTank", "addWaterCooling", "addWaterTank", "addWaterTank");
+            }
+            return;
+        }
+
+        if (_currentPreset != SettingsPresets.PresetName.Custom
+            && _currentPreset != SettingsPresets.PresetName.Random
+            && SettingsPresets.GetPresetSetting(_currentPreset, name) != null
+            && !newValue.Equals(oldValue))
+        {
+            _currentPreset = SettingsPresets.PresetName.Custom;
+            ModHelper.Config.SetSettingsValue("preset", _currentPreset.GetName());
+            RedrawSettingsMenu("preset", "preset");
+
+            return;
+        }
+
+        if (name == "preset" && !newValue.Equals(oldValue))
+        {
+            var allSettings = Enum.GetValues(typeof(Settings)) as Settings[];
+            var newPreset = (string)newValue;
+            var oldPreset = (string)oldValue;
+
+            _currentPreset = (SettingsPresets.GetPresetFromConfig(newPreset));
+            ModHelper.Config.SetSettingsValue("preset", _currentPreset.GetName());
+
+            if (newPreset == "Custom" || newPreset == "Random")
+            {
+                WriteDebugMessage("Load");
+                SettingExtensions.LoadCustomSettings();
+                foreach (Settings setting in allSettings)
+                {
+                    ModHelper.Config.SetSettingsValue(setting.GetName(), setting.GetValue());
+                }
+            }
+            else if (oldPreset == "Custom" || oldPreset == "Random")
+            {
+                WriteDebugMessage("Save");
+                SettingExtensions.SaveCustomSettings();
+            }
+
+            SettingsPresets.ApplyPreset(SettingsPresets.GetPresetFromConfig(newPreset), ModHelper.Config);
+            foreach (Settings setting in allSettings)
+            {
+                setting.SetValue(ModHelper.Config.GetSettingsValue<object>(setting.GetName()));
+            }
+
+            if (newPreset == "Random" && oldPreset == "Custom")
+            {
+                RedrawSettingsMenu("preset", "randomDifficulty", "preset", "preset");
+            }
+            else if (newPreset == "Custom" && oldPreset == "Random")
+            {
+                RedrawSettingsMenu("preset", "preset", "preset", "randomDifficulty");
+            }
+            else
+            {
+                RedrawSettingsMenu();
+            }
+            return;
+        }
+
+        if (name == "repairWrenchType" && !newValue.Equals(oldValue))
+        {
+            RedrawSettingsMenu("repairWrenchType", "repairWrenchType");
+        }
+    }
+
+    public void RedrawSettingsMenu(string startSetting = "", string endSetting = "", string startDestroySetting = "", string endDestroySetting = "")
+    {
+        if (startDestroySetting == "")
+        {
+            startDestroySetting = startSetting;
+        }
+        if (endDestroySetting == "")
+        {
+            endDestroySetting = endSetting;
+        }
+
+        MenuManager menuManager = StartupPopupPatches.menuManager;
+        IOptionsMenuManager OptionsMenuManager = menuManager.OptionsMenuManager;
+
+        var menus = typeof(MenuManager).GetField("ModSettingsMenus", BindingFlags.Public
+            | BindingFlags.NonPublic | BindingFlags.Static).GetValue(menuManager)
+            as List<(IModBehaviour behaviour, Menu modMenu)>;
+
+        Menu newModTab = null;
+
+        for (int i = 0; i < menus.Count; i++)
+        {
+            if ((object)menus[i].behaviour == this)
+            {
+                newModTab = menus[i].modMenu;
+            }
+        }
+
+        if (newModTab == null) return;
+
+        newModTab._menuOptions = [];
+
+        Scrollbar scrollbar = newModTab.transform.Find("Scroll View/Scrollbar Vertical").GetComponent<Scrollbar>();
+        float lastScrollValue = scrollbar.value;
+
+        Transform settingsParent = newModTab.transform.Find("Scroll View/Viewport/Content");
+
+        if (!DestroyExistingSettings(newModTab, settingsParent, startDestroySetting, endDestroySetting, out int insertionIndex))
+        {
+            return;
+        }
+
+        _detectValueChanged = false;
+
+        if (startSetting == "")
+        {
+            OptionsMenuManager.AddSeparator(newModTab, true);
+            OptionsMenuManager.CreateLabel(newModTab, "Any changes to the settings are applied on the next loop!");
+            OptionsMenuManager.AddSeparator(newModTab, true);
+        }
+
+        int startIndex = 0;
+        int endIndex = ModHelper.Config.Settings.Count - 1;
+        if (startSetting != "")
+        {
+            startIndex = ModHelper.Config.Settings.Keys.ToList().IndexOf(startSetting);
+        }
+        if (endSetting != "")
+        {
+            endIndex = ModHelper.Config.Settings.Keys.ToList().IndexOf(endSetting);
+        }
+
+        Dictionary<int, string> cachedNames = [];
+
+        for (int i = startIndex; i < ModHelper.Config.Settings.Count; i++)
+        {
+            string name = ModHelper.Config.Settings.ElementAt(i).Key;
+
+            if (ShouldHideSetting(i, name))
+            {
+                continue;
+            }
+
+            object setting = ModHelper.Config.Settings.ElementAt(i).Value;
+            var settingType = GetSettingType(setting);
+            var label = ModHelper.MenuTranslations.GetLocalizedString(name);
+            var tooltip = "";
+
+            var settingObject = setting as JObject;
+
+            if (settingObject != default(JObject))
+            {
+                if (settingObject["dlcOnly"]?.ToObject<bool>() ?? false)
+                {
+                    if (EntitlementsManager.IsDlcOwned() == EntitlementsManager.AsyncOwnershipStatus.NotOwned)
+                    {
+                        continue;
+                    }
+                }
+
+                if (settingObject["title"] != null)
+                {
+                    if (!SetCustomSettingName(settingsParent, ref label, ref cachedNames, name))
+                    {
+                        label = ModHelper.MenuTranslations.GetLocalizedString(settingObject["title"].ToString());
+
+                        if (SettingExtensions.customObjLabels.ContainsKey(name))
+                        {
+                            string old = SettingExtensions.customObjLabels[name];
+                            for (int c = 0; c < settingsParent.childCount; c++)
+                            {
+                                if (settingsParent.GetChild(c).name == "UIElement-" + old)
+                                {
+                                    var id = settingsParent.GetChild(c).GetInstanceID();
+                                    if (!cachedNames.ContainsKey(id))
+                                    {
+                                        cachedNames.Add(id, "UIElement-" + label);
+                                    }
+                                }
+                            }
+                            SettingExtensions.customObjLabels[name] = label;
+                        }
+                    }
+                }
+
+                if (settingObject["tooltip"] != null)
+                {
+                    if (!SetCustomTooltip(ref tooltip, name))
+                    {
+                        tooltip = ModHelper.MenuTranslations.GetLocalizedString(settingObject["tooltip"].ToString());
+                    }
+                }
+            }
+
+            if (endSetting != "" && i > endIndex)
+            {
+                for (int j = 0; j < settingsParent.childCount; j++)
+                {
+                    if (settingsParent.GetChild(j).name == "UIElement-" + label)
+                    {
+                        MenuOption option = settingsParent.GetChild(j).GetComponentInChildren<MenuOption>();
+                        if (option != null)
+                        {
+                            newModTab._menuOptions = newModTab._menuOptions.Add(option);
+                        }
+                    }
+                }
+                continue;
+            }
+
+            switch (settingType)
+            {
+                case SettingType.CHECKBOX:
+                    var currentCheckboxValue = ModHelper.Config.GetSettingsValue<bool>(name);
+                    var settingCheckbox = OptionsMenuManager.AddCheckboxInput(newModTab, label, tooltip, currentCheckboxValue);
+                    settingCheckbox.ModSettingKey = name;
+                    settingCheckbox.OnValueChanged += (bool newValue) =>
+                    {
+                        var oldValue = ModHelper.Config.GetSettingsValue<bool>(name);
+                        ModHelper.Config.SetSettingsValue(name, newValue);
+                        ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
+                        Configure(ModHelper.Config);
+                        OnValueChanged(name, oldValue, newValue);
+                    };
+                    break;
+                case SettingType.TOGGLE:
+                    var currentToggleValue = ModHelper.Config.GetSettingsValue<bool>(name);
+                    var yes = settingObject["yes"].ToString();
+                    var no = settingObject["no"].ToString();
+                    var settingToggle = OptionsMenuManager.AddToggleInput(newModTab, label, yes, no, tooltip, currentToggleValue);
+                    settingToggle.ModSettingKey = name;
+                    settingToggle.OnValueChanged += (bool newValue) =>
+                    {
+                        var oldValue = ModHelper.Config.GetSettingsValue<bool>(name);
+                        ModHelper.Config.SetSettingsValue(name, newValue);
+                        ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
+                        Configure(ModHelper.Config);
+                        OnValueChanged(name, oldValue, newValue);
+                    };
+                    break;
+                case SettingType.SELECTOR:
+                    var currentSelectorValue = ModHelper.Config.GetSettingsValue<string>(name);
+                    var options = settingObject["options"].ToArray().Select(x => x.ToString()).ToArray();
+                    var currentSelectedIndex = Array.IndexOf(options, currentSelectorValue);
+                    var settingSelector = OptionsMenuManager.AddSelectorInput(newModTab, label, options, tooltip, true, currentSelectedIndex);
+                    settingSelector.ModSettingKey = name;
+                    settingSelector.OnValueChanged += (int newIndex, string newSelection) =>
+                    {
+                        var oldValue = ModHelper.Config.GetSettingsValue<string>(name);
+                        ModHelper.Config.SetSettingsValue(name, newSelection);
+                        ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
+                        Configure(ModHelper.Config);
+                        OnValueChanged(name, oldValue, newSelection);
+                    };
+                    break;
+                case SettingType.SEPARATOR:
+                    if (settingObject["title"] != null)
+                    {
+                        if (settingObject["title"].ToString() == "line")
+                        {
+                            OptionsMenuManager.AddSeparator(newModTab, true);
+                        }
+                        else if (settingObject["tooltip"] != null
+                            && settingObject["tooltip"].ToString() == "side")
+                        {
+                            CreateSideLabel(newModTab, settingObject["title"].ToString());
+                        }
+                        else
+                        {
+                            OptionsMenuManager.AddSeparator(newModTab, true);
+                            OptionsMenuManager.CreateLabel(newModTab, label);
+                            //OptionsMenuManager.AddSeparator(newModTab, false);
+                        }
+                    }
+                    else
+                    {
+                        OptionsMenuManager.AddSeparator(newModTab, false);
+                    }
+                    break;
+                case SettingType.SLIDER:
+                    var currentSliderValue = ModHelper.Config.GetSettingsValue<float>(name);
+                    var lower = settingObject["min"].ToObject<float>();
+                    var upper = settingObject["max"].ToObject<float>();
+                    var settingSlider = OptionsMenuManager.AddSliderInput(newModTab, label, lower, upper, tooltip, currentSliderValue);
+                    settingSlider.ModSettingKey = name;
+                    settingSlider.OnValueChanged += (float newValue) =>
+                    {
+                        var oldValue = ModHelper.Config.GetSettingsValue<float>(name);
+                        ModHelper.Config.SetSettingsValue(name, newValue);
+                        ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
+                        Configure(ModHelper.Config);
+                        OnValueChanged(name, oldValue, newValue);
+                    };
+                    break;
+                case SettingType.TEXT:
+                    var currentTextValue = ModHelper.Config.GetSettingsValue<string>(name);
+                    var textInput = OptionsMenuManager.AddTextEntryInput(newModTab, label, currentTextValue, tooltip, false);
+                    textInput.ModSettingKey = name;
+                    textInput.OnConfirmEntry += () =>
+                    {
+                        var oldValue = ModHelper.Config.GetSettingsValue<string>(name);
+                        var newValue = textInput.GetInputText();
+                        ModHelper.Config.SetSettingsValue(name, newValue);
+                        ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
+                        Configure(ModHelper.Config);
+                        textInput.SetText(newValue);
+                        OnValueChanged(name, oldValue, newValue);
+                    };
+                    break;
+                case SettingType.NUMBER:
+                    var currentValue = ModHelper.Config.GetSettingsValue<double>(name);
+                    var numberInput = OptionsMenuManager.AddTextEntryInput(newModTab, label, currentValue.ToString(CultureInfo.CurrentCulture), tooltip, true);
+                    numberInput.ModSettingKey = name;
+                    numberInput.OnConfirmEntry += () =>
+                    {
+                        if (!string.IsNullOrEmpty(numberInput.GetInputText()))
+                        {
+                            var oldValue = ModHelper.Config.GetSettingsValue<double>(name);
+                            var newValue = double.Parse(numberInput.GetInputText());
+                            ModHelper.Config.SetSettingsValue(name, newValue);
+                            ModHelper.Storage.Save(ModHelper.Config, Constants.ModConfigFileName);
+                            Configure(ModHelper.Config);
+                            numberInput.SetText(newValue.ToString());
+                            OnValueChanged(name, oldValue, newValue);
+                        }
+                    };
+                    break;
+                default:
+                    WriteDebugMessage($"Couldn't generate input for unkown input type {settingType}", error: true);
+                    OptionsMenuManager.CreateLabel(newModTab, $"Unknown {settingType} : {name}");
+                    break;
+            }
+
+            if (startSetting != "")
+            {
+                if (insertionIndex >= 0)
+                {
+                    var addedSetting = settingsParent.GetChild(settingsParent.childCount - 1);
+                    addedSetting.SetSiblingIndex(insertionIndex);
+                    insertionIndex++;
+
+                    if ((bool)enableColorBlending.GetValue() && GetDecorationSettings().Contains(name))
+                    {
+                        string stem = name.Substring(0, name.Length - 6);
+                        if (_stemToSuffix.ContainsKey(stem) && stem != "indicator"
+                            && name.Substring(name.Length - 1)
+                            == (string)(stem + "ColorOptions").AsEnum<Settings>().GetValue())
+                        {
+                            OptionsMenuManager.AddSeparator(newModTab, false);
+                            var sep = settingsParent.GetChild(settingsParent.childCount - 1);
+                            sep.name = "UIElement-" + label;
+                            sep.SetSiblingIndex(insertionIndex);
+                            insertionIndex++;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if ((bool)enableColorBlending.GetValue() && GetDecorationSettings().Contains(name))
+                {
+                    string stem = name.Substring(0, name.Length - 6);
+                    if (_stemToSuffix.ContainsKey(stem) && stem != "indicator"
+                        && name.Substring(name.Length - 1)
+                        == (string)(stem + "ColorOptions").AsEnum<Settings>().GetValue())
+                    {
+                        OptionsMenuManager.AddSeparator(newModTab, false);
+                    }
+                }
+            }
+        }
+
+        if (endSetting == "")
+        {
+            OptionsMenuManager.AddSeparator(newModTab, true);
+            OptionsMenuManager.CreateLabel(newModTab, "Found a bug? Have an idea for a new setting?\nFeel free to come chat about it on the Outer Wilds Modding Discord server!");
+            OptionsMenuManager.AddSeparator(newModTab, true);
+        }
+
+        if (newModTab._tooltipDisplay != null)
+        {
+            foreach (MenuOption option in newModTab.GetComponentsInChildren<MenuOption>(true))
+            {
+                option.SetTooltipDisplay(newModTab._tooltipDisplay);
+            }
+        }
+
+        bool foundSelectable = false;
+        newModTab._listSelectables = newModTab.GetComponentsInChildren<Selectable>(true);
+        foreach (Selectable selectable in newModTab._listSelectables)
+        {
+            selectable.gameObject.GetAddComponent<Menu.MenuSelectHandler>().OnSelectableSelected += newModTab.OnMenuItemSelected;
+
+            if (newModTab._lastSelected != null
+                && selectable.gameObject.name == newModTab._lastSelected.gameObject.name)
+            {
+                SelectableAudioPlayer component = newModTab._selectOnActivate.GetComponent<SelectableAudioPlayer>();
+                if (component != null)
+                {
+                    component.SilenceNextSelectEvent();
+                }
+                Locator.GetMenuInputModule().SelectOnNextUpdate(selectable);
+                foundSelectable = true;
+            }
+        }
+
+        if (!foundSelectable && newModTab._selectOnActivate != null)
+        {
+            SelectableAudioPlayer component = newModTab._selectOnActivate.GetComponent<SelectableAudioPlayer>();
+            if (component != null)
+            {
+                component.SilenceNextSelectEvent();
+            }
+            Locator.GetMenuInputModule().SelectOnNextUpdate(newModTab._selectOnActivate);
+            newModTab._lastSelected = newModTab._selectOnActivate;
+        }
+
+        if (newModTab._setMenuNavigationOnActivate)
+        {
+            Menu.SetVerticalNavigation(newModTab, newModTab._menuOptions);
+        }
+
+        ModHelper.Events.Unity.FireInNUpdates(() =>
+        {
+            scrollbar.value = lastScrollValue;
+        }, 2);
+
+        ModHelper.Events.Unity.FireInNUpdates(() =>
+        {
+            _detectValueChanged = true;
+        }, 5);
+    }
+
+    private void CreateSideLabel(Menu menu, string label)
+    {
+        var newObj = new GameObject("Label");
+
+        var layoutElement = newObj.AddComponent<LayoutElement>();
+        layoutElement.flexibleWidth = 1;
+
+        var verticalLayout = newObj.AddComponent<VerticalLayoutGroup>();
+        verticalLayout.padding = new RectOffset(20, 180, 0, 0);
+        verticalLayout.spacing = 0;
+        verticalLayout.childAlignment = TextAnchor.MiddleLeft;
+        verticalLayout.childForceExpandHeight = false;
+        verticalLayout.childForceExpandWidth = false;
+        verticalLayout.childControlHeight = true;
+        verticalLayout.childControlWidth = true;
+        verticalLayout.childScaleHeight = false;
+        verticalLayout.childScaleWidth = false;
+
+        var textObj = new GameObject("Text");
+
+        var text = textObj.AddComponent<Text>();
+        text.text = label;
+        text.font = Resources.Load<Font>("fonts/english - latin/Adobe - SerifGothicStd");
+        text.fontSize = 36;
+        text.alignment = TextAnchor.MiddleLeft;
+        text.horizontalOverflow = HorizontalWrapMode.Wrap;
+        text.verticalOverflow = VerticalWrapMode.Truncate;
+
+        var textLayoutElement = textObj.AddComponent<LayoutElement>();
+        textLayoutElement.minHeight = 70;
+
+        textObj.transform.parent = newObj.transform;
+        textObj.transform.localScale = Vector3.one;
+        textObj.transform.localPosition = Vector3.zero;
+        textObj.transform.localRotation = Quaternion.identity;
+
+        var parent = menu.transform;
+
+        if (menu.transform.Find("Scroll View") != null)
+        {
+            parent = menu.transform.Find("Scroll View").Find("Viewport").Find("Content");
+        }
+
+        if (menu.transform.Find("Content") != null)
+        {
+            parent = menu.transform.Find("Content");
+        }
+
+        newObj.transform.parent = parent;
+        newObj.transform.localScale = Vector3.one;
+        newObj.transform.localPosition = Vector3.zero;
+        newObj.transform.localRotation = Quaternion.identity;
+    }
+
+    private bool DestroyExistingSettings(Menu menu, Transform parent, string startSetting, string endSetting, out int insertionIndex)
+    {
+        bool hasStart = startSetting != "";
+        bool hasEnd = endSetting != "";
+        if (hasStart || hasEnd)
+        {
+            string startTitle = "";
+            if (hasStart)
+            {
+                var setting = ModHelper.Config.Settings[startSetting] as JObject;
+                if (setting != default(JObject) && setting["title"] != null)
+                {
+                    if (SettingExtensions.customObjLabels.ContainsKey(startSetting))
+                    {
+                        startTitle = SettingExtensions.customObjLabels[startSetting];
+                    }
+                    else
+                    {
+                        startTitle = setting["title"].ToString();
+                    }
+                }
+            }
+
+            string endTitle = "";
+            if (hasEnd)
+            {
+                var setting = ModHelper.Config.Settings[endSetting] as JObject;
+                if (setting != default(JObject) && setting["title"] != null)
+                {
+                    if (SettingExtensions.customObjLabels.ContainsKey(endSetting))
+                    {
+                        endTitle = SettingExtensions.customObjLabels[endSetting];
+                    }
+                    else
+                    {
+                        endTitle = setting["title"].ToString();
+                    }
+                }
+            }
+
+            int startIndex = -1;
+            int endIndex = -1;
+            for (int i = 0; i < parent.childCount; i++)
+            {
+                if (parent.GetChild(i).name == "UIElement-" + startTitle)
+                {
+                    startIndex = i;
+                }
+
+                if (startIndex < 0)
+                {
+                    MenuOption option = parent.GetChild(i).GetComponentInChildren<MenuOption>();
+                    if (option != null)
+                    {
+                        menu._menuOptions = menu._menuOptions.Add(option);
+                    }
+                    continue;
+                }
+
+                if (parent.GetChild(i).name == "UIElement-" + endTitle)
+                {
+                    endIndex = i;
+                }
+
+                Destroy(parent.GetChild(i).gameObject);
+
+                if (endIndex > 0)
+                {
+                    insertionIndex = startIndex;
+                    return startIndex >= 0;
+                }
+            }
+
+            insertionIndex = startIndex;
+            return startIndex >= 0;
+        }
+
+        for (int i = 0; i < parent.childCount; i++)
+        {
+            if (i < 2)
+            {
+                MenuOption option = parent.GetChild(i).GetComponentInChildren<MenuOption>();
+                if (option != null)
+                {
+                    menu._menuOptions = menu._menuOptions.Add(option);
+                }
+            }
+            else
+            {
+                Destroy(parent.GetChild(i).gameObject);
+            }
+        }
+
+        insertionIndex = -1;
+        return true;
+    }
+
+    private bool ShouldHideSetting(int currIndex, string name)
+    {
+        foreach (Settings hiddenSetting in HiddenSettings)
+        {
+            if (hiddenSetting.ToString() == name)
+            {
+                return true;
+            }
+        }
+
+        if (name == "preset" && HidePreset)
+        {
+            return true;
+        }
+
+        if (_currentPreset != SettingsPresets.PresetName.Random)
+        {
+            if (name == "randomIterations" || name == "randomDifficulty")
+            {
+                return true;
+            }
+        }
+
+        if (GetDecorationSettings().Contains(name))
+        {
+            if (name != "enableColorBlending" && !(bool)enableColorBlending.GetValue()
+                && (!int.TryParse(name.Substring(name.Length - 1), out int value) || value != 1))
+            {
+                return true;
+            }
+
+            if (name.Length >= 6)
+            {
+                string stem = name.Substring(0, name.Length - 6);
+                if (_stemToSuffix.ContainsKey(stem))
+                {
+                    Settings numSetting = (stem + "ColorOptions").AsEnum<Settings>();
+                    int num = int.Parse((string)numSetting.GetValue());
+                    if (int.Parse(name.Substring(name.Length - 1)) > num)
+                    {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        if (GetTemperatureSettings().Contains(name) && name != "enableShipTemperature")
+        {
+            return !(bool)enableShipTemperature.GetValue();
+        }
+
+        if (GetWaterSettings().Contains(name) && name != "addWaterTank")
+        {
+            return !(bool)addWaterTank.GetValue();
+        }
+
+        return false;
+    }
+
+    private bool SetCustomSettingName(Transform settingsParent, ref string label, ref Dictionary<int, string> cachedNames, string settingName)
+    {
+        bool custom = false;
+
+        if (!(bool)enableColorBlending.GetValue()) return false;
+
+        string stem = settingName.Substring(0, settingName.Length - 6);
+        if (!_stemToSuffix.ContainsKey(stem))
+        {
+            return false;
+        }
+
+        Settings numSetting = (stem + "ColorOptions").AsEnum<Settings>();
+        int num = int.Parse((string)numSetting.GetValue());
+        if (num == 1)
+        {
+            return false;
+        }
+
+        int index = int.Parse(settingName.Substring(settingName.Length - 1));
+        Settings blendSetting = (stem + "ColorBlend").AsEnum<Settings>();
+        string blend = (string)blendSetting.GetValue();
+
+        var found = _customSettingNames.Where(tuple => tuple.blendType == blend
+            && tuple.canShow(index, num));
+
+        if (found.Count() > 0)
+        {
+            label = _stemToSuffix[stem] + " " + found.First().suffix;
+            custom = true;
+        }
+
+        if (custom)
+        {
+            if (!SettingExtensions.customObjLabels.ContainsKey(settingName))
+            {
+                SettingExtensions.customObjLabels.Add(settingName, label);
+            }
+            else
+            {
+                string old = SettingExtensions.customObjLabels[settingName];
+                for (int c = 0; c < settingsParent.childCount; c++)
+                {
+                    if (settingsParent.GetChild(c).name == "UIElement-" + old)
+                    {
+                        var id = settingsParent.GetChild(c).GetInstanceID();
+                        if (!cachedNames.ContainsKey(id))
+                            cachedNames.Add(id, "UIElement-" + label);
+                    }
+                }
+                SettingExtensions.customObjLabels[settingName] = label;
+            }
+            return true;
+        }
+
+        return false;
+    }
+
+    private bool SetCustomTooltip(ref string tooltip, string settingName)
+    {
+        if (settingName == "preset")
+        {
+            if (_currentPreset == SettingsPresets.PresetName.VanillaPlus)
+            {
+                tooltip = "Vanilla Plus is the default preset. It turns everything off except for some Quality of Life features.";
+            }
+            else if (_currentPreset == SettingsPresets.PresetName.Minimal)
+            {
+                tooltip = "The Minimal preset disables anything related to the ship that you could consider useful.";
+            }
+            else if (_currentPreset == SettingsPresets.PresetName.Impossible)
+            {
+                tooltip = "The Impossible preset doesn't add or disable anything, but it changes the ship to be as annoying as possible.";
+            }
+            else if (_currentPreset == SettingsPresets.PresetName.NewStuff)
+            {
+                tooltip = "The New Stuff preset gives the ship a ton of new features that it doesn't normally have.";
+            }
+            else if (_currentPreset == SettingsPresets.PresetName.Pandemonium)
+            {
+                tooltip = "The Pandemonium preset just turns everything on. Good luck.";
+            }
+            else if (_currentPreset == SettingsPresets.PresetName.Random)
+            {
+                tooltip = "The Random preset randomizes the mod settings each loop. You can customize the randomizer by using the two sliders below or by using the RandomizerSettings.json file in the mod folder.";
+            }
+            else if (_currentPreset == SettingsPresets.PresetName.Custom)
+            {
+                tooltip = "No preset is selected. Customize your ship to your heart's desire.";
+            }
+
+            return true;
+        }
+
+        if (settingName == "repairWrenchType" && (string)repairWrenchType.GetValue() != "Disabled")
+        {
+            if ((string)repairWrenchType.GetValue() == "Enabled")
+            {
+                tooltip = "Adds a repair wrench to the cockpit. Holding it will speed up ship repairs.";
+            }
+            else
+            {
+                tooltip = "Adds a repair wrench to the cockpit. You need to be holding the wrench to make repairs to the ship.";
+            }
+            return true;
+        }
+
+        if (settingName.Substring(settingName.Length - 5, 5) != "Blend")
+        {
+            return false;
+        }
+
+        Settings blendSetting = settingName.AsEnum<Settings>();
+        tooltip = _customTooltips[(string)blendSetting.GetValue()];
+        return true;
+    }
+
+    private SettingType GetSettingType(object setting)
+    {
+        var settingObject = setting as JObject;
+
+        if (setting is bool || (settingObject != null && settingObject["type"].ToString() == "toggle" && (settingObject["yes"] == null || settingObject["no"] == null)))
+        {
+            return SettingType.CHECKBOX;
+        }
+        else if (setting is string || (settingObject != null && settingObject["type"].ToString() == "text"))
+        {
+            return SettingType.TEXT;
+        }
+        else if (setting is int || setting is long || setting is float || setting is double || setting is decimal || (settingObject != null && settingObject["type"].ToString() == "number"))
+        {
+            return SettingType.NUMBER;
+        }
+        else if (settingObject != null && settingObject["type"].ToString() == "toggle")
+        {
+            return SettingType.TOGGLE;
+        }
+        else if (settingObject != null && settingObject["type"].ToString() == "selector")
+        {
+            return SettingType.SELECTOR;
+        }
+        else if (settingObject != null && settingObject["type"].ToString() == "slider")
+        {
+            return SettingType.SLIDER;
+        }
+        else if (settingObject != null && settingObject["type"].ToString() == "separator")
+        {
+            return SettingType.SEPARATOR;
+        }
+
+        WriteDebugMessage($"Couldn't work out setting type. Type:{setting.GetType().Name} SettingObjectType:{settingObject?["type"].ToString()}", error: true);
+        return SettingType.NONE;
+    }
+
+    enum SettingType
+    {
+        NONE,
+        CHECKBOX,
+        TOGGLE,
+        TEXT,
+        NUMBER,
+        SELECTOR,
+        SLIDER,
+        SEPARATOR
     }
 
     public override object GetApi()

@@ -308,7 +308,7 @@ public class PatchHandler : MonoBehaviour
             if (!string.IsNullOrWhiteSpace(damageCause)
                 && components[index] is ShipReactorComponent && !components[index].isDamaged)
             {
-                ErnestoDetectiveController.SetReactorCause(damageCause);
+                Ernesto.ErnestoDetectiveController.SetReactorCause(damageCause);
             }
             components[index].SetDamaged(true);
         }

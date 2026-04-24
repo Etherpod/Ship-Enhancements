@@ -56,12 +56,10 @@
     <None Include="ExperimentalSettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <EmbeddedResource Include="Data/themes.json"/>
   </ItemGroup>
   <ItemGroup>
     <Content Include="ShipEnhancements.csproj.user" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Decoration\themes.json" />
   </ItemGroup>
   <ProjectExtensions><VisualStudio><UserProperties default-config_1json__JsonSchema="" /></VisualStudio></ProjectExtensions>
 </Project>

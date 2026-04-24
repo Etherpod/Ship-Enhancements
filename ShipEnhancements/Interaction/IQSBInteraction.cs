@@ -1,4 +1,4 @@
-﻿using ShipEnhancements;
+using ShipEnhancements;
 using ShipEnhancements.Buttons;
 using UnityEngine;
 

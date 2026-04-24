@@ -48,7 +48,7 @@ public class SEItemSocket : OWItemSocket
         enabled = (bool)unlimitedItems.GetProperty();
 
         _playerCam = Locator.GetPlayerCamera();
-        AssetBundleUtilities.ReplaceShaders(_prefabItem.gameObject);
+        Utils.AssetBundleUtilities.ReplaceShaders(_prefabItem.gameObject);
         if ((bool)unlimitedItems.GetProperty())
         {
             Locator.GetPromptManager().AddScreenPrompt(_createItemPrompt, PromptPosition.Center, false);

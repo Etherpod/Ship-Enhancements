@@ -172,7 +172,7 @@ public class ShipTemperatureDamageController : MonoBehaviour
         if (targetHull._integrity <= 0f && targetHull.shipModule is ShipDetachableModule
             && (!(bool)preventSystemFailure.GetProperty() || targetHull.section == ShipHull.Section.Front))
         {
-            ErnestoDetectiveController.ItWasTemperatureDamage(_detector.GetInternalTemperatureRatio() >= 0f);
+            Ernesto.ErnestoDetectiveController.ItWasTemperatureDamage(_detector.GetInternalTemperatureRatio() >= 0f);
         }
     }
 
@@ -190,7 +190,7 @@ public class ShipTemperatureDamageController : MonoBehaviour
     {
         if (component is ShipReactorComponent && !component.isDamaged)
         {
-            ErnestoDetectiveController.SetReactorCause("temperature" + (_detector.GetInternalTemperatureRatio() >= 0f ? "_hot" : "_cold"));
+            Ernesto.ErnestoDetectiveController.SetReactorCause("temperature" + (_detector.GetInternalTemperatureRatio() >= 0f ? "_hot" : "_cold"));
         }
         component.SetDamaged(true);
     }

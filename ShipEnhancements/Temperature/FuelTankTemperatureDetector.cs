@@ -1,4 +1,4 @@
-﻿using ShipEnhancements.Ernesto;
+using ShipEnhancements.Ernesto;
 using ShipEnhancements.Items;
 using ShipEnhancements.ModSettings;
 using ShipEnhancements.Temperature;

@@ -1,9 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using ShipEnhancements.Decoration;
-using ShipEnhancements.Ernesto;
 using UnityEngine;
 using static ShipEnhancements.Settings;
+using ShipEnhancements.Decoration;
 
 namespace ShipEnhancements.Buttons;
 
@@ -24,8 +23,6 @@ public class ShipOverdriveController : ElectricalComponent
     private bool _onCooldown = false;
     private readonly float _cooldownLength = 8f;
     private float _cooldownT;
-    //private Color _defaultColor;
-    //private Color _overdriveColor;
     private Color _indicatorColor = new Color(0.49853f, 0.38774f, 5.29f);
     private readonly float _thrustMultiplier = 6f;
     private ShipReactorComponent _reactor;
@@ -34,10 +31,8 @@ public class ShipOverdriveController : ElectricalComponent
     private ThrustModulatorController _modulatorController;
     private bool _electricalDisrupted = false;
     private bool _lastPoweredState = false;
-    private int _focusedButtons;
-    private bool _focused = false;
     private bool _wasInFreeLook = false;
-    private float _buttonResetTime = 2.5f;
+    private readonly float _buttonResetTime = 2.5f;
     private float _resetStartTime;
     private bool _onResetTimer = false;
     private bool _fuelDepleted = false;
@@ -87,9 +82,6 @@ public class ShipOverdriveController : ElectricalComponent
         }
         _thrusterRenderers = [.. renderers];
         _thrusterLights = [.. lights];
-        //_defaultColor = _thrusterRenderers[0].material.GetColor("_Color");
-        //Material overdriveMat = (Material)ShipEnhancements.LoadAsset("Assets/ShipEnhancements/Effects_HEA_ThrusterFlames_Overdrive_mat.mat");
-        //_overdriveColor = overdriveMat.GetColor("_Color");
         _primeButton.SetButtonOn(false);
         _activateButton.SetButtonActive(false);
 
@@ -102,23 +94,7 @@ public class ShipOverdriveController : ElectricalComponent
         {
             if (_cooldownT > 0f)
             {
-                /*if (SELocator.GetShipBody().GetComponent<ShipThrusterBlendController>())
-                {
-                    foreach (Renderer renderer in _thrusterRenderers)
-                    {
-                        renderer.material.SetColor("_Color", Color.Lerp(RainbowShipThrusters.currentThrusterColor, _overdriveColor, _cooldownT));
-                    }
-                }
-                else
-                {
-                    foreach (Renderer renderer in _thrusterRenderers)
-                    {
-                        renderer.material.SetColor("_Color", Color.Lerp(_defaultColor, _overdriveColor, _cooldownT));
-                    }
-                }*/
-
                 ThrustIndicatorManager.LayerColor(_indicatorColor, _cooldownT);
-
                 _cooldownT -= Time.deltaTime / _cooldownLength;
             }
             else
@@ -192,14 +168,14 @@ public class ShipOverdriveController : ElectricalComponent
             {
                 if (!_reactor.isDamaged)
                 {
-                    ErnestoDetectiveController.SetReactorCause("overdrive");
+                    Ernesto.ErnestoDetectiveController.SetReactorCause("overdrive");
                 }
                 _reactor.SetDamaged(true);
             }
         }
         else if (host)
         {
-            ErnestoDetectiveController.ItWasExplosion(fromOverdrive: true);
+            Ernesto.ErnestoDetectiveController.ItWasExplosion(fromOverdrive: true);
             SELocator.GetShipDamageController().Explode();
             return;
         }

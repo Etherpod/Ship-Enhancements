@@ -1,4 +1,5 @@
-﻿using static ShipEnhancements.Settings;
+﻿using UnityEngine;
+using static ShipEnhancements.Settings;
 
 namespace ShipEnhancements.Decoration;
 

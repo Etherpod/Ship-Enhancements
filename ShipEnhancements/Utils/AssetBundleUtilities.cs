@@ -58,4 +58,27 @@ public static class AssetBundleUtilities
             }
         }
     }
+
+    public static void ReplaceMaterialShader(Material material)
+    {
+        if (material == null) return;
+
+        var replacementShader = Shader.Find(material.shader.name);
+        if (replacementShader == null) return;
+
+        // preserve override tag and render queue (for Standard shader)
+        // keywords and properties are already preserved
+        if (material.renderQueue != material.shader.renderQueue)
+        {
+            var renderType = material.GetTag("RenderType", false);
+            var renderQueue = material.renderQueue;
+            material.shader = replacementShader;
+            material.SetOverrideTag("RenderType", renderType);
+            material.renderQueue = renderQueue;
+        }
+        else
+        {
+            material.shader = replacementShader;
+        }
+    }
 }
