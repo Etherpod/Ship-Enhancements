@@ -117,11 +117,6 @@ public class ShipEngineSwitch : CockpitInteractible
                 _thrustersIndicatorLight.intensity = !thrustersUsable ? 0f : _baseIndicatorLightIntensity;
             }
         }
-        else if ((float)fuelRegenerationMultiplier.GetProperty() != 0f)
-        {
-            float fuelAdd = (float)fuelRegenerationMultiplier.GetProperty() * Time.deltaTime * 2.5f;
-            SELocator.GetShipResources().DrainFuel(-fuelAdd);
-        }
     }
 
     private void FixedUpdate()

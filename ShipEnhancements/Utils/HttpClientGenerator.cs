@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Net.Http;
 using System.Net.Http.Headers;
-//using Dalamud.Plugin.Services;
 
-<<<<<<<< HEAD:ShipEnhancements/Utils/HttpClientGenerator.cs
 namespace ShipEnhancements.Utils;
-========
-namespace ShipEnhancements.Ernesto;
->>>>>>>> temp-version-3.0.0:ShipEnhancements/Ernesto/HttpClientGenerator.cs
 
 public class HttpClientGenerator : IDisposable
 {

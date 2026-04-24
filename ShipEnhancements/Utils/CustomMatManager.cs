@@ -28,7 +28,10 @@ public static class CustomMatManager
 			new ShipTextureInfo(
 				baseDiffuse,
 				baseBump,
-				baseGloss == null ? null : baseGloss
+				baseGloss == null ? null : baseGloss,
+				// TODO: use actual values here
+				0.3f,
+				0.5f
 			),
 			new ShipRenderTextureInfo(
 				CreateRenderTexture(baseDiffuse),

@@ -121,7 +121,7 @@ public class CockpitEffectController : MonoBehaviour
             UpdateDirt();
         }
 
-        if (SELocator.GetShipTemperatureDetector() && _reactorHeat != null)
+        if (_reactorHeat && SELocator.GetShipTemperatureDetector().GetTemperatureRatio() < 0f)
         {
             UpdateIce();
         }
@@ -129,25 +129,10 @@ public class CockpitEffectController : MonoBehaviour
 
     private void UpdateIce()
     {
-        float heatLerp = _reactorHeat.GetHeatRatio();
-        float heatMult = Mathf.Sin((heatLerp * Mathf.PI) / 2);
-        
-        float temperature = SELocator.GetShipTemperatureDetector().GetTemperatureRatio();
-        if (temperature >= -0.2f)
-        {
-            // Melt
-            float tempLerp = Mathf.InverseLerp(-0.2f, 1f, temperature);
-            float speed = 1 - Mathf.Cos((tempLerp * Mathf.PI) / 2);
-            _iceBuildup = Mathf.Max(0f, _iceBuildup - speed * (heatMult + 1) * Time.deltaTime / 15f);
-        }
-        else
-        {
-            // Freeze
-            float tempLerp = Mathf.InverseLerp(-0.2f, -1f, temperature);
-            float speed = -(Mathf.Cos(Mathf.PI * tempLerp) - 1) / 2;
-            _iceBuildup = Mathf.Min(1f, _iceBuildup + speed * heatMult * Time.deltaTime / 30f);
-        }
-        
+        float tempRatio = SELocator.GetShipTemperatureDetector().GetTemperatureRatio() * -1;
+        tempRatio *= 1.2f;
+        float ratio = _reactorHeat.GetHeatRatio() * 1.5f * tempRatio;
+        _iceBuildup = Mathf.Lerp(_iceBuildup, ratio, Time.deltaTime / 60f);
         _iceMat.SetFloat(_iceCutoffPropID, _iceBuildup);
     }
 

@@ -153,7 +153,7 @@ public class QSBCompatibility
 
     public void SendHostPreset(uint id)
     {
-        _api.SendMessage("host-preset", (int)ShipEnhancements.Instance.GetCurrentPreset(), id);
+        _api.SendMessage("host-preset", (int)SEMenuManager.CurrentPreset, id);
     }
 
     private void ReceiveHostPreset(uint id, int preset)

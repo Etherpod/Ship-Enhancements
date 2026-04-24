@@ -1013,7 +1013,7 @@ public static class SEMenuManager
             .GetComponent<Image>()
             .sprite;*/
         
-        var dotsImage = (Texture2D)LoadAsset("Assets/ShipEnhancements/UI_Menu_ChangelogUnreadSeparator.png");
+        var dotsImage = LoadAsset<Texture2D>("Assets/ShipEnhancements/UI_Menu_ChangelogUnreadSeparator.png");
         var dotsSprite = Sprite.Create(dotsImage, new Rect(0f, 0f, 1512f, 59f), new Vector2(0.5f, 0.5f));
 
         var imageObj = new GameObject("dots");
@@ -1038,7 +1038,7 @@ public static class SEMenuManager
         image.pixelsPerUnitMultiplier = 2f;
         image.preserveAspect = true;
         
-        var labelImage = (Texture2D)LoadAsset("Assets/ShipEnhancements/UI_Menu_ChangelogUnreadLabel.png");
+        var labelImage = LoadAsset<Texture2D>("Assets/ShipEnhancements/UI_Menu_ChangelogUnreadLabel.png");
         var labelSprite = Sprite.Create(labelImage, new Rect(0f, 0f, 1512f, 59f), new Vector2(0.5f, 0.5f));
 
         var labelObj = UnityEngine.Object.Instantiate(imageObj, imageObj.transform);
