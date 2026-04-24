@@ -1,4 +1,6 @@
-﻿using static ShipEnhancements.ShipEnhancements.Settings;
+﻿using ShipEnhancements.Interaction;
+using ShipEnhancements.ModSettings;
+using static ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 

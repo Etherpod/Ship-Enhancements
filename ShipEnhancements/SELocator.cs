@@ -1,6 +1,11 @@
 ﻿using System.Linq;
+using ShipEnhancements.Buttons;
+using ShipEnhancements.Ernesto;
+using ShipEnhancements.ModSettings;
+using ShipEnhancements.RemoteControl;
+using ShipEnhancements.Temperature;
 using UnityEngine;
-using static ShipEnhancements.ShipEnhancements.Settings;
+using static ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 

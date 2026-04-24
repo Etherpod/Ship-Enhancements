@@ -17,7 +17,7 @@ using QSB.SectorSync.WorldObjects;
 using QSB.ItemSync;
 using QSB.ItemSync.WorldObjects.Items;
 using QSB.ShipSync.Patches;
-using static ShipEnhancements.ShipEnhancements.Settings;
+using static ShipEnhancements.Settings;
 using QSB.Tools.ProbeLauncherTool.Patches;
 using QSB.ShipSync.Messages;
 using QSB.Player.TransformSync;
@@ -27,6 +27,8 @@ using QSB.Anglerfish.Patches;
 using QSB.Anglerfish.WorldObjects;
 using QSB.Anglerfish.Messages;
 using QSB.ItemSync.WorldObjects.Sockets;
+using ShipEnhancements.Buttons;
+using ShipEnhancements.Interaction;
 
 namespace ShipEnhancementsQSB;
 

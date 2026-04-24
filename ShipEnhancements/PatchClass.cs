@@ -7,9 +7,16 @@ using HarmonyLib;
 using OWML.Common;
 using OWML.ModHelper.Menus.CustomInputs;
 using OWML.ModHelper.Menus.NewMenuSystem;
+using ShipEnhancements.Buttons;
+using ShipEnhancements.Ernesto;
+using ShipEnhancements.Interaction;
+using ShipEnhancements.Items;
+using ShipEnhancements.ModSettings;
+using ShipEnhancements.Temperature;
+using ShipEnhancements.Utils;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using static ShipEnhancements.ShipEnhancements.Settings;
+using static ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -4836,7 +4843,7 @@ public static class PatchClass
                 }
 
                 __instance.OnActivateMenu += () => ShipEnhancements.Instance.ModHelper.Events.Unity
-                    .FireOnNextUpdate(() => ShipEnhancements.Instance.RedrawSettingsMenu());
+                    .FireOnNextUpdate(() => SEMenuManager.RedrawSettingsMenu());
                 return;
             }
         }

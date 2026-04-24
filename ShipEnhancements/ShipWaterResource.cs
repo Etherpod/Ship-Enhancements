@@ -1,5 +1,7 @@
-﻿using UnityEngine;
-using static ShipEnhancements.ShipEnhancements.Settings;
+﻿using ShipEnhancements.ModSettings;
+using ShipEnhancements.Temperature;
+using UnityEngine;
+using static ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 

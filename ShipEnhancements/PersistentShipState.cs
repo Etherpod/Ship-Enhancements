@@ -4,9 +4,11 @@ using System.Linq;
 using System.Reflection;
 using MonoMod.Utils;
 using Newtonsoft.Json;
+using ShipEnhancements.Buttons;
+using ShipEnhancements.Items;
 using ShipEnhancements.Models.Json;
 using UnityEngine;
-using static ShipEnhancements.ShipEnhancements.Settings;
+using static ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
@@ -115,7 +117,7 @@ public class PersistentShipState : MonoBehaviour
 
         _activeSettings.Clear();
         
-        var settings = Enum.GetValues(typeof(ShipEnhancements.Settings)) as ShipEnhancements.Settings[];
+        var settings = Enum.GetValues(typeof(Settings)) as Settings[];
         foreach (var s in settings)
         {
             var def = SettingExtensions.ConvertJValue(ShipEnhancements.Instance.ModHelper

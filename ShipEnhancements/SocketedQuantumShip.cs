@@ -53,7 +53,7 @@ public class SocketedQuantumShip : SocketedQuantumObject
         return base.IsPlayerEntangled() || PlayerState.IsInsideShip();
     }
 
-    private void OnDestroy()
+    public override void OnDestroy()
     {
         GlobalMessenger.RemoveListener("ShipEnterQuantumMoon", OnShipEnterQuantumMoon);
         GlobalMessenger.RemoveListener("ShipExitQuantumMoon", OnShipExitQuantumMoon);

@@ -36,9 +36,9 @@ public class HullBreachEntrywayTrigger : MonoBehaviour
 
         if (hitObj.CompareTag("PlayerDetector"))
         {
-            if (!(bool)ShipEnhancements.Settings.enableAutoHatch.GetProperty() && !ShipEnhancements.InMultiplayer)
+            if (!(bool)Settings.enableAutoHatch.GetProperty() && !ShipEnhancements.InMultiplayer)
             {
-                if (!(bool)ShipEnhancements.Settings.disableHatch.GetProperty())
+                if (!(bool)Settings.disableHatch.GetProperty())
                 {
                     _hatch.OpenHatch();
                 }
@@ -66,9 +66,9 @@ public class HullBreachEntrywayTrigger : MonoBehaviour
         {
             _hatch._triggerVolume.RemoveObjectFromVolume(Locator.GetPlayerDetector().gameObject);
             SELocator.GetShipBody().GetComponentInChildren<ShipDirectionalForceVolume>()._triggerVolume.RemoveObjectFromVolume(Locator.GetPlayerDetector().gameObject);
-            if (!(bool)ShipEnhancements.Settings.enableAutoHatch.GetProperty() && !ShipEnhancements.InMultiplayer)
+            if (!(bool)Settings.enableAutoHatch.GetProperty() && !ShipEnhancements.InMultiplayer)
             {
-                if (!(bool)ShipEnhancements.Settings.disableHatch.GetProperty())
+                if (!(bool)Settings.disableHatch.GetProperty())
                 {
                     _hatch.OpenHatch();
                 }

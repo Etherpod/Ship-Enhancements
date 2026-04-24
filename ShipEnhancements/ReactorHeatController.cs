@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using ShipEnhancements.Ernesto;
+using UnityEngine;
 
 namespace ShipEnhancements;
 

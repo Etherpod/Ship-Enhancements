@@ -30,7 +30,7 @@ public class ShipClockController : MonoBehaviour
 
         _gear.enabled = false;
         _lastSeconds = 0;
-        if ((bool)ShipEnhancements.Settings.enableGasLeak.GetProperty())
+        if ((bool)Settings.enableGasLeak.GetProperty())
         {
             _reverse = Random.value < 0.1f;
         }

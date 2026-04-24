@@ -5,8 +5,10 @@ using System.Reflection;
 using NewHorizons;
 using NewHorizons.Components.Stars;
 using NewHorizons.Components.SizeControllers;
-using static ShipEnhancements.ShipEnhancements.Settings;
+using static ShipEnhancements.Settings;
 using NewHorizons.Builder.General;
+using ShipEnhancements.Interaction;
+using ShipEnhancements.Temperature;
 
 namespace ShipEnhancementsNH;
 

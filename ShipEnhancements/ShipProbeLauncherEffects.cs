@@ -1,5 +1,6 @@
-﻿using UnityEngine;
-using static ShipEnhancements.ShipEnhancements.Settings;
+﻿using ShipEnhancements.Interaction;
+using UnityEngine;
+using static ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 

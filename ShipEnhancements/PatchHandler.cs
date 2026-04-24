@@ -2,8 +2,9 @@
 using System.Collections;
 using System.Linq;
 using System.Reflection;
+using ShipEnhancements.Ernesto;
 using UnityEngine;
-using static ShipEnhancements.ShipEnhancements.Settings;
+using static ShipEnhancements.Settings;
 
 namespace ShipEnhancements;
 
