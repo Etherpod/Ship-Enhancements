@@ -1,5 +1,12 @@
 ![Ship Enhancements banner](banner.png)
 
+![GitHub Release](https://img.shields.io/github/v/release/Etherpod/Ship-Enhancements?style=flat-square&color=00c451)
+![GitHub Release Date](https://img.shields.io/github/release-date/Etherpod/Ship-Enhancements?label=last%20release&style=flat-square&color=00b06e)
+![GitHub all releases](https://img.shields.io/github/downloads/Etherpod/Ship-Enhancements/total?style=flat-square&color=009c8b)
+![GitHub release (latest by date)](https://img.shields.io/github/downloads/Etherpod/Ship-Enhancements/latest/total?style=flat-square&color=0087a8)
+
+[![Install Ship Enhancements](https://img.shields.io/endpoint?url=https%3A%2F%2Fouterwildsmods.com%2Fapi%2FEtherpod.ShipEnhancements%2Fbadge.json&color=0073c5)](https://outerwildsmods.com/mods/shipenhancements/)
+
 ---
 
 Ship Enhancements adds way too much stuff to the ship, all of which you can find in the mod settings menu. Any changes to the ship will be applied on the next loop. Experiment and have fun!
@@ -20,7 +27,7 @@ It won't break if you play in VR, but it isn't exactly the best experience. Cust
 I made a mod called [Traveler's Pack](https://outerwildsmods.com/mods/travelerspack/) to address this problem. Try playing with it enabled if you run into the issue of there being too many items.
 
 ## Does this mod support [Achievements+](https://outerwildsmods.com/mods/achievements/)?
-It sure does! It adds 12 new achievements that you can try and unlock.
+It does! It adds 12 new achievements that you can try and unlock.
 
 ---
 
@@ -124,12 +131,12 @@ Some new stuff that Slate didn't have time to include in the ship.
 - **Scout Launcher Component**: Turns the ship's scout launcher into a fully functioning ship component. If you damage it, you won't be able to launch or recall your scout from the ship until you repair it.
 - **Ship Scout Photo Mode**: Lets you switch to photo mode on the ship's scout launcher. It will default to photo mode if scout launching is disabled.
 - **Signalscope Component**: Turns the ship's signalscope into a fully functioning ship component. If you damage it, you might have some trouble hearing signals through it.
-- **Ship Signal**: Adds a signal for the ship on the Outer Wilds Ventures frequency. The signal will stop if the ship's signalscope is damaged.
+- **Ship Signal Type**: Adds a signal to the ship on the Outer Wilds Ventures frequency. The signal will stop if the ship's signalscope is damaged.
 - **Ship Signalscope Zoom**: Lets you zoom in using the ship's signalscope. It works the same as the handheld signalscope, except the screen won't be covered by the scope.
 
 ---
 
-The **Ship Signal** has a special use to it! If you find the ship's signal on your signalscope, you can "Tune In" to the signal to broadcast commands to the ship from afar. There are a lot of commands you can use, which are sorted into groups to make it easier to navigate.
+The **Ship Signal** has a special use to it! If you set the type to "Advanced" and find the ship's signal on your signalscope, you can "Tune In" to the signal to broadcast commands to the ship from afar. There are a lot of commands you can use, which are sorted into groups to make it easier to navigate.
 
 - Component Commands
   - **Activate Return Warp** - Warps the ship home. (Requires the **Ship Warp Core**)
@@ -159,6 +166,8 @@ The **Ship Signal** has a special use to it! If you find the ship's signal on yo
 - Other Commands
   - **Enter Ship Viewer** - Connects to the ship's scout launcher camera and landing camera, then displays a live feed in the command menu. If the scout launcher or landing camera is damaged, their cameras will only show static.
   - **Call Ernesto** - Calls Ernesto. (Requires **Ernesto**)
+
+---
 
 ### *Items*
 - **Portable Campfire**: Adds a portable campfire to the ship next to your suit. Set it up wherever you want and roast a marshmallow.
@@ -339,18 +348,16 @@ Some Outer Wilds bugs that this mod fixes automatically. These bugs are mostly c
 - Dialogue would sometimes start with the wrong text (also patched by **Vanilla Fix**)
 
 # Credits
-Big thanks to **ditzy** for all of their help! There's so much I have to put it in a list:
-- Helping program shaders
-- Helping with one of Ernesto's special abilities
-- Coding pretty much the entire program for the orbital autopilot
-- Helping refactor the ship decoration code
+These people have all been a big help with the mod! It wouldn't have gotten to where it is today without them, and I'm very thankful for all of their contributions.
 
-Big thanks to **ColumbidaeCafe** for helping develop most of the ideas and sound effects!
+- **ditzy** - Some of the best features wouldn't have been possible without them! They've given continual assistance through the development of this mod, including:
+  - Writing almost the entire program for the orbital autopilot
+  - Helping refactor all of the decoration code multiple times
+  - Helping write custom shaders
+  - Giving direction on almost all of the programming problems I ran into
+- **ColumbidaeCafe** - My main source of ideas and sound effects in early development! Their most notable sound effect is the funny clanging sound you hear when placing down a **Tether Hook**
+- **harperlr** - Big ship propaganda expert and moral support
+- **SpatialX** - Contributed many ideas to the mod, including the infamous **Portable Fuel Canister**, and even made a [Ship Enhancements trailer](https://youtu.be/FT8VdG_Bzo0)! (though it's a little outdated now)
+- **JohnCorby** - Helped with physics shenanigans related to the **Ship Bounciness** setting
 
-Thank you **harperlr** for making the radio model and for helping to playtest QSB support!
-
-Thank you **SpatialX** for making an awesome [Ship Enhancements trailer](https://youtu.be/FT8VdG_Bzo0)!
-
-Thank you **JohnCorby** for helping with some physics shenanigans ::)
-
-And a final thank you to the **Outer Wilds Modding** server on Discord, this wouldn't have been possible without them.
+Ship Enhancements is the culmination of all my modding experience acquired over a couple years, but I would have never acquired all of that experience without the **Outer Wilds Modding Discord** server to help me! Thank you to everyone in this wonderful community for being so supportive and helpful; not just to me, but to all of the aspiring modders that stop by to ask questions. Anyone can write docs on how to mod Outer Wilds, but it's the community that makes modding such an enjoyable experience.
