@@ -7,11 +7,15 @@ namespace ShipEnhancements.Decoration;
 
 public class ShipTextureBlender : IDisposable
 {
+	private static readonly int ScanTimeId = Shader.PropertyToID("_ScanTime");
     private static readonly int OverlayColorId = Shader.PropertyToID("_OverlayColor");
     private static readonly int BlendFactorId = Shader.PropertyToID("_BlendFactor");
+    private static readonly int ScanFactorId = Shader.PropertyToID("_ScanFactor");
+    private static readonly int TileFactorId = Shader.PropertyToID("_TileFactor");
     private static readonly int DestZoneId = Shader.PropertyToID("_DestZone");
     private static readonly int DestExclusionZoneId = Shader.PropertyToID("_DestExclusionZone");
     private static readonly int SourceMapId = Shader.PropertyToID("_SourceMap");
+    private static readonly int HasSourceId = Shader.PropertyToID("_HasSource");
     private static readonly int SourceMultiplierId = Shader.PropertyToID("_SourceMultiplier");
     private static readonly int BumpStrengthId = Shader.PropertyToID("_BumpScale");
     private static readonly int MetallicStrengthId = Shader.PropertyToID("_Metallic");
@@ -24,6 +28,8 @@ public class ShipTextureBlender : IDisposable
     public Material BlendedMaterial { get; }
     public Color OverlayColor { get; set; }
     public float BlendFactor { get; set; }
+    public float ScanFactor { get; set; }
+    public float TileFactor { get; set; }
 
     public float BumpStrength
     {
@@ -58,9 +64,11 @@ public class ShipTextureBlender : IDisposable
         Vector4? destExclusionZone = null,
         Color? overlayColor = null,
         float initialBlendFactor = 0f,
-        float initialBumpStrength = 1f,
-        float initialMetallicStrength = 0f,
-        float initialGlossStrength = 0f
+        float initialScanFactor = 1f,
+        float initialTileFactor = 1f,
+        float? initialBumpStrength = null,
+        float? initialMetallicStrength = null,
+        float? initialGlossStrength = null
     )
     {
         if (blendingMaterial == null)
@@ -72,15 +80,18 @@ public class ShipTextureBlender : IDisposable
         BaseMaterial = baseMaterial;
         OverlayColor = overlayColor ?? DefaultColor;
         BlendFactor = initialBlendFactor;
+        ScanFactor = initialScanFactor;
+        TileFactor = initialTileFactor;
 
+        CustomMatManager.InitializeMaterial(baseMaterial);
         var mat = this.GetCustomMaterial(baseMaterial);
         BlendedMaterial = mat.Mat;
         BaseTexture = mat.BaseTex;
         targetTex = mat.Tex;
         
-        BumpStrength = initialBumpStrength;
-        MetallicStrength = initialMetallicStrength;
-        GlossStrength = initialGlossStrength;
+        if (initialBumpStrength.HasValue) BumpStrength = initialBumpStrength.Value;
+        if (initialMetallicStrength.HasValue) MetallicStrength = initialMetallicStrength.Value;
+        if (initialGlossStrength.HasValue) GlossStrength = initialGlossStrength.Value;
     }
 
     public void Dispose()
@@ -94,7 +105,7 @@ public class ShipTextureBlender : IDisposable
 
         // if (OWTime.IsPaused()) return false;
 
-        if (blendingMaterial is null || SourceTexture is null)
+        if (blendingMaterial is null)
         {
             $"[Q6J] can't update blend | {BlendedMaterial.name}".Log();
             return false;
@@ -102,11 +113,15 @@ public class ShipTextureBlender : IDisposable
 
         // $"[Q6J] update blend [2] | {BlendedMaterial.name}".Log();
 
-        blendingMaterial.SetTexture(SourceMapId, SourceTexture.Diffuse);
+        blendingMaterial.SetFloat(ScanTimeId, Time.realtimeSinceStartup);
+        blendingMaterial.SetFloat(HasSourceId, SourceTexture == null ? 0f : 1f);
+        blendingMaterial.SetTexture(SourceMapId, SourceTexture?.Diffuse);
         blendingMaterial.SetVector(DestZoneId, DestZone);
         blendingMaterial.SetVector(DestExclusionZoneId, DestExclusionZone);
         blendingMaterial.SetColor(OverlayColorId, OverlayColor);
         blendingMaterial.SetFloat(BlendFactorId, BlendFactor);
+        blendingMaterial.SetFloat(ScanFactorId, ScanFactor);
+        blendingMaterial.SetFloat(TileFactorId, TileFactor);
         Graphics.Blit(BaseTexture.Diffuse, targetTex.Diffuse, blendingMaterial, 0);
 
         return true;
@@ -120,12 +135,12 @@ public class ShipTextureBlender : IDisposable
         
         // $"[Q6J] update blend full [2] | {BlendedMaterial.name}".Log();
         
-        blendingMaterial.SetTexture(SourceMapId, SourceTexture.BumpMap);
+        blendingMaterial.SetTexture(SourceMapId, SourceTexture?.BumpMap);
         blendingMaterial.SetFloat(SourceMultiplierId, BumpMultiplier);
         Graphics.Blit(BaseTexture.BumpMap, targetTex.BumpMap, blendingMaterial, 1);
 
-        if (!SourceTexture.HasGloss) return;
-        blendingMaterial.SetTexture(SourceMapId, SourceTexture.GlossMap);
+        if (SourceTexture is not { HasGloss: true }) return;
+        blendingMaterial.SetTexture(SourceMapId, SourceTexture?.GlossMap);
         blendingMaterial.SetFloat(SourceMultiplierId, GlossMultiplier);
         Graphics.Blit(BaseTexture.GlossMap, targetTex.GlossMap, blendingMaterial, 2);
     }

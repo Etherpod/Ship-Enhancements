@@ -28,10 +28,7 @@ public static class CustomMatManager
 			new ShipTextureInfo(
 				baseDiffuse,
 				baseBump,
-				baseGloss == null ? null : baseGloss,
-				// TODO: use actual values here
-				0.3f,
-				0.5f
+				baseGloss == null ? null : baseGloss
 			),
 			new ShipRenderTextureInfo(
 				CreateRenderTexture(baseDiffuse),
@@ -96,12 +93,13 @@ public static class CustomMatManager
 		if (0 < --MatUsers[mat]) return;
 		MatUsers.Remove(mat);
 		MatByBase.Remove(mat.BaseMat);
-		UnityEngine.Object.Destroy(mat.Mat);
+		UnityEngine.Object.DestroyImmediate(mat.Mat);
 		mat.Tex.Release();
 	});
 
 	private static RenderTexture CreateRenderTexture(Texture baseTexture) =>
-		new(baseTexture.width, baseTexture.height, 0, RenderTextureFormat.ARGB32);
+		// new(baseTexture.width, baseTexture.height, 0, RenderTextureFormat.ARGB32);
+		new(4096, 4096, 0, RenderTextureFormat.ARGB32);
 
 	private static void Synchronized(Action block)
 	{
