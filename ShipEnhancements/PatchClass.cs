@@ -4395,24 +4395,33 @@ public static class PatchClass
     {
         bool qShip = (bool)enableQuantumShip.GetProperty();
         bool disabled = (bool)disableMinimapMarkers.GetProperty();
+        
+        // this will only run if trying to enable components
         if (!value || (!qShip && !disabled)) return true;
+
+        if (!disabled)
+        {
+            __instance._playerTrailRenderer.enabled = true;
+            __instance._probeTrailRenderer.enabled = true;
+        }
 
         for (int i = 0; i < __instance._minimapRenderersToSwitchOnOff.Length; i++)
         {
             if (__instance._minimapRenderersToSwitchOnOff[i].transform.parent == __instance._globeMeshTransform)
             {
-                __instance._minimapRenderersToSwitchOnOff[i].enabled = value;
+                __instance._minimapRenderersToSwitchOnOff[i].enabled = true;
             }
-            else
+            // only runs if markers enabled and qhip
+            else if (!disabled)
             {
-                __instance._minimapRenderersToSwitchOnOff[i].enabled = !disabled && (!qShip
-                    || __instance._minimapRenderersToSwitchOnOff[i].name != "ShipMarker"
-                    || !(Locator.GetQuantumMoon()?._isShipInside ?? false));
+                __instance._minimapRenderersToSwitchOnOff[i].enabled = 
+                    __instance._minimapRenderersToSwitchOnOff[i].name != "ShipMarker"
+                    || !(Locator.GetQuantumMoon()?._isShipInside ?? false);
             }
         }
         for (int j = 0; j < __instance._electricalComponentsToSwitchOnOff.Length; j++)
         {
-            __instance._electricalComponentsToSwitchOnOff[j].SetPowered(value);
+            __instance._electricalComponentsToSwitchOnOff[j].SetPowered(true);
         }
 
         return false;
