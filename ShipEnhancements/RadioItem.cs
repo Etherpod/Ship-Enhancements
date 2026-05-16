@@ -133,9 +133,14 @@ public class RadioItem : OWItem
 
         GlobalMessenger.AddListener("ExitShip", OnExitShip);
         GlobalMessenger.AddListener("EnterShip", OnEnterShip);
-        GlobalMessenger.AddListener("EnterDreamWorld", OnEnterDreamWorld);
-        GlobalMessenger.AddListener("ExitDreamWorld", OnExitDreamWorld);
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
+
+        if (ShipEnhancements.DLCEnabled)
+        {
+            GlobalMessenger.AddListener("EnterDreamWorld", OnEnterDreamWorld);
+            GlobalMessenger.AddListener("ExitDreamWorld", OnExitDreamWorld);
+        }
+        
         _codeDetector.OnChangeActiveZone += OnChangeCodeZone;
     }
 
@@ -530,7 +535,7 @@ public class RadioItem : OWItem
             }
         }
 
-        if (_playingInDreamWorld)
+        if (ShipEnhancements.DLCEnabled && _playingInDreamWorld)
         {
             Vector3 sleepPosition = Locator.GetDreamWorldController().GetDreamCampfire().transform.position
                 + Locator.GetDreamWorldController()._relativeSleepLocation.localPosition;
@@ -946,9 +951,14 @@ public class RadioItem : OWItem
         base.OnDestroy();
         GlobalMessenger.RemoveListener("ExitShip", OnExitShip);
         GlobalMessenger.RemoveListener("EnterShip", OnEnterShip);
-        GlobalMessenger.RemoveListener("EnterDreamWorld", OnEnterDreamWorld);
-        GlobalMessenger.RemoveListener("ExitDreamWorld", OnExitDreamWorld);
         GlobalMessenger.RemoveListener("ShipSystemFailure", OnShipSystemFailure);
+
+        if (ShipEnhancements.DLCEnabled)
+        {
+            GlobalMessenger.RemoveListener("EnterDreamWorld", OnEnterDreamWorld);
+            GlobalMessenger.RemoveListener("ExitDreamWorld", OnExitDreamWorld);
+        }
+
         _codeDetector.OnChangeActiveZone -= OnChangeCodeZone;
     }
 }

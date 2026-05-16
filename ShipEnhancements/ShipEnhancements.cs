@@ -68,6 +68,9 @@ public class ShipEnhancements : ModBehaviour
     public static SaveDataJson SaveData;
 
     public bool IsWarpingBackToEye = false;
+    
+    public static bool DLCEnabled => EntitlementsManager.IsDlcOwned() == 
+        EntitlementsManager.AsyncOwnershipStatus.Owned;
 
     public static uint[] PlayerIDs
     {
@@ -1264,17 +1267,20 @@ public class ShipEnhancements : ModBehaviour
         }
 
         AntiRiverVolumes.Clear();
-        
-        GameObject darkSideVol = LoadPrefab("Assets/ShipEnhancements/AntiRiverVolume_DarkSideDockingBay.prefab");
-        GameObject lightSideVol = LoadPrefab("Assets/ShipEnhancements/AntiRiverVolume_LightSideDockingBay.prefab");
-        AntiRiverVolumes.Add(CreateObject(darkSideVol,
-            GameObject.Find("RingWorld_Body").transform
-                .Find("Sector_RingWorld/Sector_DarkSideDockingBay/Volumes_DarkSideDockingBay"))
-            .GetComponent<AntiRiverVolume>());
-        AntiRiverVolumes.Add(CreateObject(lightSideVol,
-            GameObject.Find("RingWorld_Body").transform
-                .Find("Sector_RingWorld/Sector_LightSideDockingBay/Volumes_LightSideDockingBay"))
-            .GetComponent<AntiRiverVolume>());
+
+        if (DLCEnabled)
+        {
+            GameObject darkSideVol = LoadPrefab("Assets/ShipEnhancements/AntiRiverVolume_DarkSideDockingBay.prefab");
+            GameObject lightSideVol = LoadPrefab("Assets/ShipEnhancements/AntiRiverVolume_LightSideDockingBay.prefab");
+            AntiRiverVolumes.Add(CreateObject(darkSideVol,
+                    GameObject.Find("RingWorld_Body").transform
+                        .Find("Sector_RingWorld/Sector_DarkSideDockingBay/Volumes_DarkSideDockingBay"))
+                .GetComponent<AntiRiverVolume>());
+            AntiRiverVolumes.Add(CreateObject(lightSideVol,
+                    GameObject.Find("RingWorld_Body").transform
+                        .Find("Sector_RingWorld/Sector_LightSideDockingBay/Volumes_LightSideDockingBay"))
+                .GetComponent<AntiRiverVolume>());
+        }
 
         SetUpShipAudio();
 
@@ -2495,13 +2501,16 @@ public class ShipEnhancements : ModBehaviour
             CreateObject(zone, vessel.transform.Find("Sector_VesselDimension"));
         }
 
-        GameObject rw = GameObject.Find("RingWorld_Body");
-        if (rw != null)
+        if (DLCEnabled)
         {
-            GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_ElegyForTheRings.prefab");
-            CreateObject(zone, rw.transform.Find("Sector_RingInterior/Sector_Zone1/Sector_DreamFireHouse_Zone1"));
-            CreateObject(zone, rw.transform.Find("Sector_RingInterior/Sector_Zone2/Sector_DreamFireLighthouse_Zone2_AnimRoot/Volumes_DreamFireLighthouse_Zone2"));
-            CreateObject(zone, rw.transform.Find("Sector_RingInterior/Sector_Zone3/Sector_HiddenGorge/Sector_DreamFireHouse_Zone3"));
+            GameObject rw = GameObject.Find("RingWorld_Body");
+            if (rw != null)
+            {
+                GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_ElegyForTheRings.prefab");
+                CreateObject(zone, rw.transform.Find("Sector_RingInterior/Sector_Zone1/Sector_DreamFireHouse_Zone1"));
+                CreateObject(zone, rw.transform.Find("Sector_RingInterior/Sector_Zone2/Sector_DreamFireLighthouse_Zone2_AnimRoot/Volumes_DreamFireLighthouse_Zone2"));
+                CreateObject(zone, rw.transform.Find("Sector_RingInterior/Sector_Zone3/Sector_HiddenGorge/Sector_DreamFireHouse_Zone3"));
+            }
         }
 
         GameObject sun = GameObject.Find("Sun_Body");
