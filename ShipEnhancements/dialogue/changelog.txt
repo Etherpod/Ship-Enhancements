@@ -1,3 +1,7 @@
+---Release v2.3.2
+
+- Fixed a bug where the mod couldn't be played without the DLC enabled
+
 ---Release v2.3.1
 
 - The **Ship Signal**  is now labeled "SHIP" instead of "UNKNOWN"
