@@ -108,7 +108,7 @@ public class ShipRemoteControl : MonoBehaviour
         AddMaterials();
 
         var launcherParent = SELocator.GetShipTransform().Find("Module_Cockpit/Systems_Cockpit/ProbeLauncher");
-        var launcherCamObj = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipViewer_LauncherCamera.prefab");
+        var launcherCamObj = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipSignal/ShipViewer_LauncherCamera.prefab");
         var launcherCamViewer = ShipEnhancements.CreateObject(launcherCamObj, launcherParent)
             .GetComponent<ShipViewerCamera>();
         if (SELocator.GetProbeLauncherComponent() != null)
@@ -118,7 +118,7 @@ public class ShipRemoteControl : MonoBehaviour
         _shipCameras.Add(launcherCamViewer);
         
         var landingParent = SELocator.GetShipTransform().Find("Module_Cockpit/Systems_Cockpit");
-        var landingCamObj = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipViewer_LandingCamera.prefab");
+        var landingCamObj = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipSignal/ShipViewer_LandingCamera.prefab");
         var landingCam = ShipEnhancements.CreateObject(landingCamObj, landingParent).GetComponent<OWCamera>();
         var landingCamViewer = landingCam.GetComponent<ShipViewerCamera>();
         landingCamViewer.SetShipComponent(SELocator.GetShipTransform().GetComponentInChildren<ShipCameraComponent>());

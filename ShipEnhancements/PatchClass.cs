@@ -672,7 +672,7 @@ public static class PatchClass
     {
         if ((bool)enableGravityLandingGear.GetProperty())
         {
-            GameObject gravityPadObj = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/GravityLandingPad.prefab");
+            GameObject gravityPadObj = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/Buttons/GravityLandingPad.prefab");
             ShipEnhancements.CreateObject(gravityPadObj, __instance.transform);
         }
     }
@@ -2804,7 +2804,7 @@ public static class PatchClass
 
         if ((bool)enableScoutLauncherComponent.GetProperty())
         {
-            GameObject probeLauncherComponent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ProbeLauncherComponent.prefab");
+            GameObject probeLauncherComponent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipComponents/ProbeLauncherComponent.prefab");
             GameObject componentObj = ShipEnhancements.CreateObject(probeLauncherComponent, cockpit._componentsGroup.transform);
             var comp = componentObj.GetComponent<ProbeLauncherComponent>();
             SELocator.SetProbeLauncherComponent(comp);
@@ -2816,7 +2816,7 @@ public static class PatchClass
         }
         if ((bool)enableSignalscopeComponent.GetProperty())
         {
-            GameObject signalscopeComponent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/SignalscopeComponent.prefab");
+            GameObject signalscopeComponent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipComponents/SignalscopeComponent.prefab");
             GameObject componentObj2 = ShipEnhancements.CreateObject(signalscopeComponent, cockpit._componentsGroup.transform);
             SignalscopeComponent comp = componentObj2.GetComponent<SignalscopeComponent>();
             SELocator.SetSignalscopeComponent(comp);
@@ -2829,7 +2829,7 @@ public static class PatchClass
         if ((string)shipWarpCoreType.GetProperty() == "Component")
         {
             // setting wrong here??
-            GameObject warpCoreComponent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipWarpCoreComponent.prefab");
+            GameObject warpCoreComponent = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipComponents/ShipWarpCoreComponent.prefab");
             warpCoreComponent.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = UnityEngine.Object.FindObjectOfType<ShipBody>().gameObject;
             GameObject componentObj = ShipEnhancements.CreateObject(warpCoreComponent, cockpit._componentsGroup.transform);
             var comp = componentObj.GetComponent<ShipWarpCoreComponent>();
@@ -2842,7 +2842,7 @@ public static class PatchClass
 
             if (ShipEnhancements.NHAPI == null && GameObject.Find("TimberHearth_Body"))
             {
-                GameObject receiver = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipWarpReceiver.prefab");
+                GameObject receiver = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/Buttons/ShipWarpReceiver.prefab");
                 receiver.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = UnityEngine.Object.FindObjectOfType<ShipBody>().gameObject;
                 GameObject receiverObj = ShipEnhancements.CreateObject(receiver, GameObject.Find("TimberHearth_Body").transform);
                 componentObj.GetComponentInChildren<ShipWarpCoreController>().SetReceiver(receiverObj.GetComponent<ShipWarpCoreReceiver>());

@@ -25,7 +25,7 @@ public static class ShipDecorationManager
     
 	public static void Initialize()
 	{
-        textureBlendMat = LoadMaterial("Assets/ShipEnhancements/ShipSkins/ShipTextureBlend.mat");
+        textureBlendMat = LoadMaterial("Assets/ShipEnhancements/Decoration/ShipTextures/ShipTextureBlend.mat");
         
 		if (_defaultInteriorHullMat == null)
         {
@@ -66,37 +66,37 @@ public static class ShipDecorationManager
 
         if (_defaultSEInteriorMat1 == null)
         {
-            _defaultSEInteriorMat1 = LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_VillageCabin_Recolored_mat.mat");
+            _defaultSEInteriorMat1 = LoadMaterial("Assets/ShipEnhancements/Material/ShipInterior_HEA_VillageCabin_Recolored_mat.mat");
         }
 
         if (_defaultSEInteriorMat2 == null)
         {
-            _defaultSEInteriorMat2 = LoadMaterial("Assets/ShipEnhancements/ShipInterior_SE_VillageCabin_mat.mat");
+            _defaultSEInteriorMat2 = LoadMaterial("Assets/ShipEnhancements/Material/ShipInterior_SE_VillageCabin_mat.mat");
         }
 
         CustomMatManager.ClearMaterials(true);
         
         Material[] lightmapMaterials =
         {
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_SE_VillageCabin_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_VillageCabin_Recolored_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_SE_VillageMetal_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_VillageMetal_Recolored_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_VillagePlanks_Recolored_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_SE_CampsiteProps_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_CampsiteProps_Recolored_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_SE_SignsDecal_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_SignsDecal_Recolored_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_VillageCloth_Recolored_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_NOM_CopperOld_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_NOM_Sandstone_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/CockpitWindowFrost_Material.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_WaterGaugeMetal_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_ShipCurtain_Cloth_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_ShipCurtain_Metal_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipInterior_HEA_ShipCurtain_CampsiteProps_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipPlants/ShipInterior_Cactus_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/ShipPlants/ShipInterior_CactusFlower_mat.mat"),
+            LoadMaterial("Assets/ShipEnhancements/Material/ShipInterior_SE_VillageCabin_mat.mat"),
+            LoadMaterial("Assets/ShipEnhancements/Material/ShipInterior_HEA_VillageCabin_Recolored_mat.mat"),
+            LoadMaterial("Assets/ShipEnhancements/Material/ShipInterior_SE_VillageMetal_mat.mat"),
+            LoadMaterial("Assets/ShipEnhancements/Material/ShipInterior_HEA_VillageMetal_Recolored_mat.mat"),
+            LoadMaterial("Assets/ShipEnhancements/Material/ShipInterior_HEA_VillagePlanks_Recolored_mat.mat"),
+            LoadMaterial("Assets/ShipEnhancements/Material/ShipInterior_SE_CampsiteProps_mat.mat"),
+            LoadMaterial("Assets/ShipEnhancements/Material/ShipInterior_HEA_CampsiteProps_Recolored_mat.mat"),
+            LoadMaterial("Assets/ShipEnhancements/Material/ShipInterior_SE_SignsDecal_mat.mat"),
+            LoadMaterial("Assets/ShipEnhancements/Material/ShipInterior_HEA_SignsDecal_Recolored_mat.mat"),
+            LoadMaterial("Assets/ShipEnhancements/Material/ShipInterior_HEA_VillageCloth_Recolored_mat.mat"),
+            LoadMaterial("Assets/ShipEnhancements/Material/ShipInterior_NOM_CopperOld_mat.mat"),
+            LoadMaterial("Assets/ShipEnhancements/Material/ShipInterior_NOM_Sandstone_mat.mat"),
+            LoadMaterial("Assets/ShipEnhancements/ShipEffects/CockpitWindowFrost_Material.mat"),
+            LoadMaterial("Assets/ShipEnhancements/Material/ShipInterior_HEA_WaterGaugeMetal_mat.mat"),
+            LoadMaterial("Assets/ShipEnhancements/Material/ShipInterior_HEA_ShipCurtain_Cloth_mat.mat"),
+            LoadMaterial("Assets/ShipEnhancements/Material/ShipInterior_HEA_ShipCurtain_Metal_mat.mat"),
+            LoadMaterial("Assets/ShipEnhancements/Material/ShipInterior_HEA_ShipCurtain_CampsiteProps_mat.mat"),
+            LoadMaterial("Assets/ShipEnhancements/Decoration/CockpitPlants/Material/ShipInterior_Cactus_mat.mat"),
+            LoadMaterial("Assets/ShipEnhancements/Decoration/CockpitPlants/Material/ShipInterior_CactusFlower_mat.mat"),
             _customGlassMat,
         };
 
@@ -107,7 +107,7 @@ public static class ShipDecorationManager
 
         MeshRenderer chassisRenderer = SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry/Cockpit_Interior/Cockpit_Interior_Chassis")
             .GetComponent<MeshRenderer>();
-        Texture2D blackTex = LoadAsset<Texture2D>("Assets/ShipEnhancements/Black_d.png");
+        Texture2D blackTex = LoadAsset<Texture2D>("Assets/ShipEnhancements/Material/Black_d.png");
         chassisRenderer.sharedMaterials[6].SetTexture("_OcclusionMap", blackTex);
         chassisRenderer.sharedMaterials[6].SetFloat("_OcclusionStrength", 0.75f);
         

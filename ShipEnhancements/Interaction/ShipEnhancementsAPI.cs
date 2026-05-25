@@ -14,7 +14,7 @@ public class ShipEnhancementsAPI : IShipEnhancements
         bool isShell = false, float shellCenterRadius = 0f, float shellCenterThickness = 0f, 
         string objectName = "TemperatureZone")
     {
-        GameObject tempZoneObj = LoadPrefab("Assets/ShipEnhancements/TemperatureZonePrefab.prefab");
+        GameObject tempZoneObj = LoadPrefab("Assets/ShipEnhancements/Temperature/TemperatureZonePrefab.prefab");
         tempZoneObj.name = objectName;
         TemperatureZone tempZone = tempZoneObj.GetComponent<TemperatureZone>();
         if (innerRadius > outerRadius)

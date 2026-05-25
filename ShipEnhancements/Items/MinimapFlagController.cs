@@ -18,11 +18,11 @@ public class MinimapFlagController : MonoBehaviour
         GameObject prefab;
         if (_minimap._minimapMode == Minimap.MinimapMode.Player)
         {
-            prefab = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/PlayerFlagMarkerPivot.prefab");
+            prefab = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/Items/ExpeditionFlag/PlayerFlagMarkerPivot.prefab");
         }
         else
         {
-            prefab = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipFlagMarkerPivot.prefab");
+            prefab = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/Items/ExpeditionFlag/ShipFlagMarkerPivot.prefab");
         }
         _flagMarkerPrefab = prefab;
     }

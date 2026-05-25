@@ -97,6 +97,7 @@ public class ShipEnhancements : ModBehaviour
     public ItemType RepairWrenchType { get; private set; }
     public ItemType RadioType { get; private set; }
     public ItemType ResourcePumpType { get; private set; }
+    public ItemType DecoratorType { get; private set; }
     public SignalName ShipSignalName { get; private set; }
     public int ThrustModulatorLevel { get; private set; }
     public float ThrustModulatorFactor => ThrustModulatorLevel / 5f;
@@ -234,6 +235,7 @@ public class ShipEnhancements : ModBehaviour
         RepairWrenchType = EnumUtils.Create<ItemType>("RepairWrench");
         RadioType = EnumUtils.Create<ItemType>("Radio");
         ResourcePumpType = EnumUtils.Create<ItemType>("ResourcePump");
+        DecoratorType = EnumUtils.Create<ItemType>("Decorator");
         ShipSignalName = EnumUtils.Create<SignalName>("Ship");
         
         SaveData = ModHelper.Storage.Load<SaveDataJson>("save.json");
@@ -984,10 +986,10 @@ public class ShipEnhancements : ModBehaviour
         SELocator.GetShipCockpitController()._interactVolume.gameObject
             .AddComponent<FlightConsoleInteractController>();
 
-        var debugObjectsPrefab = LoadPrefab("Assets/ShipEnhancements/DebugObjects.prefab");
+        var debugObjectsPrefab = LoadPrefab("Assets/ShipEnhancements/Buttons/DebugObjects.prefab");
         DebugObjects = CreateObject(debugObjectsPrefab, SELocator.GetShipBody().transform);
 
-        GameObject buttonConsole = LoadPrefab("Assets/ShipEnhancements/ButtonConsole.prefab");
+        GameObject buttonConsole = LoadPrefab("Assets/ShipEnhancements/Buttons/ButtonConsole.prefab");
         CreateObject(buttonConsole, SELocator.GetShipBody().transform.Find("Module_Cockpit"));
 
         if ((bool)enableScoutLauncherComponent.GetProperty()
@@ -996,13 +998,13 @@ public class ShipEnhancements : ModBehaviour
             Transform damageScreen = SELocator.GetShipTransform().Find("Module_Cockpit/Systems_Cockpit/ShipCockpitUI/DamageScreen/HUD_ShipDamageDisplay");
             if ((bool)enableScoutLauncherComponent.GetProperty())
             {
-                GameObject scoutDamage = LoadPrefab("Assets/ShipEnhancements/HUD_ShipDamageDisplay_Scout.prefab");
+                GameObject scoutDamage = LoadPrefab("Assets/ShipEnhancements/ShipComponents/HUD_ShipDamageDisplay_Scout.prefab");
                 scoutDamage.GetComponent<MeshRenderer>().material = damageScreen.GetComponent<MeshRenderer>().material;
                 CreateObject(scoutDamage, damageScreen.parent);
             }
             if ((string)shipWarpCoreType.GetProperty() == "Component")
             {
-                GameObject warpDamage = LoadPrefab("Assets/ShipEnhancements/HUD_ShipDamageDisplay_Warp.prefab");
+                GameObject warpDamage = LoadPrefab("Assets/ShipEnhancements/ShipComponents/HUD_ShipDamageDisplay_Warp.prefab");
                 warpDamage.GetComponent<MeshRenderer>().material = damageScreen.GetComponent<MeshRenderer>().material;
                 CreateObject(warpDamage, damageScreen.parent);
             }
@@ -1195,13 +1197,13 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)addPortableCampfire.GetProperty())
         {
             Transform suppliesParent = SELocator.GetShipTransform().Find("Module_Supplies");
-            GameObject portableCampfireSocket = LoadPrefab("Assets/ShipEnhancements/PortableCampfireSocket.prefab");
+            GameObject portableCampfireSocket = LoadPrefab("Assets/ShipEnhancements/Items/PortableCampfire/PortableCampfireSocket.prefab");
             PortableCampfireSocket campfireSocket = CreateObject(portableCampfireSocket, suppliesParent).GetComponent<PortableCampfireSocket>();
         }
         if ((bool)enableShipTemperature.GetProperty())
         {
             SELocator.GetShipBody().GetComponentInChildren<ShipFuelGauge>().gameObject.AddComponent<ShipTemperatureGauge>();
-            GameObject hullTempDial = LoadPrefab("Assets/ShipEnhancements/ShipTempDial.prefab");
+            GameObject hullTempDial = LoadPrefab("Assets/ShipEnhancements/Temperature/ShipTempDial.prefab");
             CreateObject(hullTempDial, SELocator.GetShipTransform().Find("Module_Cockpit"));
 
             if (temperatureZonesAmount.GetProperty().ToString() == "Sun")
@@ -1220,7 +1222,7 @@ public class ShipEnhancements : ModBehaviour
 
             if ((float)shipExplosionMultiplier.GetProperty() < 0f)
             {
-                GameObject newExplosion = LoadPrefab("Assets/ShipEnhancements/BlackHoleExplosion.prefab");
+                GameObject newExplosion = LoadPrefab("Assets/ShipEnhancements/ShipEffects/Explosion/BlackHoleExplosion.prefab");
                 GameObject newExplosionObj = CreateObject(newExplosion, effectsTransform);
                 SELocator.GetShipDamageController()._explosion = newExplosionObj.GetComponent<ExplosionController>();
                 Destroy(explosion.gameObject);
@@ -1275,7 +1277,7 @@ public class ShipEnhancements : ModBehaviour
 
                     ThrusterTheme thrusterColors = ThemeManager.GetThrusterTheme(color);
                     rend.material.SetTexture("_MainTex",
-                        LoadAsset<Texture2D>("Assets/ShipEnhancements/ThrusterColors/"
+                        LoadAsset<Texture2D>("Assets/ShipEnhancements/Decoration/ThrusterColors/"
                         + thrusterColors.ThrusterColor));
 
                     Color thrustColor = Color.white * Mathf.Pow(2, thrusterColors.ThrusterIntensity);
@@ -1303,7 +1305,7 @@ public class ShipEnhancements : ModBehaviour
             /*GameObject hook = LoadPrefab("Assets/ShipEnhancements/TetherHook.prefab");
             AssetBundleUtilities.ReplaceShaders(hook);*/
 
-            GameObject socketParent = CreateObject(LoadPrefab("Assets/ShipEnhancements/HookSocketParent.prefab"), SELocator.GetShipTransform());
+            GameObject socketParent = CreateObject(LoadPrefab("Assets/ShipEnhancements/Items/Tether/HookSocketParent.prefab"), SELocator.GetShipTransform());
             socketParent.transform.localPosition = Vector3.zero;
             /*foreach (TetherHookSocket socket in socketParent.GetComponentsInChildren<TetherHookSocket>())
             {
@@ -1312,18 +1314,18 @@ public class ShipEnhancements : ModBehaviour
             }*/
 
             SELocator.GetPlayerBody().gameObject.AddComponent<TetherPromptController>();
-            GameObject audio = LoadPrefab("Assets/ShipEnhancements/TetherAudioController.prefab");
+            GameObject audio = LoadPrefab("Assets/ShipEnhancements/Items/Tether/TetherAudioController.prefab");
             CreateObject(audio, SELocator.GetPlayerBody().transform);
         }
         if ((bool)extraEjectButtons.GetProperty())
         {
-            GameObject suppliesButton = LoadPrefab("Assets/ShipEnhancements/SuppliesEjectButton.prefab");
+            GameObject suppliesButton = LoadPrefab("Assets/ShipEnhancements/Buttons/EjectButtons/SuppliesEjectButton.prefab");
             CreateObject(suppliesButton, SELocator.GetShipTransform().Find("Module_Cabin"));
 
-            GameObject engineButton = LoadPrefab("Assets/ShipEnhancements/EngineEjectButton.prefab");
+            GameObject engineButton = LoadPrefab("Assets/ShipEnhancements/Buttons/EjectButtons/EngineEjectButton.prefab");
             CreateObject(engineButton, SELocator.GetShipTransform().Find("Module_Cabin"));
 
-            GameObject landingGearButton = LoadPrefab("Assets/ShipEnhancements/LandingGearEjectButton.prefab");
+            GameObject landingGearButton = LoadPrefab("Assets/ShipEnhancements/Buttons/EjectButtons/LandingGearEjectButton.prefab");
             CreateObject(landingGearButton, SELocator.GetShipTransform().Find("Module_Cabin"));
         }
         bool physicsBounce = (float)shipBounciness.GetProperty() > 0f && (float)shipBounciness.GetProperty() <= 1f;
@@ -1343,14 +1345,14 @@ public class ShipEnhancements : ModBehaviour
                     friction = Mathf.Lerp(0.6f, 1f, ((float)shipFriction.GetProperty() - 0.5f) * 2f);
                 }
 
-                mat = LoadAsset<PhysicMaterial>("Assets/ShipEnhancements/FrictionlessBouncyShip.physicMaterial");
+                mat = LoadAsset<PhysicMaterial>("Assets/ShipEnhancements/Material/FrictionlessBouncyShip.physicMaterial");
                 mat.dynamicFriction = friction;
                 mat.staticFriction = friction;
                 mat.bounciness = (float)shipBounciness.GetProperty();
             }
             else if (physicsBounce)
             {
-                mat = LoadAsset<PhysicMaterial>("Assets/ShipEnhancements/BouncyShip.physicMaterial");
+                mat = LoadAsset<PhysicMaterial>("Assets/ShipEnhancements/Material/BouncyShip.physicMaterial");
                 mat.bounciness = (float)shipBounciness.GetProperty();
             }
             else
@@ -1365,7 +1367,7 @@ public class ShipEnhancements : ModBehaviour
                     friction = Mathf.Lerp(0.6f, 1f, ((float)shipFriction.GetProperty() - 0.5f) * 2f);
                 }
 
-                mat = LoadAsset<PhysicMaterial>("Assets/ShipEnhancements/FrictionlessShip.physicMaterial");
+                mat = LoadAsset<PhysicMaterial>("Assets/ShipEnhancements/Material/FrictionlessShip.physicMaterial");
                 mat.dynamicFriction = friction;
                 mat.staticFriction = friction;
             }
@@ -1378,12 +1380,12 @@ public class ShipEnhancements : ModBehaviour
         if (true || (float)rustLevel.GetProperty() > 0f || ((float)dirtAccumulationTime.GetProperty() > 0f
             && (float)maxDirtAccumulation.GetProperty() > 0f))
         {
-            GameObject cockpitController = LoadPrefab("Assets/ShipEnhancements/CockpitEffectController.prefab");
+            GameObject cockpitController = LoadPrefab("Assets/ShipEnhancements/ShipEffects/CockpitEffectController.prefab");
             CreateObject(cockpitController, SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Geometry"));
         }
         if ((bool)addPortableTractorBeam.GetProperty())
         {
-            GameObject tractorSocket = LoadPrefab("Assets/ShipEnhancements/PortableTractorBeamSocket.prefab");
+            GameObject tractorSocket = LoadPrefab("Assets/ShipEnhancements/Items/PortableTractorBeam/PortableTractorBeamSocket.prefab");
             GameObject tractorSocketObj = CreateObject(tractorSocket, SELocator.GetShipTransform().Find("Module_Cabin"));
         }
         if ((bool)addExpeditionFlag.GetProperty())
@@ -1391,25 +1393,25 @@ public class ShipEnhancements : ModBehaviour
             SELocator.GetShipTransform().GetComponentInChildren<Minimap>().gameObject.AddComponent<MinimapFlagController>();
             SELocator.GetPlayerBody().GetComponentInChildren<Minimap>().gameObject.AddComponent<MinimapFlagController>();
 
-            GameObject flagSocket = LoadPrefab("Assets/ShipEnhancements/ExpeditionFlagSocket.prefab");
+            GameObject flagSocket = LoadPrefab("Assets/ShipEnhancements/Items/ExpeditionFlag/ExpeditionFlagSocket.prefab");
             GameObject flagSocketObj = CreateObject(flagSocket, SELocator.GetShipTransform().Find("Module_Cabin"));
         }
         if ((bool)addFuelCanister.GetProperty())
         {
             // Remove marshmallows from cabin to make room for canister
-            MeshFilter rend = LoadPrefab("Assets/ShipEnhancements/CabinFuelTankReplacement.fbx").GetComponent<MeshFilter>();
+            MeshFilter rend = LoadPrefab("Assets/ShipEnhancements/ShipMesh/CabinFuelTankReplacement.fbx").GetComponent<MeshFilter>();
             MeshFilter targetRend = SELocator.GetShipTransform()
                 .Find("Module_Cabin/Geo_Cabin/Cabin_Geometry/Cabin_Interior/Cabin_Interior 1/Cabin_Interior 1_MeshPart0")
                 .GetComponent<MeshFilter>();
             targetRend.mesh = rend.mesh;
 
-            Mesh shadowMesh = LoadPrefab("Assets/ShipEnhancements/AltShadowCasters/Shadowcaster_Cabin_NoMallows.fbx").GetComponent<MeshFilter>().mesh;
+            Mesh shadowMesh = LoadPrefab("Assets/ShipEnhancements/ShipMesh/Shadowcaster_Cabin_NoMallows.fbx").GetComponent<MeshFilter>().mesh;
             SELocator.GetShipTransform().Find("Module_Cabin/Geo_Cabin/Shadowcaster_Cabin").GetComponent<MeshFilter>().mesh = shadowMesh;
 
             /*GameObject tank = LoadPrefab("Assets/ShipEnhancements/FuelTankItem.prefab");
             AssetBundleUtilities.ReplaceShaders(tank);
             GameObject tankObj = Instantiate(tank);*/
-            GameObject tankSocket = LoadPrefab("Assets/ShipEnhancements/FuelTankSocket.prefab");
+            GameObject tankSocket = LoadPrefab("Assets/ShipEnhancements/Items/FuelTank/FuelTankSocket.prefab");
             GameObject tankSocketObj = CreateObject(tankSocket, SELocator.GetShipTransform().Find("Module_Cabin"));
             //tankSocketObj.GetComponent<FuelTankItemSocket>().PlaceIntoSocket(tankObj.GetComponent<FuelTankItem>());
         }
@@ -1419,13 +1421,13 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((string)shipWarpCoreType.GetProperty() == "Enabled")
         {
-            GameObject core = LoadPrefab("Assets/ShipEnhancements/ShipWarpCore.prefab");
+            GameObject core = LoadPrefab("Assets/ShipEnhancements/Buttons/ShipWarpCore.prefab");
             core.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = SELocator.GetShipBody().gameObject;
             GameObject coreObj = CreateObject(core, SELocator.GetShipTransform().Find("Module_Cockpit"));
 
             if (NHAPI == null && GameObject.Find("TimberHearth_Body"))
             {
-                GameObject receiver = LoadPrefab("Assets/ShipEnhancements/ShipWarpReceiver.prefab");
+                GameObject receiver = LoadPrefab("Assets/ShipEnhancements/Buttons/ShipWarpReceiver.prefab");
                 receiver.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = SELocator.GetShipBody().gameObject;
                 GameObject receiverObj = CreateObject(receiver, GameObject.Find("TimberHearth_Body").transform);
                 coreObj.GetComponent<ShipWarpCoreController>().SetReceiver(receiverObj.GetComponent<ShipWarpCoreReceiver>());
@@ -1454,7 +1456,7 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((bool)enableRepairConfirmation.GetProperty() || (bool)enableFragileShip.GetProperty())
         {
-            GameObject audio = LoadPrefab("Assets/ShipEnhancements/SystemOnlineAudio.prefab");
+            GameObject audio = LoadPrefab("Assets/ShipEnhancements/ShipEffects/Audio/SystemOnlineAudio.prefab");
             OWAudioSource source = CreateObject(audio, SELocator.GetShipTransform().Find("Audio_Ship")).GetComponent<OWAudioSource>();
             AddShipAudioToChange(source);
 
@@ -1485,7 +1487,7 @@ public class ShipEnhancements : ModBehaviour
             AssetBundleUtilities.ReplaceShaders(crystal);
             ShipGravityCrystalItem item = Instantiate(crystal).GetComponent<ShipGravityCrystalItem>();*/
 
-            GameObject crystalSocket = LoadPrefab("Assets/ShipEnhancements/GravityCrystalSocket.prefab");
+            GameObject crystalSocket = LoadPrefab("Assets/ShipEnhancements/Items/GravityCrystal/GravityCrystalSocket.prefab");
             ShipGravityCrystalSocket socket = CreateObject(crystalSocket, SELocator.GetShipTransform().Find("Module_Engine")).GetComponent<ShipGravityCrystalSocket>();
             socket.AddComponentMeshes([obj1, obj2]);
             //socket.PlaceIntoSocket(item);
@@ -1498,7 +1500,7 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((bool)addErnesto.GetProperty())
         {
-            GameObject ernesto = LoadPrefab("Assets/ShipEnhancements/Ernesto.prefab");
+            GameObject ernesto = LoadPrefab("Assets/ShipEnhancements/Ernesto/Ernesto.prefab");
             GameObject ernestoObj = CreateObject(ernesto, SELocator.GetShipBody().transform.Find("Module_Cockpit"));
             var font = (Font)Resources.Load(@"fonts\english - latin\HVD Fonts - BrandonGrotesque-Bold_Dynamic");
             if (font != null)
@@ -1512,7 +1514,7 @@ public class ShipEnhancements : ModBehaviour
             if (bh != null)
             {
                 var parent = bh.transform.Find("Sector_BH/Sector_OldSettlement/Fragment OldSettlement 5");
-                var additions = LoadPrefab("Assets/ShipEnhancements/OldSettlementAdditions.prefab");
+                var additions = LoadPrefab("Assets/ShipEnhancements/Ernesto/OldSettlementAdditions.prefab");
                 CreateObject(additions, parent);
             }
         }
@@ -1525,14 +1527,14 @@ public class ShipEnhancements : ModBehaviour
             MeshFilter rend;
             if ((bool)addFuelCanister.GetProperty())
             {
-                rend = LoadPrefab("Assets/ShipEnhancements/CurtainTankCabinReplacement.prefab").GetComponent<MeshFilter>();
+                rend = LoadPrefab("Assets/ShipEnhancements/ShipMesh/CurtainTankCabinReplacement.prefab").GetComponent<MeshFilter>();
 
-                Mesh shadowMesh = LoadPrefab("Assets/ShipEnhancements/AltShadowCasters/Shadowcaster_Cabin_NoMallows.fbx").GetComponent<MeshFilter>().mesh;
+                Mesh shadowMesh = LoadPrefab("Assets/ShipEnhancements/ShipMesh/Shadowcaster_Cabin_NoMallows.fbx").GetComponent<MeshFilter>().mesh;
                 SELocator.GetShipTransform().Find("Module_Cabin/Geo_Cabin/Shadowcaster_Cabin").GetComponent<MeshFilter>().mesh = shadowMesh;
             }
             else
             {
-                rend = LoadPrefab("Assets/ShipEnhancements/CurtainCabinReplacement.prefab").GetComponent<MeshFilter>();
+                rend = LoadPrefab("Assets/ShipEnhancements/ShipMesh/CurtainCabinReplacement.prefab").GetComponent<MeshFilter>();
             }
             MeshFilter targetRend = SELocator.GetShipTransform()
                 .Find("Module_Cabin/Geo_Cabin/Cabin_Geometry/Cabin_Interior/Cabin_Interior 1/Cabin_Interior 1_MeshPart0")
@@ -1544,17 +1546,17 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((string)repairWrenchType.GetProperty() != "Disabled")
         {
-            GameObject wrenchSocketObj = LoadPrefab("Assets/ShipEnhancements/RepairWrenchSocket.prefab");
+            GameObject wrenchSocketObj = LoadPrefab("Assets/ShipEnhancements/Items/RepairWrench/RepairWrenchSocket.prefab");
             RepairWrenchSocket wrenchSocket = CreateObject(wrenchSocketObj,
                 SELocator.GetShipTransform().Find("Module_Cockpit")).GetComponent<RepairWrenchSocket>();
         }
         if ((bool)addRadio.GetProperty())
         {
-            GameObject radioSocketObj = LoadPrefab("Assets/ShipEnhancements/RadioItemSocket.prefab");
+            GameObject radioSocketObj = LoadPrefab("Assets/ShipEnhancements/Items/Radio/RadioItemSocket.prefab");
             RadioItemSocket radioSocket = CreateObject(radioSocketObj,
                 SELocator.GetShipTransform().Find("Module_Cockpit")).GetComponent<RadioItemSocket>();
 
-            GameObject codeNotesObj = LoadPrefab("Assets/ShipEnhancements/CodeNotes.prefab");
+            GameObject codeNotesObj = LoadPrefab("Assets/ShipEnhancements/Items/Radio/CodeNotes.prefab");
             CreateObject(codeNotesObj, SELocator.GetShipTransform().Find("Module_Cockpit"));
 
             AddRadioCodeZones();
@@ -1578,7 +1580,7 @@ public class ShipEnhancements : ModBehaviour
             || (float)sandDamage.GetProperty() > 0f
             || (float)cycloneChaos.GetProperty() > 0.7f)
         {
-            GameObject fluidDamage = LoadPrefab("Assets/ShipEnhancements/ShipFluidDamageController.prefab");
+            GameObject fluidDamage = LoadPrefab("Assets/ShipEnhancements/FluidDamage/ShipFluidDamageController.prefab");
             CreateObject(fluidDamage, SELocator.GetShipTransform());
         }
         if ((bool)disableMinimapMarkers.GetProperty())
@@ -1689,7 +1691,7 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((bool)scoutPhotoMode.GetProperty())
         {
-            var bracketUI = LoadPrefab("Assets/ShipEnhancements/ProbeBracketsDisplay.prefab");
+            var bracketUI = LoadPrefab("Assets/ShipEnhancements/ShipEffects/ProbeBracketsDisplay.prefab");
             var launcherUI = SELocator.GetShipTransform().GetComponentInChildren<ProbeLauncherUI>();
             var imageObj = CreateObject(bracketUI, launcherUI.transform.parent).GetComponentInChildren<Image>();
             imageObj.enabled = false;
@@ -1697,18 +1699,18 @@ public class ShipEnhancements : ModBehaviour
         }
         if ((bool)addResourcePump.GetProperty())
         {
-            GameObject pumpSocketObj = LoadPrefab("Assets/ShipEnhancements/ResourcePumpSocket.prefab");
+            GameObject pumpSocketObj = LoadPrefab("Assets/ShipEnhancements/Items/ResourcePump/ResourcePumpSocket.prefab");
             CreateObject(pumpSocketObj, SELocator.GetShipTransform().Find("Module_Cabin"));
         }
         if ((bool)addWaterTank.GetProperty())
         {
             SELocator.GetShipBody().gameObject.AddComponent<ShipWaterResource>();
-            GameObject meterObj = LoadPrefab("Assets/ShipEnhancements/ShipWaterMeter.prefab");
+            GameObject meterObj = LoadPrefab("Assets/ShipEnhancements/WaterResource/ShipWaterMeter.prefab");
             CreateObject(meterObj, SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit"));
         }
         if ((bool)addWaterCooling.GetProperty())
         {
-            GameObject leverObj = LoadPrefab("Assets/ShipEnhancements/WaterCoolingLever.prefab");
+            GameObject leverObj = LoadPrefab("Assets/ShipEnhancements/WaterResource/WaterCoolingLever.prefab");
             CreateObject(leverObj, SELocator.GetShipTransform().Find("Module_Cabin/Geo_Cabin"));
         }
         if ((bool)enableReactorOverload.GetProperty() && (bool)enableShipTemperature.GetProperty())
@@ -1716,7 +1718,7 @@ public class ShipEnhancements : ModBehaviour
             SELocator.GetShipDamageController()._shipReactorComponent.gameObject.AddComponent<ReactorHeatController>();
             if ((bool)enableReactorOverload.GetProperty())
             {
-                GameObject overloadObj = LoadPrefab("Assets/ShipEnhancements/ReactorOverloadInteract.prefab");
+                GameObject overloadObj = LoadPrefab("Assets/ShipEnhancements/Temperature/ReactorOverloadInteract.prefab");
                 CreateObject(overloadObj, SELocator.GetShipTransform().Find("Module_Engine"));
             }
         }
@@ -1772,7 +1774,7 @@ public class ShipEnhancements : ModBehaviour
         CharacterDialogueTree ernestoCallDialogue = null;
         if ((string)shipSignalType.GetProperty() == "Advanced" && (bool)addErnesto.GetProperty())
         {
-            var prefab = LoadPrefab("Assets/ShipEnhancements/ErnestoCallDialogue.prefab");
+            var prefab = LoadPrefab("Assets/ShipEnhancements/Ernesto/ErnestoCallDialogue.prefab");
             var obj = CreateObject(prefab, SELocator.GetPlayerBody().transform.Find("PlayerCamera"));
             obj.transform.localPosition = new Vector3(0, 0, 1.5f);
             ernestoCallDialogue = obj.GetComponentInChildren<CharacterDialogueTree>();
@@ -1799,7 +1801,7 @@ public class ShipEnhancements : ModBehaviour
             if ((bool)disableEjectButton.GetProperty())
             {
                 SELocator.GetShipBody().GetComponentInChildren<ShipEjectionSystem>().GetComponent<InteractReceiver>().DisableInteraction();
-                GameObject ejectButtonTape = LoadPrefab("Assets/ShipEnhancements/EjectButtonTape.prefab");
+                GameObject ejectButtonTape = LoadPrefab("Assets/ShipEnhancements/Buttons/EjectButtons/EjectButtonTape.prefab");
                 CreateObject(ejectButtonTape, SELocator.GetShipBody().transform.Find("Module_Cockpit/Geo_Cockpit"));
             }
             if ((bool)disableShipSuit.GetProperty())
@@ -1931,13 +1933,13 @@ public class ShipEnhancements : ModBehaviour
             }
             if ((string)shipSignalType.GetProperty() != "Disabled")
             {
-                GameObject signal = LoadPrefab("Assets/ShipEnhancements/ShipSignal.prefab");
+                GameObject signal = LoadPrefab("Assets/ShipEnhancements/ShipSignal/ShipSignal.prefab");
                 CreateObject(signal, SELocator.GetShipCockpitController()
                     .transform.parent.GetComponentInChildren<ShipCockpitUI>()._sigScopeDish);
 
                 if ((string)shipSignalType.GetProperty() == "Advanced")
                 {
-                    var canvas = LoadPrefab("Assets/ShipEnhancements/SignalscopeCommandCanvas.prefab");
+                    var canvas = LoadPrefab("Assets/ShipEnhancements/ShipSignal/SignalscopeCommandCanvas.prefab");
                     var parent = GameObject.Find("PlayerHUD/HelmetOffUI").transform;
                     SELocator.SetRemoteControl(CreateObject(canvas, parent).GetComponent<ShipRemoteControl>());
                     SELocator.GetRemoteControl().AssignErnestoCallDialogue(ernestoCallDialogue);
@@ -1961,7 +1963,7 @@ public class ShipEnhancements : ModBehaviour
 
         if (multiplier >= 100f)
         {
-            GameObject supernova = LoadPrefab("Assets/ShipEnhancements/ExplosionSupernova.prefab");
+            GameObject supernova = LoadPrefab("Assets/ShipEnhancements/ShipEffects/Explosion/ExplosionSupernova.prefab");
             GameObject supernovaObj = CreateObject(supernova, SELocator.GetShipTransform().Find("Module_Engine"));
             supernovaObj.SetActive(false);
             return;
@@ -2004,7 +2006,7 @@ public class ShipEnhancements : ModBehaviour
 
                 if (multiplier >= 10f)
                 {
-                    CreateObject(LoadPrefab("Assets/ShipEnhancements/ShipExplosionExpandAudio.prefab"),
+                    CreateObject(LoadPrefab("Assets/ShipEnhancements/ShipEffects/Explosion/ShipExplosionExpandAudio.prefab"),
                         audio.transform).name = "ShipExplosionExpandAudio";
                 }
             }
@@ -2012,7 +2014,7 @@ public class ShipEnhancements : ModBehaviour
 
         if ((bool)moreExplosionDamage.GetProperty())
         {
-            GameObject damage = LoadPrefab("Assets/ShipEnhancements/ExplosionDamage.prefab");
+            GameObject damage = LoadPrefab("Assets/ShipEnhancements/ShipEffects/Explosion/ExplosionDamage.prefab");
             GameObject damageObj = CreateObject(damage, explosion.transform);
             damageObj.transform.localPosition = Vector3.zero;
             damageObj.transform.localScale = Vector3.one;
@@ -2030,9 +2032,9 @@ public class ShipEnhancements : ModBehaviour
             GameObject sun = GameObject.Find("Sun_Body");
             if (sun != null)
             {
-                GameObject sunTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Sun.prefab");
+                GameObject sunTempZone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/Sun_Surface.prefab");
                 CreateObject(sunTempZone, sun.transform.Find("Sector_SUN/Volumes_SUN"));
-                GameObject supernovaTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Supernova.prefab");
+                GameObject supernovaTempZone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/Sun_Supernova.prefab");
                 CreateObject(supernovaTempZone, sun.GetComponentInChildren<SupernovaEffectController>().transform);
             }
         }
@@ -2047,13 +2049,13 @@ public class ShipEnhancements : ModBehaviour
         GameObject ct = GameObject.Find("CaveTwin_Body");
         if (ct != null)
         {
-            GameObject ctTempZone1 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_CaveTwinHot.prefab");
+            GameObject ctTempZone1 = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/EmberTwin_Surface.prefab");
             CreateObject(ctTempZone1, ct.transform.Find("Sector_CaveTwin"));
         }
         GameObject tt = GameObject.Find("TowerTwin_Body");
         if (tt != null)
         {
-            GameObject ttTempZone1 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_TowerTwinHot.prefab");
+            GameObject ttTempZone1 = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/AshTwin_Surface.prefab");
             CreateObject(ttTempZone1, tt.transform.Find("Sector_TowerTwin"));
         }
 
@@ -2064,28 +2066,36 @@ public class ShipEnhancements : ModBehaviour
             GameObject vm = GameObject.Find("VolcanicMoon_Body");
             if (vm != null)
             {
-                GameObject vmTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_VolcanicMoon.prefab");
+                GameObject vmTempZone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/HollowsLantern_Surface.prefab");
                 CreateObject(vmTempZone, vm.transform.Find("Sector_VM"));
             }
 
             GameObject gd = GameObject.Find("GiantsDeep_Body");
             if (gd != null)
             {
-                GameObject gdTempZone2 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_GiantsDeepCore.prefab");
+                GameObject gdTempZone2 = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/GiantsDeep_Core.prefab");
                 CreateObject(gdTempZone2, gd.transform.Find("Sector_GD/Sector_GDInterior"));
             }
 
             GameObject th = GameObject.Find("TimberHearth_Body");
             if (th != null)
             {
-                GameObject thTempZone2 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_TimberHearthCore.prefab");
+                GameObject thTempZone2 = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/TimberHearth_Core.prefab");
                 CreateObject(thTempZone2, th.transform.Find("Sector_TH"));
+            }
+            
+            GameObject qm = GameObject.Find("QuantumMoon_Body");
+            if (qm != null)
+            {
+                Transform root = qm.transform.Find("Sector_QuantumMoon");
+                GameObject zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/QuantumMoon_HourglassTwins.prefab");
+                CreateObject(zone, root.Find("State_HT"));
             }
 
             Campfire[] campfires = FindObjectsOfType<Campfire>();
             if (campfires.Length > 0)
             {
-                GameObject campfireTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Campfire.prefab");
+                GameObject campfireTempZone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/TemperatureZone_Campfire.prefab");
                 foreach (Campfire fire in campfires)
                 {
                     CreateObject(campfireTempZone, fire.transform.parent);
@@ -2098,60 +2108,60 @@ public class ShipEnhancements : ModBehaviour
             GameObject db = GameObject.Find("DarkBramble_Body");
             if (db != null)
             {
-                GameObject dbTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_DarkBramble.prefab");
+                GameObject dbTempZone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/DarkBramble_Surface.prefab");
                 CreateObject(dbTempZone, db.transform.Find("Sector_DB"));
             }
 
             GameObject escapePodDimension = GameObject.Find("DB_EscapePodDimension_Body");
             if (escapePodDimension != null)
             {
-                GameObject podDimensionTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_EscapePodDimension.prefab");
+                GameObject podDimensionTempZone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/DarkBramble_EscapePodDimension.prefab");
                 CreateObject(podDimensionTempZone, escapePodDimension.transform.Find("Sector_EscapePodDimension"));
             }
 
             GameObject comet = GameObject.Find("Comet_Body");
             if (comet != null)
             {
-                GameObject cometTempZone1 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_InterloperAtmosphere.prefab");
+                GameObject cometTempZone1 = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/Interloper_Surface.prefab");
                 CreateObject(cometTempZone1, comet.transform.Find("Sector_CO"));
-                GameObject cometTempZone2 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_InterloperDarkSide.prefab");
+                GameObject cometTempZone2 = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/Interloper_DarkSide.prefab");
                 CreateObject(cometTempZone2, comet.transform.Find("Sector_CO"));
             }
 
             GameObject gd = GameObject.Find("GiantsDeep_Body");
             if (gd != null)
             {
-                GameObject gdTempZone1 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_GiantsDeepOcean.prefab");
+                GameObject gdTempZone1 = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/GiantsDeep_Ocean.prefab");
                 CreateObject(gdTempZone1, gd.transform.Find("Sector_GD/Sector_GDInterior"));
             }
 
             GameObject brambleIsland = GameObject.Find("BrambleIsland_Body");
             if (brambleIsland != null)
             {
-                GameObject brambleIslandTempZones = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_BrambleIsland.prefab");
+                GameObject brambleIslandTempZones = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/GiantsDeep_BrambleIsland.prefab");
                 CreateObject(brambleIslandTempZones, brambleIsland.transform.Find("Sector_BrambleIsland"));
             }
 
             GameObject bh = GameObject.Find("BrittleHollow_Body");
             if (bh != null)
             {
-                GameObject bhTempZone1 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_BrittleHollowNorth.prefab");
+                GameObject bhTempZone1 = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/BrittleHollow_NorthPole.prefab");
                 CreateObject(bhTempZone1, bh.transform.Find("Sector_BH"));
-                GameObject bhTempZone2 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_BrittleHollowSouth.prefab");
+                GameObject bhTempZone2 = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/BrittleHollow_SouthPole.prefab");
                 CreateObject(bhTempZone2, bh.transform.Find("Sector_BH"));
             }
 
             GameObject th = GameObject.Find("TimberHearth_Body");
             if (th != null)
             {
-                GameObject thTempZone1 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_TimberHearthGeyser.prefab");
+                GameObject thTempZone1 = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/TimberHearth_BigGeyser.prefab");
                 CreateObject(thTempZone1, th.transform.Find("Sector_TH"));
-                GameObject thTempZone3 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_TimberHearthSurface.prefab");
+                GameObject thTempZone3 = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/TimberHearth_Surface.prefab");
                 CreateObject(thTempZone3, th.transform.Find("Sector_TH"));
 
                 if (ModCompatibility.ChristmasStory)
                 {
-                    GameObject thTempZone4 = LoadPrefab("Assets/ShipEnhancements/TZCustom/ChristmasStory_Village.prefab");
+                    GameObject thTempZone4 = LoadPrefab("Assets/ShipEnhancements/Temperature/TZCustom/ChristmasStory_Village.prefab");
                     CreateObject(thTempZone4, th.transform.Find("Sector_TH/Sector_Village"));
                 }
             }
@@ -2159,20 +2169,20 @@ public class ShipEnhancements : ModBehaviour
             GameObject moon = GameObject.Find("Moon_Body");
             if (moon != null)
             {
-                GameObject moonTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_AttlerockCrater.prefab");
+                GameObject moonTempZone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/Attlerock_BigCrater.prefab");
                 CreateObject(moonTempZone, moon.transform.Find("Sector_THM"));
             }
 
             if (ct != null)
             {
-                GameObject ctTempZone2 = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_CaveTwinCold.prefab");
+                GameObject ctTempZone2 = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/EmberTwin_Canyon.prefab");
                 CreateObject(ctTempZone2, ct.transform.Find("Sector_CaveTwin"));
             }
 
             GameObject whs = GameObject.Find("WhiteholeStationSuperstructure_Body");
             if (whs != null)
             {
-                GameObject whsTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_WhiteHoleStation.prefab");
+                GameObject whsTempZone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/TemperatureZone_WhiteHoleStation.prefab");
                 CreateObject(whsTempZone, whs.transform);
             }
 
@@ -2180,11 +2190,9 @@ public class ShipEnhancements : ModBehaviour
             if (qm != null)
             {
                 Transform root = qm.transform.Find("Sector_QuantumMoon");
-                GameObject zone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_QuantumMoon_HourglassTwins.prefab");
-                CreateObject(zone, root.Find("State_HT"));
-                zone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_QuantumMoon_DarkBramble.prefab");
+                GameObject zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/QuantumMoon_DarkBramble.prefab");
                 CreateObject(zone, root.Find("State_DB"));
-                zone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_QuantumMoon_BrittleHollow.prefab");
+                zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/QuantumMoon_BrittleHollow.prefab");
                 CreateObject(zone, root.Find("State_BH"));
             }
         }
@@ -2195,58 +2203,58 @@ public class ShipEnhancements : ModBehaviour
         GameObject et = GameObject.Find("CaveTwin_Body");
         if (et != null)
         {
-            GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_NomaiMeditation.prefab");
+            GameObject zone = LoadPrefab("Assets/ShipEnhancements/Items/Radio/RadioCodes/RadioCodeZone_NomaiMeditation.prefab");
             CreateObject(zone, et.transform.Find("Sector_CaveTwin"));
         }
 
         GameObject th = GameObject.Find("TimberHearth_Body");
         if (th != null)
         {
-            GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_HearthsShadow.prefab");
+            GameObject zone = LoadPrefab("Assets/ShipEnhancements/Items/Radio/RadioCodes/RadioCodeZone_HearthsShadow.prefab");
             CreateObject(zone, th.transform.Find("Sector_TH"));
         }
 
         GameObject ss = GameObject.Find("SunStation_Body");
         if (ss != null)
         {
-            GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_NoTimeForCaution.prefab");
+            GameObject zone = LoadPrefab("Assets/ShipEnhancements/Items/Radio/RadioCodes/RadioCodeZone_NoTimeForCaution.prefab");
             CreateObject(zone, ss.transform.Find("Sector_SunStation"));
         }
 
         GameObject co = GameObject.Find("Comet_Body");
         if (co != null)
         {
-            GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_RiversEndTimes.prefab");
+            GameObject zone = LoadPrefab("Assets/ShipEnhancements/Items/Radio/RadioCodes/RadioCodeZone_RiversEndTimes.prefab");
             CreateObject(zone, co.transform.Find("Sector_CO"));
         }
 
         GameObject qm = GameObject.Find("QuantumMoon_Body");
         if (qm != null)
         {
-            GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_LastDreamOfHome.prefab");
+            GameObject zone = LoadPrefab("Assets/ShipEnhancements/Items/Radio/RadioCodes/RadioCodeZone_LastDreamOfHome.prefab");
             CreateObject(zone, qm.transform.Find("Sector_QuantumMoon/State_EYE"));
         }
 
         GameObject vessel = GameObject.Find("DB_VesselDimension_Body");
         if (vessel != null)
         {
-            GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_OlderThanTheUniverse.prefab");
+            GameObject zone = LoadPrefab("Assets/ShipEnhancements/Items/Radio/RadioCodes/RadioCodeZone_OlderThanTheUniverse.prefab");
             CreateObject(zone, vessel.transform.Find("Sector_VesselDimension"));
         }
 
         GameObject rw = GameObject.Find("RingWorld_Body");
         if (rw != null)
         {
-            GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_ElegyForTheRings.prefab");
-            CreateObject(zone, rw.transform.Find("Sector_RingInterior/Sector_Zone1/Sector_DreamFireHouse_Zone1"));
-            CreateObject(zone, rw.transform.Find("Sector_RingInterior/Sector_Zone2/Sector_DreamFireLighthouse_Zone2_AnimRoot/Volumes_DreamFireLighthouse_Zone2"));
-            CreateObject(zone, rw.transform.Find("Sector_RingInterior/Sector_Zone3/Sector_HiddenGorge/Sector_DreamFireHouse_Zone3"));
+            GameObject zone = LoadPrefab("Assets/ShipEnhancements/Items/Radio/RadioCodes/RadioCodeZone_ElegyForTheRings.prefab");
+            CreateObject(zone, rw.transform.Find("Sector_RingInterior/Items/Radio/RadioCodes/Sector_Zone1/Sector_DreamFireHouse_Zone1"));
+            CreateObject(zone, rw.transform.Find("Sector_RingInterior/Items/Radio/RadioCodes/Sector_Zone2/Sector_DreamFireLighthouse_Zone2_AnimRoot/Volumes_DreamFireLighthouse_Zone2"));
+            CreateObject(zone, rw.transform.Find("Sector_RingInterior/Items/Radio/RadioCodes/Sector_Zone3/Sector_HiddenGorge/Sector_DreamFireHouse_Zone3"));
         }
 
         GameObject sun = GameObject.Find("Sun_Body");
         if (sun != null)
         {
-            GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_TheSpiritOfWater.prefab");
+            GameObject zone = LoadPrefab("Assets/ShipEnhancements/Items/Radio/RadioCodes/RadioCodeZone_TheSpiritOfWater.prefab");
             CreateObject(zone, sun.transform.Find("Sector_SUN/Volumes_SUN/SupernovaVolume"));
         }
 
@@ -2255,7 +2263,7 @@ public class ShipEnhancements : ModBehaviour
             GameObject bh = GameObject.Find("BrittleHollow_Body");
             if (bh != null)
             {
-                GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_0187.prefab");
+                GameObject zone = LoadPrefab("Assets/ShipEnhancements/Items/Radio/RadioCodes/RadioCodeZone_0187.prefab");
                 CreateObject(zone, bh.transform.Find("Sector_BH/Sector_OldSettlement/Fragment OldSettlement 5/Core_OldSettlement 5"));
             }
         }
@@ -2265,7 +2273,7 @@ public class ShipEnhancements : ModBehaviour
     {
         if ((bool)addRadio.GetProperty() && name == "Egg Star")
         {
-            GameObject zone = LoadPrefab("Assets/ShipEnhancements/RadioCodeZone_Doom.prefab");
+            GameObject zone = LoadPrefab("Assets/ShipEnhancements/Items/Radio/RadioCodes/RadioCodeZone_Doom.prefab");
             CreateObject(zone, NHAPI.GetPlanet(name).transform);
         }
         if ((bool)enableShipTemperature.GetProperty())
@@ -2276,75 +2284,75 @@ public class ShipEnhancements : ModBehaviour
             {
                 if (name == "Twilight Frost")
                 {
-                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/Evacuation_TwilightFrost.prefab");
+                    zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZCustom/Evacuation_TwilightFrost.prefab");
                 }
                 else if (name == "Smoldering Gulch")
                 {
-                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/Evacuation_SmolderingGulch.prefab");
+                    zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZCustom/Evacuation_SmolderingGulch.prefab");
                 }
             }
             if (ModCompatibility.EchoHike)
             {
                 if (name == "Echo Hike")
                 {
-                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/EchoHike_FrozenSolace.prefab");
+                    zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZCustom/EchoHike_FrozenSolace.prefab");
                 }
             }
             if (ModCompatibility.AxiomsRefuge)
             {
                 if (name == "Axiom")
                 {
-                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/AxiomsRefuge_Axiom.prefab");
+                    zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZCustom/AxiomsRefuge_Axiom.prefab");
                 }
                 else if (name == "Aicale")
                 {
-                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/AxiomsRefuge_Aicale.prefab");
+                    zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZCustom/AxiomsRefuge_Aicale.prefab");
                 }
             }
             if (ModCompatibility.MisfiredJump)
             {
                 if (name == "Scalding Abyss")
                 {
-                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/MisfiredJump_ScaldingAbyss.prefab");
+                    zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZCustom/MisfiredJump_ScaldingAbyss.prefab");
                 }
             }
             if (ModCompatibility.TheStrangerTheyAre)
             {
                 if (name == "Ringed Giant")
                 {
-                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/TheStrangerTheyAre_RingedGiant.prefab");
+                    zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZCustom/TheStrangerTheyAre_RingedGiant.prefab");
                 }
                 else if (name == "Burning Bombardier")
                 {
-                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/TheStrangerTheyAre_BurningBombardier.prefab");
+                    zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZCustom/TheStrangerTheyAre_BurningBombardier.prefab");
                 }
                 else if (name == "Sizzling Sands")
                 {
-                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/TheStrangerTheyAre_SizzlingSands.prefab");
+                    zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZCustom/TheStrangerTheyAre_SizzlingSands.prefab");
                 }
                 else if (name == "Distant Enigma")
                 {
                     Transform root = NHAPI.GetPlanet(name).transform;
                     if (root.Find("Sector-3") && !root.Find("Sector-3/TheStrangerTheyAre_DistantEnigma_ThinIce"))
                     {
-                        zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/TheStrangerTheyAre_DistantEnigma_ThinIce.prefab");
+                        zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZCustom/TheStrangerTheyAre_DistantEnigma_ThinIce.prefab");
                         CreateObject(zone, root.Find("Sector-3"));
                     }
                     else if (root.Find("Sector-2") && !root.Find("Sector-2/TheStrangerTheyAre_DistantEnigma_Water"))
                     {
-                        zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/TheStrangerTheyAre_DistantEnigma_Water.prefab");
+                        zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZCustom/TheStrangerTheyAre_DistantEnigma_Water.prefab");
                         CreateObject(zone, root.Find("Sector-2"));
                     }
                     else if (!root.Find("Sector/TheStrangerTheyAre_DistantEnigma_ThickIce"))
                     {
-                        zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/TheStrangerTheyAre_DistantEnigma_ThickIce.prefab");
+                        zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZCustom/TheStrangerTheyAre_DistantEnigma_ThickIce.prefab");
                         CreateObject(zone, root.Find("Sector"));
                     }
                     return;
                 }
                 else if (name == "Velvet Vortex")
                 {
-                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/TheStrangerTheyAre_VelvetVortex.prefab");
+                    zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZCustom/TheStrangerTheyAre_VelvetVortex.prefab");
                 }
             }
             if (ModCompatibility.Heliostudy)
@@ -2352,48 +2360,48 @@ public class ShipEnhancements : ModBehaviour
                 if (name == "Walker_Jam5_Planet4")
                 {
                     Transform root = NHAPI.GetPlanet(name).transform;
-                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/Heliostudy_GlacialAbyss!.prefab");
+                    zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZCustom/Heliostudy_GlacialAbyss!.prefab");
                     CreateObject(zone, root);
-                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/Heliostudy_GlacialAbyss!_Core.prefab");
+                    zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZCustom/Heliostudy_GlacialAbyss!_Core.prefab");
                     CreateObject(zone, root);
                     return;
                 }
                 else if (name == "Walker_Jam5_Planet2")
                 {
-                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/Heliostudy_TheBigOne.prefab");
+                    zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZCustom/Heliostudy_TheBigOne.prefab");
                 }
                 else if (name == "Walker_Jam5_Planet3")
                 {
-                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/Heliostudy_Daucus.prefab");
+                    zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZCustom/Heliostudy_Daucus.prefab");
                 }
                 else if (name == "Walker_Jam5_Planet1")
                 {
-                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/Heliostudy_ShatteredGeode.prefab");
+                    zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZCustom/Heliostudy_ShatteredGeode.prefab");
                 }
             }
             if (ModCompatibility.OnARail)
             {
                 if (name == "Frost Car")
                 {
-                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/OnARail_FrostCar.prefab");
+                    zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZCustom/OnARail_FrostCar.prefab");
                 }
             }
             if (ModCompatibility.UnnamedMystery)
             {
                 if (name == "Electrum")
                 {
-                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/UnnamedMystery_Electrum.prefab");
+                    zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZCustom/UnnamedMystery_Electrum.prefab");
                 }
                 else if (name == "Zephyria")
                 {
-                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/UnnamedMystery_Zephyria.prefab");
+                    zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZCustom/UnnamedMystery_Zephyria.prefab");
                 }
             }
             if (ModCompatibility.FretsQuest2)
             {
                 if (name == "Frozen Homeworld")
                 {
-                    zone = LoadPrefab("Assets/ShipEnhancements/TZCustom/FretsQuest2_FrozenHomeworld.prefab");
+                    zone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZCustom/FretsQuest2_FrozenHomeworld.prefab");
                 }
             }
 
@@ -2409,7 +2417,7 @@ public class ShipEnhancements : ModBehaviour
         if ((bool)enableShipTemperature.GetProperty()
             && (!ModCompatibility.Evacuation || name != "2walker2.OogaBooga"))
         {
-            GameObject sunTempZone = LoadPrefab("Assets/ShipEnhancements/TemperatureZone_Sun.prefab");
+            GameObject sunTempZone = LoadPrefab("Assets/ShipEnhancements/Temperature/TZVanilla/Sun_Surface.prefab");
 
             SunController[] suns = FindObjectsOfType<SunController>();
             foreach (SunController sun in suns)
@@ -2436,7 +2444,7 @@ public class ShipEnhancements : ModBehaviour
             (Transform transform, Vector3 offset) spawn = NHInteraction.GetShipSpawnPoint();
             if (spawn.transform == null) return;
 
-            GameObject receiver = LoadPrefab("Assets/ShipEnhancements/ShipWarpReceiver.prefab");
+            GameObject receiver = LoadPrefab("Assets/ShipEnhancements/Buttons/ShipWarpReceiver.prefab");
             receiver.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = SELocator.GetShipBody().gameObject;
             ShipWarpCoreReceiver receiverObj = CreateObject(receiver, spawn.transform).GetComponent<ShipWarpCoreReceiver>();
             receiverObj.transform.localPosition = spawn.offset;
@@ -2448,7 +2456,7 @@ public class ShipEnhancements : ModBehaviour
         }
         else
         {
-            GameObject receiver = LoadPrefab("Assets/ShipEnhancements/ShipWarpReceiver.prefab");
+            GameObject receiver = LoadPrefab("Assets/ShipEnhancements/Buttons/ShipWarpReceiver.prefab");
             receiver.GetComponentInChildren<SingularityWarpEffect>()._warpedObjectGeometry = SELocator.GetShipBody().gameObject;
             GameObject receiverObj = CreateObject(receiver, GameObject.Find("TimberHearth_Body").transform);
 
@@ -2558,7 +2566,7 @@ public class ShipEnhancements : ModBehaviour
         shipAudio._shipElectrics._audioSource.maxDistance = alarmSource.maxDistance;
         _shipAudioToChange.Add(shipAudio._shipElectrics._audioSource);
 
-        GameObject toolRefObj = LoadPrefab("Assets/ShipEnhancements/ToolAudioTemplate.prefab");
+        GameObject toolRefObj = LoadPrefab("Assets/ShipEnhancements/ShipEffects/Audio/ToolAudioTemplate.prefab");
         OWAudioSource toolRef = CreateObject(toolRefObj).GetComponent<OWAudioSource>();
 
         shipAudio._probeScreenSource.SetCustomCurve(AudioSourceCurveType.CustomRolloff,
@@ -2588,7 +2596,7 @@ public class ShipEnhancements : ModBehaviour
         shipAudio._signalscopeSource.transform.parent = cockpitAudioParent;
         shipAudio._probeScreenSource.transform.parent = cockpitAudioParent;
 
-        GameObject ejectAudioObj = LoadPrefab("Assets/ShipEnhancements/EjectAudio.prefab");
+        GameObject ejectAudioObj = LoadPrefab("Assets/ShipEnhancements/ShipEffects/Audio/EjectAudio.prefab");
         CreateObject(ejectAudioObj, shipAudio.transform.Find("ShipInteriorAudio")).name = "EjectAudio";
     }
 

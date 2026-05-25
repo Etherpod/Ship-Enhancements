@@ -18,11 +18,11 @@ public class ShipFluidDamageController : MonoBehaviour
 
     private void Awake()
     {
-        GameObject cabin = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/Detectors/CabinFluidDetector.prefab");
-        GameObject cockpit = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/Detectors/CockpitFluidDetector.prefab");
-        GameObject engine = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/Detectors/EngineFluidDetector.prefab");
-        GameObject supplies = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/Detectors/SuppliesFluidDetector.prefab");
-        GameObject landingGear = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/Detectors/LandingGearFluidDetector.prefab");
+        GameObject cabin = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/FluidDamage/CabinFluidDetector.prefab");
+        GameObject cockpit = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/FluidDamage/CockpitFluidDetector.prefab");
+        GameObject engine = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/FluidDamage/EngineFluidDetector.prefab");
+        GameObject supplies = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/FluidDamage/SuppliesFluidDetector.prefab");
+        GameObject landingGear = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/FluidDamage/LandingGearFluidDetector.prefab");
         _moduleDetectors.Add(ShipEnhancements.CreateObject(cabin, transform.parent.Find("Module_Cabin")).GetComponent<StaticFluidDetector>());
         _moduleDetectors.Add(ShipEnhancements.CreateObject(cockpit, transform.parent.Find("Module_Cockpit")).GetComponent<StaticFluidDetector>());
         _moduleDetectors.Add(ShipEnhancements.CreateObject(engine, transform.parent.Find("Module_Engine")).GetComponent<StaticFluidDetector>());
