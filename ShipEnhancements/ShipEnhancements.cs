@@ -1722,6 +1722,46 @@ public class ShipEnhancements : ModBehaviour
                 CreateObject(overloadObj, SELocator.GetShipTransform().Find("Module_Engine"));
             }
         }
+        if ((bool)addDecorator.GetProperty())
+        {
+            var decoratorSocket = LoadPrefab("Assets/ShipEnhancements/Items/Decorator/DecoratorSocket.prefab");
+            CreateObject(decoratorSocket, SELocator.GetShipTransform().Find("Module_Cabin"));
+
+            var thrusterGroup =
+                LoadPrefab("Assets/ShipEnhancements/Items/Decorator/Selectors/SE_SelectionGroup_Thrusters.prefab");
+            CreateObject(thrusterGroup, SELocator.GetShipTransform());
+            var exteriorHullGroup =
+                LoadPrefab("Assets/ShipEnhancements/Items/Decorator/Selectors/SE_SelectionGroup_ExteriorHulls.prefab");
+            CreateObject(exteriorHullGroup, SELocator.GetShipTransform());
+
+            var rootPath = "Assets/ShipEnhancements/Items/Decorator/Selectors/SE_Selector_";
+            var cockpitSelector = LoadPrefab(rootPath + "Cockpit.prefab");
+            CreateObject(cockpitSelector,
+                SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Colliders"));
+            var headlightsSelector = LoadPrefab(rootPath + "Headlights.prefab");
+            CreateObject(headlightsSelector,
+                SELocator.GetShipTransform().Find("Module_Engine/Geo_Engine/Engine_Colliders"));
+            
+            var canvasObj = LoadPrefab("Assets/ShipEnhancements/Items/Decorator/DecoratorInterfaceCanvas.prefab");
+            var parent = GameObject.Find("PlayerHUD/HelmetOffUI").transform;
+            var canvas = CreateObject(canvasObj, parent).GetComponent<Canvas>();
+            canvas.worldCamera =
+                SELocator.GetPlayerBody().GetComponentInChildren<PlayerCameraController>()
+                    ._playerCamera.mainCamera;
+            canvas.planeDistance = 9f;
+            
+            var refMat = parent.Find("SignalscopeCanvas/SigScopeDisplay/FrequencyLabel")
+                .GetComponent<Text>().material;
+        
+            foreach (var image in canvas.GetComponentsInChildren<Image>(true))
+            {
+                image.material = new Material(refMat);
+            }
+            foreach (var text in canvas.GetComponentsInChildren<Text>(true))
+            {
+                text.material = new Material(refMat);
+            }
+        }
 
         if (AchievementsAPI != null)
         {
@@ -2966,25 +3006,48 @@ public class ShipEnhancements : ModBehaviour
     public static GameObject LoadPrefab(string path)
     {
         var obj = (GameObject)Instance._shipEnhancementsBundle.LoadAsset(path);
+        if (obj == null)
+        {
+            WriteDebugMessage("ERROR - Prefab is null at path: " + path, error: true);
+            return obj;
+        }
+        
         AssetBundleUtilities.ReplaceShaders(obj);
         return obj;
     }
 
     public static AudioClip LoadAudio(string path)
     {
-        return (AudioClip)Instance._shipEnhancementsBundle.LoadAsset(path);
+        var audio = (AudioClip)Instance._shipEnhancementsBundle.LoadAsset(path);
+        if (audio == null)
+        {
+            WriteDebugMessage("ERROR - Audio is null at path: " + path, error: true);
+        }
+
+        return audio;
     }
     
     public static Material LoadMaterial(string path)
     {
         Material mat = (Material)Instance._shipEnhancementsBundle.LoadAsset(path);
+        if (mat == null)
+        {
+            WriteDebugMessage("ERROR - Material is null at path: " + path, error: true);
+        }
+        
         AssetBundleUtilities.ReplaceMaterialShader(mat);
         return mat;
     }
 
     public static T LoadAsset<T>(string path) where T : UnityEngine.Object
     {
-        return Instance._shipEnhancementsBundle.LoadAsset<T>(path);
+        var asset = Instance._shipEnhancementsBundle.LoadAsset<T>(path);
+        if (asset == null)
+        {
+            WriteDebugMessage("ERROR - Asset is null at path: " + path, error: true);
+        }
+
+        return asset;
     }
 
     public static GameObject CreateObject(GameObject obj)

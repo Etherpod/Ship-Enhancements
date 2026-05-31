@@ -899,6 +899,13 @@
       "type": "separator",
       "title": "Decoration"
     },
+    
+    "addDecorator": {
+      "title": "Add Decorator",
+      "type": "toggle",
+      "value": false,
+      "tooltip": "Adds a tool to the ship which lets you decorate stuff."
+    },
 
     "shipPlantType": {
       "title": "Cockpit Plant",

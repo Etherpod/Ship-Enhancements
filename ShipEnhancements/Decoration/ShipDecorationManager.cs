@@ -95,8 +95,8 @@ public static class ShipDecorationManager
             LoadMaterial("Assets/ShipEnhancements/Material/ShipInterior_HEA_ShipCurtain_Cloth_mat.mat"),
             LoadMaterial("Assets/ShipEnhancements/Material/ShipInterior_HEA_ShipCurtain_Metal_mat.mat"),
             LoadMaterial("Assets/ShipEnhancements/Material/ShipInterior_HEA_ShipCurtain_CampsiteProps_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/Decoration/CockpitPlants/Material/ShipInterior_Cactus_mat.mat"),
-            LoadMaterial("Assets/ShipEnhancements/Decoration/CockpitPlants/Material/ShipInterior_CactusFlower_mat.mat"),
+            LoadMaterial("Assets/ShipEnhancements/Decoration/CockpitPlants/ShipInterior_Cactus_mat.mat"),
+            LoadMaterial("Assets/ShipEnhancements/Decoration/CockpitPlants/ShipInterior_CactusFlower_mat.mat"),
             _customGlassMat,
         };
 

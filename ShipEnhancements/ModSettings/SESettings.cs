@@ -160,4 +160,5 @@ public enum Settings
 	enableShipSignalscopeZoom,
 	shipPlantType,
 	shipStringLights,
+	addDecorator,
 }
