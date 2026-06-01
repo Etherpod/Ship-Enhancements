@@ -1,20 +1,20 @@
-﻿using ShipEnhancements.Decoration;
-using UnityEngine;
-using UnityEngine.EventSystems;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
-namespace ShipEnhancements.Items;
+namespace ShipEnhancements.Decoration;
 
-// PLEASE FIX NAMESPACE AFTER PUSH
 public class ColorPresetButton : DecoratorInterfaceElement
 {
 	[SerializeField]
-	private Color _colorPreset = Color.white;
-	[SerializeField]
 	private Image _colorDisplayImage;
 
-	private void Start()
+	private Color _colorPreset;
+
+	public void SetColorPreset(Color preset)
 	{
-		_colorDisplayImage.color = _colorPreset;
+		_colorPreset = preset;
+		_colorDisplayImage.color = preset;
 	}
+
+	public Color GetColorPreset() => _colorPreset;
 }

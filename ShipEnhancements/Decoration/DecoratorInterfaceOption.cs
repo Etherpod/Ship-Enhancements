@@ -6,22 +6,35 @@ namespace ShipEnhancements.Decoration;
 
 public class DecoratorInterfaceOption : DecoratorInterfaceElement
 {
-	[SerializeField]
-	private InterfaceOptionType _optionType;
-	[SerializeField]
 	private DecoratorInterfaceMode _linkedMode;
+	private Text _attachedText;
+	private Color _initialTextColor;
+	private bool _everInitialized;
 
-	public enum InterfaceOptionType
+	protected override void Awake()
 	{
-		Color,
-		HullColor,
-		WoodColor,
-		Texture,
-		HullTexture,
-		WoodTexture,
-		GlassMaterial,
-		FlameColor,
-		Reset,
+		base.Awake();
+		Initialize();
+	}
+
+	public void Initialize()
+	{
+		if (!_everInitialized)
+		{
+			_attachedText = GetComponent<Text>();
+			_initialTextColor = _attachedText.color;
+			_everInitialized = true;
+		}
+	}
+
+	protected override void Select_Internal()
+	{
+		_attachedText.color = Color.white;
+	}
+	
+	protected override void Deselect_Internal()
+	{
+		_attachedText.color = _initialTextColor;
 	}
 
 	protected override void Submit_Internal()
@@ -33,5 +46,13 @@ public class DecoratorInterfaceOption : DecoratorInterfaceElement
 		}
 	}
 
-	public InterfaceOptionType GetOptionType() => _optionType;
+	public void SetDisplayText(string text)
+	{
+		_attachedText.text = text;
+	}
+
+	public void SetLinkedMode(DecoratorInterfaceMode mode)
+	{
+		_linkedMode = mode;
+	}
 }

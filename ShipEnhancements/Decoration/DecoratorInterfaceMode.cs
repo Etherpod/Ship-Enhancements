@@ -1,17 +1,19 @@
-﻿using UnityEngine;
+﻿using ShipEnhancements.Decoration.Modules;
+using UnityEngine;
 
 namespace ShipEnhancements.Decoration;
 
 public class DecoratorInterfaceMode : MonoBehaviour
 {
 	[SerializeField]
-	private string _headerOverride;
+	protected string _headerOverride;
 	[SerializeField]
-	private DecoratorInterfaceElement _firstSelectedElement;
+	protected DecoratorInterfaceElement _firstSelectedElement;
 
-	private DecoratorInterface _interface;
+	protected DecorationModule _module;
+	protected DecoratorInterface _interface;
 
-	private void Awake()
+	protected virtual void Awake()
 	{
 		_interface = GetComponentInParent<DecoratorInterface>();
 		if (_interface == null)
@@ -20,8 +22,9 @@ public class DecoratorInterfaceMode : MonoBehaviour
 		}
 	}
 
-	public void Activate()
+	public virtual void Activate()
 	{
+		Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.Menu_ChangeTab);
 		gameObject.SetActive(true);
 		if (_firstSelectedElement != null)
 		{
@@ -29,10 +32,18 @@ public class DecoratorInterfaceMode : MonoBehaviour
 		}
 	}
 	
-	public void Deactivate()
+	public virtual void Deactivate()
 	{
+		Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.Menu_ChangeTab);
 		gameObject.SetActive(false);
 	}
 
+	public void AssignModule(DecorationModule module)
+	{
+		_module = module;
+	}
+
 	public string GetDisplayOverride() => _headerOverride;
+
+	public virtual float GetSelectionFadeOverride() => -1f;
 }

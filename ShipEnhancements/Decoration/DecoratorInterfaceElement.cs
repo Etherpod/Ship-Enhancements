@@ -4,15 +4,26 @@ namespace ShipEnhancements.Decoration;
 
 public abstract class DecoratorInterfaceElement : MonoBehaviour
 {
-	public delegate void SelectEvent(DecoratorInterfaceElement element);
+	public delegate void ElementEvent(DecoratorInterfaceElement element);
 
-	public event SelectEvent OnElementSelected;
-	public event SelectEvent OnElementDeselected;
+	public event ElementEvent OnElementSelected;
+	public event ElementEvent OnElementDeselected;
+	public event ElementEvent OnElementSubmitted;
 
 	[SerializeField]
 	protected GameObject[] _objectsEnabledWhenSelected;
 	[SerializeField]
 	protected GameObject[] _objectsHiddenWhenSelected;
+	[Space]
+	[SerializeField]
+	protected AudioType _selectAudio = AudioType.Menu_UpDown;
+	[SerializeField]
+	protected AudioType _submitAudio = AudioType.ShipLogMoveBetweenEntries;
+	[SerializeField]
+	protected AudioClip _customSelectAudio;
+	[SerializeField]
+	protected AudioClip _customSubmitAudio;
+	[Space]
 	[SerializeField]
 	protected DecoratorInterfaceElement _selectOnLeft;
 	[SerializeField]
@@ -21,11 +32,12 @@ public abstract class DecoratorInterfaceElement : MonoBehaviour
 	protected DecoratorInterfaceElement _selectOnUp;
 	[SerializeField]
 	protected DecoratorInterfaceElement _selectOnDown;
+	[Space]
 
 	protected DecoratorInterface _interface;
 	protected bool _selected;
 
-	private void Awake()
+	protected virtual void Awake()
 	{
 		_interface = GetComponentInParent<DecoratorInterface>();
 		if (_interface == null)
@@ -37,13 +49,14 @@ public abstract class DecoratorInterfaceElement : MonoBehaviour
 		_interface.AddInterfaceElement(this);
 	}
 
-	private void Start()
+	protected virtual void Start()
 	{
 		UpdateToggledObjects();
 	}
 
 	public void Select()
 	{
+		PlaySelectAudio();
 		Select_Internal();
 		_selected = true;
 		UpdateToggledObjects();
@@ -64,7 +77,9 @@ public abstract class DecoratorInterfaceElement : MonoBehaviour
 
 	public void Submit()
 	{
+		PlaySubmitAudio();
 		Submit_Internal();
+		OnElementSubmitted?.Invoke(this);
 	}
 
 	protected virtual void Submit_Internal() { }
@@ -79,6 +94,30 @@ public abstract class DecoratorInterfaceElement : MonoBehaviour
 		foreach (var obj in _objectsHiddenWhenSelected)
 		{
 			obj.SetActive(!_selected);
+		}
+	}
+
+	protected virtual void PlaySelectAudio()
+	{
+		if (_customSelectAudio != null)
+		{
+			Locator.GetMenuAudioController()._audioSource.PlayOneShot(_customSelectAudio);
+		}
+		else
+		{
+			Locator.GetMenuAudioController()._audioSource.PlayOneShot(_selectAudio);
+		}
+	}
+	
+	protected virtual void PlaySubmitAudio()
+	{
+		if (_customSubmitAudio != null)
+		{
+			Locator.GetMenuAudioController()._audioSource.PlayOneShot(_customSubmitAudio);
+		}
+		else
+		{
+			Locator.GetMenuAudioController()._audioSource.PlayOneShot(_submitAudio);
 		}
 	}
 

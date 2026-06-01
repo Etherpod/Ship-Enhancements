@@ -10,7 +10,7 @@ public class DecoratorItem : OWItem
 	
 	private readonly float _maxRaycastDistance = 100f;
 	private DecoratorInterface _interface;
-	private DecoratorSelector _currentSelection;
+	private DecoratorSelection _currentSelection;
 	
 	public override string GetDisplayName()
 	{
@@ -26,6 +26,7 @@ public class DecoratorItem : OWItem
 	private void Start()
 	{
 		_interface = FindObjectOfType<DecoratorInterface>();
+		_interface.OnModeActivated += OnInterfaceModeActivated;
 	}
 
 	private void Update()
@@ -65,7 +66,7 @@ public class DecoratorItem : OWItem
 		}
 
 		// better collider setup so I don't have to get parent
-		if (hit.collider.transform.parent.TryGetComponent(out DecoratorSelector selector) &&
+		if (hit.collider.transform.parent.TryGetComponent(out DecoratorSelection selector) &&
 			hit.distance <= selector.GetSelectDistance())
 		{
 			if (selector != _currentSelection)
@@ -144,5 +145,16 @@ public class DecoratorItem : OWItem
 			ToggleCurrentSelection(false);
 			_currentSelection = null;
 		}
+	}
+
+	private void OnInterfaceModeActivated(float fadeOverride)
+	{
+		_currentSelection.SetFadeOverride(fadeOverride);
+	}
+
+	public override void OnDestroy()
+	{
+		base.OnDestroy();
+		_interface.OnModeActivated -= OnInterfaceModeActivated;
 	}
 }

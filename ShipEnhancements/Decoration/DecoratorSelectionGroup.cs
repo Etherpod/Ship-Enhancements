@@ -12,7 +12,7 @@ public class DecoratorSelectionGroup : MonoBehaviour
 	[SerializeField]
 	private string[] _relativePaths;
 
-	private List<DecoratorSelector> _selectors = [];
+	private List<DecoratorSelection> _selectors = [];
 
 	private void Start()
 	{
@@ -30,13 +30,13 @@ public class DecoratorSelectionGroup : MonoBehaviour
 			}
 
 			var selector = ShipEnhancements.CreateObject(_selectorPrefabs[i], parent)
-				.GetComponent<DecoratorSelector>();
+				.GetComponent<DecoratorSelection>();
 			selector.SetSelectionGroup(this);
 			_selectors.Add(selector);
 		}
 	}
 
-	public DecoratorSelector[] GetSelectors() => _selectors.ToArray();
+	public DecoratorSelection[] GetSelectors() => _selectors.ToArray();
 
 	public void SetAllSelected(bool selected)
 	{

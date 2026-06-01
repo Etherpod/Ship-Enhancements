@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,11 +8,15 @@ namespace ShipEnhancements.Decoration;
 public class DecoratorInterface : MonoBehaviour
 {
 	public delegate void DeactiveInterfaceEvent();
-
 	public event DeactiveInterfaceEvent OnInterfaceDeactivated;
+
+	public delegate void ActivateModeEvent(float fadeOverride);
+	public event ActivateModeEvent OnModeActivated;
 	
 	[SerializeField]
 	private CanvasGroupAnimator _canvasGroupAnimator;
+	[SerializeField]
+	private Transform _layoutParent;
 	[SerializeField]
 	private Text _headerLabel;
 	[SerializeField]
@@ -25,11 +30,13 @@ public class DecoratorInterface : MonoBehaviour
 	private DecoratorInterfaceElement _activeElement;
 
 	private DecoratorSelectionData _selectedData;
+	private List<DecoratorInterfaceMode> _modes = [];
 	private DecoratorInterfaceMode _activeMode;
 
 	private void Start()
 	{
 		_canvasGroupAnimator.SetImmediate(0f, new Vector3(1f, 0f, 1f));
+		enabled = false;
 	}
 
 	private void Update()
@@ -91,20 +98,34 @@ public class DecoratorInterface : MonoBehaviour
 	{
 		_selectedData = data;
 		_headerLabel.text = data.GetDisplayName();
-		_optionsList.SetDisplayedOptions(_selectedData.GetOptionsToDisplay());
+
+		_modes.Clear();
+		_optionsList.ClearDisplayedOptions();
+		if (data.GetModules().Length > 0)
+		{
+			_modes.AddRange(data.GetModules()
+				.Select(module => module.CreateInterfaceMode(_layoutParent)));
+			_optionsList.AddDisplayedOptions(_selectedData.GetModules(), _modes.ToArray());
+		}
 		
 		Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.ShipLogSelectEntry);
 		_canvasGroupAnimator.AnimateTo(1f, Vector3.one, 0.1f);
 		_activated = true;
+		enabled = true;
 	}
 
 	public void Deactivate()
 	{
 		SwitchToMode(null);
 		_optionsList.ClearDisplayedOptions();
+		foreach (var mode in _modes)
+		{
+			Destroy(mode.gameObject);
+		}
 		Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.ShipLogDeselectEntry);
 		_canvasGroupAnimator.AnimateTo(0f, new Vector3(1f, 0f, 1f), 0.1f);
 		_activated = false;
+		enabled = false;
 		
 		OnInterfaceDeactivated?.Invoke();
 	}
@@ -143,12 +164,26 @@ public class DecoratorInterface : MonoBehaviour
 			_optionsList.ClearDisplayedOptions();
 			_headerLabel.text = mode.GetDisplayOverride();
 			mode.Activate();
+			OnModeActivated?.Invoke(mode.GetSelectionFadeOverride());
 		}
 		else
 		{
 			_headerLabel.text = _selectedData.GetDisplayName();
 			_mainOptionsObject.SetActive(true);
-			_optionsList.SetDisplayedOptions(_selectedData.GetOptionsToDisplay());
+			_optionsList.ClearDisplayedOptions();
+			if (_selectedData.GetModules().Length > 0)
+			{
+				_optionsList.AddDisplayedOptions(_selectedData.GetModules(), _modes.ToArray());
+			}
+			OnModeActivated?.Invoke(-1f);
+		}
+	}
+
+	public void SetDecorationColor(Color color)
+	{
+		if (_selectedData != null)
+		{
+			_selectedData.SetColor(color);
 		}
 	}
 

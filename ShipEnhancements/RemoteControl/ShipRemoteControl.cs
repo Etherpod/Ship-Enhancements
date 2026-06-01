@@ -105,7 +105,6 @@ public class ShipRemoteControl : MonoBehaviour
         var canvas = GetComponent<Canvas>();
         canvas.worldCamera = Locator.GetPlayerCamera().mainCamera;
         canvas.planeDistance = 9f;
-        AddMaterials();
 
         var launcherParent = SELocator.GetShipTransform().Find("Module_Cockpit/Systems_Cockpit/ProbeLauncher");
         var launcherCamObj = ShipEnhancements.LoadPrefab("Assets/ShipEnhancements/ShipSignal/ShipViewer_LauncherCamera.prefab");
@@ -141,21 +140,6 @@ public class ShipRemoteControl : MonoBehaviour
         _shipViewerTexture.Create();
         
         GlobalMessenger.AddListener("ShipSystemFailure", OnShipSystemFailure);
-    }
-
-    private void AddMaterials()
-    {
-        var refMat = GameObject.Find("PlayerHUD/HelmetOffUI/SignalscopeCanvas/SigScopeDisplay/FrequencyLabel")
-            .GetComponent<Text>().material;
-        
-        foreach (var image in GetComponentsInChildren<Image>(true))
-        {
-            image.material = new Material(refMat);
-        }
-        foreach (var text in GetComponentsInChildren<Text>(true))
-        {
-            text.material = new Material(refMat);
-        }
     }
 
     public void AssignErnestoCallDialogue(CharacterDialogueTree dialogueTree)

@@ -1734,12 +1734,12 @@ public class ShipEnhancements : ModBehaviour
                 LoadPrefab("Assets/ShipEnhancements/Items/Decorator/Selectors/SE_SelectionGroup_ExteriorHulls.prefab");
             CreateObject(exteriorHullGroup, SELocator.GetShipTransform());
 
-            var rootPath = "Assets/ShipEnhancements/Items/Decorator/Selectors/SE_Selector_";
-            var cockpitSelector = LoadPrefab(rootPath + "Cockpit.prefab");
-            CreateObject(cockpitSelector,
+            var rootPath = "Assets/ShipEnhancements/Items/Decorator/Selectors/SE_Selection_";
+            var cockpitSelection = LoadPrefab(rootPath + "Cockpit.prefab");
+            CreateObject(cockpitSelection,
                 SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Colliders"));
-            var headlightsSelector = LoadPrefab(rootPath + "Headlights.prefab");
-            CreateObject(headlightsSelector,
+            var headlightsSelection = LoadPrefab(rootPath + "Headlights.prefab");
+            CreateObject(headlightsSelection,
                 SELocator.GetShipTransform().Find("Module_Engine/Geo_Engine/Engine_Colliders"));
             
             var canvasObj = LoadPrefab("Assets/ShipEnhancements/Items/Decorator/DecoratorInterfaceCanvas.prefab");
@@ -1749,18 +1749,6 @@ public class ShipEnhancements : ModBehaviour
                 SELocator.GetPlayerBody().GetComponentInChildren<PlayerCameraController>()
                     ._playerCamera.mainCamera;
             canvas.planeDistance = 9f;
-            
-            var refMat = parent.Find("SignalscopeCanvas/SigScopeDisplay/FrequencyLabel")
-                .GetComponent<Text>().material;
-        
-            foreach (var image in canvas.GetComponentsInChildren<Image>(true))
-            {
-                image.material = new Material(refMat);
-            }
-            foreach (var text in canvas.GetComponentsInChildren<Text>(true))
-            {
-                text.material = new Material(refMat);
-            }
         }
 
         if (AchievementsAPI != null)

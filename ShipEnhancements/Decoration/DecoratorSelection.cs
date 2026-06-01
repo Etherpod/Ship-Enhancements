@@ -2,7 +2,7 @@
 
 namespace ShipEnhancements.Decoration;
 
-public class DecoratorSelector : MonoBehaviour
+public class DecoratorSelection : MonoBehaviour
 {
 	[SerializeField]
 	private Collider _collider;
@@ -32,6 +32,8 @@ public class DecoratorSelector : MonoBehaviour
 	private float _currentHighlight;
 	private float _lastHighlight;
 	private float _targetHighlight;
+
+	private float _fadeOverride = -1;
 	
 	private void Awake()
 	{
@@ -70,13 +72,16 @@ public class DecoratorSelector : MonoBehaviour
 		
 		_selected = selected;
 		_lastFade = _currentFade;
-		_targetFade = selected ? 1f : 0f;
+		_targetFade = selected ? 
+			(_fadeOverride >= 0f ? _fadeOverride : 1f) : 
+			0f;
 		_fadeStartTime = Time.time;
 		enabled = true;
 
 		if (!selected)
 		{
 			SetActive(false);
+			_fadeOverride = -1f;
 		}
 	}
 
@@ -92,6 +97,16 @@ public class DecoratorSelector : MonoBehaviour
 	public void SetSelectionGroup(DecoratorSelectionGroup group)
 	{
 		_group = group;
+	}
+
+	public void SetFadeOverride(float fadeOverride)
+	{
+		_lastFade = _currentFade;
+		_targetFade = fadeOverride >= 0f ? 
+			fadeOverride : 
+			(_selected ? 1f : 0f);
+		_fadeStartTime = Time.time;
+		enabled = true;
 	}
 
 	public DecoratorSelectionGroup GetSelectionGroup() => _group;

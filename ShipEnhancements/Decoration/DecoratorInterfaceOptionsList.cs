@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using ShipEnhancements.Decoration.Modules;
 using UnityEngine;
 
 namespace ShipEnhancements.Decoration;
@@ -7,28 +8,28 @@ namespace ShipEnhancements.Decoration;
 public class DecoratorInterfaceOptionsList : MonoBehaviour
 {
 	[SerializeField]
-	private DecoratorInterfaceOption[] _optionPrefabs;
+	private GameObject _optionTemplate;
 
 	private List<DecoratorInterfaceOption> _displayedOptions = [];
 
-	public void SetDisplayedOptions(DecoratorInterfaceOption.InterfaceOptionType[] optionTypes)
+	public void SetDisplayedOptions(DecorationModule[] modules, DecoratorInterfaceMode[] modes)
 	{
 		ClearDisplayedOptions();
-		AddDisplayedOptions(optionTypes);
+		AddDisplayedOptions(modules, modes);
 	}
 
-	public void AddDisplayedOptions(DecoratorInterfaceOption.InterfaceOptionType[] optionTypes)
+	public void AddDisplayedOptions(DecorationModule[] modules, DecoratorInterfaceMode[] modes)
 	{
-		List<DecoratorInterfaceOption> optionsToSpawn = [];
-		optionsToSpawn.AddRange(optionTypes
-			.Select(type => _optionPrefabs.FirstOrDefault(p => 
-				p.GetOptionType() == type))
-			.Where(option => option != null));
-
-		for (int i = 0; i < optionsToSpawn.Count; i++)
+		for (int i = 0; i < modules.Length; i++)
 		{
-			var newOption = Instantiate(optionsToSpawn[i].gameObject, transform)
+			var newOption = Instantiate(_optionTemplate, transform)
 				.GetComponent<DecoratorInterfaceOption>();
+			newOption.Initialize();
+			newOption.SetDisplayText(modules[i].GetDisplayName());
+			if (i < modes.Length)
+			{
+				newOption.SetLinkedMode(modes[i]);
+			}
 			
 			if (i > 0)
 			{
