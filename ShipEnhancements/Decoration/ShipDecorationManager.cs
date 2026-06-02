@@ -121,6 +121,7 @@ public static class ShipDecorationManager
     
     private static void SetUpShipLogSplashScreen()
     {
+        return;
         GameObject go = SELocator.GetShipBody().GetComponentInChildren<ShipLogSplashScreen>().gameObject;
         MeshRenderer rend = go.GetComponent<MeshRenderer>();
 

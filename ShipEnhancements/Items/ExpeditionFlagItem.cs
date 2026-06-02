@@ -43,7 +43,7 @@ public class ExpeditionFlagItem : OWItem
 
     private void Start()
     {
-        Texture2D tex = null;
+        /*Texture2D tex = null;
         byte[] fileData;
 
         List<string> files = [];
@@ -62,9 +62,19 @@ public class ExpeditionFlagItem : OWItem
         if (tex != null)
         {
             _decalRenderer.material.SetTexture("_MainTex", tex);
-        }
+        }*/
 
         SetIsDropped(false);
+    }
+
+    public Texture2D GetFlagTexture()
+    {
+        return (Texture2D)_decalRenderer.material.GetTexture("_MainTex");
+    }
+
+    public void SetFlagTexture(Texture2D texture)
+    {
+        _decalRenderer.material.SetTexture("_MainTex", texture);
     }
 
     public override void PickUpItem(Transform holdTranform)

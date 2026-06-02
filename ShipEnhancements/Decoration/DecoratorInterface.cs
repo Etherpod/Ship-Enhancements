@@ -20,9 +20,7 @@ public class DecoratorInterface : MonoBehaviour
 	[SerializeField]
 	private Text _headerLabel;
 	[SerializeField]
-	private GameObject _mainOptionsObject;
-	[SerializeField]
-	private DecoratorInterfaceOptionsList _optionsList;
+	private OptionsListWindow _defaultOptions;
 
 	private bool _activated;
 
@@ -30,8 +28,8 @@ public class DecoratorInterface : MonoBehaviour
 	private DecoratorInterfaceElement _activeElement;
 
 	private DecoratorSelectionData _selectedData;
-	private List<DecoratorInterfaceMode> _modes = [];
-	private DecoratorInterfaceMode _activeMode;
+	//private List<DecoratorInterfaceWindow> _extraModes = [];
+	private DecoratorInterfaceWindow _activeWindow;
 
 	private void Start()
 	{
@@ -50,9 +48,9 @@ public class DecoratorInterface : MonoBehaviour
 		
 		if (OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.Character))
 		{
-			if (_activeMode != null)
+			if (_activeWindow != _defaultOptions)
 			{
-				SwitchToMode(null);
+				SwitchToWindow(_defaultOptions);
 			}
 			else
 			{
@@ -97,16 +95,27 @@ public class DecoratorInterface : MonoBehaviour
 	public void Activate(DecoratorSelectionData data)
 	{
 		_selectedData = data;
-		_headerLabel.text = data.GetDisplayName();
-
-		_modes.Clear();
-		_optionsList.ClearDisplayedOptions();
+		_defaultOptions.SetDisplayOverride(data.GetDisplayName());
+		
 		if (data.GetModules().Length > 0)
 		{
-			_modes.AddRange(data.GetModules()
-				.Select(module => module.CreateInterfaceMode(_layoutParent)));
-			_optionsList.AddDisplayedOptions(_selectedData.GetModules(), _modes.ToArray());
+			List<OptionsListElementData> windowData = [];
+			for (int i = 0; i < data.GetModules().Length; i++)
+			{
+				if (data.GetModules()[i] == null)
+				{
+					ShipEnhancements.WriteDebugMessage("ERROR - Null module on " + data.gameObject.name);
+					continue;
+				}
+				var window = data.GetModules()[i].CreateWindow(_layoutParent);
+				windowData.Add(new WindowOptionData(data.GetModules()[i].GetDisplayName(), window));
+			}
+			
+			_defaultOptions.AddDisplayedOptions(windowData.ToArray());
+			_defaultOptions.OnSubmitOption += OnSubmitWindowOption;
 		}
+		
+		SwitchToWindow(_defaultOptions);
 		
 		Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.ShipLogSelectEntry);
 		_canvasGroupAnimator.AnimateTo(1f, Vector3.one, 0.1f);
@@ -116,12 +125,16 @@ public class DecoratorInterface : MonoBehaviour
 
 	public void Deactivate()
 	{
-		SwitchToMode(null);
-		_optionsList.ClearDisplayedOptions();
-		foreach (var mode in _modes)
+		_activeWindow.Deactivate();
+		_activeWindow = null;
+		_defaultOptions.ClearDisplayedOptions();
+		_defaultOptions.OnSubmitOption -= OnSubmitWindowOption;
+		
+		foreach (var module in _selectedData.GetModules())
 		{
-			Destroy(mode.gameObject);
+			module.DestroyWindow();
 		}
+		
 		Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.ShipLogDeselectEntry);
 		_canvasGroupAnimator.AnimateTo(0f, new Vector3(1f, 0f, 1f), 0.1f);
 		_activated = false;
@@ -144,47 +157,30 @@ public class DecoratorInterface : MonoBehaviour
 		_activeElement = element;
 	}
 
-	public void SwitchToMode(DecoratorInterfaceMode mode)
+	private void OnSubmitWindowOption(OptionsListElementData data)
 	{
-		if (mode == _activeMode)
+		if (data is not WindowOptionData windowData) return;
+		
+		SwitchToWindow(windowData.linkedWindow);
+	}
+
+	public void SwitchToWindow(DecoratorInterfaceWindow window)
+	{
+		if (window == _activeWindow)
 		{
 			return;
 		}
 
-		if (_activeMode != null)
+		if (_activeWindow != null)
 		{
-			_activeMode.Deactivate();
+			_activeWindow.Deactivate();
 		}
 		
-		_activeMode = mode;
-
-		if (mode != null)
-		{
-			_mainOptionsObject.SetActive(false);
-			_optionsList.ClearDisplayedOptions();
-			_headerLabel.text = mode.GetDisplayOverride();
-			mode.Activate();
-			OnModeActivated?.Invoke(mode.GetSelectionFadeOverride());
-		}
-		else
-		{
-			_headerLabel.text = _selectedData.GetDisplayName();
-			_mainOptionsObject.SetActive(true);
-			_optionsList.ClearDisplayedOptions();
-			if (_selectedData.GetModules().Length > 0)
-			{
-				_optionsList.AddDisplayedOptions(_selectedData.GetModules(), _modes.ToArray());
-			}
-			OnModeActivated?.Invoke(-1f);
-		}
-	}
-
-	public void SetDecorationColor(Color color)
-	{
-		if (_selectedData != null)
-		{
-			_selectedData.SetColor(color);
-		}
+		_activeWindow = window;
+		
+		_headerLabel.text = window.GetDisplayOverride();
+		window.Activate();
+		OnModeActivated?.Invoke(window.GetSelectionFadeOverride());
 	}
 
 	public void AddInterfaceElement(DecoratorInterfaceElement element)
@@ -204,12 +200,14 @@ public class DecoratorInterface : MonoBehaviour
 			_elements.Remove(element);
 		}
 	}
+}
 
-	/*private void OnDestroy()
+public class WindowOptionData : OptionsListElementData
+{
+	public DecoratorInterfaceWindow linkedWindow;
+
+	public WindowOptionData(string name, DecoratorInterfaceWindow window) : base(name)
 	{
-		foreach (var element in _elements)
-		{
-			element.OnElementSelected -= OnElementSelected;
-		}
-	}*/
+		linkedWindow = window;
+	}
 }

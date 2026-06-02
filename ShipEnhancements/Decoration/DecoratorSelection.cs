@@ -21,7 +21,7 @@ public class DecoratorSelection : MonoBehaviour
 	private bool _selected;
 	private bool _highlighted;
 	
-	private readonly float _fadeLength = 0.2f;
+	private readonly float _fadeLength = 0.3f;
 	private float _fadeStartTime;
 	private float _currentFade;
 	private float _lastFade;

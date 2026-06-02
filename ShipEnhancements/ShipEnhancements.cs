@@ -1741,6 +1741,12 @@ public class ShipEnhancements : ModBehaviour
             var headlightsSelection = LoadPrefab(rootPath + "Headlights.prefab");
             CreateObject(headlightsSelection,
                 SELocator.GetShipTransform().Find("Module_Engine/Geo_Engine/Engine_Colliders"));
+            var plantSelection = LoadPrefab(rootPath + "CockpitPlants.prefab");
+            CreateObject(plantSelection,
+                SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit/Cockpit_Colliders"));
+            var shipLogSelection = LoadPrefab(rootPath + "ShipLog.prefab");
+            CreateObject(shipLogSelection,
+                SELocator.GetShipTransform().Find("Module_Cabin/Geo_Cabin/Cabin_Colliders_Back"));
             
             var canvasObj = LoadPrefab("Assets/ShipEnhancements/Items/Decorator/DecoratorInterfaceCanvas.prefab");
             var parent = GameObject.Find("PlayerHUD/HelmetOffUI").transform;

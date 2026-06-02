@@ -4,22 +4,25 @@ using UnityEngine;
 
 namespace ShipEnhancements.Decoration;
 
-public class ColorSelectorMode : DecoratorInterfaceMode
+public class ImagePreviewWindow : DecoratorInterfaceWindow
 {
+	public delegate void OptionSubmitEvent(ImagePreviewElementData data);
+	public event OptionSubmitEvent OnSubmitOption;
+	
 	[SerializeField]
 	private GameObject _elementRowTemplate;
 	[SerializeField]
-	private GameObject _colorButtonTemplate;
+	private GameObject _previewTemplate;
 	[SerializeField]
 	private int _rowSize = 3;
 
-	private List<ColorPresetButton> _buttons = [];
+	private List<ImagePreviewElement> _previews = [];
 
-	public void Initialize(Color[] colorPresets)
+	public void Initialize(ImagePreviewElementData[] elementData)
 	{
 		List<Transform> elementRows = [];
 
-		for (int i = 0; i < colorPresets.Length; i++)
+		for (int i = 0; i < elementData.Length; i++)
 		{
 			var r = i / _rowSize;
 			var c = i % _rowSize;
@@ -29,9 +32,9 @@ public class ColorSelectorMode : DecoratorInterfaceMode
 				elementRows.Add(Instantiate(_elementRowTemplate, transform).transform);
 			}
 			
-			_buttons.Add(Instantiate(_colorButtonTemplate, elementRows[r]).GetComponent<ColorPresetButton>());
-			var activeElement = _buttons[i];
-			activeElement.SetColorPreset(colorPresets[i]);
+			_previews.Add(Instantiate(_previewTemplate, elementRows[r]).GetComponent<ImagePreviewElement>());
+			var activeElement = _previews[i];
+			activeElement.Initialize(elementData[i]);
 			activeElement.OnElementSubmitted += OnElementSubmitted;
 
 			if (i == 0)
@@ -41,7 +44,7 @@ public class ColorSelectorMode : DecoratorInterfaceMode
 			
 			if (r > 0)
 			{
-				var upElement = _buttons[i - _rowSize];
+				var upElement = _previews[i - _rowSize];
 				if (upElement)
 				{
 					upElement.SetDownElement(activeElement);
@@ -51,7 +54,7 @@ public class ColorSelectorMode : DecoratorInterfaceMode
 			
 			if (c > 0)
 			{
-				var leftElement = _buttons[i - 1];
+				var leftElement = _previews[i - 1];
 				if (leftElement)
 				{
 					leftElement.SetRightElement(activeElement);
@@ -65,29 +68,25 @@ public class ColorSelectorMode : DecoratorInterfaceMode
 			row.gameObject.SetActive(true);
 		}
 
-		foreach (var button in _buttons)
+		foreach (var preview in _previews)
 		{
-			button.gameObject.SetActive(true);
+			preview.gameObject.SetActive(true);
 		}
 	}
 
 	private void OnElementSubmitted(DecoratorInterfaceElement element)
 	{
-		if (element is not ColorPresetButton colorPreset) return;
+		if (element is not ImagePreviewElement preview ||
+			!_previews.Contains(preview)) return;
 
-		if (_module is ColorModule colorModule)
-		{
-			colorModule.ApplyColor(colorPreset.GetColorPreset());
-		}
+		OnSubmitOption?.Invoke(preview.GetData());
 	}
-
-	public override float GetSelectionFadeOverride() => 0.1f;
 
 	private void OnDestroy()
 	{
-		foreach (var button in _buttons)
+		foreach (var preview in _previews)
 		{
-			button.OnElementSubmitted -= OnElementSubmitted;
+			preview.OnElementSubmitted -= OnElementSubmitted;
 		}
 	}
 }

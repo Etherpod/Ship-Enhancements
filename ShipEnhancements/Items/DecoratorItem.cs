@@ -91,7 +91,16 @@ public class DecoratorItem : OWItem
 
 	private void UpdateSelection()
 	{
-		if (OWInput.IsNewlyPressed(InputLibrary.lockOn) && !_currentSelection.IsActive())
+		if (OWInput.GetInputMode() != InputMode.Character)
+		{
+			ToggleCurrentSelection(false);
+            _interface.Deactivate();
+            _currentSelection = null;
+            return;
+		}
+		
+		if (OWInput.IsNewlyPressed(InputLibrary.lockOn, InputMode.Character) && 
+			!_currentSelection.IsActive())
 		{
 			DecoratorSelectionData data;
 			if (_currentSelection.GetSelectionGroup() != null)
@@ -108,19 +117,6 @@ public class DecoratorItem : OWItem
 			_interface.Activate(data);
 			_interface.OnInterfaceDeactivated += OnInterfaceDeactivated;
 		}
-		/*else if (OWInput.IsNewlyPressed(InputLibrary.cancel) && _currentSelection.IsActive())
-		{
-			if (_currentSelection.GetSelectionGroup() != null)
-			{
-				_currentSelection.GetSelectionGroup().SetAllActive(false);
-			}
-			else
-			{
-				_currentSelection.SetActive(false);
-			}
-			
-			// close menu
-		}*/
 	}
 
 	private void ToggleCurrentSelection(bool selected)

@@ -4,12 +4,12 @@ using UnityEngine.UI;
 
 namespace ShipEnhancements.Decoration;
 
-public class DecoratorInterfaceOption : DecoratorInterfaceElement
+public class OptionsListElement : DecoratorInterfaceElement
 {
-	private DecoratorInterfaceMode _linkedMode;
-	private Text _attachedText;
-	private Color _initialTextColor;
-	private bool _everInitialized;
+	protected OptionsListElementData _data;
+	protected Text _attachedText;
+	protected Color _initialTextColor;
+	protected bool _everInitialized;
 
 	protected override void Awake()
 	{
@@ -17,12 +17,19 @@ public class DecoratorInterfaceOption : DecoratorInterfaceElement
 		Initialize();
 	}
 
-	public void Initialize()
+	public void Initialize(OptionsListElementData data = null)
 	{
 		if (!_everInitialized)
 		{
 			_attachedText = GetComponent<Text>();
 			_initialTextColor = _attachedText.color;
+			
+			if (data != null)
+			{			
+				_data = data;
+				SetDisplayText(data.displayName);
+			}
+			
 			_everInitialized = true;
 		}
 	}
@@ -37,22 +44,20 @@ public class DecoratorInterfaceOption : DecoratorInterfaceElement
 		_attachedText.color = _initialTextColor;
 	}
 
-	protected override void Submit_Internal()
-	{
-		if (_linkedMode != null)
-		{
-			ShipEnhancements.WriteDebugMessage("Switch to mode " + _linkedMode);
-			_interface.SwitchToMode(_linkedMode);
-		}
-	}
-
 	public void SetDisplayText(string text)
 	{
 		_attachedText.text = text;
 	}
 
-	public void SetLinkedMode(DecoratorInterfaceMode mode)
+	public OptionsListElementData GetData() => _data;
+}
+
+public class OptionsListElementData
+{
+	public string displayName;
+
+	public OptionsListElementData(string name)
 	{
-		_linkedMode = mode;
+		displayName = name;
 	}
 }

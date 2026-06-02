@@ -2,7 +2,7 @@
 
 namespace ShipEnhancements.Decoration.Modules;
 
-public class HeadlightColorModule : ColorModule
+public class HeadlightColorModule : ImagePreviewModule
 {
 	private ShipHeadlightComponent _headlightComponent;
 	
@@ -10,21 +10,23 @@ public class HeadlightColorModule : ColorModule
 	{
 		_headlightComponent = SELocator.GetShipTransform().GetComponentInChildren<ShipHeadlightComponent>();
 	}
-	
-	public override void ApplyColor(Color color)
+
+	protected override void OnSubmitOption(ImagePreviewElementData data)
 	{
 		foreach (var light in _headlightComponent._headlights)
 		{
 			if (light._light != null)
 			{
-				light._light.color = color;
+				light._light.color = data.imageColor;
 			}
 
 			if (light._emissiveRenderer != null)
 			{
-				light._matPropBlock.SetColor(light._propID_EmissionColor, color);
+				light._matPropBlock.SetColor(light._propID_EmissionColor, data.imageColor);
 				light._emissiveRenderer.SetPropertyBlock(light._matPropBlock);
 			}
 		}
 	}
+
+	public override float GetSelectionFadeOverride() => 0.1f;
 }

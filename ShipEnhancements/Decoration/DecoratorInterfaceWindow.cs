@@ -3,15 +3,18 @@ using UnityEngine;
 
 namespace ShipEnhancements.Decoration;
 
-public class DecoratorInterfaceMode : MonoBehaviour
+public class DecoratorInterfaceWindow : MonoBehaviour
 {
 	[SerializeField]
 	protected string _headerOverride;
 	[SerializeField]
 	protected DecoratorInterfaceElement _firstSelectedElement;
+	[SerializeField]
+	private bool _useTabAudio = true;
 
 	protected DecorationModule _module;
 	protected DecoratorInterface _interface;
+	private bool _active;
 
 	protected virtual void Awake()
 	{
@@ -24,18 +27,36 @@ public class DecoratorInterfaceMode : MonoBehaviour
 
 	public virtual void Activate()
 	{
-		Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.Menu_ChangeTab);
+		if (_active) return;
+
+		if (_useTabAudio)
+		{
+			PlayAudio();
+		}
 		gameObject.SetActive(true);
 		if (_firstSelectedElement != null)
 		{
 			_firstSelectedElement.Select();
 		}
+
+		_active = true;
 	}
 	
 	public virtual void Deactivate()
 	{
-		Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.Menu_ChangeTab);
+		if (!_active) return;
+
+		if (_useTabAudio)
+		{
+			PlayAudio();
+		}
 		gameObject.SetActive(false);
+		_active = false;
+	}
+
+	private void PlayAudio()
+	{
+		Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.Menu_ChangeTab);
 	}
 
 	public void AssignModule(DecorationModule module)
@@ -43,7 +64,14 @@ public class DecoratorInterfaceMode : MonoBehaviour
 		_module = module;
 	}
 
+	public void SetDisplayOverride(string text) => _headerOverride = text;
+
 	public string GetDisplayOverride() => _headerOverride;
 
-	public virtual float GetSelectionFadeOverride() => -1f;
+	public float GetSelectionFadeOverride()
+	{
+		if (_module == null) return -1;
+
+		return _module.GetSelectionFadeOverride();
+	}
 }
