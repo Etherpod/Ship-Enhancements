@@ -12,8 +12,8 @@ public class ExpeditionFlagModule : CustomTexturePreviewModule
 	{
 		_defaultTexture = _flagItem.GetFlagTexture();
 	}
-	
-	protected override void OnSubmitOption(ImagePreviewElementData data)
+
+	protected override void OnSelectOption(ImagePreviewElementData data)
 	{
 		_flagItem.SetFlagTexture(data.imageTexture);
 	}

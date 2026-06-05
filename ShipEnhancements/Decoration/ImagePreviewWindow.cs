@@ -7,8 +7,9 @@ namespace ShipEnhancements.Decoration;
 
 public class ImagePreviewWindow : DecoratorInterfaceWindow
 {
-	public delegate void OptionSubmitEvent(ImagePreviewElementData data);
-	public event OptionSubmitEvent OnSubmitOption;
+	public delegate void OptionStateEvent(ImagePreviewElementData data);
+	public event OptionStateEvent OnSelectOption;
+	public event OptionStateEvent OnSubmitOption;
 	
 	[SerializeField]
 	private GameObject _elementRowTemplate;
@@ -18,6 +19,7 @@ public class ImagePreviewWindow : DecoratorInterfaceWindow
 	private int _rowSize = 3;
 
 	private List<ImagePreviewElement> _previews = [];
+	private ImagePreviewElement _activeElement;
 
 	public void Initialize(ImagePreviewElementData[] elementData)
 	{
@@ -36,6 +38,7 @@ public class ImagePreviewWindow : DecoratorInterfaceWindow
 			_previews.Add(Instantiate(_previewTemplate, elementRows[r]).GetComponent<ImagePreviewElement>());
 			var activeElement = _previews[i];
 			activeElement.Initialize(elementData[i]);
+			activeElement.OnElementSelected += OnElementSelected;
 			activeElement.OnElementSubmitted += OnElementSubmitted;
 
 			if (i == 0)
@@ -75,14 +78,23 @@ public class ImagePreviewWindow : DecoratorInterfaceWindow
 		}
 	}
 
-	public void SelectElementAtIndex(int index)
+	public void SetInitialIndex(int index)
 	{
 		var element = _previews
 			.FirstOrDefault(e => e.GetData().listIndex == index);
 		if (element != null)
 		{
-			// select
+			_activeElement = element;
+			_firstSelectedElement = element;
 		}
+	}
+
+	private void OnElementSelected(DecoratorInterfaceElement element)
+	{
+		if (element is not ImagePreviewElement preview ||
+			!_previews.Contains(preview)) return;
+
+		OnSelectOption?.Invoke(preview.GetData());
 	}
 
 	private void OnElementSubmitted(DecoratorInterfaceElement element)
@@ -90,13 +102,42 @@ public class ImagePreviewWindow : DecoratorInterfaceWindow
 		if (element is not ImagePreviewElement preview ||
 			!_previews.Contains(preview)) return;
 
+		if (_activeElement != null && _activeElement != element)
+		{
+			_activeElement.Unsubmit();
+		}
+		
+		_activeElement = preview;
 		OnSubmitOption?.Invoke(preview.GetData());
+	}
+
+	public override void Activate()
+	{
+		base.Activate();
+		if (_activeElement != null)
+		{
+			_activeElement.Submit(false);
+		}
+	}
+
+	public override void Deactivate()
+	{
+		if (_activeElement != null)
+		{
+			_activeElement.Unsubmit();
+			if (_activeElement != _interface.GetSelectedElement())
+			{
+				OnElementSelected(_activeElement);
+			}
+		}
+		base.Deactivate();
 	}
 
 	private void OnDestroy()
 	{
 		foreach (var preview in _previews)
 		{
+			preview.OnElementSelected -= OnElementSelected;
 			preview.OnElementSubmitted -= OnElementSubmitted;
 		}
 	}

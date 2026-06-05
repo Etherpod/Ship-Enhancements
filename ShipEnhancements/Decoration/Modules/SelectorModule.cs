@@ -18,8 +18,8 @@ public class SelectorModule : DecorationModule
 
 		var data = GenerateOptionData();
 		window.AddDisplayedOptions(data);
-		// might have to move selection
-		window.SelectElementAtIndex(_selectedIndex);
+		window.SetInitialIndex(_selectedIndex);
+		window.OnSelectOption += OnSelectOption;
 		window.OnSubmitOption += OnSubmitOption;
 		return window;
 	}
@@ -34,10 +34,16 @@ public class SelectorModule : DecorationModule
 
 		return data.ToArray();
 	}
+	
+	protected virtual void OnSelectOption(OptionsListElementData data) { }
 
 	protected virtual void OnSubmitOption(OptionsListElementData data)
 	{
 		_selectedIndex = data.listIndex;
+		if (_currentWindow is OptionsListWindow listWindow)
+		{
+			listWindow.SetInitialIndex(data.listIndex);
+		}
 	}
 
 	public string[] GetOptionNames() => _optionNames;
@@ -47,6 +53,7 @@ public class SelectorModule : DecorationModule
 		base.DestroyWindow();
 		if (_currentWindow is OptionsListWindow list)
 		{
+			list.OnSelectOption -= OnSelectOption;
 			list.OnSubmitOption -= OnSubmitOption;
 		}
 	}

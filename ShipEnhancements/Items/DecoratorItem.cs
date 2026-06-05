@@ -157,8 +157,22 @@ public class DecoratorItem : OWItem
 
 	public override void DropItem(Vector3 position, Vector3 normal, Transform parent, Sector sector, IItemDropTarget customDropTarget)
 	{
+		bool wasHeld = Locator.GetToolModeSwapper().GetItemCarryTool().GetHeldItem() == this;
 		base.DropItem(position, normal, parent, sector, customDropTarget);
-		GlobalMessenger<DecoratorItem>.FireEvent("SE_UnequipDecorator", this);
+		if (wasHeld)
+		{
+			GlobalMessenger<DecoratorItem>.FireEvent("SE_UnequipDecorator", this);
+		}
+	}
+
+	public override void SocketItem(Transform socketTransform, Sector sector)
+	{
+		bool wasHeld = Locator.GetToolModeSwapper().GetItemCarryTool().GetHeldItem() == this;
+		base.SocketItem(socketTransform, sector);
+		if (wasHeld)
+		{
+			GlobalMessenger<DecoratorItem>.FireEvent("SE_UnequipDecorator", this);
+		}
 	}
 
 	public override void OnDestroy()

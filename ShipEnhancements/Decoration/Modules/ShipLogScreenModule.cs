@@ -14,7 +14,7 @@ public class ShipLogScreenModule : CustomTexturePreviewModule
 		_defaultTexture = (Texture2D)_shipLogRenderer.sharedMaterial.GetTexture("_MainTex");
 	}
 	
-	protected override void OnSubmitOption(ImagePreviewElementData data)
+	protected override void OnSelectOption(ImagePreviewElementData data)
 	{
 		_shipLogRenderer.sharedMaterial.SetTexture("_MainTex", data.imageTexture);
 	}

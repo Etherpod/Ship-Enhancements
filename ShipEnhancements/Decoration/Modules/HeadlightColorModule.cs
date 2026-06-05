@@ -11,7 +11,7 @@ public class HeadlightColorModule : ImagePreviewModule
 		_headlightComponent = SELocator.GetShipTransform().GetComponentInChildren<ShipHeadlightComponent>();
 	}
 
-	protected override void OnSubmitOption(ImagePreviewElementData data)
+	protected override void OnSelectOption(ImagePreviewElementData data)
 	{
 		foreach (var light in _headlightComponent._headlights)
 		{

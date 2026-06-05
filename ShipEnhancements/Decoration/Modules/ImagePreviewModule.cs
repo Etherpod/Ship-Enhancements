@@ -10,7 +10,7 @@ public class ImagePreviewModule : DecorationModule
 	[SerializeField]
 	protected Texture2D[] _texturePreviews;
 
-	protected int _selectedIndex;
+	protected int _activeIndex;
 
 	public override DecoratorInterfaceWindow CreateWindow(Transform parent)
 	{
@@ -19,9 +19,9 @@ public class ImagePreviewModule : DecorationModule
 
 		var data = GenerateOptionData();
 		window.Initialize(data);
-		// might have to move selection
-		window.SelectElementAtIndex(_selectedIndex);
-		window.OnSubmitOption += OnSubmitOption; 
+		window.SetInitialIndex(_activeIndex);
+		window.OnSelectOption += OnSelectOption;
+		window.OnSubmitOption += OnSubmitOption;
 		return window;
 	}
 	
@@ -47,10 +47,16 @@ public class ImagePreviewModule : DecorationModule
 		
 		return data.ToArray();
 	}
+	
+	protected virtual void OnSelectOption(ImagePreviewElementData data) { }
 
 	protected virtual void OnSubmitOption(ImagePreviewElementData data)
 	{
-		_selectedIndex = data.listIndex;
+		_activeIndex = data.listIndex;
+		if (_currentWindow is ImagePreviewWindow previewWindow)
+		{
+			previewWindow.SetInitialIndex(data.listIndex);
+		}
 	}
 
 	public override void DestroyWindow()
@@ -58,6 +64,7 @@ public class ImagePreviewModule : DecorationModule
 		base.DestroyWindow();
 		if (_currentWindow is ImagePreviewWindow previewWindow)
 		{
+			previewWindow.OnSelectOption -= OnSelectOption;
 			previewWindow.OnSubmitOption -= OnSubmitOption;
 		}
 	}

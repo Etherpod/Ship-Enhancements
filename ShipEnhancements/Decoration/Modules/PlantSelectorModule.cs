@@ -38,14 +38,10 @@ public class PlantSelectorModule : SelectorModule
 
 		return data.ToArray();
 	}
-
-	// this needs to be changed to select for preview
-	protected override void OnSubmitOption(OptionsListElementData data)
+	
+	protected override void OnSelectOption(OptionsListElementData data)
 	{
-		if (data is not PlantSelectorOptionData plantData ||
-			data.listIndex == _selectedIndex) return;
-		
-		base.OnSubmitOption(data);
+		if (data is not PlantSelectorOptionData plantData) return;
 		
 		if (_currentPlant != null)
 		{

@@ -98,9 +98,18 @@ public class DecoratorSelection : MonoBehaviour
 
 	private void UpdateColliderActivation()
 	{
-		_collider.SetActive(_decoratorEquipped && (_interiorOnly == _exteriorOnly ||
-			(PlayerState.IsInsideShip() && _interiorOnly) ||
-			(!PlayerState.IsInsideShip() && _exteriorOnly)));
+		ShipEnhancements.WriteDebugMessage("update activation on " + gameObject.name);
+		if (!_decoratorEquipped)
+		{
+			ShipEnhancements.WriteDebugMessage("DISABLE");
+			_collider.SetActive(false);
+		}
+		else
+		{
+			_collider.SetActive(_interiorOnly == _exteriorOnly ||
+				(PlayerState.IsInsideShip() && _interiorOnly) ||
+				(!PlayerState.IsInsideShip() && _exteriorOnly));
+		}
 	}
 
 	public void SetSelectionGroup(DecoratorSelectionGroup group)

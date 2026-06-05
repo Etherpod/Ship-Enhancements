@@ -8,8 +8,9 @@ namespace ShipEnhancements.Decoration;
 
 public class OptionsListWindow : DecoratorInterfaceWindow
 {
-	public delegate void OptionSubmitEvent(OptionsListElementData data);
-	public event OptionSubmitEvent OnSubmitOption;
+	public delegate void OptionStateEvent(OptionsListElementData data);
+	public event OptionStateEvent OnSelectOption;
+	public event OptionStateEvent OnSubmitOption;
 	
 	[SerializeField]
 	protected GameObject _optionTemplate;
@@ -17,6 +18,7 @@ public class OptionsListWindow : DecoratorInterfaceWindow
 	protected Transform _rootTransform;
 
 	protected List<OptionsListElement> _displayedOptions = [];
+	protected OptionsListElement _activeElement;
 
 	public OptionsListElement[] SetDisplayedOptions(OptionsListElementData[] names)
 	{
@@ -41,6 +43,7 @@ public class OptionsListWindow : DecoratorInterfaceWindow
 			newOption.gameObject.SetActive(true);
 			_displayedOptions.Add(newOption);
 
+			newOption.OnElementSelected += OnElementSelected;
 			newOption.OnElementSubmitted += OnElementSubmitted;
 		}
 
@@ -53,6 +56,7 @@ public class OptionsListWindow : DecoratorInterfaceWindow
 		_firstSelectedElement = null;
 		for (int i = _displayedOptions.Count - 1; i >= 0; i--)
 		{
+			_displayedOptions[i].OnElementSelected -= OnElementSelected;
 			_displayedOptions[i].OnElementSubmitted -= OnElementSubmitted;
 			Destroy(_displayedOptions[i].gameObject);
 			_displayedOptions.RemoveAt(i);
@@ -61,14 +65,23 @@ public class OptionsListWindow : DecoratorInterfaceWindow
 
 	public OptionsListElement[] GetDisplayedOptions() => _displayedOptions.ToArray();
 
-	public void SelectElementAtIndex(int index)
+	public void SetInitialIndex(int index)
 	{
 		var element = _displayedOptions
 			.FirstOrDefault(e => e.GetData().listIndex == index);
 		if (element != null)
 		{
-			// select
+			_activeElement = element;
+			_firstSelectedElement = element;
 		}
+	}
+	
+	private void OnElementSelected(DecoratorInterfaceElement element)
+	{
+		if (element is not OptionsListElement option ||
+			!_displayedOptions.Contains(option)) return;
+
+		OnSelectOption?.Invoke(option.GetData());
 	}
 
 	private void OnElementSubmitted(DecoratorInterfaceElement element)
@@ -79,7 +92,34 @@ public class OptionsListWindow : DecoratorInterfaceWindow
 			return;
 		}
 		
+		if (_activeElement != null && _activeElement != element)
+		{
+			_activeElement.Unsubmit();
+		}
+		
 		OnSubmitOption?.Invoke(option.GetData());
+	}
+
+	public override void Activate()
+	{
+		base.Activate();
+		if (_activeElement != null)
+		{
+			_activeElement.Submit(false);
+		}
+	}
+
+	public override void Deactivate()
+	{
+		if (_activeElement != null)
+		{
+			_activeElement.Unsubmit();
+			if (_activeElement != _interface.GetSelectedElement())
+			{
+				OnElementSelected(_activeElement);
+			}
+		}
+		base.Deactivate();
 	}
 
 	private void OnDestroy()

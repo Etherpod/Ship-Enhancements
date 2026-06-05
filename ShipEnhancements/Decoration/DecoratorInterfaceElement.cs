@@ -11,9 +11,11 @@ public abstract class DecoratorInterfaceElement : MonoBehaviour
 	public event ElementEvent OnElementSubmitted;
 
 	[SerializeField]
-	protected GameObject[] _objectsEnabledWhenSelected;
+	protected float _selectedScaleFactor = 1f;
 	[SerializeField]
-	protected GameObject[] _objectsHiddenWhenSelected;
+	protected GameObject[] _objectsEnabledOnSelect;
+	[SerializeField]
+	protected GameObject[] _objectsEnabledOnSubmit;
 	[Space]
 	[SerializeField]
 	protected AudioType _selectAudio = AudioType.Menu_UpDown;
@@ -36,6 +38,7 @@ public abstract class DecoratorInterfaceElement : MonoBehaviour
 
 	protected DecoratorInterface _interface;
 	protected bool _selected;
+	protected bool _submitted;
 
 	protected virtual void Awake()
 	{
@@ -54,12 +57,17 @@ public abstract class DecoratorInterfaceElement : MonoBehaviour
 		UpdateToggledObjects();
 	}
 
-	public void Select()
+	public void Select(bool playAudio = true)
 	{
-		PlaySelectAudio();
+		if (playAudio)
+		{
+			PlaySelectAudio();
+		}
+		
 		Select_Internal();
 		_selected = true;
 		UpdateToggledObjects();
+		transform.localScale = Vector3.one * _selectedScaleFactor;
 		OnElementSelected?.Invoke(this);
 	}
 
@@ -70,30 +78,43 @@ public abstract class DecoratorInterfaceElement : MonoBehaviour
 		Deselect_Internal();
 		_selected = false;
 		UpdateToggledObjects();
+		transform.localScale = Vector3.one;
 		OnElementDeselected?.Invoke(this);
 	}
 
 	protected virtual void Deselect_Internal() { }
 
-	public void Submit()
+	public void Submit(bool playAudio = true)
 	{
-		PlaySubmitAudio();
+		if (playAudio)
+		{
+			PlaySubmitAudio();
+		}
+
 		Submit_Internal();
+		_submitted = true;
+		UpdateToggledObjects();
 		OnElementSubmitted?.Invoke(this);
 	}
-
+	
 	protected virtual void Submit_Internal() { }
+	
+	public void Unsubmit()
+	{
+		_submitted = false;
+		UpdateToggledObjects();
+	}
 	
 	private void UpdateToggledObjects()
 	{
-		foreach (var obj in _objectsEnabledWhenSelected)
+		foreach (var obj in _objectsEnabledOnSelect)
 		{
 			obj.SetActive(_selected);
 		}
 
-		foreach (var obj in _objectsHiddenWhenSelected)
+		foreach (var obj in _objectsEnabledOnSubmit)
 		{
-			obj.SetActive(!_selected);
+			obj.SetActive(_submitted);
 		}
 	}
 

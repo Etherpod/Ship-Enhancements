@@ -25,10 +25,9 @@ public class DecoratorInterface : MonoBehaviour
 	private bool _activated;
 
 	private List<DecoratorInterfaceElement> _elements = [];
-	private DecoratorInterfaceElement _activeElement;
+	private DecoratorInterfaceElement _selectedElement;
 
 	private DecoratorSelectionData _selectedData;
-	//private List<DecoratorInterfaceWindow> _extraModes = [];
 	private DecoratorInterfaceWindow _activeWindow;
 
 	private void Start()
@@ -41,7 +40,7 @@ public class DecoratorInterface : MonoBehaviour
 	{
 		if (!_activated) return;
 		
-		if (_activeElement != null && _activeElement.gameObject.activeInHierarchy)
+		if (_selectedElement != null && _selectedElement.gameObject.activeInHierarchy)
 		{
 			UpdateNavigation();
 		}
@@ -64,26 +63,26 @@ public class DecoratorInterface : MonoBehaviour
 		if (OWInput.IsNewlyPressed(InputLibrary.lockOn, InputMode.Character))
 		{
 			ShipEnhancements.WriteDebugMessage("try submit");
-			_activeElement.Submit();
+			_selectedElement.Submit();
 			return;
 		}
 			
 		DecoratorInterfaceElement next = null;
 		if (OWInput.IsNewlyPressed(InputLibrary.toolOptionLeft, InputMode.Character))
 		{
-			next = _activeElement.GetElementInDirection(new Vector2(-1, 0));
+			next = _selectedElement.GetElementInDirection(new Vector2(-1, 0));
 		}
 		else if (OWInput.IsNewlyPressed(InputLibrary.toolOptionRight, InputMode.Character))
 		{
-			next = _activeElement.GetElementInDirection(new Vector2(1, 0));
+			next = _selectedElement.GetElementInDirection(new Vector2(1, 0));
 		}
 		else if (OWInput.IsNewlyPressed(InputLibrary.toolOptionUp, InputMode.Character))
 		{
-			next = _activeElement.GetElementInDirection(new Vector2(0, 1));
+			next = _selectedElement.GetElementInDirection(new Vector2(0, 1));
 		}
 		else if (OWInput.IsNewlyPressed(InputLibrary.toolOptionDown, InputMode.Character))
 		{
-			next = _activeElement.GetElementInDirection(new Vector2(0, -1));
+			next = _selectedElement.GetElementInDirection(new Vector2(0, -1));
 		}
 
 		if (next != null)
@@ -153,17 +152,17 @@ public class DecoratorInterface : MonoBehaviour
 
 	private void OnElementSelected(DecoratorInterfaceElement element)
 	{
-		if (element == _activeElement) return;
-		
-		ShipEnhancements.WriteDebugMessage("switch to element " + element);
+		if (element == _selectedElement) return;
 
-		if (_activeElement != null)
+		if (_selectedElement != null)
 		{
-			_activeElement.Deselect();
+			_selectedElement.Deselect();
 		}
 		
-		_activeElement = element;
+		_selectedElement = element;
 	}
+
+	public DecoratorInterfaceElement GetSelectedElement() => _selectedElement;
 
 	private void OnSubmitWindowOption(OptionsListElementData data)
 	{

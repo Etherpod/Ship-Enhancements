@@ -476,6 +476,7 @@ public class TextInputReader : MonoBehaviour
 
 	public void EnableInput()
 	{
+		_lastInputTime = Time.time;
 		enabled = true;
 	}
 
