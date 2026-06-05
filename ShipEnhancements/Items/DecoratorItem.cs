@@ -91,7 +91,8 @@ public class DecoratorItem : OWItem
 
 	private void UpdateSelection()
 	{
-		if (OWInput.GetInputMode() != InputMode.Character)
+		if (OWInput.GetInputMode() != InputMode.Character &&
+			OWInput.GetInputMode() != InputMode.Menu)
 		{
 			ToggleCurrentSelection(false);
             _interface.Deactivate();

@@ -1748,6 +1748,10 @@ public class ShipEnhancements : ModBehaviour
             CreateObject(shipLogSelection,
                 SELocator.GetShipTransform().Find("Module_Cabin/Geo_Cabin/Cabin_Colliders_Back"));
             
+            var shipLabel = LoadPrefab("Assets/ShipEnhancements/Decoration/ShipNameLabel.prefab");
+            CreateObject(shipLabel,
+                SELocator.GetShipTransform().Find("Module_Cockpit/Geo_Cockpit"));
+            
             var canvasObj = LoadPrefab("Assets/ShipEnhancements/Items/Decorator/DecoratorInterfaceCanvas.prefab");
             var parent = GameObject.Find("PlayerHUD/HelmetOffUI").transform;
             var canvas = CreateObject(canvasObj, parent).GetComponent<Canvas>();

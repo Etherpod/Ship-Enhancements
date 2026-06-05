@@ -94,6 +94,8 @@ public class DecoratorInterface : MonoBehaviour
 
 	public void Activate(DecoratorSelectionData data)
 	{
+		if (_activated) return;
+		
 		_selectedData = data;
 		_defaultOptions.SetDisplayOverride(data.GetDisplayName());
 		
@@ -125,8 +127,14 @@ public class DecoratorInterface : MonoBehaviour
 
 	public void Deactivate()
 	{
-		_activeWindow.Deactivate();
-		_activeWindow = null;
+		if (!_activated) return;
+		
+		if (_activeWindow != null)
+		{
+			_activeWindow.Deactivate();
+			_activeWindow = null;
+		}
+		
 		_defaultOptions.ClearDisplayedOptions();
 		_defaultOptions.OnSubmitOption -= OnSubmitWindowOption;
 		
