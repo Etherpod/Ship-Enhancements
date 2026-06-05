@@ -1,11 +1,12 @@
-﻿using UnityEngine;
+﻿using ShipEnhancements.Items;
+using UnityEngine;
 
 namespace ShipEnhancements.Decoration;
 
 public class DecoratorSelection : MonoBehaviour
 {
 	[SerializeField]
-	private Collider _collider;
+	private GameObject _collider;
 	[SerializeField]
 	private OWRenderer _renderer;
 	[SerializeField]
@@ -18,6 +19,7 @@ public class DecoratorSelection : MonoBehaviour
 	private readonly int _highlightPropertyID = Shader.PropertyToID("_HighlightAmount");
 	private DecoratorSelectionGroup _group;
 
+	private bool _decoratorEquipped;
 	private bool _selected;
 	private bool _highlighted;
 	
@@ -39,13 +41,13 @@ public class DecoratorSelection : MonoBehaviour
 	{
 		GlobalMessenger.AddListener("EnterShip", OnEnterShip);
 		GlobalMessenger.AddListener("ExitShip", OnExitShip);
+		GlobalMessenger<DecoratorItem>.AddListener("SE_EquipDecorator", OnEquipDecorator);
+		GlobalMessenger<DecoratorItem>.AddListener("SE_UnequipDecorator", OnUnequipDecorator);
 	}
 
 	private void Start()
 	{
-		_collider.enabled = _interiorOnly == _exteriorOnly ||
-			(PlayerState.IsInsideShip() && _interiorOnly) ||
-			(!PlayerState.IsInsideShip() && _exteriorOnly);
+		UpdateColliderActivation();
 		_renderer.SetFade(0);
 		enabled = false;
 	}
@@ -94,6 +96,13 @@ public class DecoratorSelection : MonoBehaviour
 		enabled = true;
 	}
 
+	private void UpdateColliderActivation()
+	{
+		_collider.SetActive(_decoratorEquipped && (_interiorOnly == _exteriorOnly ||
+			(PlayerState.IsInsideShip() && _interiorOnly) ||
+			(!PlayerState.IsInsideShip() && _exteriorOnly)));
+	}
+
 	public void SetSelectionGroup(DecoratorSelectionGroup group)
 	{
 		_group = group;
@@ -119,17 +128,31 @@ public class DecoratorSelection : MonoBehaviour
 
 	private void OnEnterShip()
 	{
-		_collider.enabled = _interiorOnly || _interiorOnly == _exteriorOnly;
+		UpdateColliderActivation();
 	}
 
 	private void OnExitShip()
 	{
-		_collider.enabled = _exteriorOnly || _exteriorOnly == _interiorOnly;
+		UpdateColliderActivation();
+	}
+
+	private void OnEquipDecorator(DecoratorItem item)
+	{
+		_decoratorEquipped = true;
+		UpdateColliderActivation();
+	}
+	
+	private void OnUnequipDecorator(DecoratorItem item)
+	{		
+		_decoratorEquipped = false;
+		UpdateColliderActivation();
 	}
 
 	private void OnDestroy()
 	{
 		GlobalMessenger.RemoveListener("EnterShip", OnEnterShip);
 		GlobalMessenger.RemoveListener("ExitShip", OnExitShip);
+		GlobalMessenger<DecoratorItem>.RemoveListener("SE_EquipDecorator", OnEquipDecorator);
+		GlobalMessenger<DecoratorItem>.RemoveListener("SE_UnequipDecorator", OnUnequipDecorator);
 	}
 }

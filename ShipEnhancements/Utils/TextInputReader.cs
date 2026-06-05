@@ -32,6 +32,7 @@ public class TextInputReader : MonoBehaviour
 
 	private void Start()
 	{
+		_caretIndex = _textField.text.Length;
 		_updateCaretNextFrame = true;
 	}
 	

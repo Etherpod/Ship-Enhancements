@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using ShipEnhancements.Utils;
 using UnityEngine;
 
@@ -10,7 +11,6 @@ public class PlantSelectorModule : SelectorModule
 	private GameObject[] _plantPrefabs;
 
 	private GameObject _defaultPlant;
-	private string  _currentName;
 	private GameObject _currentPlant;
 
 	private void Start()
@@ -33,16 +33,19 @@ public class PlantSelectorModule : SelectorModule
 		for (int i = 0; i < _optionNames.Length; i++)
 		{
 			if (i >= _plantPrefabs.Length) break;
-			data.Add(new PlantSelectorOptionData(_optionNames[i], _plantPrefabs[i]));
+			data.Add(new PlantSelectorOptionData(i, _optionNames[i], _plantPrefabs[i]));
 		}
 
 		return data.ToArray();
 	}
 
+	// this needs to be changed to select for preview
 	protected override void OnSubmitOption(OptionsListElementData data)
 	{
 		if (data is not PlantSelectorOptionData plantData ||
-			plantData.displayName == _currentName) return;
+			data.listIndex == _selectedIndex) return;
+		
+		base.OnSubmitOption(data);
 		
 		if (_currentPlant != null)
 		{
@@ -65,8 +68,6 @@ public class PlantSelectorModule : SelectorModule
 		{
 			_defaultPlant.SetActive(false);
 		}
-
-		_currentName = plantData.displayName;
 	}
 
 	public override float GetSelectionFadeOverride() => 0f;
@@ -76,7 +77,7 @@ public class PlantSelectorOptionData : OptionsListElementData
 {
 	public GameObject plantPrefab;
 
-	public PlantSelectorOptionData(string name, GameObject prefab) : base(name)
+	public PlantSelectorOptionData(int index, string name, GameObject prefab) : base(index, name)
 	{
 		plantPrefab = prefab;
 	}

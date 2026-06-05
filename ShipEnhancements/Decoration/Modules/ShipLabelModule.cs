@@ -9,6 +9,7 @@ public class ShipLabelModule : TextInputModule
 
 	protected override void OnTextUpdated(string text)
 	{
+		base.OnTextUpdated(text);
 		_nameManager.SetShipName(text);
 	}
 }

@@ -27,11 +27,13 @@ public class ImagePreviewElement : DecoratorInterfaceElement
 
 public class ImagePreviewElementData
 {
+	public int listIndex;
 	public Color imageColor;
 	public Texture2D imageTexture;
 
-	public ImagePreviewElementData(Color color, Texture2D texture = null)
+	public ImagePreviewElementData(int index, Color color, Texture2D texture = null)
 	{
+		listIndex = index;
 		imageColor = color;
 		imageTexture = texture;
 	}

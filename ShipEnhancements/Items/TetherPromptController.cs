@@ -15,8 +15,8 @@ public class TetherPromptController : MonoBehaviour
         _reelOutPrompt = new ScreenPrompt(InputLibrary.toolOptionDown, "<CMD>" + "   " + "Reel tether out", 0, ScreenPrompt.DisplayState.Normal, false);
         _disconnectPrompt = new ScreenPrompt(InputLibrary.freeLook, InputLibrary.interact, "<CMD>   Disconnect Tether", ScreenPrompt.MultiCommandType.HOLD_ONE_AND_PRESS_2ND);
 
-        GlobalMessenger.AddListener("AttachPlayerTether", OnAttachPlayerTether);
-        GlobalMessenger.AddListener("DetachPlayerTether", OnDetachPlayerTether);
+        GlobalMessenger.AddListener("SE_AttachPlayerTether", OnAttachPlayerTether);
+        GlobalMessenger.AddListener("SE_DetachPlayerTether", OnDetachPlayerTether);
 
         ShipEnhancements.Instance.ModHelper.Events.Unity.RunWhen(() => Locator.GetPromptManager() != null, () =>
         {
@@ -54,7 +54,7 @@ public class TetherPromptController : MonoBehaviour
 
     private void OnDestroy()
     {
-        GlobalMessenger.RemoveListener("AttachPlayerTether", OnAttachPlayerTether);
-        GlobalMessenger.RemoveListener("DetachPlayerTether", OnDetachPlayerTether);
+        GlobalMessenger.RemoveListener("SE_AttachPlayerTether", OnAttachPlayerTether);
+        GlobalMessenger.RemoveListener("SE_DetachPlayerTether", OnDetachPlayerTether);
     }
 }

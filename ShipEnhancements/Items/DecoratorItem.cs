@@ -149,6 +149,18 @@ public class DecoratorItem : OWItem
 		_currentSelection.SetFadeOverride(fadeOverride);
 	}
 
+	public override void PickUpItem(Transform holdTranform)
+	{
+		base.PickUpItem(holdTranform);
+		GlobalMessenger<DecoratorItem>.FireEvent("SE_EquipDecorator", this);
+	}
+
+	public override void DropItem(Vector3 position, Vector3 normal, Transform parent, Sector sector, IItemDropTarget customDropTarget)
+	{
+		base.DropItem(position, normal, parent, sector, customDropTarget);
+		GlobalMessenger<DecoratorItem>.FireEvent("SE_UnequipDecorator", this);
+	}
+
 	public override void OnDestroy()
 	{
 		base.OnDestroy();

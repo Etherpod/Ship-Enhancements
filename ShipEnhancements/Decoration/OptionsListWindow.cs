@@ -61,6 +61,16 @@ public class OptionsListWindow : DecoratorInterfaceWindow
 
 	public OptionsListElement[] GetDisplayedOptions() => _displayedOptions.ToArray();
 
+	public void SelectElementAtIndex(int index)
+	{
+		var element = _displayedOptions
+			.FirstOrDefault(e => e.GetData().listIndex == index);
+		if (element != null)
+		{
+			// select
+		}
+	}
+
 	private void OnElementSubmitted(DecoratorInterfaceElement element)
 	{
 		if (element is not OptionsListElement option ||

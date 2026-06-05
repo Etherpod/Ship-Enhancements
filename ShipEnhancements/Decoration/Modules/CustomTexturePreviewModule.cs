@@ -16,10 +16,12 @@ public class CustomTexturePreviewModule : ImagePreviewModule
 	protected override ImagePreviewElementData[] GenerateOptionData()
 	{
 		List<ImagePreviewElementData> data = [];
+		int startIndex = 0;
 		
 		if (_defaultTexture != null)
 		{
-			data.Add(new ImagePreviewElementData(Color.white, _defaultTexture));
+			data.Add(new ImagePreviewElementData(0, Color.white, _defaultTexture));
+			startIndex++;
 		}
 
 		List<string> files = [];
@@ -30,15 +32,15 @@ public class CustomTexturePreviewModule : ImagePreviewModule
 				$"*.{type}", SearchOption.TopDirectoryOnly));
 		}
 
-		foreach (var file in files)
+		for (int i = 0; i < files.Count; i++)
 		{
-			var fileData = File.ReadAllBytes(file);
+			var fileData = File.ReadAllBytes(files[i]);
 			var tex = new Texture2D(2, 2);
 			tex.LoadImage(fileData);
 
 			if (tex != null)
 			{
-				data.Add(new ImagePreviewElementData(Color.white, tex));
+				data.Add(new ImagePreviewElementData(i + startIndex, Color.white, tex));
 			}
 		}
 		

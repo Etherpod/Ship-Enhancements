@@ -19,8 +19,8 @@ public class TetherAudioController : MonoBehaviour
 
     private void Awake()
     {
-        GlobalMessenger.AddListener("AttachPlayerTether", OnAttachPlayerTether);
-        GlobalMessenger.AddListener("DetachPlayerTether", OnDetachPlayerTether);
+        GlobalMessenger.AddListener("SE_AttachPlayerTether", OnAttachPlayerTether);
+        GlobalMessenger.AddListener("SE_DetachPlayerTether", OnDetachPlayerTether);
 
         enabled = false;
     }
@@ -90,7 +90,7 @@ public class TetherAudioController : MonoBehaviour
 
     private void OnDestroy()
     {
-        GlobalMessenger.RemoveListener("AttachPlayerTether", OnAttachPlayerTether);
-        GlobalMessenger.RemoveListener("DetachPlayerTether", OnDetachPlayerTether);
+        GlobalMessenger.RemoveListener("SE_AttachPlayerTether", OnAttachPlayerTether);
+        GlobalMessenger.RemoveListener("SE_DetachPlayerTether", OnDetachPlayerTether);
     }
 }

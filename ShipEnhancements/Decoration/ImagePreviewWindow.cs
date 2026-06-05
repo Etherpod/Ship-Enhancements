@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using ShipEnhancements.Decoration.Modules;
 using UnityEngine;
 
@@ -71,6 +72,16 @@ public class ImagePreviewWindow : DecoratorInterfaceWindow
 		foreach (var preview in _previews)
 		{
 			preview.gameObject.SetActive(true);
+		}
+	}
+
+	public void SelectElementAtIndex(int index)
+	{
+		var element = _previews
+			.FirstOrDefault(e => e.GetData().listIndex == index);
+		if (element != null)
+		{
+			// select
 		}
 	}
 

@@ -207,7 +207,7 @@ public class Tether : MonoBehaviour
 
         if (attachedToPlayer)
         {
-            ShipEnhancements.Instance.ModHelper.Events.Unity.FireOnNextUpdate(() => GlobalMessenger.FireEvent("AttachPlayerTether"));
+            ShipEnhancements.Instance.ModHelper.Events.Unity.FireOnNextUpdate(() => GlobalMessenger.FireEvent("SE_AttachPlayerTether"));
         }
     }
 
@@ -244,7 +244,7 @@ public class Tether : MonoBehaviour
 
         if (attachedToPlayer)
         {
-            GlobalMessenger.FireEvent("DetachPlayerTether");
+            GlobalMessenger.FireEvent("SE_DetachPlayerTether");
         }
     }
 

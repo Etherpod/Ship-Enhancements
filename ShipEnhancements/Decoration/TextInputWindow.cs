@@ -22,11 +22,6 @@ public class TextInputWindow : DecoratorInterfaceWindow
 	private bool _popupEnabled;
 	private string _rawText;
 
-	private void Start()
-	{
-		_rawText = _textPreview.text;
-	}
-
 	private void Update()
 	{
 		if (!_popupEnabled && OWInput.IsNewlyPressed(InputLibrary.interactSecondary, InputMode.Character))
@@ -61,9 +56,15 @@ public class TextInputWindow : DecoratorInterfaceWindow
 		}
 	}
 
+	public void SetText(string text)
+	{
+		_rawText = text;
+	}
+
 	public override void Activate()
 	{
 		base.Activate();
+		_textWrapper.SetText(_rawText);
 		_inputPopupPrefab.SetActive(false);
 		var popup = ShipEnhancements.CreateObject(_inputPopupPrefab, _interface.transform);
 		_popup = popup.GetComponent<TextInputPopup>();

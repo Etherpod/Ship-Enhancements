@@ -41,7 +41,7 @@ public class DecoratorInterface : MonoBehaviour
 	{
 		if (!_activated) return;
 		
-		if (_activeElement != null)
+		if (_activeElement != null && _activeElement.gameObject.activeInHierarchy)
 		{
 			UpdateNavigation();
 		}
@@ -110,7 +110,7 @@ public class DecoratorInterface : MonoBehaviour
 					continue;
 				}
 				var window = data.GetModules()[i].CreateWindow(_layoutParent);
-				windowData.Add(new WindowOptionData(data.GetModules()[i].GetDisplayName(), window));
+				windowData.Add(new WindowOptionData(i, data.GetModules()[i].GetDisplayName(), window));
 			}
 			
 			_defaultOptions.AddDisplayedOptions(windowData.ToArray());
@@ -214,7 +214,7 @@ public class WindowOptionData : OptionsListElementData
 {
 	public DecoratorInterfaceWindow linkedWindow;
 
-	public WindowOptionData(string name, DecoratorInterfaceWindow window) : base(name)
+	public WindowOptionData(int index, string name, DecoratorInterfaceWindow window) : base(index, name)
 	{
 		linkedWindow = window;
 	}

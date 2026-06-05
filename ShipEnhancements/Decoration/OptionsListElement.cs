@@ -54,10 +54,12 @@ public class OptionsListElement : DecoratorInterfaceElement
 
 public class OptionsListElementData
 {
+	public int listIndex;
 	public string displayName;
 
-	public OptionsListElementData(string name)
+	public OptionsListElementData(int index, string name)
 	{
+		listIndex = index;
 		displayName = name;
 	}
 }

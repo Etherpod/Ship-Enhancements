@@ -12,7 +12,7 @@ public class ManualTextWrapper : MonoBehaviour
 	private Text _text;
 	private TextStyleApplier _styleApplier;
     
-	private void Start()
+	private void Awake()
 	{
 		_text = this.GetRequiredComponent<Text>();
 		_styleApplier = GetComponent<TextStyleApplier>();
