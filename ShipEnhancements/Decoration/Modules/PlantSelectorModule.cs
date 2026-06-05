@@ -18,11 +18,19 @@ public class PlantSelectorModule : SelectorModule
 		_defaultPlant = SELocator.GetShipTransform()
 			.Find("Module_Cockpit/Props_Cockpit/Props_HEA_ShipFoliage").gameObject;
 
-		foreach (var prefab in _plantPrefabs)
+		for (int i = 0; i < _plantPrefabs.Length; i++)
 		{
-			if (prefab != null)
+			if (_plantPrefabs[i] != null)
 			{
-				AssetBundleUtilities.ReplaceShaders(prefab);
+				AssetBundleUtilities.ReplaceShaders(_plantPrefabs[i]);
+
+				if (_optionNames[i] == "Cactus")
+				{
+					_plantPrefabs[i].transform.Find("Props_HGT_Cactus_Single_A_Alt/DethornedCactus").gameObject
+						.SetActive(!(bool)Settings.disableHazardPrevention.GetProperty());
+					_plantPrefabs[i].transform.Find("Props_HGT_Cactus_Single_A_Alt/ThornedCactus").gameObject
+						.SetActive((bool)Settings.disableHazardPrevention.GetProperty());
+				}
 			}
 		}
 	}
