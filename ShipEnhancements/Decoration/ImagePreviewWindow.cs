@@ -10,18 +10,26 @@ public class ImagePreviewWindow : DecoratorInterfaceWindow
 	public delegate void OptionStateEvent(ImagePreviewElementData data);
 	public event OptionStateEvent OnSelectOption;
 	public event OptionStateEvent OnSubmitOption;
-	
+
+	[SerializeField]
+	private Transform _layoutParent;
 	[SerializeField]
 	private GameObject _elementRowTemplate;
 	[SerializeField]
 	private GameObject _previewTemplate;
 	[SerializeField]
 	private int _rowSize = 3;
+	[SerializeField]
+	private GameObject _colorPickerHint;
+	[SerializeField]
+	private GameObject _resetHint;
 
 	private List<ImagePreviewElement> _previews = [];
 	private ImagePreviewElement _activeElement;
+	private bool _hasColorPicker;
+	private ImagePreviewElementData _defaultData;
 
-	public void Initialize(ImagePreviewElementData[] elementData)
+	public void Initialize(ImagePreviewElementData[] elementData, bool showColorPicker = false)
 	{
 		List<Transform> elementRows = [];
 
@@ -32,7 +40,7 @@ public class ImagePreviewWindow : DecoratorInterfaceWindow
 			
 			if (c == 0)
 			{
-				elementRows.Add(Instantiate(_elementRowTemplate, transform).transform);
+				elementRows.Add(Instantiate(_elementRowTemplate, _layoutParent).transform);
 			}
 			
 			_previews.Add(Instantiate(_previewTemplate, elementRows[r]).GetComponent<ImagePreviewElement>());
@@ -54,9 +62,22 @@ public class ImagePreviewWindow : DecoratorInterfaceWindow
 					upElement.SetDownElement(activeElement);
 					activeElement.SetUpElement(upElement);
 				}
+
+				// link larger row to smaller row
+				if (i == elementData.Length - 1 && c < _rowSize - 1)
+				{
+					for (int k = 1; k < _rowSize - c; k++)
+					{
+						var extraElement = _previews[i - _rowSize + k];
+						if (extraElement)
+						{
+							extraElement.SetDownElement(activeElement);
+						}
+					}
+				}
 			}
 			
-			if (c > 0)
+			if (i > 0)
 			{
 				var leftElement = _previews[i - 1];
 				if (leftElement)
@@ -76,6 +97,21 @@ public class ImagePreviewWindow : DecoratorInterfaceWindow
 		{
 			preview.gameObject.SetActive(true);
 		}
+
+		if (showColorPicker)
+		{
+			_hasColorPicker = true;
+			_colorPickerHint.SetActive(true);
+		}
+		else
+		{
+			_colorPickerHint.SetActive(false);
+		}
+
+		if (_defaultData == null)
+		{
+			_resetHint.SetActive(false);
+		}
 	}
 
 	public void SetInitialIndex(int index)
@@ -86,6 +122,32 @@ public class ImagePreviewWindow : DecoratorInterfaceWindow
 		{
 			_activeElement = element;
 			_firstSelectedElement = element;
+		}
+	}
+
+	public void SetDefaultData(ImagePreviewElementData data)
+	{
+		if (data != null)
+		{
+			_defaultData = data;
+			_resetHint.SetActive(true);
+		}
+	}
+
+	private void Update()
+	{
+		if (_defaultData != null && 
+			OWInput.IsNewlyPressed(InputLibrary.autopilot, InputMode.Character))
+		{
+			if (_activeElement != null)
+			{
+				_activeElement.Unsubmit();
+				_activeElement = null;
+			}
+
+			Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.Menu_ResetDefaults);
+			OnSelectOption?.Invoke(_defaultData);
+			OnSubmitOption?.Invoke(_defaultData);
 		}
 	}
 
@@ -108,10 +170,11 @@ public class ImagePreviewWindow : DecoratorInterfaceWindow
 		}
 		
 		_activeElement = preview;
+		OnSelectOption?.Invoke(preview.GetData());
 		OnSubmitOption?.Invoke(preview.GetData());
 	}
 
-	public override void Activate()
+	public override void Activate() 
 	{
 		base.Activate();
 		if (_activeElement != null)
@@ -130,6 +193,11 @@ public class ImagePreviewWindow : DecoratorInterfaceWindow
 				OnElementSelected(_activeElement);
 			}
 		}
+		else
+		{
+			OnSelectOption?.Invoke(_defaultData);
+		}
+		
 		base.Deactivate();
 	}
 

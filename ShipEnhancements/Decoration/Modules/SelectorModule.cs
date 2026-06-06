@@ -10,6 +10,7 @@ public class SelectorModule : DecorationModule
 	protected string[] _optionNames;
 
 	protected int _selectedIndex;
+	protected OptionsListElementData _defaultData;
 
 	public override DecoratorInterfaceWindow CreateWindow(Transform parent)
 	{

@@ -10,20 +10,11 @@ public class CustomTexturePreviewModule : ImagePreviewModule
 	protected string _texturePath;
 	[SerializeField]
 	protected string[] _validFileTypes;
-
-	protected Texture2D _defaultTexture;
 	
 	protected override ImagePreviewElementData[] GenerateOptionData()
 	{
 		List<ImagePreviewElementData> data = [];
-		int startIndex = 0;
 		
-		if (_defaultTexture != null)
-		{
-			data.Add(new ImagePreviewElementData(0, Color.white, _defaultTexture));
-			startIndex++;
-		}
-
 		List<string> files = [];
 		foreach (var type in _validFileTypes)
 		{
@@ -40,7 +31,7 @@ public class CustomTexturePreviewModule : ImagePreviewModule
 
 			if (tex != null)
 			{
-				data.Add(new ImagePreviewElementData(i + startIndex, Color.white, tex));
+				data.Add(new ImagePreviewElementData(i, Color.white, tex));
 			}
 		}
 		

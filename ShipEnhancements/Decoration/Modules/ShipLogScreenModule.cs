@@ -11,7 +11,12 @@ public class ShipLogScreenModule : CustomTexturePreviewModule
 		_shipLogRenderer = SELocator.GetShipBody()
 			.GetComponentInChildren<ShipLogSplashScreen>()
 			.GetComponent<MeshRenderer>();
-		_defaultTexture = (Texture2D)_shipLogRenderer.sharedMaterial.GetTexture("_MainTex");
+	}
+	
+	protected override ImagePreviewElementData GenerateDefaultData()
+	{
+		var tex = (Texture2D)_shipLogRenderer.sharedMaterial.GetTexture("_MainTex");
+		return new ImagePreviewElementData(-1, Color.white, tex);
 	}
 	
 	protected override void OnSelectOption(ImagePreviewElementData data)

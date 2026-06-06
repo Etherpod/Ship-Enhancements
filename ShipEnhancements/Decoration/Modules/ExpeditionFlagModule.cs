@@ -7,10 +7,10 @@ public class ExpeditionFlagModule : CustomTexturePreviewModule
 {
 	[SerializeField]
 	private ExpeditionFlagItem _flagItem;
-
-	private void Start()
+	
+	protected override ImagePreviewElementData GenerateDefaultData()
 	{
-		_defaultTexture = _flagItem.GetFlagTexture();
+		return new ImagePreviewElementData(-1, Color.white, _flagItem.GetFlagTexture());
 	}
 
 	protected override void OnSelectOption(ImagePreviewElementData data)
