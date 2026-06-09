@@ -117,6 +117,8 @@ public class DecoratorItem : OWItem
 			
 			_interface.Activate(data);
 			_interface.OnInterfaceDeactivated += OnInterfaceDeactivated;
+			_interface.OnEnterMultiSelect += OnEnterMultiSelect;
+			_interface.OnExitMultiSelect += OnExitMultiSelect;
 		}
 	}
 
@@ -137,11 +139,23 @@ public class DecoratorItem : OWItem
 	private void OnInterfaceDeactivated()
 	{
 		_interface.OnInterfaceDeactivated -= OnInterfaceDeactivated;
+		_interface.OnEnterMultiSelect -= OnEnterMultiSelect;
+		_interface.OnExitMultiSelect -= OnExitMultiSelect;
 		if (_currentSelection != null)
 		{
 			ToggleCurrentSelection(false);
 			_currentSelection = null;
 		}
+	}
+	
+	private void OnEnterMultiSelect()
+	{
+		
+	}
+	
+	private void OnExitMultiSelect()
+	{
+		
 	}
 
 	private void OnInterfaceModeActivated(float fadeOverride)

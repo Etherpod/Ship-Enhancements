@@ -64,6 +64,8 @@ public class DecoratorInterfaceWindow : MonoBehaviour
 		_module = module;
 	}
 
+	public bool IsActive() => _active;
+
 	public void SetDisplayOverride(string text) => _headerOverride = text;
 
 	public string GetDisplayOverride() => _headerOverride;

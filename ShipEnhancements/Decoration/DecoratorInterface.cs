@@ -12,6 +12,11 @@ public class DecoratorInterface : MonoBehaviour
 
 	public delegate void ActivateModeEvent(float fadeOverride);
 	public event ActivateModeEvent OnModeActivated;
+
+	public delegate void MultiSelectEvent();
+
+	public event MultiSelectEvent OnEnterMultiSelect;
+	public event MultiSelectEvent OnExitMultiSelect;
 	
 	[SerializeField]
 	private CanvasGroupAnimator _canvasGroupAnimator;
@@ -21,8 +26,11 @@ public class DecoratorInterface : MonoBehaviour
 	private Text _headerLabel;
 	[SerializeField]
 	private OptionsListWindow _defaultOptions;
+	[SerializeField]
+	private GameObject _multiSelectHint;
 
 	private bool _activated;
+	private bool _hasMultiSelect;
 
 	private List<DecoratorInterfaceElement> _elements = [];
 	private DecoratorInterfaceElement _selectedElement;
@@ -43,6 +51,12 @@ public class DecoratorInterface : MonoBehaviour
 		if (_selectedElement != null && _selectedElement.gameObject.activeInHierarchy)
 		{
 			UpdateNavigation();
+		}
+
+		if (_hasMultiSelect && _defaultOptions.IsActive() &&
+			OWInput.IsNewlyPressed(InputLibrary.interactSecondary, InputMode.Character))
+		{
+			
 		}
 		
 		if (OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.Character))
@@ -114,6 +128,18 @@ public class DecoratorInterface : MonoBehaviour
 			
 			_defaultOptions.AddDisplayedOptions(windowData.ToArray());
 			_defaultOptions.OnSubmitOption += OnSubmitWindowOption;
+		}
+
+		if (_selectedData.TryGetComponent(out DecoratorSelectionGroup group) &&
+			group.GetSelectors().Length > 1)
+		{
+			_multiSelectHint.SetActive(true);
+			_hasMultiSelect = true;
+		}
+		else
+		{
+			_multiSelectHint.SetActive(false);
+			_hasMultiSelect = false;
 		}
 		
 		SwitchToWindow(_defaultOptions);

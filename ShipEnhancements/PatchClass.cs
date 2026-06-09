@@ -711,6 +711,12 @@ public static class PatchClass
     [HarmonyPatch(typeof(ShipThrusterController), nameof(ShipThrusterController.ReadTranslationalInput))]
     public static void LimitTranslationalInput(ShipThrusterController __instance, ref Vector3 __result)
     {
+        if (__result != Vector3.zero && !SELocator.GetShipResources().AreThrustersUsable())
+        {
+            __result = Vector3.zero;
+            return;
+        }
+        
         if ((bool)enableThrustModulator.GetProperty())
         {
             __result *= ShipEnhancements.Instance.ThrustModulatorFactor
