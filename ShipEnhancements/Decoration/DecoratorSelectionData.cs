@@ -14,13 +14,5 @@ public class DecoratorSelectionData : MonoBehaviour
 
 	public DecorationModule[] GetModules() => _modules;
 
-	public void SetColor(Color color)
-	{
-		foreach (var light in SELocator.GetShipTransform().GetComponentsInChildren<ShipLight>(true))
-		{
-			light._light?.color = color;
-			light._matPropBlock?.SetColor(light._propID_EmissionColor, color);
-			light._emissiveRenderer?.SetPropertyBlock(light._matPropBlock);
-		}
-	}
+	
 }

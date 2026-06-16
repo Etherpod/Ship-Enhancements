@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using ShipEnhancements.Decoration;
 using UnityEngine;
 
@@ -11,6 +12,9 @@ public class DecoratorItem : OWItem
 	private readonly float _maxRaycastDistance = 100f;
 	private DecoratorInterface _interface;
 	private DecoratorSelection _currentSelection;
+	private bool _inMultiSelect;
+	private DecoratorSelection _currentSubSelection;
+	private List<DecoratorSelection> _multiSelectObjects = [];
 	
 	public override string GetDisplayName()
 	{
@@ -33,7 +37,8 @@ public class DecoratorItem : OWItem
 	{
 		if (Locator.GetToolModeSwapper().GetItemCarryTool().GetHeldItem() == this)
 		{
-			if (_currentSelection == null || !_currentSelection.IsActive())
+			if ((_currentSelection == null || !_currentSelection.IsActive()) && 
+			    !_inMultiSelect && !_interface.IsActive())
 			{
 				ProcessRaycast();
 			}
@@ -45,9 +50,7 @@ public class DecoratorItem : OWItem
 		}
 		else if (_currentSelection != null)
 		{
-			ToggleCurrentSelection(false);
-			_interface.Deactivate();
-			_currentSelection = null;
+			DisableSelection();
 		}
 	}
 
@@ -89,36 +92,91 @@ public class DecoratorItem : OWItem
 		}
 	}
 
+	private void UpdateMultiSelect()
+	{
+		if (!Physics.Raycast(Locator.GetPlayerCamera().transform.position, Locator.GetPlayerCamera().transform.forward,
+			    out RaycastHit hit, _maxRaycastDistance, OWLayerMask.interactMask))
+		{
+			if (_currentSubSelection != null && 
+			    !_multiSelectObjects.Contains(_currentSubSelection))
+			{
+				_currentSubSelection.SetActive(false);
+				_currentSubSelection = null;
+			}
+			
+			return;
+		}
+		
+		if (hit.collider.transform.parent.TryGetComponent(out DecoratorSelection selector) &&
+		    hit.distance <= selector.GetSelectDistance())
+		{
+			if (selector != _currentSubSelection)
+			{
+				if (_currentSubSelection != null && 
+				    !_multiSelectObjects.Contains(_currentSubSelection))
+				{
+					_currentSubSelection.SetActive(false);
+				}
+
+				_currentSubSelection = selector;
+				_currentSubSelection.SetActive(true);
+			}
+		}
+		else if (_currentSubSelection != null && 
+		         !_multiSelectObjects.Contains(_currentSubSelection))
+		{
+			_currentSubSelection.SetActive(false);
+			_currentSubSelection = null;
+		}
+	}
+
 	private void UpdateSelection()
 	{
 		if (OWInput.GetInputMode() != InputMode.Character &&
 			OWInput.GetInputMode() != InputMode.Menu)
 		{
-			ToggleCurrentSelection(false);
-            _interface.Deactivate();
-            _currentSelection = null;
+			DisableSelection();
             return;
 		}
-		
-		if (OWInput.IsNewlyPressed(InputLibrary.lockOn, InputMode.Character) && 
-			!_currentSelection.IsActive())
+
+		if (_inMultiSelect)
 		{
-			DecoratorSelectionData data;
-			if (_currentSelection.GetSelectionGroup() != null)
+			UpdateMultiSelect();
+		}
+		
+		if (OWInput.IsNewlyPressed(InputLibrary.lockOn, InputMode.Character))
+		{
+			if (_inMultiSelect && _currentSubSelection != null)
 			{
-				data = _currentSelection.GetSelectionGroup().GetComponent<DecoratorSelectionData>();
-				_currentSelection.GetSelectionGroup().SetAllActive(true);
+				if (!_multiSelectObjects.Contains(_currentSubSelection))
+				{
+					_multiSelectObjects.Add(_currentSubSelection);
+				}
+				else
+				{
+					_multiSelectObjects.Remove(_currentSubSelection);
+					_currentSubSelection.SetActive(false);
+				}
 			}
-			else
+			else if (!_currentSelection.IsActive())
 			{
-				data = _currentSelection.GetComponent<DecoratorSelectionData>();
-				_currentSelection.SetActive(true);
-			}
+				DecoratorSelectionData data;
+				if (_currentSelection.GetSelectionGroup() != null)
+				{
+					data = _currentSelection.GetSelectionGroup().GetComponent<DecoratorSelectionData>();
+					_currentSelection.GetSelectionGroup().SetAllActive(true);
+				}
+				else
+				{
+					data = _currentSelection.GetComponent<DecoratorSelectionData>();
+					_currentSelection.SetActive(true);
+				}
 			
-			_interface.Activate(data);
-			_interface.OnInterfaceDeactivated += OnInterfaceDeactivated;
-			_interface.OnEnterMultiSelect += OnEnterMultiSelect;
-			_interface.OnExitMultiSelect += OnExitMultiSelect;
+				_interface.Activate(data);
+				_interface.OnInterfaceDeactivated += OnInterfaceDeactivated;
+				_interface.OnEnterMultiSelect += OnEnterMultiSelect;
+				_interface.OnExitMultiSelect += OnExitMultiSelect;
+			}
 		}
 	}
 
@@ -136,6 +194,18 @@ public class DecoratorItem : OWItem
 		}
 	}
 	
+	// move into event?
+	private void DisableSelection()
+	{
+		ToggleCurrentSelection(false);
+		_interface.Deactivate();
+		_currentSelection = null;
+		_currentSubSelection = null;
+		_multiSelectObjects.Clear();
+		GlobalMessenger<DecoratorSelectionGroup>.FireEvent("SE_SetDecoratorMask", null);
+		_inMultiSelect = false;
+	}
+	
 	private void OnInterfaceDeactivated()
 	{
 		_interface.OnInterfaceDeactivated -= OnInterfaceDeactivated;
@@ -146,16 +216,35 @@ public class DecoratorItem : OWItem
 			ToggleCurrentSelection(false);
 			_currentSelection = null;
 		}
+
+		_currentSubSelection = null;
+		_multiSelectObjects.Clear();
+		GlobalMessenger<DecoratorSelectionGroup>.FireEvent("SE_SetDecoratorMask", null);
+		_inMultiSelect = false;
 	}
 	
 	private void OnEnterMultiSelect()
 	{
+		if (_currentSelection == null || 
+		    _currentSelection.GetSelectionGroup() == null)
+		{
+			return;
+		}
+
+		foreach (var selection in _currentSelection.GetSelectionGroup().GetSelectors())
+		{
+			selection.SetActive(_multiSelectObjects.Contains(selection));
+		}
 		
+		GlobalMessenger<DecoratorSelectionGroup>.FireEvent("SE_SetDecoratorMask", 
+			_currentSelection.GetSelectionGroup());
+		_inMultiSelect = true;
 	}
 	
 	private void OnExitMultiSelect()
 	{
-		
+		GlobalMessenger<DecoratorSelectionGroup>.FireEvent("SE_SetDecoratorMask", null);
+		_inMultiSelect = false;
 	}
 
 	private void OnInterfaceModeActivated(float fadeOverride)

@@ -31,6 +31,7 @@ public class DecoratorInterface : MonoBehaviour
 
 	private bool _activated;
 	private bool _hasMultiSelect;
+	private bool _inMultiSelect;
 
 	private List<DecoratorInterfaceElement> _elements = [];
 	private DecoratorInterfaceElement _selectedElement;
@@ -56,7 +57,16 @@ public class DecoratorInterface : MonoBehaviour
 		if (_hasMultiSelect && _defaultOptions.IsActive() &&
 			OWInput.IsNewlyPressed(InputLibrary.interactSecondary, InputMode.Character))
 		{
-			
+			if (!_inMultiSelect)
+			{
+				OnEnterMultiSelect?.Invoke();
+				_inMultiSelect = true;	
+			}
+			else
+			{
+				OnExitMultiSelect?.Invoke();
+				_inMultiSelect = false;
+			}
 		}
 		
 		if (OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.Character))
@@ -170,6 +180,7 @@ public class DecoratorInterface : MonoBehaviour
 		
 		Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.ShipLogDeselectEntry);
 		_canvasGroupAnimator.AnimateTo(0f, new Vector3(1f, 0f, 1f), 0.1f);
+		_inMultiSelect = false;
 		_activated = false;
 		enabled = false;
 		
@@ -233,6 +244,8 @@ public class DecoratorInterface : MonoBehaviour
 			_elements.Remove(element);
 		}
 	}
+
+	public bool IsActive() => _activated;
 }
 
 public class WindowOptionData : OptionsListElementData

@@ -20,6 +20,7 @@ public class DecoratorSelection : MonoBehaviour
 	private DecoratorSelectionGroup _group;
 
 	private bool _decoratorEquipped;
+	private bool _disabledByMask;
 	private bool _selected;
 	private bool _highlighted;
 	
@@ -43,6 +44,8 @@ public class DecoratorSelection : MonoBehaviour
 		GlobalMessenger.AddListener("ExitShip", OnExitShip);
 		GlobalMessenger<DecoratorItem>.AddListener("SE_EquipDecorator", OnEquipDecorator);
 		GlobalMessenger<DecoratorItem>.AddListener("SE_UnequipDecorator", OnUnequipDecorator);
+		GlobalMessenger<DecoratorSelectionGroup>
+			.AddListener("SE_SetDecoratorMask", OnSetDecoratorMask);
 	}
 
 	private void Start()
@@ -98,10 +101,8 @@ public class DecoratorSelection : MonoBehaviour
 
 	private void UpdateColliderActivation()
 	{
-		ShipEnhancements.WriteDebugMessage("update activation on " + gameObject.name);
-		if (!_decoratorEquipped)
+		if (!_decoratorEquipped || _disabledByMask)
 		{
-			ShipEnhancements.WriteDebugMessage("DISABLE");
 			_collider.SetActive(false);
 		}
 		else
@@ -154,6 +155,12 @@ public class DecoratorSelection : MonoBehaviour
 	private void OnUnequipDecorator(DecoratorItem item)
 	{		
 		_decoratorEquipped = false;
+		UpdateColliderActivation();
+	}
+
+	private void OnSetDecoratorMask(DecoratorSelectionGroup group)
+	{
+		_disabledByMask = group != null && group != _group;
 		UpdateColliderActivation();
 	}
 
