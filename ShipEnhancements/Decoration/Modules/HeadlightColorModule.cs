@@ -33,12 +33,12 @@ public class HeadlightColorModule : ImagePreviewModule
 			}
 		}
 
-		return new HeadlightColorElementData(-1, lightColor, emissiveColor);
+		return new LightColorElementData(-1, lightColor, emissiveColor);
 	}
 
 	protected override void OnSelectOption(ImagePreviewElementData data)
 	{
-		if (data is HeadlightColorElementData headlightData)
+		if (data is LightColorElementData headlightData)
 		{
 			foreach (var light in _headlightComponent._headlights)
 			{
@@ -73,15 +73,4 @@ public class HeadlightColorModule : ImagePreviewModule
 	}
 
 	public override float GetSelectionFadeOverride() => 0.1f;
-}
-
-public class HeadlightColorElementData : ImagePreviewElementData
-{
-	public Color emissiveRendererColor;
-
-	public HeadlightColorElementData(int index, Color lightColor, Color emissiveColor) : 
-		base(index, lightColor, null)
-	{
-		emissiveRendererColor = emissiveColor;
-	}
 }

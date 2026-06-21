@@ -13,9 +13,16 @@ public class DecoratorSelectionGroup : MonoBehaviour
 	private string[] _relativePaths;
 
 	private List<DecoratorSelection> _selectors = [];
-
+	private List<DecoratorSelection> _activeSelectors = [];
+	private DecoratorSelectionData _data;
+	
 	private void Start()
 	{
+		if (TryGetComponent(out DecoratorSelectionData data))
+		{
+			_data = data;
+		}
+		
 		if (_relativePaths.Length != _selectorPrefabs.Length)
 		{
 			ShipEnhancements.WriteDebugMessage($"ERROR - List lengths do not match on group {gameObject.name}");
@@ -38,13 +45,32 @@ public class DecoratorSelectionGroup : MonoBehaviour
 
 	public DecoratorSelection[] GetSelectors() => _selectors.ToArray();
 
+	public DecoratorSelection[] GetActiveSelectors() => _activeSelectors.ToArray();
+
+	public DecoratorSelectionData GetSelectionData() => _data;
+
 	public void SetAllSelected(bool selected)
 	{
 		_selectors.ForEach(s => s.SetSelected(selected));
 	}
 
-	public void SetAllActive(bool active)
+	public void SetAllActive(bool active, bool mask)
 	{
-		_selectors.ForEach(s => s.SetActive(active));
+		var list = mask ? _activeSelectors : _selectors;
+		list.ForEach(s => s.SetActive(active));
+	}
+
+	public void SetSelectorActive(DecoratorSelection selection, bool active)
+	{
+		if (!_selectors.Contains(selection)) return;
+
+		if (active && !_activeSelectors.Contains(selection))
+		{
+			_activeSelectors.Add(selection);
+		}
+		else if (!active && _activeSelectors.Contains(selection))
+		{
+			_activeSelectors.Remove(selection);
+		}
 	}
 }

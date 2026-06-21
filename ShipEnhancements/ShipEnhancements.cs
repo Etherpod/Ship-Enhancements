@@ -104,9 +104,7 @@ public class ShipEnhancements : ModBehaviour
     public AudioClip ShipHorn { get; private set; }
     public List<Settings> HiddenSettings { get; private set; } = [];
     public bool HidePreset = false;
-
-    private SettingPresets.PresetName _currentPreset = (SettingPresets.PresetName)(-1);
-    private bool _advancedColors = false;
+    
     public List<AntiRiverVolume> AntiRiverVolumes { get; private set; } = [];
 
     public GameObject DebugObjects { get; private set; }
@@ -115,10 +113,7 @@ public class ShipEnhancements : ModBehaviour
     private float _lastSuitOxygen;
     private bool _shipDestroyed;
     private bool _checkEndConversation = false;
-    private bool _setupQSB = false;
     private bool _disableAirWhenZeroOxygen = false;
-    private bool _unsubFromBodyLoaded = false;
-    private bool _unsubFromSystemLoaded = false;
     private bool _unsubFromShipSpawn = false;
     private ShipDetachableLeg _frontLeg = null;
     private List<OWAudioSource> _shipAudioToChange = [];
@@ -948,9 +943,7 @@ public class ShipEnhancements : ModBehaviour
             gameObject.AddComponent(nhAssembly.GetType("ShipEnhancementsNH.NHInteraction", true));
 
             NHAPI.GetBodyLoadedEvent().AddListener(OnNHBodyLoaded);
-            _unsubFromBodyLoaded = true;
             NHAPI.GetStarSystemLoadedEvent().AddListener(OnNHStarSystemLoaded);
-            _unsubFromSystemLoaded = true;
         }
     }
 
@@ -1505,7 +1498,7 @@ public class ShipEnhancements : ModBehaviour
             var font = (Font)Resources.Load(@"fonts\english - latin\HVD Fonts - BrandonGrotesque-Bold_Dynamic");
             if (font != null)
             {
-                ernestoObj.GetComponentInChildren<UnityEngine.UI.Text>().font = font;
+                ernestoObj.GetComponentInChildren<Text>().font = font;
             }
             DialogueBuilder.FixCustomDialogue(ernestoObj, "ConversationZone");
             DialogueBuilder.FixCustomDialogue(ernestoObj, "ConversationZone (1)");
@@ -1733,6 +1726,9 @@ public class ShipEnhancements : ModBehaviour
             var exteriorHullGroup =
                 LoadPrefab("Assets/ShipEnhancements/Items/Decorator/Selectors/SE_SelectionGroup_ExteriorHulls.prefab");
             CreateObject(exteriorHullGroup, SELocator.GetShipTransform());
+            var lightsGroup =
+                LoadPrefab("Assets/ShipEnhancements/Items/Decorator/Selectors/SE_SelectionGroup_Lights.prefab");
+            CreateObject(lightsGroup, SELocator.GetShipTransform());
 
             var rootPath = "Assets/ShipEnhancements/Items/Decorator/Selectors/SE_Selection_";
             var cockpitSelection = LoadPrefab(rootPath + "Cockpit.prefab");

@@ -18,6 +18,7 @@ public class DecoratorSelection : MonoBehaviour
 
 	private readonly int _highlightPropertyID = Shader.PropertyToID("_HighlightAmount");
 	private DecoratorSelectionGroup _group;
+	private DecoratorSelectionData _data;
 
 	private bool _decoratorEquipped;
 	private bool _disabledByMask;
@@ -50,6 +51,11 @@ public class DecoratorSelection : MonoBehaviour
 
 	private void Start()
 	{
+		if (TryGetComponent(out DecoratorSelectionData data))
+		{
+			_data = data;
+		}
+		
 		UpdateColliderActivation();
 		_renderer.SetFade(0);
 		enabled = false;
@@ -116,6 +122,7 @@ public class DecoratorSelection : MonoBehaviour
 	public void SetSelectionGroup(DecoratorSelectionGroup group)
 	{
 		_group = group;
+		_data = group.GetSelectionData();
 	}
 
 	public void SetFadeOverride(float fadeOverride)
@@ -129,6 +136,8 @@ public class DecoratorSelection : MonoBehaviour
 	}
 
 	public DecoratorSelectionGroup GetSelectionGroup() => _group;
+
+	public DecoratorSelectionData GetSelectionData() => _data;
 
 	public float GetSelectDistance() => _selectDistance;
 

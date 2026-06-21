@@ -13,6 +13,4 @@ public class DecoratorSelectionData : MonoBehaviour
 	public string GetDisplayName() => _displayName;
 
 	public DecorationModule[] GetModules() => _modules;
-
-	
 }

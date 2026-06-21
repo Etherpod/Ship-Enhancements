@@ -15,9 +15,8 @@ public class DecoratorInterface : MonoBehaviour
 
 	public delegate void MultiSelectEvent();
 
-	public event MultiSelectEvent OnEnterMultiSelect;
-	public event MultiSelectEvent OnExitMultiSelect;
-	
+	[SerializeField] 
+	private DecoratorSelectionManager _selectionManager;
 	[SerializeField]
 	private CanvasGroupAnimator _canvasGroupAnimator;
 	[SerializeField]
@@ -28,6 +27,8 @@ public class DecoratorInterface : MonoBehaviour
 	private OptionsListWindow _defaultOptions;
 	[SerializeField]
 	private GameObject _multiSelectHint;
+	[SerializeField]
+	private MultiSelectWindow _multiSelectWindow;
 
 	private bool _activated;
 	private bool _hasMultiSelect;
@@ -35,7 +36,7 @@ public class DecoratorInterface : MonoBehaviour
 
 	private List<DecoratorInterfaceElement> _elements = [];
 	private DecoratorInterfaceElement _selectedElement;
-
+	
 	private DecoratorSelectionData _selectedData;
 	private DecoratorInterfaceWindow _activeWindow;
 
@@ -49,27 +50,44 @@ public class DecoratorInterface : MonoBehaviour
 	{
 		if (!_activated) return;
 		
-		if (_selectedElement != null && _selectedElement.gameObject.activeInHierarchy)
+		if (_selectedElement != null && _selectedElement.gameObject.activeInHierarchy &&
+		    !_inMultiSelect)
 		{
 			UpdateNavigation();
 		}
 
-		if (_hasMultiSelect && _defaultOptions.IsActive() &&
+		if (_inMultiSelect)
+		{
+			if (OWInput.IsNewlyPressed(InputLibrary.toolOptionUp, InputMode.Character))
+			{
+				_selectionManager.AddAllInGroup(true);
+			}
+			else if (OWInput.IsNewlyPressed(InputLibrary.toolOptionDown, InputMode.Character))
+			{
+				_selectionManager.RemoveAllInGroup(true);
+			}
+		}
+
+		if (_hasMultiSelect && (_defaultOptions.IsActive() || _multiSelectWindow.IsActive()) &&
 			OWInput.IsNewlyPressed(InputLibrary.interactSecondary, InputMode.Character))
 		{
 			if (!_inMultiSelect)
 			{
-				OnEnterMultiSelect?.Invoke();
+				//OnEnterMultiSelect?.Invoke();
+				SwitchToWindow(_multiSelectWindow);
+				_selectionManager.EnableMultiSelect();
 				_inMultiSelect = true;	
 			}
 			else
 			{
-				OnExitMultiSelect?.Invoke();
+				//OnExitMultiSelect?.Invoke();
+				SwitchToWindow(_defaultOptions);
+				_selectionManager.DisableMultiSelect();
 				_inMultiSelect = false;
 			}
 		}
 		
-		if (OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.Character))
+		if (!_inMultiSelect && OWInput.IsNewlyPressed(InputLibrary.cancel, InputMode.Character))
 		{
 			if (_activeWindow != _defaultOptions)
 			{
@@ -115,25 +133,25 @@ public class DecoratorInterface : MonoBehaviour
 		}
 	}
 
-	public void Activate(DecoratorSelectionData data)
+	public void Activate()
 	{
 		if (_activated) return;
 		
-		_selectedData = data;
-		_defaultOptions.SetDisplayOverride(data.GetDisplayName());
+		_selectedData = _selectionManager.GetCurrentData();
+		_defaultOptions.SetDisplayOverride(_selectedData.GetDisplayName());
 		
-		if (data.GetModules().Length > 0)
+		if (_selectedData.GetModules().Length > 0)
 		{
 			List<OptionsListElementData> windowData = [];
-			for (int i = 0; i < data.GetModules().Length; i++)
+			for (int i = 0; i < _selectedData.GetModules().Length; i++)
 			{
-				if (data.GetModules()[i] == null)
+				if (_selectedData.GetModules()[i] == null)
 				{
-					ShipEnhancements.WriteDebugMessage("ERROR - Null module on " + data.gameObject.name);
+					ShipEnhancements.WriteDebugMessage("ERROR - Null module on " + _selectedData.gameObject.name);
 					continue;
 				}
-				var window = data.GetModules()[i].CreateWindow(_layoutParent);
-				windowData.Add(new WindowOptionData(i, data.GetModules()[i].GetDisplayName(), window));
+				var window = _selectedData.GetModules()[i].CreateWindow(_layoutParent);
+				windowData.Add(new WindowOptionData(i, _selectedData.GetModules()[i].GetDisplayName(), window));
 			}
 			
 			_defaultOptions.AddDisplayedOptions(windowData.ToArray());
@@ -180,7 +198,12 @@ public class DecoratorInterface : MonoBehaviour
 		
 		Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.ShipLogDeselectEntry);
 		_canvasGroupAnimator.AnimateTo(0f, new Vector3(1f, 0f, 1f), 0.1f);
-		_inMultiSelect = false;
+		if (_inMultiSelect)
+		{
+			_selectionManager.DisableMultiSelect();
+			_inMultiSelect = false;
+		}
+		_selectionManager.ClearSelections();
 		_activated = false;
 		enabled = false;
 		
@@ -200,6 +223,8 @@ public class DecoratorInterface : MonoBehaviour
 	}
 
 	public DecoratorInterfaceElement GetSelectedElement() => _selectedElement;
+
+	public DecoratorSelectionManager GetSelectionManager() => _selectionManager;
 
 	private void OnSubmitWindowOption(OptionsListElementData data)
 	{
@@ -224,7 +249,7 @@ public class DecoratorInterface : MonoBehaviour
 		
 		_headerLabel.text = window.GetDisplayOverride();
 		window.Activate();
-		OnModeActivated?.Invoke(window.GetSelectionFadeOverride());
+		_selectionManager.SetFadeOverride(window.GetSelectionFadeOverride());
 	}
 
 	public void AddInterfaceElement(DecoratorInterfaceElement element)
