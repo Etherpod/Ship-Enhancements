@@ -18,8 +18,16 @@ public class SelectorModule : DecorationModule
 		if (window == null) return window;
 
 		var data = GenerateOptionData();
+		
+		if (_defaultData == null)
+		{
+			_defaultData = GenerateDefaultData();
+		}
+		
+		window.SetDefaultData(_defaultData);
 		window.AddDisplayedOptions(data);
 		window.SetInitialIndex(_selectedIndex);
+		
 		window.OnSelectOption += OnSelectOption;
 		window.OnSubmitOption += OnSubmitOption;
 		return window;
@@ -34,6 +42,11 @@ public class SelectorModule : DecorationModule
 		}
 
 		return data.ToArray();
+	}
+	
+	protected virtual OptionsListElementData GenerateDefaultData()
+	{
+		return null;
 	}
 	
 	protected virtual void OnSelectOption(OptionsListElementData data) { }

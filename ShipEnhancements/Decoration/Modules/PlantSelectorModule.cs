@@ -9,6 +9,8 @@ public class PlantSelectorModule : SelectorModule
 {
 	[SerializeField]
 	private GameObject[] _plantPrefabs;
+	[SerializeField]
+	private bool[] _requiresDLC;
 
 	private GameObject _defaultPlant;
 	private GameObject _currentPlant;
@@ -41,12 +43,23 @@ public class PlantSelectorModule : SelectorModule
 		for (int i = 0; i < _optionNames.Length; i++)
 		{
 			if (i >= _plantPrefabs.Length) break;
+			if (i < _requiresDLC.Length && _requiresDLC[i] && 
+				EntitlementsManager.IsDlcOwned() != EntitlementsManager.AsyncOwnershipStatus.Owned)
+			{
+				continue;
+			}
+			
 			data.Add(new PlantSelectorOptionData(i, _optionNames[i], _plantPrefabs[i]));
 		}
 
 		return data.ToArray();
 	}
-	
+
+	protected override OptionsListElementData GenerateDefaultData()
+	{
+		return new PlantSelectorOptionData(-1, "Default", null);
+	}
+
 	protected override void OnSelectOption(OptionsListElementData data)
 	{
 		if (data is not PlantSelectorOptionData plantData) return;
@@ -57,7 +70,7 @@ public class PlantSelectorModule : SelectorModule
 			_currentPlant = null;
 		}
 
-		if (plantData.displayName == "Default")
+		if (plantData == _defaultData)
 		{
 			_defaultPlant.SetActive(true);
 		}

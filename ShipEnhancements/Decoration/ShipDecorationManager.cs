@@ -113,7 +113,7 @@ public static class ShipDecorationManager
         
         SetUpShipLogSplashScreen();
         ApplyHullDecoration();
-        SetGlassMaterial();
+        //SetGlassMaterial();
         SetShipPlantDecoration();
         SetStringLightDecoration();
         SetDamageColors();
@@ -324,9 +324,9 @@ public static class ShipDecorationManager
         );
     }
 
-    private static void SetGlassMaterial()
+    public static void SetGlassMaterial(Material material)
     {
-        string tex = (string)shipGlassTexture.GetProperty();
+        // TODO: save paths at start in case ship brok
         string[] paths =
         [
             "Module_Cockpit/Geo_Cockpit/Cockpit_Geometry/Cockpit_Exterior/CockpitExterior_GoldGlass",
@@ -334,7 +334,7 @@ public static class ShipDecorationManager
             "Module_Cabin/Geo_Cabin/Cabin_Tech/Cabin_Tech_Exterior/HatchPivot/Hatch_GoldGlass"
         ];
 
-        if (tex == "None")
+        if (material == null)
         {
             foreach (string child in paths)
             {
@@ -343,7 +343,8 @@ public static class ShipDecorationManager
                 {
                     if (rend.sharedMaterials[i] == null) continue;
                     
-                    if (rend.sharedMaterials[i] == _customGlassMat)
+                    if (rend.sharedMaterials[i] == _defaultGlassMat || 
+                        rend.sharedMaterials[i] == _customGlassMat)
                     {
                         List<Material> mats = new List<Material>();
                         mats.AddRange(rend.sharedMaterials);
@@ -357,9 +358,7 @@ public static class ShipDecorationManager
         }
         else
         {
-            string path = ShipEnhancements.ThemeManager.GetGlassMaterialPath((string)shipGlassTexture.GetProperty());
-            Material newMat = LoadMaterial(path);
-            _customGlassMat = new Material(newMat);
+            var newMat = new Material(material);
             
             foreach (string child in paths)
             {
@@ -368,15 +367,18 @@ public static class ShipDecorationManager
                 {
                     if (rend.sharedMaterials[i] == null) continue;
                     
-                    if (rend.sharedMaterials[i] == _defaultGlassMat)
+                    if (rend.sharedMaterials[i] == _defaultGlassMat || 
+                        rend.sharedMaterials[i] == _customGlassMat)
                     {
                         List<Material> mats = new List<Material>();
                         mats.AddRange(rend.sharedMaterials);
-                        mats[i] = _customGlassMat;
+                        mats[i] = newMat;
                         rend.sharedMaterials = mats.ToArray();
                     }
                 }
             }
+            
+            _customGlassMat = newMat;
         }
     }
 

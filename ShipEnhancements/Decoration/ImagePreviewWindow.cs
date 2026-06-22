@@ -111,6 +111,7 @@ public class ImagePreviewWindow : DecoratorInterfaceWindow
 		if (_defaultData == null)
 		{
 			_resetHint.SetActive(false);
+			enabled = false;
 		}
 	}
 
@@ -131,13 +132,19 @@ public class ImagePreviewWindow : DecoratorInterfaceWindow
 		{
 			_defaultData = data;
 			_resetHint.SetActive(true);
+			enabled = true;
 		}
 	}
 
 	private void Update()
 	{
-		if (_defaultData != null && 
-			OWInput.IsNewlyPressed(InputLibrary.autopilot, InputMode.Character))
+		if (_defaultData == null)
+		{
+			enabled = false;
+			return;
+		}
+		
+		if (OWInput.IsNewlyPressed(InputLibrary.autopilot, InputMode.Character))
 		{
 			if (_activeElement != null)
 			{

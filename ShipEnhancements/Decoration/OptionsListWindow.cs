@@ -16,9 +16,12 @@ public class OptionsListWindow : DecoratorInterfaceWindow
 	protected GameObject _optionTemplate;
 	[SerializeField]
 	protected Transform _rootTransform;
+	[SerializeField]
+	protected GameObject _resetHint;
 
 	protected List<OptionsListElement> _displayedOptions = [];
 	protected OptionsListElement _activeElement;
+	private OptionsListElementData _defaultData;
 
 	public OptionsListElement[] SetDisplayedOptions(OptionsListElementData[] names)
 	{
@@ -32,6 +35,8 @@ public class OptionsListWindow : DecoratorInterfaceWindow
 		{
 			var newOption = Instantiate(_optionTemplate, _rootTransform)
 				.GetComponent<OptionsListElement>();
+			// make sure reset hint is last
+			newOption.transform.SetSiblingIndex(_rootTransform.childCount - 2);
 			newOption.Initialize(elementData[i]);
 			
 			if (i > 0)
@@ -73,6 +78,43 @@ public class OptionsListWindow : DecoratorInterfaceWindow
 		{
 			_activeElement = element;
 			_firstSelectedElement = element;
+		}
+	}
+	
+	public void SetDefaultData(OptionsListElementData data)
+	{
+		if (data != null)
+		{
+			_defaultData = data;
+			_resetHint?.SetActive(true);
+			enabled = true;
+		}
+		else
+		{
+			_resetHint?.SetActive(false);
+			enabled = false;
+		}
+	}
+
+	private void Update()
+	{
+		if (_defaultData == null)
+		{
+			enabled = false;
+			return;
+		}
+		
+		if (OWInput.IsNewlyPressed(InputLibrary.autopilot, InputMode.Character))
+		{
+			if (_activeElement != null)
+			{
+				_activeElement.Unsubmit();
+				_activeElement = null;
+			}
+
+			Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.Menu_ResetDefaults);
+			OnSelectOption?.Invoke(_defaultData);
+			OnSubmitOption?.Invoke(_defaultData);
 		}
 	}
 	
