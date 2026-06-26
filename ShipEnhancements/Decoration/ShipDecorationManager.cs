@@ -26,6 +26,7 @@ public static class ShipDecorationManager
 	public static void Initialize()
 	{
         textureBlendMat = LoadMaterial("Assets/ShipEnhancements/Decoration/ShipTextures/ShipTextureBlend.mat");
+        Shader.SetGlobalFloat(Shader.PropertyToID("_GlitchScale"), 1f);
         
 		if (_defaultInteriorHullMat == null)
         {
@@ -154,9 +155,6 @@ public static class ShipDecorationManager
         string interiorWood = (string)interiorWoodColor1.GetProperty();
         string exteriorWood = (string)exteriorWoodColor1.GetProperty();
         
-        WriteDebugMessage("interior hull setting: " + interiorHull);
-        WriteDebugMessage("exterior hull setting: " + exteriorHull);
-        
         bool interiorHullTex = (string)interiorHullTexture.GetProperty() != "None";
         bool exteriorHullTex = (string)exteriorHullTexture.GetProperty() != "None";
         bool interiorWoodTex = (string)interiorWoodTexture.GetProperty() != "None";
@@ -186,6 +184,16 @@ public static class ShipDecorationManager
             _defaultSEInteriorMat1,
             _defaultSEInteriorMat2
         ];
+        
+        var intHullTex = LoadCustomTexture(interiorHullTex, interiorHullTexture, true);
+        var extHullTex = LoadCustomTexture(exteriorHullTex, exteriorHullTexture, true);
+        var intWoodTex = LoadCustomTexture(interiorWoodTex, interiorWoodTexture, false);
+        var extWoodTex = LoadCustomTexture(exteriorWoodTex, exteriorWoodTexture, false);
+        
+        var intHullBlendController = SELocator.GetShipBody().gameObject.GetAddComponent<InteriorHullBlendController>();
+        var extHullBlendController = SELocator.GetShipBody().gameObject.GetAddComponent<ExteriorHullBlendController>();
+        var intWoodBlendController = SELocator.GetShipBody().gameObject.GetAddComponent<InteriorWoodBlendController>();
+        var extWoodBlendController = SELocator.GetShipBody().gameObject.GetAddComponent<ExteriorWoodBlendController>();
 
         foreach (var blender in _textureBlenders.Values) blender.Dispose();
         _textureBlenders.Clear();
@@ -208,10 +216,14 @@ public static class ShipDecorationManager
 
                 var isCustom = new[]
                 {
-                    interiorMats.Contains(mat) && customizeInteriorHull,
+                    interiorMats.Contains(mat),
+                    mat == _defaultExteriorHullMat,
+                    mat == _defaultInteriorWoodMat,
+                    mat == _defaultExteriorWoodMat
+                    /*interiorMats.Contains(mat) && customizeInteriorHull,
                     mat == _defaultExteriorHullMat && customizeExteriorHull,
                     mat == _defaultInteriorWoodMat && customizeInteriorWood,
-                    mat == _defaultExteriorWoodMat && customizeExteriorWood
+                    mat == _defaultExteriorWoodMat && customizeExteriorWood*/
                 }.Any(b => b);
                 if (isCustom) return _textureBlenders[mat].BlendedMaterial;
 
@@ -220,16 +232,6 @@ public static class ShipDecorationManager
         }
         
         // DumpMats("D:/misc/files/mats_03.json");
-
-        var intHullTex = LoadCustomTexture(interiorHullTex, interiorHullTexture, true);
-        var extHullTex = LoadCustomTexture(exteriorHullTex, exteriorHullTexture, true);
-        var intWoodTex = LoadCustomTexture(interiorWoodTex, interiorWoodTexture, false);
-        var extWoodTex = LoadCustomTexture(exteriorWoodTex, exteriorWoodTexture, false);
-        
-        var intHullBlendController = SELocator.GetShipBody().gameObject.GetAddComponent<InteriorHullBlendController>();
-        var extHullBlendController = SELocator.GetShipBody().gameObject.GetAddComponent<ExteriorHullBlendController>();
-        var intWoodBlendController = SELocator.GetShipBody().gameObject.GetAddComponent<InteriorWoodBlendController>();
-        var extWoodBlendController = SELocator.GetShipBody().gameObject.GetAddComponent<ExteriorWoodBlendController>();
         
         foreach (var mat in interiorMats)
         {
@@ -277,6 +279,60 @@ public static class ShipDecorationManager
         }
         
         // DumpMats("D:/misc/files/mats_04.json");
+    }
+
+    public static void UpdateBlenderTexture(int blenderIndex, string texturePath)
+    {
+        bool hasTex = texturePath != "Default";
+
+        ShipTextureInfo texture = hasTex ? new ShipTextureInfo(texturePath, true) : null;
+        
+        if (blenderIndex == 0)
+        {
+            Material[] interiorMats =
+            [
+                _defaultInteriorHullMat,
+                _defaultSEInteriorMat1,
+                _defaultSEInteriorMat2
+            ];
+
+            foreach (var mat in interiorMats)
+            {
+                ConfigureBlender(
+                    mat,
+                    texturePath != "Default",
+                    texture,
+                    false,
+                    null,
+                    "Default"
+                );
+                
+                _textureBlenders[mat].UpdateFullTexture();
+            }
+        }
+        else
+        {
+            Material mat;
+            if (blenderIndex == 1) mat = _defaultExteriorHullMat;
+            else if (blenderIndex == 2) mat = _defaultInteriorWoodMat;
+            else if (blenderIndex == 3) mat = _defaultExteriorWoodMat;
+            else
+            {
+                WriteDebugMessage($"{blenderIndex} is invalid blender index!", error: true);
+                return;
+            }
+            
+            ConfigureBlender(
+                mat,
+                texturePath != "Default",
+                texture,
+                false,
+                null,
+                "Default"
+            );
+            
+            _textureBlenders[mat].UpdateFullTexture();
+        }
     }
 
     private static void ConfigureBlender(

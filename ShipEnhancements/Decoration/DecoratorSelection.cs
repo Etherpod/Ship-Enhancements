@@ -179,5 +179,7 @@ public class DecoratorSelection : MonoBehaviour
 		GlobalMessenger.RemoveListener("ExitShip", OnExitShip);
 		GlobalMessenger<DecoratorItem>.RemoveListener("SE_EquipDecorator", OnEquipDecorator);
 		GlobalMessenger<DecoratorItem>.RemoveListener("SE_UnequipDecorator", OnUnequipDecorator);
+		GlobalMessenger<DecoratorSelectionGroup>
+			.RemoveListener("SE_SetDecoratorMask", OnSetDecoratorMask);
 	}
 }

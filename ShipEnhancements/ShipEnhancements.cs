@@ -1723,6 +1723,9 @@ public class ShipEnhancements : ModBehaviour
             var thrusterGroup =
                 LoadPrefab("Assets/ShipEnhancements/Items/Decorator/Selectors/SE_SelectionGroup_Thrusters.prefab");
             CreateObject(thrusterGroup, SELocator.GetShipTransform());
+            var interiorHullGroup =
+                LoadPrefab("Assets/ShipEnhancements/Items/Decorator/Selectors/SE_SelectionGroup_InteriorHulls.prefab");
+            CreateObject(interiorHullGroup, SELocator.GetShipTransform());
             var exteriorHullGroup =
                 LoadPrefab("Assets/ShipEnhancements/Items/Decorator/Selectors/SE_SelectionGroup_ExteriorHulls.prefab");
             CreateObject(exteriorHullGroup, SELocator.GetShipTransform());

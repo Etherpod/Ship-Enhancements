@@ -74,10 +74,11 @@ public class DecoratorItem : OWItem
 			
 			return;
 		}
+		
+		var selector = hit.collider.GetComponentInParent<DecoratorSelection>();
 
 		// better collider setup so I don't have to get parent
-		if (hit.collider.transform.parent.TryGetComponent(out DecoratorSelection selector) &&
-			hit.distance <= selector.GetSelectDistance())
+		if (selector != null && hit.distance <= selector.GetSelectDistance())
 		{
 			/*if (selector != _currentSelection)
 			{
