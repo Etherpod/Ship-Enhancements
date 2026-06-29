@@ -22,6 +22,10 @@ public static class CustomMatManager
 		var baseDiffuse = baseMaterial.mainTexture;
 		var baseBump = baseMaterial.GetTexture(PropIdBumpMap);
 		var baseGloss = baseMaterial.GetTexture(PropIdMetallicGlossMap);
+		if (baseGloss == null)
+		{
+			baseGloss = new Texture2D(2048, 2048);
+		}
 		mat = new MatData(
 			baseMaterial,
 			new Material(baseMaterial),
@@ -43,8 +47,6 @@ public static class CustomMatManager
 		mat.Mat.mainTexture = mat.Tex.Diffuse;
 		mat.Mat.SetTexture(PropIdBumpMap, mat.Tex.BumpMap);
 		if (mat.Tex.HasGloss) mat.Mat.SetTexture(PropIdMetallicGlossMap, mat.Tex.GlossMap);
-		// tried setting a gloss texture here, but it never gets blit-ed by the shader
-		else mat.Mat.SetTexture(PropIdMetallicGlossMap, new Texture2D(2048, 2048));
 
 		LightmapManager.AddMaterial(mat.Mat);
 

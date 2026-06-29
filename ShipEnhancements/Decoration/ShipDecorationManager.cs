@@ -352,54 +352,39 @@ public static class ShipDecorationManager
         if (textureCondition)
         {
             blender.SourceTexture = sourceTexture;
-            // this should already be at one I think, but also it just isn't going metallic in-game like it used to?
-            // maybe it's tied to gloss strength?
             blender.MetallicStrength = 1f;
-            // tile is set from preset in Unity
             blender.DiffuseTileFactor = sourceTexture.DiffuseTileFactor;
             var baseGloss = material.GetFloat("_GlossMapScale");
             var glossFactor = sourceTexture.GlossStrength / baseGloss;
-            WriteDebugMessage($"{sourceTexture.GlossMap.name}: \nstr: {sourceTexture.GlossStrength}\nbase: {baseGloss}\nfactor: {glossFactor}");
             
-            // factor check is leftover from old code, but left in case I want to go back
             if (glossFactor > 1)
             {
-                //blender.GlossStrength = sourceTexture.GlossStrength;
-                //blender.GlossStrength = blender.BaseMaterial.GetFloat("_GlossMapScale");
-                
-                // same as the else statement
-                blender.GlossMultiplier = glossFactor;
+                blender.GlossStrength = sourceTexture.GlossStrength;
+                blender.GlossMultiplier = -1 / glossFactor;
             }
             else
             {
                 blender.GlossStrength = blender.BaseMaterial.GetFloat("_GlossMapScale");
-                ShipEnhancements.WriteDebugMessage($"gloss str set to {blender.GlossStrength}");
                 blender.GlossMultiplier = glossFactor;
-                ShipEnhancements.WriteDebugMessage($"gloss mult set to {blender.GlossMultiplier}");
             }
             
             var baseBump = material.GetFloat("_BumpScale");
             var bumpFactor = sourceTexture.BumpStrength / baseBump;
             if (bumpFactor > 1)
             {
-                //blender.BumpStrength = sourceTexture.BumpStrength;
-                //blender.GlossStrength = blender.BaseMaterial.GetFloat("_GlossMapScale");
-                
-                blender.BumpMultiplier = bumpFactor;
+                blender.BumpStrength = sourceTexture.BumpStrength;
+                blender.BumpMultiplier = -1 / bumpFactor;
             }
             else
             {
                 blender.BumpStrength = blender.BaseMaterial.GetFloat("_BumpScale");
-                ShipEnhancements.WriteDebugMessage($"bump str set to {blender.BumpStrength}");
                 blender.BumpMultiplier = bumpFactor;
-                ShipEnhancements.WriteDebugMessage($"bump mult set to {blender.BumpMultiplier}");
             }
         }
         else
         {
-            // reset to default because these get changed for the textures
             blender.SourceTexture = blender.BaseTexture;
-            blender.MetallicStrength = 0f;
+            blender.MetallicStrength = blender.BaseMaterial.GetFloat("_Metallic");;
             blender.GlossStrength = blender.BaseMaterial.GetFloat("_GlossMapScale");
             blender.BumpStrength = blender.BaseMaterial.GetFloat("_BumpScale");
             blender.GlossMultiplier = 1f;
