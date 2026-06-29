@@ -6,7 +6,7 @@ namespace ShipEnhancements.Decoration.Modules;
 public class HullTextureModule : ImagePreviewModule
 {
 	[SerializeField]
-	private string[] _texturePaths;
+	private HullTexturePreset[] _presets;
 	[SerializeField]
 	private int _blenderID;
 
@@ -14,9 +14,9 @@ public class HullTextureModule : ImagePreviewModule
 	{
 		List<HullTextureElementData> hullDatas = [];
 		
-		for (int i = 0; i < _texturePaths.Length; i++)
+		for (int i = 0; i < _presets.Length; i++)
 		{
-			hullDatas.Add(new HullTextureElementData(i, _texturePaths[i]));
+			hullDatas.Add(new HullTextureElementData(i, _presets[i]));
 		}
 
 		return hullDatas.ToArray();
@@ -24,22 +24,20 @@ public class HullTextureModule : ImagePreviewModule
 
 	protected override ImagePreviewElementData GenerateDefaultData()
 	{
-		return new HullTextureElementData(-1, "Default");
+		return new HullTextureElementData(-1, null);
 	}
 	
 	protected override void OnSelectOption(ImagePreviewElementData data)
 	{
 		if (data is not HullTextureElementData hullData) return;
 
-		if (hullData.texturePath == "Default")
+		if (hullData.texturePreset == null)
 		{
-			ShipDecorationManager.UpdateBlenderTexture(_blenderID, hullData.texturePath);
+			ShipDecorationManager.UpdateBlenderTexture(_blenderID, null);
 			return;
 		}
 		
-		ShipDecorationManager.UpdateBlenderTexture(_blenderID, 
-			"Assets/ShipEnhancements/Decoration/ShipTextures/WoodTextures/SE_Wood_" + 
-			hullData.texturePath);
+		ShipDecorationManager.UpdateBlenderTexture(_blenderID, hullData.texturePreset);
 	}
 
 	public override float GetSelectionFadeOverride() => 0.1f;
@@ -47,24 +45,28 @@ public class HullTextureModule : ImagePreviewModule
 
 public class HullTextureElementData : ImagePreviewElementData
 {
-	public string texturePath;
-	//public Texture2D smoothTexture;
-	//public Texture2D normalTexture;
+	public HullTexturePreset texturePreset;
 	
-	public HullTextureElementData(int index, string texPath) : 
-		base(index, Color.white, GetColorTexture(texPath))
+	public HullTextureElementData(int index, HullTexturePreset preset) : 
+		base(index, Color.white, GetDisplayTexture(preset))
 	{
-		texturePath = texPath;
-		//smoothTexture = ShipEnhancements.LoadAsset<Texture2D>(texPath + "_s.png");
-		//normalTexture = ShipEnhancements.LoadAsset<Texture2D>(texPath + "_n.png");
+		texturePreset = preset;
 	}
 
-	private static Texture2D GetColorTexture(string path)
+	private static Texture2D GetDisplayTexture(HullTexturePreset preset)
 	{
-		if (path == "Default") return null;
+		if (preset == null) return null;
 		
-		return ShipEnhancements.LoadAsset<Texture2D>(
-			"Assets/ShipEnhancements/Decoration/ShipTextures/WoodTextures/SE_Wood_" + 
-			path + "_d.png");
+		if (preset.hasHullTexture)
+		{
+			return preset.hullDiffuseLayers[0].texture;
+		}
+		
+		if (preset.hasWoodTexture)
+		{
+			return preset.woodDiffuseLayers[0].texture;
+		}
+
+		return null;
 	}
 }

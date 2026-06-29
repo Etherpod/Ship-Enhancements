@@ -281,11 +281,15 @@ public static class ShipDecorationManager
         // DumpMats("D:/misc/files/mats_04.json");
     }
 
-    public static void UpdateBlenderTexture(int blenderIndex, string texturePath)
+    // index is hardcoded for the four materials right now
+    // temporary solution
+    public static void UpdateBlenderTexture(int blenderIndex, HullTexturePreset preset)
     {
-        bool hasTex = texturePath != "Default";
+        bool hasTex = preset != null &&
+            ((blenderIndex < 2 && preset.hasHullTexture) || 
+                (blenderIndex >= 2 && preset.hasWoodTexture));
 
-        ShipTextureInfo texture = hasTex ? new ShipTextureInfo(texturePath, true) : null;
+        ShipTextureInfo texture = hasTex ? new ShipTextureInfo(preset, blenderIndex >= 2) : null;
         
         if (blenderIndex == 0)
         {
@@ -300,7 +304,7 @@ public static class ShipDecorationManager
             {
                 ConfigureBlender(
                     mat,
-                    texturePath != "Default",
+                    preset != null,
                     texture,
                     false,
                     null,
@@ -324,7 +328,7 @@ public static class ShipDecorationManager
             
             ConfigureBlender(
                 mat,
-                texturePath != "Default",
+                preset != null,
                 texture,
                 false,
                 null,
@@ -346,9 +350,61 @@ public static class ShipDecorationManager
     {
         var blender = _textureBlenders[material];
         if (textureCondition)
+        {
             blender.SourceTexture = sourceTexture;
+            // this should already be at one I think, but also it just isn't going metallic in-game like it used to?
+            // maybe it's tied to gloss strength?
+            blender.MetallicStrength = 1f;
+            // tile is set from preset in Unity
+            blender.DiffuseTileFactor = sourceTexture.DiffuseTileFactor;
+            var baseGloss = material.GetFloat("_GlossMapScale");
+            var glossFactor = sourceTexture.GlossStrength / baseGloss;
+            WriteDebugMessage($"{sourceTexture.GlossMap.name}: \nstr: {sourceTexture.GlossStrength}\nbase: {baseGloss}\nfactor: {glossFactor}");
+            
+            // factor check is leftover from old code, but left in case I want to go back
+            if (glossFactor > 1)
+            {
+                //blender.GlossStrength = sourceTexture.GlossStrength;
+                //blender.GlossStrength = blender.BaseMaterial.GetFloat("_GlossMapScale");
+                
+                // same as the else statement
+                blender.GlossMultiplier = glossFactor;
+            }
+            else
+            {
+                blender.GlossStrength = blender.BaseMaterial.GetFloat("_GlossMapScale");
+                ShipEnhancements.WriteDebugMessage($"gloss str set to {blender.GlossStrength}");
+                blender.GlossMultiplier = glossFactor;
+                ShipEnhancements.WriteDebugMessage($"gloss mult set to {blender.GlossMultiplier}");
+            }
+            
+            var baseBump = material.GetFloat("_BumpScale");
+            var bumpFactor = sourceTexture.BumpStrength / baseBump;
+            if (bumpFactor > 1)
+            {
+                //blender.BumpStrength = sourceTexture.BumpStrength;
+                //blender.GlossStrength = blender.BaseMaterial.GetFloat("_GlossMapScale");
+                
+                blender.BumpMultiplier = bumpFactor;
+            }
+            else
+            {
+                blender.BumpStrength = blender.BaseMaterial.GetFloat("_BumpScale");
+                ShipEnhancements.WriteDebugMessage($"bump str set to {blender.BumpStrength}");
+                blender.BumpMultiplier = bumpFactor;
+                ShipEnhancements.WriteDebugMessage($"bump mult set to {blender.BumpMultiplier}");
+            }
+        }
         else
+        {
+            // reset to default because these get changed for the textures
             blender.SourceTexture = blender.BaseTexture;
+            blender.MetallicStrength = 0f;
+            blender.GlossStrength = blender.BaseMaterial.GetFloat("_GlossMapScale");
+            blender.BumpStrength = blender.BaseMaterial.GetFloat("_BumpScale");
+            blender.GlossMultiplier = 1f;
+            blender.BumpMultiplier = 1f;
+        }
 
         if (blendCondition)
             blendController.AddTextureBlender(blender);

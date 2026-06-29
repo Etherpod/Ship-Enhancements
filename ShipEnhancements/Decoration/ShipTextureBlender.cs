@@ -29,7 +29,9 @@ public class ShipTextureBlender : IDisposable
     public Color OverlayColor { get; set; }
     public float BlendFactor { get; set; }
     public float ScanFactor { get; set; }
-    public float TileFactor { get; set; }
+    public float DiffuseTileFactor { get; set; }
+    public float GlossTileFactor { get; set; }
+    public float BumpTileFactor { get; set; }
 
     public float BumpStrength
     {
@@ -81,7 +83,7 @@ public class ShipTextureBlender : IDisposable
         OverlayColor = overlayColor ?? DefaultColor;
         BlendFactor = initialBlendFactor;
         ScanFactor = initialScanFactor;
-        TileFactor = initialTileFactor;
+        DiffuseTileFactor = initialTileFactor;
 
         CustomMatManager.InitializeMaterial(baseMaterial);
         var mat = this.GetCustomMaterial(baseMaterial);
@@ -121,7 +123,8 @@ public class ShipTextureBlender : IDisposable
         blendingMaterial.SetColor(OverlayColorId, OverlayColor);
         blendingMaterial.SetFloat(BlendFactorId, BlendFactor);
         blendingMaterial.SetFloat(ScanFactorId, ScanFactor);
-        blendingMaterial.SetFloat(TileFactorId, TileFactor);
+        // renamed from old code and too lazy to change name back
+        blendingMaterial.SetFloat(TileFactorId, DiffuseTileFactor);
         Graphics.Blit(BaseTexture.Diffuse, targetTex.Diffuse, blendingMaterial, 0);
 
         return true;
