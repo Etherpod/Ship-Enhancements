@@ -1,6 +1,7 @@
 ﻿using System;
 using ShipEnhancements.Utils;
 using UnityEngine;
+using UnityEngine.Experimental.Rendering;
 using IDisposable = Delaunay.Utils.IDisposable;
 
 namespace ShipEnhancements.Decoration;
@@ -142,7 +143,11 @@ public class ShipTextureBlender : IDisposable
         blendingMaterial.SetFloat(SourceMultiplierId, BumpMultiplier);
         Graphics.Blit(BaseTexture.BumpMap, targetTex.BumpMap, blendingMaterial, 1);
 
-        if (SourceTexture is not { HasGloss: true }) return;
+        if (SourceTexture is not { HasGloss: true })
+        {
+            blendingMaterial.SetTexture(SourceMapId, null);
+            return;
+        }
         blendingMaterial.SetTexture(SourceMapId, SourceTexture?.GlossMap);
         blendingMaterial.SetFloat(SourceMultiplierId, GlossMultiplier);
         Graphics.Blit(BaseTexture.GlossMap, targetTex.GlossMap, blendingMaterial, 2);

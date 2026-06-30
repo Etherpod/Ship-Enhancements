@@ -2,6 +2,7 @@
 using System.Linq;
 using ShipEnhancements.Decoration.Modules;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace ShipEnhancements.Decoration;
 
@@ -19,6 +20,8 @@ public class ImagePreviewWindow : DecoratorInterfaceWindow
 	private GameObject _previewTemplate;
 	[SerializeField]
 	private int _rowSize = 3;
+	[SerializeField]
+	private Text _previewLabelText;
 	[SerializeField]
 	private GameObject _colorPickerHint;
 	[SerializeField]
@@ -123,6 +126,7 @@ public class ImagePreviewWindow : DecoratorInterfaceWindow
 		{
 			_activeElement = element;
 			_firstSelectedElement = element;
+			_previewLabelText.text = element.GetData().displayName;
 		}
 	}
 
@@ -153,6 +157,7 @@ public class ImagePreviewWindow : DecoratorInterfaceWindow
 			}
 
 			Locator.GetMenuAudioController()._audioSource.PlayOneShot(AudioType.Menu_ResetDefaults);
+			_previewLabelText.text = _defaultData.displayName;
 			OnSelectOption?.Invoke(_defaultData);
 			OnSubmitOption?.Invoke(_defaultData);
 		}
@@ -163,6 +168,7 @@ public class ImagePreviewWindow : DecoratorInterfaceWindow
 		if (element is not ImagePreviewElement preview ||
 			!_previews.Contains(preview)) return;
 
+		_previewLabelText.text = preview.GetData().displayName;
 		OnSelectOption?.Invoke(preview.GetData());
 	}
 

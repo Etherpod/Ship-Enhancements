@@ -29,12 +29,14 @@ public class ImagePreviewElementData
 {
 	public int listIndex;
 	public Color imageColor;
+	public string displayName;
 	public Texture2D imageTexture;
 
-	public ImagePreviewElementData(int index, Color color, Texture2D texture = null)
+	public ImagePreviewElementData(int index, Color color, Texture2D texture = null, string name = "")
 	{
 		listIndex = index;
 		imageColor = color;
+		displayName = name;
 		imageTexture = texture;
 	}
 }

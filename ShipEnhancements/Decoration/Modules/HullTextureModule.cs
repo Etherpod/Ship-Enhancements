@@ -16,7 +16,13 @@ public class HullTextureModule : ImagePreviewModule
 		
 		for (int i = 0; i < _presets.Length; i++)
 		{
-			hullDatas.Add(new HullTextureElementData(i, _presets[i]));
+			if (_presets[i].dlcOnly && EntitlementsManager.IsDlcOwned() !=
+				EntitlementsManager.AsyncOwnershipStatus.Owned)
+			{
+				continue;
+			}
+			
+			hullDatas.Add(new HullTextureElementData(i, _presets[i], _blenderID >= 2, _presets[i].displayName));
 		}
 
 		return hullDatas.ToArray();
@@ -24,7 +30,7 @@ public class HullTextureModule : ImagePreviewModule
 
 	protected override ImagePreviewElementData GenerateDefaultData()
 	{
-		return new HullTextureElementData(-1, null);
+		return new HullTextureElementData(-1, null, false, "Default");
 	}
 	
 	protected override void OnSelectOption(ImagePreviewElementData data)
@@ -47,24 +53,24 @@ public class HullTextureElementData : ImagePreviewElementData
 {
 	public HullTexturePreset texturePreset;
 	
-	public HullTextureElementData(int index, HullTexturePreset preset) : 
-		base(index, Color.white, GetDisplayTexture(preset))
+	public HullTextureElementData(int index, HullTexturePreset preset, bool isWood, string name) : 
+		base(index, Color.white, GetDisplayTexture(preset, isWood), name)
 	{
 		texturePreset = preset;
 	}
 
-	private static Texture2D GetDisplayTexture(HullTexturePreset preset)
+	private static Texture2D GetDisplayTexture(HullTexturePreset preset, bool useWood)
 	{
 		if (preset == null) return null;
+		
+		if (useWood && preset.hasWoodTexture)
+		{
+			return preset.woodDiffuseLayers[0].texture;
+		}
 		
 		if (preset.hasHullTexture)
 		{
 			return preset.hullDiffuseLayers[0].texture;
-		}
-		
-		if (preset.hasWoodTexture)
-		{
-			return preset.woodDiffuseLayers[0].texture;
 		}
 
 		return null;

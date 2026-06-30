@@ -10,6 +10,7 @@ public record ShipTextureInfo
 	public Texture BumpMap { get; }
 	public Texture GlossMap { get; }
 	// store info from preset
+	public float MetallicStrength { get; }
 	public float GlossStrength { get; }
 	public float BumpStrength { get; }
 	public float DiffuseTileFactor { get; }
@@ -37,11 +38,13 @@ public record ShipTextureInfo
 	public ShipTextureInfo(HullTexturePreset preset, bool useWood)
 	{
 		assetRootPath = null;
+		
 		if (useWood && preset.hasWoodTexture)
 		{
 			Diffuse = preset.woodDiffuseLayers[0].texture;
 			BumpMap = preset.woodNormalLayers[0].texture;
 			GlossMap = preset.woodSmoothnessLayers[0].texture;
+			MetallicStrength = preset.woodMetallicStrength;
 			GlossStrength = preset.woodSmoothnessStrength;
 			BumpStrength = preset.woodNormalStrength;
 			DiffuseTileFactor = preset.woodTextureScale.x;
@@ -51,6 +54,7 @@ public record ShipTextureInfo
 			Diffuse = preset.hullDiffuseLayers[0].texture;
 			BumpMap = preset.hullNormalLayers[0].texture;
 			GlossMap = preset.hullSmoothnessLayers[0].texture;
+			MetallicStrength = preset.hullMetallicStrength;
 			GlossStrength = preset.hullSmoothnessStrength;
 			BumpStrength = preset.hullNormalStrength;
 			DiffuseTileFactor = preset.hullTextureScale.x;

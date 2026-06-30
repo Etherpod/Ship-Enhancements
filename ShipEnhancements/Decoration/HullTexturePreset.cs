@@ -12,6 +12,7 @@ public class HullTexturePreset : ScriptableObject
 	public List<TextureLayerElement> hullDiffuseLayers = [];
 	public List<TextureLayerElement> hullSmoothnessLayers = [];
 	public List<TextureLayerElement> hullNormalLayers = [];
+	public float hullMetallicStrength = 1f;
 	public float hullSmoothnessStrength = 1f;
 	public float hullNormalStrength = 1f;
 	public bool hasWoodTexture = true;
@@ -19,6 +20,7 @@ public class HullTexturePreset : ScriptableObject
 	public List<TextureLayerElement> woodDiffuseLayers = [];
 	public List<TextureLayerElement> woodSmoothnessLayers = [];
 	public List<TextureLayerElement> woodNormalLayers = [];
+	public float woodMetallicStrength = 1f;
 	public float woodSmoothnessStrength = 1f;
 	public float woodNormalStrength = 1f;
 }

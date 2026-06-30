@@ -352,7 +352,7 @@ public static class ShipDecorationManager
         if (textureCondition)
         {
             blender.SourceTexture = sourceTexture;
-            blender.MetallicStrength = 1f;
+            blender.MetallicStrength = sourceTexture.MetallicStrength;
             blender.DiffuseTileFactor = sourceTexture.DiffuseTileFactor;
             var baseGloss = material.GetFloat("_GlossMapScale");
             var glossFactor = sourceTexture.GlossStrength / baseGloss;
