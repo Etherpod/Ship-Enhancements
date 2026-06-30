@@ -150,8 +150,9 @@ public class DecoratorItem : OWItem
 
 	private void UpdateSelection()
 	{
-		if (OWInput.GetInputMode() != InputMode.Character &&
-			OWInput.GetInputMode() != InputMode.Menu)
+		if ((OWInput.GetInputMode() != InputMode.Character &&
+			OWInput.GetInputMode() != InputMode.Menu) ||
+			_selectionManager.GetDistanceToSelector(transform.position) > _maxRaycastDistance)
 		{
 			DisableSelection();
             return;

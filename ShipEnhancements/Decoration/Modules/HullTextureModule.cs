@@ -46,7 +46,7 @@ public class HullTextureModule : ImagePreviewModule
 		ShipDecorationManager.UpdateBlenderTexture(_blenderID, hullData.texturePreset);
 	}
 
-	public override float GetSelectionFadeOverride() => 0.1f;
+	public override float GetSelectionFadeOverride() => 0f;
 }
 
 public class HullTextureElementData : ImagePreviewElementData

@@ -49,7 +49,7 @@ public class CockpitGlassSelectorModule : SelectorModule
 		ShipDecorationManager.SetGlassMaterial(glassData._material);
 	}
 	
-	public override float GetSelectionFadeOverride() => 0.1f;
+	public override float GetSelectionFadeOverride() => 0f;
 }
 
 public class CockpitGlassSelectorOptionData : OptionsListElementData

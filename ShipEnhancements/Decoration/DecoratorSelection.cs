@@ -10,12 +10,15 @@ public class DecoratorSelection : MonoBehaviour
 	[SerializeField]
 	private OWRenderer _renderer;
 	[SerializeField]
+	private bool _showGridDetail = true;
+	[SerializeField]
 	private float _selectDistance = 10f;
 	[SerializeField]
 	private bool _interiorOnly;
 	[SerializeField]
 	private bool _exteriorOnly;
 
+	private readonly int _detailPropertyID = Shader.PropertyToID("_ShowDetail");
 	private readonly int _highlightPropertyID = Shader.PropertyToID("_HighlightAmount");
 	private DecoratorSelectionGroup _group;
 	private DecoratorSelectionData _data;
@@ -57,6 +60,7 @@ public class DecoratorSelection : MonoBehaviour
 		}
 		
 		UpdateColliderActivation();
+		_renderer.SetMaterialProperty(_detailPropertyID, _showGridDetail ? 1f : 0f);
 		_renderer.SetFade(0);
 		enabled = false;
 	}

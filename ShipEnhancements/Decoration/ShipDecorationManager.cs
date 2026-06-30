@@ -22,11 +22,15 @@ public static class ShipDecorationManager
     private static Material _customGlassMat;
     private static Material _defaultSEInteriorMat1;
     private static Material _defaultSEInteriorMat2;
+    private static HullTextureScanEffect _scanEffect;
+    private static (int index, HullTexturePreset preset) _cachedPreset;
     
 	public static void Initialize()
 	{
         textureBlendMat = LoadMaterial("Assets/ShipEnhancements/Decoration/ShipTextures/ShipTextureBlend.mat");
-        Shader.SetGlobalFloat(Shader.PropertyToID("_GlitchScale"), 1f);
+        Shader.SetGlobalFloat(Shader.PropertyToID("_GlitchScale"), 20f);
+        Shader.SetGlobalFloat(Shader.PropertyToID("_GlitchProb"), 0.75f);
+        Shader.SetGlobalFloat(Shader.PropertyToID("_ScanBandSize"), 0.05f);
         
 		if (_defaultInteriorHullMat == null)
         {
@@ -277,14 +281,70 @@ public static class ShipDecorationManager
             // $"[Q6J] try to full update {blender.BlendedMaterial.name}".Log();
             blender.UpdateFullTexture();
         }
-        
+
         // DumpMats("D:/misc/files/mats_04.json");
+        
+        _scanEffect = SELocator.GetShipBody().gameObject.GetAddComponent<HullTextureScanEffect>();
     }
 
     // index is hardcoded for the four materials right now
     // temporary solution
     public static void UpdateBlenderTexture(int blenderIndex, HullTexturePreset preset)
     {
+        if (_scanEffect == null)
+        {
+            _cachedPreset = (blenderIndex, preset);
+            ApplyCachedTexturePreset();
+            return;
+        }
+        
+        if (_scanEffect.enabled) return;
+
+        ShipTextureBlender[] blenders;
+        
+        if (blenderIndex == 0)
+        {
+            Material[] interiorMats =
+            [
+                _defaultInteriorHullMat,
+                _defaultSEInteriorMat1,
+                _defaultSEInteriorMat2
+            ];
+
+            blenders = interiorMats
+                .Select(m => _textureBlenders[m])
+                .ToArray();
+        }
+        else
+        {
+            Material mat;
+            if (blenderIndex == 1) mat = _defaultExteriorHullMat;
+            else if (blenderIndex == 2) mat = _defaultInteriorWoodMat;
+            else if (blenderIndex == 3) mat = _defaultExteriorWoodMat;
+            else
+            {
+                WriteDebugMessage($"{blenderIndex} is invalid blender index!", error: true);
+                return;
+            }
+
+            blenders = [_textureBlenders[mat]];
+        }
+
+        _cachedPreset = (blenderIndex, preset);
+        _scanEffect.OnScanComplete += ApplyCachedTexturePreset;
+        _scanEffect.PlayScanEffect(blenders, 0.5f, 0.25f);
+    }
+
+    private static void ApplyCachedTexturePreset()
+    {
+        if (_scanEffect != null)
+        {
+            _scanEffect.OnScanComplete -= ApplyCachedTexturePreset;
+        }
+        
+        var blenderIndex = _cachedPreset.index;
+        var preset = _cachedPreset.preset;
+        
         bool hasTex = preset != null &&
             ((blenderIndex < 2 && preset.hasHullTexture) || 
                 (blenderIndex >= 2 && preset.hasWoodTexture));

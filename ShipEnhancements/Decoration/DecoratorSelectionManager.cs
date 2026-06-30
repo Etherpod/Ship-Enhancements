@@ -168,6 +168,16 @@ public class DecoratorSelectionManager : MonoBehaviour
 
 	public bool IsInMultiSelect() => _inMultiSelect;
 
+	public float GetDistanceToSelector(Vector3 worldPos)
+	{
+		if (_currentSelections.Count == 0)
+		{
+			return -1;
+		}
+
+		return (_currentSelections[0].transform.position - worldPos).magnitude;
+	}
+
 	public DecoratorSelectionData GetCurrentData() => _currentData;
 
 	public DecoratorSelection[] GetActiveSelections()
